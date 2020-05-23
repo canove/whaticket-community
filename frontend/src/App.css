@@ -1,0 +1,11 @@
+button:active {
+	opacity: 0.5;
+}
+
+button:focus {
+	outline: 0;
+}
+
+img:active {
+	opacity: 0.5;
+}
