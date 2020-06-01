@@ -138,6 +138,8 @@ const ChatBox = ({ currentPeerContact }) => {
 		setShowEmoji(false);
 	};
 
+	console.log(listMessages);
+
 	const renderMessages = () => {
 		if (listMessages.length > 0) {
 			let viewListMessages = [];
@@ -227,6 +229,7 @@ const ChatBox = ({ currentPeerContact }) => {
 						viewListMessages.push(
 							<div className="viewItemRight" key={message.id}>
 								<span className="textContentItem ">{message.messageBody}</span>
+								<span className="messageAck">{message.ack}</span>
 							</div>
 						);
 					}

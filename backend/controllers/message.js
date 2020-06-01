@@ -1,18 +1,13 @@
 const fs = require("fs");
 const Message = require("../models/Message");
 const Contact = require("../models/Contact");
-const io = require("../socket");
+const { getIO } = require("../socket");
+const { getWbot } = require("./wbot");
 
-const wbot = require("./wbot");
 const { MessageMedia } = require("whatsapp-web.js");
 
-exports.getContactMessages = async (req, res, next) => {
-	const { contactId } = req.params;
-
+const setMessagesAsRead = async contactId => {
 	try {
-		const contact = await Contact.findByPk(contactId);
-		const contactMessages = await contact.getMessages();
-
 		const result = await Message.update(
 			{ read: true },
 			{
@@ -23,6 +18,35 @@ exports.getContactMessages = async (req, res, next) => {
 			}
 		);
 
+		if (!result) {
+			const error = new Error(
+				"Erro ao definir as mensagens como lidas no banco de dados"
+			);
+			error.satusCode = 501;
+			throw error;
+		}
+	} catch (err) {
+		next(err);
+	}
+};
+
+exports.getContactMessages = async (req, res, next) => {
+	const wbot = getWbot();
+	const io = getIO();
+
+	const { contactId } = req.params;
+
+	try {
+		const contact = await Contact.findByPk(contactId);
+		if (!contact) {
+			const error = new Error("Erro ao localizar o contato no banco de dados");
+			error.satusCode = 501;
+			throw error;
+		}
+
+		setMessagesAsRead(contactId);
+		const contactMessages = await contact.getMessages();
+
 		return res.json(contactMessages);
 	} catch (err) {
 		next(err);
@@ -30,9 +54,13 @@ exports.getContactMessages = async (req, res, next) => {
 };
 
 exports.postCreateContactMessage = async (req, res, next) => {
+	const wbot = getWbot();
+	const io = getIO();
+
 	const { contactId } = req.params;
 	const message = req.body;
 	const media = req.file;
+	let sentMessage;
 
 	try {
 		const contact = await Contact.findByPk(contactId);
@@ -45,10 +73,15 @@ exports.postCreateContactMessage = async (req, res, next) => {
 				message.mediaType = "other";
 			}
 
-			wbot.getWbot().sendMessage(`${contact.number}@c.us`, newMedia);
+			sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, newMedia);
 		} else {
-			wbot.getWbot().sendMessage(`${contact.number}@c.us`, message.messageBody);
+			sentMessage = await wbot.sendMessage(
+				`${contact.number}@c.us`,
+				message.messageBody
+			);
 		}
+
+		message.id = sentMessage.id.id;
 
 		const newMessage = await contact.createMessage(message);
 		if (!newMessage) {
@@ -57,7 +90,7 @@ exports.postCreateContactMessage = async (req, res, next) => {
 			throw error;
 		}
 
-		io.getIO().to(contactId).emit("appMessage", {
+		io.to(contactId).emit("appMessage", {
 			action: "create",
 			message: newMessage,
 		});

@@ -42,14 +42,15 @@ const Chat = ({ showToast }) => {
 		socket.emit("joinNotification");
 
 		socket.on("contact", data => {
-			console.log(data);
+			console.log("mensagem de um novo contato");
 			if (data.action === "create") {
 				addContact(data.contact);
+				setNotification(prevState => !prevState);
 			}
 		});
 
 		socket.on("appMessage", data => {
-			console.log("recebendo msg");
+			console.log("mensagem de contato existente");
 			setNotification(prevState => !prevState);
 			// handleUnreadMessages(data.message.contactId);
 		});
@@ -57,7 +58,7 @@ const Chat = ({ showToast }) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [contacts]);
+	}, []);
 
 	// const handleUnreadMessages = contactId => {
 	// 	console.log("Atualizando mensagens n lidas");

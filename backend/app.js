@@ -52,6 +52,7 @@ sequelize
 			});
 
 			socket.on("joinNotification", () => {
+				console.log("chat entro no canal de notificações");
 				socket.join("notification");
 			});
 

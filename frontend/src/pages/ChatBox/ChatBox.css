@@ -332,6 +332,10 @@ input::placeholder {
 	overflow-wrap: break-word;
 }
 
+.messageAck {
+	font-size: 10px;
+}
+
 .viewListContentChat div:last-child {
 	margin-bottom: 10px;
 }
