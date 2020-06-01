@@ -1,6 +1,9 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const sequelize = require("./util/database");
+const multer = require("multer");
+
 const wBot = require("./controllers/wbot");
 const Contact = require("./models/Contact");
 const wbotMessageListener = require("./controllers/wbotMessageListener");
@@ -11,8 +14,19 @@ const AuthRoutes = require("./routes/auth");
 
 const app = express();
 
+const fileStorage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, "public");
+	},
+	filename: (req, file, cb) => {
+		cb(null, new Date().getTime() + "-" + file.originalname);
+	},
+});
+
 app.use(cors());
 app.use(express.json());
+app.use(multer({ storage: fileStorage }).single("media"));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use(messageRoutes);
 app.use(ContactRoutes);
@@ -32,7 +46,18 @@ sequelize
 		const server = app.listen(8080);
 		const io = require("./socket").init(server);
 		io.on("connection", socket => {
-			console.log("Cliente Connected");
+			console.log("Client Connected");
+			socket.on("joinChatBox", contactId => {
+				socket.join(contactId);
+			});
+
+			socket.on("joinNotification", () => {
+				socket.join("notification");
+			});
+
+			socket.on("disconnect", () => {
+				console.log("Client disconnected");
+			});
 		});
 
 		wBot.init();

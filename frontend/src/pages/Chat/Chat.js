@@ -10,6 +10,7 @@ import LogedinNavbar from "../../components/Navbar/LogedinNavbar";
 import DefaultNavbar from "../../components/Navbar/DefaultNavbar";
 
 import ChatBox from "../ChatBox/ChatBox";
+// let socket;
 
 const Chat = ({ showToast }) => {
 	const token = localStorage.getItem("token");
@@ -18,17 +19,27 @@ const Chat = ({ showToast }) => {
 	const [currentPeerContact, setCurrentPeerContact] = useState(null);
 	const [contacts, setContacts] = useState([]);
 	const [displayedContacts, setDisplayedContacts] = useState([]);
+	const [notification, setNotification] = useState(true);
 
 	useEffect(() => {
 		const fetchContacts = async () => {
-			const res = await api.get("/contacts", {
-				headers: { Authorization: "Bearer " + token },
-			});
-			setContacts(res.data);
-			setDisplayedContacts(res.data);
+			try {
+				const res = await api.get("/contacts", {
+					headers: { Authorization: "Bearer " + token },
+				});
+				setContacts(res.data);
+				setDisplayedContacts(res.data);
+			} catch (err) {
+				alert(err.response.data.message);
+			}
 		};
 		fetchContacts();
+	}, [currentPeerContact, token, notification]);
+
+	useEffect(() => {
 		const socket = openSocket("http://localhost:8080");
+
+		socket.emit("joinNotification");
 
 		socket.on("contact", data => {
 			console.log(data);
@@ -37,14 +48,31 @@ const Chat = ({ showToast }) => {
 			}
 		});
 
+		socket.on("appMessage", data => {
+			console.log("recebendo msg");
+			setNotification(prevState => !prevState);
+			// handleUnreadMessages(data.message.contactId);
+		});
+
 		return () => {
 			socket.disconnect();
 		};
-	}, [currentPeerContact, token]);
+	}, [contacts]);
+
+	// const handleUnreadMessages = contactId => {
+	// 	console.log("Atualizando mensagens n lidas");
+	// 	console.log(contacts);
+	// 	let aux = [...contacts];
+	// 	let contactIndex = aux.findIndex(contact => contact.id === contactId);
+	// 	aux[contactIndex].unreadMessages++;
+
+	// 	aux.unshift(aux.splice(contactIndex, 1)[0]);
+
+	// 	setDisplayedContacts(aux);
+	// };
 
 	const addContact = contact => {
 		setContacts(prevState => [...prevState, contact]);
-		console.log("adicionando contato", contact);
 		setDisplayedContacts(prevState => [...prevState, contact]);
 	};
 
@@ -109,16 +137,20 @@ const Chat = ({ showToast }) => {
 											<img
 												className="viewAvatarItem"
 												alt=""
-												src={profileDefaultPic}
+												src={
+													contact.imageURL
+														? contact.imageURL
+														: profileDefaultPic
+												}
 											/>
 											<div className="viewWrapContentItem">
 												<span className="textItem">{contact.name}</span>
 											</div>
 
-											{contact.messages && contact.messages.length > 0 && (
+											{contact.unreadMessages > 0 && (
 												<div className="notificationpragraph">
 													<p className="newmessages">
-														{contact.messages.length}
+														{contact.unreadMessages}
 													</p>
 												</div>
 											)}

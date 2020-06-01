@@ -49,7 +49,7 @@ exports.login = async (req, res, next) => {
 		const token = jwt.sign(
 			{ email: loadedUser.email, userId: loadedUser.id },
 			"mysecret",
-			{ expiresIn: "1h" }
+			{ expiresIn: "24h" }
 		);
 		return res
 			.status(200)

@@ -5,11 +5,6 @@ const MessangeController = require("../controllers/message");
 
 const routes = express.Router();
 
-routes.post(
-	"/messages/setread",
-	isAuth,
-	MessangeController.postUpdateMessageStatus
-);
 routes.get(
 	"/messages/:contactId",
 	isAuth,

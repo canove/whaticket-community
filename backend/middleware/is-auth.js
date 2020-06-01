@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
 		const token = req.get("Authorization").split(" ")[1];
 		decodedToken = jwt.verify(token, "mysecret");
 	} catch (err) {
-		err.statusCode = 500;
+		err.statusCode = 401;
 		next(err);
 	}
 
