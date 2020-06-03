@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 // import { Card } from "react-bootstrap"; alterei pra DIV, remover caso não dê problemas
 import { FiPaperclip, FiSend, FiX, FiSmile } from "react-icons/fi";
 import { RiSendPlane2Line } from "react-icons/ri";
@@ -18,6 +18,7 @@ import ScrollToBottom from "react-scroll-to-bottom";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./ChatBox.css";
+import useMessageSerach from "../../components/MessageSearch/useMessageSerach";
 
 // const executeScroll = myRef =>
 // 	myRef.current.scrollIntoView({
@@ -28,47 +29,49 @@ import "./ChatBox.css";
 const ChatBox = ({ currentPeerContact }) => {
 	const SERVER_URL = "http://localhost:8080/";
 	const contactId = currentPeerContact.id;
-	const unreadMessages = currentPeerContact.messages;
+
 	const userId = localStorage.getItem("userId");
 	const username = localStorage.getItem("username");
 	const token = localStorage.getItem("token");
-	const mediaInitialState = { preview: "", raw: "", name: "" };
-	// const [isLoading, setIsLoading] = useState(true);
 
-	const [listMessages, setListMessages] = useState([]);
+	const mediaInitialState = { preview: "", raw: "", name: "" };
+
 	const [inputMessage, setInputMessage] = useState("");
 	const [media, setMedia] = useState(mediaInitialState);
 	const [showEmoji, setShowEmoji] = useState(false);
+
+	const [query, setQuery] = useState("");
+	const [pageNumber, setPageNumber] = useState(1);
+
+	const {
+		listMessages,
+		setListMessages,
+		hasMore,
+		loading,
+		error,
+	} = useMessageSerach(query, pageNumber, token, contactId);
+
+	const scrollPosition = useRef();
+	const observer = useRef();
+	const firstMessageRef = useCallback(
+		node => {
+			if (observer.current) observer.current.disconnect();
+			observer.current = new IntersectionObserver(entries => {
+				if (entries[0].isIntersecting && hasMore) {
+					console.log("Visible");
+					setPageNumber(prevPageNumber => prevPageNumber + 1);
+				}
+			});
+			if (node) observer.current.observe(node);
+		},
+		[loading, hasMore]
+	);
 
 	// let lastMessageRef = useRef();
 
 	// useEffect(() => {
 	// 	executeScroll(lastMessageRef);
-	// }, [isLoading]);
-
-	useEffect(() => {
-		const fetchMessages = async () => {
-			// setIsLoading(true);
-			try {
-				const res = await api.get("/messages/" + contactId, {
-					headers: { Authorization: "Bearer " + token },
-					params: { page: 3 },
-				});
-				setListMessages(res.data);
-				// setIsLoading(false);
-			} catch (err) {
-				alert(err);
-			}
-		};
-
-		fetchMessages();
-
-		return () => {
-			setInputMessage("");
-			setShowEmoji(false);
-			setMedia({});
-		};
-	}, [contactId, unreadMessages, token]);
+	// }, [loading]);
 
 	useEffect(() => {
 		const socket = openSocket(SERVER_URL);
@@ -87,13 +90,17 @@ const ChatBox = ({ currentPeerContact }) => {
 
 		return () => {
 			socket.disconnect();
+			setInputMessage("");
+			setQuery("");
+			setShowEmoji(false);
+			setPageNumber(1);
+			setMedia({});
 		};
 	}, [contactId]);
 
 	const updateMessageAck = message => {
 		let id = message.id;
 		setListMessages(prevState => {
-			console.log("mudando o ack da mensagem");
 			let aux = [...prevState];
 			let messageIndex = aux.findIndex(message => message.id === id);
 			aux[messageIndex].ack = message.ack;
@@ -172,7 +179,10 @@ const ChatBox = ({ currentPeerContact }) => {
 		setShowEmoji(false);
 	};
 
-	console.log(listMessages);
+	const handleSearch = e => {
+		setQuery(e.target.value);
+		setPageNumber(1);
+	};
 
 	const renderMsgAck = message => {
 		//todo remove timestamp logic from main return and adopt moment to timestamps
@@ -353,6 +363,24 @@ const ChatBox = ({ currentPeerContact }) => {
 								</div>
 							</div>
 						);
+					} else if (index === 3) {
+						viewListMessages.push(
+							<div
+								ref={firstMessageRef}
+								className="viewItemRight"
+								key={message.id}
+							>
+								<div className="textContentItem">
+									{message.messageBody}
+									<span className="timestamp">
+										{moment(message.createdAt)
+											.tz("America/Sao_Paulo")
+											.format("HH:mm")}{" "}
+										{renderMsgAck(message)}
+									</span>
+								</div>
+							</div>
+						);
 					} else {
 						viewListMessages.push(
 							<div className="viewItemRight" key={message.id}>
@@ -394,13 +422,17 @@ const ChatBox = ({ currentPeerContact }) => {
 				<div className="aboutme">
 					<span>Status do contato</span>
 				</div>
-			</div>
-			<ScrollToBottom className="viewListContentChat">
-				<div className="viewListContentChat">
-					{renderMessages()}
-					{/* <div ref={lastMessageRef}> </div> */}
+				<div>
+					<input type="serch" value={query} onChange={handleSearch} />
 				</div>
-			</ScrollToBottom>
+			</div>
+			{/* <ScrollToBottom className="viewListContentChat"> */}
+			<div className="viewListContentChat">
+				{renderMessages()}
+
+				{/* <div ref={lastMessageRef}>Last Message</div> */}
+			</div>
+			{/* </ScrollToBottom> */}
 			{media.preview ? (
 				<div className="viewMediaBottom">
 					<FiX

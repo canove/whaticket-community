@@ -3,6 +3,7 @@ const Message = require("../models/Message");
 const Contact = require("../models/Contact");
 const { getIO } = require("../socket");
 const { getWbot } = require("./wbot");
+const sequelize = require("sequelize");
 
 const { MessageMedia } = require("whatsapp-web.js");
 
@@ -35,10 +36,20 @@ exports.getContactMessages = async (req, res, next) => {
 	const io = getIO();
 
 	const { contactId } = req.params;
-	const { search, page = 1 } = req.query;
+	const { searchParam, pageNumber = 1 } = req.query;
 
-	let limit = 5;
-	let offset = limit * (page - 1);
+	const lowerSerachParam = searchParam.toLowerCase();
+
+	const whereCondition = {
+		messageBody: sequelize.where(
+			sequelize.fn("LOWER", sequelize.col("messageBody")),
+			"LIKE",
+			"%" + lowerSerachParam + "%"
+		),
+	};
+
+	let limit = 10;
+	let offset = limit * (pageNumber - 1);
 
 	try {
 		const contact = await Contact.findByPk(contactId);
@@ -50,13 +61,17 @@ exports.getContactMessages = async (req, res, next) => {
 
 		setMessagesAsRead(contactId);
 
+		const messagesFound = await contact.countMessages({
+			where: whereCondition,
+		});
 		const contactMessages = await contact.getMessages({
+			where: whereCondition,
 			limit,
 			offset,
 			order: [["createdAt", "DESC"]],
 		});
 
-		return res.json(contactMessages.reverse());
+		return res.json({ messages: contactMessages.reverse(), messagesFound });
 	} catch (err) {
 		next(err);
 	}
