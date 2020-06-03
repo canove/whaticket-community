@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Chat.css";
+import { useHistory } from "react-router-dom";
 import api from "../../util/api";
 import profilePic from "../../Images/canove.png";
 import profileDefaultPic from "../../Images/profile_default.png";
@@ -10,11 +10,14 @@ import LogedinNavbar from "../../components/Navbar/LogedinNavbar";
 import DefaultNavbar from "../../components/Navbar/DefaultNavbar";
 
 import ChatBox from "../ChatBox/ChatBox";
+import "./Chat.css";
 // let socket;
 
 const Chat = ({ showToast }) => {
 	const token = localStorage.getItem("token");
 	const username = localStorage.getItem("username");
+
+	const history = useHistory();
 
 	const [currentPeerContact, setCurrentPeerContact] = useState(null);
 	const [contacts, setContacts] = useState([]);
@@ -30,11 +33,18 @@ const Chat = ({ showToast }) => {
 				setContacts(res.data);
 				setDisplayedContacts(res.data);
 			} catch (err) {
-				alert(err.response.data.message);
+				if (err.response.data.message === "invalidToken") {
+					localStorage.removeItem("token");
+					localStorage.removeItem("username");
+					localStorage.removeItem("userId");
+					history.push("/login");
+					alert("Sessão expirada, por favor, faça login novamente.");
+				}
+				console.log(err);
 			}
 		};
 		fetchContacts();
-	}, [currentPeerContact, token, notification]);
+	}, [currentPeerContact, token, notification, history]);
 
 	useEffect(() => {
 		const socket = openSocket("http://localhost:8080");
@@ -42,7 +52,6 @@ const Chat = ({ showToast }) => {
 		socket.emit("joinNotification");
 
 		socket.on("contact", data => {
-			console.log("mensagem de um novo contato");
 			if (data.action === "create") {
 				addContact(data.contact);
 				setNotification(prevState => !prevState);
@@ -50,7 +59,6 @@ const Chat = ({ showToast }) => {
 		});
 
 		socket.on("appMessage", data => {
-			console.log("mensagem de contato existente");
 			setNotification(prevState => !prevState);
 			// handleUnreadMessages(data.message.contactId);
 		});

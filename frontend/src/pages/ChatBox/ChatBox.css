@@ -171,40 +171,43 @@ input::placeholder {
 /* View item message */
 
 .viewItemRight {
+	margin-right: 20px;
+	margin-top: 5px;
 	min-width: 100px;
 	max-width: 600px;
 	height: auto;
-
-	margin-right: 20px;
-	margin-top: 5px;
-	background-color: #dcf8c6;
+	display: block;
+	position: relative;
 	align-self: flex-end;
+	text-align: left;
+	background-color: #dcf8c6;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 0px;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	color: #203152;
 	box-shadow: 0 5px 5px #808888;
+	padding-left: 10px;
+	padding-right: 40px;
+	padding-top: 5px;
+	padding-bottom: 0px;
+	color: #203152;
 }
 
 .viewItemRight2 {
-	width: 300px;
-	padding: 4px;
+	width: 315px;
+	padding: 8px;
 	height: auto;
 	background-color: #dcf8c6;
 	align-self: flex-end;
 	margin-right: 20px;
 	margin-top: 10px;
+	display: block;
+	position: relative;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 0px;
 	color: #203152;
-	/* text-align: left; */
 	box-shadow: 0 5px 5px #808888;
 }
 
@@ -214,6 +217,8 @@ input::placeholder {
 	align-self: flex-end;
 	margin-right: 20px;
 	margin-top: 10px;
+	display: block;
+	position: relative;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;
 	border-bottom-left-radius: 8px;
@@ -247,33 +252,37 @@ input::placeholder {
 }
 
 .viewItemLeft {
+	margin-left: 20px;
+	margin-top: 5px;
 	min-width: 100px;
 	max-width: 600px;
 	height: auto;
+	display: block;
+	position: relative;
 
-	margin-left: 20px;
-	margin-top: 5px;
 	background-color: #ffffff;
 	align-self: flex-start;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;
 	border-bottom-left-radius: 0px;
 	border-bottom-right-radius: 8px;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-top: 10px;
-	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 40px;
+	padding-top: 5px;
+	padding-bottom: 0px;
 	color: #303030;
 	box-shadow: 0 5px 5px #808888;
 }
 
 .viewItemLeft2 {
-	width: 300px;
-	padding: 4px;
+	width: 315px;
+	padding: 8px;
 	height: auto;
+	background-color: #ffffff;
 	margin-left: 10px;
 	margin-top: 10px;
-	background-color: #ffffff;
+	display: block;
+	position: relative;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;
 	border-bottom-left-radius: 0px;
@@ -287,6 +296,8 @@ input::placeholder {
 	margin-top: 10px;
 	width: 300px;
 	height: auto;
+	display: block;
+	position: relative;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;
 	border-bottom-left-radius: 0px;
@@ -330,10 +341,16 @@ input::placeholder {
 .textContentItem {
 	font-size: 16px;
 	overflow-wrap: break-word;
+	padding: 0px 50px 0px 0px;
 }
 
-.messageAck {
-	font-size: 10px;
+.timestamp {
+	font-size: 11px;
+	position: absolute;
+	bottom: 5px;
+	right: 10px;
+	text-transform: uppercase;
+	color: #999;
 }
 
 .viewListContentChat div:last-child {
@@ -354,7 +371,7 @@ input::placeholder {
 
 .imgItemLeft {
 	object-fit: cover;
-	width: 300px;
+	width: 290px;
 	height: 300px;
 	border-top-left-radius: 8px;
 	border-top-right-radius: 8px;

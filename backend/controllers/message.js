@@ -35,6 +35,10 @@ exports.getContactMessages = async (req, res, next) => {
 	const io = getIO();
 
 	const { contactId } = req.params;
+	const { search, page = 1 } = req.query;
+
+	let limit = 5;
+	let offset = limit * (page - 1);
 
 	try {
 		const contact = await Contact.findByPk(contactId);
@@ -45,9 +49,14 @@ exports.getContactMessages = async (req, res, next) => {
 		}
 
 		setMessagesAsRead(contactId);
-		const contactMessages = await contact.getMessages();
 
-		return res.json(contactMessages);
+		const contactMessages = await contact.getMessages({
+			limit,
+			offset,
+			order: [["createdAt", "DESC"]],
+		});
+
+		return res.json(contactMessages.reverse());
 	} catch (err) {
 		next(err);
 	}

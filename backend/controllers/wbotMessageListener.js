@@ -84,23 +84,27 @@ const wbotMessageListener = () => {
 		}
 	});
 
-	wbot.on("message_ack", (msg, ack) => {
-		// console.log("alteração do ack da msg", msg);
+	wbot.on("message_ack", async (msg, ack) => {
 		try {
-			const result = Message.update({ ack: ack }, { where: { id: msg.id.id } });
-
-			if (!result) {
+			const messageToUpdate = await Message.findOne({
+				where: { id: msg.id.id },
+			});
+			if (!messageToUpdate) {
 				const error = new Error(
-					"Erro ao definir as mensagens como lidas no banco de dados"
+					"Erro ao alterar o ack da mensagem no banco de dados"
 				);
 				error.satusCode = 501;
 				throw error;
 			}
+			await messageToUpdate.update({ ack: ack });
+
+			io.to(messageToUpdate.contactId).emit("appMessage", {
+				action: "update",
+				message: messageToUpdate,
+			});
 		} catch (err) {
 			console.log(err);
 		}
-
-		console.log("ack da msg", ack);
 	});
 };
 

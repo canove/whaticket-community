@@ -6,6 +6,7 @@ const sequelize = new Sequelize("econo_whatsbot", "root", "nodecomplete", {
 		collate: "utf8mb4_bin",
 	},
 	dialect: "mysql",
+	timezone: "-03:00",
 	host: "localhost",
 	logging: false,
 });
