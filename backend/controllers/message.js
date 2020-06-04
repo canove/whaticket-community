@@ -48,7 +48,7 @@ exports.getContactMessages = async (req, res, next) => {
 		),
 	};
 
-	let limit = 10;
+	let limit = 20;
 	let offset = limit * (pageNumber - 1);
 
 	try {

@@ -168,6 +168,35 @@ input::placeholder {
 	color: rgb(199, 199, 199);
 }
 
+.rootsearchbar {
+	padding: 10px;
+	width: 300px;
+	margin-bottom: 10px;
+	background-color: #f7f7f7;
+}
+
+.input-container {
+	/* IE10 */
+	display: flex;
+	width: 300px;
+	margin-bottom: 15px;
+}
+
+.input-field {
+	width: 300px;
+
+	border-radius: 10px;
+
+	/* margin-right: 85%; */
+	border: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+
+	width: 100%;
+	padding: 10px;
+	text-align: center;
+}
+
 /* View item message */
 
 .viewItemRight {
@@ -227,7 +256,7 @@ input::placeholder {
 }
 
 .viewWrapItemLeft {
-	width: 300px;
+	/* width: 300px; */
 	text-align: left;
 	align-self: flex-start;
 	margin-left: 20px;
@@ -235,13 +264,13 @@ input::placeholder {
 	margin-bottom: -15px;
 }
 
-.viewWrapItemLeft2 {
+.viewWrapItemRight {
 	width: 300px;
-	align-self: flex-start;
+	align-self: flex-end;
 	text-align: left;
-	margin-left: 20px;
+	/* margin-left: 20px;
 	margin-top: 10px;
-	margin-bottom: -15px;
+	margin-bottom: -15px; */
 }
 
 .viewWrapItemLeft3 {
@@ -304,20 +333,7 @@ input::placeholder {
 	border-bottom-right-radius: 8px;
 	color: white;
 }
-.time {
-	display: flex;
-	align-items: center;
-	text-align: center;
-	margin-left: 400px;
-	font: italic small-caps bold 15px/30px Georgia, serif;
-	width: 110px;
-	background-color: #e1f3fb;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	padding-left: 5px;
-	padding-right: 5px;
-	border-radius: 10px;
-}
+
 .timesetup {
 	align-items: center;
 }
@@ -379,11 +395,27 @@ input::placeholder {
 	border-bottom-right-radius: 8px;
 }
 
-.textTimeLeft {
+.time {
+	align-items: center;
+	text-align: center;
+	align-self: center;
+	font: italic small-caps bold 15px/30px Georgia, serif;
+	width: 110px;
+	background-color: #e1f3fb;
+	margin: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	border-radius: 10px;
+}
+
+.textTime {
 	color: #808888;
 	font-size: 12px;
 	font-style: italic;
-	margin-left: 50px;
+	align-self: center;
+	margin-left: 0px;
 }
 
 /* Stickers */

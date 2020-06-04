@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-// import { Card } from "react-bootstrap"; alterei pra DIV, remover caso não dê problemas
-import { FiPaperclip, FiSend, FiX, FiSmile } from "react-icons/fi";
-import { RiSendPlane2Line } from "react-icons/ri";
+import React, { useState, useEffect } from "react";
+import InfiniteScrollReverse from "react-infinite-scroll-reverse";
+import ReactLoading from "react-loading";
+import {
+	FiPaperclip,
+	FiSend,
+	FiTrash2,
+	FiSmile,
+	FiFastForward,
+	FiFile,
+} from "react-icons/fi";
 import { BsCheck, BsCheckAll, BsClock } from "react-icons/bs";
-import { FaFileDownload } from "react-icons/fa";
-import "emoji-mart/css/emoji-mart.css";
+
 import { Picker } from "emoji-mart";
 import ModalImage from "react-modal-image";
 import moment from "moment-timezone";
@@ -14,17 +20,9 @@ import openSocket from "socket.io-client";
 import profileDefaultPic from "../../Images/profile_default.png";
 import ReactAudioPlayer from "react-audio-player";
 
-import ScrollToBottom from "react-scroll-to-bottom";
-
 import "react-toastify/dist/ReactToastify.css";
+import "emoji-mart/css/emoji-mart.css";
 import "./ChatBox.css";
-import useMessageSerach from "../../components/MessageSearch/useMessageSerach";
-
-// const executeScroll = myRef =>
-// 	myRef.current.scrollIntoView({
-// 		// behavior: "smooth",
-// 		block: "end",
-// 	});
 
 const ChatBox = ({ currentPeerContact }) => {
 	const SERVER_URL = "http://localhost:8080/";
@@ -35,43 +33,42 @@ const ChatBox = ({ currentPeerContact }) => {
 	const token = localStorage.getItem("token");
 
 	const mediaInitialState = { preview: "", raw: "", name: "" };
-
 	const [inputMessage, setInputMessage] = useState("");
 	const [media, setMedia] = useState(mediaInitialState);
 	const [showEmoji, setShowEmoji] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [listMessages, setListMessages] = useState([]);
+	const [hasMore, setHasMore] = useState(false);
+	const [searchParam, setSearchParam] = useState("");
+	const [pageNumber, setPageNumber] = useState(0);
 
-	const [query, setQuery] = useState("");
-	const [pageNumber, setPageNumber] = useState(1);
+	useEffect(() => setListMessages([]), [searchParam]);
 
-	const {
-		listMessages,
-		setListMessages,
-		hasMore,
-		loading,
-		error,
-	} = useMessageSerach(query, pageNumber, token, contactId);
-
-	const scrollPosition = useRef();
-	const observer = useRef();
-	const firstMessageRef = useCallback(
-		node => {
-			if (observer.current) observer.current.disconnect();
-			observer.current = new IntersectionObserver(entries => {
-				if (entries[0].isIntersecting && hasMore) {
-					console.log("Visible");
-					setPageNumber(prevPageNumber => prevPageNumber + 1);
+	useEffect(() => {
+		setLoading(true);
+		const delayDebounceFn = setTimeout(() => {
+			console.log(searchParam);
+			const fetchMessages = async () => {
+				try {
+					const res = await api.get("/messages/" + contactId, {
+						headers: { Authorization: "Bearer " + token },
+						params: { searchParam, pageNumber },
+					});
+					setListMessages(prevMessages => {
+						return [...res.data.messages, ...prevMessages];
+					});
+					setHasMore(res.data.messages.length > 0);
+					setLoading(false);
+					console.log(res.data);
+				} catch (err) {
+					console.log(err);
+					alert(err);
 				}
-			});
-			if (node) observer.current.observe(node);
-		},
-		[loading, hasMore]
-	);
-
-	// let lastMessageRef = useRef();
-
-	// useEffect(() => {
-	// 	executeScroll(lastMessageRef);
-	// }, [loading]);
+			};
+			fetchMessages();
+		}, 1000);
+		return () => clearTimeout(delayDebounceFn);
+	}, [searchParam, pageNumber, contactId, token]);
 
 	useEffect(() => {
 		const socket = openSocket(SERVER_URL);
@@ -79,24 +76,27 @@ const ChatBox = ({ currentPeerContact }) => {
 		socket.emit("joinChatBox", contactId, () => {});
 
 		socket.on("appMessage", data => {
-			// setIsLoading(true);
 			if (data.action === "create") {
 				addMessage(data.message);
 			} else if (data.action === "update") {
 				updateMessageAck(data.message);
 			}
-			// setIsLoading(false);
 		});
 
 		return () => {
 			socket.disconnect();
 			setInputMessage("");
-			setQuery("");
+			setSearchParam("");
 			setShowEmoji(false);
 			setPageNumber(1);
 			setMedia({});
+			setListMessages([]);
 		};
 	}, [contactId]);
+
+	const loadMore = () => {
+		setPageNumber(prevPageNumber => prevPageNumber + 1);
+	};
 
 	const updateMessageAck = message => {
 		let id = message.id;
@@ -180,8 +180,32 @@ const ChatBox = ({ currentPeerContact }) => {
 	};
 
 	const handleSearch = e => {
-		setQuery(e.target.value);
+		setSearchParam(e.target.value);
 		setPageNumber(1);
+	};
+
+	const checkMessageDay = (message, index) => {
+		if (index < listMessages.length - 1) {
+			let messageDay = moment(listMessages[index].createdAt)
+				.tz("America/Sao_Paulo")
+				.format("DD");
+
+			let nextMessageDay = moment(listMessages[index + 1].createdAt)
+				.tz("America/Sao_Paulo")
+				.format("DD");
+
+			if (messageDay < nextMessageDay) {
+				return (
+					<span className="textTime" key={message.createdAt}>
+						<div className="time">
+							{moment(listMessages[index + 1].createdAt)
+								.tz("America/Sao_Paulo")
+								.format("DD/MM/YY")}
+						</div>
+					</span>
+				);
+			}
+		}
 	};
 
 	const renderMsgAck = message => {
@@ -221,7 +245,8 @@ const ChatBox = ({ currentPeerContact }) => {
 											.format("HH:mm")}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else if (message.mediaUrl && message.mediaType === "audio") {
 						viewListMessages.push(
@@ -237,7 +262,8 @@ const ChatBox = ({ currentPeerContact }) => {
 											.format("HH:mm")}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else if (message.mediaUrl && message.mediaType === "video") {
 						viewListMessages.push(
@@ -255,7 +281,8 @@ const ChatBox = ({ currentPeerContact }) => {
 											.format("HH:mm")}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else if (message.mediaUrl) {
 						viewListMessages.push(
@@ -266,7 +293,7 @@ const ChatBox = ({ currentPeerContact }) => {
 										className="textContentItem"
 									>
 										{message.messageBody}
-										<FaFileDownload size="20" />
+										<FiFile size="20" />
 									</a>
 									<span className="timestamp">
 										{moment(message.createdAt)
@@ -274,7 +301,8 @@ const ChatBox = ({ currentPeerContact }) => {
 											.format("HH:mm")}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else {
 						viewListMessages.push(
@@ -287,10 +315,12 @@ const ChatBox = ({ currentPeerContact }) => {
 											.format("HH:mm")}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					}
-				} else {
+				} // mensagens enviadas
+				else {
 					if (message.mediaUrl && message.mediaType === "image") {
 						viewListMessages.push(
 							<div className="viewItemRight2" key={message.id}>
@@ -310,9 +340,9 @@ const ChatBox = ({ currentPeerContact }) => {
 										{renderMsgAck(message)}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
-						// mensagens enviadas
 					} else if (message.mediaUrl && message.mediaType === "audio") {
 						viewListMessages.push(
 							<div className="viewItemRight2 " key={message.id}>
@@ -328,7 +358,8 @@ const ChatBox = ({ currentPeerContact }) => {
 										{renderMsgAck(message)}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else if (message.mediaUrl && message.mediaType === "video") {
 						viewListMessages.push(
@@ -341,7 +372,8 @@ const ChatBox = ({ currentPeerContact }) => {
 										.format("HH:mm")}{" "}
 									{renderMsgAck(message)}
 								</span>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else if (message.mediaUrl) {
 						viewListMessages.push(
@@ -352,7 +384,7 @@ const ChatBox = ({ currentPeerContact }) => {
 										className="textContentItem"
 									>
 										{message.messageBody}
-										<FaFileDownload size="20" />
+										<FiFile size="20" />
 									</a>
 									<span className="timestamp">
 										{moment(message.createdAt)
@@ -361,25 +393,8 @@ const ChatBox = ({ currentPeerContact }) => {
 										{renderMsgAck(message)}
 									</span>
 								</div>
-							</div>
-						);
-					} else if (index === 3) {
-						viewListMessages.push(
-							<div
-								ref={firstMessageRef}
-								className="viewItemRight"
-								key={message.id}
-							>
-								<div className="textContentItem">
-									{message.messageBody}
-									<span className="timestamp">
-										{moment(message.createdAt)
-											.tz("America/Sao_Paulo")
-											.format("HH:mm")}{" "}
-										{renderMsgAck(message)}
-									</span>
-								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					} else {
 						viewListMessages.push(
@@ -393,7 +408,8 @@ const ChatBox = ({ currentPeerContact }) => {
 										{renderMsgAck(message)}
 									</span>
 								</div>
-							</div>
+							</div>,
+							checkMessageDay(message, index)
 						);
 					}
 				}
@@ -408,6 +424,8 @@ const ChatBox = ({ currentPeerContact }) => {
 		}
 	};
 
+	console.log(listMessages);
+
 	return (
 		<div className="viewChatBoard">
 			<div className="headerChatBoard">
@@ -420,22 +438,33 @@ const ChatBox = ({ currentPeerContact }) => {
 					<p style={{ fontSize: "20px" }}>{currentPeerContact.name}</p>
 				</span>
 				<div className="aboutme">
-					<span>Status do contato</span>
+					<span>
+						<p>Status do contato</p>
+					</span>
 				</div>
-				<div>
-					<input type="serch" value={query} onChange={handleSearch} />
+				<div className="input-container">
+					<input
+						className="input-field"
+						type="text"
+						placeholder="Buscar Mensagens"
+						onChange={handleSearch}
+						value={searchParam}
+					/>
 				</div>
 			</div>
-			{/* <ScrollToBottom className="viewListContentChat"> */}
-			<div className="viewListContentChat">
+			<InfiniteScrollReverse
+				className="viewListContentChat"
+				hasMore={hasMore}
+				isLoading={loading}
+				loadMore={loadMore}
+				loadArea={10}
+			>
 				{renderMessages()}
+			</InfiniteScrollReverse>
 
-				{/* <div ref={lastMessageRef}>Last Message</div> */}
-			</div>
-			{/* </ScrollToBottom> */}
 			{media.preview ? (
 				<div className="viewMediaBottom">
-					<FiX
+					<FiTrash2
 						color="gray"
 						className="icOpenGallery"
 						onClick={e => setMedia(mediaInitialState)}
@@ -444,7 +473,7 @@ const ChatBox = ({ currentPeerContact }) => {
 						{media.name}
 						{/* <img src={media.preview} alt=""></img> */}
 					</span>
-					<RiSendPlane2Line
+					<FiFastForward
 						color="gray"
 						className="icSend"
 						onClick={handleUploadMedia}
@@ -494,6 +523,11 @@ const ChatBox = ({ currentPeerContact }) => {
 					<FiSend color="gray" className="icSend" onClick={handleSendMessage} />
 				</div>
 			)}
+			{loading ? (
+				<div className="viewLoading">
+					<ReactLoading type={"spin"} color={""} height={"3%"} width={"3%"} />
+				</div>
+			) : null}
 		</div>
 	);
 };

@@ -17,6 +17,7 @@
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
     "react-icons": "^3.10.0",
+    "react-infinite-scroll-reverse": "^1.0.3",
     "react-loading": "^2.0.3",
     "react-modal-image": "^2.5.0",
     "react-moment": "^0.9.7",
