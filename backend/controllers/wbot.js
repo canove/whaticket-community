@@ -32,8 +32,19 @@ module.exports = {
 		wbot.on("auth_failure", msg => {
 			console.error("AUTHENTICATION FAILURE", msg);
 		});
-		wbot.on("ready", () => {
+		wbot.on("ready", async () => {
 			console.log("READY");
+			// const chats = await wbot.getChats(); // pega as mensagens nao lidas (recebidas quando o bot estava offline)
+			// let unreadMessages;                  // todo > salvar isso no DB pra mostrar no frontend
+			// for (let chat of chats) {
+			// 	if (chat.unreadCount > 0) {
+			// 		unreadMessages = await chat.fetchMessages({
+			// 			limit: chat.unreadCount,
+			// 		});
+			// 	}
+			// }
+
+			// console.log(unreadMessages);
 		});
 
 		return wbot;

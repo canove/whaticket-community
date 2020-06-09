@@ -61,7 +61,7 @@ const wbotMessageListener = () => {
 					newMessage = await contact.createMessage({
 						id: msg.id.id,
 						messageBody: msg.body || media.filename,
-						mediaUrl: path.join("public", media.filename),
+						mediaUrl: media.filename,
 						mediaType: media.mimetype.split("/")[0],
 					});
 				}

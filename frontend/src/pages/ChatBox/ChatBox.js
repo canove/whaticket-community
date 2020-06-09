@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InfiniteScrollReverse from "react-infinite-scroll-reverse";
-import ReactLoading from "react-loading";
+import { Spinner } from "react-bootstrap";
 import {
 	FiPaperclip,
 	FiSend,
@@ -41,8 +41,11 @@ const ChatBox = ({ currentPeerContact }) => {
 	const [hasMore, setHasMore] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [pageNumber, setPageNumber] = useState(0);
+	const lastMessageRef = useRef();
 
-	useEffect(() => setListMessages([]), [searchParam]);
+	useEffect(() => {
+		setListMessages([]);
+	}, [searchParam]);
 
 	useEffect(() => {
 		setLoading(true);
@@ -60,6 +63,9 @@ const ChatBox = ({ currentPeerContact }) => {
 					setHasMore(res.data.messages.length > 0);
 					setLoading(false);
 					console.log(res.data);
+					if (pageNumber === 1 && res.data.messages.length > 0) {
+						scrollToBottom();
+					}
 				} catch (err) {
 					console.log(err);
 					alert(err);
@@ -78,6 +84,7 @@ const ChatBox = ({ currentPeerContact }) => {
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
 				addMessage(data.message);
+				scrollToBottom();
 			} else if (data.action === "update") {
 				updateMessageAck(data.message);
 			}
@@ -109,8 +116,23 @@ const ChatBox = ({ currentPeerContact }) => {
 		});
 	};
 
+	const scrollToBottom = () => {
+		if (lastMessageRef) {
+			lastMessageRef.current.scrollIntoView({});
+		}
+	};
+
 	const addMessage = message => {
-		setListMessages(prevState => [...prevState, message]);
+		setListMessages(prevState => {
+			if (prevState.length >= 20) {
+				let aux = [...prevState];
+				aux.shift();
+				aux.push(message);
+				return aux;
+			} else {
+				return [...prevState, message];
+			}
+		});
 	};
 
 	const handleChangeInput = e => {
@@ -206,6 +228,15 @@ const ChatBox = ({ currentPeerContact }) => {
 				);
 			}
 		}
+		if (index + 1 === listMessages.length) {
+			return (
+				<div
+					key={`ref-${message.createdAt}`}
+					ref={lastMessageRef}
+					style={{ float: "left", clear: "both" }}
+				></div>
+			);
+		}
 	};
 
 	const renderMsgAck = message => {
@@ -232,9 +263,9 @@ const ChatBox = ({ currentPeerContact }) => {
 							<div className="viewItemLeft2" key={message.id}>
 								<ModalImage
 									className="imgItemLeft"
-									smallSrcSet={`${SERVER_URL}${message.mediaUrl}`}
-									medium={`${SERVER_URL}${message.mediaUrl}`}
-									large={`${SERVER_URL}${message.mediaUrl}`}
+									smallSrcSet={message.mediaUrl}
+									medium={message.mediaUrl}
+									large={message.mediaUrl}
 									alt=""
 								/>
 								<div className="textContentItem">
@@ -442,9 +473,9 @@ const ChatBox = ({ currentPeerContact }) => {
 						<p>Status do contato</p>
 					</span>
 				</div>
-				<div className="input-container">
+				<div className="search-input-container">
 					<input
-						className="input-field"
+						className="search-input-field"
 						type="text"
 						placeholder="Buscar Mensagens"
 						onChange={handleSearch}
@@ -459,7 +490,7 @@ const ChatBox = ({ currentPeerContact }) => {
 				loadMore={loadMore}
 				loadArea={10}
 			>
-				{renderMessages()}
+				{listMessages.length > 0 ? renderMessages() : []}
 			</InfiniteScrollReverse>
 
 			{media.preview ? (
@@ -525,7 +556,7 @@ const ChatBox = ({ currentPeerContact }) => {
 			)}
 			{loading ? (
 				<div className="viewLoading">
-					<ReactLoading type={"spin"} color={""} height={"3%"} width={"3%"} />
+					<Spinner animation="border" variant="success" />
 				</div>
 			) : null}
 		</div>

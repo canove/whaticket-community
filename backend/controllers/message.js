@@ -8,6 +8,7 @@ const sequelize = require("sequelize");
 const { MessageMedia } = require("whatsapp-web.js");
 
 const setMessagesAsRead = async contactId => {
+	const io = getIO();
 	try {
 		const result = await Message.update(
 			{ read: true },
@@ -26,8 +27,13 @@ const setMessagesAsRead = async contactId => {
 			error.satusCode = 501;
 			throw error;
 		}
+
+		io.to("notification").emit("contact", {
+			action: "updateUnread",
+			contactId: contactId,
+		});
 	} catch (err) {
-		next(err);
+		console.log(err);
 	}
 };
 
@@ -37,6 +43,8 @@ exports.getContactMessages = async (req, res, next) => {
 
 	const { contactId } = req.params;
 	const { searchParam, pageNumber = 1 } = req.query;
+
+	console.log(req.body, req.query);
 
 	const lowerSerachParam = searchParam.toLowerCase();
 
@@ -59,7 +67,7 @@ exports.getContactMessages = async (req, res, next) => {
 			throw error;
 		}
 
-		setMessagesAsRead(contactId);
+		await setMessagesAsRead(contactId);
 
 		const messagesFound = await contact.countMessages({
 			where: whereCondition,
@@ -71,7 +79,26 @@ exports.getContactMessages = async (req, res, next) => {
 			order: [["createdAt", "DESC"]],
 		});
 
-		return res.json({ messages: contactMessages.reverse(), messagesFound });
+		const serializedMessages = contactMessages.map(message => {
+			return {
+				id: message.id,
+				createdAt: message.createdAt,
+				updatedAt: message.updatedAt,
+				messageBody: message.messageBody,
+				userId: message.userId,
+				ack: message.ack,
+				read: message.read,
+				mediaType: message.mediaType,
+				contactId: message.contactId,
+				mediaUrl: `${
+					message.mediaUrl
+						? `http://localhost:8080/public/${message.mediaUrl}`
+						: ""
+				}`,
+			};
+		});
+
+		return res.json({ messages: serializedMessages.reverse(), messagesFound });
 	} catch (err) {
 		next(err);
 	}
@@ -90,7 +117,7 @@ exports.postCreateContactMessage = async (req, res, next) => {
 		const contact = await Contact.findByPk(contactId);
 		if (media) {
 			const newMedia = MessageMedia.fromFilePath(req.file.path);
-			message.mediaUrl = req.file.path;
+			message.mediaUrl = req.file.filename;
 			if (newMedia.mimetype) {
 				message.mediaType = newMedia.mimetype.split("/")[0];
 			} else {
@@ -118,6 +145,7 @@ exports.postCreateContactMessage = async (req, res, next) => {
 			action: "create",
 			message: newMessage,
 		});
+		await setMessagesAsRead(contactId);
 
 		return res.json({ message: "Mensagem enviada" });
 	} catch (err) {

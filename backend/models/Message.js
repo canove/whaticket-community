@@ -7,6 +7,10 @@ const Message = sequelize.define("message", {
 		allowNull: false,
 		primaryKey: true,
 	},
+	createdAt: {
+		allowNull: false,
+		type: Sequelize.DATE(6),
+	},
 	userId: { type: Sequelize.INTEGER, defaultValue: 0 },
 	ack: { type: Sequelize.INTEGER, defaultValue: 0 },
 	messageBody: { type: Sequelize.STRING(250), allowNull: false },

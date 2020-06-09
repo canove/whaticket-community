@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 import Home from "./pages/Home/Home";
 import Chat from "./pages/Chat/Chat";
+import Chat2 from "./pages/Chat-Material/Chat2";
 import Profile from "./pages/Profile/Profile";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
@@ -51,6 +52,11 @@ const App = () => {
 					exact
 					path="/chat"
 					render={props => <Chat showToast={showToast} />}
+				/>
+				<Route
+					exact
+					path="/chat2"
+					render={props => <Chat2 showToast={showToast} />}
 				/>
 			</Switch>
 		</BrowserRouter>

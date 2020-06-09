@@ -4,18 +4,16 @@
 	display: flex;
 	flex: 1;
 	flex-direction: column;
-	width: 100%;
 	position: relative;
-
+	height: 92vh;
 	background-image: url("../../Images/wa-background.png");
 
 	backface-visibility: hidden;
 	border-left: 1px solid #ededed;
-	/* border-right: 5px solid #DFA375; */
-	max-height: 104.3%;
-	min-height: 104.3%;
+	/* max-height: 104.3%; */
+	/* min-height: 104.3%; */
 	/* margin-right: 20px; */
-	border-radius: 10px;
+	/* border-radius: 10px; */
 	/* box-shadow: 0 5px 5px #808888; */
 }
 .viewAvatarItem {
@@ -168,33 +166,37 @@ input::placeholder {
 	color: rgb(199, 199, 199);
 }
 
-.rootsearchbar {
+/* serach messages */
+
+.searchMessageBar {
 	padding: 10px;
 	width: 300px;
 	margin-bottom: 10px;
 	background-color: #f7f7f7;
 }
 
-.input-container {
-	/* IE10 */
-	display: flex;
-	width: 300px;
-	margin-bottom: 15px;
-}
-
-.input-field {
+.search-input-field {
 	width: 300px;
 
 	border-radius: 10px;
 
 	/* margin-right: 85%; */
+	align-self: center;
 	border: none !important;
 	box-shadow: none !important;
 	outline: none !important;
 
-	width: 100%;
 	padding: 10px;
 	text-align: center;
+}
+
+.search-input-container {
+	/* IE10 */
+	display: flex;
+	width: 50%;
+	margin-left: 50%;
+	align-content: flex-end;
+	margin-bottom: 0px;
 }
 
 /* View item message */

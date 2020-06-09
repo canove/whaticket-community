@@ -2,6 +2,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import "./Navbar.css";
 
 const DefaultNavbar = () => {
 	const username = localStorage.getItem("username");
@@ -30,6 +31,9 @@ const DefaultNavbar = () => {
 							</LinkContainer>
 							<LinkContainer to="/chat">
 								<Nav.Link href="#link">Chat</Nav.Link>
+							</LinkContainer>
+							<LinkContainer to="/chat2">
+								<Nav.Link href="#link">Chat MaterialUi</Nav.Link>
 							</LinkContainer>
 						</Nav>
 						<Navbar.Text>

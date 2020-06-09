@@ -62,10 +62,11 @@
 /* List user */
 
 .viewListUser {
-	overflow-y: scroll;
-	max-height: 90vh;
-	min-height: 90vh;
-	height: auto;
+	overflow: scroll;
+	display: inline-block;
+	/* max-height: 100%;
+	min-height: 100%; */
+	height: 80vh;
 	width: 50vh;
 	/* padding-top: 10px; */
 	/* padding-bottom: 10px; */
