@@ -129,6 +129,12 @@ const useStyles = makeStyles(theme => ({
 		boxShadow: "0 2px 2px #808888",
 	},
 
+	textContentItem: {
+		alignSelf: "middle",
+		overflowWrap: "break-word",
+		padding: "3px 80px 6px 6px",
+	},
+
 	messageMedia: {
 		objectFit: "cover",
 		width: 250,
@@ -137,11 +143,6 @@ const useStyles = makeStyles(theme => ({
 		borderTopRightRadius: 8,
 		borderBottomLeftRadius: 8,
 		borderBottomRightRadius: 8,
-	},
-
-	textContentItem: {
-		overflowWrap: "break-word",
-		padding: "0px 60px 10px 0px",
 	},
 
 	timestamp: {
@@ -167,6 +168,15 @@ const useStyles = makeStyles(theme => ({
 		padding: 8,
 		alignSelf: "center",
 		marginLeft: "0px",
+	},
+
+	ackIcons: {
+		fontSize: 18,
+	},
+
+	ackDoneAllIcon: {
+		color: green[500],
+		fontSize: 18,
 	},
 }));
 
@@ -264,8 +274,9 @@ const MessagesList = ({ selectedContact }) => {
 		setMessagesList(prevState => {
 			let aux = [...prevState];
 			let messageIndex = aux.findIndex(message => message.id === id);
-			aux[messageIndex].ack = message.ack;
-
+			if (messageIndex) {
+				aux[messageIndex].ack = message.ack;
+			}
 			return aux;
 		});
 	};
@@ -307,16 +318,18 @@ const MessagesList = ({ selectedContact }) => {
 
 	const renderMessageAck = message => {
 		if (message.ack === 0) {
-			return <AccessTimeIcon fontSize="small" />;
+			return <AccessTimeIcon fontSize="small" className={classes.ackIcons} />;
 		}
 		if (message.ack === 1) {
-			return <DoneIcon fontSize="small" />;
+			return <DoneIcon fontSize="small" className={classes.ackIcons} />;
 		}
 		if (message.ack === 2) {
-			return <DoneAllIcon fontSize="small" />;
+			return <DoneAllIcon fontSize="small" className={classes.ackIcons} />;
 		}
 		if (message.ack === 3) {
-			return <DoneAllIcon fontSize="small" color="primary" />;
+			return (
+				<DoneAllIcon fontSize="small" className={classes.ackDoneAllIcon} />
+			);
 		}
 	};
 
@@ -372,10 +385,9 @@ const MessagesList = ({ selectedContact }) => {
 
 	const renderMessages = () => {
 		if (messagesList.length > 0) {
-			let viewMessagesList = [];
-			messagesList.forEach((message, index) => {
+			const viewMessagesList = messagesList.map((message, index) => {
 				if (message.userId === 0) {
-					viewMessagesList.push(
+					return [
 						renderDailyTimestamps(message, index),
 						<div className={classes.messageLeft} key={message.id}>
 							{message.mediaUrl && checkMessaageMedia(message)}
@@ -387,10 +399,10 @@ const MessagesList = ({ selectedContact }) => {
 										.format("HH:mm")}
 								</span>
 							</div>
-						</div>
-					);
+						</div>,
+					];
 				} else {
-					viewMessagesList.push(
+					return [
 						renderDailyTimestamps(message, index),
 						<div className={classes.messageRight} key={message.id}>
 							{message.mediaUrl && checkMessaageMedia(message)}
@@ -403,8 +415,8 @@ const MessagesList = ({ selectedContact }) => {
 									{renderMessageAck(message)}
 								</span>
 							</div>
-						</div>
-					);
+						</div>,
+					];
 				}
 			});
 			return viewMessagesList;

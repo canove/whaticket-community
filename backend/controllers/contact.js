@@ -5,19 +5,22 @@ const Sequelize = require("sequelize");
 exports.getContacts = async (req, res) => {
 	try {
 		const contacts = await Contact.findAll({
-			include: { model: Message, attributes: [] },
+			include: {
+				model: Message,
+				attributes: ["messageBody"],
+			},
 			attributes: {
 				include: [
 					[
 						Sequelize.literal(`(
-              SELECT COUNT(*)
-              FROM messages AS message
-              WHERE
-                  message.contactId = contact.id
-                  AND
-                  message.read = 0
-                  
-          )`),
+			        SELECT COUNT(*)
+			        FROM messages AS message
+			        WHERE
+			            message.contactId = contact.id
+			            AND
+			            message.read = 0
+
+			    )`),
 						"unreadMessages",
 					],
 				],

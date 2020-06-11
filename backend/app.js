@@ -19,7 +19,7 @@ const fileStorage = multer.diskStorage({
 		cb(null, "public");
 	},
 	filename: (req, file, cb) => {
-		cb(null, new Date().getTime() + "-" + file.originalname);
+		cb(null, new Date().getTime() + "-" + file.originalname.replace(/\s/g, ""));
 	},
 });
 

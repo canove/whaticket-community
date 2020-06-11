@@ -81,15 +81,7 @@ exports.getContactMessages = async (req, res, next) => {
 
 		const serializedMessages = contactMessages.map(message => {
 			return {
-				id: message.id,
-				createdAt: message.createdAt,
-				updatedAt: message.updatedAt,
-				messageBody: message.messageBody,
-				userId: message.userId,
-				ack: message.ack,
-				read: message.read,
-				mediaType: message.mediaType,
-				contactId: message.contactId,
+				...message.dataValues,
 				mediaUrl: `${
 					message.mediaUrl
 						? `http://localhost:8080/public/${message.mediaUrl}`
@@ -117,7 +109,7 @@ exports.postCreateContactMessage = async (req, res, next) => {
 		const contact = await Contact.findByPk(contactId);
 		if (media) {
 			const newMedia = MessageMedia.fromFilePath(req.file.path);
-			message.mediaUrl = req.file.filename;
+			message.mediaUrl = req.file.filename.replace(/\s/g, "");
 			if (newMedia.mimetype) {
 				message.mediaType = newMedia.mimetype.split("/")[0];
 			} else {
@@ -143,7 +135,14 @@ exports.postCreateContactMessage = async (req, res, next) => {
 
 		io.to(contactId).emit("appMessage", {
 			action: "create",
-			message: newMessage,
+			message: {
+				...newMessage.dataValues,
+				mediaUrl: `${
+					message.mediaUrl
+						? `http://localhost:8080/public/${message.mediaUrl}`
+						: ""
+				}`,
+			},
 		});
 		await setMessagesAsRead(contactId);
 

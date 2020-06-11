@@ -184,7 +184,7 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 								</ListItemAvatar>
 								<ListItemText
 									primary={contact.name}
-									secondary="last contact message..."
+									secondary={contact.messages[0].messageBody || "oio"}
 								/>
 								<ListItemSecondaryAction>
 									{contact.unreadMessages > 0 && (
