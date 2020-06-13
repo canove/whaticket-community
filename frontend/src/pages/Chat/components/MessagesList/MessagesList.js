@@ -21,34 +21,43 @@ import moment from "moment-timezone";
 import InfiniteScrollReverse from "react-infinite-scroll-reverse";
 import ModalImage from "react-modal-image";
 import ReactAudioPlayer from "react-audio-player";
+import MessagesInput from "../MessagesInput/MessagesInput";
 
 const useStyles = makeStyles(theme => ({
+	mainWrapper: {
+		height: "100%",
+		display: "flex",
+		flexDirection: "column",
+		overflow: "hidden",
+	},
+
 	messagesHeader: {
 		display: "flex",
 		backgroundColor: "#eee",
-		borderTopLeftRadius: 0,
-		borderBottomLeftRadius: 0,
-		borderBottomRightRadius: 0,
+		flex: "none",
 	},
 
 	messagesSearchInputWrapper: {
 		margin: 20,
+		display: "flex",
 		marginLeft: "auto",
 		background: "#fff",
 		borderRadius: 40,
+		paddingRight: 4,
 		width: 250,
 	},
 
 	messagesSearchInput: {
 		border: "none",
+		flex: 1,
 		borderRadius: 30,
 	},
 
 	searchIcon: {
 		color: "grey",
-		marginLeft: 7,
-		marginRight: 7,
-		verticalAlign: "middle",
+		marginLeft: 6,
+		marginRight: 6,
+		alignSelf: "center",
 	},
 
 	settingsIcon: {
@@ -56,13 +65,20 @@ const useStyles = makeStyles(theme => ({
 		padding: 8,
 	},
 
+	messagesListWrapper: {
+		overflow: "hidden",
+		position: "relative",
+		display: "flex",
+		flexDirection: "column",
+		flexGrow: 1,
+	},
+
 	messagesList: {
 		backgroundImage: 'url("http://localhost:8080/public/wa-background.png")',
 		display: "flex",
-		flex: 1,
 		flexDirection: "column",
+		flexGrow: 1,
 		padding: "20px 20px 20px 20px",
-		height: 500,
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
@@ -72,9 +88,6 @@ const useStyles = makeStyles(theme => ({
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
 			backgroundColor: "#e8e8e8",
 		},
-	},
-	wrapper: {
-		position: "relative",
 	},
 
 	circleLoading: {
@@ -130,7 +143,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	textContentItem: {
-		alignSelf: "middle",
 		overflowWrap: "break-word",
 		padding: "3px 80px 6px 6px",
 	},
@@ -172,11 +184,13 @@ const useStyles = makeStyles(theme => ({
 
 	ackIcons: {
 		fontSize: 18,
+		verticalAlign: "middle",
 	},
 
 	ackDoneAllIcon: {
 		color: green[500],
 		fontSize: 18,
+		verticalAlign: "middle",
 	},
 }));
 
@@ -274,7 +288,7 @@ const MessagesList = ({ selectedContact }) => {
 		setMessagesList(prevState => {
 			let aux = [...prevState];
 			let messageIndex = aux.findIndex(message => message.id === id);
-			if (messageIndex) {
+			if (messageIndex !== -1) {
 				aux[messageIndex].ack = message.ack;
 			}
 			return aux;
@@ -425,12 +439,12 @@ const MessagesList = ({ selectedContact }) => {
 		}
 	};
 
-	console.log(messagesList);
-
 	return (
-		<>
-			<Card variant="outlined" className={classes.messagesHeader}>
+		<div className={classes.mainWrapper}>
+			<Card variant="outlined" square className={classes.messagesHeader}>
 				<CardHeader
+					titleTypographyProps={{ noWrap: true }}
+					subheaderTypographyProps={{ noWrap: true }}
 					avatar={<Avatar alt="contact_name" src={selectedContact.imageURL} />}
 					title={selectedContact.name}
 					subheader="Contacts Status"
@@ -438,6 +452,7 @@ const MessagesList = ({ selectedContact }) => {
 				<div className={classes.messagesSearchInputWrapper}>
 					<SearchIcon className={classes.searchIcon} />
 					<InputBase
+						type="search"
 						className={classes.messagesSearchInput}
 						placeholder="Pesquisar mensagens"
 						onChange={handleSearch}
@@ -450,7 +465,7 @@ const MessagesList = ({ selectedContact }) => {
 					</IconButton>
 				</div>
 			</Card>
-			<div className={classes.wrapper}>
+			<div className={classes.messagesListWrapper}>
 				<InfiniteScrollReverse
 					className={classes.messagesList}
 					hasMore={hasMore}
@@ -460,13 +475,17 @@ const MessagesList = ({ selectedContact }) => {
 				>
 					{messagesList.length > 0 ? renderMessages() : []}
 				</InfiniteScrollReverse>
+				<MessagesInput
+					selectedContact={selectedContact}
+					searchParam={searchParam}
+				/>
 				{loading ? (
 					<div>
 						<CircularProgress className={classes.circleLoading} />
 					</div>
 				) : null}
 			</div>
-		</>
+		</div>
 	);
 };
 

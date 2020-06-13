@@ -10,11 +10,10 @@ import Avatar from "@material-ui/core/Avatar";
 import profileDefaultPic from "../../../../Images/profile_default.png";
 
 const useStyles = makeStyles(theme => ({
-	root: {
-		flexGrow: 1,
-	},
 	contactsHeader: {
 		display: "flex",
+		flex: "none",
+		// height: 80,
 		backgroundColor: "#eee",
 		borderBottomLeftRadius: 0,
 		borderBottomRightRadius: 0,
@@ -33,7 +32,7 @@ const ContactsHeader = () => {
 	const username = localStorage.getItem("username");
 
 	return (
-		<Card variant="outlined" className={classes.contactsHeader}>
+		<Card variant="outlined" square className={classes.contactsHeader}>
 			<CardHeader
 				avatar={<Avatar alt="logged_user" src={profileDefaultPic} />}
 				title={username}

@@ -1,15 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import ScopedCssBaseline from "@material-ui/core/ScopedCssBaseline";
+// import "bootstrap/dist/css/bootstrap.min.css";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 import App from "./App";
 
 ReactDOM.render(
 	<React.StrictMode>
-		<ScopedCssBaseline>
+		<CssBaseline>
 			<App />
-		</ScopedCssBaseline>
+		</CssBaseline>
 	</React.StrictMode>,
 	document.getElementById("root")
 );

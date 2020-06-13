@@ -2,9 +2,8 @@ import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
-import Home from "./pages/Home/Home";
+import Dashboard from "./pages/Home/Dashboard";
 import Chat from "./pages/Chat/Chat";
-import Chat2 from "./pages/Chat-Material/Chat2";
 import Profile from "./pages/Profile/Profile";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
@@ -32,7 +31,7 @@ const App = () => {
 				position={toast.POSITION.TOP_CENTER}
 			/>
 			<Switch>
-				<Route exact path="/" render={props => <Home />} />
+				<Route exact path="/" render={props => <Dashboard />} />
 				<Route
 					exact
 					path="/login"
@@ -52,11 +51,6 @@ const App = () => {
 					exact
 					path="/chat"
 					render={props => <Chat showToast={showToast} />}
-				/>
-				<Route
-					exact
-					path="/chat2"
-					render={props => <Chat2 showToast={showToast} />}
 				/>
 			</Switch>
 		</BrowserRouter>

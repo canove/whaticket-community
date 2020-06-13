@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../../util/api";
+import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -9,6 +10,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { green } from "@material-ui/core/colors";
 
 import AttachFileIcon from "@material-ui/icons/AttachFile";
+import IconButton from "@material-ui/core/IconButton";
 import MoodIcon from "@material-ui/icons/Mood";
 import SendIcon from "@material-ui/icons/Send";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -17,64 +19,60 @@ const useStyles = makeStyles(theme => ({
 	newMessageBox: {
 		background: "#eee",
 		display: "flex",
-		position: "relative",
-		padding: "10px 13px",
-		borderTopLeftRadius: 0,
-		borderTopRightRadius: 0,
-		borderBottomLeftRadius: 0,
+		padding: "10px",
+		alignItems: "center",
 	},
 
 	messageInputWrapper: {
+		padding: 6,
 		background: "#fff",
+		display: "flex",
 		borderRadius: 40,
 		flex: 1,
 	},
 
 	messageInput: {
 		paddingLeft: 10,
+		flex: 1,
 		border: "none",
-		borderRadius: 30,
-		width: "80%",
 	},
 
 	sendMessageIcons: {
 		color: "grey",
-		margin: 4,
-		cursor: "pointer",
-		"&:hover": {
-			opacity: "70%",
-		},
+	},
+
+	uploadInput: {
+		display: "none",
 	},
 
 	viewMediaInputWrapper: {
 		display: "flex",
 		padding: "10px 13px",
 		position: "relative",
-		borderTopLeftRadius: 0,
-		borderTopRightRadius: 0,
-		borderBottomLeftRadius: 0,
 		justifyContent: "space-between",
+		alignItems: "center",
 		backgroundColor: "#eee",
 	},
 
 	emojiBox: {
 		position: "absolute",
-		bottom: 50,
+		bottom: 63,
+		width: 40,
 		borderTop: "1px solid #e8e8e8",
 	},
 
 	circleLoading: {
 		color: green[500],
 		position: "absolute",
-		top: 0,
+		top: "20%",
 		left: "50%",
-		marginTop: 6,
-		marginBottom: 6,
+		// marginTop: 8,
+		// marginBottom: 6,
 		marginLeft: -12,
 	},
 }));
 
-const MessagesInput = ({ selectedContact }) => {
+const MessagesInput = ({ selectedContact, searchParam }) => {
 	const classes = useStyles();
 	const contactId = selectedContact.id;
 	const userId = localStorage.getItem("userId");
@@ -165,33 +163,48 @@ const MessagesInput = ({ selectedContact }) => {
 
 	if (media.preview)
 		return (
-			<Paper variant="outlined" className={classes.viewMediaInputWrapper}>
-				<CancelIcon
-					className={classes.sendMessageIcons}
+			<Paper
+				variant="outlined"
+				square
+				className={classes.viewMediaInputWrapper}
+			>
+				<IconButton
+					aria-label="cancel-upload"
+					component="span"
 					onClick={e => setMedia(mediaInitialState)}
-				/>
-				<span>
-					{media.name}
-					{/* <img src={media.preview} alt=""></img> */}
-				</span>
+				>
+					<CancelIcon className={classes.sendMessageIcons} />
+				</IconButton>
+
 				{loading ? (
 					<div>
 						<CircularProgress className={classes.circleLoading} />
 					</div>
-				) : null}
-				<SendIcon
-					className={classes.sendMessageIcons}
+				) : (
+					<span>
+						{media.name}
+						{/* <img src={media.preview} alt=""></img> */}
+					</span>
+				)}
+				<IconButton
+					aria-label="send-upload"
+					component="span"
 					onClick={handleUploadMedia}
-				/>
+				>
+					<SendIcon className={classes.sendMessageIcons} />
+				</IconButton>
 			</Paper>
 		);
 	else {
 		return (
-			<Paper variant="outlined" className={classes.newMessageBox}>
-				<MoodIcon
-					className={classes.sendMessageIcons}
+			<Paper variant="outlined" square className={classes.newMessageBox}>
+				<IconButton
+					aria-label="emojiPicker"
+					component="span"
 					onClick={e => setShowEmoji(prevState => !prevState)}
-				/>
+				>
+					<MoodIcon className={classes.sendMessageIcons} />
+				</IconButton>
 				{showEmoji ? (
 					<div className={classes.emojiBox}>
 						<Picker
@@ -202,17 +215,21 @@ const MessagesInput = ({ selectedContact }) => {
 						/>
 					</div>
 				) : null}
-				<label htmlFor="upload-button" className={classes.sendMessageIcons}>
-					<AttachFileIcon />
-				</label>
+
 				<input
 					type="file"
 					id="upload-button"
-					style={{ display: "none" }}
+					className={classes.uploadInput}
 					onChange={handleChangeMedia}
 				/>
+				<label htmlFor="upload-button">
+					<IconButton aria-label="upload" component="span">
+						<AttachFileIcon className={classes.sendMessageIcons} />
+					</IconButton>
+				</label>
 				<div className={classes.messageInputWrapper}>
 					<InputBase
+						inputRef={input => input && !searchParam && input.focus()}
 						className={classes.messageInput}
 						placeholder="Escreva uma mensagem"
 						value={inputMessage}
@@ -225,10 +242,13 @@ const MessagesInput = ({ selectedContact }) => {
 						}}
 					/>
 				</div>
-				<SendIcon
-					className={classes.sendMessageIcons}
+				<IconButton
+					aria-label="emojiPicker"
+					component="span"
 					onClick={handleSendMessage}
-				/>
+				>
+					<SendIcon className={classes.sendMessageIcons} />
+				</IconButton>
 			</Paper>
 		);
 	}
