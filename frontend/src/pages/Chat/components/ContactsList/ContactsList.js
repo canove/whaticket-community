@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../../../../util/api";
 import openSocket from "socket.io-client";
+import moment from "moment-timezone";
 
 import profileDefaultPic from "../../../../Images/profile_default.png";
 
@@ -13,12 +14,12 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
-import Typography from "@material-ui/core/Typography";
 
 import ContactsHeader from "../ContactsHeader/ContactsHeader";
 
@@ -87,6 +88,19 @@ const useStyles = makeStyles(theme => ({
 		border: "none",
 		borderRadius: 30,
 	},
+
+	contactNameWrapper: {
+		display: "flex",
+		// display: "inline",
+	},
+
+	contactName: {
+		// flex: 1,
+	},
+
+	lastMessageTime: {
+		marginLeft: "auto",
+	},
 }));
 
 const ContactsList = ({ selectedContact, setSelectedContact }) => {
@@ -102,18 +116,16 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 	useEffect(() => {
 		const fetchContacts = async () => {
 			try {
-				const res = await api.get("/contacts", {
-					headers: { Authorization: "Bearer " + token },
-				});
+				const res = await api.get(
+					"/contacts"
+					// { headers: { Authorization: "Bearer " + token }, }
+				);
 				setContacts(res.data);
 				setDisplayedContacts(res.data);
 			} catch (err) {
-				if (err.response.data.message === "invalidToken") {
-					localStorage.removeItem("token");
-					localStorage.removeItem("username");
-					localStorage.removeItem("userId");
-					history.push("/login");
-					alert("Sessão expirada, por favor, faça login novamente.");
+				if (err) {
+					console.log(err);
+					alert(err);
 				}
 				console.log(err);
 			}
@@ -206,9 +218,35 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 									></Avatar>
 								</ListItemAvatar>
 								<ListItemText
-									primaryTypographyProps={{ noWrap: true }}
-									secondaryTypographyProps={{ noWrap: true }}
-									primary={contact.name}
+									// primaryTypographyProps={{ noWrap: true }}
+									// secondaryTypographyProps={{ noWrap: true }}
+
+									primary={
+										<div className={classes.contactNameWrapper}>
+											<Typography
+												className={classes.contactName}
+												noWrap
+												component="span"
+												variant="body2"
+												color="textPrimary"
+											>
+												{contact.name}
+											</Typography>
+											{contact.messages && contact.messages[0] && (
+												<Typography
+													className={classes.lastMessageTime}
+													oWrap
+													component="span"
+													variant="body2"
+													color="textSecondary"
+												>
+													{moment(contact.messages[0].createdAt)
+														.tz("America/Sao_Paulo")
+														.format("HH:mm")}
+												</Typography>
+											)}
+										</div>
+									}
 									secondary={
 										(contact.messages &&
 											contact.messages[0] &&

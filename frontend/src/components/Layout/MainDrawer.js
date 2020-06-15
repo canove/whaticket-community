@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -16,6 +16,12 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MainListItems from "./MainListItems";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+
+import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@material-ui/core/Menu";
+
+import { AuthContext } from "../../Context/Auth/AuthContext";
 
 const drawerWidth = 240;
 
@@ -98,14 +104,34 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const MainDrawer = ({ appTitle, children }) => {
+	const { handleLogout } = useContext(AuthContext);
 	const classes = useStyles();
 	const [open, setOpen] = useState(true);
+	const [anchorEl, setAnchorEl] = React.useState(null);
+	const menuOpen = Boolean(anchorEl);
+	const drawerState = localStorage.getItem("drawerOpen");
+
+	useEffect(() => {
+		if (drawerState === "0") {
+			setOpen(false);
+		}
+	}, [drawerState]);
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
+		localStorage.setItem("drawerOpen", 1);
 	};
 	const handleDrawerClose = () => {
 		setOpen(false);
+		localStorage.setItem("drawerOpen", 0);
+	};
+
+	const handleMenu = event => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
 	};
 
 	return (
@@ -159,6 +185,36 @@ const MainDrawer = ({ appTitle, children }) => {
 							<NotificationsIcon />
 						</Badge>
 					</IconButton>
+
+					<div>
+						<IconButton
+							aria-label="account of current user"
+							aria-controls="menu-appbar"
+							aria-haspopup="true"
+							onClick={handleMenu}
+							color="inherit"
+						>
+							<AccountCircle />
+						</IconButton>
+						<Menu
+							id="menu-appbar"
+							anchorEl={anchorEl}
+							anchorOrigin={{
+								vertical: "top",
+								horizontal: "right",
+							}}
+							keepMounted
+							transformOrigin={{
+								vertical: "top",
+								horizontal: "right",
+							}}
+							open={menuOpen}
+							onClose={handleClose}
+						>
+							<MenuItem onClick={handleClose}>Profile</MenuItem>
+							<MenuItem onClick={handleLogout}>Logout</MenuItem>
+						</Menu>
+					</div>
 				</Toolbar>
 			</AppBar>
 			<main className={classes.content}>

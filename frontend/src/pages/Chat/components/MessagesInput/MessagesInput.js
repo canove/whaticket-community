@@ -77,7 +77,6 @@ const MessagesInput = ({ selectedContact, searchParam }) => {
 	const contactId = selectedContact.id;
 	const userId = localStorage.getItem("userId");
 	const username = localStorage.getItem("username");
-	const token = localStorage.getItem("token");
 
 	const mediaInitialState = { preview: "", raw: "", name: "" };
 	const [media, setMedia] = useState(mediaInitialState);
@@ -131,9 +130,7 @@ const MessagesInput = ({ selectedContact, searchParam }) => {
 		formData.append("messageBody", media.name);
 
 		try {
-			await api.post(`/messages/${contactId}`, formData, {
-				headers: { Authorization: "Bearer " + token },
-			});
+			await api.post(`/messages/${contactId}`, formData);
 		} catch (err) {
 			console.log(err);
 			alert(err);
@@ -151,9 +148,7 @@ const MessagesInput = ({ selectedContact, searchParam }) => {
 			messageBody: `${username}: ${inputMessage.trim()}`,
 		};
 		try {
-			await api.post(`/messages/${contactId}`, message, {
-				headers: { Authorization: "Bearer " + token },
-			});
+			await api.post(`/messages/${contactId}`, message);
 		} catch (err) {
 			alert(err);
 		}

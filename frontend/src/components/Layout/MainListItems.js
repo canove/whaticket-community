@@ -10,7 +10,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Collapse from "@material-ui/core/Collapse";
 
 import DashboardIcon from "@material-ui/icons/Dashboard";
-import PeopleIcon from "@material-ui/icons/People";
+import WhatsAppIcon from "@material-ui/icons/WhatsApp";
+// import PeopleIcon from "@material-ui/icons/People";
+import BorderOuterIcon from "@material-ui/icons/BorderOuter";
 import ChatIcon from "@material-ui/icons/Chat";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import LayersIcon from "@material-ui/icons/Layers";
@@ -25,7 +27,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function ListItemLink(props) {
-	const { icon, primary, to } = props;
+	const { icon, primary, to, className } = props;
 
 	const renderLink = React.useMemo(
 		() =>
@@ -37,7 +39,7 @@ function ListItemLink(props) {
 
 	return (
 		<li>
-			<ListItem button component={renderLink}>
+			<ListItem button component={renderLink} className={className}>
 				{icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
 				<ListItemText primary={primary} />
 			</ListItem>
@@ -56,33 +58,38 @@ const MainListItems = () => {
 	return (
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
-			<ListItemLink to="/chat" primary="Chat" icon={<ChatIcon />} />
 
 			<ListItem button onClick={handleClick}>
 				<ListItemIcon>
-					<PeopleIcon />
+					<WhatsAppIcon />
 				</ListItemIcon>
-				<ListItemText primary="Clientes" />
+				<ListItemText primary="WhatsApp" />
 				{open ? <ExpandLess /> : <ExpandMore />}
 			</ListItem>
 			<Collapse in={open} timeout="auto" unmountOnExit>
 				<List component="div" disablePadding>
-					<ListItem button className={classes.nested}>
-						<ListItemIcon>
-							<LayersIcon />
-						</ListItemIcon>
-						<ListItemText primary="Starred" />
-					</ListItem>
+					<ListItemLink
+						className={classes.nested}
+						to="/whats-auth"
+						primary="Autenticação"
+						icon={<BorderOuterIcon />}
+					/>
+					<ListItemLink
+						className={classes.nested}
+						to="/chat"
+						primary="Chat"
+						icon={<ChatIcon />}
+					/>
 				</List>
 			</Collapse>
 
-			<ListItem button>
+			<ListItem button disabled>
 				<ListItemIcon>
 					<BarChartIcon />
 				</ListItemIcon>
 				<ListItemText primary="Relatórios" />
 			</ListItem>
-			<ListItem button>
+			<ListItem button disabled>
 				<ListItemIcon>
 					<LayersIcon />
 				</ListItemIcon>

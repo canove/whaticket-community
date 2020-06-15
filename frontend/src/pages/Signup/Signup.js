@@ -54,6 +54,7 @@ const useStyles = makeStyles(theme => ({
 const SignUp = () => {
 	const classes = useStyles();
 	const history = useHistory();
+
 	const [user, setUser] = useState({ name: "", email: "", password: "" });
 
 	const handleChangeInput = e => {

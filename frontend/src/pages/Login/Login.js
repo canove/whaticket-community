@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import api from "../../util/api";
+import React, { useState, useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import Avatar from "@material-ui/core/Avatar";
@@ -16,6 +14,8 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+
+import { AuthContext } from "../../Context/Auth/AuthContext";
 
 const Copyright = () => {
 	return (
@@ -51,27 +51,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Login = ({ showToast }) => {
-	const [user, setUser] = useState({ email: "", password: "" });
-	const history = useHistory();
-
 	const classes = useStyles();
 
-	const handleLogin = async e => {
-		e.preventDefault();
-		try {
-			const res = await api.post("/auth/login", user);
-			localStorage.setItem("token", res.data.token);
-			localStorage.setItem("username", res.data.username);
-			localStorage.setItem("userId", res.data.userId);
-			// const remainingMilliseconds = 60 * 60 * 1000;
-			// const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
-			// localStorage.setItem("expiryDate", expiryDate.toISOString());
-			showToast(1, "Login efetuado com sucesso");
-			history.push("/chat");
-		} catch (err) {
-			console.log(err);
-		}
-	};
+	const [user, setUser] = useState({ email: "", password: "" });
+
+	const { handleLogin } = useContext(AuthContext);
 
 	const handleChangeInput = e => {
 		setUser({ ...user, [e.target.name]: e.target.value });

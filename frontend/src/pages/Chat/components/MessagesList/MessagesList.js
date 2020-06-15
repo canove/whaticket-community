@@ -218,7 +218,6 @@ const MessagesList = ({ selectedContact }) => {
 			const fetchMessages = async () => {
 				try {
 					const res = await api.get("/messages/" + contactId, {
-						headers: { Authorization: "Bearer " + token },
 						params: { searchParam, pageNumber },
 					});
 					setMessagesList(prevMessages => {

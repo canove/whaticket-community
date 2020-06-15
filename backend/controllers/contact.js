@@ -7,7 +7,7 @@ exports.getContacts = async (req, res) => {
 		const contacts = await Contact.findAll({
 			include: {
 				model: Message,
-				attributes: ["messageBody"],
+				attributes: ["messageBody", "createdAt"],
 			},
 			attributes: {
 				include: [
