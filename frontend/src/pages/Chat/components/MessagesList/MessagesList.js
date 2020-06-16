@@ -20,7 +20,6 @@ import openSocket from "socket.io-client";
 import moment from "moment-timezone";
 import InfiniteScrollReverse from "react-infinite-scroll-reverse";
 import ModalImage from "react-modal-image";
-import ReactAudioPlayer from "react-audio-player";
 import MessagesInput from "../MessagesInput/MessagesInput";
 
 const useStyles = makeStyles(theme => ({
@@ -313,7 +312,11 @@ const MessagesList = ({ selectedContact }) => {
 			);
 		}
 		if (message.mediaType === "audio") {
-			return <ReactAudioPlayer src={message.mediaUrl} controls />;
+			return (
+				<audio controls>
+					<source src={message.mediaUrl} type="audio/ogg"></source>
+				</audio>
+			);
 		}
 
 		if (message.mediaType === "video") {

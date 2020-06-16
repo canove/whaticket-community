@@ -13,7 +13,6 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
@@ -24,11 +23,6 @@ import InputBase from "@material-ui/core/InputBase";
 import ContactsHeader from "../ContactsHeader/ContactsHeader";
 
 const useStyles = makeStyles(theme => ({
-	badgeStyle: {
-		color: "white",
-		backgroundColor: green[500],
-	},
-
 	contactsWrapper: {
 		display: "flex",
 		height: "100%",
@@ -94,12 +88,23 @@ const useStyles = makeStyles(theme => ({
 		// display: "inline",
 	},
 
-	contactName: {
-		// flex: 1,
-	},
-
 	lastMessageTime: {
 		marginLeft: "auto",
+	},
+
+	contactLastMessage: {
+		paddingRight: 20,
+	},
+
+	newMessagesCount: {
+		alignSelf: "center",
+		marginRight: 8,
+		marginLeft: "auto",
+	},
+
+	badgeStyle: {
+		color: "white",
+		backgroundColor: green[500],
 	},
 }));
 
@@ -112,6 +117,14 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 	const [notification, setNotification] = useState(true);
 
 	const history = useHistory();
+
+	useEffect(() => {
+		if (!("Notification" in window)) {
+			console.log("Esse navegador não suporte notificações");
+		} else {
+			Notification.requestPermission();
+		}
+	}, []);
 
 	useEffect(() => {
 		const fetchContacts = async () => {
@@ -139,9 +152,6 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 		socket.emit("joinNotification");
 
 		socket.on("contact", data => {
-			if (data.action === "create") {
-				addContact(data.contact);
-			}
 			if (data.action === "updateUnread") {
 				resetUnreadMessages(data.contactId);
 			}
@@ -149,13 +159,40 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 
 		socket.on("appMessage", data => {
 			setNotification(prevState => !prevState);
-			// handleUnreadMessages(data.message.contactId);
+			if (
+				selectedContact &&
+				data.message.contactId === selectedContact.id &&
+				document.visibilityState === "visible"
+			) {
+				return;
+			}
+
+			let contactImageUrl = profileDefaultPic;
+			let contactName = "Novo Contato";
+
+			const contactIndex = contacts.findIndex(
+				contact => contact.id === data.message.contactId
+			);
+
+			if (contactIndex !== -1) {
+				contactImageUrl = contacts[contactIndex].imageURL;
+				contactName = contacts[contactIndex].name;
+			}
+
+			const options = {
+				body: `${data.message.messageBody} - ${moment(new Date())
+					.tz("America/Sao_Paulo")
+					.format("DD/MM/YY - HH:mm")}`,
+				icon: contactImageUrl,
+			};
+			new Notification(`Mensagem de ${contactName}`, options);
+			document.getElementById("sound").play();
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, []);
+	}, [selectedContact, contacts]);
 
 	const resetUnreadMessages = contactId => {
 		setDisplayedContacts(prevState => {
@@ -167,14 +204,8 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 		});
 	};
 
-	const addContact = contact => {
-		setContacts(prevState => [contact, ...prevState]);
-		setDisplayedContacts(prevState => [contact, ...prevState]);
-	};
-
 	const handleSelectContact = (e, contact) => {
 		setSelectedContact(contact);
-		// setNotification(prevState => !prevState);
 	};
 
 	const handleSearchContact = e => {
@@ -218,13 +249,9 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 									></Avatar>
 								</ListItemAvatar>
 								<ListItemText
-									// primaryTypographyProps={{ noWrap: true }}
-									// secondaryTypographyProps={{ noWrap: true }}
-
 									primary={
-										<div className={classes.contactNameWrapper}>
+										<span className={classes.contactNameWrapper}>
 											<Typography
-												className={classes.contactName}
 												noWrap
 												component="span"
 												variant="body2"
@@ -235,7 +262,7 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 											{contact.messages && contact.messages[0] && (
 												<Typography
 													className={classes.lastMessageTime}
-													oWrap
+													noWrap
 													component="span"
 													variant="body2"
 													color="textSecondary"
@@ -245,31 +272,44 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 														.format("HH:mm")}
 												</Typography>
 											)}
-										</div>
+										</span>
 									}
 									secondary={
-										(contact.messages &&
-											contact.messages[0] &&
-											contact.messages[0].messageBody) ||
-										"-"
+										<span className={classes.contactNameWrapper}>
+											<Typography
+												className={classes.contactLastMessage}
+												noWrap
+												component="span"
+												variant="body2"
+												color="textSecondary"
+											>
+												{(contact.messages &&
+													contact.messages[0] &&
+													contact.messages[0].messageBody) || <br />}
+											</Typography>
+											{contact.unreadMessages > 0 && (
+												<Badge
+													className={classes.newMessagesCount}
+													badgeContent={contact.unreadMessages}
+													classes={{
+														badge: classes.badgeStyle,
+													}}
+												/>
+											)}
+										</span>
 									}
 								/>
-								<ListItemSecondaryAction>
-									{contact.unreadMessages > 0 && (
-										<Badge
-											badgeContent={contact.unreadMessages}
-											classes={{
-												badge: classes.badgeStyle,
-											}}
-										/>
-									)}
-								</ListItemSecondaryAction>
 							</ListItem>
 							<Divider variant="inset" component="li" />
 						</React.Fragment>
 					))}
 				</List>
 			</Paper>
+			<audio id="sound" preload="auto">
+				<source src={require("../../../../util/sound.mp3")} type="audio/mpeg" />
+				<source src={require("../../../../util/sound.ogg")} type="audio/ogg" />
+				<embed hidden={true} autostart="false" loop={false} src="./sound.mp3" />
+			</audio>
 		</div>
 	);
 };

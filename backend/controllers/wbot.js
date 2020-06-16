@@ -1,39 +1,42 @@
-const path = require("path");
 const qrCode = require("qrcode-terminal");
-const fs = require("fs");
 const { Client } = require("whatsapp-web.js");
+const Whatsapp = require("../models/Whatsapp");
+
 let wbot;
 
 module.exports = {
-	init: () => {
-		const SESSION_FILE_PATH = path.join(__dirname, "/session.json");
+	init: async () => {
 		let sessionCfg;
-		if (fs.existsSync(SESSION_FILE_PATH)) {
-			sessionCfg = require(SESSION_FILE_PATH);
+
+		const dbSession = await Whatsapp.findOne({ where: { id: 1 } });
+		if (dbSession && dbSession.session) {
+			sessionCfg = JSON.parse(dbSession.session);
 		}
+
 		wbot = new Client({
 			session: sessionCfg,
+			restartOnAuthFail: true,
 		});
 		wbot.initialize();
-		wbot.on("qr", qr => {
+		wbot.on("qr", async qr => {
 			qrCode.generate(qr, { small: true });
+			await Whatsapp.upsert({ id: 1, qrcode: qr, status: "pending" });
 		});
-		wbot.on("authenticated", session => {
+		wbot.on("authenticated", async session => {
 			console.log("AUTHENTICATED");
-			sessionCfg = session;
-			fs.writeFile(SESSION_FILE_PATH, JSON.stringify(sessionCfg), function (
-				err
-			) {
-				if (err) {
-					console.error(err);
-				}
+			await Whatsapp.upsert({
+				id: 1,
+				session: JSON.stringify(session),
+				status: "authenticated",
 			});
 		});
-		wbot.on("auth_failure", msg => {
+		wbot.on("auth_failure", async msg => {
 			console.error("AUTHENTICATION FAILURE", msg);
+			await Whatsapp.destroy({ where: { id: 1 } });
 		});
 		wbot.on("ready", async () => {
 			console.log("READY");
+			await Whatsapp.update({ status: "online" }, { where: { id: 1 } });
 			// const chats = await wbot.getChats(); // pega as mensagens nao lidas (recebidas quando o bot estava offline)
 			// let unreadMessages;                  // todo > salvar isso no DB pra mostrar no frontend
 			// for (let chat of chats) {
@@ -45,6 +48,7 @@ module.exports = {
 			// }
 
 			// console.log(unreadMessages);
+			wbot.sendPresenceAvailable();
 		});
 
 		return wbot;

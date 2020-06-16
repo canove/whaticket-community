@@ -7,6 +7,7 @@ const multer = require("multer");
 const wBot = require("./controllers/wbot");
 const Contact = require("./models/Contact");
 const wbotMessageListener = require("./controllers/wbotMessageListener");
+const wbotMonitor = require("./controllers/wbotMonitor");
 
 const messageRoutes = require("./routes/message");
 const ContactRoutes = require("./routes/contacts");
@@ -61,9 +62,10 @@ sequelize
 			});
 		});
 
-		wBot.init();
-		wbotMessageListener();
-
+		wBot.init().then(res => {
+			wbotMessageListener();
+			wbotMonitor();
+		});
 		console.log("Server started");
 	})
 	.catch(err => {

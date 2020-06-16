@@ -4,7 +4,9 @@ import MainDrawer from "../../components/Layout/MainDrawer";
 const Dashboard = () => {
 	return (
 		<div>
-			<MainDrawer appTitle="Dashboard"></MainDrawer>
+			<MainDrawer appTitle="Dashboard">
+				<h1>Todo Dashboard</h1>
+			</MainDrawer>
 		</div>
 	);
 };

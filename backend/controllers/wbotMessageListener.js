@@ -5,7 +5,7 @@ const path = require("path");
 const fs = require("fs");
 
 const { getIO } = require("../socket");
-const { getWbot } = require("./wbot");
+const { getWbot, init } = require("./wbot");
 
 const wbotMessageListener = () => {
 	const io = getIO();
@@ -14,6 +14,9 @@ const wbotMessageListener = () => {
 	wbot.on("message", async msg => {
 		let newMessage;
 		console.log(msg);
+		if (msg.from === "status@broadcast") {
+			return;
+		}
 		const msgContact = await msg.getContact();
 		const imageUrl = await msgContact.getProfilePicUrl();
 		try {
@@ -21,19 +24,16 @@ const wbotMessageListener = () => {
 				where: { number: msgContact.number },
 			});
 
+			if (contact) {
+				await contact.update({ imageURL: imageUrl });
+			}
+
 			if (!contact) {
 				try {
 					contact = await Contact.create({
 						name: msgContact.pushname || msgContact.number.toString(),
 						number: msgContact.number,
 						imageURL: imageUrl,
-					});
-
-					// contact.dataValues.unreadMessages = 1;
-
-					io.to("notification").emit("contact", {
-						action: "create",
-						contact: contact,
 					});
 				} catch (err) {
 					console.log(err);
@@ -45,8 +45,7 @@ const wbotMessageListener = () => {
 				if (media) {
 					if (!media.filename) {
 						let ext = media.mimetype.split("/")[1].split(";")[0];
-						let aux = Math.random(5).toString();
-						media.filename = aux.split(".")[1] + "." + ext;
+						media.filename = `${new Date().getTime()}.${ext}`;
 					}
 
 					fs.writeFile(
@@ -72,10 +71,19 @@ const wbotMessageListener = () => {
 				});
 			}
 
-			io.to(contact.id).to("notification").emit("appMessage", {
-				action: "create",
-				message: newMessage,
-			});
+			io.to(contact.id)
+				.to("notification")
+				.emit("appMessage", {
+					action: "create",
+					message: {
+						...newMessage.dataValues,
+						mediaUrl: `${
+							newMessage.mediaUrl
+								? `http://localhost:8080/public/${newMessage.mediaUrl}`
+								: ""
+						}`,
+					},
+				});
 
 			let chat = await msg.getChat();
 			chat.sendSeen();
@@ -90,6 +98,7 @@ const wbotMessageListener = () => {
 				where: { id: msg.id.id },
 			});
 			if (!messageToUpdate) {
+				// will throw an error is msg wasn't sent from app
 				const error = new Error(
 					"Erro ao alterar o ack da mensagem no banco de dados"
 				);
