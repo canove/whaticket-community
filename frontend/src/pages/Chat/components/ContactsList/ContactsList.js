@@ -114,7 +114,6 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 
 	const [contacts, setContacts] = useState([]);
 	const [displayedContacts, setDisplayedContacts] = useState([]);
-	const [notification, setNotification] = useState(true);
 
 	const history = useHistory();
 
@@ -129,10 +128,7 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 	useEffect(() => {
 		const fetchContacts = async () => {
 			try {
-				const res = await api.get(
-					"/contacts"
-					// { headers: { Authorization: "Bearer " + token }, }
-				);
+				const res = await api.get("/contacts");
 				setContacts(res.data);
 				setDisplayedContacts(res.data);
 			} catch (err) {
@@ -144,7 +140,7 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 			}
 		};
 		fetchContacts();
-	}, [token, notification, history]);
+	}, [token, history]);
 
 	useEffect(() => {
 		const socket = openSocket("http://localhost:8080");
@@ -158,7 +154,6 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 		});
 
 		socket.on("appMessage", data => {
-			setNotification(prevState => !prevState);
 			if (
 				selectedContact &&
 				data.message.contactId === selectedContact.id &&
@@ -177,22 +172,39 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 			if (contactIndex !== -1) {
 				contactImageUrl = contacts[contactIndex].imageURL;
 				contactName = contacts[contactIndex].name;
+				setDisplayedContacts(prevState => {
+					let aux = [...prevState];
+					aux.unshift(aux.splice(contactIndex, 1)[0]);
+					return aux;
+				});
+				setContacts(prevState => {
+					let aux = [...prevState];
+					aux[contactIndex].unreadMessages++;
+					aux.unshift(aux.splice(contactIndex, 1)[0]);
+					return aux;
+				});
+			} else {
+				setContacts(prevState => [data.contact, ...prevState]);
+				setDisplayedContacts(prevState => [data.contact, ...prevState]);
 			}
-
-			const options = {
-				body: `${data.message.messageBody} - ${moment(new Date())
-					.tz("America/Sao_Paulo")
-					.format("DD/MM/YY - HH:mm")}`,
-				icon: contactImageUrl,
-			};
-			new Notification(`Mensagem de ${contactName}`, options);
-			document.getElementById("sound").play();
+			showNotification(data, contactName, contactImageUrl);
 		});
 
 		return () => {
 			socket.disconnect();
 		};
 	}, [selectedContact, contacts]);
+
+	const showNotification = (data, contactName, contactImageUrl) => {
+		const options = {
+			body: `${data.message.messageBody} - ${moment(new Date())
+				.tz("America/Sao_Paulo")
+				.format("DD/MM/YY - HH:mm")}`,
+			icon: contactImageUrl,
+		};
+		new Notification(`Mensagem de ${contactName}`, options);
+		document.getElementById("sound").play();
+	};
 
 	const resetUnreadMessages = contactId => {
 		setDisplayedContacts(prevState => {
@@ -259,15 +271,14 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 											>
 												{contact.name}
 											</Typography>
-											{contact.messages && contact.messages[0] && (
+											{contact.lastMessage && (
 												<Typography
 													className={classes.lastMessageTime}
-													noWrap
 													component="span"
 													variant="body2"
 													color="textSecondary"
 												>
-													{moment(contact.messages[0].createdAt)
+													{moment(contact.updatedAt)
 														.tz("America/Sao_Paulo")
 														.format("HH:mm")}
 												</Typography>
@@ -283,9 +294,7 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 												variant="body2"
 												color="textSecondary"
 											>
-												{(contact.messages &&
-													contact.messages[0] &&
-													contact.messages[0].messageBody) || <br />}
+												{contact.lastMessage || <br />}
 											</Typography>
 											{contact.unreadMessages > 0 && (
 												<Badge

@@ -13,7 +13,7 @@ const wbotMonitor = () => {
 	const wbot = getWbot();
 
 	wbot.on("change_state", newState => {
-		console.log(newState);
+		console.log("monitor", newState);
 	});
 
 	wbot.on("change_battery", batteryInfo => {
@@ -27,7 +27,10 @@ const wbotMonitor = () => {
 		wbot.destroy();
 		setTimeout(() =>
 			init()
-				.then(res => wbotMessageListener(), 2000)
+				.then(res => {
+					wbotMessageListener();
+					wbotMonitor();
+				})
 				.catch(err => console.log(err))
 		);
 	});

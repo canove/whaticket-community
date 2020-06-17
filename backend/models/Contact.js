@@ -8,7 +8,7 @@ const Contact = sequelize.define("contact", {
 	name: { type: Sequelize.STRING(100), allowNull: false },
 	number: { type: Sequelize.STRING(15), allowNull: false },
 	imageURL: { type: Sequelize.STRING(200) },
-	ateraId: Sequelize.INTEGER(),
+	lastMessage: { type: Sequelize.TEXT },
 });
 
 Contact.hasMany(Message, {

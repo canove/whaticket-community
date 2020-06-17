@@ -12,6 +12,7 @@ const wbotMonitor = require("./controllers/wbotMonitor");
 const messageRoutes = require("./routes/message");
 const ContactRoutes = require("./routes/contacts");
 const AuthRoutes = require("./routes/auth");
+const WhatsRoutes = require("./routes/whatsapp");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use(messageRoutes);
 app.use(ContactRoutes);
+app.use(WhatsRoutes);
 app.use("/auth", AuthRoutes);
 
 app.use((error, req, res, next) => {

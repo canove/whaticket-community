@@ -13,80 +13,91 @@ const wbotMessageListener = () => {
 
 	wbot.on("message", async msg => {
 		let newMessage;
-		console.log(msg);
+		// console.log(msg);
 		if (msg.from === "status@broadcast") {
 			return;
 		}
-		const msgContact = await msg.getContact();
-		const imageUrl = await msgContact.getProfilePicUrl();
 		try {
-			let contact = await Contact.findOne({
-				where: { number: msgContact.number },
-			});
+			const msgContact = await msg.getContact();
+			const imageUrl = await msgContact.getProfilePicUrl();
+			try {
+				let contact = await Contact.findOne({
+					where: { number: msgContact.number },
+				});
 
-			if (contact) {
-				await contact.update({ imageURL: imageUrl });
-			}
-
-			if (!contact) {
-				try {
-					contact = await Contact.create({
-						name: msgContact.pushname || msgContact.number.toString(),
-						number: msgContact.number,
-						imageURL: imageUrl,
-					});
-				} catch (err) {
-					console.log(err);
+				if (contact) {
+					await contact.update({ imageURL: imageUrl });
 				}
-			}
-			if (msg.hasMedia) {
-				const media = await msg.downloadMedia();
 
-				if (media) {
-					if (!media.filename) {
-						let ext = media.mimetype.split("/")[1].split(";")[0];
-						media.filename = `${new Date().getTime()}.${ext}`;
+				if (!contact) {
+					try {
+						contact = await Contact.create({
+							name: msgContact.pushname || msgContact.number.toString(),
+							number: msgContact.number,
+							imageURL: imageUrl,
+						});
+					} catch (err) {
+						console.log(err);
 					}
+				}
+				if (msg.hasMedia) {
+					const media = await msg.downloadMedia();
 
-					fs.writeFile(
-						path.join(__dirname, "..", "public", media.filename),
-						media.data,
-						"base64",
-						err => {
-							console.log(err);
+					if (media) {
+						if (!media.filename) {
+							let ext = media.mimetype.split("/")[1].split(";")[0];
+							media.filename = `${new Date().getTime()}.${ext}`;
 						}
-					);
 
+						fs.writeFile(
+							path.join(__dirname, "..", "public", media.filename),
+							media.data,
+							"base64",
+							err => {
+								console.log(err);
+							}
+						);
+
+						newMessage = await contact.createMessage({
+							id: msg.id.id,
+							messageBody: msg.body || media.filename,
+							mediaUrl: media.filename,
+							mediaType: media.mimetype.split("/")[0],
+						});
+						await contact.update({ lastMessage: msg.body || media.filename });
+					}
+				} else {
 					newMessage = await contact.createMessage({
 						id: msg.id.id,
-						messageBody: msg.body || media.filename,
-						mediaUrl: media.filename,
-						mediaType: media.mimetype.split("/")[0],
+						messageBody: msg.body,
 					});
+					await contact.update({ lastMessage: msg.body });
 				}
-			} else {
-				newMessage = await contact.createMessage({
-					id: msg.id.id,
-					messageBody: msg.body,
-				});
+
+				io.to(contact.id)
+					.to("notification")
+					.emit("appMessage", {
+						action: "create",
+						message: {
+							...newMessage.dataValues,
+							mediaUrl: `${
+								newMessage.mediaUrl
+									? `http://localhost:8080/public/${newMessage.mediaUrl}`
+									: ""
+							}`,
+						},
+						contact: {
+							...contact.dataValues,
+							unreadMessages: 1,
+							lastMessage: newMessage.messageBody,
+						},
+					});
+
+				let chat = await msg.getChat();
+				chat.sendSeen();
+			} catch (err) {
+				console.log(err);
 			}
-
-			io.to(contact.id)
-				.to("notification")
-				.emit("appMessage", {
-					action: "create",
-					message: {
-						...newMessage.dataValues,
-						mediaUrl: `${
-							newMessage.mediaUrl
-								? `http://localhost:8080/public/${newMessage.mediaUrl}`
-								: ""
-						}`,
-					},
-				});
-
-			let chat = await msg.getChat();
-			chat.sendSeen();
 		} catch (err) {
 			console.log(err);
 		}
