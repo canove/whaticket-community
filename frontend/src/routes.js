@@ -57,6 +57,7 @@ const Routes = () => {
 				<Switch>
 					<PrivateRoute exact path="/" component={Dashboard} />
 					<PrivateRoute exact path="/chat" component={Chat} />
+					<PrivateRoute exact path="/chat/:contactId" component={Chat} />
 					<PrivateRoute exact path="/profile" component={Profile} />
 					<PrivateRoute exact path="/whats-auth" component={WhatsAuth} />
 					<PublicRoute exact path="/login" component={Login} />

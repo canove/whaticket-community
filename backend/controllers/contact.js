@@ -3,12 +3,23 @@ const Message = require("../models/Message");
 const Sequelize = require("sequelize");
 
 exports.getContacts = async (req, res) => {
+	const { searchParam } = req.query;
+
+	const lowerSerachParam = searchParam.toLowerCase();
+
+	const whereCondition = {
+		name: Sequelize.where(
+			Sequelize.fn("LOWER", Sequelize.col("name")),
+			"LIKE",
+			"%" + lowerSerachParam + "%"
+		),
+	};
+
+	//todo >> add contact number to search where condition
+
 	try {
 		const contacts = await Contact.findAll({
-			include: {
-				model: Message,
-				attributes: [],
-			},
+			where: whereCondition,
 			attributes: {
 				include: [
 					[
@@ -25,7 +36,7 @@ exports.getContacts = async (req, res) => {
 					],
 				],
 			},
-			order: [[Message, "createdAt", "DESC"]],
+			order: [["updatedAt", "DESC"]],
 		});
 
 		return res.json(contacts);

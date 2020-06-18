@@ -13,6 +13,7 @@
     "emoji-mart": "^3.0.0",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
+    "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
     "react-audio-player": "^0.13.0",
     "react-bootstrap": "^1.0.1",

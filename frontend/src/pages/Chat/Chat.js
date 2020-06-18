@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
@@ -47,7 +48,7 @@ const useStyles = makeStyles(theme => ({
 
 const Chat = () => {
 	const classes = useStyles();
-	const [selectedContact, setSelectedContact] = useState(null);
+	const { contactId } = useParams();
 
 	return (
 		<div>
@@ -56,15 +57,12 @@ const Chat = () => {
 					<Paper square className={classes.chatPapper}>
 						<Grid container spacing={0}>
 							<Grid item xs={4} className={classes.contactsWrapper}>
-								<ContactsList
-									selectedContact={selectedContact}
-									setSelectedContact={setSelectedContact}
-								/>
+								<ContactsList />
 							</Grid>
 							<Grid item xs={8} className={classes.messagessWrapper}>
-								{selectedContact ? (
+								{contactId ? (
 									<>
-										<MessagesList selectedContact={selectedContact} />
+										<MessagesList />
 									</>
 								) : (
 									<Paper

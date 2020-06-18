@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import api from "../../../../util/api";
 import openSocket from "socket.io-client";
 import moment from "moment-timezone";
@@ -8,6 +8,7 @@ import profileDefaultPic from "../../../../Images/profile_default.png";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -45,6 +46,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	contactsList: {
+		position: "relative",
 		borderTopLeftRadius: 0,
 		borderTopRightRadius: 0,
 		borderBottomRightRadius: 0,
@@ -59,6 +61,7 @@ const useStyles = makeStyles(theme => ({
 		},
 	},
 	contactsSearchBox: {
+		position: "relative",
 		background: "#fafafa",
 		padding: "10px 13px",
 	},
@@ -106,14 +109,24 @@ const useStyles = makeStyles(theme => ({
 		color: "white",
 		backgroundColor: green[500],
 	},
+	circleLoading: {
+		color: green[500],
+		opacity: "70%",
+		position: "absolute",
+		top: 0,
+		left: "50%",
+		marginTop: 12,
+		// marginLeft: -12,
+	},
 }));
 
-const ContactsList = ({ selectedContact, setSelectedContact }) => {
+const ContactsList = () => {
 	const classes = useStyles();
 	const token = localStorage.getItem("token");
-
+	const { contactId } = useParams();
 	const [contacts, setContacts] = useState([]);
-	const [displayedContacts, setDisplayedContacts] = useState([]);
+	const [loading, setLoading] = useState();
+	const [searchParam, setSearchParam] = useState("");
 
 	const history = useHistory();
 
@@ -126,21 +139,23 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 	}, []);
 
 	useEffect(() => {
-		const fetchContacts = async () => {
-			try {
-				const res = await api.get("/contacts");
-				setContacts(res.data);
-				setDisplayedContacts(res.data);
-			} catch (err) {
-				if (err) {
+		setLoading(true);
+		const delayDebounceFn = setTimeout(() => {
+			const fetchContacts = async () => {
+				try {
+					const res = await api.get("/contacts", {
+						params: { searchParam },
+					});
+					setContacts(res.data);
+					setLoading(false);
+				} catch (err) {
 					console.log(err);
-					alert(err);
 				}
-				console.log(err);
-			}
-		};
-		fetchContacts();
-	}, [token, history]);
+			};
+			fetchContacts();
+		}, 1000);
+		return () => clearTimeout(delayDebounceFn);
+	}, [searchParam, token]);
 
 	useEffect(() => {
 		const socket = openSocket("http://localhost:8080");
@@ -154,60 +169,54 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 		});
 
 		socket.on("appMessage", data => {
-			if (
-				selectedContact &&
-				data.message.contactId === selectedContact.id &&
-				document.visibilityState === "visible"
-			) {
-				return;
+			if (data.action === "create") {
+				updateUnreadMessagesCount(data);
+				if (
+					contactId &&
+					data.message.contactId === +contactId &&
+					document.visibilityState === "visible"
+				)
+					return;
+				showDesktopNotification(data);
 			}
-
-			let contactImageUrl = profileDefaultPic;
-			let contactName = "Novo Contato";
-
-			const contactIndex = contacts.findIndex(
-				contact => contact.id === data.message.contactId
-			);
-
-			if (contactIndex !== -1) {
-				contactImageUrl = contacts[contactIndex].imageURL;
-				contactName = contacts[contactIndex].name;
-				setDisplayedContacts(prevState => {
-					let aux = [...prevState];
-					aux.unshift(aux.splice(contactIndex, 1)[0]);
-					return aux;
-				});
-				setContacts(prevState => {
-					let aux = [...prevState];
-					aux[contactIndex].unreadMessages++;
-					aux.unshift(aux.splice(contactIndex, 1)[0]);
-					return aux;
-				});
-			} else {
-				setContacts(prevState => [data.contact, ...prevState]);
-				setDisplayedContacts(prevState => [data.contact, ...prevState]);
-			}
-			showNotification(data, contactName, contactImageUrl);
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [selectedContact, contacts]);
+	}, [contactId]);
 
-	const showNotification = (data, contactName, contactImageUrl) => {
+	const updateUnreadMessagesCount = data => {
+		setContacts(prevState => {
+			const contactIndex = prevState.findIndex(
+				contact => contact.id === data.message.contactId
+			);
+
+			if (contactIndex !== -1) {
+				let aux = [...prevState];
+				aux[contactIndex].unreadMessages++;
+				aux[contactIndex].lastMessage = data.message.messageBody;
+				aux.unshift(aux.splice(contactIndex, 1)[0]);
+				return aux;
+			} else {
+				return [data.contact, ...prevState];
+			}
+		});
+	};
+
+	const showDesktopNotification = data => {
 		const options = {
 			body: `${data.message.messageBody} - ${moment(new Date())
 				.tz("America/Sao_Paulo")
 				.format("DD/MM/YY - HH:mm")}`,
-			icon: contactImageUrl,
+			icon: data.contact.imageURL,
 		};
-		new Notification(`Mensagem de ${contactName}`, options);
+		new Notification(`Mensagem de ${data.contact.name}`, options);
 		document.getElementById("sound").play();
 	};
 
 	const resetUnreadMessages = contactId => {
-		setDisplayedContacts(prevState => {
+		setContacts(prevState => {
 			let aux = [...prevState];
 			let contactIndex = aux.findIndex(contact => contact.id === +contactId);
 			aux[contactIndex].unreadMessages = 0;
@@ -217,17 +226,12 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 	};
 
 	const handleSelectContact = (e, contact) => {
-		setSelectedContact(contact);
+		history.push(`/chat/${contact.id}`);
 	};
 
 	const handleSearchContact = e => {
-		let searchTerm = e.target.value.toLowerCase();
-
-		setDisplayedContacts(
-			contacts.filter(contact =>
-				contact.name.toLowerCase().includes(searchTerm)
-			)
-		);
+		// let searchTerm = e.target.value.toLowerCase();
+		setSearchParam(e.target.value.toLowerCase());
 	};
 
 	return (
@@ -246,12 +250,12 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 			</Paper>
 			<Paper variant="outlined" className={classes.contactsList}>
 				<List>
-					{displayedContacts.map((contact, index) => (
+					{contacts.map((contact, index) => (
 						<React.Fragment key={contact.id}>
 							<ListItem
 								button
 								onClick={e => handleSelectContact(e, contact)}
-								selected={selectedContact && selectedContact.id === contact.id}
+								selected={contactId && +contactId === contact.id}
 							>
 								<ListItemAvatar>
 									<Avatar
@@ -296,15 +300,13 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 											>
 												{contact.lastMessage || <br />}
 											</Typography>
-											{contact.unreadMessages > 0 && (
-												<Badge
-													className={classes.newMessagesCount}
-													badgeContent={contact.unreadMessages}
-													classes={{
-														badge: classes.badgeStyle,
-													}}
-												/>
-											)}
+											<Badge
+												className={classes.newMessagesCount}
+												badgeContent={contact.unreadMessages}
+												classes={{
+													badge: classes.badgeStyle,
+												}}
+											/>
 										</span>
 									}
 								/>
@@ -313,6 +315,11 @@ const ContactsList = ({ selectedContact, setSelectedContact }) => {
 						</React.Fragment>
 					))}
 				</List>
+				{loading ? (
+					<div>
+						<CircularProgress className={classes.circleLoading} />
+					</div>
+				) : null}
 			</Paper>
 			<audio id="sound" preload="auto">
 				<source src={require("../../../../util/sound.mp3")} type="audio/mpeg" />

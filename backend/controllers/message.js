@@ -3,7 +3,7 @@ const Message = require("../models/Message");
 const Contact = require("../models/Contact");
 const { getIO } = require("../socket");
 const { getWbot } = require("./wbot");
-const sequelize = require("sequelize");
+const Sequelize = require("sequelize");
 
 const { MessageMedia } = require("whatsapp-web.js");
 
@@ -44,13 +44,11 @@ exports.getContactMessages = async (req, res, next) => {
 	const { contactId } = req.params;
 	const { searchParam, pageNumber = 1 } = req.query;
 
-	console.log(req.body, req.query);
-
 	const lowerSerachParam = searchParam.toLowerCase();
 
 	const whereCondition = {
-		messageBody: sequelize.where(
-			sequelize.fn("LOWER", sequelize.col("messageBody")),
+		messageBody: Sequelize.where(
+			Sequelize.fn("LOWER", Sequelize.col("messageBody")),
 			"LIKE",
 			"%" + lowerSerachParam + "%"
 		),
@@ -90,7 +88,11 @@ exports.getContactMessages = async (req, res, next) => {
 			};
 		});
 
-		return res.json({ messages: serializedMessages.reverse(), messagesFound });
+		return res.json({
+			messages: serializedMessages.reverse(),
+			contact: contact,
+			messagesFound,
+		});
 	} catch (err) {
 		next(err);
 	}

@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import api from "../../util/api";
 import clsx from "clsx";
 import MainDrawer from "../../components/Layout/MainDrawer";
+import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+import Bateryinfo from "./components/Bateryinfo";
+import Qrcode from "./components/Qrcode";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -41,6 +46,47 @@ const useStyles = makeStyles(theme => ({
 
 const WhatsAuth = () => {
 	const classes = useStyles();
+	const history = useHistory();
+
+	const [qrCode, setQrCode] = useState("");
+	const [session, setSession] = useState({});
+
+	useEffect(() => {
+		const fetchSession = async () => {
+			try {
+				const res = await api.get("/whatsapp/session");
+				setQrCode(res.data.qrcode);
+				setSession(res.data);
+			} catch (err) {
+				console.log(err);
+			}
+		};
+		fetchSession();
+	}, []);
+
+	useEffect(() => {
+		const socket = openSocket("http://localhost:8080");
+
+		socket.on("qrcode", data => {
+			if (data.action === "update") {
+				setQrCode(data.qr);
+			}
+		});
+
+		socket.on("whats_auth", data => {
+			if (data.action === "authentication") {
+				history.push("/chat");
+				setQrCode("");
+				setSession(data.session);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
+
+	console.log(session);
 
 	const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -52,16 +98,20 @@ const WhatsAuth = () => {
 						<div className={classes.appBarSpacer} />
 						<Container maxWidth="lg" className={classes.container}>
 							<Grid container spacing={3}>
-								<Grid item xs={12}>
-									<Paper className={classes.paper}>
-										<h4>Status da conexão</h4>
-									</Paper>
-								</Grid>
-								<Grid item xs={12}>
-									<Paper className={fixedHeightPaper}>
-										<h1>QR Code</h1>
-									</Paper>
-								</Grid>
+								{session.status === "pending" ? (
+									<Grid item xs={6}>
+										<Paper className={classes.paper}>
+											<Qrcode qrCode={qrCode} />
+										</Paper>
+									</Grid>
+								) : (
+									<Grid item xs={6}>
+										<Paper className={classes.paper}>
+											<Bateryinfo sessio={session} />
+										</Paper>
+									</Grid>
+								)}
+
 								{/* <Grid item xs={12} md={4} lg={3}>
 									<Paper className={fixedHeightPaper}>
 										<h1>paper2</h1>

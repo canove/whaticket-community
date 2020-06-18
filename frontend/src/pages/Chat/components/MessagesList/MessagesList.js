@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
@@ -92,6 +93,7 @@ const useStyles = makeStyles(theme => ({
 	circleLoading: {
 		color: green[500],
 		position: "absolute",
+		opacity: "70%",
 		top: 0,
 		left: "50%",
 		marginTop: 12,
@@ -193,13 +195,14 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const MessagesList = ({ selectedContact }) => {
-	const contactId = selectedContact.id;
+const MessagesList = () => {
+	const { contactId } = useParams();
 	const classes = useStyles();
 
 	const token = localStorage.getItem("token");
 
 	const [loading, setLoading] = useState(true);
+	const [contact, setContact] = useState({});
 	const [messagesList, setMessagesList] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
@@ -213,12 +216,12 @@ const MessagesList = ({ selectedContact }) => {
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
-			console.log(searchParam);
 			const fetchMessages = async () => {
 				try {
 					const res = await api.get("/messages/" + contactId, {
 						params: { searchParam, pageNumber },
 					});
+					setContact(res.data.contact);
 					setMessagesList(prevMessages => {
 						return [...res.data.messages, ...prevMessages];
 					});
@@ -444,13 +447,24 @@ const MessagesList = ({ selectedContact }) => {
 	return (
 		<div className={classes.mainWrapper}>
 			<Card variant="outlined" square className={classes.messagesHeader}>
-				<CardHeader
-					titleTypographyProps={{ noWrap: true }}
-					subheaderTypographyProps={{ noWrap: true }}
-					avatar={<Avatar alt="contact_name" src={selectedContact.imageURL} />}
-					title={selectedContact.name}
-					subheader="Contacts Status"
-				/>
+				{!loading ? (
+					<CardHeader
+						titleTypographyProps={{ noWrap: true }}
+						subheaderTypographyProps={{ noWrap: true }}
+						avatar={<Avatar alt="contact_image" src={contact.imageURL} />}
+						title={contact.name}
+						subheader="Contact Status"
+					/>
+				) : (
+					<CardHeader
+						titleTypographyProps={{ noWrap: true }}
+						subheaderTypographyProps={{ noWrap: true }}
+						avatar={<Avatar alt="contact_image" />}
+						title=""
+						subheader=""
+					/>
+				)}
+
 				<div className={classes.messagesSearchInputWrapper}>
 					<SearchIcon className={classes.searchIcon} />
 					<InputBase
@@ -477,10 +491,7 @@ const MessagesList = ({ selectedContact }) => {
 				>
 					{messagesList.length > 0 ? renderMessages() : []}
 				</InfiniteScrollReverse>
-				<MessagesInput
-					selectedContact={selectedContact}
-					searchParam={searchParam}
-				/>
+				<MessagesInput searchParam={searchParam} />
 				{loading ? (
 					<div>
 						<CircularProgress className={classes.circleLoading} />

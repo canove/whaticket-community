@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import api from "../../../../util/api";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
@@ -63,6 +64,7 @@ const useStyles = makeStyles(theme => ({
 
 	circleLoading: {
 		color: green[500],
+		opacity: "70%",
 		position: "absolute",
 		top: "20%",
 		left: "50%",
@@ -72,9 +74,9 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const MessagesInput = ({ selectedContact, searchParam }) => {
+const MessagesInput = ({ searchParam }) => {
 	const classes = useStyles();
-	const contactId = selectedContact.id;
+	const { contactId } = useParams();
 	const userId = localStorage.getItem("userId");
 	const username = localStorage.getItem("username");
 
@@ -90,7 +92,7 @@ const MessagesInput = ({ selectedContact, searchParam }) => {
 			setShowEmoji(false);
 			setMedia({});
 		};
-	}, [selectedContact]);
+	}, [contactId]);
 
 	const handleChangeInput = e => {
 		setInputMessage(e.target.value);

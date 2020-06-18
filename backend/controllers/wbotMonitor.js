@@ -1,9 +1,5 @@
-const Contact = require("../models/Contact");
-const Message = require("../models/Message");
+const Whatsapp = require("../models/Whatsapp");
 const wbotMessageListener = require("./wbotMessageListener");
-
-const path = require("path");
-const fs = require("fs");
 
 const { getIO } = require("../socket");
 const { getWbot, init } = require("./wbot");
@@ -12,32 +8,43 @@ const wbotMonitor = () => {
 	const io = getIO();
 	const wbot = getWbot();
 
-	wbot.on("change_state", newState => {
-		console.log("monitor", newState);
-	});
+	try {
+		wbot.on("change_state", newState => {
+			console.log("monitor", newState);
+		});
 
-	wbot.on("change_battery", batteryInfo => {
-		// Battery percentage for attached device has changed
-		const { battery, plugged } = batteryInfo;
-		console.log(`Battery: ${battery}% - Charging? ${plugged}`);
-	});
+		wbot.on("change_battery", async batteryInfo => {
+			// Battery percentage for attached device has changed
+			const { battery, plugged } = batteryInfo;
+			try {
+				await Whatsapp.update({ battery, plugged }, { where: { id: 1 } });
+			} catch (err) {
+				console.log(err);
+			}
 
-	wbot.on("disconnected", reason => {
-		console.log("disconnected", reason);
-		wbot.destroy();
-		setTimeout(() =>
-			init()
-				.then(res => {
-					wbotMessageListener();
-					wbotMonitor();
-				})
-				.catch(err => console.log(err))
-		);
-	});
+			console.log(`Battery: ${battery}% - Charging? ${plugged}`); //todo> save batery state to db
+		});
 
-	// setInterval(() => {
-	// 	wbot.resetState();
-	// }, 20000);
+		wbot.on("disconnected", reason => {
+			console.log("disconnected", reason); //todo> save connection status to DB
+			setTimeout(
+				() =>
+					init()
+						.then(res => {
+							wbotMessageListener();
+							wbotMonitor();
+						})
+						.catch(err => console.log(err)),
+				2000
+			);
+		});
+
+		// setInterval(() => {
+		// 	wbot.resetState();
+		// }, 20000);
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 module.exports = wbotMonitor;

@@ -12,7 +12,7 @@ import Collapse from "@material-ui/core/Collapse";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 // import PeopleIcon from "@material-ui/icons/People";
-import BorderOuterIcon from "@material-ui/icons/BorderOuter";
+import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import ChatIcon from "@material-ui/icons/Chat";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import LayersIcon from "@material-ui/icons/Layers";
@@ -71,8 +71,8 @@ const MainListItems = () => {
 					<ListItemLink
 						className={classes.nested}
 						to="/whats-auth"
-						primary="Autenticação"
-						icon={<BorderOuterIcon />}
+						primary="Conexão"
+						icon={<SyncAltIcon />}
 					/>
 					<ListItemLink
 						className={classes.nested}
