@@ -30,7 +30,7 @@ const useAuth = () => {
 			setIsAuth(true);
 			history.push("/chat");
 		} catch (err) {
-			console.log(err);
+			alert(err);
 		}
 	};
 

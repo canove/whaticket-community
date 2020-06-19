@@ -15,6 +15,8 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Avatar from "@material-ui/core/Avatar";
 import { green } from "@material-ui/core/colors";
 
+import whatsBackground from "../../../../Images/wa-background.png";
+
 import api from "../../../../util/api";
 import openSocket from "socket.io-client";
 
@@ -74,7 +76,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	messagesList: {
-		backgroundImage: 'url("http://localhost:8080/public/wa-background.png")',
+		backgroundImage: `url(${whatsBackground})`,
 		display: "flex",
 		flexDirection: "column",
 		flexGrow: 1,
