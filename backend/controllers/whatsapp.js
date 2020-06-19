@@ -1,4 +1,4 @@
-const Whatsapp = require("../models/whatsapp");
+const Whatsapp = require("../models/Whatsapp");
 
 exports.getSession = async (req, res, next) => {
 	try {
