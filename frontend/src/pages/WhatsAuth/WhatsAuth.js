@@ -64,7 +64,7 @@ const WhatsAuth = () => {
 	}, []);
 
 	useEffect(() => {
-		const socket = openSocket("http://localhost:8080");
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
 		socket.on("qrcode", data => {
 			if (data.action === "update") {

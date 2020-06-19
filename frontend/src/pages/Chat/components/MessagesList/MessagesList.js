@@ -241,7 +241,7 @@ const MessagesList = () => {
 	}, [searchParam, pageNumber, contactId, token]);
 
 	useEffect(() => {
-		const socket = openSocket("http://localhost:8080/");
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
 		socket.emit("joinChatBox", contactId, () => {});
 
