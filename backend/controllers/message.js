@@ -82,7 +82,7 @@ exports.getContactMessages = async (req, res, next) => {
 				...message.dataValues,
 				mediaUrl: `${
 					message.mediaUrl
-						? `http://localhost:8080/public/${message.mediaUrl}`
+						? `http://localhost:${process.env.PORT}/public/${message.mediaUrl}`
 						: ""
 				}`,
 			};

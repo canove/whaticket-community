@@ -1,3 +1,4 @@
+require("dotenv/config");
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -46,7 +47,7 @@ app.use((error, req, res, next) => {
 sequelize
 	.sync()
 	.then(() => {
-		const server = app.listen(8080);
+		const server = app.listen(process.env.PORT);
 		const io = require("./socket").init(server);
 		io.on("connection", socket => {
 			console.log("Client Connected");
@@ -64,11 +65,11 @@ sequelize
 			});
 		});
 
-		wBot.init().then(res => {
+		wBot.init().then(() => {
 			wbotMessageListener();
 			wbotMonitor();
 		});
-		console.log("Server started");
+		console.log("Server started on", process.env.PORT);
 	})
 	.catch(err => {
 		console.log(err);

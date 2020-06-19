@@ -82,7 +82,7 @@ const wbotMessageListener = () => {
 							...newMessage.dataValues,
 							mediaUrl: `${
 								newMessage.mediaUrl
-									? `http://localhost:8080/public/${newMessage.mediaUrl}`
+									? `http://localhost:${process.env.PORT}/public/${newMessage.mediaUrl}`
 									: ""
 							}`,
 						},

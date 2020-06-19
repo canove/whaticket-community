@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../../util/api";
-import clsx from "clsx";
 import MainDrawer from "../../components/Layout/MainDrawer";
 import openSocket from "socket.io-client";
 
@@ -84,11 +83,9 @@ const WhatsAuth = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, []);
+	}, [history]);
 
 	console.log(session);
-
-	const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
 	return (
 		<div>
