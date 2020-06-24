@@ -12,6 +12,7 @@ const wbotMessageListener = () => {
 	const wbot = getWbot();
 
 	wbot.on("message", async msg => {
+		console.log(msg);
 		let newMessage;
 		// console.log(msg);
 		if (msg.from === "status@broadcast") {
@@ -19,14 +20,14 @@ const wbotMessageListener = () => {
 		}
 		try {
 			const msgContact = await msg.getContact();
-			const imageUrl = await msgContact.getProfilePicUrl();
+			const profilePicUrl = await msgContact.getProfilePicUrl();
 			try {
 				let contact = await Contact.findOne({
 					where: { number: msgContact.number },
 				});
 
 				if (contact) {
-					await contact.update({ profilePicUrl: imageUrl });
+					await contact.update({ profilePicUrl: profilePicUrl });
 				}
 
 				if (!contact) {
@@ -34,12 +35,18 @@ const wbotMessageListener = () => {
 						contact = await Contact.create({
 							name: msgContact.pushname || msgContact.number.toString(),
 							number: msgContact.number,
-							profilePicUrl: imageUrl,
+							profilePicUrl: profilePicUrl,
 						});
 					} catch (err) {
 						console.log(err);
 					}
 				}
+
+				if (msg.hasQuotedMsg) {
+					const quotedMessage = await msg.getQuotedMessage();
+					console.log("quoted", quotedMessage);
+				}
+
 				if (msg.hasMedia) {
 					const media = await msg.downloadMedia();
 
