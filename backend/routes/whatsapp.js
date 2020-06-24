@@ -12,4 +12,11 @@ routes.get("/whatsapp/session", isAuth, WhatsappController.getSession);
 // 	WhatsappController.postCreateContactMessage
 // );
 
+routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts);
+// routes.post(
+// 	"/messages/:contactId",
+// 	isAuth,
+// 	WhatsappController.postCreateContactMessage
+// );
+
 module.exports = routes;

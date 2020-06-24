@@ -2,6 +2,7 @@ const express = require("express");
 const { body } = require("express-validator");
 const User = require("../models/User");
 const authController = require("../controllers/auth");
+const isAuth = require("../middleware/is-auth");
 
 const routes = express.Router();
 
@@ -26,5 +27,9 @@ routes.put(
 );
 
 routes.post("/login", authController.login);
+
+routes.get("/check", isAuth, (req, res) => {
+	res.status(200).json({ authenticated: true });
+});
 
 module.exports = routes;

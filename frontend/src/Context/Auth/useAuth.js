@@ -15,9 +15,29 @@ const useAuth = () => {
 			api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
 			setIsAuth(true);
 		}
+		const checkAuth = async () => {
+			if (
+				history.location.pathname === "/login" ||
+				history.location.pathname === "/signup"
+			) {
+				setLoading(false);
 
-		setLoading(false);
-	}, []);
+				return;
+			}
+			try {
+				const res = await api.get("/auth/check");
+				if (res.status === 200) {
+					setIsAuth(true);
+					setLoading(false);
+				}
+			} catch (err) {
+				setLoading(false);
+				setIsAuth(false);
+				alert("Erro de autenticação. Por favor, faça login novamente");
+			}
+		};
+		checkAuth();
+	}, [history.location.pathname]);
 
 	const handleLogin = async (e, user) => {
 		e.preventDefault();

@@ -5,6 +5,7 @@ module.exports = (req, res, next) => {
 	try {
 		const [, token] = req.get("Authorization").split(" ");
 		decodedToken = jwt.verify(token, "mysecret");
+		req.userId = decodedToken.userId;
 	} catch (err) {
 		err.statusCode = 401;
 		err.message = "invalidToken";
@@ -17,6 +18,5 @@ module.exports = (req, res, next) => {
 		next(error);
 	}
 
-	req.userId = decodedToken.userId;
 	next();
 };

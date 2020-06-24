@@ -24,7 +24,7 @@ const setMessagesAsRead = async contactId => {
 			const error = new Error(
 				"Erro ao definir as mensagens como lidas no banco de dados"
 			);
-			error.satusCode = 501;
+			error.statusCode = 501;
 			throw error;
 		}
 
@@ -61,7 +61,7 @@ exports.getContactMessages = async (req, res, next) => {
 		const contact = await Contact.findByPk(contactId);
 		if (!contact) {
 			const error = new Error("Erro ao localizar o contato no banco de dados");
-			error.satusCode = 501;
+			error.statusCode = 501;
 			throw error;
 		}
 
@@ -131,7 +131,7 @@ exports.postCreateContactMessage = async (req, res, next) => {
 		const newMessage = await contact.createMessage(message);
 		if (!newMessage) {
 			const error = new Error("Erro ao inserir a mensagem no banco de dados");
-			error.satusCode = 501;
+			error.statusCode = 501;
 			throw error;
 		}
 

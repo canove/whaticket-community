@@ -9,11 +9,27 @@ import Profile from "./pages/Profile/Profile";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
 import WhatsAuth from "./pages/WhatsAuth/WhatsAuth";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+	backdrop: {
+		zIndex: theme.zIndex.drawer + 1,
+		color: "#fff",
+	},
+}));
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
+	const classes = useStyles();
 	const { isAuth, loading } = useContext(AuthContext);
 
-	if (loading) return <h1>Loading...</h1>;
+	if (loading)
+		return (
+			<Backdrop className={classes.backdrop} open={loading}>
+				<CircularProgress color="inherit" />
+			</Backdrop>
+		);
 
 	return (
 		<Route
@@ -32,9 +48,15 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 };
 
 const PublicRoute = ({ component: Component, ...rest }) => {
+	const classes = useStyles();
 	const { isAuth, loading } = useContext(AuthContext);
 
-	if (loading) return <h1>Loading...</h1>;
+	if (loading)
+		return (
+			<Backdrop className={classes.backdrop} open={loading}>
+				<CircularProgress color="inherit" />
+			</Backdrop>
+		);
 
 	return (
 		<Route

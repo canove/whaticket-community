@@ -26,7 +26,7 @@ const wbotMessageListener = () => {
 				});
 
 				if (contact) {
-					await contact.update({ imageURL: imageUrl });
+					await contact.update({ profilePicUrl: imageUrl });
 				}
 
 				if (!contact) {
@@ -34,7 +34,7 @@ const wbotMessageListener = () => {
 						contact = await Contact.create({
 							name: msgContact.pushname || msgContact.number.toString(),
 							number: msgContact.number,
-							imageURL: imageUrl,
+							profilePicUrl: imageUrl,
 						});
 					} catch (err) {
 						console.log(err);
@@ -113,7 +113,7 @@ const wbotMessageListener = () => {
 				const error = new Error(
 					"Erro ao alterar o ack da mensagem no banco de dados"
 				);
-				error.satusCode = 501;
+				error.statusCode = 501;
 				throw error;
 			}
 			await messageToUpdate.update({ ack: ack });

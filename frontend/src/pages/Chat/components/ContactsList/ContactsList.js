@@ -16,10 +16,13 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
+import AddIcon from "@material-ui/icons/Add";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
+import Fab from "@material-ui/core/Fab";
+import AddContactModal from "../AddContact/AddContactModal";
 
 import ContactsHeader from "../ContactsHeader/ContactsHeader";
 
@@ -118,6 +121,14 @@ const useStyles = makeStyles(theme => ({
 		marginTop: 12,
 		// marginLeft: -12,
 	},
+	fabButton: {
+		position: "absolute",
+		zIndex: 1,
+		bottom: 20,
+		left: 0,
+		right: 0,
+		margin: "0 auto",
+	},
 }));
 
 const ContactsList = () => {
@@ -127,6 +138,8 @@ const ContactsList = () => {
 	const [contacts, setContacts] = useState([]);
 	const [loading, setLoading] = useState();
 	const [searchParam, setSearchParam] = useState("");
+
+	const [modalOpen, setModalOpen] = useState(false);
 
 	const history = useHistory();
 
@@ -209,7 +222,7 @@ const ContactsList = () => {
 			body: `${data.message.messageBody} - ${moment(new Date())
 				.tz("America/Sao_Paulo")
 				.format("DD/MM/YY - HH:mm")}`,
-			icon: data.contact.imageURL,
+			icon: data.contact.profilePicUrl,
 		};
 		new Notification(`Mensagem de ${data.contact.name}`, options);
 		document.getElementById("sound").play();
@@ -234,9 +247,34 @@ const ContactsList = () => {
 		setSearchParam(e.target.value.toLowerCase());
 	};
 
+	const handleShowContactModal = e => {
+		setModalOpen(true);
+	};
+
+	const handleAddContact = async contact => {
+		try {
+			const res = await api.post("/contacts", contact);
+			setContacts(prevState => [res.data, ...prevState]);
+			setModalOpen(false);
+			console.log(res.data);
+		} catch (err) {
+			if (err.response.status === 422) {
+				console.log("deu erro", err.response);
+				alert(err.response.data.message);
+			} else {
+				alert(err);
+			}
+		}
+	};
+
 	return (
 		<div className={classes.contactsWrapper}>
 			<ContactsHeader />
+			<AddContactModal
+				setModalOpen={setModalOpen}
+				modalOpen={modalOpen}
+				handleAddContact={handleAddContact}
+			/>
 			<Paper variant="outlined" square className={classes.contactsSearchBox}>
 				<div className={classes.serachInputWrapper}>
 					<SearchIcon className={classes.searchIcon} />
@@ -260,7 +298,9 @@ const ContactsList = () => {
 								<ListItemAvatar>
 									<Avatar
 										src={
-											contact.imageURL ? contact.imageURL : profileDefaultPic
+											contact.profilePicUrl
+												? contact.profilePicUrl
+												: profileDefaultPic
 										}
 									></Avatar>
 								</ListItemAvatar>
@@ -320,6 +360,14 @@ const ContactsList = () => {
 						<CircularProgress className={classes.circleLoading} />
 					</div>
 				) : null}
+				<Fab
+					color="secondary"
+					aria-label="add"
+					className={classes.fabButton}
+					onClick={handleShowContactModal}
+				>
+					<AddIcon />
+				</Fab>
 			</Paper>
 			<audio id="sound" preload="auto">
 				<source src={require("../../../../util/sound.mp3")} type="audio/mpeg" />

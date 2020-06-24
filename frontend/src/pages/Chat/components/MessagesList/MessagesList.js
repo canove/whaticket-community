@@ -299,7 +299,7 @@ const MessagesList = () => {
 	};
 
 	const scrollToBottom = () => {
-		if (lastMessageRef) {
+		if (lastMessageRef.current) {
 			lastMessageRef.current.scrollIntoView({});
 		}
 	};
@@ -449,11 +449,11 @@ const MessagesList = () => {
 	return (
 		<div className={classes.mainWrapper}>
 			<Card variant="outlined" square className={classes.messagesHeader}>
-				{!loading ? (
+				{contact.name ? (
 					<CardHeader
 						titleTypographyProps={{ noWrap: true }}
 						subheaderTypographyProps={{ noWrap: true }}
-						avatar={<Avatar alt="contact_image" src={contact.imageURL} />}
+						avatar={<Avatar alt="contact_image" src={contact.profilePicUrl} />}
 						title={contact.name}
 						subheader="Contact Status"
 					/>

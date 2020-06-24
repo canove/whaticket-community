@@ -7,7 +7,7 @@ const Message = require("./Message");
 const Contact = sequelize.define("contact", {
 	name: { type: Sequelize.STRING(100), allowNull: false },
 	number: { type: Sequelize.STRING(15), allowNull: false },
-	imageURL: { type: Sequelize.STRING(200) },
+	profilePicUrl: { type: Sequelize.STRING(200) },
 	lastMessage: { type: Sequelize.TEXT },
 });
 

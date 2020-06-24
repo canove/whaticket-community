@@ -1,4 +1,6 @@
 const Whatsapp = require("../models/Whatsapp");
+const { getIO } = require("../socket");
+const { getWbot, init } = require("./wbot");
 
 exports.getSession = async (req, res, next) => {
 	try {
@@ -9,6 +11,19 @@ exports.getSession = async (req, res, next) => {
 		}
 
 		return res.status(200).json(dbSession);
+	} catch (err) {
+		next(err);
+	}
+};
+
+exports.getContacts = async (req, res, next) => {
+	const io = getIO();
+	const wbot = getWbot();
+
+	try {
+		const phoneContacts = await wbot.getContacts();
+
+		return res.status(200).json(phoneContacts);
 	} catch (err) {
 		next(err);
 	}
