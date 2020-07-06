@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 
-const sequelize = require("../util/database");
+const sequelize = require("../database");
 
 const Whatsapp = sequelize.define("whatsapp", {
 	session: { type: Sequelize.TEXT() },

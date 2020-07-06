@@ -4,7 +4,7 @@ const Message = require("../models/Message");
 const path = require("path");
 const fs = require("fs");
 
-const { getIO } = require("../socket");
+const { getIO } = require("../libs/socket");
 const { getWbot, init } = require("./wbot");
 
 const wbotMessageListener = () => {

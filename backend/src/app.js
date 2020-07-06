@@ -1,12 +1,13 @@
-require("dotenv/config");
+// require("dotenv/config");
+require("express-async-errors");
 const express = require("express");
 const path = require("path");
+const Youch = require("youch");
 const cors = require("cors");
-const sequelize = require("./util/database");
+const sequelize = require("./database/");
 const multer = require("multer");
 
 const wBot = require("./controllers/wbot");
-const Contact = require("./models/Contact");
 const wbotMessageListener = require("./controllers/wbotMessageListener");
 const wbotMonitor = require("./controllers/wbotMonitor");
 
@@ -36,19 +37,20 @@ app.use(ContactRoutes);
 app.use(WhatsRoutes);
 app.use("/auth", AuthRoutes);
 
-app.use((error, req, res, next) => {
-	// console.log(error);
-	const status = error.statusCode || 500;
-	const message = error.message;
-	const data = error.data;
-	res.status(status).json({ message: message, data: data });
+app.use(async (err, req, res, next) => {
+	if (process.env.NODE_ENV === "development") {
+		const errors = await new Youch(err, req).toJSON();
+		return res.status(500).json(errors);
+	}
+
+	return res.status(500).json({ error: "Internal server error" });
 });
 
 sequelize
 	.sync()
 	.then(() => {
 		const server = app.listen(process.env.PORT);
-		const io = require("./socket").init(server);
+		const io = require("./libs/socket").init(server);
 		io.on("connection", socket => {
 			console.log("Client Connected");
 			socket.on("joinChatBox", contactId => {

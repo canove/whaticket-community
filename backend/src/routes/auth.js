@@ -6,7 +6,7 @@ const isAuth = require("../middleware/is-auth");
 
 const routes = express.Router();
 
-routes.put(
+routes.post(
 	"/signup",
 	[
 		body("email")
@@ -15,7 +15,7 @@ routes.put(
 			.custom((value, { req }) => {
 				return User.findOne({ where: { email: value } }).then(user => {
 					if (user) {
-						return Promise.reject("Um cadastro com este email já existe!");
+						return Promise.reject("An user with this email already exists!");
 					}
 				});
 			})

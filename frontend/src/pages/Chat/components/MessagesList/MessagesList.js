@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
+import { isSameDay, parseISO, format } from "date-fns";
+import openSocket from "socket.io-client";
+import InfiniteScrollReverse from "react-infinite-scroll-reverse";
+import ModalImage from "react-modal-image";
+
 import { makeStyles } from "@material-ui/core/styles";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -18,11 +23,7 @@ import { green } from "@material-ui/core/colors";
 import whatsBackground from "../../../../Images/wa-background.png";
 
 import api from "../../../../util/api";
-import openSocket from "socket.io-client";
 
-import moment from "moment-timezone";
-import InfiniteScrollReverse from "react-infinite-scroll-reverse";
-import ModalImage from "react-modal-image";
 import MessagesInput from "../MessagesInput/MessagesInput";
 
 const useStyles = makeStyles(theme => ({
@@ -164,7 +165,7 @@ const useStyles = makeStyles(theme => ({
 		fontSize: 11,
 		position: "absolute",
 		bottom: 0,
-		right: 10,
+		right: 5,
 		color: "#999",
 	},
 
@@ -188,12 +189,14 @@ const useStyles = makeStyles(theme => ({
 	ackIcons: {
 		fontSize: 18,
 		verticalAlign: "middle",
+		marginLeft: 4,
 	},
 
 	ackDoneAllIcon: {
 		color: green[500],
 		fontSize: 18,
 		verticalAlign: "middle",
+		marginLeft: 4,
 	},
 }));
 
@@ -362,32 +365,23 @@ const MessagesList = () => {
 					key={`timestamp-${message.id}`}
 				>
 					<div className={classes.dailyTimestampText}>
-						{moment(messagesList[index].createdAt)
-							.tz("America/Sao_Paulo")
-							.format("DD/MM/YY")}
+						{format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
 					</div>
 				</span>
 			);
 		}
 		if (index < messagesList.length - 1) {
-			let messageDay = moment(messagesList[index].createdAt)
-				.tz("America/Sao_Paulo")
-				.format("DD/MM/YY");
+			let messageDay = parseISO(messagesList[index].createdAt);
+			let previousMessageDay = parseISO(messagesList[index - 1].createdAt);
 
-			let previousMessageDay = moment(messagesList[index - 1].createdAt)
-				.tz("America/Sao_Paulo")
-				.format("DD/MM/YY");
-
-			if (messageDay > previousMessageDay) {
+			if (!isSameDay(messageDay, previousMessageDay)) {
 				return (
 					<span
 						className={classes.dailyTimestamp}
 						key={`timestamp-${message.id}`}
 					>
 						<div className={classes.dailyTimestampText}>
-							{moment(messagesList[index].createdAt)
-								.tz("America/Sao_Paulo")
-								.format("DD/MM/YY")}
+							{format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
 						</div>
 					</span>
 				);
@@ -415,9 +409,7 @@ const MessagesList = () => {
 							<div className={classes.textContentItem}>
 								{message.messageBody}
 								<span className={classes.timestamp}>
-									{moment(message.createdAt)
-										.tz("America/Sao_Paulo")
-										.format("HH:mm")}
+									{format(parseISO(message.createdAt), "HH:mm")}
 								</span>
 							</div>
 						</div>,
@@ -430,9 +422,7 @@ const MessagesList = () => {
 							<div className={classes.textContentItem}>
 								{message.messageBody}
 								<span className={classes.timestamp}>
-									{moment(message.createdAt)
-										.tz("America/Sao_Paulo")
-										.format("HH:mm")}{" "}
+									{format(parseISO(message.createdAt), "HH:mm")}
 									{renderMessageAck(message)}
 								</span>
 							</div>

@@ -1,7 +1,7 @@
 const Whatsapp = require("../models/Whatsapp");
 const wbotMessageListener = require("./wbotMessageListener");
 
-const { getIO } = require("../socket");
+const { getIO } = require("../libs/socket");
 const { getWbot, init } = require("./wbot");
 
 const wbotMonitor = () => {

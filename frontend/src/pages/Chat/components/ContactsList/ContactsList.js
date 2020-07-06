@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import api from "../../../../util/api";
 import openSocket from "socket.io-client";
-import moment from "moment-timezone";
+
+import { parseISO, format } from "date-fns";
 
 import profileDefaultPic from "../../../../Images/profile_default.png";
 
@@ -219,9 +220,7 @@ const ContactsList = () => {
 
 	const showDesktopNotification = data => {
 		const options = {
-			body: `${data.message.messageBody} - ${moment(new Date())
-				.tz("America/Sao_Paulo")
-				.format("DD/MM/YY - HH:mm")}`,
+			body: `${data.message.messageBody} - ${format(new Date(), "HH:mm")}`,
 			icon: data.contact.profilePicUrl,
 		};
 		new Notification(`Mensagem de ${data.contact.name}`, options);
@@ -322,9 +321,7 @@ const ContactsList = () => {
 													variant="body2"
 													color="textSecondary"
 												>
-													{moment(contact.updatedAt)
-														.tz("America/Sao_Paulo")
-														.format("HH:mm")}
+													{format(parseISO(contact.updatedAt), "HH:mm")}
 												</Typography>
 											)}
 										</span>
