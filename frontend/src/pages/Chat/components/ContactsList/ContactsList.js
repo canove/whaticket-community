@@ -146,7 +146,7 @@ const ContactsList = () => {
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
-			console.log("Esse navegador não suporte notificações");
+			console.log("This browser doesn't support notifications");
 		} else {
 			Notification.requestPermission();
 		}

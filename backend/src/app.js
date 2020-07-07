@@ -20,7 +20,7 @@ const app = express();
 
 const fileStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, "public");
+		cb(null, path.resolve(__dirname, "public"));
 	},
 	filename: (req, file, cb) => {
 		cb(null, new Date().getTime() + "-" + file.originalname.replace(/\s/g, ""));
@@ -40,9 +40,10 @@ app.use("/auth", AuthRoutes);
 app.use(async (err, req, res, next) => {
 	if (process.env.NODE_ENV === "development") {
 		const errors = await new Youch(err, req).toJSON();
+		console.log(err);
 		return res.status(500).json(errors);
 	}
-
+	console.log(err);
 	return res.status(500).json({ error: "Internal server error" });
 });
 

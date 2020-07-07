@@ -12,6 +12,7 @@
     "date-fns": "^2.14.0",
     "dotenv": "^8.2.0",
     "emoji-mart": "^3.0.0",
+    "mic-recorder-to-mp3": "^2.2.1",
     "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

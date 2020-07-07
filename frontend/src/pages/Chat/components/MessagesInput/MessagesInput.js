@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import api from "../../../../util/api";
 import "emoji-mart/css/emoji-mart.css";
+import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
+import MicRecorder from "mic-recorder-to-mp3";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import InputBase from "@material-ui/core/InputBase";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { green } from "@material-ui/core/colors";
-
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import IconButton from "@material-ui/core/IconButton";
 import MoodIcon from "@material-ui/icons/Mood";
 import SendIcon from "@material-ui/icons/Send";
 import CancelIcon from "@material-ui/icons/Cancel";
+import MicIcon from "@material-ui/icons/Mic";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+
+import api from "../../../../util/api";
+import RecordingTimer from "./RecordingTimer";
+
+const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 const useStyles = makeStyles(theme => ({
 	newMessageBox: {
@@ -72,6 +79,20 @@ const useStyles = makeStyles(theme => ({
 		// marginBottom: 6,
 		marginLeft: -12,
 	},
+
+	recorderWrapper: {
+		display: "flex",
+		alignItems: "center",
+		alignContent: "middle",
+	},
+
+	cancelAudioIcon: {
+		color: "red",
+	},
+
+	sendAudioIcon: {
+		color: "green",
+	},
 }));
 
 const MessagesInput = ({ searchParam }) => {
@@ -85,6 +106,9 @@ const MessagesInput = ({ searchParam }) => {
 	const [inputMessage, setInputMessage] = useState("");
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [loading, setLoading] = useState(false);
+
+	const [recording, setRecording] = useState(false);
+	const [blobURL, setBlobURL] = useState("");
 
 	useEffect(() => {
 		return () => {
@@ -158,6 +182,33 @@ const MessagesInput = ({ searchParam }) => {
 		setShowEmoji(false);
 	};
 
+	const startRecording = () => {
+		navigator.getUserMedia(
+			{ audio: true },
+			() => {
+				Mp3Recorder.start()
+					.then(() => {
+						setRecording(true);
+					})
+					.catch(e => console.error(e));
+			},
+			() => {
+				console.log("Permission Denied");
+			}
+		);
+	};
+
+	const stopRecording = () => {
+		Mp3Recorder.stop()
+			.getMp3()
+			.then(([buffer, blob]) => {
+				const blobURL = URL.createObjectURL(blob);
+				setBlobURL(blobURL);
+				setRecording(false);
+			})
+			.catch(e => console.log(e));
+	};
+
 	if (media.preview)
 		return (
 			<Paper
@@ -195,6 +246,7 @@ const MessagesInput = ({ searchParam }) => {
 	else {
 		return (
 			<Paper variant="outlined" square className={classes.newMessageBox}>
+				<audio src={blobURL} controls="controls" />
 				<IconButton
 					aria-label="emojiPicker"
 					component="span"
@@ -231,6 +283,7 @@ const MessagesInput = ({ searchParam }) => {
 						placeholder="Escreva uma mensagem"
 						value={inputMessage}
 						onChange={handleChangeInput}
+						disabled={recording}
 						onPaste={handleInputPaste}
 						onKeyPress={e => {
 							if (e.key === "Enter") {
@@ -239,13 +292,42 @@ const MessagesInput = ({ searchParam }) => {
 						}}
 					/>
 				</div>
-				<IconButton
-					aria-label="emojiPicker"
-					component="span"
-					onClick={handleSendMessage}
-				>
-					<SendIcon className={classes.sendMessageIcons} />
-				</IconButton>
+				{inputMessage ? (
+					<IconButton
+						aria-label="sendMessage"
+						component="span"
+						onClick={handleSendMessage}
+					>
+						<SendIcon className={classes.sendMessageIcons} />
+					</IconButton>
+				) : recording ? (
+					<div className={classes.recorderWrapper}>
+						<IconButton
+							aria-label="cancelRecording"
+							component="span"
+							fontSize="large"
+							onClick={e => setRecording(false)}
+						>
+							<HighlightOffIcon className={classes.cancelAudioIcon} />
+						</IconButton>
+						<RecordingTimer />
+						<IconButton
+							aria-label="sendRecordedAudio"
+							component="span"
+							onClick={stopRecording}
+						>
+							<CheckCircleOutlineIcon className={classes.sendAudioIcon} />
+						</IconButton>
+					</div>
+				) : (
+					<IconButton
+						aria-label="showRecorder"
+						component="span"
+						onClick={startRecording}
+					>
+						<MicIcon className={classes.sendMessageIcons} />
+					</IconButton>
+				)}
 			</Paper>
 		);
 	}
