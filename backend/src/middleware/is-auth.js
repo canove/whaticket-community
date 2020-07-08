@@ -14,9 +14,7 @@ module.exports = (req, res, next) => {
 	}
 
 	if (!decodedToken) {
-		const error = new Error("Falha na autenticação");
-		error.statusCode = 401;
-		next(error);
+		return res.status(401).json({ message: "Unauthorized" });
 	}
 
 	next();
