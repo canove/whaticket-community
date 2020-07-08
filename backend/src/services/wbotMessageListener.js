@@ -14,8 +14,7 @@ const wbotMessageListener = () => {
 	wbot.on("message", async msg => {
 		console.log(msg);
 		let newMessage;
-		// console.log(msg);
-		if (msg.from === "status@broadcast") {
+		if (msg.from === "status@broadcast" || msg.type === "location") {
 			return;
 		}
 		try {
@@ -28,9 +27,7 @@ const wbotMessageListener = () => {
 
 				if (contact) {
 					await contact.update({ profilePicUrl: profilePicUrl });
-				}
-
-				if (!contact) {
+				} else {
 					try {
 						contact = await Contact.create({
 							name: msgContact.pushname || msgContact.number.toString(),
@@ -81,24 +78,26 @@ const wbotMessageListener = () => {
 					await contact.update({ lastMessage: msg.body });
 				}
 
-				io.to(contact.id)
-					.to("notification")
-					.emit("appMessage", {
-						action: "create",
-						message: {
-							...newMessage.dataValues,
-							mediaUrl: `${
-								newMessage.mediaUrl
-									? `http://${process.env.HOST}:${process.env.PORT}/public/${newMessage.mediaUrl}`
-									: ""
-							}`,
-						},
-						contact: {
-							...contact.dataValues,
-							unreadMessages: 1,
-							lastMessage: newMessage.messageBody,
-						},
-					});
+				const serializedMessage = {
+					...newMessage.dataValues,
+					mediaUrl: `${
+						newMessage.mediaUrl
+							? `http://${process.env.HOST}:${process.env.PORT}/public/${newMessage.mediaUrl}`
+							: ""
+					}`,
+				};
+
+				const serializaedContact = {
+					...contact.dataValues,
+					unreadMessages: 1,
+					lastMessage: newMessage.messageBody,
+				};
+
+				io.to(contact.id).to("notification").emit("appMessage", {
+					action: "create",
+					message: serializedMessage,
+					contact: serializaedContact,
+				});
 
 				let chat = await msg.getChat();
 				chat.sendSeen();
