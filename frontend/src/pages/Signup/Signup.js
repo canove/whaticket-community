@@ -64,11 +64,11 @@ const SignUp = () => {
 	const handleSignUp = async e => {
 		e.preventDefault();
 		try {
-			await api.put("/auth/signup", user);
+			await api.post("/auth/signup", user);
+			history.push("/login");
 		} catch (err) {
 			alert(err);
 		}
-		history.push("/login");
 	};
 
 	return (

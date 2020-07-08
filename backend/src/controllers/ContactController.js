@@ -4,7 +4,7 @@ const Sequelize = require("sequelize");
 const { getIO } = require("../libs/socket");
 const { getWbot } = require("../libs/wbot");
 
-exports.getContacts = async (req, res) => {
+exports.index = async (req, res) => {
 	const { searchParam = "" } = req.query;
 
 	const lowerSerachParam = searchParam.toLowerCase();
@@ -43,7 +43,7 @@ exports.getContacts = async (req, res) => {
 	return res.json(contacts);
 };
 
-exports.createContact = async (req, res) => {
+exports.store = async (req, res) => {
 	const wbot = getWbot();
 	const io = getIO();
 	const { number, name } = req.body;

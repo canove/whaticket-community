@@ -1,4 +1,3 @@
-const fs = require("fs");
 const Message = require("../models/Message");
 const Contact = require("../models/Contact");
 const { getIO } = require("../libs/socket");
@@ -25,7 +24,7 @@ const setMessagesAsRead = async contactId => {
 	});
 };
 
-exports.getContactMessages = async (req, res, next) => {
+exports.index = async (req, res, next) => {
 	const wbot = getWbot();
 	const io = getIO();
 
@@ -76,7 +75,7 @@ exports.getContactMessages = async (req, res, next) => {
 	});
 };
 
-exports.postCreateContactMessage = async (req, res, next) => {
+exports.store = async (req, res, next) => {
 	const wbot = getWbot();
 	const io = getIO();
 

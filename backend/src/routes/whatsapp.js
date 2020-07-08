@@ -6,17 +6,7 @@ const WhatsappController = require("../controllers/whatsapp");
 const routes = express.Router();
 
 routes.get("/whatsapp/session", isAuth, WhatsappController.getSession);
-// routes.post(
-// 	"/messages/:contactId",
-// 	isAuth,
-// 	WhatsappController.postCreateContactMessage
-// );
 
-routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts);
-// routes.post(
-// 	"/messages/:contactId",
-// 	isAuth,
-// 	WhatsappController.postCreateContactMessage
-// );
+routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts); // fetch contacts in user cellphone, not in use
 
 module.exports = routes;

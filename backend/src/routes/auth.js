@@ -1,7 +1,8 @@
 const express = require("express");
 const { body } = require("express-validator");
 const User = require("../models/User");
-const authController = require("../controllers/auth");
+const SessionController = require("../controllers/SessionController");
+const UserController = require("../controllers/UserController");
 const isAuth = require("../middleware/is-auth");
 
 const routes = express.Router();
@@ -23,10 +24,10 @@ routes.post(
 		body("password").trim().isLength({ min: 5 }),
 		body("name").trim().not().isEmpty(),
 	],
-	authController.signup
+	UserController.store
 );
 
-routes.post("/login", authController.login);
+routes.post("/login", SessionController.store);
 
 routes.get("/check", isAuth, (req, res) => {
 	res.status(200).json({ authenticated: true });

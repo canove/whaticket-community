@@ -1,4 +1,3 @@
-// require("dotenv/config");
 require("express-async-errors");
 const express = require("express");
 const path = require("path");
@@ -11,8 +10,8 @@ const wBot = require("./libs/wbot");
 const wbotMessageListener = require("./services/wbotMessageListener");
 const wbotMonitor = require("./services/wbotMonitor");
 
-const messageRoutes = require("./routes/message");
-const ContactRoutes = require("./routes/contacts");
+const MessagesRoutes = require("./routes/messages");
+const ContactsRoutes = require("./routes/contacts");
 const AuthRoutes = require("./routes/auth");
 const WhatsRoutes = require("./routes/whatsapp");
 
@@ -32,8 +31,8 @@ app.use(express.json());
 app.use(multer({ storage: fileStorage }).single("media"));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
-app.use(messageRoutes);
-app.use(ContactRoutes);
+app.use(MessagesRoutes);
+app.use(ContactsRoutes);
 app.use(WhatsRoutes);
 app.use("/auth", AuthRoutes);
 
