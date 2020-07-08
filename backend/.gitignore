@@ -1,4 +1,8 @@
 node_modules
+<<<<<<< HEAD
 /src/public/*
+=======
+src/public/*
+>>>>>>> 855e28c7d73506671ea1a37b162f381b2d9c01b7
 !src/public/.gitkeep 
 .env
