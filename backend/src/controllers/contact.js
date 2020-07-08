@@ -2,7 +2,7 @@ const Contact = require("../models/Contact");
 const Message = require("../models/Message");
 const Sequelize = require("sequelize");
 const { getIO } = require("../libs/socket");
-const { getWbot } = require("./wbot");
+const { getWbot } = require("../libs/wbot");
 
 exports.getContacts = async (req, res) => {
 	const { searchParam = "" } = req.query;

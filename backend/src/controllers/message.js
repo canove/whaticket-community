@@ -2,7 +2,7 @@ const fs = require("fs");
 const Message = require("../models/Message");
 const Contact = require("../models/Contact");
 const { getIO } = require("../libs/socket");
-const { getWbot } = require("./wbot");
+const { getWbot } = require("../libs/wbot");
 const Sequelize = require("sequelize");
 
 const { MessageMedia } = require("whatsapp-web.js");

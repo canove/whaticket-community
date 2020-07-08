@@ -80,6 +80,11 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: -12,
 	},
 
+	audioLoading: {
+		color: green[500],
+		opacity: "70%",
+	},
+
 	recorderWrapper: {
 		display: "flex",
 		alignItems: "center",
@@ -108,7 +113,6 @@ const MessagesInput = ({ searchParam }) => {
 	const [loading, setLoading] = useState(false);
 
 	const [recording, setRecording] = useState(false);
-	const [blobURL, setBlobURL] = useState("");
 
 	useEffect(() => {
 		return () => {
@@ -167,6 +171,7 @@ const MessagesInput = ({ searchParam }) => {
 
 	const handleSendMessage = async () => {
 		if (inputMessage.trim() === "") return;
+		setLoading(true);
 		const message = {
 			read: 1,
 			userId: userId,
@@ -180,9 +185,10 @@ const MessagesInput = ({ searchParam }) => {
 		}
 		setInputMessage("");
 		setShowEmoji(false);
+		setLoading(false);
 	};
 
-	const startRecording = () => {
+	const handleStartRecording = () => {
 		navigator.getUserMedia(
 			{ audio: true },
 			() => {
@@ -198,15 +204,38 @@ const MessagesInput = ({ searchParam }) => {
 		);
 	};
 
-	const stopRecording = () => {
+	const handleUploadAudio = () => {
+		setLoading(true);
 		Mp3Recorder.stop()
 			.getMp3()
-			.then(([buffer, blob]) => {
-				const blobURL = URL.createObjectURL(blob);
-				setBlobURL(blobURL);
+			.then(async ([buffer, blob]) => {
+				if (blob.size < 10000) {
+					setLoading(false);
+					setRecording(false);
+					return;
+				}
+				const formData = new FormData();
+				const filename = `${new Date().getTime()}.mp3`;
+				console.log(blob);
+				formData.append("media", blob, filename);
+				formData.append("messageBody", filename);
+				formData.append("userId", userId);
+				try {
+					await api.post(`/messages/${contactId}`, formData);
+				} catch (err) {
+					console.log(err);
+					alert(err);
+				}
 				setRecording(false);
+				setLoading(false);
 			})
 			.catch(e => console.log(e));
+	};
+
+	const handleCancelAudio = () => {
+		Mp3Recorder.stop()
+			.getMp3()
+			.then(() => setRecording(false));
 	};
 
 	if (media.preview)
@@ -246,10 +275,10 @@ const MessagesInput = ({ searchParam }) => {
 	else {
 		return (
 			<Paper variant="outlined" square className={classes.newMessageBox}>
-				<audio src={blobURL} controls="controls" />
 				<IconButton
 					aria-label="emojiPicker"
 					component="span"
+					disabled={loading}
 					onClick={e => setShowEmoji(prevState => !prevState)}
 				>
 					<MoodIcon className={classes.sendMessageIcons} />
@@ -272,7 +301,7 @@ const MessagesInput = ({ searchParam }) => {
 					onChange={handleChangeMedia}
 				/>
 				<label htmlFor="upload-button">
-					<IconButton aria-label="upload" component="span">
+					<IconButton aria-label="upload" component="span" disabled={loading}>
 						<AttachFileIcon className={classes.sendMessageIcons} />
 					</IconButton>
 				</label>
@@ -286,7 +315,8 @@ const MessagesInput = ({ searchParam }) => {
 						disabled={recording}
 						onPaste={handleInputPaste}
 						onKeyPress={e => {
-							if (e.key === "Enter") {
+							if (loading) return;
+							else if (e.key === "Enter") {
 								handleSendMessage();
 							}
 						}}
@@ -297,6 +327,7 @@ const MessagesInput = ({ searchParam }) => {
 						aria-label="sendMessage"
 						component="span"
 						onClick={handleSendMessage}
+						disabled={loading}
 					>
 						<SendIcon className={classes.sendMessageIcons} />
 					</IconButton>
@@ -306,15 +337,24 @@ const MessagesInput = ({ searchParam }) => {
 							aria-label="cancelRecording"
 							component="span"
 							fontSize="large"
-							onClick={e => setRecording(false)}
+							disabled={loading}
+							onClick={handleCancelAudio}
 						>
 							<HighlightOffIcon className={classes.cancelAudioIcon} />
 						</IconButton>
-						<RecordingTimer />
+						{loading ? (
+							<div>
+								<CircularProgress className={classes.audioLoading} />
+							</div>
+						) : (
+							<RecordingTimer />
+						)}
+
 						<IconButton
 							aria-label="sendRecordedAudio"
 							component="span"
-							onClick={stopRecording}
+							onClick={handleUploadAudio}
+							disabled={loading}
 						>
 							<CheckCircleOutlineIcon className={classes.sendAudioIcon} />
 						</IconButton>
@@ -323,7 +363,7 @@ const MessagesInput = ({ searchParam }) => {
 					<IconButton
 						aria-label="showRecorder"
 						component="span"
-						onClick={startRecording}
+						onClick={handleStartRecording}
 					>
 						<MicIcon className={classes.sendMessageIcons} />
 					</IconButton>

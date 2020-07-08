@@ -5,7 +5,7 @@ const path = require("path");
 const fs = require("fs");
 
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("./wbot");
+const { getWbot, init } = require("../libs/wbot");
 
 const wbotMessageListener = () => {
 	const io = getIO();

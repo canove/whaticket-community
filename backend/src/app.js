@@ -7,9 +7,9 @@ const cors = require("cors");
 const sequelize = require("./database/");
 const multer = require("multer");
 
-const wBot = require("./controllers/wbot");
-const wbotMessageListener = require("./controllers/wbotMessageListener");
-const wbotMonitor = require("./controllers/wbotMonitor");
+const wBot = require("./libs/wbot");
+const wbotMessageListener = require("./services/wbotMessageListener");
+const wbotMonitor = require("./services/wbotMonitor");
 
 const messageRoutes = require("./routes/message");
 const ContactRoutes = require("./routes/contacts");

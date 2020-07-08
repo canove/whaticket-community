@@ -1,6 +1,6 @@
 const Whatsapp = require("../models/Whatsapp");
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("./wbot");
+const { getWbot, init } = require("../libs/wbot");
 
 exports.getSession = async (req, res, next) => {
 	const dbSession = await Whatsapp.findOne({ where: { id: 1 } });
