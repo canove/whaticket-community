@@ -1,4 +1,5 @@
 node_modules
+my_folder
 src/public/*
 !src/public/.gitkeep 
 .env
