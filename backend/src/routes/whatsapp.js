@@ -1,12 +1,17 @@
 const express = require("express");
 const isAuth = require("../middleware/is-auth");
 
-const WhatsappController = require("../controllers/whatsapp");
+const WhatsAppSessionController = require("../controllers/WhatsAppSessionController");
 
 const routes = express.Router();
 
-routes.get("/whatsapp/session", isAuth, WhatsappController.getSession);
+routes.get(
+	"/whatsapp/session/:sessionId",
+	isAuth,
+	WhatsAppSessionController.show
+);
 
-routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts); // fetch contacts in user cellphone, not in use
+// fetch contacts in user cellphone, not in use
+// routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts);
 
 module.exports = routes;

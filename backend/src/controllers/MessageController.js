@@ -1,64 +1,71 @@
 const Message = require("../models/Message");
 const Contact = require("../models/Contact");
+const Ticket = require("../models/Ticket");
 const { getIO } = require("../libs/socket");
 const { getWbot } = require("../libs/wbot");
 const Sequelize = require("sequelize");
 
 const { MessageMedia } = require("whatsapp-web.js");
 
-const setMessagesAsRead = async contactId => {
+const setMessagesAsRead = async ticketId => {
 	const io = getIO();
 	await Message.update(
 		{ read: true },
 		{
 			where: {
-				contactId: contactId,
+				ticketId: ticketId,
 				read: false,
 			},
 		}
 	);
 
-	io.to("notification").emit("contact", {
+	io.to("notification").emit("ticket", {
 		action: "updateUnread",
-		contactId: contactId,
+		ticketId: ticketId,
 	});
 };
 
 exports.index = async (req, res, next) => {
-	const wbot = getWbot();
-	const io = getIO();
+	// const wbot = getWbot();
+	// const io = getIO();
 
-	const { contactId } = req.params;
+	const { ticketId } = req.params;
 	const { searchParam = "", pageNumber = 1 } = req.query;
 
-	const lowerSerachParam = searchParam.toLowerCase();
-
 	const whereCondition = {
-		messageBody: Sequelize.where(
-			Sequelize.fn("LOWER", Sequelize.col("messageBody")),
+		body: Sequelize.where(
+			Sequelize.fn("LOWER", Sequelize.col("body")),
 			"LIKE",
-			"%" + lowerSerachParam + "%"
+			"%" + searchParam.toLowerCase() + "%"
 		),
 	};
 
 	let limit = 20;
 	let offset = limit * (pageNumber - 1);
 
-	const contact = await Contact.findByPk(contactId);
-	if (!contact) {
-		return res.status(400).json({ error: "No contact found with this ID" });
+	const ticket = await Ticket.findByPk(ticketId, {
+		include: [
+			{
+				model: Contact,
+				attributes: ["name", "number", "profilePicUrl"],
+			},
+		],
+	});
+
+	if (!ticket) {
+		return res.status(400).json({ error: "No ticket found with this ID" });
 	}
 
-	await setMessagesAsRead(contactId);
+	await setMessagesAsRead(ticketId);
 
-	const contactMessages = await contact.getMessages({
+	const ticketMessages = await ticket.getMessages({
 		where: whereCondition,
 		limit,
 		offset,
 		order: [["createdAt", "DESC"]],
 	});
 
-	const serializedMessages = contactMessages.map(message => {
+	const serializedMessages = ticketMessages.map(message => {
 		return {
 			...message.dataValues,
 			mediaUrl: `${
@@ -71,7 +78,8 @@ exports.index = async (req, res, next) => {
 
 	return res.json({
 		messages: serializedMessages.reverse(),
-		contact: contact,
+		ticket: ticket,
+		contact: ticket.Contact,
 	});
 };
 
@@ -79,12 +87,20 @@ exports.store = async (req, res, next) => {
 	const wbot = getWbot();
 	const io = getIO();
 
-	const { contactId } = req.params;
+	const { ticketId } = req.params;
 	const message = req.body;
 	const media = req.file;
 	let sentMessage;
 
-	const contact = await Contact.findByPk(contactId);
+	const ticket = await Ticket.findByPk(ticketId, {
+		include: [
+			{
+				model: Contact,
+				attributes: ["number"],
+			},
+		],
+	});
+
 	if (media) {
 		const newMedia = MessageMedia.fromFilePath(req.file.path);
 		message.mediaUrl = req.file.filename.replace(/\s/g, "");
@@ -94,17 +110,20 @@ exports.store = async (req, res, next) => {
 			message.mediaType = "other";
 		}
 
-		sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, newMedia);
+		sentMessage = await wbot.sendMessage(
+			`${ticket.Contact.number}@c.us`,
+			newMedia
+		);
 	} else {
 		sentMessage = await wbot.sendMessage(
-			`${contact.number}@c.us`,
-			message.messageBody
+			`${ticket.Contact.number}@c.us`,
+			message.body
 		);
 	}
 
 	message.id = sentMessage.id.id;
 
-	const newMessage = await contact.createMessage(message);
+	const newMessage = await ticket.createMessage(message);
 
 	const serialziedMessage = {
 		...newMessage.dataValues,
@@ -115,11 +134,12 @@ exports.store = async (req, res, next) => {
 		}`,
 	};
 
-	io.to(contactId).emit("appMessage", {
+	io.to(ticketId).emit("appMessage", {
 		action: "create",
 		message: serialziedMessage,
 	});
-	await setMessagesAsRead(contactId);
 
-	return res.json({ message: "Mensagem enviada" });
+	await setMessagesAsRead(ticketId);
+
+	return res.json({ message: "Mensagem enviada", newMessage, ticket });
 };

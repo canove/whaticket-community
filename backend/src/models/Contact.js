@@ -1,19 +1,24 @@
 const Sequelize = require("sequelize");
 
-const sequelize = require("../database");
+class Contact extends Sequelize.Model {
+	static init(sequelize) {
+		super.init(
+			{
+				name: { type: Sequelize.STRING },
+				number: { type: Sequelize.STRING },
+				profilePicUrl: { type: Sequelize.STRING },
+			},
+			{
+				sequelize,
+			}
+		);
 
-const Message = require("./Message");
+		return this;
+	}
 
-const Contact = sequelize.define("contact", {
-	name: { type: Sequelize.STRING(100), allowNull: false },
-	number: { type: Sequelize.STRING(15), allowNull: false },
-	profilePicUrl: { type: Sequelize.STRING(200) },
-	lastMessage: { type: Sequelize.TEXT },
-});
-
-Contact.hasMany(Message, {
-	onDelete: "CASCADE",
-	onUpdate: "RESTRICT",
-});
+	static associate(models) {
+		this.hasMany(models.Ticket, { foreignKey: "contactId" });
+	}
+}
 
 module.exports = Contact;

@@ -1,0 +1,76 @@
+const Sequelize = require("sequelize");
+
+const Ticket = require("../models/Ticket");
+const Contact = require("../models/Contact");
+
+exports.index = async (req, res) => {
+	const tickets = await Ticket.findAll({
+		include: [
+			{
+				model: Contact,
+				attributes: ["name", "number", "profilePicUrl"],
+			},
+		],
+		attributes: {
+			include: [
+				[
+					Sequelize.literal(`(
+			        SELECT COUNT(*)
+			        FROM Messages AS message
+			        WHERE
+			            message.ticketId = Ticket.id
+			            AND
+			            message.read = 0
+
+			    )`),
+					"unreadMessages",
+				],
+			],
+		},
+	});
+
+	return res.json(tickets);
+};
+
+exports.store = async (req, res) => {
+	const ticket = await Ticket.create(req.body);
+
+	res.status(200).json(ticket);
+};
+
+exports.update = async (req, res) => {
+	const { ticketId } = req.params;
+
+	const ticket = await Ticket.findByPk(ticketId, {
+		include: [
+			{
+				model: Contact,
+				attributes: ["name", "number", "profilePicUrl"],
+			},
+		],
+		attributes: {
+			include: [
+				[
+					Sequelize.literal(`(
+			        SELECT COUNT(*)
+			        FROM Messages AS message
+			        WHERE
+			            message.ticketId = Ticket.id
+			            AND
+			            message.read = 0
+
+			    )`),
+					"unreadMessages",
+				],
+			],
+		},
+	});
+
+	if (!ticket) {
+		return res.status(400).json({ error: "No ticket found with this ID" });
+	}
+
+	await ticket.update(req.body);
+
+	res.status(200).json(ticket);
+};

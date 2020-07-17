@@ -2,8 +2,12 @@ const Sequelize = require("sequelize");
 const dbConfig = require("../config/database");
 
 const User = require("../models/User");
+const Contact = require("../models/Contact");
+const Ticket = require("../models/Ticket");
+const Message = require("../models/Message");
+const Whatsapp = require("../models/Whatsapp");
 
-const models = [User];
+const models = [User, Contact, Ticket, Message, Whatsapp];
 
 class Database {
 	constructor() {
@@ -13,7 +17,9 @@ class Database {
 	init() {
 		this.sequelize = new Sequelize(dbConfig);
 
-		models.map(model => model.init(this.sequelize));
+		models
+			.map(model => model.init(this.sequelize))
+			.map(model => model.associate && model.associate(this.sequelize.models));
 	}
 }
 

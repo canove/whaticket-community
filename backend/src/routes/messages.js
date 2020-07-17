@@ -5,8 +5,8 @@ const MessageController = require("../controllers/MessageController");
 
 const routes = express.Router();
 
-routes.get("/messages/:contactId", isAuth, MessageController.index);
+routes.get("/messages/:ticketId", isAuth, MessageController.index);
 
-routes.post("/messages/:contactId", isAuth, MessageController.store);
+routes.post("/messages/:ticketId", isAuth, MessageController.store);
 
 module.exports = routes;

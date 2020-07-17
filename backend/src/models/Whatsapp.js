@@ -1,13 +1,22 @@
 const Sequelize = require("sequelize");
 
-const sequelize = require("../database");
+class Whatsapp extends Sequelize.Model {
+	static init(sequelize) {
+		super.init(
+			{
+				session: { type: Sequelize.TEXT },
+				qrcode: { type: Sequelize.TEXT },
+				status: { type: Sequelize.STRING },
+				battery: { type: Sequelize.STRING },
+				plugged: { type: Sequelize.BOOLEAN },
+			},
+			{
+				sequelize,
+			}
+		);
 
-const Whatsapp = sequelize.define("whatsapp", {
-	session: { type: Sequelize.TEXT() },
-	qrcode: { type: Sequelize.TEXT() },
-	status: { type: Sequelize.STRING(60) },
-	battery: { type: Sequelize.STRING(20) },
-	plugged: { type: Sequelize.BOOLEAN() },
-});
+		return this;
+	}
+}
 
 module.exports = Whatsapp;
