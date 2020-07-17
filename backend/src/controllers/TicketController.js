@@ -4,7 +4,19 @@ const Ticket = require("../models/Ticket");
 const Contact = require("../models/Contact");
 
 exports.index = async (req, res) => {
+	const { status = "" } = req.query;
+
+	let whereCondition;
+	if (!status) {
+		whereCondition = ["pending", "open"];
+	} else {
+		whereCondition = [status];
+	}
+
 	const tickets = await Ticket.findAll({
+		where: {
+			status: { [Sequelize.Op.or]: whereCondition },
+		},
 		include: [
 			{
 				model: Contact,
