@@ -1,6 +1,20 @@
 const Sequelize = require("sequelize");
-const dbConfig = require("../config/dbConfig");
+const dbConfig = require("../config/database");
 
-const sequelize = new Sequelize(dbConfig);
+const User = require("../models/User");
 
-module.exports = sequelize;
+const models = [User];
+
+class Database {
+	constructor() {
+		this.init();
+	}
+
+	init() {
+		this.sequelize = new Sequelize(dbConfig);
+
+		models.map(model => model.init(this.sequelize));
+	}
+}
+
+module.exports = new Database();

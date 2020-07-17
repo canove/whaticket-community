@@ -1,17 +1,31 @@
 const Sequelize = require("sequelize");
+const bcrypt = require("bcryptjs");
 
-const sequelize = require("../database");
+class User extends Sequelize.Model {
+	static init(sequelize) {
+		super.init(
+			{
+				name: { type: Sequelize.STRING },
+				password: { type: Sequelize.VIRTUAL },
+				passwordHash: { type: Sequelize.STRING },
+				email: { type: Sequelize.STRING },
+			},
+			{
+				sequelize,
+			}
+		);
 
-const User = sequelize.define("user", {
-	id: {
-		type: Sequelize.INTEGER,
-		allowNull: false,
-		primaryKey: true,
-		autoIncrement: true,
-	},
-	name: { type: Sequelize.STRING(100), allowNull: false },
-	password: { type: Sequelize.STRING(100), allowNull: false },
-	email: { type: Sequelize.STRING(100), allowNull: false },
-});
+		this.addHook("beforeSave", async user => {
+			if (user.password) {
+				user.passwordHash = await bcrypt.hash(user.password, 8);
+			}
+		});
+		return this;
+	}
+
+	checkPassword(password) {
+		return bcrypt.compare(password, this.passwordHash);
+	}
+}
 
 module.exports = User;

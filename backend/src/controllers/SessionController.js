@@ -1,6 +1,6 @@
 const { validationResult } = require("express-validator");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const authConfig = require("../config/auth");
 
 const User = require("../models/User");
 
@@ -9,17 +9,20 @@ exports.store = async (req, res, next) => {
 
 	const user = await User.findOne({ where: { email: email } });
 	if (!user) {
-		return res.status(400).json({ error: "No user found with this email" });
+		return res.status(401).json({ error: "No user found with this email" });
 	}
 
-	const isEqual = await bcrypt.compare(password, user.password);
-	if (!isEqual) {
+	if (!(await user.checkPassword(password))) {
 		return res.status(401).json({ error: "Password does not match" });
 	}
 
-	const token = jwt.sign({ email: user.email, userId: user.id }, "mysecret", {
-		expiresIn: "24h",
-	});
+	const token = jwt.sign(
+		{ email: user.email, userId: user.id },
+		authConfig.secret,
+		{
+			expiresIn: authConfig.expiresIn,
+		}
+	);
 
 	return res
 		.status(200)
