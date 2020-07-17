@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../../util/api";
-import MainDrawer from "../../components/Layout/MainDrawer";
 import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -89,36 +88,34 @@ const WhatsAuth = () => {
 
 	return (
 		<div>
-			<MainDrawer appTitle="QR Code">
-				<div className={classes.root}>
-					<main className={classes.content}>
-						<div className={classes.appBarSpacer} />
-						<Container maxWidth="lg" className={classes.container}>
-							<Grid container spacing={3}>
-								{session.status === "pending" ? (
-									<Grid item xs={6}>
-										<Paper className={classes.paper}>
-											<Qrcode qrCode={qrCode} />
-										</Paper>
-									</Grid>
-								) : (
-									<Grid item xs={6}>
-										<Paper className={classes.paper}>
-											<Bateryinfo sessio={session} />
-										</Paper>
-									</Grid>
-								)}
+			<div className={classes.root}>
+				<main className={classes.content}>
+					<div className={classes.appBarSpacer} />
+					<Container maxWidth="lg" className={classes.container}>
+						<Grid container spacing={3}>
+							{session.status === "pending" ? (
+								<Grid item xs={6}>
+									<Paper className={classes.paper}>
+										<Qrcode qrCode={qrCode} />
+									</Paper>
+								</Grid>
+							) : (
+								<Grid item xs={6}>
+									<Paper className={classes.paper}>
+										<Bateryinfo sessio={session} />
+									</Paper>
+								</Grid>
+							)}
 
-								{/* <Grid item xs={12} md={4} lg={3}>
+							{/* <Grid item xs={12} md={4} lg={3}>
 									<Paper className={fixedHeightPaper}>
 										<h1>paper2</h1>
 									</Paper>
 								</Grid> */}
-							</Grid>
-						</Container>
-					</main>
-				</div>
-			</MainDrawer>
+						</Grid>
+					</Container>
+				</main>
+			</div>
 		</div>
 	);
 };

@@ -133,6 +133,7 @@ const wbotMessageListener = () => {
 				action: "create",
 				message: serializedMessage,
 				ticket: serializaedTicket,
+				contact: contact,
 			});
 
 			let chat = await msg.getChat();

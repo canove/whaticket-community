@@ -102,7 +102,7 @@ const useStyles = makeStyles(theme => ({
 
 const MessagesInput = ({ searchParam }) => {
 	const classes = useStyles();
-	const { contactId } = useParams();
+	const { ticketId } = useParams();
 	const userId = localStorage.getItem("userId");
 	const username = localStorage.getItem("username");
 
@@ -120,7 +120,7 @@ const MessagesInput = ({ searchParam }) => {
 			setShowEmoji(false);
 			setMedia({});
 		};
-	}, [contactId]);
+	}, [ticketId]);
 
 	const handleChangeInput = e => {
 		setInputMessage(e.target.value);
@@ -157,10 +157,10 @@ const MessagesInput = ({ searchParam }) => {
 		const formData = new FormData();
 		formData.append("media", media.raw);
 		formData.append("userId", userId);
-		formData.append("messageBody", media.name);
+		formData.append("body", media.name);
 
 		try {
-			await api.post(`/messages/${contactId}`, formData);
+			await api.post(`/messages/${ticketId}`, formData);
 		} catch (err) {
 			console.log(err);
 			alert(err);
@@ -176,10 +176,10 @@ const MessagesInput = ({ searchParam }) => {
 			read: 1,
 			userId: userId,
 			mediaUrl: "",
-			messageBody: `${username}: ${inputMessage.trim()}`,
+			body: `${username}: ${inputMessage.trim()}`,
 		};
 		try {
-			await api.post(`/messages/${contactId}`, message);
+			await api.post(`/messages/${ticketId}`, message);
 		} catch (err) {
 			alert(err);
 		}
@@ -218,10 +218,10 @@ const MessagesInput = ({ searchParam }) => {
 				const filename = `${new Date().getTime()}.mp3`;
 				console.log(blob);
 				formData.append("media", blob, filename);
-				formData.append("messageBody", filename);
+				formData.append("body", filename);
 				formData.append("userId", userId);
 				try {
-					await api.post(`/messages/${contactId}`, formData);
+					await api.post(`/messages/${ticketId}`, formData);
 				} catch (err) {
 					console.log(err);
 					alert(err);

@@ -3,11 +3,13 @@ const Sequelize = require("sequelize");
 const Ticket = require("../models/Ticket");
 const Contact = require("../models/Contact");
 
+const { getIO } = require("../libs/socket");
+
 exports.index = async (req, res) => {
 	const { status = "" } = req.query;
 
 	let whereCondition;
-	if (!status) {
+	if (!status || status === "open") {
 		whereCondition = ["pending", "open"];
 	} else {
 		whereCondition = [status];
@@ -51,6 +53,7 @@ exports.store = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+	const io = getIO();
 	const { ticketId } = req.params;
 
 	const ticket = await Ticket.findByPk(ticketId, {
@@ -83,6 +86,11 @@ exports.update = async (req, res) => {
 	}
 
 	await ticket.update(req.body);
+
+	io.to("notification").emit("ticket", {
+		action: "updateStatus",
+		ticket: ticket,
+	});
 
 	res.status(200).json(ticket);
 };

@@ -220,7 +220,7 @@ const MainDrawer = ({ appTitle, children }) => {
 			<main className={classes.content}>
 				<div className={classes.appBarSpacer} />
 
-				{children ? children : <h1>Dashboard</h1>}
+				{children ? children : null}
 			</main>
 		</div>
 	);

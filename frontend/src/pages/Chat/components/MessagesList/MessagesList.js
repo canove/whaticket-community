@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "socket.io-client";
@@ -11,13 +11,11 @@ import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DoneIcon from "@material-ui/icons/Done";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
-import SearchIcon from "@material-ui/icons/Search";
-import InputBase from "@material-ui/core/InputBase";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
-import IconButton from "@material-ui/core/IconButton";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import ReplayIcon from "@material-ui/icons/Replay";
 import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
 import { green } from "@material-ui/core/colors";
 
 import whatsBackground from "../../../../Images/wa-background.png";
@@ -40,32 +38,13 @@ const useStyles = makeStyles(theme => ({
 		flex: "none",
 	},
 
-	messagesSearchInputWrapper: {
-		margin: 20,
-		display: "flex",
-		marginLeft: "auto",
-		background: "#fff",
-		borderRadius: 40,
-		paddingRight: 4,
-		width: 250,
-	},
-
-	messagesSearchInput: {
-		border: "none",
-		flex: 1,
-		borderRadius: 30,
-	},
-
-	searchIcon: {
-		color: "grey",
-		marginLeft: 6,
+	actionButtons: {
 		marginRight: 6,
 		alignSelf: "center",
-	},
-
-	settingsIcon: {
-		alignSelf: "center",
-		padding: 8,
+		marginLeft: "auto",
+		"& > *": {
+			margin: theme.spacing(1),
+		},
 	},
 
 	messagesListWrapper: {
@@ -201,13 +180,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const MessagesList = () => {
-	const { contactId } = useParams();
+	const { ticketId } = useParams();
+	const history = useHistory();
 	const classes = useStyles();
 
 	const token = localStorage.getItem("token");
+	const userId = localStorage.getItem("userId");
 
 	const [loading, setLoading] = useState(true);
 	const [contact, setContact] = useState({});
+	const [ticket, setTicket] = useState({});
 	const [messagesList, setMessagesList] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
@@ -223,10 +205,11 @@ const MessagesList = () => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchMessages = async () => {
 				try {
-					const res = await api.get("/messages/" + contactId, {
+					const res = await api.get("/messages/" + ticketId, {
 						params: { searchParam, pageNumber },
 					});
 					setContact(res.data.contact);
+					setTicket(res.data.ticket);
 					setMessagesList(prevMessages => {
 						return [...res.data.messages, ...prevMessages];
 					});
@@ -243,12 +226,12 @@ const MessagesList = () => {
 			fetchMessages();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, contactId, token]);
+	}, [searchParam, pageNumber, ticketId, token]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
-		socket.emit("joinChatBox", contactId, () => {});
+		socket.emit("joinChatBox", ticketId, () => {});
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
@@ -265,7 +248,7 @@ const MessagesList = () => {
 			setPageNumber(1);
 			setMessagesList([]);
 		};
-	}, [contactId]);
+	}, [ticketId]);
 
 	const handleSearch = e => {
 		setSearchParam(e.target.value);
@@ -340,6 +323,18 @@ const MessagesList = () => {
 		}
 	};
 
+	const handleUpdateTicketStatus = async (status, userId) => {
+		try {
+			await api.put(`/tickets/${ticketId}`, {
+				status: status,
+				userId: userId || null,
+			});
+		} catch (err) {
+			console.log(err);
+		}
+		history.push("/chat");
+	};
+
 	const renderMessageAck = message => {
 		if (message.ack === 0) {
 			return <AccessTimeIcon fontSize="small" className={classes.ackIcons} />;
@@ -401,13 +396,13 @@ const MessagesList = () => {
 	const renderMessages = () => {
 		if (messagesList.length > 0) {
 			const viewMessagesList = messagesList.map((message, index) => {
-				if (message.userId === 0) {
+				if (!message.userId) {
 					return [
 						renderDailyTimestamps(message, index),
 						<div className={classes.messageLeft} key={message.id}>
 							{message.mediaUrl && checkMessaageMedia(message)}
 							<div className={classes.textContentItem}>
-								{message.messageBody}
+								{message.body}
 								<span className={classes.timestamp}>
 									{format(parseISO(message.createdAt), "HH:mm")}
 								</span>
@@ -420,7 +415,7 @@ const MessagesList = () => {
 						<div className={classes.messageRight} key={message.id}>
 							{message.mediaUrl && checkMessaageMedia(message)}
 							<div className={classes.textContentItem}>
-								{message.messageBody}
+								{message.body}
 								<span className={classes.timestamp}>
 									{format(parseISO(message.createdAt), "HH:mm")}
 									{renderMessageAck(message)}
@@ -444,8 +439,8 @@ const MessagesList = () => {
 						titleTypographyProps={{ noWrap: true }}
 						subheaderTypographyProps={{ noWrap: true }}
 						avatar={<Avatar alt="contact_image" src={contact.profilePicUrl} />}
-						title={contact.name}
-						subheader="Contact Status"
+						title={`${contact.name} #${ticket.id}`}
+						subheader={`Atribuído á ${ticket.userId}`}
 					/>
 				) : (
 					<CardHeader
@@ -457,20 +452,22 @@ const MessagesList = () => {
 					/>
 				)}
 
-				<div className={classes.messagesSearchInputWrapper}>
-					<SearchIcon className={classes.searchIcon} />
-					<InputBase
-						type="search"
-						className={classes.messagesSearchInput}
-						placeholder="Pesquisar mensagens"
-						onChange={handleSearch}
-						value={searchParam}
-					/>
-				</div>
-				<div className={classes.settingsIcon}>
-					<IconButton aria-label="settings">
-						<MoreVertIcon />
-					</IconButton>
+				<div className={classes.actionButtons}>
+					<Button
+						startIcon={<ReplayIcon />}
+						size="small"
+						onClick={e => handleUpdateTicketStatus("pending")}
+					>
+						Retornar
+					</Button>
+					<Button
+						size="small"
+						variant="contained"
+						color="primary"
+						onClick={e => handleUpdateTicketStatus("closed", userId)}
+					>
+						Resolver
+					</Button>
 				</div>
 			</Card>
 			<div className={classes.messagesListWrapper}>

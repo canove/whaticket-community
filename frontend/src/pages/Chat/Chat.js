@@ -4,15 +4,14 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 
-import ContactsList from "./components/ContactsList/ContactsList";
+import TicketsList from "./components/TicketsList/TicketsList";
 import MessagesList from "./components/MessagesList/MessagesList";
-import MainDrawer from "../../components/Layout/MainDrawer";
 
 const useStyles = makeStyles(theme => ({
 	chatContainer: {
 		flex: 1,
-		backgroundColor: "#eee",
-		// padding: 20,
+		// backgroundColor: "#eee",
+		padding: theme.spacing(4),
 		height: `calc(100% - 64px)`,
 		overflowY: "hidden",
 	},
@@ -48,36 +47,28 @@ const useStyles = makeStyles(theme => ({
 
 const Chat = () => {
 	const classes = useStyles();
-	const { contactId } = useParams();
+	const { ticketId } = useParams();
 
 	return (
-		<div>
-			<MainDrawer appTitle="Chat">
-				<div className={classes.chatContainer}>
-					<Paper square className={classes.chatPapper}>
-						<Grid container spacing={0}>
-							<Grid item xs={4} className={classes.contactsWrapper}>
-								<ContactsList />
-							</Grid>
-							<Grid item xs={8} className={classes.messagessWrapper}>
-								{contactId ? (
-									<>
-										<MessagesList />
-									</>
-								) : (
-									<Paper
-										square
-										variant="outlined"
-										className={classes.welcomeMsg}
-									>
-										<span>Selecione um contato para começar a conversar</span>
-									</Paper>
-								)}
-							</Grid>
-						</Grid>
-					</Paper>
-				</div>
-			</MainDrawer>
+		<div className={classes.chatContainer}>
+			<Paper square className={classes.chatPapper}>
+				<Grid container spacing={0}>
+					<Grid item xs={4} className={classes.contactsWrapper}>
+						<TicketsList />
+					</Grid>
+					<Grid item xs={8} className={classes.messagessWrapper}>
+						{ticketId ? (
+							<>
+								<MessagesList />
+							</>
+						) : (
+							<Paper square variant="outlined" className={classes.welcomeMsg}>
+								<span>Selecione um contato para começar a conversar</span>
+							</Paper>
+						)}
+					</Grid>
+				</Grid>
+			</Paper>
 		</div>
 	);
 };

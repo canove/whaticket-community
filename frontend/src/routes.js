@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import { AuthContext, AuthProvider } from "./Context/Auth/AuthContext";
 
+import MainDrawer from "./components/Layout/MainDrawer";
 import Dashboard from "./pages/Home/Dashboard";
 import Chat from "./pages/Chat/Chat";
 import Profile from "./pages/Profile/Profile";
@@ -77,13 +78,14 @@ const Routes = () => {
 		<BrowserRouter>
 			<AuthProvider>
 				<Switch>
-					<PrivateRoute exact path="/" component={Dashboard} />
-					<PrivateRoute exact path="/chat" component={Chat} />
-					<PrivateRoute exact path="/chat/:contactId" component={Chat} />
-					<PrivateRoute exact path="/profile" component={Profile} />
-					<PrivateRoute exact path="/whats-auth" component={WhatsAuth} />
 					<PublicRoute exact path="/login" component={Login} />
 					<PublicRoute exact path="/signup" component={Signup} />
+					<MainDrawer>
+						<PrivateRoute exact path="/" component={Dashboard} />
+						<PrivateRoute exact path="/chat/:ticketId?" component={Chat} />
+						<PrivateRoute exact path="/profile" component={Profile} />
+						<PrivateRoute exact path="/whats-auth" component={WhatsAuth} />
+					</MainDrawer>
 				</Switch>
 			</AuthProvider>
 		</BrowserRouter>
