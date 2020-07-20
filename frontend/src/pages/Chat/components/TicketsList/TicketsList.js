@@ -31,8 +31,11 @@ import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 
+import TicketSkeleton from "./TicketSkeleton";
+
 const useStyles = makeStyles(theme => ({
 	contactsWrapper: {
+		position: "relative",
 		display: "flex",
 		height: "100%",
 		flexDirection: "column",
@@ -41,8 +44,8 @@ const useStyles = makeStyles(theme => ({
 		borderBottomRightRadius: 0,
 	},
 
-	contactsHeader: {
-		display: "flex",
+	tabsHeader: {
+		// display: "flex",
 		backgroundColor: "#eee",
 	},
 
@@ -53,7 +56,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	openTicketsList: {
-		position: "relative",
 		height: "50%",
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
@@ -63,11 +65,10 @@ const useStyles = makeStyles(theme => ({
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
 			backgroundColor: "#e8e8e8",
 		},
-		borderTop: "2px solid rgba(0, 0, 0, 0.12)",
+		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
 	closedTicketsList: {
-		position: "relative",
 		flex: 1,
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
@@ -166,18 +167,10 @@ const useStyles = makeStyles(theme => ({
 		color: green[500],
 		opacity: "70%",
 		position: "absolute",
-		top: 0,
+		top: "50%",
 		left: "50%",
 		marginTop: 12,
 		// marginLeft: -12,
-	},
-	fabButton: {
-		position: "absolute",
-		zIndex: 1,
-		bottom: 20,
-		left: 0,
-		right: 0,
-		margin: "0 auto",
 	},
 }));
 
@@ -429,12 +422,25 @@ const TicketsList = () => {
 				)
 		);
 
-		return viewTickets;
+		if (loading) {
+			return <>{Array(2).fill(<TicketSkeleton />)}</>;
+		} else if (viewTickets.length === 0) {
+			return (
+				<div>
+					<span className={classes.noTicketsTitle}>All caught up</span>
+					<p className={classes.noTicketsText}>
+						No tickets to look into for now. Take a breather!
+					</p>
+				</div>
+			);
+		} else {
+			return viewTickets;
+		}
 	};
 
 	return (
 		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>
-			<Paper elevation={0}>
+			<Paper elevation={0} square className={classes.tabsHeader}>
 				<Tabs
 					value={tab}
 					onChange={handleChangeTab}
@@ -465,11 +471,6 @@ const TicketsList = () => {
 						onChange={handleSearchContact}
 					/>
 				</div>
-				{loading ? (
-					<div>
-						<CircularProgress className={classes.circleLoading} />
-					</div>
-				) : null}
 			</Paper>
 			{tab === "open" ? (
 				<>
@@ -501,7 +502,6 @@ const TicketsList = () => {
 					<List>{renderTickets("closed")}</List>
 				</Paper>
 			)}
-
 			<audio id="sound" preload="auto">
 				<source src={require("../../../../util/sound.mp3")} type="audio/mpeg" />
 				<source src={require("../../../../util/sound.ogg")} type="audio/ogg" />

@@ -5,7 +5,6 @@ import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Bateryinfo from "./components/Bateryinfo";

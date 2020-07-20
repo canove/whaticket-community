@@ -18,6 +18,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import { green } from "@material-ui/core/colors";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 import whatsBackground from "../../../../Images/wa-background.png";
 
@@ -257,10 +258,10 @@ const MessagesList = () => {
 		};
 	}, [ticketId]);
 
-	const handleSearch = e => {
-		setSearchParam(e.target.value);
-		setPageNumber(1);
-	};
+	// const handleSearch = e => {
+	// 	setSearchParam(e.target.value);
+	// 	setPageNumber(1);
+	// };
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);
@@ -441,53 +442,64 @@ const MessagesList = () => {
 	return (
 		<Paper variant="outlined" elevation={0} className={classes.mainWrapper}>
 			<Card square className={classes.messagesHeader}>
-				{contact.name ? (
-					<CardHeader
-						titleTypographyProps={{ noWrap: true }}
-						subheaderTypographyProps={{ noWrap: true }}
-						avatar={<Avatar alt="contact_image" src={contact.profilePicUrl} />}
-						title={`${contact.name} #${ticket.id}`}
-						subheader={`Atribuído á ${ticket.userId}`}
-					/>
-				) : (
-					<CardHeader
-						titleTypographyProps={{ noWrap: true }}
-						subheaderTypographyProps={{ noWrap: true }}
-						avatar={<Avatar alt="contact_image" />}
-						title=""
-						subheader=""
-					/>
-				)}
-
-				<div className={classes.actionButtons}>
-					{ticket.status === "closed" ? (
-						<Button
-							startIcon={<ReplayIcon />}
-							size="small"
-							onClick={e => handleUpdateTicketStatus("open", userId)}
-						>
-							Reabrir
-						</Button>
-					) : (
-						<>
+				<CardHeader
+					titleTypographyProps={{ noWrap: true }}
+					subheaderTypographyProps={{ noWrap: true }}
+					avatar={
+						loading ? (
+							<Skeleton animation="wave" variant="circle">
+								<Avatar alt="contact_image" />
+							</Skeleton>
+						) : (
+							<Avatar src={contact.profilePicUrl} alt="contact_image" />
+						)
+					}
+					title={
+						loading ? (
+							<Skeleton animation="wave" width={60} />
+						) : (
+							`${contact.name} #${ticket.id}`
+						)
+					}
+					subheader={
+						loading ? (
+							<Skeleton animation="wave" width={80} />
+						) : (
+							`Atribuído á ${ticket.userId}`
+						)
+					}
+				/>
+				{!loading && (
+					<div className={classes.actionButtons}>
+						{ticket.status === "closed" ? (
 							<Button
 								startIcon={<ReplayIcon />}
 								size="small"
-								onClick={e => handleUpdateTicketStatus("pending", null)}
+								onClick={e => handleUpdateTicketStatus("open", userId)}
 							>
-								Retornar
+								Reabrir
 							</Button>
-							<Button
-								size="small"
-								variant="contained"
-								color="primary"
-								onClick={e => handleUpdateTicketStatus("closed", userId)}
-							>
-								Resolver
-							</Button>
-						</>
-					)}
-				</div>
+						) : (
+							<>
+								<Button
+									startIcon={<ReplayIcon />}
+									size="small"
+									onClick={e => handleUpdateTicketStatus("pending", null)}
+								>
+									Retornar
+								</Button>
+								<Button
+									size="small"
+									variant="contained"
+									color="primary"
+									onClick={e => handleUpdateTicketStatus("closed", userId)}
+								>
+									Resolver
+								</Button>
+							</>
+						)}
+					</div>
+				)}
 			</Card>
 			<div className={classes.messagesListWrapper}>
 				<InfiniteScrollReverse
