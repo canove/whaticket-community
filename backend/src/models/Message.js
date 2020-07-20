@@ -9,6 +9,14 @@ class Message extends Sequelize.Model {
 				body: { type: Sequelize.TEXT },
 				mediaUrl: { type: Sequelize.STRING },
 				mediaType: { type: Sequelize.STRING },
+				createdAt: {
+					type: Sequelize.DATE(6),
+					allowNull: false,
+				},
+				updatedAt: {
+					type: Sequelize.DATE(6),
+					allowNull: false,
+				},
 			},
 			{
 				sequelize,

@@ -27,15 +27,16 @@ const useStyles = makeStyles(theme => ({
 	newMessageBox: {
 		background: "#eee",
 		display: "flex",
-		padding: "10px",
+		padding: "7px",
 		alignItems: "center",
+		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
 	messageInputWrapper: {
 		padding: 6,
 		background: "#fff",
 		display: "flex",
-		borderRadius: 40,
+		borderRadius: 20,
 		flex: 1,
 	},
 
@@ -60,6 +61,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "space-between",
 		alignItems: "center",
 		backgroundColor: "#eee",
+		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
 	emojiBox: {
@@ -240,11 +242,7 @@ const MessagesInput = ({ searchParam }) => {
 
 	if (media.preview)
 		return (
-			<Paper
-				variant="outlined"
-				square
-				className={classes.viewMediaInputWrapper}
-			>
+			<Paper elevation={0} square className={classes.viewMediaInputWrapper}>
 				<IconButton
 					aria-label="cancel-upload"
 					component="span"
@@ -274,7 +272,7 @@ const MessagesInput = ({ searchParam }) => {
 		);
 	else {
 		return (
-			<Paper variant="outlined" square className={classes.newMessageBox}>
+			<Paper square elevation={0} className={classes.newMessageBox}>
 				<IconButton
 					aria-label="emojiPicker"
 					component="span"
@@ -310,6 +308,8 @@ const MessagesInput = ({ searchParam }) => {
 						inputRef={input => input && !searchParam && input.focus()}
 						className={classes.messageInput}
 						placeholder="Escreva uma mensagem"
+						multiline
+						rowsMax={5}
 						value={inputMessage}
 						onChange={handleChangeInput}
 						disabled={recording}

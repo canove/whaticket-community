@@ -14,27 +14,19 @@ import Qrcode from "./components/Qrcode";
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
+		padding: theme.spacing(4),
 	},
 
-	title: {
-		flexGrow: 1,
-	},
-
-	appBarSpacer: theme.mixins.toolbar,
 	content: {
 		flexGrow: 1,
 
 		overflow: "auto",
 	},
-	container: {
-		// paddingTop: theme.spacing(4),
-		// paddingBottom: theme.spacing(4),
-		height: `calc(100% - 64px)`,
-	},
 	paper: {
 		padding: theme.spacing(2),
 		display: "flex",
 		overflow: "auto",
+		alignItems: "center",
 		flexDirection: "column",
 	},
 	fixedHeight: {
@@ -52,7 +44,7 @@ const WhatsAuth = () => {
 	useEffect(() => {
 		const fetchSession = async () => {
 			try {
-				const res = await api.get("/whatsapp/session");
+				const res = await api.get("/whatsapp/session/1");
 				setQrCode(res.data.qrcode);
 				setSession(res.data);
 			} catch (err) {
@@ -73,9 +65,9 @@ const WhatsAuth = () => {
 
 		socket.on("whats_auth", data => {
 			if (data.action === "authentication") {
-				history.push("/chat");
 				setQrCode("");
 				setSession(data.session);
+				history.push("/chat");
 			}
 		});
 
@@ -87,35 +79,22 @@ const WhatsAuth = () => {
 	console.log(session);
 
 	return (
-		<div>
-			<div className={classes.root}>
-				<main className={classes.content}>
-					<div className={classes.appBarSpacer} />
-					<Container maxWidth="lg" className={classes.container}>
-						<Grid container spacing={3}>
-							{session.status === "pending" ? (
-								<Grid item xs={6}>
-									<Paper className={classes.paper}>
-										<Qrcode qrCode={qrCode} />
-									</Paper>
-								</Grid>
-							) : (
-								<Grid item xs={6}>
-									<Paper className={classes.paper}>
-										<Bateryinfo sessio={session} />
-									</Paper>
-								</Grid>
-							)}
-
-							{/* <Grid item xs={12} md={4} lg={3}>
-									<Paper className={fixedHeightPaper}>
-										<h1>paper2</h1>
-									</Paper>
-								</Grid> */}
-						</Grid>
-					</Container>
-				</main>
-			</div>
+		<div className={classes.root}>
+			<Grid container spacing={3}>
+				{session.status === "pending" ? (
+					<Grid item xs={12}>
+						<Paper className={classes.paper}>
+							<Qrcode qrCode={qrCode} />
+						</Paper>
+					</Grid>
+				) : (
+					<Grid item xs={6}>
+						<Paper className={classes.paper}>
+							<Bateryinfo sessio={session} />
+						</Paper>
+					</Grid>
+				)}
+			</Grid>
 		</div>
 	);
 };

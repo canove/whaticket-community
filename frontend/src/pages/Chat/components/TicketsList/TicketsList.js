@@ -37,14 +37,13 @@ const useStyles = makeStyles(theme => ({
 		height: "100%",
 		flexDirection: "column",
 		overflow: "hidden",
+		borderTopRightRadius: 0,
+		borderBottomRightRadius: 0,
 	},
 
 	contactsHeader: {
 		display: "flex",
 		backgroundColor: "#eee",
-		borderBottomLeftRadius: 0,
-		borderBottomRightRadius: 0,
-		borderTopRightRadius: 0,
 	},
 
 	settingsIcon: {
@@ -55,9 +54,6 @@ const useStyles = makeStyles(theme => ({
 
 	openTicketsList: {
 		position: "relative",
-		borderTopLeftRadius: 0,
-		borderTopRightRadius: 0,
-		borderBottomRightRadius: 0,
 		height: "50%",
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
@@ -67,13 +63,11 @@ const useStyles = makeStyles(theme => ({
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
 			backgroundColor: "#e8e8e8",
 		},
+		borderTop: "2px solid rgba(0, 0, 0, 0.12)",
 	},
 
 	closedTicketsList: {
 		position: "relative",
-		borderTopLeftRadius: 0,
-		borderTopRightRadius: 0,
-		borderBottomRightRadius: 0,
 		flex: 1,
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
@@ -83,6 +77,7 @@ const useStyles = makeStyles(theme => ({
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
 			backgroundColor: "#e8e8e8",
 		},
+		borderTop: "2px solid rgba(0, 0, 0, 0.12)",
 	},
 
 	ticketsListHeader: {
@@ -90,12 +85,12 @@ const useStyles = makeStyles(theme => ({
 		// flexShrink: 0,
 		// -webkitBoxAlign: "center",
 		alignItems: "center",
-		fontWeight: 600,
+		fontWeight: 500,
 		fontSize: "16px",
 		height: "56px",
 		// backgroundColor: "#eee",
 		color: "rgb(67, 83, 105)",
-		padding: "0px 24px",
+		padding: "0px 12px",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
@@ -305,11 +300,16 @@ const TicketsList = () => {
 
 	const resetUnreadMessages = ticketId => {
 		setTickets(prevState => {
-			let aux = [...prevState];
-			let ticketIndex = aux.findIndex(ticket => ticket.id === +ticketId);
-			aux[ticketIndex].unreadMessages = 0;
-
-			return aux;
+			const ticketIndex = prevState.findIndex(
+				ticket => ticket.id === +ticketId
+			);
+			if (ticketIndex !== -1) {
+				let aux = [...prevState];
+				aux[ticketIndex].unreadMessages = 0;
+				return aux;
+			} else {
+				return prevState;
+			}
 		});
 	};
 
@@ -338,8 +338,7 @@ const TicketsList = () => {
 	};
 
 	const countTickets = status => {
-		const ticketsFound = tickets.filter(ticket => ticket.status === status)
-			.length;
+		const ticketsFound = tickets.filter(t => t.status === status).length;
 
 		if (ticketsFound === 0) return "";
 		return ticketsFound;
@@ -434,8 +433,8 @@ const TicketsList = () => {
 	};
 
 	return (
-		<div className={classes.contactsWrapper}>
-			<Paper square variant="outlined" className={classes.root}>
+		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>
+			<Paper elevation={0}>
 				<Tabs
 					value={tab}
 					onChange={handleChangeTab}
@@ -456,7 +455,7 @@ const TicketsList = () => {
 					/>
 				</Tabs>
 			</Paper>
-			<Paper variant="outlined" square className={classes.contactsSearchBox}>
+			<Paper square elevation={0} className={classes.contactsSearchBox}>
 				<div className={classes.serachInputWrapper}>
 					<SearchIcon className={classes.searchIcon} />
 					<InputBase
@@ -474,7 +473,7 @@ const TicketsList = () => {
 			</Paper>
 			{tab === "open" ? (
 				<>
-					<Paper variant="outlined" className={classes.openTicketsList}>
+					<Paper square elevation={0} className={classes.openTicketsList}>
 						<List style={{ paddingTop: 0 }}>
 							<div className={classes.ticketsListHeader}>
 								Meus tickets
@@ -485,7 +484,7 @@ const TicketsList = () => {
 							{renderTickets("open")}
 						</List>
 					</Paper>
-					<Paper variant="outlined" className={classes.openTicketsList}>
+					<Paper square elevation={0} className={classes.openTicketsList}>
 						<List style={{ paddingTop: 0 }}>
 							<div className={classes.ticketsListHeader}>
 								Aguardando
@@ -498,7 +497,7 @@ const TicketsList = () => {
 					</Paper>
 				</>
 			) : (
-				<Paper variant="outlined" className={classes.closedTicketsList}>
+				<Paper square elevation={0} className={classes.closedTicketsList}>
 					<List>{renderTickets("closed")}</List>
 				</Paper>
 			)}
@@ -508,7 +507,7 @@ const TicketsList = () => {
 				<source src={require("../../../../util/sound.ogg")} type="audio/ogg" />
 				<embed hidden={true} autostart="false" loop={false} src="./sound.mp3" />
 			</audio>
-		</div>
+		</Paper>
 	);
 };
 

@@ -12,28 +12,26 @@ const useStyles = makeStyles(theme => ({
 		flex: 1,
 		// backgroundColor: "#eee",
 		padding: theme.spacing(4),
-		height: `calc(100% - 64px)`,
+		height: `calc(100% - 48px)`,
 		overflowY: "hidden",
 	},
 
 	chatPapper: {
-		backgroundColor: "#eee",
+		// backgroundColor: "#eee",
 		display: "flex",
 		height: "100%",
-		overflowY: "hidden",
 	},
 
 	contactsWrapper: {
 		display: "flex",
 		height: "100%",
 		flexDirection: "column",
-		overflow: "hidden",
+		overflowY: "hidden",
 	},
 	messagessWrapper: {
 		display: "flex",
 		height: "100%",
 		flexDirection: "column",
-		overflow: "hidden",
 	},
 	welcomeMsg: {
 		backgroundColor: "#eee",
@@ -51,7 +49,7 @@ const Chat = () => {
 
 	return (
 		<div className={classes.chatContainer}>
-			<Paper square className={classes.chatPapper}>
+			<Paper square elevation={0} className={classes.chatPapper}>
 				<Grid container spacing={0}>
 					<Grid item xs={4} className={classes.contactsWrapper}>
 						<TicketsList />

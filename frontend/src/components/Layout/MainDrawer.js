@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 		alignItems: "center",
 		justifyContent: "flex-end",
 		padding: "0 8px",
-		...theme.mixins.toolbar,
+		minHeight: "48px",
 	},
 	appBar: {
 		zIndex: theme.zIndex.drawer + 1,
@@ -85,10 +85,11 @@ const useStyles = makeStyles(theme => ({
 			width: theme.spacing(9),
 		},
 	},
-	appBarSpacer: theme.mixins.toolbar,
+	appBarSpacer: {
+		minHeight: "48px",
+	},
 	content: {
 		flex: 1,
-		// height: "100%",
 		overflow: "auto",
 	},
 	container: {
@@ -158,7 +159,7 @@ const MainDrawer = ({ appTitle, children }) => {
 				position="absolute"
 				className={clsx(classes.appBar, open && classes.appBarShift)}
 			>
-				<Toolbar className={classes.toolbar}>
+				<Toolbar variant="dense" className={classes.toolbar}>
 					<IconButton
 						edge="start"
 						color="inherit"

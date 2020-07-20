@@ -16,6 +16,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import ReplayIcon from "@material-ui/icons/Replay";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
+import Paper from "@material-ui/core/Paper";
 import { green } from "@material-ui/core/colors";
 
 import whatsBackground from "../../../../Images/wa-background.png";
@@ -30,12 +31,16 @@ const useStyles = makeStyles(theme => ({
 		display: "flex",
 		flexDirection: "column",
 		overflow: "hidden",
+		borderTopLeftRadius: 0,
+		borderBottomLeftRadius: 0,
+		borderLeft: "0",
 	},
 
 	messagesHeader: {
 		display: "flex",
 		backgroundColor: "#eee",
 		flex: "none",
+		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
 	actionButtons: {
@@ -83,7 +88,8 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	messageLeft: {
-		marginTop: 5,
+		marginRight: 20,
+		marginTop: 2,
 		minWidth: 100,
 		maxWidth: 600,
 		height: "auto",
@@ -92,20 +98,20 @@ const useStyles = makeStyles(theme => ({
 
 		backgroundColor: "#ffffff",
 		alignSelf: "flex-start",
-		borderTopLeftRadius: 8,
+		borderTopLeftRadius: 0,
 		borderTopRightRadius: 8,
-		borderBottomLeftRadius: 0,
+		borderBottomLeftRadius: 8,
 		borderBottomRightRadius: 8,
 		paddingLeft: 5,
 		paddingRight: 5,
 		paddingTop: 5,
 		paddingBottom: 0,
-		boxShadow: "0 2px 2px #808888",
+		boxShadow: "0 1px 1px #b3b3b3",
 	},
 
 	messageRight: {
 		marginLeft: 20,
-		marginTop: 5,
+		marginTop: 2,
 		minWidth: 100,
 		maxWidth: 600,
 		height: "auto",
@@ -122,7 +128,7 @@ const useStyles = makeStyles(theme => ({
 		paddingRight: 5,
 		paddingTop: 5,
 		paddingBottom: 0,
-		boxShadow: "0 2px 2px #808888",
+		boxShadow: "0 1px 1px #b3b3b3",
 	},
 
 	textContentItem: {
@@ -156,6 +162,7 @@ const useStyles = makeStyles(theme => ({
 		backgroundColor: "#e1f3fb",
 		margin: "10px",
 		borderRadius: "10px",
+		boxShadow: "0 1px 1px #b3b3b3",
 	},
 
 	dailyTimestampText: {
@@ -432,8 +439,8 @@ const MessagesList = () => {
 	};
 
 	return (
-		<div className={classes.mainWrapper}>
-			<Card variant="outlined" square className={classes.messagesHeader}>
+		<Paper variant="outlined" elevation={0} className={classes.mainWrapper}>
+			<Card square className={classes.messagesHeader}>
 				{contact.name ? (
 					<CardHeader
 						titleTypographyProps={{ noWrap: true }}
@@ -453,21 +460,33 @@ const MessagesList = () => {
 				)}
 
 				<div className={classes.actionButtons}>
-					<Button
-						startIcon={<ReplayIcon />}
-						size="small"
-						onClick={e => handleUpdateTicketStatus("pending")}
-					>
-						Retornar
-					</Button>
-					<Button
-						size="small"
-						variant="contained"
-						color="primary"
-						onClick={e => handleUpdateTicketStatus("closed", userId)}
-					>
-						Resolver
-					</Button>
+					{ticket.status === "closed" ? (
+						<Button
+							startIcon={<ReplayIcon />}
+							size="small"
+							onClick={e => handleUpdateTicketStatus("open", userId)}
+						>
+							Reabrir
+						</Button>
+					) : (
+						<>
+							<Button
+								startIcon={<ReplayIcon />}
+								size="small"
+								onClick={e => handleUpdateTicketStatus("pending", null)}
+							>
+								Retornar
+							</Button>
+							<Button
+								size="small"
+								variant="contained"
+								color="primary"
+								onClick={e => handleUpdateTicketStatus("closed", userId)}
+							>
+								Resolver
+							</Button>
+						</>
+					)}
 				</div>
 			</Card>
 			<div className={classes.messagesListWrapper}>
@@ -487,7 +506,7 @@ const MessagesList = () => {
 					</div>
 				) : null}
 			</div>
-		</div>
+		</Paper>
 	);
 };
 
