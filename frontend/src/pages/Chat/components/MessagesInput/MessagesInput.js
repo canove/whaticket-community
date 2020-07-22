@@ -113,7 +113,6 @@ const MessagesInput = ({ searchParam }) => {
 	const [inputMessage, setInputMessage] = useState("");
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [loading, setLoading] = useState(false);
-
 	const [recording, setRecording] = useState(false);
 
 	useEffect(() => {
@@ -276,7 +275,7 @@ const MessagesInput = ({ searchParam }) => {
 				<IconButton
 					aria-label="emojiPicker"
 					component="span"
-					disabled={loading}
+					disabled={loading || recording}
 					onClick={e => setShowEmoji(prevState => !prevState)}
 				>
 					<MoodIcon className={classes.sendMessageIcons} />
@@ -295,11 +294,16 @@ const MessagesInput = ({ searchParam }) => {
 				<input
 					type="file"
 					id="upload-button"
+					disabled={loading || recording}
 					className={classes.uploadInput}
 					onChange={handleChangeMedia}
 				/>
 				<label htmlFor="upload-button">
-					<IconButton aria-label="upload" component="span" disabled={loading}>
+					<IconButton
+						aria-label="upload"
+						component="span"
+						disabled={loading || recording}
+					>
 						<AttachFileIcon className={classes.sendMessageIcons} />
 					</IconButton>
 				</label>
@@ -312,7 +316,7 @@ const MessagesInput = ({ searchParam }) => {
 						rowsMax={5}
 						value={inputMessage}
 						onChange={handleChangeInput}
-						disabled={recording}
+						disabled={recording || loading}
 						onPaste={handleInputPaste}
 						onKeyPress={e => {
 							if (loading) return;
@@ -363,6 +367,7 @@ const MessagesInput = ({ searchParam }) => {
 					<IconButton
 						aria-label="showRecorder"
 						component="span"
+						disabled={loading}
 						onClick={handleStartRecording}
 					>
 						<MicIcon className={classes.sendMessageIcons} />

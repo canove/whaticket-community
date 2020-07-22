@@ -19,6 +19,26 @@ const TicketSkeleton = () => {
 				/>
 			</ListItem>
 			<Divider />
+			<ListItem dense>
+				<ListItemAvatar>
+					<Skeleton animation="wave" variant="circle" width={40} height={40} />
+				</ListItemAvatar>
+				<ListItemText
+					primary={<Skeleton animation="wave" height={20} width={70} />}
+					secondary={<Skeleton animation="wave" height={20} width={120} />}
+				/>
+			</ListItem>
+			<Divider />
+			<ListItem dense>
+				<ListItemAvatar>
+					<Skeleton animation="wave" variant="circle" width={40} height={40} />
+				</ListItemAvatar>
+				<ListItemText
+					primary={<Skeleton animation="wave" height={20} width={60} />}
+					secondary={<Skeleton animation="wave" height={20} width={90} />}
+				/>
+			</ListItem>
+			<Divider />
 		</>
 	);
 };

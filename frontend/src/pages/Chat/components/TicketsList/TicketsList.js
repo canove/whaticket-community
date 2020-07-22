@@ -5,11 +5,8 @@ import openSocket from "socket.io-client";
 
 import { parseISO, format } from "date-fns";
 
-import profileDefaultPic from "../../../../Images/profile_default.png";
-
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -46,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 	tabsHeader: {
 		// display: "flex",
+		flex: "none",
 		backgroundColor: "#eee",
 	},
 
@@ -86,7 +84,7 @@ const useStyles = makeStyles(theme => ({
 		// flexShrink: 0,
 		// -webkitBoxAlign: "center",
 		alignItems: "center",
-		fontWeight: 500,
+		fontWeight: 600,
 		fontSize: "16px",
 		height: "56px",
 		// backgroundColor: "#eee",
@@ -112,6 +110,29 @@ const useStyles = makeStyles(theme => ({
 			position: "absolute",
 			left: "50%",
 		},
+	},
+
+	noTicketsDiv: {
+		display: "flex",
+		height: "100px",
+		margin: 40,
+		flexDirection: "column",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+
+	noTicketsText: {
+		textAlign: "center",
+		color: "rgb(104, 121, 146)",
+		fontSize: "14px",
+		lineHeight: "1.4",
+	},
+
+	noTicketsTitle: {
+		textAlign: "center",
+		fontSize: "16px",
+		fontWeight: "600",
+		margin: "0px",
 	},
 
 	contactsSearchBox: {
@@ -230,12 +251,14 @@ const TicketsList = () => {
 		});
 
 		socket.on("appMessage", data => {
+			console.log(data);
 			if (data.action === "create") {
 				updateUnreadMessagesCount(data);
 				if (
-					ticketId &&
-					data.message.ticketId === +ticketId &&
-					document.visibilityState === "visible"
+					(ticketId &&
+						data.message.ticketId === +ticketId &&
+						document.visibilityState === "visible") ||
+					(data.ticket.userId !== userId && data.ticket.userId)
 				)
 					return;
 				showDesktopNotification(data);
@@ -245,7 +268,7 @@ const TicketsList = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [ticketId]);
+	}, [ticketId, userId]);
 
 	const updateUnreadMessagesCount = data => {
 		setTickets(prevState => {
@@ -282,7 +305,6 @@ const TicketsList = () => {
 	};
 
 	const showDesktopNotification = data => {
-		console.log("data", data);
 		const options = {
 			body: `${data.message.body} - ${format(new Date(), "HH:mm")}`,
 			icon: data.contact.profilePicUrl,
@@ -330,17 +352,22 @@ const TicketsList = () => {
 		}
 	};
 
-	const countTickets = status => {
-		const ticketsFound = tickets.filter(t => t.status === status).length;
+	const countTickets = (status, userId) => {
+		const ticketsFound = tickets.filter(
+			t => t.status === status && t.userId === userId
+		).length;
 
 		if (ticketsFound === 0) return "";
 		return ticketsFound;
 	};
 
 	const renderTickets = (status, userId) => {
-		const viewTickets = tickets.map(
-			(ticket, index) =>
-				ticket.status === status && (
+		const viewTickets = tickets.map(ticket => {
+			if (
+				(ticket.status === status && ticket.userId === userId) ||
+				ticket.status === "closed"
+			)
+				return (
 					<React.Fragment key={ticket.id}>
 						<ListItem
 							dense
@@ -355,9 +382,7 @@ const TicketsList = () => {
 							<ListItemAvatar>
 								<Avatar
 									src={
-										ticket.Contact.profilePicUrl
-											? ticket.Contact.profilePicUrl
-											: profileDefaultPic
+										ticket.Contact.profilePicUrl && ticket.Contact.profilePicUrl
 									}
 								></Avatar>
 							</ListItemAvatar>
@@ -419,17 +444,22 @@ const TicketsList = () => {
 						</ListItem>
 						<Divider variant="inset" component="li" />
 					</React.Fragment>
-				)
-		);
+				);
+			else return null;
+		});
 
 		if (loading) {
-			return <>{Array(2).fill(<TicketSkeleton />)}</>;
-		} else if (viewTickets.length === 0) {
+			return <TicketSkeleton />;
+		} else if (countTickets(status, userId) === "" && status !== "closed") {
 			return (
-				<div>
-					<span className={classes.noTicketsTitle}>All caught up</span>
+				<div className={classes.noTicketsDiv}>
+					<span className={classes.noTicketsTitle}>
+						{status === "pending" ? "Tudo resolvido" : "Pronto pra mais?"}
+					</span>
 					<p className={classes.noTicketsText}>
-						No tickets to look into for now. Take a breather!
+						{status === "pending"
+							? "Nenhum ticket pendente por enquanto. Hora do café!"
+							: "Aceite um ticket da fila para começar."}
 					</p>
 				</div>
 			);
@@ -479,10 +509,10 @@ const TicketsList = () => {
 							<div className={classes.ticketsListHeader}>
 								Meus tickets
 								<span className={classes.ticketsCount}>
-									{countTickets("open")}
+									{countTickets("open", userId)}
 								</span>
 							</div>
-							{renderTickets("open")}
+							{renderTickets("open", userId)}
 						</List>
 					</Paper>
 					<Paper square elevation={0} className={classes.openTicketsList}>
@@ -490,16 +520,16 @@ const TicketsList = () => {
 							<div className={classes.ticketsListHeader}>
 								Aguardando
 								<span className={classes.ticketsCount}>
-									{countTickets("pending")}
+									{countTickets("pending", null)}
 								</span>
 							</div>
-							{renderTickets("pending")}
+							{renderTickets("pending", null)}
 						</List>
 					</Paper>
 				</>
 			) : (
 				<Paper square elevation={0} className={classes.closedTicketsList}>
-					<List>{renderTickets("closed")}</List>
+					<List>{renderTickets("closed", userId)}</List>
 				</Paper>
 			)}
 			<audio id="sound" preload="auto">
