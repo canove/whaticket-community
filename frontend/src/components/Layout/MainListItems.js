@@ -11,14 +11,12 @@ import Collapse from "@material-ui/core/Collapse";
 
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
-// import PeopleIcon from "@material-ui/icons/People";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import ChatIcon from "@material-ui/icons/Chat";
-import BarChartIcon from "@material-ui/icons/BarChart";
 import LayersIcon from "@material-ui/icons/Layers";
-// import AssignmentIcon from "@material-ui/icons/Assignment";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
+import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
 
 const useStyles = makeStyles(theme => ({
 	nested: {
@@ -82,13 +80,11 @@ const MainListItems = () => {
 					/>
 				</List>
 			</Collapse>
-
-			<ListItem button disabled>
-				<ListItemIcon>
-					<BarChartIcon />
-				</ListItemIcon>
-				<ListItemText primary="Relatórios" />
-			</ListItem>
+			<ListItemLink
+				to="/contacts"
+				primary="Contatos"
+				icon={<ContactPhoneIcon />}
+			/>
 			<ListItem button disabled>
 				<ListItemIcon>
 					<LayersIcon />

@@ -1,7 +1,9 @@
 import React, { useContext } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
-import { AuthContext, AuthProvider } from "./Context/Auth/AuthContext";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { makeStyles } from "@material-ui/core/styles";
 
 import MainDrawer from "./components/Layout/MainDrawer";
 import Dashboard from "./pages/Home/Dashboard";
@@ -10,9 +12,8 @@ import Profile from "./pages/Profile/Profile";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
 import WhatsAuth from "./pages/WhatsAuth/WhatsAuth";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { makeStyles } from "@material-ui/core/styles";
+import Contacts from "./pages/Contacts";
+import { AuthContext, AuthProvider } from "./Context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	backdrop: {
@@ -85,6 +86,7 @@ const Routes = () => {
 						<PrivateRoute exact path="/chat/:ticketId?" component={Chat} />
 						<PrivateRoute exact path="/profile" component={Profile} />
 						<PrivateRoute exact path="/whats-auth" component={WhatsAuth} />
+						<PrivateRoute exact path="/contacts" component={Contacts} />
 					</MainDrawer>
 				</Switch>
 			</AuthProvider>

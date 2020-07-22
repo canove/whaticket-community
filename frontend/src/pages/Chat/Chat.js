@@ -49,7 +49,7 @@ const Chat = () => {
 
 	return (
 		<div className={classes.chatContainer}>
-			<Paper square elevation={0} className={classes.chatPapper}>
+			<Paper square className={classes.chatPapper}>
 				<Grid container spacing={0}>
 					<Grid item xs={4} className={classes.contactsWrapper}>
 						<TicketsList />
