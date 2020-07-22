@@ -22,6 +22,7 @@ import EditIcon from "@material-ui/icons/Edit";
 
 import PaginationActions from "./PaginationActions";
 import api from "../../util/api";
+import ContactModal from "./ContactModal";
 
 const useStyles = makeStyles(theme => ({
 	mainContainer: {
@@ -74,6 +75,8 @@ const Contacts = () => {
 	const [searchParam, setSearchParam] = useState("");
 	const [contacts, setContacts] = useState([]);
 
+	const [modalOpen, setModalOpen] = useState(true);
+
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
@@ -108,8 +111,22 @@ const Contacts = () => {
 		setSearchParam(event.target.value.toLowerCase());
 	};
 
+	const handleClickOpen = () => {
+		setModalOpen(true);
+	};
+
+	const handleClose = () => {
+		setModalOpen(false);
+	};
+
 	return (
 		<Container className={classes.mainContainer}>
+			<ContactModal
+				modalOpen={modalOpen}
+				onClose={handleClose}
+				setModalOpen={setModalOpen}
+				aria-labelledby="form-dialog-title"
+			></ContactModal>
 			<div className={classes.contactsHeader}>
 				<h2>Todos os contatos</h2>
 
@@ -130,7 +147,7 @@ const Contacts = () => {
 					<Button variant="contained" color="primary">
 						Importar contatos
 					</Button>
-					<Button variant="contained" color="primary">
+					<Button variant="contained" color="primary" onClick={handleClickOpen}>
 						Adicionar contato
 					</Button>
 				</div>
