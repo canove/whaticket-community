@@ -1,3 +1,5 @@
+const Sequelize = require("sequelize");
+
 const Contact = require("../models/Contact");
 // const Message = require("../models/Message");
 // const Sequelize = require("sequelize");
@@ -5,23 +7,29 @@ const Contact = require("../models/Contact");
 // const { getWbot } = require("../libs/wbot");
 
 exports.index = async (req, res) => {
-	// const { searchParam = "" } = req.query;
+	const { searchParam = "", pageNumber = 1, rowsPerPage = 10 } = req.query;
 
-	// const lowerSerachParam = searchParam.toLowerCase();
+	const whereCondition = {
+		name: Sequelize.where(
+			Sequelize.fn("LOWER", Sequelize.col("name")),
+			"LIKE",
+			"%" + searchParam.toLowerCase() + "%"
+		),
+	};
 
-	// const whereCondition = {
-	// 	name: Sequelize.where(
-	// 		Sequelize.fn("LOWER", Sequelize.col("name")),
-	// 		"LIKE",
-	// 		"%" + lowerSerachParam + "%"
-	// 	),
-	// };
+	let limit = +rowsPerPage;
+	let offset = limit * (pageNumber - 1);
 
 	//todo >> add contact number to search where condition
 
-	const contacts = await Contact.findAll();
+	const { count, rows: contacts } = await Contact.findAndCountAll({
+		where: whereCondition,
+		limit,
+		offset,
+		order: [["createdAt", "DESC"]],
+	});
 
-	return res.json(contacts);
+	return res.json({ contacts, count });
 };
 
 exports.store = async (req, res) => {

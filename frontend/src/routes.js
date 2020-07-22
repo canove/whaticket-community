@@ -12,7 +12,7 @@ import Profile from "./pages/Profile/Profile";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
 import WhatsAuth from "./pages/WhatsAuth/WhatsAuth";
-import Contacts from "./pages/Contacts";
+import ContactsList from "./pages/Contacts/ContactsList";
 import { AuthContext, AuthProvider } from "./Context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
@@ -86,7 +86,7 @@ const Routes = () => {
 						<PrivateRoute exact path="/chat/:ticketId?" component={Chat} />
 						<PrivateRoute exact path="/profile" component={Profile} />
 						<PrivateRoute exact path="/whats-auth" component={WhatsAuth} />
-						<PrivateRoute exact path="/contacts" component={Contacts} />
+						<PrivateRoute exact path="/contacts" component={ContactsList} />
 					</MainDrawer>
 				</Switch>
 			</AuthProvider>
