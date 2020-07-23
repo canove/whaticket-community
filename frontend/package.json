@@ -13,6 +13,7 @@
     "date-fns": "^2.14.0",
     "dotenv": "^8.2.0",
     "emoji-mart": "^3.0.0",
+    "formik": "^2.1.5",
     "mic-recorder-to-mp3": "^2.2.1",
     "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
@@ -21,6 +22,7 @@
     "react-modal-image": "^2.5.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "shortid": "^2.2.15",
     "socket.io-client": "^2.3.0"
   },
   "scripts": {

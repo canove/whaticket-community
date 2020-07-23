@@ -15,6 +15,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import Container from "@material-ui/core/Container";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Typography from "@material-ui/core/Typography";
 
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
@@ -128,7 +129,9 @@ const Contacts = () => {
 				aria-labelledby="form-dialog-title"
 			></ContactModal>
 			<div className={classes.contactsHeader}>
-				<h2>Todos os contatos</h2>
+				<Typography variant="h5" gutterBottom>
+					Contatos
+				</Typography>
 
 				<div className={classes.actionButtons}>
 					<TextField

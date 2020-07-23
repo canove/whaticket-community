@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+import { Formik, FieldArray } from "formik";
+
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
-import FormHelperText from "@material-ui/core/FormHelperText";
+
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -34,65 +34,32 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const AddContactModal = ({ modalOpen, setModalOpen, handleAddContact }) => {
+const AddContactModal = ({
+	modalOpen,
+	setModalOpen,
+	handleAddContact,
+	contactId,
+}) => {
 	const classes = useStyles();
-	const initialState = { name: "", number: "" };
-	const [contact, setContact] = useState(initialState);
-	const [newInfo, setNewInfo] = useState({
-		name: "",
-		value: "",
-	});
-	const [extraInfo, setExtraInfo] = useState([
-		{
-			id: "test1",
-			name: "Teste",
-			value: "testera",
-		},
-		{
-			id: "test2",
-			name: "Mesh Agent URL",
-			value: "http://10.10.10.2",
-		},
-		{
-			id: "test3",
-			name: "Atera Agent URL",
-			value: "http://10.10.10.5",
-		},
-	]);
 
+	const [contact, setContact] = useState({
+		id: "",
+		name: "",
+		number: "",
+		email: "",
+		extraInfo: [
+			{
+				id: "",
+				name: "",
+				value: "",
+			},
+		],
+	});
 	const handleClose = () => {
 		setModalOpen(false);
 	};
 
-	const handleChangeInput = e => {
-		setContact({ ...contact, [e.target.name]: e.target.value });
-	};
-
-	const handleChangeExtraInfoInput = (e, id) => {
-		setExtraInfo(prevState => {
-			const index = prevState.findIndex(ext => ext.id === id);
-			if (index === -1) return prevState;
-			let aux = [...prevState];
-			aux[index] = { ...aux[index], [e.target.name]: e.target.value };
-			return aux;
-		});
-	};
-
-	console.log(extraInfo);
-
-	const handleAddExtraInfo = () => {
-		setExtraInfo(prevState => [newInfo, ...extraInfo]);
-	};
-
-	const handleDeleteExtraInfo = (extraId, id) => {
-		setExtraInfo(prevState => {
-			const index = prevState.findIndex(ext => ext.id === id);
-			if (index === -1) return prevState;
-			let aux = [...prevState];
-			aux.splice(index, 1);
-			return aux;
-		});
-	};
+	useEffect(() => {}, [contactId]);
 
 	return (
 		<div className={classes.root}>
@@ -105,101 +72,134 @@ const AddContactModal = ({ modalOpen, setModalOpen, handleAddContact }) => {
 				scroll="paper"
 				className={classes.modal}
 			>
-				<DialogTitle id="form-dialog-title">Adicionar contato</DialogTitle>
-				<DialogContent dividers>
-					<Typography variant="subtitle1" gutterBottom>
-						Dados do contato
-					</Typography>
-					<TextField
-						id="contactName"
-						label="Nome"
-						variant="outlined"
-						margin="dense"
-						required
-						className={classes.textField}
-					/>
-					<TextField
-						id="contactNumber"
-						label="Número do Whatsapp"
-						placeholder="Ex: 13912344321"
-						variant="outlined"
-						margin="dense"
-						required
-					/>
-					<div>
-						<TextField
-							id="outlined-full-width"
-							label="Email"
-							placeholder="Endereço de Email"
-							fullWidth
-							margin="dense"
-							variant="outlined"
-						/>
-					</div>
-					<Typography
-						style={{ marginBottom: 8, marginTop: 12 }}
-						variant="subtitle1"
-					>
-						Informações extras
-					</Typography>
-					{extraInfo &&
-						extraInfo.map((extra, index) => (
-							<div key={extra.id} className={classes.extraAttr}>
+				<Formik
+					initialValues={contact}
+					onSubmit={(values, { setSubmitting }) => {
+						setTimeout(() => {
+							alert(JSON.stringify(values, null, 2));
+							setSubmitting(false);
+						}, 400);
+					}}
+				>
+					{({
+						values,
+						errors,
+						touched,
+						handleChange,
+						handleBlur,
+						handleSubmit,
+						isSubmitting,
+					}) => (
+						<>
+							<DialogTitle id="form-dialog-title">
+								Adicionar contato
+							</DialogTitle>
+							<DialogContent dividers>
+								<Typography variant="subtitle1" gutterBottom>
+									Dados do contato
+								</Typography>
 								<TextField
-									// id={extra.id}
-									label="Nome do campo"
+									label="Nome"
 									name="name"
-									value={extra.name}
-									onChange={e => handleChangeExtraInfoInput(e, extra.id)}
+									value={values.name}
+									onChange={handleChange}
 									variant="outlined"
 									margin="dense"
 									required
 									className={classes.textField}
 								/>
 								<TextField
-									// id={extra.id}
-									label="Valor"
-									name="value"
-									value={extra.value}
-									onChange={e => handleChangeExtraInfoInput(e, extra.id)}
+									label="Número do Whatsapp"
+									name="number"
+									value={values.number}
+									onChange={handleChange}
+									placeholder="Ex: 13912344321"
 									variant="outlined"
 									margin="dense"
 									required
 								/>
-								<IconButton
-									size="small"
-									onClick={e => handleDeleteExtraInfo(extra.id, index)}
+								<div>
+									<TextField
+										label="Email"
+										name="email"
+										value={values.email}
+										onChange={handleChange}
+										placeholder="Endereço de Email"
+										fullWidth
+										margin="dense"
+										variant="outlined"
+									/>
+								</div>
+								<Typography
+									style={{ marginBottom: 8, marginTop: 12 }}
+									variant="subtitle1"
 								>
-									<DeleteOutlineIcon />
-								</IconButton>
-							</div>
-						))}
+									Informações extras
+								</Typography>
 
-					<div className={classes.extraAttr}>
-						<Button
-							style={{ flex: 1, marginTop: 8 }}
-							variant="outlined"
-							color="primary"
-							onClick={handleAddExtraInfo}
-						>
-							+ Adicionar atributo
-						</Button>
-					</div>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleClose} color="secondary">
-						Cancelar
-					</Button>
-					<Button
-						onClick={e => {
-							handleAddContact(contact);
-							setContact(initialState);
-						}}
-						color="primary"
-					>
-						Adicionar
-					</Button>
-				</DialogActions>
+								<FieldArray name="extraInfo">
+									{({ push, remove }) => (
+										<>
+											{values.extraInfo &&
+												values.extraInfo.length > 0 &&
+												values.extraInfo.map((info, index) => (
+													<div
+														className={classes.extraAttr}
+														key={`${index}-info`}
+													>
+														<TextField
+															label="Nome do campo"
+															name={`extraInfo[${index}].name`}
+															value={info.name}
+															onChange={handleChange}
+															variant="outlined"
+															margin="dense"
+															required
+															className={classes.textField}
+														/>
+														<TextField
+															label="Valor"
+															name={`extraInfo[${index}].value`}
+															value={info.value}
+															onChange={handleChange}
+															variant="outlined"
+															margin="dense"
+															className={classes.textField}
+															required
+														/>
+														<IconButton
+															size="small"
+															onClick={() => remove(index)}
+														>
+															<DeleteOutlineIcon />
+														</IconButton>
+													</div>
+												))}
+											<div className={classes.extraAttr}>
+												<Button
+													style={{ flex: 1, marginTop: 8 }}
+													variant="outlined"
+													color="primary"
+													onClick={() => push({ name: "", value: "" })}
+												>
+													+ Adicionar atributo
+												</Button>
+											</div>
+										</>
+									)}
+								</FieldArray>
+							</DialogContent>
+							<DialogActions>
+								<Button onClick={handleClose} color="secondary">
+									Cancelar
+								</Button>
+								<Button onClick={handleSubmit} color="primary">
+									Adicionar
+								</Button>
+							</DialogActions>
+						</>
+					)}
+				</Formik>
 			</Dialog>
 		</div>
 	);
