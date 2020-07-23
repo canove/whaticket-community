@@ -75,8 +75,9 @@ const Contacts = () => {
 	const [count, setCount] = useState(0);
 	const [searchParam, setSearchParam] = useState("");
 	const [contacts, setContacts] = useState([]);
+	const [selectedContactId, setSelectedContactId] = useState(null);
 
-	const [modalOpen, setModalOpen] = useState(true);
+	const [modalOpen, setModalOpen] = useState(false);
 
 	useEffect(() => {
 		setLoading(true);
@@ -113,11 +114,17 @@ const Contacts = () => {
 	};
 
 	const handleClickOpen = () => {
+		setSelectedContactId(null);
 		setModalOpen(true);
 	};
 
 	const handleClose = () => {
 		setModalOpen(false);
+	};
+
+	const hadleEditContact = contactId => {
+		setSelectedContactId(contactId);
+		setModalOpen(true);
 	};
 
 	return (
@@ -127,6 +134,7 @@ const Contacts = () => {
 				onClose={handleClose}
 				setModalOpen={setModalOpen}
 				aria-labelledby="form-dialog-title"
+				contactId={selectedContactId}
 			></ContactModal>
 			<div className={classes.contactsHeader}>
 				<Typography variant="h5" gutterBottom>
@@ -176,7 +184,10 @@ const Contacts = () => {
 								<TableCell>{contact.number}</TableCell>
 								<TableCell>{contact.updatedAt}</TableCell>
 								<TableCell align="right">
-									<IconButton size="small">
+									<IconButton
+										size="small"
+										onClick={() => hadleEditContact(contact.id)}
+									>
 										<EditIcon />
 									</IconButton>
 									<IconButton size="small">

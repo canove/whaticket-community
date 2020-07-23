@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 
 const Contact = require("../models/Contact");
+const ContactCustomField = require("../models/ContactCustomField");
+
 // const Message = require("../models/Message");
 // const Sequelize = require("sequelize");
 // const { getIO } = require("../libs/socket");
@@ -49,4 +51,19 @@ exports.store = async (req, res) => {
 	const { number, name } = await Contact.create(req.body);
 
 	res.status(200).json({ number, name });
+};
+
+exports.show = async (req, res) => {
+	const { contactId } = req.params;
+
+	const { id, name, number, extraInfo } = await Contact.findByPk(contactId, {
+		include: [{ model: ContactCustomField, as: "extraInfo" }],
+	});
+
+	res.status(200).json({
+		id,
+		name,
+		number,
+		extraInfo,
+	});
 };

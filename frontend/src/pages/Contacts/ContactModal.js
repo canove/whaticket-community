@@ -15,6 +15,8 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 
 import { makeStyles } from "@material-ui/core/styles";
 
+import api from "../../util/api";
+
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
@@ -55,11 +57,33 @@ const AddContactModal = ({
 			},
 		],
 	});
+
+	useEffect(() => {
+		const fetchContact = async () => {
+			if (!contactId) return;
+			const res = await api.get(`/contacts/${contactId}`);
+			setContact(res.data);
+		};
+
+		fetchContact();
+	}, [contactId]);
+
 	const handleClose = () => {
 		setModalOpen(false);
+		setContact({
+			id: "",
+			name: "",
+			number: "",
+			email: "",
+			extraInfo: [
+				{
+					id: "",
+					name: "",
+					value: "",
+				},
+			],
+		});
 	};
-
-	useEffect(() => {}, [contactId]);
 
 	return (
 		<div className={classes.root}>
@@ -74,6 +98,7 @@ const AddContactModal = ({
 			>
 				<Formik
 					initialValues={contact}
+					enableReinitialize={true}
 					onSubmit={(values, { setSubmitting }) => {
 						setTimeout(() => {
 							alert(JSON.stringify(values, null, 2));
