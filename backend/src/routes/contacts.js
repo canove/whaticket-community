@@ -11,6 +11,6 @@ routes.get("/contacts/:contactId", isAuth, ContactController.show);
 
 routes.post("/contacts", isAuth, ContactController.store);
 
-// routes.put("/contacts/contactId", isAuth, ContactController.index);
+routes.put("/contacts/:contactId", isAuth, ContactController.update);
 
 module.exports = routes;

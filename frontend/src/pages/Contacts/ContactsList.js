@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -100,6 +101,33 @@ const Contacts = () => {
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, page, token, rowsPerPage]);
 
+	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
+		socket.on("contact", data => {
+			if (data.action === "update" || data.action === "create") {
+				updateContacts(data.contact);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
+
+	const updateContacts = contact => {
+		setContacts(prevState => {
+			const contactIndex = prevState.findIndex(c => c.id === contact.id);
+
+			if (contactIndex === -1) {
+				return [contact, ...prevState];
+			}
+			const aux = [...prevState];
+			aux[contactIndex] = contact;
+			return aux;
+		});
+	};
+
 	const handleChangePage = (event, newPage) => {
 		setPage(newPage);
 	};
@@ -119,6 +147,7 @@ const Contacts = () => {
 	};
 
 	const handleClose = () => {
+		setSelectedContactId(null);
 		setModalOpen(false);
 	};
 

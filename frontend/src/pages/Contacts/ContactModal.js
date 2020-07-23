@@ -36,27 +36,27 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const AddContactModal = ({
+const ContactModal = ({
 	modalOpen,
 	setModalOpen,
 	handleAddContact,
+	onClose,
 	contactId,
 }) => {
 	const classes = useStyles();
-
-	const [contact, setContact] = useState({
-		id: "",
+	const initialState = {
 		name: "",
 		number: "",
 		email: "",
 		extraInfo: [
 			{
-				id: "",
 				name: "",
 				value: "",
 			},
 		],
-	});
+	};
+
+	const [contact, setContact] = useState(initialState);
 
 	useEffect(() => {
 		const fetchContact = async () => {
@@ -69,21 +69,21 @@ const AddContactModal = ({
 	}, [contactId]);
 
 	const handleClose = () => {
-		setModalOpen(false);
-		setContact({
-			id: "",
-			name: "",
-			number: "",
-			email: "",
-			extraInfo: [
-				{
-					id: "",
-					name: "",
-					value: "",
-				},
-			],
-		});
+		onClose();
+		setContact(initialState);
 	};
+
+	const handleSaveContact = async values => {
+		if (contactId) {
+			await api.put(`/contacts/${contactId}`, values);
+		} else {
+			await api.post("/contacts", values);
+		}
+		handleClose();
+	};
+
+	console.log(contact);
+	console.log("id", contactId);
 
 	return (
 		<div className={classes.root}>
@@ -101,7 +101,7 @@ const AddContactModal = ({
 					enableReinitialize={true}
 					onSubmit={(values, { setSubmitting }) => {
 						setTimeout(() => {
-							alert(JSON.stringify(values, null, 2));
+							handleSaveContact(values);
 							setSubmitting(false);
 						}, 400);
 					}}
@@ -126,7 +126,7 @@ const AddContactModal = ({
 								<TextField
 									label="Nome"
 									name="name"
-									value={values.name}
+									value={values.name || ""}
 									onChange={handleChange}
 									variant="outlined"
 									margin="dense"
@@ -136,7 +136,7 @@ const AddContactModal = ({
 								<TextField
 									label="Número do Whatsapp"
 									name="number"
-									value={values.number}
+									value={values.number || ""}
 									onChange={handleChange}
 									placeholder="Ex: 13912344321"
 									variant="outlined"
@@ -147,7 +147,7 @@ const AddContactModal = ({
 									<TextField
 										label="Email"
 										name="email"
-										value={values.email}
+										value={values.email || ""}
 										onChange={handleChange}
 										placeholder="Endereço de Email"
 										fullWidth
@@ -159,7 +159,7 @@ const AddContactModal = ({
 									style={{ marginBottom: 8, marginTop: 12 }}
 									variant="subtitle1"
 								>
-									Informações extras
+									Informações adicionais
 								</Typography>
 
 								<FieldArray name="extraInfo">
@@ -175,7 +175,7 @@ const AddContactModal = ({
 														<TextField
 															label="Nome do campo"
 															name={`extraInfo[${index}].name`}
-															value={info.name}
+															value={info.name || ""}
 															onChange={handleChange}
 															variant="outlined"
 															margin="dense"
@@ -185,7 +185,7 @@ const AddContactModal = ({
 														<TextField
 															label="Valor"
 															name={`extraInfo[${index}].value`}
-															value={info.value}
+															value={info.value || ""}
 															onChange={handleChange}
 															variant="outlined"
 															margin="dense"
@@ -230,4 +230,4 @@ const AddContactModal = ({
 	);
 };
 
-export default AddContactModal;
+export default ContactModal;

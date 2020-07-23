@@ -6,6 +6,7 @@ class Contact extends Sequelize.Model {
 			{
 				name: { type: Sequelize.STRING },
 				number: { type: Sequelize.STRING },
+				email: { type: Sequelize.STRING, allowNull: false, defaultValue: "" },
 				profilePicUrl: { type: Sequelize.STRING },
 			},
 			{

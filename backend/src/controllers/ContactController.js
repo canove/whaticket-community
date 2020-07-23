@@ -5,7 +5,7 @@ const ContactCustomField = require("../models/ContactCustomField");
 
 // const Message = require("../models/Message");
 // const Sequelize = require("sequelize");
-// const { getIO } = require("../libs/socket");
+const { getIO } = require("../libs/socket");
 // const { getWbot } = require("../libs/wbot");
 
 exports.index = async (req, res) => {
@@ -36,7 +36,7 @@ exports.index = async (req, res) => {
 
 exports.store = async (req, res) => {
 	// const wbot = getWbot();
-	// const io = getIO();
+	const io = getIO();
 	// const { number, name } = req.body;
 
 	// const result = await wbot.isRegisteredUser(`55${number}@c.us`);
@@ -48,9 +48,14 @@ exports.store = async (req, res) => {
 	// }
 	// const profilePicUrl = await wbot.getProfilePicUrl(`55${number}@c.us`);
 
-	const { number, name } = await Contact.create(req.body);
+	const contact = await Contact.create(req.body);
 
-	res.status(200).json({ number, name });
+	io.emit("contact", {
+		action: "create",
+		contact: contact,
+	});
+
+	res.status(200).json(contact);
 };
 
 exports.show = async (req, res) => {
@@ -66,4 +71,25 @@ exports.show = async (req, res) => {
 		number,
 		extraInfo,
 	});
+};
+
+exports.update = async (req, res) => {
+	const io = getIO();
+
+	const { contactId } = req.params;
+
+	const contact = await Contact.findByPk(contactId);
+
+	if (!contact) {
+		return res.status(400).json({ error: "No contact found with this ID" });
+	}
+
+	await contact.update(req.body);
+
+	io.emit("contact", {
+		action: "update",
+		contact: contact,
+	});
+
+	res.status(200).json(contact);
 };
