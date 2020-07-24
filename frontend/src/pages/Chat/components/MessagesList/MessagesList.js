@@ -7,6 +7,7 @@ import InfiniteScrollReverse from "react-infinite-scroll-reverse";
 import ModalImage from "react-modal-image";
 
 import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DoneIcon from "@material-ui/icons/Done";
@@ -16,9 +17,15 @@ import CardHeader from "@material-ui/core/CardHeader";
 import ReplayIcon from "@material-ui/icons/Replay";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import Divider from "@material-ui/core/Divider";
 import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
 import { green } from "@material-ui/core/colors";
 import Skeleton from "@material-ui/lab/Skeleton";
+
+import Drawer from "@material-ui/core/Drawer";
 
 import whatsBackground from "../../../../Images/wa-background.png";
 
@@ -26,8 +33,18 @@ import api from "../../../../util/api";
 
 import MessagesInput from "../MessagesInput/MessagesInput";
 
+const drawerWidth = 320;
+
 const useStyles = makeStyles(theme => ({
+	root: {
+		display: "flex",
+		height: "100%",
+		position: "relative",
+		overflow: "hidden",
+	},
+
 	mainWrapper: {
+		flex: 1,
 		height: "100%",
 		display: "flex",
 		flexDirection: "column",
@@ -35,6 +52,21 @@ const useStyles = makeStyles(theme => ({
 		borderTopLeftRadius: 0,
 		borderBottomLeftRadius: 0,
 		borderLeft: "0",
+		marginRight: -drawerWidth,
+		transition: theme.transitions.create("margin", {
+			easing: theme.transitions.easing.sharp,
+			duration: theme.transitions.duration.leavingScreen,
+		}),
+	},
+
+	mainWrapperShift: {
+		borderTopRightRadius: 0,
+		borderBottomRightRadius: 0,
+		transition: theme.transitions.create("margin", {
+			easing: theme.transitions.easing.easeOut,
+			duration: theme.transitions.duration.enteringScreen,
+		}),
+		marginRight: 0,
 	},
 
 	messagesHeader: {
@@ -46,6 +78,7 @@ const useStyles = makeStyles(theme => ({
 
 	actionButtons: {
 		marginRight: 6,
+		flex: "none",
 		alignSelf: "center",
 		marginLeft: "auto",
 		"& > *": {
@@ -185,6 +218,27 @@ const useStyles = makeStyles(theme => ({
 		verticalAlign: "middle",
 		marginLeft: 4,
 	},
+
+	drawer: {
+		width: drawerWidth,
+		flexShrink: 0,
+	},
+	drawerPaper: {
+		width: drawerWidth,
+		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+		borderTopRightRadius: 4,
+		borderBottomRightRadius: 4,
+	},
+	drawerHeader: {
+		display: "flex",
+		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+
+		backgroundColor: "#eee",
+		alignItems: "center",
+		padding: theme.spacing(0, 1),
+		minHeight: "73px",
+		justifyContent: "flex-start",
+	},
 }));
 
 const MessagesList = () => {
@@ -203,6 +257,8 @@ const MessagesList = () => {
 	const [searchParam, setSearchParam] = useState("");
 	const [pageNumber, setPageNumber] = useState(0);
 	const lastMessageRef = useRef();
+
+	const [open, setOpen] = useState(true);
 
 	useEffect(() => {
 		setMessagesList([]);
@@ -439,86 +495,135 @@ const MessagesList = () => {
 		}
 	};
 
+	const handleDrawerOpen = () => {
+		setOpen(true);
+	};
+	const handleDrawerClose = () => {
+		setOpen(false);
+	};
+
 	return (
-		<Paper variant="outlined" elevation={0} className={classes.mainWrapper}>
-			<Card square className={classes.messagesHeader}>
-				<CardHeader
-					titleTypographyProps={{ noWrap: true }}
-					subheaderTypographyProps={{ noWrap: true }}
-					avatar={
-						loading ? (
-							<Skeleton animation="wave" variant="circle">
-								<Avatar alt="contact_image" />
-							</Skeleton>
-						) : (
-							<Avatar src={contact.profilePicUrl} alt="contact_image" />
-						)
-					}
-					title={
-						loading ? (
-							<Skeleton animation="wave" width={60} />
-						) : (
-							`${contact.name} #${ticket.id}`
-						)
-					}
-					subheader={
-						loading ? (
-							<Skeleton animation="wave" width={80} />
-						) : (
-							`Atribuído á ${ticket.userId}`
-						)
-					}
-				/>
-				{!loading && (
-					<div className={classes.actionButtons}>
-						{ticket.status === "closed" ? (
-							<Button
-								startIcon={<ReplayIcon />}
-								size="small"
-								onClick={e => handleUpdateTicketStatus("open", userId)}
-							>
-								Reabrir
-							</Button>
-						) : (
-							<>
+		<div className={classes.root} id="drawer-container">
+			<Paper
+				variant="outlined"
+				elevation={0}
+				className={clsx(classes.mainWrapper, {
+					[classes.mainWrapperShift]: open,
+				})}
+			>
+				<Card square className={classes.messagesHeader}>
+					<CardHeader
+						titleTypographyProps={{ noWrap: true }}
+						subheaderTypographyProps={{ noWrap: true }}
+						avatar={
+							loading ? (
+								<Skeleton animation="wave" variant="circle">
+									<Avatar alt="contact_image" />
+								</Skeleton>
+							) : (
+								<Avatar src={contact.profilePicUrl} alt="contact_image" />
+							)
+						}
+						title={
+							loading ? (
+								<Skeleton animation="wave" width={60} />
+							) : (
+								`${contact.name} #${ticket.id}`
+							)
+						}
+						subheader={
+							loading ? (
+								<Skeleton animation="wave" width={80} />
+							) : (
+								`Atribuído á ${ticket.userId}`
+							)
+						}
+					/>
+					{!loading && (
+						<div className={classes.actionButtons}>
+							{ticket.status === "closed" ? (
 								<Button
 									startIcon={<ReplayIcon />}
 									size="small"
-									onClick={e => handleUpdateTicketStatus("pending", null)}
+									onClick={e => handleUpdateTicketStatus("open", userId)}
 								>
-									Retornar
+									Reabrir
 								</Button>
-								<Button
-									size="small"
-									variant="contained"
-									color="primary"
-									onClick={e => handleUpdateTicketStatus("closed", userId)}
-								>
-									Resolver
-								</Button>
-							</>
-						)}
-					</div>
-				)}
-			</Card>
-			<div className={classes.messagesListWrapper}>
-				<InfiniteScrollReverse
-					className={classes.messagesList}
-					hasMore={hasMore}
-					isLoading={loading}
-					loadMore={loadMore}
-					loadArea={10}
-				>
-					{messagesList.length > 0 ? renderMessages() : []}
-				</InfiniteScrollReverse>
-				<MessagesInput searchParam={searchParam} />
-				{loading ? (
-					<div>
-						<CircularProgress className={classes.circleLoading} />
-					</div>
-				) : null}
-			</div>
-		</Paper>
+							) : (
+								<>
+									<Button
+										startIcon={<ReplayIcon />}
+										size="small"
+										onClick={e => handleUpdateTicketStatus("pending", null)}
+									>
+										Retornar
+									</Button>
+									<Button
+										startIcon={<ReplayIcon />}
+										size="small"
+										onClick={handleDrawerOpen}
+									>
+										Drawer
+									</Button>
+									<Button
+										size="small"
+										variant="contained"
+										color="primary"
+										onClick={e => handleUpdateTicketStatus("closed", userId)}
+									>
+										Resolver
+									</Button>
+								</>
+							)}
+						</div>
+					)}
+				</Card>
+				<div className={classes.messagesListWrapper}>
+					<InfiniteScrollReverse
+						className={classes.messagesList}
+						hasMore={hasMore}
+						isLoading={loading}
+						loadMore={loadMore}
+						loadArea={10}
+					>
+						{messagesList.length > 0 ? renderMessages() : []}
+					</InfiniteScrollReverse>
+					<MessagesInput searchParam={searchParam} />
+					{loading ? (
+						<div>
+							<CircularProgress className={classes.circleLoading} />
+						</div>
+					) : null}
+				</div>
+			</Paper>
+			<Drawer
+				className={classes.drawer}
+				variant="persistent"
+				anchor="right"
+				open={open}
+				PaperProps={{ style: { position: "absolute" } }}
+				BackdropProps={{ style: { position: "absolute" } }}
+				ModalProps={{
+					container: document.getElementById("drawer-container"),
+					style: { position: "absolute" },
+				}}
+				classes={{
+					paper: classes.drawerPaper,
+				}}
+			>
+				<div className={classes.drawerHeader}>
+					<IconButton onClick={handleDrawerClose}>
+						<CloseIcon />
+					</IconButton>
+					<Typography style={{ justifySelf: "center" }}>
+						Dados do contato
+					</Typography>
+				</div>
+				<a href="https://economicros.ddns.com.br:4043/?viewmode=11&gotonode=j@fJRRDC0rsF1pdypERaF4eQbcwntph@aNQrtLIXhES3Q4AZX678gnn4qbPG619C">
+					Value
+				</a>
+			</Drawer>
+		</div>
 	);
 };
 
