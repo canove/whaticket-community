@@ -14,14 +14,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
-// import AddIcon from "@material-ui/icons/Add";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import Button from "@material-ui/core/Button";
-// import Fab from "@material-ui/core/Fab";
-// import AddContactModal from "../AddContact/AddContactModal";
 
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -84,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 		// flexShrink: 0,
 		// -webkitBoxAlign: "center",
 		alignItems: "center",
-		fontWeight: 600,
+		fontWeight: 500,
 		fontSize: "16px",
 		height: "56px",
 		// backgroundColor: "#eee",
@@ -294,15 +291,17 @@ const TicketsList = () => {
 				ticket => ticket.id === data.ticket.id
 			);
 
-			if (ticketIndex !== -1) {
+			if (ticketIndex === -1) {
+				return [data.ticket, ...prevState];
+			} else {
 				let aux = [...prevState];
 				aux[ticketIndex] = data.ticket;
 				return aux;
-			} else {
-				return [data.ticket, ...prevState];
 			}
 		});
 	};
+
+	console.log(tickets);
 
 	const showDesktopNotification = data => {
 		const options = {
@@ -350,6 +349,7 @@ const TicketsList = () => {
 		} catch (err) {
 			alert(err);
 		}
+		history.push(`/chat/${ticketId}`);
 	};
 
 	const countTickets = (status, userId) => {
@@ -365,7 +365,7 @@ const TicketsList = () => {
 		const viewTickets = tickets.map(ticket => {
 			if (
 				(ticket.status === status && ticket.userId === userId) ||
-				ticket.status === "closed"
+				(ticket.status === "closed" && status === "closed")
 			)
 				return (
 					<React.Fragment key={ticket.id}>

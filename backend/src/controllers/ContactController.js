@@ -37,7 +37,7 @@ exports.index = async (req, res) => {
 exports.store = async (req, res) => {
 	// const wbot = getWbot();
 	const io = getIO();
-	// const { number, name } = req.body;
+	const newContact = req.body;
 
 	// const result = await wbot.isRegisteredUser(`55${number}@c.us`);
 
@@ -48,7 +48,9 @@ exports.store = async (req, res) => {
 	// }
 	// const profilePicUrl = await wbot.getProfilePicUrl(`55${number}@c.us`);
 
-	const contact = await Contact.create(req.body);
+	const contact = await Contact.create(newContact, {
+		include: "extraInfo",
+	});
 
 	io.emit("contact", {
 		action: "create",
@@ -64,7 +66,7 @@ exports.show = async (req, res) => {
 	const { id, name, number, email, extraInfo } = await Contact.findByPk(
 		contactId,
 		{
-			include: [{ model: ContactCustomField, as: "extraInfo" }],
+			include: "extraInfo",
 		}
 	);
 
@@ -80,15 +82,39 @@ exports.show = async (req, res) => {
 exports.update = async (req, res) => {
 	const io = getIO();
 
+	const updatedContact = req.body;
+
 	const { contactId } = req.params;
 
-	const contact = await Contact.findByPk(contactId);
+	const contact = await Contact.findByPk(contactId, {
+		include: "extraInfo",
+	});
 
 	if (!contact) {
 		return res.status(400).json({ error: "No contact found with this ID" });
 	}
 
-	await contact.update(req.body);
+	if (updatedContact.extraInfo) {
+		await Promise.all(
+			updatedContact.extraInfo.map(async info => {
+				await ContactCustomField.upsert({ ...info, contactId: contact.id });
+			})
+		);
+
+		await Promise.all(
+			contact.extraInfo.map(async oldInfo => {
+				let stillExists = updatedContact.extraInfo.findIndex(
+					info => info.id === oldInfo.id
+				);
+
+				if (stillExists === -1) {
+					await ContactCustomField.destroy({ where: { id: oldInfo.id } });
+				}
+			})
+		);
+	}
+
+	await contact.update(updatedContact);
 
 	io.emit("contact", {
 		action: "update",
