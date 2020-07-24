@@ -179,7 +179,11 @@ const Contacts = () => {
 	};
 
 	const handleDeleteContact = async contactId => {
-		await api.delete(`/contacts/${contactId}`);
+		try {
+			await api.delete(`/contacts/${contactId}`);
+		} catch (err) {
+			alert(err);
+		}
 		setDeletingContact(null);
 	};
 

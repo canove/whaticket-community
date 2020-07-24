@@ -52,14 +52,9 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactModal = ({
-	modalOpen,
-	setModalOpen,
-	handleAddContact,
-	onClose,
-	contactId,
-}) => {
+const ContactModal = ({ modalOpen, onClose, contactId }) => {
 	const classes = useStyles();
+
 	const initialState = {
 		name: "",
 		number: "",
@@ -90,10 +85,14 @@ const ContactModal = ({
 	};
 
 	const handleSaveContact = async values => {
-		if (contactId) {
-			await api.put(`/contacts/${contactId}`, values);
-		} else {
-			await api.post("/contacts", values);
+		try {
+			if (contactId) {
+				await api.put(`/contacts/${contactId}`, values);
+			} else {
+				await api.post("/contacts", values);
+			}
+		} catch (err) {
+			alert(err);
 		}
 		handleClose();
 	};
