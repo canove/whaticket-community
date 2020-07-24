@@ -12,6 +12,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { green } from "@material-ui/core/colors";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -33,6 +35,20 @@ const useStyles = makeStyles(theme => ({
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
+	},
+
+	btnWrapper: {
+		// margin: theme.spacing(1),
+		position: "relative",
+	},
+
+	buttonProgress: {
+		color: green[500],
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -12,
+		marginLeft: -12,
 	},
 }));
 
@@ -82,17 +98,12 @@ const ContactModal = ({
 		handleClose();
 	};
 
-	console.log(contact);
-	console.log("id", contactId);
-
 	return (
 		<div className={classes.root}>
 			<Dialog
 				open={modalOpen}
 				onClose={handleClose}
-				aria-labelledby="form-dialog-title"
 				maxWidth="lg"
-				// maxHeight="xs"
 				scroll="paper"
 				className={classes.modal}
 			>
@@ -117,7 +128,7 @@ const ContactModal = ({
 					}) => (
 						<>
 							<DialogTitle id="form-dialog-title">
-								Adicionar contato
+								{contactId ? "Editar contato" : "Adicionar contato"}
 							</DialogTitle>
 							<DialogContent dividers>
 								<Typography variant="subtitle1" gutterBottom>
@@ -215,11 +226,28 @@ const ContactModal = ({
 								</FieldArray>
 							</DialogContent>
 							<DialogActions>
-								<Button onClick={handleClose} color="secondary">
+								<Button
+									onClick={handleClose}
+									color="secondary"
+									disabled={isSubmitting}
+									variant="outlined"
+								>
 									Cancelar
 								</Button>
-								<Button onClick={handleSubmit} color="primary">
-									Adicionar
+								<Button
+									onClick={handleSubmit}
+									color="primary"
+									disabled={isSubmitting}
+									variant="contained"
+									className={classes.btnWrapper}
+								>
+									{contactId ? "Salvar" : "Adicionar"}
+									{isSubmitting && (
+										<CircularProgress
+											size={24}
+											className={classes.buttonProgress}
+										/>
+									)}
 								</Button>
 							</DialogActions>
 						</>

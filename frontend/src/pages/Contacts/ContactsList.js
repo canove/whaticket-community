@@ -25,6 +25,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import PaginationActions from "./PaginationActions";
 import api from "../../util/api";
 import ContactModal from "./ContactModal";
+import ContactsSekeleton from "./ContactsSekeleton";
+
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
 const useStyles = makeStyles(theme => ({
 	mainContainer: {
@@ -68,7 +71,7 @@ const Contacts = () => {
 	const classes = useStyles();
 
 	const token = localStorage.getItem("token");
-	const userId = localStorage.getItem("userId");
+	// const userId = localStorage.getItem("userId");
 
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(0);
@@ -79,6 +82,9 @@ const Contacts = () => {
 	const [selectedContactId, setSelectedContactId] = useState(null);
 
 	const [modalOpen, setModalOpen] = useState(false);
+
+	const [deletingContact, setDeletingContact] = useState(null);
+	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	useEffect(() => {
 		setLoading(true);
@@ -108,6 +114,10 @@ const Contacts = () => {
 			if (data.action === "update" || data.action === "create") {
 				updateContacts(data.contact);
 			}
+
+			if (data.action === "delete") {
+				deleteContact(data.contactId);
+			}
 		});
 
 		return () => {
@@ -124,6 +134,18 @@ const Contacts = () => {
 			}
 			const aux = [...prevState];
 			aux[contactIndex] = contact;
+			return aux;
+		});
+	};
+
+	const deleteContact = contactId => {
+		setContacts(prevState => {
+			const contactIndex = prevState.findIndex(c => c.id === +contactId);
+
+			if (contactIndex === -1) return prevState;
+
+			const aux = [...prevState];
+			aux.splice(contactIndex, 1);
 			return aux;
 		});
 	};
@@ -156,6 +178,11 @@ const Contacts = () => {
 		setModalOpen(true);
 	};
 
+	const handleDeleteContact = async contactId => {
+		await api.delete(`/contacts/${contactId}`);
+		setDeletingContact(null);
+	};
+
 	return (
 		<Container className={classes.mainContainer}>
 			<ContactModal
@@ -165,6 +192,15 @@ const Contacts = () => {
 				aria-labelledby="form-dialog-title"
 				contactId={selectedContactId}
 			></ContactModal>
+			<ConfirmationModal
+				title={deletingContact && `Deletar ${deletingContact.name}`}
+				open={confirmOpen}
+				setOpen={setConfirmOpen}
+				onConfirm={e => handleDeleteContact(deletingContact.id)}
+			>
+				Tem certeza que deseja deletar este contato? Todos os tickets
+				relacionados serão perdidos.
+			</ConfirmationModal>
 			<div className={classes.contactsHeader}>
 				<Typography variant="h5" gutterBottom>
 					Contatos
@@ -204,27 +240,40 @@ const Contacts = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{contacts.map(contact => (
-							<TableRow key={contact.id}>
-								<TableCell style={{ paddingRight: 0 }}>
-									{<Avatar src={contact.profilePicUrl} />}
-								</TableCell>
-								<TableCell>{contact.name}</TableCell>
-								<TableCell>{contact.number}</TableCell>
-								<TableCell>{contact.updatedAt}</TableCell>
-								<TableCell align="right">
-									<IconButton
-										size="small"
-										onClick={() => hadleEditContact(contact.id)}
-									>
-										<EditIcon />
-									</IconButton>
-									<IconButton size="small">
-										<DeleteOutlineIcon />
-									</IconButton>
-								</TableCell>
-							</TableRow>
-						))}
+						{loading ? (
+							<ContactsSekeleton />
+						) : (
+							<>
+								{contacts.map(contact => (
+									<TableRow key={contact.id}>
+										<TableCell style={{ paddingRight: 0 }}>
+											{<Avatar src={contact.profilePicUrl} />}
+										</TableCell>
+										<TableCell>{contact.name}</TableCell>
+										<TableCell>{contact.number}</TableCell>
+										<TableCell>{contact.email}</TableCell>
+										<TableCell align="right">
+											<IconButton
+												size="small"
+												onClick={() => hadleEditContact(contact.id)}
+											>
+												<EditIcon />
+											</IconButton>
+
+											<IconButton
+												size="small"
+												onClick={e => {
+													setConfirmOpen(true);
+													setDeletingContact(contact);
+												}}
+											>
+												<DeleteOutlineIcon />
+											</IconButton>
+										</TableCell>
+									</TableRow>
+								))}
+							</>
+						)}
 					</TableBody>
 					<TableFooter>
 						<TableRow>

@@ -13,4 +13,6 @@ routes.post("/contacts", isAuth, ContactController.store);
 
 routes.put("/contacts/:contactId", isAuth, ContactController.update);
 
+routes.delete("/contacts/:contactId", isAuth, ContactController.delete);
+
 module.exports = routes;

@@ -61,14 +61,18 @@ exports.store = async (req, res) => {
 exports.show = async (req, res) => {
 	const { contactId } = req.params;
 
-	const { id, name, number, extraInfo } = await Contact.findByPk(contactId, {
-		include: [{ model: ContactCustomField, as: "extraInfo" }],
-	});
+	const { id, name, number, email, extraInfo } = await Contact.findByPk(
+		contactId,
+		{
+			include: [{ model: ContactCustomField, as: "extraInfo" }],
+		}
+	);
 
 	res.status(200).json({
 		id,
 		name,
 		number,
+		email,
 		extraInfo,
 	});
 };
@@ -92,4 +96,24 @@ exports.update = async (req, res) => {
 	});
 
 	res.status(200).json(contact);
+};
+
+exports.delete = async (req, res) => {
+	const io = getIO();
+	const { contactId } = req.params;
+
+	const contact = await Contact.findByPk(contactId);
+
+	if (!contact) {
+		return res.status(400).json({ error: "No contact found with this ID" });
+	}
+
+	await contact.destroy();
+
+	io.emit("contact", {
+		action: "delete",
+		contactId: contactId,
+	});
+
+	res.status(200).json({ message: "Contact deleted" });
 };
