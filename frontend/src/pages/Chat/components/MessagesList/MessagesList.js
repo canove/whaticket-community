@@ -29,6 +29,7 @@ import Drawer from "@material-ui/core/Drawer";
 
 import whatsBackground from "../../../../Images/wa-background.png";
 
+import LinkifyWithTargetBlank from "../../../../components/LinkifyWithTargetBlank";
 import api from "../../../../util/api";
 
 import MessagesInput from "../MessagesInput/MessagesInput";
@@ -461,32 +462,36 @@ const MessagesList = () => {
 		if (messagesList.length > 0) {
 			const viewMessagesList = messagesList.map((message, index) => {
 				if (!message.userId) {
-					return [
-						renderDailyTimestamps(message, index),
-						<div className={classes.messageLeft} key={message.id}>
-							{message.mediaUrl && checkMessaageMedia(message)}
-							<div className={classes.textContentItem}>
-								{message.body}
-								<span className={classes.timestamp}>
-									{format(parseISO(message.createdAt), "HH:mm")}
-								</span>
+					return (
+						<LinkifyWithTargetBlank key={message.id}>
+							{renderDailyTimestamps(message, index)}
+							<div className={classes.messageLeft}>
+								{message.mediaUrl && checkMessaageMedia(message)}
+								<div className={classes.textContentItem}>
+									{message.body}
+									<span className={classes.timestamp}>
+										{format(parseISO(message.createdAt), "HH:mm")}
+									</span>
+								</div>
 							</div>
-						</div>,
-					];
+						</LinkifyWithTargetBlank>
+					);
 				} else {
-					return [
-						renderDailyTimestamps(message, index),
-						<div className={classes.messageRight} key={message.id}>
-							{message.mediaUrl && checkMessaageMedia(message)}
-							<div className={classes.textContentItem}>
-								{message.body}
-								<span className={classes.timestamp}>
-									{format(parseISO(message.createdAt), "HH:mm")}
-									{renderMessageAck(message)}
-								</span>
+					return (
+						<LinkifyWithTargetBlank key={message.id}>
+							{renderDailyTimestamps(message, index)}
+							<div className={classes.messageRight}>
+								{message.mediaUrl && checkMessaageMedia(message)}
+								<div className={classes.textContentItem}>
+									{message.body}
+									<span className={classes.timestamp}>
+										{format(parseISO(message.createdAt), "HH:mm")}
+										{renderMessageAck(message)}
+									</span>
+								</div>
 							</div>
-						</div>,
-					];
+						</LinkifyWithTargetBlank>
+					);
 				}
 			});
 			return viewMessagesList;
