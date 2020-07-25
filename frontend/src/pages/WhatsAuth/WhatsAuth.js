@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import api from "../../util/api";
+import api from "../../services/api";
 import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import Bateryinfo from "./components/Bateryinfo";
-import Qrcode from "./components/Qrcode";
+import SessionInfo from "../../components/SessionInfo";
+import Qrcode from "../../components/Qrcode";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -88,7 +88,7 @@ const WhatsAuth = () => {
 				) : (
 					<Grid item xs={6}>
 						<Paper className={classes.paper}>
-							<Bateryinfo sessio={session} />
+							<SessionInfo sessio={session} />
 						</Paper>
 					</Grid>
 				)}

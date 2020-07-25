@@ -27,12 +27,12 @@ import Skeleton from "@material-ui/lab/Skeleton";
 
 import Drawer from "@material-ui/core/Drawer";
 
-import whatsBackground from "../../../../Images/wa-background.png";
+import whatsBackground from "../../assets/wa-background.png";
 
-import LinkifyWithTargetBlank from "../../../../components/LinkifyWithTargetBlank";
-import api from "../../../../util/api";
+import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
+import api from "../../services/api";
 
-import MessagesInput from "../MessagesInput/MessagesInput";
+import MessageInput from "../MessageInput/";
 
 const drawerWidth = 320;
 
@@ -593,7 +593,7 @@ const MessagesList = () => {
 					>
 						{messagesList.length > 0 ? renderMessages() : []}
 					</InfiniteScrollReverse>
-					<MessagesInput searchParam={searchParam} />
+					<MessageInput searchParam={searchParam} />
 					{loading ? (
 						<div>
 							<CircularProgress className={classes.circleLoading} />

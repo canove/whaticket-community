@@ -9,7 +9,7 @@ const useStyles = makeStyles({
 	},
 });
 
-const Bateryinfo = ({ session }) => {
+const SessionInfo = ({ session }) => {
 	const classes = useStyles();
 	return (
 		<React.Fragment>
@@ -31,4 +31,4 @@ const Bateryinfo = ({ session }) => {
 	);
 };
 
-export default Bateryinfo;
+export default SessionInfo;

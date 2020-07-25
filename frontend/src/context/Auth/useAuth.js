@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-import api from "../../util/api";
+import api from "../../services/api";
 
 const useAuth = () => {
 	const history = useHistory();

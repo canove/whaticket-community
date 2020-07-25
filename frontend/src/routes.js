@@ -5,15 +5,14 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 
-import MainDrawer from "./components/Layout/MainDrawer";
-import Dashboard from "./pages/Home/Dashboard";
-import Chat from "./pages/Chat/Chat";
-import Profile from "./pages/Profile/Profile";
-import Signup from "./pages/Signup/Signup";
-import Login from "./pages/Login/Login";
+import MainDrawer from "./components/MainDrawer";
+import Dashboard from "./pages/Dashboard/";
+import Chat from "./pages/Chat/";
+import Signup from "./pages/Signup/";
+import Login from "./pages/Login/";
 import WhatsAuth from "./pages/WhatsAuth/WhatsAuth";
-import ContactsList from "./pages/Contacts/ContactsList";
-import { AuthContext, AuthProvider } from "./Context/Auth/AuthContext";
+import Contacts from "./pages/Contacts/";
+import { AuthContext, AuthProvider } from "./context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	backdrop: {
@@ -84,9 +83,8 @@ const Routes = () => {
 					<MainDrawer>
 						<PrivateRoute exact path="/" component={Dashboard} />
 						<PrivateRoute exact path="/chat/:ticketId?" component={Chat} />
-						<PrivateRoute exact path="/profile" component={Profile} />
 						<PrivateRoute exact path="/whats-auth" component={WhatsAuth} />
-						<PrivateRoute exact path="/contacts" component={ContactsList} />
+						<PrivateRoute exact path="/contacts" component={Contacts} />
 					</MainDrawer>
 				</Switch>
 			</AuthProvider>

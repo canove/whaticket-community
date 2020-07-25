@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import api from "../../../../util/api";
 import openSocket from "socket.io-client";
 
 import { parseISO, format } from "date-fns";
@@ -24,8 +23,9 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-
 import TicketSkeleton from "./TicketSkeleton";
+
+import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
 	contactsWrapper: {
@@ -533,8 +533,8 @@ const TicketsList = () => {
 				</Paper>
 			)}
 			<audio id="sound" preload="auto">
-				<source src={require("../../../../util/sound.mp3")} type="audio/mpeg" />
-				<source src={require("../../../../util/sound.ogg")} type="audio/ogg" />
+				<source src={require("../../assets/sound.mp3")} type="audio/mpeg" />
+				<source src={require("../../assets/sound.ogg")} type="audio/ogg" />
 				<embed hidden={true} autostart="false" loop={false} src="./sound.mp3" />
 			</audio>
 		</Paper>

@@ -21,7 +21,7 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
-import { AuthContext } from "../../Context/Auth/AuthContext";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const drawerWidth = 240;
 

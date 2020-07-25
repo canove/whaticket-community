@@ -18,7 +18,7 @@ import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
-import api from "../../../../util/api";
+import api from "../../services/api";
 import RecordingTimer from "./RecordingTimer";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
@@ -102,7 +102,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const MessagesInput = ({ searchParam }) => {
+const MessageInput = ({ searchParam }) => {
 	const classes = useStyles();
 	const { ticketId } = useParams();
 	const userId = localStorage.getItem("userId");
@@ -378,4 +378,4 @@ const MessagesInput = ({ searchParam }) => {
 	}
 };
 
-export default MessagesInput;
+export default MessageInput;

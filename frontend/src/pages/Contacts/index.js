@@ -22,12 +22,11 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
 
-import PaginationActions from "./PaginationActions";
-import api from "../../util/api";
-import ContactModal from "./ContactModal";
-import ContactsSekeleton from "./ContactsSekeleton";
-
-import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
+import PaginationActions from "../../components/PaginationActions";
+import api from "../../services/api";
+import ContactsSekeleton from "../../components/ContactsSekeleton";
+import ContactModal from "../../components/ContactModal";
+import ConfirmationModal from "../../components/ConfirmationModal/";
 
 const useStyles = makeStyles(theme => ({
 	mainContainer: {

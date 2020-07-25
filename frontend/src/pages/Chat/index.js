@@ -4,8 +4,8 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 
-import TicketsList from "./components/TicketsList/TicketsList";
-import MessagesList from "./components/MessagesList/MessagesList";
+import TicketsList from "../../components/TicketsList/";
+import MessagesList from "../../components/MessagesList/";
 
 const useStyles = makeStyles(theme => ({
 	chatContainer: {
