@@ -16,17 +16,24 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import ReplayIcon from "@material-ui/icons/Replay";
 import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 import Divider from "@material-ui/core/Divider";
-import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Link from "@material-ui/core/Link";
+
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+
+import Paper from "@material-ui/core/Paper";
 import { green } from "@material-ui/core/colors";
 import Skeleton from "@material-ui/lab/Skeleton";
 
-import Drawer from "@material-ui/core/Drawer";
+// import Drawer from "@material-ui/core/Drawer";
 
+import ContactDrawer from "../ContactDrawer";
 import whatsBackground from "../../assets/wa-background.png";
 
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
@@ -220,25 +227,42 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: 4,
 	},
 
-	drawer: {
-		width: drawerWidth,
-		flexShrink: 0,
-	},
-	drawerPaper: {
-		width: drawerWidth,
-		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
-		borderTopRightRadius: 4,
-		borderBottomRightRadius: 4,
-	},
-	drawerHeader: {
+	drawerContent: {
 		display: "flex",
-		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+		flexDirection: "column",
+		padding: 8,
+		// backgroundColor: "red",
+		height: "100%",
+		overflow: "hidden",
+	},
 
-		backgroundColor: "#eee",
+	drawerAvatar: {
+		margin: 15,
+		width: 160,
+		height: 160,
+	},
+
+	drawerHeader: {
+		// margin: 8,
+		display: "flex",
+		flexDirection: "column",
 		alignItems: "center",
-		padding: theme.spacing(0, 1),
-		minHeight: "73px",
-		justifyContent: "flex-start",
+		justifyContent: "center",
+		"& > *": {
+			margin: 4,
+		},
+	},
+
+	drawerDetails: {
+		marginTop: 8,
+		padding: 8,
+		display: "flex",
+		flexDirection: "column",
+		// overflow: "hidden",
+		// whiteSpace: "nowrap",
+		// textOverflow: "ellipsis",
+		// overflow: "scroll",
+		flex: 1,
 	},
 }));
 
@@ -507,6 +531,8 @@ const MessagesList = () => {
 		setOpen(false);
 	};
 
+	console.log(contact);
+
 	return (
 		<div className={classes.root} id="drawer-container">
 			<Paper
@@ -601,33 +627,46 @@ const MessagesList = () => {
 					) : null}
 				</div>
 			</Paper>
-			<Drawer
-				className={classes.drawer}
-				variant="persistent"
-				anchor="right"
-				open={open}
-				PaperProps={{ style: { position: "absolute" } }}
-				BackdropProps={{ style: { position: "absolute" } }}
-				ModalProps={{
-					container: document.getElementById("drawer-container"),
-					style: { position: "absolute" },
-				}}
-				classes={{
-					paper: classes.drawerPaper,
-				}}
-			>
-				<div className={classes.drawerHeader}>
-					<IconButton onClick={handleDrawerClose}>
-						<CloseIcon />
-					</IconButton>
-					<Typography style={{ justifySelf: "center" }}>
-						Dados do contato
-					</Typography>
+			<ContactDrawer open={open} handleDrawerClose={handleDrawerClose}>
+				<div className={classes.drawerContent}>
+					<div className={classes.drawerHeader}>
+						<Avatar
+							alt={contact.name}
+							src={contact.profilePicUrl}
+							className={classes.drawerAvatar}
+						></Avatar>
+
+						<Typography>{contact.name}</Typography>
+						<Typography>
+							<Link href={`tel:${contact.number}`}>{contact.number}</Link>
+						</Typography>
+						<Button variant="outlined" color="primary">
+							Editar contato
+						</Button>
+					</div>
+					<Paper className={classes.drawerDetails}>
+						<Typography variant="subtitle1">Informações</Typography>
+						<Table size="small">
+							<TableHead>
+								<TableRow>
+									<TableCell>Nome</TableCell>
+									<TableCell>Valor</TableCell>
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{contact &&
+									contact.extraInfo &&
+									contact.extraInfo.map(info => (
+										<TableRow key={info.id}>
+											<TableCell>{info.name}</TableCell>
+											<TableCell>{info.value}</TableCell>
+										</TableRow>
+									))}
+							</TableBody>
+						</Table>
+					</Paper>
 				</div>
-				<a href="https://economicros.ddns.com.br:4043/?viewmode=11&gotonode=j@fJRRDC0rsF1pdypERaF4eQbcwntph@aNQrtLIXhES3Q4AZX678gnn4qbPG619C">
-					Value
-				</a>
-			</Drawer>
+			</ContactDrawer>
 		</div>
 	);
 };

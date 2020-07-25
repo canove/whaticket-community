@@ -6,7 +6,7 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Divider from "@material-ui/core/Divider";
 import Skeleton from "@material-ui/lab/Skeleton";
 
-const TicketSkeleton = () => {
+const TicketsSkeleton = () => {
 	return (
 		<>
 			<ListItem dense>
@@ -43,4 +43,4 @@ const TicketSkeleton = () => {
 	);
 };
 
-export default TicketSkeleton;
+export default TicketsSkeleton;

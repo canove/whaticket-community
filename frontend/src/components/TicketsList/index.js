@@ -23,7 +23,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import TicketSkeleton from "./TicketSkeleton";
+import TicketsSkeleton from "../TicketsSkeleton";
 
 import api from "../../services/api";
 
@@ -449,7 +449,7 @@ const TicketsList = () => {
 		});
 
 		if (loading) {
-			return <TicketSkeleton />;
+			return <TicketsSkeleton />;
 		} else if (countTickets(status, userId) === "" && status !== "closed") {
 			return (
 				<div className={classes.noTicketsDiv}>
