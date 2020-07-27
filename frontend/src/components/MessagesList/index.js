@@ -16,29 +16,15 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import ReplayIcon from "@material-ui/icons/Replay";
 import Avatar from "@material-ui/core/Avatar";
-import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
-
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-
 import Paper from "@material-ui/core/Paper";
 import { green } from "@material-ui/core/colors";
 import Skeleton from "@material-ui/lab/Skeleton";
 
-// import Drawer from "@material-ui/core/Drawer";
-
+import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
 import whatsBackground from "../../assets/wa-background.png";
-
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
-import api from "../../services/api";
-
 import MessageInput from "../MessageInput/";
 
 const drawerWidth = 320;
@@ -111,6 +97,7 @@ const useStyles = makeStyles(theme => ({
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
+			height: "8px",
 		},
 		"&::-webkit-scrollbar-thumb": {
 			// borderRadius: "2px",
@@ -126,7 +113,6 @@ const useStyles = makeStyles(theme => ({
 		top: 0,
 		left: "50%",
 		marginTop: 12,
-		// marginLeft: -12,
 	},
 
 	messageLeft: {
@@ -226,44 +212,6 @@ const useStyles = makeStyles(theme => ({
 		verticalAlign: "middle",
 		marginLeft: 4,
 	},
-
-	drawerContent: {
-		display: "flex",
-		flexDirection: "column",
-		padding: 8,
-		// backgroundColor: "red",
-		height: "100%",
-		overflow: "hidden",
-	},
-
-	drawerAvatar: {
-		margin: 15,
-		width: 160,
-		height: 160,
-	},
-
-	drawerHeader: {
-		// margin: 8,
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-		"& > *": {
-			margin: 4,
-		},
-	},
-
-	drawerDetails: {
-		marginTop: 8,
-		padding: 8,
-		display: "flex",
-		flexDirection: "column",
-		// overflow: "hidden",
-		// whiteSpace: "nowrap",
-		// textOverflow: "ellipsis",
-		// overflow: "scroll",
-		flex: 1,
-	},
 }));
 
 const MessagesList = () => {
@@ -297,7 +245,7 @@ const MessagesList = () => {
 					const res = await api.get("/messages/" + ticketId, {
 						params: { searchParam, pageNumber },
 					});
-					setContact(res.data.contact);
+					setContact(res.data.ticket.contact);
 					setTicket(res.data.ticket);
 					setMessagesList(prevMessages => {
 						return [...res.data.messages, ...prevMessages];
@@ -328,6 +276,12 @@ const MessagesList = () => {
 				scrollToBottom();
 			} else if (data.action === "update") {
 				updateMessageAck(data.message);
+			}
+		});
+
+		socket.on("contact", data => {
+			if (data.action === "update") {
+				setContact(data.contact);
 			}
 		});
 
@@ -531,8 +485,6 @@ const MessagesList = () => {
 		setOpen(false);
 	};
 
-	console.log(contact);
-
 	return (
 		<div className={classes.root} id="drawer-container">
 			<Paper
@@ -627,46 +579,13 @@ const MessagesList = () => {
 					) : null}
 				</div>
 			</Paper>
-			<ContactDrawer open={open} handleDrawerClose={handleDrawerClose}>
-				<div className={classes.drawerContent}>
-					<div className={classes.drawerHeader}>
-						<Avatar
-							alt={contact.name}
-							src={contact.profilePicUrl}
-							className={classes.drawerAvatar}
-						></Avatar>
 
-						<Typography>{contact.name}</Typography>
-						<Typography>
-							<Link href={`tel:${contact.number}`}>{contact.number}</Link>
-						</Typography>
-						<Button variant="outlined" color="primary">
-							Editar contato
-						</Button>
-					</div>
-					<Paper className={classes.drawerDetails}>
-						<Typography variant="subtitle1">Informações</Typography>
-						<Table size="small">
-							<TableHead>
-								<TableRow>
-									<TableCell>Nome</TableCell>
-									<TableCell>Valor</TableCell>
-								</TableRow>
-							</TableHead>
-							<TableBody>
-								{contact &&
-									contact.extraInfo &&
-									contact.extraInfo.map(info => (
-										<TableRow key={info.id}>
-											<TableCell>{info.name}</TableCell>
-											<TableCell>{info.value}</TableCell>
-										</TableRow>
-									))}
-							</TableBody>
-						</Table>
-					</Paper>
-				</div>
-			</ContactDrawer>
+			<ContactDrawer
+				open={open}
+				handleDrawerClose={handleDrawerClose}
+				contact={contact}
+				loading={loading}
+			/>
 		</div>
 	);
 };

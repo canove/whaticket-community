@@ -22,6 +22,7 @@ exports.index = async (req, res) => {
 		include: [
 			{
 				model: Contact,
+				as: "contact",
 				attributes: ["name", "number", "profilePicUrl"],
 			},
 		],
@@ -60,6 +61,7 @@ exports.update = async (req, res) => {
 		include: [
 			{
 				model: Contact,
+				as: "contact",
 				attributes: ["name", "number", "profilePicUrl"],
 			},
 		],

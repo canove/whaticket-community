@@ -48,8 +48,9 @@ exports.index = async (req, res, next) => {
 		include: [
 			{
 				model: Contact,
+				as: "contact",
 				include: "extraInfo",
-				attributes: ["name", "number", "profilePicUrl"],
+				attributes: ["id", "name", "number", "profilePicUrl"],
 			},
 		],
 	});
@@ -81,7 +82,6 @@ exports.index = async (req, res, next) => {
 	return res.json({
 		messages: serializedMessages.reverse(),
 		ticket: ticket,
-		contact: ticket.Contact,
 	});
 };
 
@@ -98,6 +98,7 @@ exports.store = async (req, res, next) => {
 		include: [
 			{
 				model: Contact,
+				as: "contact",
 				attributes: ["number"],
 			},
 		],
@@ -113,12 +114,12 @@ exports.store = async (req, res, next) => {
 		}
 
 		sentMessage = await wbot.sendMessage(
-			`${ticket.Contact.number}@c.us`,
+			`${ticket.contact.number}@c.us`,
 			newMedia
 		);
 	} else {
 		sentMessage = await wbot.sendMessage(
-			`${ticket.Contact.number}@c.us`,
+			`${ticket.contact.number}@c.us`,
 			message.body
 		);
 	}

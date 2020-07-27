@@ -77,7 +77,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 		};
 
 		fetchContact();
-	}, [contactId]);
+	}, [contactId, modalOpen]);
 
 	const handleClose = () => {
 		onClose();

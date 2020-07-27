@@ -18,7 +18,7 @@ class Contact extends Sequelize.Model {
 	}
 
 	static associate(models) {
-		this.hasMany(models.Ticket, { foreignKey: "contactId" });
+		this.hasMany(models.Ticket, { foreignKey: "contactId", as: "contact" });
 		this.hasMany(models.ContactCustomField, {
 			foreignKey: "contactId",
 			as: "extraInfo",

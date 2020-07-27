@@ -57,6 +57,7 @@ const useStyles = makeStyles(theme => ({
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
+			height: "8px",
 		},
 		"&::-webkit-scrollbar-thumb": {
 			// borderRadius: "2px",
@@ -191,7 +192,6 @@ const Contacts = () => {
 			<ContactModal
 				modalOpen={modalOpen}
 				onClose={handleClose}
-				setModalOpen={setModalOpen}
 				aria-labelledby="form-dialog-title"
 				contactId={selectedContactId}
 			></ContactModal>

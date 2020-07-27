@@ -28,21 +28,15 @@ const verifyContact = async (msgContact, profilePicUrl) => {
 };
 
 const verifyTicket = async contact => {
-	let ticket = await Ticket.findOne({
+	const [ticket, created] = await Ticket.findOrCreate({
 		where: {
 			status: {
 				[Op.or]: ["open", "pending"],
 			},
 			contactId: contact.id,
 		},
+		defaults: { contactId: contact.id, status: "pending" },
 	});
-
-	if (!ticket) {
-		ticket = await Ticket.create({
-			contactId: contact.id,
-			status: "pending",
-		});
-	}
 
 	return ticket;
 };
@@ -127,6 +121,7 @@ const wbotMessageListener = () => {
 				...ticket.dataValues,
 				unreadMessages: 1,
 				lastMessage: newMessage.body,
+				contact: contact,
 			};
 
 			io.to(ticket.id).to("notification").emit("appMessage", {

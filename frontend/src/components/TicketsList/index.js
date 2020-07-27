@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import openSocket from "socket.io-client";
-
 import { parseISO, format } from "date-fns";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -18,11 +17,11 @@ import Badge from "@material-ui/core/Badge";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import Button from "@material-ui/core/Button";
-
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+
 import TicketsSkeleton from "../TicketsSkeleton";
 
 import api from "../../services/api";
@@ -55,6 +54,7 @@ const useStyles = makeStyles(theme => ({
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
+			height: "8px",
 		},
 		"&::-webkit-scrollbar-thumb": {
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
@@ -68,6 +68,7 @@ const useStyles = makeStyles(theme => ({
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
+			height: "8px",
 		},
 		"&::-webkit-scrollbar-thumb": {
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
@@ -194,6 +195,8 @@ const useStyles = makeStyles(theme => ({
 
 const TicketsList = () => {
 	const classes = useStyles();
+	const history = useHistory();
+
 	const token = localStorage.getItem("token");
 	const userId = +localStorage.getItem("userId");
 	const { ticketId } = useParams();
@@ -201,10 +204,6 @@ const TicketsList = () => {
 	const [loading, setLoading] = useState();
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
-
-	// const [modalOpen, setModalOpen] = useState(false);
-
-	const history = useHistory();
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -301,8 +300,6 @@ const TicketsList = () => {
 		});
 	};
 
-	console.log(tickets);
-
 	const showDesktopNotification = data => {
 		const options = {
 			body: `${data.message.body} - ${format(new Date(), "HH:mm")}`,
@@ -382,7 +379,7 @@ const TicketsList = () => {
 							<ListItemAvatar>
 								<Avatar
 									src={
-										ticket.Contact.profilePicUrl && ticket.Contact.profilePicUrl
+										ticket.contact.profilePicUrl && ticket.contact.profilePicUrl
 									}
 								></Avatar>
 							</ListItemAvatar>
@@ -395,7 +392,7 @@ const TicketsList = () => {
 											variant="body2"
 											color="textPrimary"
 										>
-											{ticket.Contact.name}
+											{ticket.contact.name}
 										</Typography>
 										{ticket.lastMessage && (
 											<Typography
