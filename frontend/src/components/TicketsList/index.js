@@ -21,8 +21,11 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import IconButton from "@material-ui/core/IconButton";
+import AddIcon from "@material-ui/icons/Add";
 
 import TicketsSkeleton from "../TicketsSkeleton";
+import NewTicketModal from "../NewTicketModal";
 
 import api from "../../services/api";
 
@@ -96,6 +99,10 @@ const useStyles = makeStyles(theme => ({
 		color: "rgb(104, 121, 146)",
 		marginLeft: "8px",
 		fontSize: "14px",
+	},
+
+	newTicketBtn: {
+		marginLeft: "auto",
 	},
 
 	ticket: {
@@ -204,6 +211,8 @@ const TicketsList = () => {
 	const [loading, setLoading] = useState();
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
+
+	const [newTicketModalOpen, setNewTicketModalOpen] = useState(true);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -349,6 +358,8 @@ const TicketsList = () => {
 		history.push(`/chat/${ticketId}`);
 	};
 
+	const handleOpenNewTicketModal = () => {};
+
 	const countTickets = (status, userId) => {
 		const ticketsFound = tickets.filter(
 			t => t.status === status && t.userId === userId
@@ -467,6 +478,10 @@ const TicketsList = () => {
 
 	return (
 		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>
+			<NewTicketModal
+				modalOpen={newTicketModalOpen}
+				onClose={e => setNewTicketModalOpen(false)}
+			/>
 			<Paper elevation={0} square className={classes.tabsHeader}>
 				<Tabs
 					value={tab}
@@ -508,6 +523,13 @@ const TicketsList = () => {
 								<span className={classes.ticketsCount}>
 									{countTickets("open", userId)}
 								</span>
+								<IconButton
+									aria-label="add ticket"
+									className={classes.newTicketBtn}
+									onClick={e => setNewTicketModalOpen(true)}
+								>
+									<AddIcon />
+								</IconButton>
 							</div>
 							{renderTickets("open", userId)}
 						</List>
