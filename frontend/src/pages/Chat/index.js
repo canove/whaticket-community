@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	chatPapper: {
-		// backgroundColor: "#eee",
+		// backgroundColor: "red",
 		display: "flex",
 		height: "100%",
 	},
@@ -49,7 +49,7 @@ const Chat = () => {
 
 	return (
 		<div className={classes.chatContainer}>
-			<Paper square className={classes.chatPapper}>
+			<div className={classes.chatPapper}>
 				<Grid container spacing={0}>
 					<Grid item xs={4} className={classes.contactsWrapper}>
 						<TicketsList />
@@ -66,7 +66,7 @@ const Chat = () => {
 						)}
 					</Grid>
 				</Grid>
-			</Paper>
+			</div>
 		</div>
 	);
 };

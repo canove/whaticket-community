@@ -65,6 +65,7 @@ const useStyles = makeStyles(theme => ({
 
 	messagesHeader: {
 		display: "flex",
+		cursor: "pointer",
 		backgroundColor: "#eee",
 		flex: "none",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -229,9 +230,8 @@ const MessagesList = () => {
 	const [hasMore, setHasMore] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [pageNumber, setPageNumber] = useState(0);
+	const [drawerOpen, setDrawerOpen] = useState(false);
 	const lastMessageRef = useRef();
-
-	const [open, setOpen] = useState(true);
 
 	useEffect(() => {
 		setMessagesList([]);
@@ -366,7 +366,9 @@ const MessagesList = () => {
 		}
 	};
 
-	const handleUpdateTicketStatus = async (status, userId) => {
+	const handleUpdateTicketStatus = async (e, status, userId) => {
+		e.preventDefault();
+		e.stopPropagation();
 		try {
 			await api.put(`/tickets/${ticketId}`, {
 				status: status,
@@ -479,10 +481,10 @@ const MessagesList = () => {
 	};
 
 	const handleDrawerOpen = () => {
-		setOpen(true);
+		setDrawerOpen(true);
 	};
 	const handleDrawerClose = () => {
-		setOpen(false);
+		setDrawerOpen(false);
 	};
 
 	return (
@@ -491,10 +493,14 @@ const MessagesList = () => {
 				variant="outlined"
 				elevation={0}
 				className={clsx(classes.mainWrapper, {
-					[classes.mainWrapperShift]: open,
+					[classes.mainWrapperShift]: drawerOpen,
 				})}
 			>
-				<Card square className={classes.messagesHeader}>
+				<Card
+					square
+					className={classes.messagesHeader}
+					onClick={handleDrawerOpen}
+				>
 					<CardHeader
 						titleTypographyProps={{ noWrap: true }}
 						subheaderTypographyProps={{ noWrap: true }}
@@ -528,7 +534,7 @@ const MessagesList = () => {
 								<Button
 									startIcon={<ReplayIcon />}
 									size="small"
-									onClick={e => handleUpdateTicketStatus("open", userId)}
+									onClick={e => handleUpdateTicketStatus(e, "open", userId)}
 								>
 									Reabrir
 								</Button>
@@ -537,22 +543,15 @@ const MessagesList = () => {
 									<Button
 										startIcon={<ReplayIcon />}
 										size="small"
-										onClick={e => handleUpdateTicketStatus("pending", null)}
+										onClick={e => handleUpdateTicketStatus(e, "pending", null)}
 									>
 										Retornar
-									</Button>
-									<Button
-										startIcon={<ReplayIcon />}
-										size="small"
-										onClick={handleDrawerOpen}
-									>
-										Drawer
 									</Button>
 									<Button
 										size="small"
 										variant="contained"
 										color="primary"
-										onClick={e => handleUpdateTicketStatus("closed", userId)}
+										onClick={e => handleUpdateTicketStatus(e, "closed", userId)}
 									>
 										Resolver
 									</Button>
@@ -581,7 +580,7 @@ const MessagesList = () => {
 			</Paper>
 
 			<ContactDrawer
-				open={open}
+				open={drawerOpen}
 				handleDrawerClose={handleDrawerClose}
 				contact={contact}
 				loading={loading}

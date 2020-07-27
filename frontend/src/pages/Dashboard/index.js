@@ -1,15 +1,13 @@
 import React from "react";
 
+import Paper from "@material-ui/core/Paper";
+
 const Dashboard = () => {
 	return (
 		<div>
-			<a
-				rel="bookmark"
-				target="_parent"
-				href="https://economicros.ddns.com.br:4043/"
-			>
+			<Paper variant="outlined" style={{ margin: 50 }}>
 				teste
-			</a>
+			</Paper>
 		</div>
 	);
 };

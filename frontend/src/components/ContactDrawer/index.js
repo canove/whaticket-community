@@ -26,9 +26,10 @@ const useStyles = makeStyles(theme => ({
 		width: drawerWidth,
 		display: "flex",
 		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+		borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 		borderTopRightRadius: 4,
 		borderBottomRightRadius: 4,
-		backgroundColor: "#eee",
 	},
 	header: {
 		display: "flex",
@@ -41,17 +42,16 @@ const useStyles = makeStyles(theme => ({
 	},
 	content: {
 		display: "flex",
+		backgroundColor: "#eee",
 		flexDirection: "column",
 		padding: "8px 0px 8px 8px",
-		// backgroundColor: "red",
 		height: "100%",
-		overflow: "scroll",
+		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
 			height: "8px",
 		},
 		"&::-webkit-scrollbar-thumb": {
-			// borderRadius: "2px",
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
 			backgroundColor: "#e8e8e8",
 		},
@@ -97,13 +97,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactDrawer = ({
-	open,
-	children,
-	handleDrawerClose,
-	contact,
-	loading,
-}) => {
+const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 	const classes = useStyles();
 
 	const [modalOpen, setModalOpen] = useState(false);
