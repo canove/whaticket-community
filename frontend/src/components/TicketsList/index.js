@@ -308,12 +308,23 @@ const TicketsList = () => {
 		});
 	};
 
+	// let notification;
+
 	const showDesktopNotification = data => {
+		console.log(data);
 		const options = {
 			body: `${data.message.body} - ${format(new Date(), "HH:mm")}`,
 			icon: data.contact.profilePicUrl,
 		};
-		new Notification(`Mensagem de ${data.contact.name}`, options);
+		let notification = new Notification(
+			`Mensagem de ${data.contact.name}`,
+			options
+		);
+		notification.onclick = function (event) {
+			event.preventDefault(); //
+			window.open(`/chat/${data.ticket.id}`, "_blank");
+		};
+
 		document.getElementById("sound").play();
 	};
 
