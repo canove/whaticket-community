@@ -250,8 +250,8 @@ const TicketsList = () => {
 			if (data.action === "updateUnread") {
 				resetUnreadMessages(data.ticketId);
 			}
-			if (data.action === "updateStatus") {
-				updateTicketStatus(data);
+			if (data.action === "updateStatus" || data.action === "create") {
+				updateTickets(data);
 			}
 		});
 
@@ -293,7 +293,7 @@ const TicketsList = () => {
 		});
 	};
 
-	const updateTicketStatus = data => {
+	const updateTickets = data => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(
 				ticket => ticket.id === data.ticket.id
@@ -357,8 +357,6 @@ const TicketsList = () => {
 		}
 		history.push(`/chat/${ticketId}`);
 	};
-
-	const handleOpenNewTicketModal = () => {};
 
 	const countTickets = (status, userId) => {
 		const ticketsFound = tickets.filter(

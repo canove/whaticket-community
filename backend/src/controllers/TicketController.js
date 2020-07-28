@@ -48,7 +48,17 @@ exports.index = async (req, res) => {
 };
 
 exports.store = async (req, res) => {
+	const io = getIO();
 	const ticket = await Ticket.create(req.body);
+
+	const contact = await ticket.getContact();
+
+	const serializaedTicket = { ...ticket.dataValues, contact: contact };
+
+	io.to("notification").emit("ticket", {
+		action: "create",
+		ticket: serializaedTicket,
+	});
 
 	res.status(200).json(ticket);
 };
