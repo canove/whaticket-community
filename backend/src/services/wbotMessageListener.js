@@ -28,7 +28,7 @@ const verifyContact = async (msgContact, profilePicUrl) => {
 };
 
 const verifyTicket = async contact => {
-	const [ticket, created] = await Ticket.findOrCreate({
+	const [ticket] = await Ticket.findOrCreate({
 		where: {
 			status: {
 				[Op.or]: ["open", "pending"],

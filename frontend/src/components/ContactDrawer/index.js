@@ -151,7 +151,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 					</Paper>
 					<Paper square variant="outlined" className={classes.contactDetails}>
 						<ContactModal
-							modalOpen={modalOpen}
+							open={modalOpen}
 							onClose={e => setModalOpen(false)}
 							aria-labelledby="form-dialog-title"
 							contactId={contact.id}

@@ -52,19 +52,13 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactModal = ({ modalOpen, onClose, contactId }) => {
+const ContactModal = ({ open, onClose, contactId }) => {
 	const classes = useStyles();
 
 	const initialState = {
 		name: "",
 		number: "",
 		email: "",
-		extraInfo: [
-			{
-				name: "",
-				value: "",
-			},
-		],
 	};
 
 	const [contact, setContact] = useState(initialState);
@@ -77,7 +71,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 		};
 
 		fetchContact();
-	}, [contactId, modalOpen]);
+	}, [contactId, open]);
 
 	const handleClose = () => {
 		onClose();
@@ -100,7 +94,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 	return (
 		<div className={classes.root}>
 			<Dialog
-				open={modalOpen}
+				open={open}
 				onClose={handleClose}
 				maxWidth="lg"
 				scroll="paper"
@@ -125,7 +119,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 						handleSubmit,
 						isSubmitting,
 					}) => (
-						<>
+						<form onSubmit={handleSubmit}>
 							<DialogTitle id="form-dialog-title">
 								{contactId ? "Editar contato" : "Adicionar contato"}
 							</DialogTitle>
@@ -148,7 +142,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 									name="number"
 									value={values.number || ""}
 									onChange={handleChange}
-									placeholder="Ex: 13912344321"
+									placeholder="Ex: 5513912344321"
 									variant="outlined"
 									margin="dense"
 									required
@@ -234,7 +228,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 									Cancelar
 								</Button>
 								<Button
-									onClick={handleSubmit}
+									type="submit"
 									color="primary"
 									disabled={isSubmitting}
 									variant="contained"
@@ -249,7 +243,7 @@ const ContactModal = ({ modalOpen, onClose, contactId }) => {
 									)}
 								</Button>
 							</DialogActions>
-						</>
+						</form>
 					)}
 				</Formik>
 			</Dialog>

@@ -70,9 +70,6 @@ const useStyles = makeStyles(theme => ({
 const Contacts = () => {
 	const classes = useStyles();
 
-	const token = localStorage.getItem("token");
-	// const userId = localStorage.getItem("userId");
-
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -80,9 +77,7 @@ const Contacts = () => {
 	const [searchParam, setSearchParam] = useState("");
 	const [contacts, setContacts] = useState([]);
 	const [selectedContactId, setSelectedContactId] = useState(null);
-
-	const [modalOpen, setModalOpen] = useState(false);
-
+	const [contactModalOpen, setContactModalOpen] = useState(false);
 	const [deletingContact, setDeletingContact] = useState(null);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -105,7 +100,7 @@ const Contacts = () => {
 			fetchContacts();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, page, token, rowsPerPage]);
+	}, [searchParam, page, rowsPerPage]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
@@ -163,19 +158,19 @@ const Contacts = () => {
 		setSearchParam(event.target.value.toLowerCase());
 	};
 
-	const handleClickOpen = () => {
+	const handleOpenContactModal = () => {
 		setSelectedContactId(null);
-		setModalOpen(true);
+		setContactModalOpen(true);
 	};
 
-	const handleClose = () => {
+	const handleCloseContactModal = () => {
 		setSelectedContactId(null);
-		setModalOpen(false);
+		setContactModalOpen(false);
 	};
 
 	const hadleEditContact = contactId => {
 		setSelectedContactId(contactId);
-		setModalOpen(true);
+		setContactModalOpen(true);
 	};
 
 	const handleDeleteContact = async contactId => {
@@ -185,24 +180,43 @@ const Contacts = () => {
 			alert(err);
 		}
 		setDeletingContact(null);
+		setSearchParam("");
+		setPage(0);
+	};
+
+	const handleimportContact = async () => {
+		try {
+			await api.post("/contacts/import");
+		} catch (err) {
+			console.log(err);
+		}
 	};
 
 	return (
 		<Container className={classes.mainContainer}>
 			<ContactModal
-				modalOpen={modalOpen}
-				onClose={handleClose}
+				open={contactModalOpen}
+				onClose={handleCloseContactModal}
 				aria-labelledby="form-dialog-title"
 				contactId={selectedContactId}
 			></ContactModal>
 			<ConfirmationModal
-				title={deletingContact && `Deletar ${deletingContact.name}`}
+				title={
+					deletingContact
+						? `Deletar ${deletingContact.name}?`
+						: `Importar contatos`
+				}
 				open={confirmOpen}
 				setOpen={setConfirmOpen}
-				onConfirm={e => handleDeleteContact(deletingContact.id)}
+				onConfirm={e =>
+					deletingContact
+						? handleDeleteContact(deletingContact.id)
+						: handleimportContact()
+				}
 			>
-				Tem certeza que deseja deletar este contato? Todos os tickets
-				relacionados serão perdidos.
+				{deletingContact
+					? "Tem certeza que deseja deletar este contato? Todos os tickets relacionados serão perdidos."
+					: "Deseja importas todos os contatos do telefone? Essa função é experimental, você terá que recarregar a página após a importação "}
 			</ConfirmationModal>
 			<div className={classes.contactsHeader}>
 				<Typography variant="h5" gutterBottom>
@@ -223,10 +237,18 @@ const Contacts = () => {
 							),
 						}}
 					/>
-					<Button variant="contained" color="primary">
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={e => setConfirmOpen(true)}
+					>
 						Importar contatos
 					</Button>
-					<Button variant="contained" color="primary" onClick={handleClickOpen}>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={handleOpenContactModal}
+					>
 						Adicionar contato
 					</Button>
 				</div>
@@ -237,7 +259,7 @@ const Contacts = () => {
 						<TableRow>
 							<TableCell padding="checkbox" />
 							<TableCell>Nome</TableCell>
-							<TableCell>Telefone</TableCell>
+							<TableCell>Whatsapp</TableCell>
 							<TableCell>Email</TableCell>
 							<TableCell align="right">Ações</TableCell>
 						</TableRow>

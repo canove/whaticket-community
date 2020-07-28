@@ -1,28 +1,30 @@
 const Sequelize = require("sequelize");
+const { Op } = require("sequelize");
 
 const Contact = require("../models/Contact");
 const ContactCustomField = require("../models/ContactCustomField");
 
-// const Message = require("../models/Message");
-// const Sequelize = require("sequelize");
 const { getIO } = require("../libs/socket");
-// const { getWbot } = require("../libs/wbot");
+const { getWbot } = require("../libs/wbot");
 
 exports.index = async (req, res) => {
 	const { searchParam = "", pageNumber = 1, rowsPerPage = 10 } = req.query;
 
 	const whereCondition = {
-		name: Sequelize.where(
-			Sequelize.fn("LOWER", Sequelize.col("name")),
-			"LIKE",
-			"%" + searchParam.toLowerCase() + "%"
-		),
+		[Op.or]: [
+			{
+				name: Sequelize.where(
+					Sequelize.fn("LOWER", Sequelize.col("name")),
+					"LIKE",
+					"%" + searchParam.toLowerCase() + "%"
+				),
+			},
+			{ number: { [Op.like]: `%${searchParam}%` } },
+		],
 	};
 
 	let limit = +rowsPerPage;
 	let offset = limit * (pageNumber - 1);
-
-	//todo >> add contact number to search where condition
 
 	const { count, rows: contacts } = await Contact.findAndCountAll({
 		where: whereCondition,
@@ -35,22 +37,27 @@ exports.index = async (req, res) => {
 };
 
 exports.store = async (req, res) => {
-	// const wbot = getWbot();
+	const wbot = getWbot();
 	const io = getIO();
 	const newContact = req.body;
 
-	// const result = await wbot.isRegisteredUser(`55${number}@c.us`);
+	const result = await wbot.isRegisteredUser(`${newContact.number}@c.us`);
 
-	// if (!result) {
-	// 	return res
-	// 		.status(400)
-	// 		.json({ error: "The suplied number is not a valid Whatsapp number" });
-	// }
-	// const profilePicUrl = await wbot.getProfilePicUrl(`55${number}@c.us`);
+	if (!result) {
+		return res
+			.status(400)
+			.json({ error: "The suplied number is not a valid Whatsapp number" });
+	}
+	const profilePicUrl = await wbot.getProfilePicUrl(
+		`${newContact.number}@c.us`
+	);
 
-	const contact = await Contact.create(newContact, {
-		include: "extraInfo",
-	});
+	const contact = await Contact.create(
+		{ ...newContact, profilePicUrl },
+		{
+			include: "extraInfo",
+		}
+	);
 
 	io.emit("contact", {
 		action: "create",

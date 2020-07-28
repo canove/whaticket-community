@@ -5,7 +5,7 @@ class Contact extends Sequelize.Model {
 		super.init(
 			{
 				name: { type: Sequelize.STRING },
-				number: { type: Sequelize.STRING },
+				number: { type: Sequelize.STRING, allowNull: false, unique: true },
 				email: { type: Sequelize.STRING, allowNull: false, defaultValue: "" },
 				profilePicUrl: { type: Sequelize.STRING },
 			},

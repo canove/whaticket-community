@@ -9,7 +9,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import FormControl from "@material-ui/core/FormControl";
 import { green } from "@material-ui/core/colors";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -43,25 +42,33 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [searchParam, setSearchParam] = useState("");
 	const [selectedContact, setSelectedContact] = useState(null);
 
 	useEffect(() => {
+		if (!modalOpen || searchParam.length < 3) return;
 		setLoading(true);
-		const fetchContacts = async () => {
-			try {
-				const res = await api.get("contacts");
-				setOptions(res.data.contacts);
-			} catch (err) {
-				alert(err);
-			}
-		};
+		const delayDebounceFn = setTimeout(() => {
+			const fetchContacts = async () => {
+				try {
+					const res = await api.get("contacts", {
+						params: { searchParam, rowsPerPage: 20 },
+					});
+					setOptions(res.data.contacts);
+					setLoading(false);
+				} catch (err) {
+					alert(err);
+				}
+			};
 
-		fetchContacts();
-		setLoading(false);
-	}, []);
+			fetchContacts();
+		}, 1000);
+		return () => clearTimeout(delayDebounceFn);
+	}, [searchParam, modalOpen]);
 
 	const handleClose = () => {
 		onClose();
+		setSearchParam("");
 		setSelectedContact(null);
 	};
 
@@ -82,6 +89,8 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 		handleClose();
 	};
 
+	console.log(options);
+
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -96,7 +105,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 						<Autocomplete
 							id="asynchronous-demo"
 							style={{ width: 300 }}
-							getOptionLabel={option => option.name}
+							getOptionLabel={option => `${option.name} - ${option.number}`}
 							onChange={(e, newValue) => {
 								setSelectedContact(newValue);
 							}}
@@ -105,9 +114,11 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 							renderInput={params => (
 								<TextField
 									{...params}
-									label="Selecione o contato"
+									label="Digite para pesquisar o contato"
 									variant="outlined"
 									required
+									autoFocus
+									onChange={e => setSearchParam(e.target.value)}
 									id="my-input"
 									InputProps={{
 										...params.InputProps,

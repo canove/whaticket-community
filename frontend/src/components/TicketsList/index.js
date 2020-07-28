@@ -211,8 +211,7 @@ const TicketsList = () => {
 	const [loading, setLoading] = useState();
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
-
-	const [newTicketModalOpen, setNewTicketModalOpen] = useState(true);
+	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
