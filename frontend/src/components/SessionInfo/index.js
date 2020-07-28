@@ -5,29 +5,25 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles({
 	main: {
-		flex: 1,
+		// flex: 1,
 	},
 });
 
 const SessionInfo = ({ session }) => {
+	console.log(session);
 	const classes = useStyles();
 	return (
-		<React.Fragment>
+		<div>
 			<Typography component="h2" variant="h6" color="primary" gutterBottom>
-				Bateria
+				{`Status: ${session.status}`}
 			</Typography>
 			<Typography component="p" variant="h6">
-				{(session && session.baterry) || "Não disponível"}
+				{`Bateria: ${session.battery}%`}
 			</Typography>
-			<Typography color="textSecondary" className={classes.main}>
-				Carregando: {(session && session.plugged) || "Não disponível"}
+			<Typography color="textSecondary">
+				{`Carregando: ${session.plugged} `}
 			</Typography>
-			<div>
-				<Link color="primary" href="#">
-					Verificar bateria
-				</Link>
-			</div>
-		</React.Fragment>
+		</div>
 	);
 };
 
