@@ -52,7 +52,7 @@ const handlMedia = async (msg, ticket) => {
 		}
 
 		fs.writeFile(
-			path.join(__dirname, "..", "public", media.filename),
+			path.join(__dirname, "..", "..", "public", media.filename),
 			media.data,
 			"base64",
 			err => {

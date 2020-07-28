@@ -1,4 +1,4 @@
 node_modules
-src/public/*
-!src/public/.gitkeep 
+public/*
+!public/.gitkeep 
 .env

@@ -20,7 +20,7 @@ const app = express();
 
 const fileStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, path.resolve(__dirname, "public"));
+		cb(null, path.resolve(__dirname, "..", "public"));
 	},
 	filename: (req, file, cb) => {
 		cb(null, new Date().getTime() + "-" + file.originalname.replace(/\s/g, ""));
@@ -30,7 +30,7 @@ const fileStorage = multer.diskStorage({
 app.use(cors());
 app.use(express.json());
 app.use(multer({ storage: fileStorage }).single("media"));
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 app.use("/auth", AuthRoutes);
 app.use(ContactsRoutes);
