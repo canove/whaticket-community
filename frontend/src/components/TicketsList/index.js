@@ -104,6 +104,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	ticketsListActions: {
+		flex: "none",
 		marginLeft: "auto",
 	},
 
