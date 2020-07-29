@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const { startOfDay, endOfDay, parseISO } = require("date-fns");
 
 const Ticket = require("../models/Ticket");
 const Contact = require("../models/Contact");
@@ -6,19 +7,31 @@ const Contact = require("../models/Contact");
 const { getIO } = require("../libs/socket");
 
 exports.index = async (req, res) => {
-	const { status = "" } = req.query;
+	const { status = "", date = "" } = req.query;
 
-	let whereCondition;
-	if (!status || status === "open") {
-		whereCondition = ["pending", "open"];
-	} else {
-		whereCondition = [status];
+	let whereCondition = {};
+	if (status === "open") {
+		whereCondition = {
+			...whereCondition,
+			status: { [Sequelize.Op.or]: ["pending", "open"] },
+		};
+	} else if (status === "closed") {
+		whereCondition = { ...whereCondition, status: "closed" };
+	}
+	if (date) {
+		whereCondition = {
+			...whereCondition,
+			createdAt: {
+				[Sequelize.Op.between]: [
+					startOfDay(parseISO(date)),
+					endOfDay(parseISO(date)),
+				],
+			},
+		};
 	}
 
 	const tickets = await Ticket.findAll({
-		where: {
-			status: { [Sequelize.Op.or]: whereCondition },
-		},
+		where: whereCondition,
 		include: [
 			{
 				model: Contact,

@@ -89,8 +89,6 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 		handleClose();
 	};
 
-	console.log(options);
-
 	return (
 		<div className={classes.root}>
 			<Dialog
