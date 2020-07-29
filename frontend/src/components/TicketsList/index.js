@@ -324,7 +324,7 @@ const TicketsList = () => {
 		);
 		notification.onclick = function (event) {
 			event.preventDefault(); //
-			window.open(`/chat/${data.ticket.id}`, "_blank");
+			window.open(`/chat/${data.ticket.id}`, "_self");
 		};
 
 		document.getElementById("sound").play();
