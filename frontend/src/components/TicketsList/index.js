@@ -23,6 +23,8 @@ import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 
 import TicketsSkeleton from "../TicketsSkeleton";
 import NewTicketModal from "../NewTicketModal";
@@ -101,7 +103,7 @@ const useStyles = makeStyles(theme => ({
 		fontSize: "14px",
 	},
 
-	newTicketBtn: {
+	ticketsListActions: {
 		marginLeft: "auto",
 	},
 
@@ -212,6 +214,7 @@ const TicketsList = () => {
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+	const [showAllTickets, setShowAllTickets] = useState(false);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -308,8 +311,6 @@ const TicketsList = () => {
 		});
 	};
 
-	// let notification;
-
 	const showDesktopNotification = data => {
 		console.log(data);
 		const options = {
@@ -381,6 +382,7 @@ const TicketsList = () => {
 		const viewTickets = tickets.map(ticket => {
 			if (
 				(ticket.status === status && ticket.userId === userId) ||
+				(ticket.status === status && showAllTickets) ||
 				(ticket.status === "closed" && status === "closed")
 			)
 				return (
@@ -527,17 +529,34 @@ const TicketsList = () => {
 					<Paper square elevation={0} className={classes.openTicketsList}>
 						<List style={{ paddingTop: 0 }}>
 							<div className={classes.ticketsListHeader}>
-								Meus tickets
+								Atendendo
 								<span className={classes.ticketsCount}>
 									{countTickets("open", userId)}
 								</span>
-								<IconButton
-									aria-label="add ticket"
-									className={classes.newTicketBtn}
-									onClick={e => setNewTicketModalOpen(true)}
-								>
-									<AddIcon />
-								</IconButton>
+								<div className={classes.ticketsListActions}>
+									<FormControlLabel
+										label="Todos"
+										labelPlacement="start"
+										control={
+											<Switch
+												size="small"
+												checked={showAllTickets}
+												onChange={e =>
+													setShowAllTickets(prevState => !prevState)
+												}
+												name="showAllTickets"
+												color="primary"
+											/>
+										}
+									/>
+									<IconButton
+										aria-label="add ticket"
+										onClick={e => setNewTicketModalOpen(true)}
+										style={{ marginLeft: 20 }}
+									>
+										<AddIcon />
+									</IconButton>
+								</div>
 							</div>
 							{renderTickets("open", userId)}
 						</List>
