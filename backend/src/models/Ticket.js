@@ -18,7 +18,7 @@ class Ticket extends Sequelize.Model {
 
 	static associate(models) {
 		this.belongsTo(models.Contact, { foreignKey: "contactId", as: "contact" });
-		this.belongsTo(models.User, { foreignKey: "userId" });
+		this.belongsTo(models.User, { foreignKey: "userId", as: "user" });
 		this.hasMany(models.Message, { foreignKey: "ticketId" });
 	}
 }

@@ -1,5 +1,6 @@
 const Message = require("../models/Message");
 const Contact = require("../models/Contact");
+const User = require("../models/User");
 
 const Ticket = require("../models/Ticket");
 const { getIO } = require("../libs/socket");
@@ -51,6 +52,10 @@ exports.index = async (req, res, next) => {
 				as: "contact",
 				include: "extraInfo",
 				attributes: ["id", "name", "number", "profilePicUrl"],
+			},
+			{
+				model: User,
+				as: "user",
 			},
 		],
 	});

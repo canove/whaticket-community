@@ -524,7 +524,7 @@ const MessagesList = () => {
 							loading ? (
 								<Skeleton animation="wave" width={80} />
 							) : (
-								`Atribuído á ${ticket.userId}`
+								ticket.user && `Atribuído à: ${ticket.user.name}`
 							)
 						}
 					/>
