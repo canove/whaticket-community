@@ -42,6 +42,7 @@ exports.index = async (req, res) => {
 				],
 			],
 		},
+		order: [["updatedAt", "DESC"]],
 	});
 
 	return res.json(tickets);
