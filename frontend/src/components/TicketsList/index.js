@@ -349,7 +349,6 @@ const TicketsList = () => {
 	};
 
 	const handleSearchContact = e => {
-		// let searchTerm = e.target.value.toLowerCase();
 		setSearchParam(e.target.value.toLowerCase());
 	};
 
@@ -371,7 +370,9 @@ const TicketsList = () => {
 
 	const countTickets = (status, userId) => {
 		const ticketsFound = tickets.filter(
-			t => t.status === status && t.userId === userId
+			t =>
+				(t.status === status && t.userId === userId) ||
+				(t.status === status && showAllTickets)
 		).length;
 
 		if (ticketsFound === 0) return "";
