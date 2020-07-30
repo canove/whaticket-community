@@ -120,3 +120,23 @@ exports.update = async (req, res) => {
 
 	res.status(200).json(ticket);
 };
+
+exports.delete = async (req, res) => {
+	const io = getIO();
+	const { ticketId } = req.params;
+
+	const ticket = await Ticket.findByPk(ticketId);
+
+	if (!ticket) {
+		return res.status(400).json({ error: "No ticket found with this ID" });
+	}
+
+	await ticket.destroy();
+
+	io.to("notification").emit("ticket", {
+		action: "delete",
+		ticketId: ticket.id,
+	});
+
+	res.status(200).json({ message: "ticket deleted" });
+};

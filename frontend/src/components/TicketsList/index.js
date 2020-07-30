@@ -251,10 +251,13 @@ const TicketsList = () => {
 
 		socket.on("ticket", data => {
 			if (data.action === "updateUnread") {
-				resetUnreadMessages(data.ticketId);
+				resetUnreadMessages(data);
 			}
 			if (data.action === "updateStatus" || data.action === "create") {
 				updateTickets(data);
+			}
+			if (data.action === "delete") {
+				deleteTicket(data);
 			}
 		});
 
@@ -277,57 +280,64 @@ const TicketsList = () => {
 		};
 	}, [ticketId, userId]);
 
-	const updateUnreadMessagesCount = data => {
+	const updateUnreadMessagesCount = ({ message, ticket }) => {
 		setTickets(prevState => {
-			const ticketIndex = prevState.findIndex(
-				ticket => ticket.id === data.message.ticketId
-			);
+			const ticketIndex = prevState.findIndex(t => t.id === message.ticketId);
 
 			if (ticketIndex !== -1) {
 				let aux = [...prevState];
-				if (!data.message.fromMe) {
+				if (!message.fromMe) {
 					aux[ticketIndex].unreadMessages++;
 				}
-				aux[ticketIndex].lastMessage = data.message.body;
-				aux[ticketIndex].status = data.ticket.status;
+				aux[ticketIndex].lastMessage = message.body;
+				aux[ticketIndex].status = ticket.status;
 				aux.unshift(aux.splice(ticketIndex, 1)[0]);
 				return aux;
 			} else {
-				return [data.ticket, ...prevState];
+				return [ticket, ...prevState];
 			}
 		});
 	};
 
-	const updateTickets = data => {
+	const updateTickets = ({ ticket }) => {
 		setTickets(prevState => {
-			const ticketIndex = prevState.findIndex(
-				ticket => ticket.id === data.ticket.id
-			);
+			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
 
 			if (ticketIndex === -1) {
-				return [data.ticket, ...prevState];
+				return [ticket, ...prevState];
 			} else {
 				let aux = [...prevState];
-				aux[ticketIndex] = data.ticket;
+				aux[ticketIndex] = ticket;
 				return aux;
 			}
 		});
 	};
 
-	const showDesktopNotification = data => {
+	const deleteTicket = ({ ticketId }) => {
+		setTickets(prevState => {
+			const ticketIndex = prevState.findIndex(ticket => ticket.id === ticketId);
+
+			if (ticketIndex === -1) {
+				return prevState;
+			} else {
+				let aux = [...prevState];
+				aux.splice(ticketIndex, 1);
+				return aux;
+			}
+		});
+	};
+
+	const showDesktopNotification = ({ message, contact, ticket }) => {
 		const options = {
-			body: `${data.message.body} - ${format(new Date(), "HH:mm")}`,
-			icon: data.contact.profilePicUrl,
-			tag: data.ticket.id,
+			body: `${message.body} - ${format(new Date(), "HH:mm")}`,
+			icon: contact.profilePicUrl,
+			tag: ticket.id,
 		};
-		let notification = new Notification(
-			`Mensagem de ${data.contact.name}`,
-			options
-		);
+		let notification = new Notification(`Mensagem de ${contact.name}`, options);
 
 		notification.onclick = function (event) {
 			event.preventDefault(); //
-			window.open(`/chat/${data.ticket.id}`, "_self");
+			window.open(`/chat/${ticket.id}`, "_self");
 		};
 
 		document.addEventListener("visibilitychange", () => {
@@ -339,7 +349,7 @@ const TicketsList = () => {
 		document.getElementById("sound").play();
 	};
 
-	const resetUnreadMessages = ticketId => {
+	const resetUnreadMessages = ({ ticketId }) => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(
 				ticket => ticket.id === +ticketId

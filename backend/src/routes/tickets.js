@@ -11,4 +11,6 @@ routes.post("/tickets", isAuth, TicketController.store);
 
 routes.put("/tickets/:ticketId", isAuth, TicketController.update);
 
+routes.delete("/tickets/:ticketId", isAuth, TicketController.delete);
+
 module.exports = routes;

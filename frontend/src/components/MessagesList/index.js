@@ -20,12 +20,15 @@ import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import { green } from "@material-ui/core/colors";
 import Skeleton from "@material-ui/lab/Skeleton";
+import IconButton from "@material-ui/core/IconButton";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
 import whatsBackground from "../../assets/wa-background.png";
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
 import MessageInput from "../MessageInput/";
+import TicketOptionsMenu from "./TicketOptionsMenu";
 
 const drawerWidth = 320;
 
@@ -65,7 +68,7 @@ const useStyles = makeStyles(theme => ({
 
 	messagesHeader: {
 		display: "flex",
-		cursor: "pointer",
+		// cursor: "pointer",
 		backgroundColor: "#eee",
 		flex: "none",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -233,6 +236,9 @@ const MessagesList = () => {
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const lastMessageRef = useRef();
 
+	const [anchorEl, setAnchorEl] = useState(null);
+	const moreMenuOpen = Boolean(anchorEl);
+
 	useEffect(() => {
 		setMessagesList([]);
 	}, [searchParam]);
@@ -366,9 +372,15 @@ const MessagesList = () => {
 		}
 	};
 
+	const handleOpenTicketOptionsMenu = e => {
+		setAnchorEl(e.currentTarget);
+	};
+
+	const handleCloseTicketOptionsMenu = e => {
+		setAnchorEl(null);
+	};
+
 	const handleUpdateTicketStatus = async (e, status, userId) => {
-		e.preventDefault();
-		e.stopPropagation();
 		try {
 			await api.put(`/tickets/${ticketId}`, {
 				status: status,
@@ -378,6 +390,14 @@ const MessagesList = () => {
 			console.log(err);
 		}
 		history.push("/chat");
+	};
+
+	const handleDrawerOpen = () => {
+		setDrawerOpen(true);
+	};
+
+	const handleDrawerClose = () => {
+		setDrawerOpen(false);
 	};
 
 	const renderMessageAck = message => {
@@ -480,13 +500,6 @@ const MessagesList = () => {
 		}
 	};
 
-	const handleDrawerOpen = () => {
-		setDrawerOpen(true);
-	};
-	const handleDrawerClose = () => {
-		setDrawerOpen(false);
-	};
-
 	return (
 		<div className={classes.root} id="drawer-container">
 			<Paper
@@ -496,12 +509,10 @@ const MessagesList = () => {
 					[classes.mainWrapperShift]: drawerOpen,
 				})}
 			>
-				<Card
-					square
-					className={classes.messagesHeader}
-					onClick={handleDrawerOpen}
-				>
+				<Card square className={classes.messagesHeader}>
 					<CardHeader
+						onClick={handleDrawerOpen}
+						style={{ cursor: "pointer" }}
 						titleTypographyProps={{ noWrap: true }}
 						subheaderTypographyProps={{ noWrap: true }}
 						avatar={
@@ -557,6 +568,15 @@ const MessagesList = () => {
 									</Button>
 								</>
 							)}
+							<IconButton onClick={handleOpenTicketOptionsMenu}>
+								<MoreVertIcon />
+							</IconButton>
+							<TicketOptionsMenu
+								ticket={ticket}
+								anchorEl={anchorEl}
+								menuOpen={moreMenuOpen}
+								handleClose={handleCloseTicketOptionsMenu}
+							/>
 						</div>
 					)}
 				</Card>
