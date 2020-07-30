@@ -259,7 +259,7 @@ const TicketsList = () => {
 		});
 
 		socket.on("appMessage", data => {
-			if (data.action === "create") {
+			if (data.action === "create" && !data.message.fromMe) {
 				updateUnreadMessagesCount(data);
 				if (
 					(ticketId &&

@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const { Op } = require("sequelize");
-const { parseISO, subHours } = require("date-fns");
+const { subHours } = require("date-fns");
 
 const Contact = require("../models/Contact");
 const Ticket = require("../models/Ticket");
@@ -93,67 +93,65 @@ const handlMedia = async (msg, ticket) => {
 	return newMessage;
 };
 
-const wbotMessageListener = () => {
+const handleMessage = async (msg, ticket, contact) => {
 	const io = getIO();
+	let newMessage;
+
+	if (msg.hasMedia) {
+		newMessage = await handlMedia(msg, ticket);
+	} else {
+		newMessage = await ticket.createMessage({
+			id: msg.id.id,
+			body: msg.body,
+			fromMe: msg.fromMe,
+		});
+		await ticket.update({ lastMessage: msg.body });
+	}
+
+	const serializedMessage = {
+		...newMessage.dataValues,
+		mediaUrl: `${
+			newMessage.mediaUrl
+				? `http://${process.env.HOST}:${process.env.PORT}/public/${newMessage.mediaUrl}`
+				: ""
+		}`,
+	};
+
+	const serializaedTicket = {
+		...ticket.dataValues,
+		unreadMessages: 1,
+		lastMessage: newMessage.body,
+		contact: contact,
+	};
+
+	io.to(ticket.id).to("notification").emit("appMessage", {
+		action: "create",
+		message: serializedMessage,
+		ticket: serializaedTicket,
+		contact: contact,
+	});
+};
+
+const wbotMessageListener = () => {
 	const wbot = getWbot();
+	const io = getIO();
 
-	wbot.on("message", async msg => {
+	wbot.on("message_create", async msg => {
 		// console.log(msg);
-
-		let newMessage;
-
-		if (msg.from === "status@broadcast" || msg.type === "location") {
-			return;
-		}
-
 		try {
-			const msgContact = await msg.getContact();
-			const profilePicUrl = await msgContact.getProfilePicUrl();
+			let msgContact;
 
-			const contact = await verifyContact(msgContact, profilePicUrl);
-
-			const ticket = await verifyTicket(contact);
-
-			// if (msg.hasQuotedMsg) {
-			// 	const quotedMessage = await msg.getQuotedMessage();
-			// 	console.log("quoted", quotedMessage);
-			// }
-
-			if (msg.hasMedia) {
-				newMessage = await handlMedia(msg, ticket);
+			if (msg.fromMe) {
+				msgContact = await wbot.getContactById(msg.to);
 			} else {
-				newMessage = await ticket.createMessage({
-					id: msg.id.id,
-					body: msg.body,
-				});
-				await ticket.update({ lastMessage: msg.body });
+				msgContact = await msg.getContact();
 			}
 
-			const serializedMessage = {
-				...newMessage.dataValues,
-				mediaUrl: `${
-					newMessage.mediaUrl
-						? `http://${process.env.HOST}:${process.env.PORT}/public/${newMessage.mediaUrl}`
-						: ""
-				}`,
-			};
+			const profilePicUrl = await msgContact.getProfilePicUrl();
+			const contact = await verifyContact(msgContact, profilePicUrl);
+			const ticket = await verifyTicket(contact);
 
-			const serializaedTicket = {
-				...ticket.dataValues,
-				unreadMessages: 1,
-				lastMessage: newMessage.body,
-				contact: contact,
-			};
-
-			io.to(ticket.id).to("notification").emit("appMessage", {
-				action: "create",
-				message: serializedMessage,
-				ticket: serializaedTicket,
-				contact: contact,
-			});
-
-			let chat = await msg.getChat();
-			chat.sendSeen();
+			await handleMessage(msg, ticket, contact);
 		} catch (err) {
 			console.log(err);
 		}
@@ -165,7 +163,7 @@ const wbotMessageListener = () => {
 				where: { id: msg.id.id },
 			});
 			if (!messageToUpdate) {
-				// will throw an error is msg wasn't sent from app
+				// will throw an error in frist ack if msg wast sent from cellphone
 				const error = new Error(
 					"Erro ao alterar o ack da mensagem no banco de dados"
 				);

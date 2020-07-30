@@ -129,25 +129,27 @@ exports.store = async (req, res, next) => {
 		);
 	}
 
-	message.id = sentMessage.id.id;
+	// CHANGED MESSAGE CREATION LOGIC TO wbotMessageListener, to handle both send from app and cellphone
+	// THIS SHOULD BE DELETED IN FUTURE VERSION
+	// message.id = sentMessage.id.id;
 
-	const newMessage = await ticket.createMessage(message);
+	// const newMessage = await ticket.createMessage(message);
 
-	const serialziedMessage = {
-		...newMessage.dataValues,
-		mediaUrl: `${
-			message.mediaUrl
-				? `http://${process.env.HOST}:${process.env.PORT}/public/${message.mediaUrl}`
-				: ""
-		}`,
-	};
+	// const serialziedMessage = {
+	// 	...newMessage.dataValues,
+	// 	mediaUrl: `${
+	// 		message.mediaUrl
+	// 			? `http://${process.env.HOST}:${process.env.PORT}/public/${message.mediaUrl}`
+	// 			: ""
+	// 	}`,
+	// };
 
-	io.to(ticketId).emit("appMessage", {
-		action: "create",
-		message: serialziedMessage,
-	});
+	// io.to(ticketId).emit("appMessage", {
+	// 	action: "create",
+	// 	message: serialziedMessage,
+	// });
 
 	await setMessagesAsRead(ticketId);
 
-	return res.json({ message: "Mensagem enviada", newMessage, ticket });
+	return res.json({ message: "Mensagem enviada", ticket });
 };

@@ -105,7 +105,7 @@ const useStyles = makeStyles(theme => ({
 const MessageInput = ({ searchParam }) => {
 	const classes = useStyles();
 	const { ticketId } = useParams();
-	const userId = localStorage.getItem("userId");
+	// const userId = localStorage.getItem("userId");
 	const username = localStorage.getItem("username");
 
 	const mediaInitialState = { preview: "", raw: "", name: "" };
@@ -157,7 +157,7 @@ const MessageInput = ({ searchParam }) => {
 		e.preventDefault();
 		const formData = new FormData();
 		formData.append("media", media.raw);
-		formData.append("userId", userId);
+		formData.append("fromMe", true);
 		formData.append("body", media.name);
 
 		try {
@@ -175,7 +175,7 @@ const MessageInput = ({ searchParam }) => {
 		setLoading(true);
 		const message = {
 			read: 1,
-			userId: userId,
+			fromMe: true,
 			mediaUrl: "",
 			body: `${username}: ${inputMessage.trim()}`,
 		};
@@ -220,7 +220,7 @@ const MessageInput = ({ searchParam }) => {
 				console.log(blob);
 				formData.append("media", blob, filename);
 				formData.append("body", filename);
-				formData.append("userId", userId);
+				formData.append("fromMe", true);
 				try {
 					await api.post(`/messages/${ticketId}`, formData);
 				} catch (err) {

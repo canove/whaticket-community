@@ -6,6 +6,7 @@ class Message extends Sequelize.Model {
 			{
 				ack: { type: Sequelize.INTEGER, defaultValue: 0 },
 				read: { type: Sequelize.BOOLEAN, defaultValue: false },
+				fromMe: { type: Sequelize.BOOLEAN, defaultValue: false },
 				body: { type: Sequelize.TEXT },
 				mediaUrl: { type: Sequelize.STRING },
 				mediaType: { type: Sequelize.STRING },
@@ -28,7 +29,6 @@ class Message extends Sequelize.Model {
 
 	static associate(models) {
 		this.belongsTo(models.Ticket, { foreignKey: "ticketId" });
-		this.belongsTo(models.User, { foreignKey: "userId" });
 	}
 }
 

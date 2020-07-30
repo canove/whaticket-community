@@ -441,7 +441,7 @@ const MessagesList = () => {
 	const renderMessages = () => {
 		if (messagesList.length > 0) {
 			const viewMessagesList = messagesList.map((message, index) => {
-				if (!message.userId) {
+				if (!message.fromMe) {
 					return (
 						<LinkifyWithTargetBlank key={message.id}>
 							{renderDailyTimestamps(message, index)}
