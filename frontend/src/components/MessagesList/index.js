@@ -221,7 +221,7 @@ const MessagesList = () => {
 	const classes = useStyles();
 
 	const token = localStorage.getItem("token");
-	const userId = localStorage.getItem("userId");
+	const userId = +localStorage.getItem("userId");
 
 	const [loading, setLoading] = useState(true);
 	const [contact, setContact] = useState({});

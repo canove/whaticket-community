@@ -288,6 +288,7 @@ const TicketsList = () => {
 				let aux = [...prevState];
 				aux[ticketIndex].unreadMessages++;
 				aux[ticketIndex].lastMessage = data.message.body;
+				aux[ticketIndex].status = data.ticket.status;
 				aux.unshift(aux.splice(ticketIndex, 1)[0]);
 				return aux;
 			} else {
@@ -487,6 +488,8 @@ const TicketsList = () => {
 			return viewTickets;
 		}
 	};
+
+	console.log(tickets);
 
 	return (
 		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>

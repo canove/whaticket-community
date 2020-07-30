@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const { Op } = require("sequelize");
+const { parseISO, subHours } = require("date-fns");
 
 const Contact = require("../models/Contact");
 const Ticket = require("../models/Ticket");
@@ -28,15 +29,35 @@ const verifyContact = async (msgContact, profilePicUrl) => {
 };
 
 const verifyTicket = async contact => {
-	const [ticket] = await Ticket.findOrCreate({
+	let ticket = await Ticket.findOne({
 		where: {
 			status: {
 				[Op.or]: ["open", "pending"],
 			},
 			contactId: contact.id,
 		},
-		defaults: { contactId: contact.id, status: "pending" },
 	});
+
+	if (!ticket) {
+		ticket = await Ticket.findOne({
+			where: {
+				createdAt: { [Op.between]: [subHours(new Date(), 2), new Date()] },
+				contactId: contact.id,
+			},
+			order: [["createdAt", "DESC"]],
+		});
+
+		if (ticket) {
+			await ticket.update({ status: "open" });
+		}
+	}
+
+	if (!ticket) {
+		ticket = await Ticket.create({
+			contactId: contact.id,
+			status: "pending",
+		});
+	}
 
 	return ticket;
 };
