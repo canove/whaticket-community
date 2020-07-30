@@ -317,15 +317,23 @@ const TicketsList = () => {
 		const options = {
 			body: `${data.message.body} - ${format(new Date(), "HH:mm")}`,
 			icon: data.contact.profilePicUrl,
+			tag: data.ticket.id,
 		};
 		let notification = new Notification(
 			`Mensagem de ${data.contact.name}`,
 			options
 		);
+
 		notification.onclick = function (event) {
 			event.preventDefault(); //
 			window.open(`/chat/${data.ticket.id}`, "_self");
 		};
+
+		document.addEventListener("visibilitychange", () => {
+			if (document.visibilityState === "visible") {
+				notification.close();
+			}
+		});
 
 		document.getElementById("sound").play();
 	};
