@@ -259,7 +259,7 @@ const TicketsList = () => {
 		});
 
 		socket.on("appMessage", data => {
-			if (data.action === "create" && !data.message.fromMe) {
+			if (data.action === "create") {
 				updateUnreadMessagesCount(data);
 				if (
 					(ticketId &&
@@ -285,7 +285,9 @@ const TicketsList = () => {
 
 			if (ticketIndex !== -1) {
 				let aux = [...prevState];
-				aux[ticketIndex].unreadMessages++;
+				if (!data.message.fromMe) {
+					aux[ticketIndex].unreadMessages++;
+				}
 				aux[ticketIndex].lastMessage = data.message.body;
 				aux[ticketIndex].status = data.ticket.status;
 				aux.unshift(aux.splice(ticketIndex, 1)[0]);
