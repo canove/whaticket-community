@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 
 import { useHistory } from "react-router-dom";
-import api from "../../services/api";
 import { Link as RouterLink } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
-// import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
@@ -18,18 +16,20 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
-function Copyright() {
+import api from "../../services/api";
+
+const Copyright = () => {
 	return (
 		<Typography variant="body2" color="textSecondary" align="center">
 			{"Copyright © "}
-			<Link color="inherit" href="https://material-ui.com/">
+			<Link color="inherit" href="https://economicros.com.br/">
 				Canove
 			</Link>{" "}
 			{new Date().getFullYear()}
 			{"."}
 		</Typography>
 	);
-}
+};
 
 const useStyles = makeStyles(theme => ({
 	paper: {
@@ -65,9 +65,10 @@ const SignUp = () => {
 		e.preventDefault();
 		try {
 			await api.post("/auth/signup", user);
+			toast.success("Usuário criado com sucesso! Faça seu login.");
 			history.push("/login");
 		} catch (err) {
-			alert(err);
+			toast.error("Erro ao criar usuário. Verifique os dados informados.");
 		}
 	};
 
