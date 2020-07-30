@@ -314,7 +314,6 @@ const TicketsList = () => {
 	};
 
 	const showDesktopNotification = data => {
-		console.log(data);
 		const options = {
 			body: `${data.message.body} - ${format(new Date(), "HH:mm")}`,
 			icon: data.contact.profilePicUrl,
@@ -488,8 +487,6 @@ const TicketsList = () => {
 			return viewTickets;
 		}
 	};
-
-	console.log(tickets);
 
 	return (
 		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>
