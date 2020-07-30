@@ -259,7 +259,6 @@ const TicketsList = () => {
 		});
 
 		socket.on("appMessage", data => {
-			console.log(data);
 			if (data.action === "create") {
 				updateUnreadMessagesCount(data);
 				if (
