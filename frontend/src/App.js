@@ -1,6 +1,6 @@
 import React from "react";
 import Routes from "./routes";
-import "dotenv/config";
+import "react-toastify/dist/ReactToastify.css";
 
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { ptBR } from "@material-ui/core/locale";

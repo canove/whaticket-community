@@ -339,8 +339,6 @@ const TicketsList = () => {
 		document.getElementById("sound").play();
 	};
 
-	console.log(process.env.NODE_ENV);
-
 	const resetUnreadMessages = ticketId => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(

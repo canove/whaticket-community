@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
+import { toast } from "react-toastify";
+
 import api from "../../services/api";
 
 const useAuth = () => {
@@ -33,7 +35,7 @@ const useAuth = () => {
 			} catch (err) {
 				setLoading(false);
 				setIsAuth(false);
-				alert("Erro de autenticação. Por favor, faça login novamente");
+				toast.error("Erro de autenticação. Por favor, faça login novamente");
 			}
 		};
 		checkAuth();
@@ -50,7 +52,7 @@ const useAuth = () => {
 			setIsAuth(true);
 			history.push("/chat");
 		} catch (err) {
-			alert(err);
+			toast.error("Erro de autenticação. Verifique os dados de login");
 		}
 	};
 

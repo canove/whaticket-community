@@ -1,11 +1,11 @@
-import React from "react";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import React, { useContext } from "react";
+import { Route, Redirect } from "react-router-dom";
 
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { AuthContext, AuthProvider } from "../context/Auth/AuthContext";
+import { AuthContext } from "../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	backdrop: {
