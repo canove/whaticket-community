@@ -23,6 +23,7 @@
     "react-modal-image": "^2.5.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-toastify": "^6.0.8",
     "recharts": "^1.8.5",
     "socket.io-client": "^2.3.0"
   },

@@ -5,14 +5,14 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 
-import MainDrawer from "./components/MainDrawer";
-import Dashboard from "./pages/Dashboard/";
-import Chat from "./pages/Chat/";
-import Signup from "./pages/Signup/";
-import Login from "./pages/Login/";
-import WhatsAuth from "./pages/WhatsAuth/WhatsAuth";
-import Contacts from "./pages/Contacts/";
-import { AuthContext, AuthProvider } from "./context/Auth/AuthContext";
+import MainDrawer from "../components/MainDrawer";
+import Dashboard from "../pages/Dashboard/";
+import Chat from "../pages/Chat/";
+import Signup from "../pages/Signup/";
+import Login from "../pages/Login/";
+import WhatsAuth from "../pages/WhatsAuth/WhatsAuth";
+import Contacts from "../pages/Contacts/";
+import { AuthContext, AuthProvider } from "../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	backdrop: {
