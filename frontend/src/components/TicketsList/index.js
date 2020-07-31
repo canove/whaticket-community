@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import openSocket from "socket.io-client";
 import { parseISO, format } from "date-fns";
+import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -258,6 +259,10 @@ const TicketsList = () => {
 			}
 			if (data.action === "delete") {
 				deleteTicket(data);
+				if (ticketId && data.ticketId === +ticketId) {
+					toast.warn("O ticket que você estava foi deletado.");
+					history.push("/chat");
+				}
 			}
 		});
 
@@ -278,7 +283,7 @@ const TicketsList = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [ticketId, userId]);
+	}, [ticketId, userId, history]);
 
 	const updateUnreadMessagesCount = ({ message, ticket }) => {
 		setTickets(prevState => {

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 
-import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import MenuItem from "@material-ui/core/MenuItem";
@@ -10,21 +9,15 @@ import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
-	const history = useHistory();
-
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 
 	const handleDeleteTicket = async () => {
 		try {
 			await api.delete(`/tickets/${ticket.id}`);
 			toast.success("Ticket deletado com sucesso.");
-			history.push("/chat");
 		} catch (err) {
 			toast.error("Erro ao deletar o ticket");
 		}
-
-		console.log("deleted");
-		handleClose();
 	};
 
 	const handleTransferTicket = e => {
@@ -37,7 +30,6 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		handleClose();
 	};
 
-	console.log(ticket);
 	return (
 		<>
 			<Menu
