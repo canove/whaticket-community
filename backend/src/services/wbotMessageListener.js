@@ -138,6 +138,10 @@ const wbotMessageListener = () => {
 
 	wbot.on("message_create", async msg => {
 		// console.log(msg);
+		if (msg.from === "status@broadcast" || msg.type === "location") {
+			return;
+		}
+
 		try {
 			let msgContact;
 
