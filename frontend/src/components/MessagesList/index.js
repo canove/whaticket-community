@@ -28,7 +28,7 @@ import ContactDrawer from "../ContactDrawer";
 import whatsBackground from "../../assets/wa-background.png";
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
 import MessageInput from "../MessageInput/";
-import TicketOptionsMenu from "./TicketOptionsMenu";
+import TicketOptionsMenu from "../TicketOptionsMenu";
 
 const drawerWidth = 320;
 
