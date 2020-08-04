@@ -73,6 +73,7 @@ const Chart = () => {
 			<ResponsiveContainer>
 				<BarChart
 					data={chartData}
+					barSize={40}
 					width={730}
 					height={250}
 					margin={{
@@ -84,7 +85,11 @@ const Chart = () => {
 				>
 					<CartesianGrid strokeDasharray="3 3" />
 					<XAxis dataKey="time" stroke={theme.palette.text.secondary} />
-					<YAxis stroke={theme.palette.text.secondary}>
+					<YAxis
+						type="number"
+						allowDecimals={false}
+						stroke={theme.palette.text.secondary}
+					>
 						<Label
 							angle={270}
 							position="left"
@@ -93,13 +98,7 @@ const Chart = () => {
 							Tickets
 						</Label>
 					</YAxis>
-					<Bar
-						// type="monotone"
-						dataKey="amount"
-						fill={theme.palette.primary.main}
-						// stroke={theme.palette.primary.main}
-						// dot={false}
-					/>
+					<Bar dataKey="amount" fill={theme.palette.primary.main} />
 				</BarChart>
 			</ResponsiveContainer>
 		</React.Fragment>
