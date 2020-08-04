@@ -130,6 +130,7 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 
 		backgroundColor: "#ffffff",
+		color: "#303030",
 		alignSelf: "flex-start",
 		borderTopLeftRadius: 0,
 		borderTopRightRadius: 8,
@@ -152,6 +153,7 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 
 		backgroundColor: "#dcf8c6",
+		color: "#303030",
 		alignSelf: "flex-end",
 		borderTopLeftRadius: 8,
 		borderTopRightRadius: 8,
@@ -453,7 +455,7 @@ const MessagesList = () => {
 				);
 			}
 		}
-		if (index + 1 === messagesList.length) {
+		if (index === messagesList.length - 1) {
 			return (
 				<div
 					key={`ref-${message.createdAt}`}
@@ -464,6 +466,19 @@ const MessagesList = () => {
 		}
 	};
 
+	const renderMessageDivider = (message, index) => {
+		if (index < messagesList.length && index > 0) {
+			let messageUser = messagesList[index].fromMe;
+			let previousMessageUser = messagesList[index - 1].fromMe;
+
+			if (messageUser !== previousMessageUser) {
+				return (
+					<span style={{ marginTop: 16 }} key={`divider-${message.id}`}></span>
+				);
+			}
+		}
+	};
+
 	const renderMessages = () => {
 		if (messagesList.length > 0) {
 			const viewMessagesList = messagesList.map((message, index) => {
@@ -471,6 +486,7 @@ const MessagesList = () => {
 					return (
 						<LinkifyWithTargetBlank key={message.id}>
 							{renderDailyTimestamps(message, index)}
+							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
 								{message.mediaUrl && checkMessaageMedia(message)}
 								<div className={classes.textContentItem}>
@@ -486,6 +502,7 @@ const MessagesList = () => {
 					return (
 						<LinkifyWithTargetBlank key={message.id}>
 							{renderDailyTimestamps(message, index)}
+							{renderMessageDivider(message, index)}
 							<div className={classes.messageRight}>
 								{message.mediaUrl && checkMessaageMedia(message)}
 								<div className={classes.textContentItem}>
