@@ -16,7 +16,7 @@ class Ticket extends Sequelize.Model {
 		);
 
 		this.addHook("afterFind", async result => {
-			if (result.length > 0) {
+			if (result && result.length > 0) {
 				await Promise.all(
 					result.map(async ticket => {
 						ticket.unreadMessages = await Message.count({
