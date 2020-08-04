@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
+import { toast } from "react-toastify";
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "socket.io-client";
 import InfiniteScrollReverse from "react-infinite-scroll-reverse";
@@ -263,13 +264,14 @@ const MessagesList = () => {
 					}
 				} catch (err) {
 					console.log(err);
-					alert(err);
+					toast.error("Ticket não encontrado");
+					history.push("/chat");
 				}
 			};
 			fetchMessages();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, ticketId, token]);
+	}, [searchParam, pageNumber, ticketId, token, history]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);

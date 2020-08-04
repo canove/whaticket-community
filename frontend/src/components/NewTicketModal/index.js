@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -37,6 +38,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
+	const history = useHistory();
 	const classes = useStyles();
 	const userId = +localStorage.getItem("userId");
 
@@ -77,11 +79,12 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 		if (!selectedContact) return;
 		setLoading(true);
 		try {
-			await api.post("/tickets", {
+			const { data: ticket } = await api.post("/tickets", {
 				contactId: selectedContact.id,
 				userId: userId,
 				status: "open",
 			});
+			history.push(`/chat/${ticket.id}`);
 		} catch (err) {
 			alert(err);
 		}

@@ -61,7 +61,7 @@ exports.index = async (req, res, next) => {
 	});
 
 	if (!ticket) {
-		return res.status(400).json({ error: "No ticket found with this ID" });
+		return res.status(404).json({ error: "No ticket found with this ID" });
 	}
 
 	await setMessagesAsRead(ticketId);
