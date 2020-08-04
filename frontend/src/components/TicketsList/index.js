@@ -251,7 +251,6 @@ const TicketsList = () => {
 		socket.emit("joinNotification");
 
 		socket.on("ticket", data => {
-			console.log("data", data);
 			if (data.action === "updateUnread") {
 				resetUnreadMessages(data);
 			}
@@ -287,7 +286,6 @@ const TicketsList = () => {
 	}, [ticketId, userId, history]);
 
 	const updateTickets = ({ ticket }) => {
-		console.log("recebido", ticket);
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
 
@@ -301,8 +299,6 @@ const TicketsList = () => {
 			}
 		});
 	};
-
-	console.log(tickets);
 
 	const deleteTicket = ({ ticketId }) => {
 		setTickets(prevState => {
