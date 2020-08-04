@@ -111,6 +111,7 @@ exports.store = async (req, res, next) => {
 
 	if (media) {
 		const newMedia = MessageMedia.fromFilePath(req.file.path);
+
 		message.mediaUrl = req.file.filename.replace(/\s/g, "");
 		if (newMedia.mimetype) {
 			message.mediaType = newMedia.mimetype.split("/")[0];
@@ -129,27 +130,25 @@ exports.store = async (req, res, next) => {
 		);
 	}
 
-	// CHANGED MESSAGE CREATION LOGIC TO wbotMessageListener, to handle both send from app and cellphone
-	// THIS SHOULD BE DELETED IN FUTURE VERSION
-	// message.id = sentMessage.id.id;
+	message.id = sentMessage.id.id;
 
-	// const newMessage = await ticket.createMessage(message);
+	const newMessage = await ticket.createMessage(message);
 
-	// const serialziedMessage = {
-	// 	...newMessage.dataValues,
-	// 	mediaUrl: `${
-	// 		message.mediaUrl
-	// 			? `http://${process.env.HOST}:${process.env.PORT}/public/${message.mediaUrl}`
-	// 			: ""
-	// 	}`,
-	// };
+	const serialziedMessage = {
+		...newMessage.dataValues,
+		mediaUrl: `${
+			message.mediaUrl
+				? `http://${process.env.HOST}:${process.env.PORT}/public/${message.mediaUrl}`
+				: ""
+		}`,
+	};
 
-	// io.to(ticketId).emit("appMessage", {
-	// 	action: "create",
-	// 	message: serialziedMessage,
-	// });
+	io.to(ticketId).emit("appMessage", {
+		action: "create",
+		message: serialziedMessage,
+	});
 
 	await setMessagesAsRead(ticketId);
 
-	return res.json({ message: "Mensagem enviada", ticket });
+	return res.json({ message: "Mensagem enviada", newMessage, ticket });
 };

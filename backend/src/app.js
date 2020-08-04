@@ -17,7 +17,6 @@ const TicketsRoutes = require("./routes/tickets");
 const WhatsRoutes = require("./routes/whatsapp");
 
 const app = express();
-
 const fileStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		cb(null, path.resolve(__dirname, "..", "public"));

@@ -84,6 +84,7 @@ const handlMedia = async (msg, ticket) => {
 		newMessage = await ticket.createMessage({
 			id: msg.id.id,
 			body: msg.body || media.filename,
+			fromMe: msg.fromMe,
 			mediaUrl: media.filename,
 			mediaType: media.mimetype.split("/")[0],
 		});
@@ -136,21 +137,14 @@ const wbotMessageListener = () => {
 	const wbot = getWbot();
 	const io = getIO();
 
-	wbot.on("message_create", async msg => {
+	wbot.on("message", async msg => {
 		// console.log(msg);
 		if (msg.from === "status@broadcast" || msg.type === "location") {
 			return;
 		}
 
 		try {
-			let msgContact;
-
-			if (msg.fromMe) {
-				msgContact = await wbot.getContactById(msg.to);
-			} else {
-				msgContact = await msg.getContact();
-			}
-
+			const msgContact = await msg.getContact();
 			const profilePicUrl = await msgContact.getProfilePicUrl();
 			const contact = await verifyContact(msgContact, profilePicUrl);
 			const ticket = await verifyTicket(contact);
