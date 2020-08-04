@@ -161,11 +161,9 @@ const wbotMessageListener = () => {
 				where: { id: msg.id.id },
 			});
 			if (!messageToUpdate) {
-				// will throw an error in frist ack if msg wast sent from cellphone
-				const error = new Error(
-					"Erro ao alterar o ack da mensagem no banco de dados"
-				);
-				error.statusCode = 501;
+				// will throw an error if msg was sent from cellphone
+				const error = new Error("No message with this ID found in database");
+				error.statusCode = 404;
 				throw error;
 			}
 			await messageToUpdate.update({ ack: ack });

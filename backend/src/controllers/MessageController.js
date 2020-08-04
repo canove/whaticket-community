@@ -110,9 +110,10 @@ exports.store = async (req, res, next) => {
 	});
 
 	if (media) {
+		console.log(media);
 		const newMedia = MessageMedia.fromFilePath(req.file.path);
 
-		message.mediaUrl = req.file.filename.replace(/\s/g, "");
+		message.mediaUrl = req.file.filename;
 		if (newMedia.mimetype) {
 			message.mediaType = newMedia.mimetype.split("/")[0];
 		} else {

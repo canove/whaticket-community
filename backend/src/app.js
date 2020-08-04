@@ -17,12 +17,13 @@ const TicketsRoutes = require("./routes/tickets");
 const WhatsRoutes = require("./routes/whatsapp");
 
 const app = express();
+
 const fileStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		cb(null, path.resolve(__dirname, "..", "public"));
 	},
 	filename: (req, file, cb) => {
-		cb(null, new Date().getTime() + "-" + file.originalname.replace(/\s/g, ""));
+		cb(null, new Date().getTime() + path.extname(file.originalname));
 	},
 });
 
@@ -55,7 +56,7 @@ const io = require("./libs/socket").init(server);
 io.on("connection", socket => {
 	console.log("Client Connected");
 	socket.on("joinChatBox", ticketId => {
-		console.log("A client joined in a ticket channel");
+		console.log("A client joined a ticket channel");
 		socket.join(ticketId);
 	});
 
