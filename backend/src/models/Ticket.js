@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const Message = require("./Message");
 
 class Ticket extends Sequelize.Model {
 	static init(sequelize) {
@@ -6,12 +7,19 @@ class Ticket extends Sequelize.Model {
 			{
 				status: { type: Sequelize.STRING, defaultValue: "pending" },
 				userId: { type: Sequelize.INTEGER, defaultValue: null },
+				unreadMessages: { type: Sequelize.VIRTUAL },
 				lastMessage: { type: Sequelize.STRING },
 			},
 			{
 				sequelize,
 			}
 		);
+
+		this.addHook("afterUpdate", async ticket => {
+			ticket.unreadMessages = await Message.count({
+				where: { ticketId: ticket.id, read: false },
+			});
+		});
 
 		return this;
 	}

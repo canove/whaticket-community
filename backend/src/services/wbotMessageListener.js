@@ -48,7 +48,7 @@ const verifyTicket = async contact => {
 		});
 
 		if (ticket) {
-			await ticket.update({ status: "open" });
+			await ticket.update({ status: "pending", userId: null });
 		}
 	}
 
@@ -120,8 +120,8 @@ const handleMessage = async (msg, ticket, contact) => {
 
 	const serializaedTicket = {
 		...ticket.dataValues,
-		unreadMessages: 1,
-		lastMessage: newMessage.body,
+		// unreadMessages: 1,
+		// lastMessage: newMessage.body,
 		contact: contact,
 	};
 

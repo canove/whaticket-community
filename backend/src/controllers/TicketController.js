@@ -39,22 +39,6 @@ exports.index = async (req, res) => {
 				attributes: ["name", "number", "profilePicUrl"],
 			},
 		],
-		attributes: {
-			include: [
-				[
-					Sequelize.literal(`(
-			        SELECT COUNT(*)
-			        FROM Messages AS message
-			        WHERE
-			            message.ticketId = Ticket.id
-			            AND
-			            message.read = 0
-
-			    )`),
-					"unreadMessages",
-				],
-			],
-		},
 		order: [["updatedAt", "DESC"]],
 	});
 
@@ -89,22 +73,6 @@ exports.update = async (req, res) => {
 				attributes: ["name", "number", "profilePicUrl"],
 			},
 		],
-		attributes: {
-			include: [
-				[
-					Sequelize.literal(`(
-			        SELECT COUNT(*)
-			        FROM Messages AS message
-			        WHERE
-			            message.ticketId = Ticket.id
-			            AND
-			            message.read = 0
-
-			    )`),
-					"unreadMessages",
-				],
-			],
-		},
 	});
 
 	if (!ticket) {

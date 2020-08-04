@@ -251,6 +251,7 @@ const TicketsList = () => {
 		socket.emit("joinNotification");
 
 		socket.on("ticket", data => {
+			console.log("data", data);
 			if (data.action === "updateUnread") {
 				resetUnreadMessages(data);
 			}
@@ -268,7 +269,7 @@ const TicketsList = () => {
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
-				updateUnreadMessagesCount(data);
+				updateTickets(data);
 				if (
 					(ticketId &&
 						data.message.ticketId === +ticketId &&
@@ -285,26 +286,8 @@ const TicketsList = () => {
 		};
 	}, [ticketId, userId, history]);
 
-	const updateUnreadMessagesCount = ({ message, ticket }) => {
-		setTickets(prevState => {
-			const ticketIndex = prevState.findIndex(t => t.id === message.ticketId);
-
-			if (ticketIndex !== -1) {
-				let aux = [...prevState];
-				if (!message.fromMe) {
-					aux[ticketIndex].unreadMessages++;
-				}
-				aux[ticketIndex].lastMessage = message.body;
-				aux[ticketIndex].status = ticket.status;
-				aux.unshift(aux.splice(ticketIndex, 1)[0]);
-				return aux;
-			} else {
-				return [ticket, ...prevState];
-			}
-		});
-	};
-
 	const updateTickets = ({ ticket }) => {
+		console.log("recebido", ticket);
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
 
@@ -313,10 +296,13 @@ const TicketsList = () => {
 			} else {
 				let aux = [...prevState];
 				aux[ticketIndex] = ticket;
+				aux.unshift(aux.splice(ticketIndex, 1)[0]);
 				return aux;
 			}
 		});
 	};
+
+	console.log(tickets);
 
 	const deleteTicket = ({ ticketId }) => {
 		setTickets(prevState => {
