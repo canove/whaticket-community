@@ -28,7 +28,7 @@ class Message extends Sequelize.Model {
 	}
 
 	static associate(models) {
-		this.belongsTo(models.Ticket, { foreignKey: "ticketId" });
+		this.belongsTo(models.Ticket, { foreignKey: "ticketId", as: "messages" });
 	}
 }
 

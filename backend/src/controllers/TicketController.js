@@ -3,13 +3,22 @@ const { startOfDay, endOfDay, parseISO } = require("date-fns");
 
 const Ticket = require("../models/Ticket");
 const Contact = require("../models/Contact");
+const Message = require("../models/Message");
 
 const { getIO } = require("../libs/socket");
 
 exports.index = async (req, res) => {
-	const { status = "", date = "" } = req.query;
+	const { status = "", date = "", searchParam = "" } = req.query;
 
 	let whereCondition = {};
+	let includeCondition = [
+		{
+			model: Contact,
+			as: "contact",
+			attributes: ["name", "number", "profilePicUrl"],
+		},
+	];
+
 	if (status === "open") {
 		whereCondition = {
 			...whereCondition,
@@ -17,7 +26,46 @@ exports.index = async (req, res) => {
 		};
 	} else if (status === "closed") {
 		whereCondition = { ...whereCondition, status: "closed" };
+	} else if (searchParam) {
+		includeCondition = [
+			...includeCondition,
+			{
+				model: Message,
+				as: "messages",
+				attributes: ["id", "body"],
+				where: {
+					body: Sequelize.where(
+						Sequelize.fn("LOWER", Sequelize.col("body")),
+						"LIKE",
+						"%" + searchParam.toLowerCase() + "%"
+					),
+				},
+				required: false,
+			},
+		];
+
+		whereCondition = {
+			...whereCondition,
+			[Sequelize.Op.or]: [
+				{
+					"$contact.name$": Sequelize.where(
+						Sequelize.fn("LOWER", Sequelize.col("name")),
+						"LIKE",
+						"%" + searchParam.toLowerCase() + "%"
+					),
+				},
+				{ "$contact.number$": { [Sequelize.Op.like]: `%${searchParam}%` } },
+				{
+					"$message.body$": Sequelize.where(
+						Sequelize.fn("LOWER", Sequelize.col("body")),
+						"LIKE",
+						"%" + searchParam.toLowerCase() + "%"
+					),
+				},
+			],
+		};
 	}
+
 	if (date) {
 		whereCondition = {
 			...whereCondition,
@@ -32,13 +80,7 @@ exports.index = async (req, res) => {
 
 	const tickets = await Ticket.findAll({
 		where: whereCondition,
-		include: [
-			{
-				model: Contact,
-				as: "contact",
-				attributes: ["name", "number", "profilePicUrl"],
-			},
-		],
+		include: includeCondition,
 		order: [["updatedAt", "DESC"]],
 	});
 
