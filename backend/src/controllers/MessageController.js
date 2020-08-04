@@ -104,7 +104,7 @@ exports.store = async (req, res, next) => {
 			{
 				model: Contact,
 				as: "contact",
-				attributes: ["number"],
+				attributes: ["number", "name", "profilePicUrl"],
 			},
 		],
 	});
@@ -124,11 +124,14 @@ exports.store = async (req, res, next) => {
 			`${ticket.contact.number}@c.us`,
 			newMedia
 		);
+
+		await ticket.update({ lastMessage: message.mediaUrl });
 	} else {
 		sentMessage = await wbot.sendMessage(
 			`${ticket.contact.number}@c.us`,
 			message.body
 		);
+		await ticket.update({ lastMessage: message.body });
 	}
 
 	message.id = sentMessage.id.id;
@@ -144,9 +147,11 @@ exports.store = async (req, res, next) => {
 		}`,
 	};
 
-	io.to(ticketId).emit("appMessage", {
+	io.to(ticketId).to("notification").emit("appMessage", {
 		action: "create",
 		message: serialziedMessage,
+		ticket: ticket,
+		contact: ticket.contact,
 	});
 
 	await setMessagesAsRead(ticketId);

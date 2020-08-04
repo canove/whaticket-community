@@ -368,7 +368,11 @@ const MessagesList = () => {
 				/>
 			);
 		} else {
-			return <a href={message.mediaUrl}>Download</a>;
+			return (
+				<a href={message.mediaUrl} target="_blank" rel="noopener noreferrer">
+					Download
+				</a>
+			);
 		}
 	};
 

@@ -120,8 +120,6 @@ const handleMessage = async (msg, ticket, contact) => {
 
 	const serializaedTicket = {
 		...ticket.dataValues,
-		// unreadMessages: 1,
-		// lastMessage: newMessage.body,
 		contact: contact,
 	};
 
