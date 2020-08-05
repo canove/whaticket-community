@@ -39,7 +39,7 @@ app.use(MessagesRoutes);
 app.use(WhatsRoutes);
 
 app.use(async (err, req, res, next) => {
-	if (process.env.NODE_ENV === "development") {
+	if (process.env.NODE_ENV === "DEVELOPMENT") {
 		const errors = await new Youch(err, req).toJSON();
 		console.log(err);
 		return res.status(500).json(errors);
