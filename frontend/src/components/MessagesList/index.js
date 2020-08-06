@@ -234,7 +234,6 @@ const MessagesList = () => {
 	const [ticket, setTicket] = useState({});
 	const [messagesList, setMessagesList] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
-	const [searchParam, setSearchParam] = useState("");
 	const [pageNumber, setPageNumber] = useState(0);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const lastMessageRef = useRef();
@@ -243,16 +242,12 @@ const MessagesList = () => {
 	const moreMenuOpen = Boolean(anchorEl);
 
 	useEffect(() => {
-		setMessagesList([]);
-	}, [searchParam]);
-
-	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchMessages = async () => {
 				try {
 					const res = await api.get("/messages/" + ticketId, {
-						params: { searchParam, pageNumber },
+						params: { pageNumber },
 					});
 					setContact(res.data.ticket.contact);
 					setTicket(res.data.ticket);
@@ -273,7 +268,7 @@ const MessagesList = () => {
 			fetchMessages();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, ticketId, token, history]);
+	}, [pageNumber, ticketId, token, history]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
@@ -297,16 +292,10 @@ const MessagesList = () => {
 
 		return () => {
 			socket.disconnect();
-			setSearchParam("");
 			setPageNumber(1);
 			setMessagesList([]);
 		};
 	}, [ticketId]);
-
-	// const handleSearch = e => {
-	// 	setSearchParam(e.target.value);
-	// 	setPageNumber(1);
-	// };
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);
@@ -613,7 +602,7 @@ const MessagesList = () => {
 					>
 						{messagesList.length > 0 ? renderMessages() : []}
 					</InfiniteScrollReverse>
-					<MessageInput searchParam={searchParam} />
+					<MessageInput />
 					{loading ? (
 						<div>
 							<CircularProgress className={classes.circleLoading} />

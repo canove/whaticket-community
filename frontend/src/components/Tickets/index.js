@@ -50,8 +50,8 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	tab: {
-		minWidth: 120, // a number of your choice
-		width: 120, // a number of your choice
+		minWidth: 120,
+		width: 120,
 	},
 
 	halfTicketsList: {
@@ -84,13 +84,10 @@ const useStyles = makeStyles(theme => ({
 
 	ticketsListHeader: {
 		display: "flex",
-		// flexShrink: 0,
-		// -webkitBoxAlign: "center",
 		alignItems: "center",
 		fontWeight: 500,
 		fontSize: "16px",
 		height: "56px",
-		// backgroundColor: "#eee",
 		color: "rgb(67, 83, 105)",
 		padding: "0px 12px",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -390,8 +387,6 @@ const Tickets = () => {
 			/>
 		);
 	};
-
-	console.log(tickets);
 
 	return (
 		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>

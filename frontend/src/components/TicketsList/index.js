@@ -1,5 +1,5 @@
 import React from "react";
-import { parseISO, format } from "date-fns";
+import { parseISO, format, isSameDay } from "date-fns";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -146,7 +146,11 @@ const TicketsList = ({
 											variant="body2"
 											color="textSecondary"
 										>
-											{format(parseISO(ticket.updatedAt), "HH:mm")}
+											{isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
+												<>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
+											) : (
+												<>{format(parseISO(ticket.updatedAt), "MM/dd/yyyy")}</>
+											)}
 										</Typography>
 									)}
 								</span>

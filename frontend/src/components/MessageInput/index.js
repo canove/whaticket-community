@@ -102,10 +102,9 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const MessageInput = ({ searchParam }) => {
+const MessageInput = () => {
 	const classes = useStyles();
 	const { ticketId } = useParams();
-	// const userId = localStorage.getItem("userId");
 	const username = localStorage.getItem("username");
 
 	const mediaInitialState = { preview: "", raw: "", name: "" };
@@ -309,7 +308,7 @@ const MessageInput = ({ searchParam }) => {
 				</label>
 				<div className={classes.messageInputWrapper}>
 					<InputBase
-						inputRef={input => input && !searchParam && input.focus()}
+						inputRef={input => input && input.focus()}
 						className={classes.messageInput}
 						placeholder="Escreva uma mensagem"
 						multiline
