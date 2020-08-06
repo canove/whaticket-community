@@ -8,7 +8,15 @@ const Message = require("../models/Message");
 const { getIO } = require("../libs/socket");
 
 exports.index = async (req, res) => {
-	const { status = "", date = "", searchParam = "" } = req.query;
+	const {
+		pageNumber = 1,
+		status = "",
+		date = "",
+		searchParam = "",
+	} = req.query;
+
+	let limit = 20;
+	let offset = limit * (pageNumber - 1);
 
 	let whereCondition = {};
 	let includeCondition = [
@@ -41,6 +49,7 @@ exports.index = async (req, res) => {
 					),
 				},
 				required: false,
+				duplicating: false,
 			},
 		];
 
@@ -78,13 +87,16 @@ exports.index = async (req, res) => {
 		};
 	}
 
-	const tickets = await Ticket.findAll({
+	const { count, rows: tickets } = await Ticket.findAndCountAll({
 		where: whereCondition,
+		distinct: true,
 		include: includeCondition,
+		limit,
+		offset,
 		order: [["updatedAt", "DESC"]],
 	});
 
-	return res.json(tickets);
+	return res.json({ count, tickets });
 };
 
 exports.store = async (req, res) => {

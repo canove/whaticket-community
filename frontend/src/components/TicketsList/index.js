@@ -3,6 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import openSocket from "socket.io-client";
 import { parseISO, format } from "date-fns";
 import { toast } from "react-toastify";
+import InfiniteScroll from "react-infinite-scroller";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -60,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 		width: 120, // a number of your choice
 	},
 
-	openTicketsList: {
+	halfTicketsList: {
 		height: "50%",
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
@@ -74,7 +75,7 @@ const useStyles = makeStyles(theme => ({
 		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
-	closedTicketsList: {
+	fullHeightTicketsList: {
 		flex: 1,
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
@@ -245,6 +246,9 @@ const TicketsList = () => {
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 	const [showAllTickets, setShowAllTickets] = useState(false);
 
+	const [pageNumber, setPageNumber] = useState(1);
+	const [count, setCount] = useState(0);
+
 	useEffect(() => {
 		if (!("Notification" in window)) {
 			console.log("This browser doesn't support notifications");
@@ -255,17 +259,21 @@ const TicketsList = () => {
 
 	useEffect(() => {
 		setTickets([]);
-	}, [searchParam]);
+		setPageNumber(1);
+	}, [searchParam, tab]);
 
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchContacts = async () => {
 				try {
-					const res = await api.get("/tickets", {
-						params: { searchParam, status: tab },
+					const { data } = await api.get("/tickets", {
+						params: { searchParam, pageNumber, status: tab },
 					});
-					setTickets(res.data);
+					setTickets(prevState => {
+						return [...prevState, ...data.tickets];
+					});
+					setCount(data.count);
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
@@ -274,7 +282,9 @@ const TicketsList = () => {
 			fetchContacts();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, token, tab]);
+	}, [searchParam, pageNumber, token, tab]);
+
+	console.log(pageNumber);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
@@ -315,6 +325,11 @@ const TicketsList = () => {
 			socket.disconnect();
 		};
 	}, [ticketId, userId, history]);
+
+	const loadMore = () => {
+		if (loading) return;
+		setPageNumber(prevPageNumber => prevPageNumber + 1);
+	};
 
 	const updateTickets = ({ ticket }) => {
 		setTickets(prevState => {
@@ -388,7 +403,6 @@ const TicketsList = () => {
 
 	const handleSearchContact = e => {
 		if (e.target.value === "") {
-			// setTab("open");
 			setSearchParam(e.target.value.toLowerCase());
 			return;
 		}
@@ -423,8 +437,7 @@ const TicketsList = () => {
 		return ticketsFound;
 	};
 
-	console.log(tickets);
-	const renderTickets = (status, userId) => {
+	const RenderTickets = ({ status, userId }) => {
 		const viewTickets = tickets.map(ticket => {
 			if (
 				(ticket.status === status && ticket.userId === userId) ||
@@ -521,7 +534,7 @@ const TicketsList = () => {
 			else return null;
 		});
 
-		if (loading) {
+		if (loading && status !== "all" && status !== "closed") {
 			return <TicketsSkeleton />;
 		} else if (
 			countTickets(status, userId) === "" &&
@@ -544,6 +557,22 @@ const TicketsList = () => {
 		} else {
 			return viewTickets;
 		}
+	};
+
+	const RenderInfiniteScroll = ({ children, loadingKey }) => {
+		return (
+			<InfiniteScroll
+				pageStart={0}
+				loadMore={loadMore}
+				hasMore={!(tickets.length === count)}
+				useWindow={false}
+				initialLoad={false}
+				threshold={100}
+				loader={<TicketsSkeleton key={loadingKey} />}
+			>
+				<List style={{ paddingTop: 0 }}>{children}</List>
+			</InfiniteScroll>
+		);
 	};
 
 	return (
@@ -586,55 +615,55 @@ const TicketsList = () => {
 					<SearchIcon className={classes.searchIcon} />
 					<InputBase
 						className={classes.contactsSearchInput}
-						placeholder="Buscar contatos"
+						placeholder="Pesquisar tickets e mensagens"
 						type="search"
 						onChange={handleSearchContact}
 					/>
 				</div>
 			</Paper>
 			<TabPanel value={tab} index={"open"} className={classes.contactsWrapper}>
-				<Paper square elevation={0} className={classes.openTicketsList}>
-					<List style={{ paddingTop: 0 }}>
-						<div className={classes.ticketsListHeader}>
-							Atendendo
-							<span className={classes.ticketsCount}>
-								{countTickets("open", userId)}
-							</span>
-							<div className={classes.ticketsListActions}>
-								<FormControlLabel
-									label="Todos"
-									labelPlacement="start"
-									control={
-										<Switch
-											size="small"
-											checked={showAllTickets}
-											onChange={e => setShowAllTickets(prevState => !prevState)}
-											name="showAllTickets"
-											color="primary"
-										/>
-									}
-								/>
-								<IconButton
-									aria-label="add ticket"
-									onClick={e => setNewTicketModalOpen(true)}
-									style={{ marginLeft: 20 }}
-								>
-									<AddIcon />
-								</IconButton>
-							</div>
+				<Paper square elevation={0} className={classes.halfTicketsList}>
+					<div className={classes.ticketsListHeader}>
+						Atendendo
+						<span className={classes.ticketsCount}>
+							{countTickets("open", userId)}
+						</span>
+						<div className={classes.ticketsListActions}>
+							<FormControlLabel
+								label="Todos"
+								labelPlacement="start"
+								control={
+									<Switch
+										size="small"
+										checked={showAllTickets}
+										onChange={e => setShowAllTickets(prevState => !prevState)}
+										name="showAllTickets"
+										color="primary"
+									/>
+								}
+							/>
+							<IconButton
+								aria-label="add ticket"
+								onClick={e => setNewTicketModalOpen(true)}
+								style={{ marginLeft: 20 }}
+							>
+								<AddIcon />
+							</IconButton>
 						</div>
-						{renderTickets("open", userId)}
+					</div>
+					<List style={{ paddingTop: 0 }}>
+						<RenderTickets status="open" userId={userId} />
 					</List>
 				</Paper>
-				<Paper square elevation={0} className={classes.openTicketsList}>
+				<Paper square elevation={0} className={classes.halfTicketsList}>
+					<div className={classes.ticketsListHeader}>
+						Aguardando
+						<span className={classes.ticketsCount}>
+							{countTickets("pending", null)}
+						</span>
+					</div>
 					<List style={{ paddingTop: 0 }}>
-						<div className={classes.ticketsListHeader}>
-							Aguardando
-							<span className={classes.ticketsCount}>
-								{countTickets("pending", null)}
-							</span>
-						</div>
-						{renderTickets("pending", null)}
+						<RenderTickets status="pending" userId={null} />
 					</List>
 				</Paper>
 			</TabPanel>
@@ -643,8 +672,10 @@ const TicketsList = () => {
 				index={"closed"}
 				className={classes.contactsWrapper}
 			>
-				<Paper square elevation={0} className={classes.closedTicketsList}>
-					<List>{renderTickets("closed", userId)}</List>
+				<Paper square elevation={0} className={classes.fullHeightTicketsList}>
+					<RenderInfiniteScroll loadingKey="loading-closed">
+						<RenderTickets status="closed" userId={null} />
+					</RenderInfiniteScroll>
 				</Paper>
 			</TabPanel>
 			<TabPanel
@@ -652,25 +683,21 @@ const TicketsList = () => {
 				index={"search"}
 				className={classes.contactsWrapper}
 			>
-				<Paper square elevation={0} className={classes.closedTicketsList}>
-					{loading ? (
-						<TicketsSkeleton />
-					) : (
-						<>
-							{tickets.length === 0 ? (
-								<div className={classes.noTicketsDiv}>
-									<span className={classes.noTicketsTitle}>
-										"Nada encontrado"
-									</span>
-									<p className={classes.noTicketsText}>
-										Tente buscar por outro termo.
-									</p>
-								</div>
-							) : (
-								<List>{renderTickets("all")}</List>
-							)}
-						</>
-					)}
+				<Paper square elevation={0} className={classes.fullHeightTicketsList}>
+					<>
+						{tickets.length === 0 && !loading ? (
+							<div className={classes.noTicketsDiv}>
+								<span className={classes.noTicketsTitle}>Nada encontrado</span>
+								<p className={classes.noTicketsText}>
+									Tente buscar por outro termo.
+								</p>
+							</div>
+						) : (
+							<RenderInfiniteScroll loadingKey="loading-all">
+								<RenderTickets status="all" />
+							</RenderInfiniteScroll>
+						)}
+					</>
 				</Paper>
 			</TabPanel>
 			<audio id="sound" preload="auto">

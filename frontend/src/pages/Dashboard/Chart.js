@@ -36,10 +36,10 @@ const Chart = () => {
 	useEffect(() => {
 		const feathTickets = async () => {
 			try {
-				const res = await api.get("/tickets", {
+				const { data } = await api.get("/tickets", {
 					params: { date: new Date().toISOString() },
 				});
-				let ticketsData = res.data;
+				const ticketsData = data.tickets;
 				setTickets(ticketsData);
 				setChartData(prevState => {
 					let aux = [...prevState];

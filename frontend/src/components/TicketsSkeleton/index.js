@@ -18,7 +18,7 @@ const TicketsSkeleton = () => {
 					secondary={<Skeleton animation="wave" height={20} width={90} />}
 				/>
 			</ListItem>
-			<Divider />
+			<Divider variant="inset" />
 			<ListItem dense>
 				<ListItemAvatar>
 					<Skeleton animation="wave" variant="circle" width={40} height={40} />
@@ -28,7 +28,7 @@ const TicketsSkeleton = () => {
 					secondary={<Skeleton animation="wave" height={20} width={120} />}
 				/>
 			</ListItem>
-			<Divider />
+			<Divider variant="inset" />
 			<ListItem dense>
 				<ListItemAvatar>
 					<Skeleton animation="wave" variant="circle" width={40} height={40} />
@@ -38,7 +38,7 @@ const TicketsSkeleton = () => {
 					secondary={<Skeleton animation="wave" height={20} width={90} />}
 				/>
 			</ListItem>
-			<Divider />
+			<Divider variant="inset" />
 		</>
 	);
 };
