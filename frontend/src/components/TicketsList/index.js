@@ -254,6 +254,10 @@ const TicketsList = () => {
 	}, []);
 
 	useEffect(() => {
+		setTickets([]);
+	}, [searchParam]);
+
+	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchContacts = async () => {
@@ -384,7 +388,8 @@ const TicketsList = () => {
 
 	const handleSearchContact = e => {
 		if (e.target.value === "") {
-			setTab("open");
+			// setTab("open");
+			setSearchParam(e.target.value.toLowerCase());
 			return;
 		}
 		setSearchParam(e.target.value.toLowerCase());
@@ -418,13 +423,14 @@ const TicketsList = () => {
 		return ticketsFound;
 	};
 
+	console.log(tickets);
 	const renderTickets = (status, userId) => {
 		const viewTickets = tickets.map(ticket => {
 			if (
 				(ticket.status === status && ticket.userId === userId) ||
 				(ticket.status === status && showAllTickets) ||
 				(ticket.status === "closed" && status === "closed") ||
-				searchParam
+				status === "all"
 			)
 				return (
 					<React.Fragment key={ticket.id}>
@@ -517,23 +523,25 @@ const TicketsList = () => {
 
 		if (loading) {
 			return <TicketsSkeleton />;
-		}
-
-		// else if (countTickets(status, userId) === "" && status !== "closed") {
-		// 	return (
-		// 		<div className={classes.noTicketsDiv}>
-		// 			<span className={classes.noTicketsTitle}>
-		// 				{status === "pending" ? "Tudo resolvido" : "Pronto pra mais?"}
-		// 			</span>
-		// 			<p className={classes.noTicketsText}>
-		// 				{status === "pending"
-		// 					? "Nenhum ticket pendente por enquanto. Hora do café!"
-		// 					: "Aceite um ticket da fila para começar."}
-		// 			</p>
-		// 		</div>
-		// 	);
-		// }
-		else {
+		} else if (
+			countTickets(status, userId) === "" &&
+			status !== "closed" &&
+			status !== "all"
+		) {
+			return (
+				<div className={classes.noTicketsDiv}>
+					<span className={classes.noTicketsTitle}>
+						{status === "pending" && "Tudo resolvido"}
+						{status === "open" && "Pronto pra mais?"}
+					</span>
+					<p className={classes.noTicketsText}>
+						{status === "pending" &&
+							"Nenhum ticket pendente por enquanto. Hora do café!"}
+						{status === "open" && "Aceite um ticket da fila para começar."}
+					</p>
+				</div>
+			);
+		} else {
 			return viewTickets;
 		}
 	};
@@ -645,7 +653,24 @@ const TicketsList = () => {
 				className={classes.contactsWrapper}
 			>
 				<Paper square elevation={0} className={classes.closedTicketsList}>
-					<List>{renderTickets()}</List>
+					{loading ? (
+						<TicketsSkeleton />
+					) : (
+						<>
+							{tickets.length === 0 ? (
+								<div className={classes.noTicketsDiv}>
+									<span className={classes.noTicketsTitle}>
+										"Nada encontrado"
+									</span>
+									<p className={classes.noTicketsText}>
+										Tente buscar por outro termo.
+									</p>
+								</div>
+							) : (
+								<List>{renderTickets("all")}</List>
+							)}
+						</>
+					)}
 				</Paper>
 			</TabPanel>
 			<audio id="sound" preload="auto">
