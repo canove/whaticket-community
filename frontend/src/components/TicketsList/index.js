@@ -55,6 +55,11 @@ const useStyles = makeStyles(theme => ({
 		padding: 8,
 	},
 
+	tab: {
+		minWidth: 120, // a number of your choice
+		width: 120, // a number of your choice
+	},
+
 	openTicketsList: {
 		height: "50%",
 		overflowY: "scroll",
@@ -172,10 +177,17 @@ const useStyles = makeStyles(theme => ({
 
 	contactNameWrapper: {
 		display: "flex",
-		// display: "inline",
+		justifyContent: "space-between",
 	},
 
 	lastMessageTime: {
+		justifySelf: "flex-end",
+	},
+
+	closedBadge: {
+		alignSelf: "center",
+		justifySelf: "flex-end",
+		marginRight: 32,
 		marginLeft: "auto",
 	},
 
@@ -203,6 +215,21 @@ const useStyles = makeStyles(theme => ({
 		// marginLeft: -12,
 	},
 }));
+
+const TabPanel = ({ children, value, index, ...rest }) => {
+	if (value === index) {
+		return (
+			<div
+				role="tabpanel"
+				id={`simple-tabpanel-${index}`}
+				aria-labelledby={`simple-tab-${index}`}
+				{...rest}
+			>
+				<>{children}</>
+			</div>
+		);
+	} else return null;
+};
 
 const TicketsList = () => {
 	const classes = useStyles();
@@ -356,7 +383,12 @@ const TicketsList = () => {
 	};
 
 	const handleSearchContact = e => {
+		if (e.target.value === "") {
+			setTab("open");
+			return;
+		}
 		setSearchParam(e.target.value.toLowerCase());
+		setTab("search");
 	};
 
 	const handleChangeTab = (event, newValue) => {
@@ -391,7 +423,8 @@ const TicketsList = () => {
 			if (
 				(ticket.status === status && ticket.userId === userId) ||
 				(ticket.status === status && showAllTickets) ||
-				(ticket.status === "closed" && status === "closed")
+				(ticket.status === "closed" && status === "closed") ||
+				searchParam
 			)
 				return (
 					<React.Fragment key={ticket.id}>
@@ -423,6 +456,13 @@ const TicketsList = () => {
 										>
 											{ticket.contact.name}
 										</Typography>
+										{ticket.status === "closed" && (
+											<Badge
+												className={classes.closedBadge}
+												badgeContent={"closed"}
+												color="primary"
+											/>
+										)}
 										{ticket.lastMessage && (
 											<Typography
 												className={classes.lastMessageTime}
@@ -446,6 +486,7 @@ const TicketsList = () => {
 										>
 											{ticket.lastMessage || <br />}
 										</Typography>
+
 										<Badge
 											className={classes.newMessagesCount}
 											badgeContent={ticket.unreadMessages}
@@ -476,20 +517,23 @@ const TicketsList = () => {
 
 		if (loading) {
 			return <TicketsSkeleton />;
-		} else if (countTickets(status, userId) === "" && status !== "closed") {
-			return (
-				<div className={classes.noTicketsDiv}>
-					<span className={classes.noTicketsTitle}>
-						{status === "pending" ? "Tudo resolvido" : "Pronto pra mais?"}
-					</span>
-					<p className={classes.noTicketsText}>
-						{status === "pending"
-							? "Nenhum ticket pendente por enquanto. Hora do café!"
-							: "Aceite um ticket da fila para começar."}
-					</p>
-				</div>
-			);
-		} else {
+		}
+
+		// else if (countTickets(status, userId) === "" && status !== "closed") {
+		// 	return (
+		// 		<div className={classes.noTicketsDiv}>
+		// 			<span className={classes.noTicketsTitle}>
+		// 				{status === "pending" ? "Tudo resolvido" : "Pronto pra mais?"}
+		// 			</span>
+		// 			<p className={classes.noTicketsText}>
+		// 				{status === "pending"
+		// 					? "Nenhum ticket pendente por enquanto. Hora do café!"
+		// 					: "Aceite um ticket da fila para começar."}
+		// 			</p>
+		// 		</div>
+		// 	);
+		// }
+		else {
 			return viewTickets;
 		}
 	};
@@ -510,14 +554,22 @@ const TicketsList = () => {
 					aria-label="icon label tabs example"
 				>
 					<Tab
-						value="open"
+						value={"open"}
 						icon={<MoveToInboxIcon />}
-						label="Caixa de Entrada"
+						label="Inbox"
+						classes={{ root: classes.tab }}
 					/>
 					<Tab
-						value="closed"
+						value={"closed"}
 						icon={<CheckCircleOutlineIcon />}
 						label="Resolvidos"
+						classes={{ root: classes.tab }}
+					/>
+					<Tab
+						value={"search"}
+						icon={<SearchIcon />}
+						label="Busca"
+						classes={{ root: classes.tab }}
 					/>
 				</Tabs>
 			</Paper>
@@ -532,60 +584,70 @@ const TicketsList = () => {
 					/>
 				</div>
 			</Paper>
-			{tab === "open" ? (
-				<>
-					<Paper square elevation={0} className={classes.openTicketsList}>
-						<List style={{ paddingTop: 0 }}>
-							<div className={classes.ticketsListHeader}>
-								Atendendo
-								<span className={classes.ticketsCount}>
-									{countTickets("open", userId)}
-								</span>
-								<div className={classes.ticketsListActions}>
-									<FormControlLabel
-										label="Todos"
-										labelPlacement="start"
-										control={
-											<Switch
-												size="small"
-												checked={showAllTickets}
-												onChange={e =>
-													setShowAllTickets(prevState => !prevState)
-												}
-												name="showAllTickets"
-												color="primary"
-											/>
-										}
-									/>
-									<IconButton
-										aria-label="add ticket"
-										onClick={e => setNewTicketModalOpen(true)}
-										style={{ marginLeft: 20 }}
-									>
-										<AddIcon />
-									</IconButton>
-								</div>
+			<TabPanel value={tab} index={"open"} className={classes.contactsWrapper}>
+				<Paper square elevation={0} className={classes.openTicketsList}>
+					<List style={{ paddingTop: 0 }}>
+						<div className={classes.ticketsListHeader}>
+							Atendendo
+							<span className={classes.ticketsCount}>
+								{countTickets("open", userId)}
+							</span>
+							<div className={classes.ticketsListActions}>
+								<FormControlLabel
+									label="Todos"
+									labelPlacement="start"
+									control={
+										<Switch
+											size="small"
+											checked={showAllTickets}
+											onChange={e => setShowAllTickets(prevState => !prevState)}
+											name="showAllTickets"
+											color="primary"
+										/>
+									}
+								/>
+								<IconButton
+									aria-label="add ticket"
+									onClick={e => setNewTicketModalOpen(true)}
+									style={{ marginLeft: 20 }}
+								>
+									<AddIcon />
+								</IconButton>
 							</div>
-							{renderTickets("open", userId)}
-						</List>
-					</Paper>
-					<Paper square elevation={0} className={classes.openTicketsList}>
-						<List style={{ paddingTop: 0 }}>
-							<div className={classes.ticketsListHeader}>
-								Aguardando
-								<span className={classes.ticketsCount}>
-									{countTickets("pending", null)}
-								</span>
-							</div>
-							{renderTickets("pending", null)}
-						</List>
-					</Paper>
-				</>
-			) : (
+						</div>
+						{renderTickets("open", userId)}
+					</List>
+				</Paper>
+				<Paper square elevation={0} className={classes.openTicketsList}>
+					<List style={{ paddingTop: 0 }}>
+						<div className={classes.ticketsListHeader}>
+							Aguardando
+							<span className={classes.ticketsCount}>
+								{countTickets("pending", null)}
+							</span>
+						</div>
+						{renderTickets("pending", null)}
+					</List>
+				</Paper>
+			</TabPanel>
+			<TabPanel
+				value={tab}
+				index={"closed"}
+				className={classes.contactsWrapper}
+			>
 				<Paper square elevation={0} className={classes.closedTicketsList}>
 					<List>{renderTickets("closed", userId)}</List>
 				</Paper>
-			)}
+			</TabPanel>
+			<TabPanel
+				value={tab}
+				index={"search"}
+				className={classes.contactsWrapper}
+			>
+				<Paper square elevation={0} className={classes.closedTicketsList}>
+					<List>{renderTickets()}</List>
+				</Paper>
+			</TabPanel>
 			<audio id="sound" preload="auto">
 				<source src={require("../../assets/sound.mp3")} type="audio/mpeg" />
 				<source src={require("../../assets/sound.ogg")} type="audio/ogg" />
