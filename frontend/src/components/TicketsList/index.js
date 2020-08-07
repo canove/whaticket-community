@@ -149,7 +149,7 @@ const TicketsList = ({
 											{isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
 												<>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
 											) : (
-												<>{format(parseISO(ticket.updatedAt), "MM/dd/yyyy")}</>
+												<>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
 											)}
 										</Typography>
 									)}

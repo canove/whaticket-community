@@ -248,8 +248,7 @@ const Tickets = () => {
 	}, [ticketId, userId, history]);
 
 	const loadMore = () => {
-		if (loading) return;
-		setPageNumber(prevPageNumber => prevPageNumber + 1);
+		setPageNumber(prevState => prevState + 1);
 	};
 
 	const updateTickets = ({ ticket }) => {
@@ -362,8 +361,8 @@ const Tickets = () => {
 		return (
 			<InfiniteScroll
 				pageStart={0}
-				loadMore={loadMore}
-				hasMore={!(tickets.length === count)}
+				loadMore={() => !loading && loadMore()}
+				hasMore={count > tickets.length}
 				useWindow={false}
 				initialLoad={false}
 				threshold={100}
