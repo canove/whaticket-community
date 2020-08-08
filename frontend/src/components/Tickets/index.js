@@ -3,7 +3,6 @@ import { useHistory, useParams } from "react-router-dom";
 import openSocket from "socket.io-client";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
-import InfiniteScroll from "react-infinite-scroller";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -27,7 +26,7 @@ import TabPanel from "../TabPanel";
 import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
-	contactsWrapper: {
+	ticketsWrapper: {
 		position: "relative",
 		display: "flex",
 		height: "100%",
@@ -330,6 +329,15 @@ const Tickets = () => {
 		setTab("search");
 	};
 
+	const handleScroll = e => {
+		if (count === tickets.length || loading) return;
+		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+		if (scrollHeight - (scrollTop + 100) < clientHeight) {
+			loadMore();
+		}
+	};
+
 	const handleChangeTab = (event, newValue) => {
 		setTab(newValue);
 	};
@@ -357,38 +365,8 @@ const Tickets = () => {
 		return ticketsFound;
 	};
 
-	const CustomInfiniteScroll = ({ children, loadingKey }) => {
-		return (
-			<InfiniteScroll
-				pageStart={0}
-				loadMore={() => !loading && loadMore()}
-				hasMore={count > tickets.length}
-				useWindow={false}
-				initialLoad={false}
-				threshold={100}
-				loader={<TicketsSkeleton key={loadingKey} />}
-			>
-				<List style={{ paddingTop: 0 }}>{children}</List>
-			</InfiniteScroll>
-		);
-	};
-
-	const CustomTicketList = ({ ...rest }) => {
-		return (
-			<TicketsList
-				tickets={tickets}
-				loading={loading}
-				handleSelectTicket={handleSelectTicket}
-				showAllTickets={showAllTickets}
-				ticketId={ticketId}
-				handleAcepptTicket={handleAcepptTicket}
-				{...rest}
-			/>
-		);
-	};
-
 	return (
-		<Paper elevation={0} variant="outlined" className={classes.contactsWrapper}>
+		<Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
 			<NewTicketModal
 				modalOpen={newTicketModalOpen}
 				onClose={e => setNewTicketModalOpen(false)}
@@ -433,8 +411,13 @@ const Tickets = () => {
 					/>
 				</div>
 			</Paper>
-			<TabPanel value={tab} name={"open"} className={classes.contactsWrapper}>
-				<Paper square elevation={0} className={classes.halfTicketsList}>
+			<TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
+				<Paper
+					square
+					elevation={0}
+					className={classes.halfTicketsList}
+					onScroll={handleScroll}
+				>
 					<div className={classes.ticketsListHeader}>
 						Atendendo
 						<span className={classes.ticketsCount}>
@@ -464,19 +447,27 @@ const Tickets = () => {
 						</div>
 					</div>
 					<List style={{ paddingTop: 0 }}>
-						{loading ? (
-							<TicketsSkeleton />
-						) : (
-							<CustomTicketList
-								noTicketsTitle="Pronto pra mais?"
-								noTicketsMessage="Aceite um ticket da fila para começar."
-								status="open"
-								userId={userId}
-							/>
-						)}
+						<TicketsList
+							tickets={tickets}
+							loading={loading}
+							handleSelectTicket={handleSelectTicket}
+							showAllTickets={showAllTickets}
+							ticketId={ticketId}
+							handleAcepptTicket={handleAcepptTicket}
+							noTicketsTitle="Pronto pra mais?"
+							noTicketsMessage="Aceite um ticket da fila para começar."
+							status="open"
+							userId={userId}
+						/>
+						{loading && <TicketsSkeleton />}
 					</List>
 				</Paper>
-				<Paper square elevation={0} className={classes.halfTicketsList}>
+				<Paper
+					square
+					elevation={0}
+					className={classes.halfTicketsList}
+					onScroll={handleScroll}
+				>
 					<div className={classes.ticketsListHeader}>
 						Aguardando
 						<span className={classes.ticketsCount}>
@@ -484,7 +475,13 @@ const Tickets = () => {
 						</span>
 					</div>
 					<List style={{ paddingTop: 0 }}>
-						<CustomTicketList
+						<TicketsList
+							tickets={tickets}
+							loading={loading}
+							handleSelectTicket={handleSelectTicket}
+							showAllTickets={showAllTickets}
+							ticketId={ticketId}
+							handleAcepptTicket={handleAcepptTicket}
 							noTicketsTitle="Tudo resolvido"
 							noTicketsMessage="Nenhum Ticket pendente"
 							status="pending"
@@ -493,22 +490,48 @@ const Tickets = () => {
 					</List>
 				</Paper>
 			</TabPanel>
-			<TabPanel value={tab} name="closed" className={classes.contactsWrapper}>
-				<Paper square elevation={0} className={classes.fullHeightTicketsList}>
-					<CustomInfiniteScroll loadingKey="loading-closed">
-						<CustomTicketList status="closed" userId={null} />
-					</CustomInfiniteScroll>
+			<TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
+				<Paper
+					square
+					elevation={0}
+					className={classes.fullHeightTicketsList}
+					onScroll={handleScroll}
+				>
+					<List style={{ paddingTop: 0 }}>
+						<TicketsList
+							tickets={tickets}
+							loading={loading}
+							handleSelectTicket={handleSelectTicket}
+							showAllTickets={showAllTickets}
+							ticketId={ticketId}
+							handleAcepptTicket={handleAcepptTicket}
+							status="closed"
+							userId={null}
+						/>
+					</List>
 				</Paper>
 			</TabPanel>
-			<TabPanel value={tab} name="search" className={classes.contactsWrapper}>
-				<Paper square elevation={0} className={classes.fullHeightTicketsList}>
-					<CustomInfiniteScroll loadingKey="loading-all">
-						<CustomTicketList
+			<TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
+				<Paper
+					square
+					elevation={0}
+					className={classes.fullHeightTicketsList}
+					onScroll={handleScroll}
+				>
+					<List style={{ paddingTop: 0 }}>
+						<TicketsList
+							tickets={tickets}
+							loading={loading}
+							handleSelectTicket={handleSelectTicket}
+							showAllTickets={showAllTickets}
+							ticketId={ticketId}
+							handleAcepptTicket={handleAcepptTicket}
 							noTicketsTitle="Nada encontrado"
 							noTicketsMessage="Tente buscar por outro termo"
 							status="all"
 						/>
-					</CustomInfiniteScroll>
+					</List>
+					{loading && <TicketsSkeleton />}
 				</Paper>
 			</TabPanel>
 			<audio id="sound" preload="auto">

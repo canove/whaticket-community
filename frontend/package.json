@@ -19,7 +19,6 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-infinite-scroll-reverse": "^1.0.3",
-    "react-infinite-scroller": "^1.2.4",
     "react-linkify": "^1.0.0-alpha",
     "react-modal-image": "^2.5.0",
     "react-router-dom": "^5.2.0",
