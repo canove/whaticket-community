@@ -4,7 +4,6 @@ import { useParams, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "socket.io-client";
-import InfiniteScrollReverse from "react-infinite-scroll-reverse";
 import ModalImage from "react-modal-image";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -99,6 +98,7 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: "column",
 		flexGrow: 1,
 		padding: "20px 20px 20px 20px",
+		// scrollBehavior: "smooth",
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
@@ -233,8 +233,8 @@ const MessagesList = () => {
 	const [contact, setContact] = useState({});
 	const [ticket, setTicket] = useState({});
 	const [messagesList, setMessagesList] = useState([]);
-	const [hasMore, setHasMore] = useState(false);
-	const [pageNumber, setPageNumber] = useState(0);
+	const [count, setCount] = useState(0);
+	const [pageNumber, setPageNumber] = useState(1);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const lastMessageRef = useRef();
 
@@ -246,17 +246,18 @@ const MessagesList = () => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchMessages = async () => {
 				try {
-					const res = await api.get("/messages/" + ticketId, {
+					const { data } = await api.get("/messages/" + ticketId, {
 						params: { pageNumber },
 					});
-					setContact(res.data.ticket.contact);
-					setTicket(res.data.ticket);
+					setContact(data.ticket.contact);
+					setTicket(data.ticket);
 					setMessagesList(prevMessages => {
-						return [...res.data.messages, ...prevMessages];
+						return [...data.messages, ...prevMessages];
 					});
-					setHasMore(res.data.messages.length > 0);
+					setCount(data.count);
+					// setHasMore(res.data.messages.length > 0);
 					setLoading(false);
-					if (pageNumber === 1 && res.data.messages.length > 1) {
+					if (pageNumber === 1 && data.messages.length > 1) {
 						scrollToBottom();
 					}
 				} catch (err) {
@@ -411,6 +412,23 @@ const MessagesList = () => {
 			return (
 				<DoneAllIcon fontSize="small" className={classes.ackDoneAllIcon} />
 			);
+		}
+	};
+
+	const handleScroll = e => {
+		if (count === messagesList.length) return;
+		const { scrollTop } = e.currentTarget;
+
+		if (scrollTop === 0) {
+			document.getElementById("messagesList").scrollTop = 50;
+		}
+
+		if (loading) {
+			return;
+		}
+
+		if (scrollTop < 50) {
+			loadMore();
 		}
 	};
 
@@ -593,15 +611,13 @@ const MessagesList = () => {
 					)}
 				</Card>
 				<div className={classes.messagesListWrapper}>
-					<InfiniteScrollReverse
+					<div
+						id="messagesList"
 						className={classes.messagesList}
-						hasMore={hasMore}
-						isLoading={loading}
-						loadMore={loadMore}
-						loadArea={10}
+						onScroll={handleScroll}
 					>
 						{messagesList.length > 0 ? renderMessages() : []}
-					</InfiniteScrollReverse>
+					</div>
 					<MessageInput />
 					{loading ? (
 						<div>

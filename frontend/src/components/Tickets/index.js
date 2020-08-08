@@ -162,7 +162,7 @@ const Tickets = () => {
 	const userId = +localStorage.getItem("userId");
 	const { ticketId } = useParams();
 	const [tickets, setTickets] = useState([]);
-	const [loading, setLoading] = useState();
+	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
@@ -338,7 +338,7 @@ const Tickets = () => {
 		}
 	};
 
-	const handleChangeTab = (event, newValue) => {
+	const handleChangeTab = (e, newValue) => {
 		setTab(newValue);
 	};
 
@@ -482,11 +482,12 @@ const Tickets = () => {
 							showAllTickets={showAllTickets}
 							ticketId={ticketId}
 							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle="Tudo resolvido"
-							noTicketsMessage="Nenhum Ticket pendente"
+							noTicketsTitle="Tudo resolvido!"
+							noTicketsMessage="Nenhum ticket pendente."
 							status="pending"
 							userId={null}
 						/>
+						{loading && <TicketsSkeleton />}
 					</List>
 				</Paper>
 			</TabPanel>
@@ -508,6 +509,7 @@ const Tickets = () => {
 							status="closed"
 							userId={null}
 						/>
+						{loading && <TicketsSkeleton />}
 					</List>
 				</Paper>
 			</TabPanel>
@@ -526,12 +528,12 @@ const Tickets = () => {
 							showAllTickets={showAllTickets}
 							ticketId={ticketId}
 							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle="Nada encontrado"
-							noTicketsMessage="Tente buscar por outro termo"
+							noTicketsTitle="Nada encontrado!"
+							noTicketsMessage="Tente buscar por outro termo."
 							status="all"
 						/>
+						{loading && <TicketsSkeleton />}
 					</List>
-					{loading && <TicketsSkeleton />}
 				</Paper>
 			</TabPanel>
 			<audio id="sound" preload="auto">

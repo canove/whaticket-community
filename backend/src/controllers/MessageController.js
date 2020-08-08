@@ -73,6 +73,8 @@ exports.index = async (req, res, next) => {
 		order: [["createdAt", "DESC"]],
 	});
 
+	const count = await ticket.countMessages();
+
 	const serializedMessages = ticketMessages.map(message => {
 		return {
 			...message.dataValues,
@@ -86,7 +88,8 @@ exports.index = async (req, res, next) => {
 
 	return res.json({
 		messages: serializedMessages.reverse(),
-		ticket: ticket,
+		ticket,
+		count,
 	});
 };
 
