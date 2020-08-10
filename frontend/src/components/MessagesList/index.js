@@ -267,7 +267,7 @@ const MessagesList = () => {
 				}
 			};
 			fetchMessages();
-		}, 1000);
+		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [pageNumber, ticketId, history]);
 
@@ -284,16 +284,19 @@ const MessagesList = () => {
 
 	useEffect(() => {
 		socket.on("appMessage", data => {
-			if (data.action === "create" && !loading) {
+			if (loading) return;
+
+			if (data.action === "create") {
 				addMessage(data.message);
 				scrollToBottom();
-			} else if (data.action === "update") {
+			}
+			if (data.action === "update") {
 				updateMessageAck(data.message);
 			}
 		});
 
 		socket.on("contact", data => {
-			if (data.action === "update" && !loading) {
+			if (data.action === "update") {
 				setContact(data.contact);
 			}
 		});

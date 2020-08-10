@@ -219,13 +219,17 @@ const Tickets = () => {
 
 	useEffect(() => {
 		socket.on("ticket", data => {
-			if (data.action === "updateUnread" && !loading) {
+			if (loading) return;
+
+			if (data.action === "updateUnread") {
 				resetUnreadMessages(data);
 			}
+
 			if (data.action === "updateStatus" || data.action === "create") {
 				updateTickets(data);
 			}
-			if (data.action === "delete" && !loading) {
+
+			if (data.action === "delete") {
 				deleteTicket(data);
 				if (ticketId && data.ticketId === +ticketId) {
 					toast.warn("O ticket que você estava foi deletado.");
@@ -235,7 +239,9 @@ const Tickets = () => {
 		});
 
 		socket.on("appMessage", data => {
-			if (data.action === "create" && !loading) {
+			if (loading) return;
+
+			if (data.action === "create") {
 				updateTickets(data);
 				if (
 					(ticketId &&
@@ -249,6 +255,8 @@ const Tickets = () => {
 		});
 	}, [history, ticketId, userId, loading]);
 
+	console.log(tickets);
+
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
 	};
@@ -257,13 +265,17 @@ const Tickets = () => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
 
-			if (ticketIndex === -1) {
-				return [ticket, ...prevState];
+			if (prevState.length >= 20) {
+				if (ticketIndex !== -1) {
+					let aux = [...prevState];
+					aux[ticketIndex] = ticket;
+					aux.unshift(aux.splice(ticketIndex, 1)[0]);
+					return aux;
+				} else {
+					return [ticket, ...prevState];
+				}
 			} else {
-				let aux = [...prevState];
-				aux[ticketIndex] = ticket;
-				aux.unshift(aux.splice(ticketIndex, 1)[0]);
-				return aux;
+				return [ticket, ...prevState];
 			}
 		});
 	};
