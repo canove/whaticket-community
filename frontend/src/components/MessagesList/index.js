@@ -221,12 +221,13 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 const MessagesList = () => {
 	const { ticketId } = useParams();
 	const history = useHistory();
 	const classes = useStyles();
 
-	const token = localStorage.getItem("token");
 	const userId = +localStorage.getItem("userId");
 
 	const [loading, setLoading] = useState(true);
@@ -255,7 +256,6 @@ const MessagesList = () => {
 						return [...data.messages, ...prevMessages];
 					});
 					setCount(data.count);
-					// setHasMore(res.data.messages.length > 0);
 					setLoading(false);
 					if (pageNumber === 1 && data.messages.length > 1) {
 						scrollToBottom();
@@ -269,15 +269,21 @@ const MessagesList = () => {
 			fetchMessages();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
-	}, [pageNumber, ticketId, token, history]);
+	}, [pageNumber, ticketId, history]);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-
 		socket.emit("joinChatBox", ticketId, () => {});
 
+		return () => {
+			socket.disconnect();
+			setPageNumber(1);
+			setMessagesList([]);
+		};
+	}, [ticketId]);
+
+	useEffect(() => {
 		socket.on("appMessage", data => {
-			if (data.action === "create") {
+			if (data.action === "create" && !loading) {
 				addMessage(data.message);
 				scrollToBottom();
 			} else if (data.action === "update") {
@@ -286,17 +292,11 @@ const MessagesList = () => {
 		});
 
 		socket.on("contact", data => {
-			if (data.action === "update") {
+			if (data.action === "update" && !loading) {
 				setContact(data.contact);
 			}
 		});
-
-		return () => {
-			socket.disconnect();
-			setPageNumber(1);
-			setMessagesList([]);
-		};
-	}, [ticketId]);
+	}, [loading]);
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);
@@ -316,20 +316,38 @@ const MessagesList = () => {
 	};
 
 	const updateMessageAck = message => {
-		let id = message.id;
 		setMessagesList(prevState => {
-			let aux = [...prevState];
-			let messageIndex = aux.findIndex(message => message.id === id);
+			const messageIndex = prevState.findIndex(m => m.id === message.id);
 			if (messageIndex !== -1) {
+				let aux = [...prevState];
 				aux[messageIndex].ack = message.ack;
+				return aux;
+			} else {
+				return prevState;
 			}
-			return aux;
 		});
 	};
 
 	const scrollToBottom = () => {
 		if (lastMessageRef.current) {
 			lastMessageRef.current.scrollIntoView({});
+		}
+	};
+
+	const handleScroll = e => {
+		if (count === messagesList.length) return;
+		const { scrollTop } = e.currentTarget;
+
+		if (scrollTop === 0) {
+			document.getElementById("messagesList").scrollTop = 1;
+		}
+
+		if (loading) {
+			return;
+		}
+
+		if (scrollTop < 50) {
+			loadMore();
 		}
 	};
 
@@ -412,23 +430,6 @@ const MessagesList = () => {
 			return (
 				<DoneAllIcon fontSize="small" className={classes.ackDoneAllIcon} />
 			);
-		}
-	};
-
-	const handleScroll = e => {
-		if (count === messagesList.length) return;
-		const { scrollTop } = e.currentTarget;
-
-		if (scrollTop === 0) {
-			document.getElementById("messagesList").scrollTop = 50;
-		}
-
-		if (loading) {
-			return;
-		}
-
-		if (scrollTop < 50) {
-			loadMore();
 		}
 	};
 
