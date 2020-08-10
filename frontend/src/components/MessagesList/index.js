@@ -221,7 +221,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+let socket;
 
 const MessagesList = () => {
 	const { ticketId } = useParams();
@@ -272,6 +272,7 @@ const MessagesList = () => {
 	}, [pageNumber, ticketId, history]);
 
 	useEffect(() => {
+		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.emit("joinChatBox", ticketId, () => {});
 
 		return () => {

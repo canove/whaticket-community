@@ -28,7 +28,7 @@ import ContactsSekeleton from "../../components/ContactsSekeleton";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
 
-const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+let socket;
 
 const useStyles = makeStyles(theme => ({
 	mainContainer: {
@@ -105,6 +105,7 @@ const Contacts = () => {
 	}, [searchParam, page, rowsPerPage]);
 
 	useEffect(() => {
+		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		return () => {
 			socket.disconnect();
 		};

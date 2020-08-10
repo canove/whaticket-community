@@ -25,7 +25,7 @@ import TabPanel from "../TabPanel";
 
 import api from "../../services/api";
 
-const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+let socket;
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -209,12 +209,13 @@ const Tickets = () => {
 	}, [searchParam, pageNumber, token, tab]);
 
 	useEffect(() => {
+		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.emit("joinNotification");
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [ticketId]);
+	}, []);
 
 	useEffect(() => {
 		socket.on("ticket", data => {
