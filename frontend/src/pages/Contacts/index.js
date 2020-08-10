@@ -28,6 +28,8 @@ import ContactsSekeleton from "../../components/ContactsSekeleton";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
 
+const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 const useStyles = makeStyles(theme => ({
 	mainContainer: {
 		flex: 1,
@@ -103,22 +105,22 @@ const Contacts = () => {
 	}, [searchParam, page, rowsPerPage]);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-
-		socket.on("contact", data => {
-			if (data.action === "update" || data.action === "create") {
-				updateContacts(data.contact);
-			}
-
-			if (data.action === "delete") {
-				deleteContact(data.contactId);
-			}
-		});
-
 		return () => {
 			socket.disconnect();
 		};
 	}, []);
+
+	useEffect(() => {
+		socket.on("contact", data => {
+			if ((data.action === "update" || data.action === "create") && !loading) {
+				updateContacts(data.contact);
+			}
+
+			if (data.action === "delete" && !loading) {
+				deleteContact(data.contactId);
+			}
+		});
+	}, [loading]);
 
 	const updateContacts = contact => {
 		setContacts(prevState => {

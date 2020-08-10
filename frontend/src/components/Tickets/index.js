@@ -25,6 +25,8 @@ import TabPanel from "../TabPanel";
 
 import api from "../../services/api";
 
+const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
 		position: "relative",
@@ -207,18 +209,22 @@ const Tickets = () => {
 	}, [searchParam, pageNumber, token, tab]);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-
 		socket.emit("joinNotification");
 
+		return () => {
+			socket.disconnect();
+		};
+	}, [ticketId]);
+
+	useEffect(() => {
 		socket.on("ticket", data => {
-			if (data.action === "updateUnread") {
+			if (data.action === "updateUnread" && !loading) {
 				resetUnreadMessages(data);
 			}
 			if (data.action === "updateStatus" || data.action === "create") {
 				updateTickets(data);
 			}
-			if (data.action === "delete") {
+			if (data.action === "delete" && !loading) {
 				deleteTicket(data);
 				if (ticketId && data.ticketId === +ticketId) {
 					toast.warn("O ticket que você estava foi deletado.");
@@ -228,7 +234,7 @@ const Tickets = () => {
 		});
 
 		socket.on("appMessage", data => {
-			if (data.action === "create") {
+			if (data.action === "create" && !loading) {
 				updateTickets(data);
 				if (
 					(ticketId &&
@@ -240,11 +246,7 @@ const Tickets = () => {
 				showDesktopNotification(data);
 			}
 		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, [ticketId, userId, history]);
+	}, [history, ticketId, userId, loading]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
