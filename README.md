@@ -20,28 +20,30 @@ If a contact sent a new message in less than 2 hours, and there is no ticket fro
 
 ## Installation and Usage (Linux)
 
-### Create database
-
-Using docker, run:
+Create Mysql Database using docker:
+_Note_: change dbname, username password.
 
 ```bash
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
 ```
 
-_Note_: change dbname, username password.
+Install puppeteer dependencies:
+
+```bash
+sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils
+```
 
 - Clone this repo
 - Install all dependencies with yarn or npm
 - On backend folder, copy .env.example to .env and fill it with database details
 - On frontend folder, copy .env.example to .env and fill it with backend URL
-
-- Start backend `cd backend && yarn start`
-- Start frontend `cd ../frontend && yarn start`
-- Goto http://localhost:3000/signup
+- Start backend: `cd backend && yarn start`
+- In another terminal, start frontend: `cd frontend && yarn start`
+- Go to http://localhost:3000/signup
 - Create an user and login with it.
-- In navigation menu, go to "Whatsapp" >> Connection and read QRCode with your whatsapp.
-- Go to Whatsapp >> Chat.
-- Send a text message to yout synced whatsapp number and start testing.
+- In navigation menu, go to _Whatsapp >> Connection_ and read QRCode with your WhatsApp.
+- Go to _Whatsapp >> Chat_.
+- Done. Every message received by your synced WhatsApp number will appear in Chat.
 
 ## Features
 
