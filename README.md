@@ -10,9 +10,21 @@ The frontend is a full-featured _chat app_ bootstrapped with react-create-app an
 
 I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Since WhatsApp Web don't allow multiple users, and 90% of our tickets cames from this channel, we created this to avoid the: 'Can I use Whatsapp now?' tap shoulder.
 
+## How it works?
+
+On every new message received in associated WhatsApp, a new Ticket is created. Then, this ticket can be reached in frontend, where you can assign ticket to your user, respond ticket and eventually close it.
+
+If a contact sent a new messages in less then 2 hours, the newest ticket will be reopen, instead of creating a new new.
+
 ## Installation
 
 todo
+
+## Usage
+
+1. Read QRCode.
+2. Create a New Ticket.
+3.
 
 ## Features
 
