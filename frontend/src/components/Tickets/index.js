@@ -12,7 +12,7 @@ import InputBase from "@material-ui/core/InputBase";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -401,7 +401,7 @@ const Tickets = () => {
 					/>
 					<Tab
 						value={"closed"}
-						icon={<CheckCircleOutlineIcon />}
+						icon={<CheckBoxIcon />}
 						label="Resolvidos"
 						classes={{ root: classes.tab }}
 					/>
