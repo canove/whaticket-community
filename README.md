@@ -4,7 +4,7 @@ A _very simple_ Ticket System based on WhatsApp messages.
 
 Backend uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) to receive and send WhatsApp messages, create tickets from them and store all in a MySQL database.
 
-The frontend is a full-featured _chat app_ bootstrapped with react-create-app and Material UI, that comunicates with backend using REST API and Websockets.
+Frontend is a full-featured multi-user _chat app_ bootstrapped with react-create-app and Material UI, that comunicates with backend using REST API and Websockets. It allows you to interact with contacts, tickets, send and receive WhatsApp messagees.
 
 ## Motivation
 
