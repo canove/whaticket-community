@@ -57,10 +57,6 @@ Send media (images/audio/documents) ✅
 
 Receive media (images/audio/video/documents) ✅
 
-## Links
-
-- [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
-
 ## Contributing
 
 Any help and suggestions are welcome!
