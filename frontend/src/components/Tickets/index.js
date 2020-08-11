@@ -189,7 +189,7 @@ const Tickets = () => {
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
-			const fetchContacts = async () => {
+			const fetchTickets = async () => {
 				try {
 					const { data } = await api.get("/tickets", {
 						params: { searchParam, pageNumber, status: tab },
@@ -203,7 +203,7 @@ const Tickets = () => {
 					console.log(err);
 				}
 			};
-			fetchContacts();
+			fetchTickets();
 		}, 1000);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, pageNumber, token, tab]);
@@ -254,8 +254,6 @@ const Tickets = () => {
 			}
 		});
 	}, [history, ticketId, userId, loading]);
-
-	console.log(tickets);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
