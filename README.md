@@ -12,13 +12,32 @@ I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Si
 
 ## How it works?
 
-On every new message received in an associated WhatsApp, a new Ticket is created with **pending** status. Then, this ticket can be reached in frontend, where you can assign ticket to your yourself by _aceppting_ it (changing the status to **open**), respond ticket and eventually _resolve_ it (changing status to **closed**). Subsequent messages from same contact will be related to first **open/pending** ticket found.
+On every new message received in an associated WhatsApp, a new Ticket is created with **pending** status. Then, this ticket can be reached in frontend, where you can assign ticket to your yourself by _aceppting_ it (changing the status to **open**), respond ticket and eventually _resolve_ it (changing status to **closed**).
+
+Subsequent messages from same contact will be related to first **open/pending** ticket found.
 
 If a contact sent a new message in less than 2 hours, and there is no ticket from this contact with **pending/open** status, the newest **closed** ticket will be reopen, instead of creating a new one.
 
-## Installation
+## Installation and Usage (Linux)
 
-todo
+# Create database
+
+Using docker, run: `docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin`
+
+_Note_: change dbname, username password.
+
+- Clone this repo
+- Install all dependencies with yarn or npm
+- On backend folder, copy .env.example to .env and fill it with database details
+- On frontend folder, copy .env.example to .env and fill it with backend URL
+
+- Start backend `cd backend && yarn start`
+- Start frontend `cd ../frontend && yarn start`
+- Goto http://localhost:3000/signup
+- Create an user and login with it.
+- In navigation menu, go to "Whatsapp" >> Connection and read QRCode with your whatsapp.
+- Go to Whatsapp >> Chat.
+- Send a text message to yout synced whatsapp number and start testing.
 
 ## Features
 
