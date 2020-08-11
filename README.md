@@ -17,9 +17,13 @@ todo
 ## Features
 
 Have multiple users chating in same WhatsApp Number ✅
+
 Create and chat with new contacts without touching cellphone ✅
+
 Send and receive message ✅
+
 Send media (images/audio/documents) ✅
+
 Receive media (images/audio/video/documents) ✅
 
 ## Links
