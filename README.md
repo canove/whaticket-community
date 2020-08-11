@@ -6,7 +6,7 @@ Backend uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) t
 
 The frontend is a full-featured _chat app_ bootstrapped with react-create-app and Material UI, that comunicates with backend using REST API and Websockets.
 
-# Motivation
+## Motivation
 
 I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Since WhatsApp Web don't allow multiple users, and 90% of our tickets cames from this channel, we created this to avoid the: 'Can I use Whatsapp now?' tap shoulder.
 
@@ -19,12 +19,6 @@ If a contact sent a new messages in less then 2 hours, the newest ticket will be
 ## Installation
 
 todo
-
-## Usage
-
-1. Read QRCode.
-2. Create a New Ticket.
-3.
 
 ## Features
 
