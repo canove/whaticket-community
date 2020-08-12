@@ -241,6 +241,11 @@ const MessagesList = () => {
 	const moreMenuOpen = Boolean(anchorEl);
 
 	useEffect(() => {
+		setPageNumber(1);
+		setMessagesList([]);
+	}, [ticketId]);
+
+	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchMessages = async () => {
@@ -293,8 +298,6 @@ const MessagesList = () => {
 
 		return () => {
 			socket.disconnect();
-			setPageNumber(1);
-			setMessagesList([]);
 		};
 	}, [ticketId, loading]);
 
