@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import { Formik, FieldArray } from "formik";
 
+import { makeStyles } from "@material-ui/core/styles";
+import { green } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
-
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -13,9 +14,8 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { green } from "@material-ui/core/colors";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 
@@ -121,14 +121,16 @@ const ContactModal = ({ open, onClose, contactId }) => {
 					}) => (
 						<form onSubmit={handleSubmit}>
 							<DialogTitle id="form-dialog-title">
-								{contactId ? "Editar contato" : "Adicionar contato"}
+								{contactId
+									? `${i18n.t("contactModal.title.edit")}`
+									: `${i18n.t("contactModal.title.add")}`}
 							</DialogTitle>
 							<DialogContent dividers>
 								<Typography variant="subtitle1" gutterBottom>
-									Dados do contato
+									{i18n.t("contactModal.form.mainInfo")}
 								</Typography>
 								<TextField
-									label="Nome"
+									label={i18n.t("contactModal.form.name")}
 									name="name"
 									value={values.name || ""}
 									onChange={handleChange}
@@ -138,18 +140,18 @@ const ContactModal = ({ open, onClose, contactId }) => {
 									className={classes.textField}
 								/>
 								<TextField
-									label="Número do Whatsapp"
+									label={i18n.t("contactModal.form.number")}
 									name="number"
 									value={values.number || ""}
 									onChange={handleChange}
-									placeholder="Ex: 5513912344321"
+									placeholder="5513912344321"
 									variant="outlined"
 									margin="dense"
 									required
 								/>
 								<div>
 									<TextField
-										label="Email"
+										label={i18n.t("contactModal.form.email")}
 										name="email"
 										value={values.email || ""}
 										onChange={handleChange}
@@ -163,7 +165,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 									style={{ marginBottom: 8, marginTop: 12 }}
 									variant="subtitle1"
 								>
-									Informações adicionais
+									{i18n.t("contactModal.form.extraInfo")}
 								</Typography>
 
 								<FieldArray name="extraInfo">
@@ -177,7 +179,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 														key={`${index}-info`}
 													>
 														<TextField
-															label="Nome do campo"
+															label={i18n.t("contactModal.form.extraName")}
 															name={`extraInfo[${index}].name`}
 															value={info.name || ""}
 															onChange={handleChange}
@@ -187,7 +189,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 															className={classes.textField}
 														/>
 														<TextField
-															label="Valor"
+															label={i18n.t("contactModal.form.extraValue")}
 															name={`extraInfo[${index}].value`}
 															value={info.value || ""}
 															onChange={handleChange}
@@ -211,7 +213,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 													color="primary"
 													onClick={() => push({ name: "", value: "" })}
 												>
-													+ Adicionar atributo
+													{`+ ${i18n.t("contactModal.buttons.addExtraInfo")}`}
 												</Button>
 											</div>
 										</>
@@ -225,7 +227,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 									disabled={isSubmitting}
 									variant="outlined"
 								>
-									Cancelar
+									{i18n.t("contactModal.buttons.cancel")}
 								</Button>
 								<Button
 									type="submit"
@@ -234,7 +236,9 @@ const ContactModal = ({ open, onClose, contactId }) => {
 									variant="contained"
 									className={classes.btnWrapper}
 								>
-									{contactId ? "Salvar" : "Adicionar"}
+									{contactId
+										? `${i18n.t("contactModal.buttons.okEdit")}`
+										: `${i18n.t("contactModal.buttons.okAdd")}`}
 									{isSubmitting && (
 										<CircularProgress
 											size={24}

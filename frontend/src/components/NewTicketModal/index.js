@@ -14,6 +14,7 @@ import { green } from "@material-ui/core/colors";
 
 import { makeStyles } from "@material-ui/core/styles";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
@@ -101,7 +102,9 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 				scroll="paper"
 			>
 				<form onSubmit={handleSaveTicket}>
-					<DialogTitle id="form-dialog-title">Criar Ticket</DialogTitle>
+					<DialogTitle id="form-dialog-title">
+						{i18n.t("newTicketModal.title")}
+					</DialogTitle>
 					<DialogContent dividers>
 						<Autocomplete
 							id="asynchronous-demo"
@@ -115,7 +118,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 							renderInput={params => (
 								<TextField
 									{...params}
-									label="Digite para pesquisar o contato"
+									label={i18n.t("newTicketModal.fieldLabel")}
 									variant="outlined"
 									required
 									autoFocus
@@ -143,7 +146,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 							disabled={loading}
 							variant="outlined"
 						>
-							Cancelar
+							{i18n.t("newTicketModal.buttons.cancel")}
 						</Button>
 						<Button
 							type="submit"
@@ -152,7 +155,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 							variant="contained"
 							className={classes.btnWrapper}
 						>
-							Salvar
+							{i18n.t("newTicketModal.buttons.ok")}
 							{loading && (
 								<CircularProgress
 									size={24}

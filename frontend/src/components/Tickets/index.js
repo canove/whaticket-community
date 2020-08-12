@@ -23,9 +23,8 @@ import NewTicketModal from "../NewTicketModal";
 import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
-
-let socket;
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -209,15 +208,9 @@ const Tickets = () => {
 	}, [searchParam, pageNumber, token, tab]);
 
 	useEffect(() => {
-		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.emit("joinNotification");
 
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
-	useEffect(() => {
 		socket.on("ticket", data => {
 			if (loading) return;
 
@@ -232,7 +225,7 @@ const Tickets = () => {
 			if (data.action === "delete") {
 				deleteTicket(data);
 				if (ticketId && data.ticketId === +ticketId) {
-					toast.warn("O ticket que você estava foi deletado.");
+					toast.warn(i18n.t("tickets.toasts.deleted"));
 					history.push("/chat");
 				}
 			}
@@ -253,6 +246,10 @@ const Tickets = () => {
 				showDesktopNotification(data);
 			}
 		});
+
+		return () => {
+			socket.disconnect();
+		};
 	}, [history, ticketId, userId, loading]);
 
 	const loadMore = () => {
@@ -262,16 +259,11 @@ const Tickets = () => {
 	const updateTickets = ({ ticket }) => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
-
-			if (prevState.length >= 20) {
-				if (ticketIndex !== -1) {
-					let aux = [...prevState];
-					aux[ticketIndex] = ticket;
-					aux.unshift(aux.splice(ticketIndex, 1)[0]);
-					return aux;
-				} else {
-					return [ticket, ...prevState];
-				}
+			if (ticketIndex !== -1) {
+				let aux = [...prevState];
+				aux[ticketIndex] = ticket;
+				aux.unshift(aux.splice(ticketIndex, 1)[0]);
+				return aux;
 			} else {
 				return [ticket, ...prevState];
 			}
@@ -298,7 +290,10 @@ const Tickets = () => {
 			icon: contact.profilePicUrl,
 			tag: ticket.id,
 		};
-		let notification = new Notification(`Mensagem de ${contact.name}`, options);
+		let notification = new Notification(
+			`${i18n.t("tickets.notification.message")} ${contact.name}`,
+			options
+		);
 
 		notification.onclick = function (event) {
 			event.preventDefault(); //
@@ -396,19 +391,19 @@ const Tickets = () => {
 					<Tab
 						value={"open"}
 						icon={<MoveToInboxIcon />}
-						label="Inbox"
+						label={i18n.t("tickets.tabs.open.title")}
 						classes={{ root: classes.tab }}
 					/>
 					<Tab
 						value={"closed"}
 						icon={<CheckBoxIcon />}
-						label="Resolvidos"
+						label={i18n.t("tickets.tabs.closed.title")}
 						classes={{ root: classes.tab }}
 					/>
 					<Tab
 						value={"search"}
 						icon={<SearchIcon />}
-						label="Busca"
+						label={i18n.t("tickets.tabs.search.title")}
 						classes={{ root: classes.tab }}
 					/>
 				</Tabs>
@@ -418,7 +413,7 @@ const Tickets = () => {
 					<SearchIcon className={classes.searchIcon} />
 					<InputBase
 						className={classes.contactsSearchInput}
-						placeholder="Pesquisar tickets e mensagens"
+						placeholder={i18n.t("tickets.search.placeholder")}
 						type="search"
 						onChange={handleSearchContact}
 					/>
@@ -432,19 +427,19 @@ const Tickets = () => {
 					onScroll={handleScroll}
 				>
 					<div className={classes.ticketsListHeader}>
-						Atendendo
+						{i18n.t("tickets.tabs.open.assignedHeader")}
 						<span className={classes.ticketsCount}>
 							{countTickets("open", userId)}
 						</span>
 						<div className={classes.ticketsListActions}>
 							<FormControlLabel
-								label="Todos"
+								label={i18n.t("tickets.buttons.showAll")}
 								labelPlacement="start"
 								control={
 									<Switch
 										size="small"
 										checked={showAllTickets}
-										onChange={e => setShowAllTickets(prevState => !prevState)}
+										onChange={() => setShowAllTickets(prevState => !prevState)}
 										name="showAllTickets"
 										color="primary"
 									/>
@@ -467,8 +462,10 @@ const Tickets = () => {
 							showAllTickets={showAllTickets}
 							ticketId={ticketId}
 							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle="Pronto pra mais?"
-							noTicketsMessage="Aceite um ticket da fila para começar."
+							noTicketsTitle={i18n.t("tickets.tabs.open.openNoTicketsTitle")}
+							noTicketsMessage={i18n.t(
+								"tickets.tabs.open.openNoTicketsMessage"
+							)}
 							status="open"
 							userId={userId}
 						/>
@@ -482,7 +479,7 @@ const Tickets = () => {
 					onScroll={handleScroll}
 				>
 					<div className={classes.ticketsListHeader}>
-						Aguardando
+						{i18n.t("tickets.tabs.open.pendingHeader")}
 						<span className={classes.ticketsCount}>
 							{countTickets("pending", null)}
 						</span>
@@ -495,8 +492,10 @@ const Tickets = () => {
 							showAllTickets={showAllTickets}
 							ticketId={ticketId}
 							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle="Tudo resolvido!"
-							noTicketsMessage="Nenhum ticket pendente."
+							noTicketsTitle={i18n.t("tickets.tabs.open.pendingNoTicketsTitle")}
+							noTicketsMessage={i18n.t(
+								"tickets.tabs.open.pendingNoTicketsMessage"
+							)}
 							status="pending"
 							userId={null}
 						/>
@@ -541,8 +540,8 @@ const Tickets = () => {
 							showAllTickets={showAllTickets}
 							ticketId={ticketId}
 							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle="Nada encontrado!"
-							noTicketsMessage="Tente buscar por outro termo."
+							noTicketsTitle={i18n.t("tickets.tabs.search.noTicketsTitle")}
+							noTicketsMessage={i18n.t("tickets.tabs.search.noTicketsMessage")}
 							status="all"
 						/>
 						{loading && <TicketsSkeleton />}

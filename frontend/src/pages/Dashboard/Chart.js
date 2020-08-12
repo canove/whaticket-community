@@ -11,6 +11,8 @@ import {
 } from "recharts";
 import { startOfHour, parseISO, format } from "date-fns";
 
+import { i18n } from "../../translate/i18n";
+
 import Title from "./Title";
 import api from "../../services/api";
 
@@ -69,7 +71,9 @@ const Chart = () => {
 
 	return (
 		<React.Fragment>
-			<Title>{`Tickets hoje: ${tickets.length}`}</Title>
+			<Title>{`${i18n.t("dashboard.charts.perDay.title")}${
+				tickets.length
+			}`}</Title>
 			<ResponsiveContainer>
 				<BarChart
 					data={chartData}

@@ -1,28 +1,16 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
 
-import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-// import ListSubheader from "@material-ui/core/ListSubheader";
-import Collapse from "@material-ui/core/Collapse";
-
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
-import ChatIcon from "@material-ui/icons/Chat";
-import LayersIcon from "@material-ui/icons/Layers";
-import ExpandLess from "@material-ui/icons/ExpandLess";
-import ExpandMore from "@material-ui/icons/ExpandMore";
+
 import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
 
-const useStyles = makeStyles(theme => ({
-	nested: {
-		paddingLeft: theme.spacing(4),
-	},
-}));
+import { i18n } from "../../translate/i18n";
 
 function ListItemLink(props) {
 	const { icon, primary, to, className } = props;
@@ -46,76 +34,27 @@ function ListItemLink(props) {
 }
 
 const MainListItems = () => {
-	const classes = useStyles();
-	const [open, setOpen] = React.useState(false);
-
-	const handleClick = () => {
-		setOpen(!open);
-	};
-
 	return (
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
+			<ListItemLink
+				to="/whats-auth"
+				primary={i18n.t("mainDrawer.listItems.connection")}
+				icon={<SyncAltIcon />}
+			/>
+			<ListItemLink
+				to="/chat"
+				primary={i18n.t("mainDrawer.listItems.tickets")}
+				icon={<WhatsAppIcon />}
+			/>
 
-			<ListItem button onClick={handleClick}>
-				<ListItemIcon>
-					<WhatsAppIcon />
-				</ListItemIcon>
-				<ListItemText primary="WhatsApp" />
-				{open ? <ExpandLess /> : <ExpandMore />}
-			</ListItem>
-			<Collapse in={open} timeout="auto" unmountOnExit>
-				<List component="div" disablePadding>
-					<ListItemLink
-						className={classes.nested}
-						to="/whats-auth"
-						primary="Conexão"
-						icon={<SyncAltIcon />}
-					/>
-					<ListItemLink
-						className={classes.nested}
-						to="/chat"
-						primary="Chat"
-						icon={<ChatIcon />}
-					/>
-				</List>
-			</Collapse>
 			<ListItemLink
 				to="/contacts"
-				primary="Contatos"
+				primary={i18n.t("mainDrawer.listItems.contacts")}
 				icon={<ContactPhoneIcon />}
 			/>
-			<ListItem button disabled>
-				<ListItemIcon>
-					<LayersIcon />
-				</ListItemIcon>
-				<ListItemText primary="Integrações" />
-			</ListItem>
 		</div>
 	);
 };
-// export const secondaryListItems = (
-// 	<div>
-// 		<ListSubheader inset>Saved reports</ListSubheader>
-// 		<ListItem button>
-// 			<ListItemIcon>
-// 				<AssignmentIcon />
-// 			</ListItemIcon>
-// 			<ListItemText primary="Current month" />
-// 		</ListItem>
-// 		<ListItem button>
-// 			<ListItemIcon>
-// 				<AssignmentIcon />
-// 			</ListItemIcon>
-// 			<ListItemText primary="Last quarter" />
-// 		</ListItem>
-// 		<ListItem button>
-// 			<ListItemIcon>
-// 				<AssignmentIcon />
-// 			</ListItemIcon>
-// 			<ListItemText primary="Year-end sale" />
-// 		</ListItem>
-// 	</div>
-// );
 
 export default MainListItems;

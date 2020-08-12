@@ -10,8 +10,6 @@ import Paper from "@material-ui/core/Paper";
 import SessionInfo from "../../components/SessionInfo";
 import Qrcode from "../../components/Qrcode";
 
-let socket;
-
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
@@ -55,14 +53,8 @@ const WhatsAuth = () => {
 	}, []);
 
 	useEffect(() => {
-		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
-	useEffect(() => {
 		socket.on("qrcode", data => {
 			if (data.action === "update") {
 				setQrCode(data.qr);
@@ -76,6 +68,10 @@ const WhatsAuth = () => {
 				history.push("/chat");
 			}
 		});
+
+		return () => {
+			socket.disconnect();
+		};
 	}, [history]);
 
 	return (

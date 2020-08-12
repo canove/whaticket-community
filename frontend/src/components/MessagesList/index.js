@@ -221,8 +221,6 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-let socket;
-
 const MessagesList = () => {
 	const { ticketId } = useParams();
 	const history = useHistory();
@@ -272,17 +270,9 @@ const MessagesList = () => {
 	}, [pageNumber, ticketId, history]);
 
 	useEffect(() => {
-		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.emit("joinChatBox", ticketId, () => {});
 
-		return () => {
-			socket.disconnect();
-			setPageNumber(1);
-			setMessagesList([]);
-		};
-	}, [ticketId]);
-
-	useEffect(() => {
 		socket.on("appMessage", data => {
 			if (loading) return;
 
@@ -300,7 +290,13 @@ const MessagesList = () => {
 				setContact(data.contact);
 			}
 		});
-	}, [loading]);
+
+		return () => {
+			socket.disconnect();
+			setPageNumber(1);
+			setMessagesList([]);
+		};
+	}, [ticketId, loading]);
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);

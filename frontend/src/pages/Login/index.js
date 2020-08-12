@@ -5,8 +5,6 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
-// import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
@@ -15,13 +13,15 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
+import { i18n } from "../../translate/i18n";
+
 import { AuthContext } from "../../context/Auth/AuthContext";
 
 const Copyright = () => {
 	return (
 		<Typography variant="body2" color="textSecondary" align="center">
 			{"Copyright © "}
-			<Link color="inherit" href="https://material-ui.com/">
+			<Link color="inherit" href="https://economicros.com.br/">
 				Canove
 			</Link>{" "}
 			{new Date().getFullYear()}
@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const Login = ({ showToast }) => {
+const Login = () => {
 	const classes = useStyles();
 
 	const [user, setUser] = useState({ email: "", password: "" });
@@ -69,7 +69,7 @@ const Login = ({ showToast }) => {
 					<LockOutlinedIcon />
 				</Avatar>
 				<Typography component="h1" variant="h5">
-					Login
+					{i18n.t("login.title")}
 				</Typography>
 				<form
 					className={classes.form}
@@ -82,7 +82,7 @@ const Login = ({ showToast }) => {
 						required
 						fullWidth
 						id="email"
-						label="Email"
+						label={i18n.t("login.form.email")}
 						name="email"
 						value={user.email}
 						onChange={handleChangeInput}
@@ -95,17 +95,13 @@ const Login = ({ showToast }) => {
 						required
 						fullWidth
 						name="password"
-						label="Senha"
+						label={i18n.t("login.form.password")}
 						type="password"
 						id="password"
 						value={user.password}
 						onChange={handleChangeInput}
 						autoComplete="current-password"
 					/>
-					{/* <FormControlLabel
-						control={<Checkbox value="remember" color="primary" />}
-						label="Lembrar"
-					/> */}
 					<Button
 						type="submit"
 						fullWidth
@@ -113,14 +109,9 @@ const Login = ({ showToast }) => {
 						color="primary"
 						className={classes.submit}
 					>
-						Entrar
+						{i18n.t("login.buttons.submit")}
 					</Button>
 					<Grid container>
-						{/* <Grid item xs>
-							<Link href="#" variant="body2">
-								Forgot password?
-							</Link>
-						</Grid> */}
 						<Grid item>
 							<Link
 								href="#"
@@ -128,7 +119,7 @@ const Login = ({ showToast }) => {
 								component={RouterLink}
 								to="/signup"
 							>
-								{"Não tem uma conta? Cadastre-se!"}
+								{i18n.t("login.buttons.register")}
 							</Link>
 						</Grid>
 					</Grid>

@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 
 const useAuth = () => {
@@ -23,7 +24,6 @@ const useAuth = () => {
 				history.location.pathname === "/signup"
 			) {
 				setLoading(false);
-
 				return;
 			}
 			try {
@@ -35,7 +35,7 @@ const useAuth = () => {
 			} catch (err) {
 				setLoading(false);
 				setIsAuth(false);
-				toast.error("Erro de autenticação. Por favor, faça login novamente");
+				toast.error(i18n.t("auth.toasts.fail"));
 			}
 		};
 		checkAuth();
@@ -50,9 +50,10 @@ const useAuth = () => {
 			localStorage.setItem("userId", res.data.userId);
 			api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
 			setIsAuth(true);
+			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/chat");
 		} catch (err) {
-			toast.error("Erro de autenticação. Verifique os dados de login");
+			toast.error(i18n.t("auth.toasts.fail"));
 		}
 	};
 

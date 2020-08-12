@@ -28,7 +28,7 @@ import ContactsSekeleton from "../../components/ContactsSekeleton";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
 
-let socket;
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles(theme => ({
 	mainContainer: {
@@ -105,13 +105,7 @@ const Contacts = () => {
 	}, [searchParam, page, rowsPerPage]);
 
 	useEffect(() => {
-		socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
-	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.on("contact", data => {
 			if ((data.action === "update" || data.action === "create") && !loading) {
 				updateContacts(data.contact);
@@ -121,6 +115,10 @@ const Contacts = () => {
 				deleteContact(data.contactId);
 			}
 		});
+
+		return () => {
+			socket.disconnect();
+		};
 	}, [loading]);
 
 	const updateContacts = contact => {
@@ -206,8 +204,10 @@ const Contacts = () => {
 			<ConfirmationModal
 				title={
 					deletingContact
-						? `Deletar ${deletingContact.name}?`
-						: `Importar contatos`
+						? `${i18n.t("contacts.confirmationModal.deleteTitle")} ${
+								deletingContact.name
+						  }?`
+						: `${i18n.t("contacts.confirmationModal.importTitlte")}`
 				}
 				open={confirmOpen}
 				setOpen={setConfirmOpen}
@@ -218,17 +218,17 @@ const Contacts = () => {
 				}
 			>
 				{deletingContact
-					? "Tem certeza que deseja deletar este contato? Todos os tickets relacionados serão perdidos."
-					: "Deseja importas todos os contatos do telefone? Essa função é experimental, você terá que recarregar a página após a importação "}
+					? `${i18n.t("contacts.confirmationModal.deleteMessage")}`
+					: `${i18n.t("contacts.confirmationModal.importMessage")}`}
 			</ConfirmationModal>
 			<div className={classes.contactsHeader}>
 				<Typography variant="h5" gutterBottom>
-					Contatos
+					{i18n.t("contacts.title")}
 				</Typography>
 
 				<div className={classes.actionButtons}>
 					<TextField
-						placeholder="Pesquisar..."
+						placeholder={i18n.t("contacts.searchPlaceholder")}
 						type="search"
 						value={searchParam}
 						onChange={handleSearch}
@@ -245,14 +245,14 @@ const Contacts = () => {
 						color="primary"
 						onClick={e => setConfirmOpen(true)}
 					>
-						Importar contatos
+						{i18n.t("contacts.buttons.import")}
 					</Button>
 					<Button
 						variant="contained"
 						color="primary"
 						onClick={handleOpenContactModal}
 					>
-						Adicionar contato
+						{i18n.t("contacts.buttons.add")}
 					</Button>
 				</div>
 			</div>
@@ -261,10 +261,12 @@ const Contacts = () => {
 					<TableHead>
 						<TableRow>
 							<TableCell padding="checkbox" />
-							<TableCell>Nome</TableCell>
-							<TableCell>Whatsapp</TableCell>
-							<TableCell>Email</TableCell>
-							<TableCell align="right">Ações</TableCell>
+							<TableCell>{i18n.t("contacts.table.name")}</TableCell>
+							<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
+							<TableCell>{i18n.t("contacts.table.email")}</TableCell>
+							<TableCell align="right">
+								{i18n.t("contacts.table.actions")}
+							</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>

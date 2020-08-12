@@ -13,6 +13,8 @@
     "date-fns": "^2.14.0",
     "emoji-mart": "^3.0.0",
     "formik": "^2.1.5",
+    "i18next": "^19.6.3",
+    "i18next-browser-languagedetector": "^5.0.1",
     "mic-recorder-to-mp3": "^2.2.1",
     "qrcode.react": "^1.0.0",
     "react": "^16.13.1",

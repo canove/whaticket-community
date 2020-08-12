@@ -12,6 +12,8 @@ import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
 import Button from "@material-ui/core/Button";
 
+import { i18n } from "../../translate/i18n";
+
 const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
@@ -185,7 +187,7 @@ const TicketsList = ({
 								className="hidden-button"
 								onClick={e => handleAcepptTicket(ticket.id)}
 							>
-								Aceitar
+								{i18n.t("ticketsList.buttons.accept")}
 							</Button>
 						) : null}
 					</ListItem>

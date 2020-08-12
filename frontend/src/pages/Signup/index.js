@@ -16,6 +16,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
+import { i18n } from "../../translate/i18n";
+
 import api from "../../services/api";
 
 const Copyright = () => {
@@ -65,10 +67,10 @@ const SignUp = () => {
 		e.preventDefault();
 		try {
 			await api.post("/auth/signup", user);
-			toast.success("Usuário criado com sucesso! Faça seu login.");
+			toast.success(i18n.t("signup.toast.success"));
 			history.push("/login");
 		} catch (err) {
-			toast.error("Erro ao criar usuário. Verifique os dados informados.");
+			toast.error(i18n.t("signup.toast.fail"));
 		}
 	};
 
@@ -80,7 +82,7 @@ const SignUp = () => {
 					<LockOutlinedIcon />
 				</Avatar>
 				<Typography component="h1" variant="h5">
-					Cadastre-se
+					{i18n.t("signup.title")}
 				</Typography>
 				<form className={classes.form} noValidate onSubmit={handleSignUp}>
 					<Grid container spacing={2}>
@@ -92,7 +94,7 @@ const SignUp = () => {
 								required
 								fullWidth
 								id="name"
-								label="Nome"
+								label={i18n.t("signup.form.name")}
 								value={user.name}
 								onChange={handleChangeInput}
 								autoFocus
@@ -105,7 +107,7 @@ const SignUp = () => {
 								required
 								fullWidth
 								id="email"
-								label="Email"
+								label={i18n.t("signup.form.email")}
 								name="email"
 								autoComplete="email"
 								value={user.email}
@@ -118,7 +120,7 @@ const SignUp = () => {
 								required
 								fullWidth
 								name="password"
-								label="Senha"
+								label={i18n.t("signup.form.password")}
 								type="password"
 								id="password"
 								autoComplete="current-password"
@@ -134,12 +136,12 @@ const SignUp = () => {
 						color="primary"
 						className={classes.submit}
 					>
-						Cadastrar
+						{i18n.t("signup.buttons.submit")}
 					</Button>
 					<Grid container justify="flex-end">
 						<Grid item>
 							<Link href="#" variant="body2" component={RouterLink} to="/login">
-								Já tem uma conta? Entre!
+								{i18n.t("signup.buttons.login")}
 							</Link>
 						</Grid>
 					</Grid>

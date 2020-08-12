@@ -7,6 +7,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Tickets from "../../components/Tickets/";
 import MessagesList from "../../components/MessagesList/";
 
+import { i18n } from "../../translate/i18n";
+
 const useStyles = makeStyles(theme => ({
 	chatContainer: {
 		flex: 1,
@@ -61,7 +63,7 @@ const Chat = () => {
 							</>
 						) : (
 							<Paper square variant="outlined" className={classes.welcomeMsg}>
-								<span>Selecione um contato para começar a conversar</span>
+								<span>{i18n.t("chat.noTicketMessage")}</span>
 							</Paper>
 						)}
 					</Grid>
