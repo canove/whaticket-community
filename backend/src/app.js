@@ -5,6 +5,8 @@ const path = require("path");
 const Youch = require("youch");
 const cors = require("cors");
 const multer = require("multer");
+const Sentry = require("@sentry/node");
+const sentryConfig = require("./config/sentry");
 
 const wBot = require("./libs/wbot");
 const wbotMessageListener = require("./services/wbotMessageListener");
@@ -18,6 +20,12 @@ const WhatsRoutes = require("./routes/whatsapp");
 
 const app = express();
 
+const server = app.listen(process.env.PORT, () => {
+	console.log(`Server started on port: ${process.env.PORT}`);
+});
+
+Sentry.init(sentryConfig);
+
 const fileStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		cb(null, path.resolve(__dirname, "..", "public"));
@@ -27,6 +35,7 @@ const fileStorage = multer.diskStorage({
 	},
 });
 
+app.use(Sentry.Handlers.requestHandler());
 app.use(cors());
 app.use(express.json());
 app.use(multer({ storage: fileStorage }).single("media"));
@@ -37,6 +46,7 @@ app.use(ContactsRoutes);
 app.use(TicketsRoutes);
 app.use(MessagesRoutes);
 app.use(WhatsRoutes);
+app.use(Sentry.Handlers.errorHandler());
 
 app.use(async (err, req, res, next) => {
 	if (process.env.NODE_ENV === "DEVELOPMENT") {
@@ -46,10 +56,6 @@ app.use(async (err, req, res, next) => {
 	}
 	console.log(err);
 	return res.status(500).json({ error: "Internal server error" });
-});
-
-const server = app.listen(process.env.PORT, () => {
-	console.log(`Server started on port: ${process.env.PORT}`);
 });
 
 const io = require("./libs/socket").init(server);
