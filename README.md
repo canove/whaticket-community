@@ -20,9 +20,7 @@ If a contact sent a new message in less than 2 hours, and there is no ticket fro
 
 ## Screenshots
 
-<img src="images/chat1.png" width="150"> 
-<img src="images/chat2.png" width="150"> 
-<img src="images/chat3.png" width="150">
+<img src="images/chat2.png" width="300"> <img src="images/chat3.png" width="330">
 
 ## Installation and Usage (Linux Debian/Ubuntu)
 
