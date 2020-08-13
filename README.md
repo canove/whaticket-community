@@ -54,15 +54,11 @@ sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service l
 
 ## Features
 
-Have multiple users chating in same WhatsApp Number ✅
-
-Create and chat with new contacts without touching cellphone ✅
-
-Send and receive message ✅
-
-Send media (images/audio/documents) ✅
-
-Receive media (images/audio/video/documents) ✅
+- Have multiple users chating in same WhatsApp Number ✅
+- Create and chat with new contacts without touching cellphone ✅
+- Send and receive message ✅
+- Send media (images/audio/documents) ✅
+- Receive media (images/audio/video/documents) ✅
 
 ## Contributing
 
