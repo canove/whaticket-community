@@ -11,6 +11,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 
+import { i18n } from "../../translate/i18n";
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
 import ContactModal from "../ContactModal";
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
@@ -123,7 +124,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 					<CloseIcon />
 				</IconButton>
 				<Typography style={{ justifySelf: "center" }}>
-					Dados do contato
+					{i18n.t("contactDrawer.header")}
 				</Typography>
 			</div>
 			{loading ? (
@@ -146,7 +147,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 							color="primary"
 							onClick={e => setModalOpen(true)}
 						>
-							Editar contato
+							{i18n.t("contactDrawer.buttons.edit")}
 						</Button>
 					</Paper>
 					<Paper square variant="outlined" className={classes.contactDetails}>
@@ -156,7 +157,9 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 							aria-labelledby="form-dialog-title"
 							contactId={contact.id}
 						></ContactModal>
-						<Typography variant="subtitle1">Outras informações</Typography>
+						<Typography variant="subtitle1">
+							{i18n.t("contactDrawer.extraInfo")}
+						</Typography>
 						{contact &&
 							contact.extraInfo &&
 							contact.extraInfo.map(info => (

@@ -147,6 +147,30 @@ const messages = {
 					contacts: "Contatos",
 				},
 			},
+			messagesList: {
+				header: {
+					assignedTo: "Atribuído à:",
+					buttons: {
+						return: "Retornar",
+						resolve: "Resolver",
+						reopen: "Reabrir",
+					},
+				},
+			},
+			messagesInput: {
+				placeholder: "Digite uma mensagem",
+			},
+			contactDrawer: {
+				header: "Dados do contato",
+				buttons: {
+					edit: "Editar contato",
+				},
+				extraInfo: "Outras informações",
+			},
+			ticketOptionsMenu: {
+				delete: "Deletar",
+				transfer: "Transferir",
+			},
 		},
 	},
 };

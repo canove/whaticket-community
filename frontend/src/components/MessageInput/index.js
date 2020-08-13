@@ -18,6 +18,7 @@ import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import RecordingTimer from "./RecordingTimer";
 
@@ -310,7 +311,7 @@ const MessageInput = () => {
 					<InputBase
 						inputRef={input => input && input.focus()}
 						className={classes.messageInput}
-						placeholder="Escreva uma mensagem"
+						placeholder={i18n.t("messagesInput.placeholder")}
 						multiline
 						rowsMax={5}
 						value={inputMessage}

@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 
@@ -47,8 +48,12 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				open={menuOpen}
 				onClose={handleClose}
 			>
-				<MenuItem onClick={handleOpenConfirmationModal}>Deletar</MenuItem>
-				<MenuItem onClick={handleTransferTicket}>Transferir</MenuItem>
+				<MenuItem onClick={handleOpenConfirmationModal}>
+					{i18n.t("ticketOptionsMenu.delete")}
+				</MenuItem>
+				<MenuItem onClick={handleTransferTicket}>
+					{i18n.t("ticketOptionsMenu.transfer")}
+				</MenuItem>
 			</Menu>
 			<ConfirmationModal
 				title={`Deletar o ticket #${ticket.id} do contato ${ticket.contact.name}?`}

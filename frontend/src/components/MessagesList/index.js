@@ -23,6 +23,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import IconButton from "@material-ui/core/IconButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
 import whatsBackground from "../../assets/wa-background.png";
@@ -569,7 +570,10 @@ const MessagesList = () => {
 							loading ? (
 								<Skeleton animation="wave" width={80} />
 							) : (
-								ticket.user && `Atribuído à: ${ticket.user.name}`
+								ticket.user &&
+								`${i18n.t("messagesList.header.assignedTo")} ${
+									ticket.user.name
+								}`
 							)
 						}
 					/>
@@ -581,7 +585,7 @@ const MessagesList = () => {
 									size="small"
 									onClick={e => handleUpdateTicketStatus(e, "open", userId)}
 								>
-									Reabrir
+									{i18n.t("messagesList.header.buttons.reopen")}
 								</Button>
 							) : (
 								<>
@@ -590,7 +594,7 @@ const MessagesList = () => {
 										size="small"
 										onClick={e => handleUpdateTicketStatus(e, "pending", null)}
 									>
-										Retornar
+										{i18n.t("messagesList.header.buttons.return")}
 									</Button>
 									<Button
 										size="small"
@@ -598,7 +602,7 @@ const MessagesList = () => {
 										color="primary"
 										onClick={e => handleUpdateTicketStatus(e, "closed", userId)}
 									>
-										Resolver
+										{i18n.t("messagesList.header.buttons.resolve")}
 									</Button>
 								</>
 							)}
