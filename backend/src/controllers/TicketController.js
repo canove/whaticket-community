@@ -87,7 +87,7 @@ exports.index = async (req, res) => {
 		};
 	}
 
-	const { count, rows: tickets } = await Ticket.findAndCountAll({
+	const { count, rows: tickets } = await Ticket.findAndCoundtAll({
 		where: whereCondition,
 		distinct: true,
 		include: includeCondition,

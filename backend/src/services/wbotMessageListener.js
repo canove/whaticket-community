@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const { Op } = require("sequelize");
 const { subHours } = require("date-fns");
+const Sentry = require("@sentry/node");
 
 const Contact = require("../models/Contact");
 const Ticket = require("../models/Ticket");
@@ -149,6 +150,7 @@ const wbotMessageListener = () => {
 
 			await handleMessage(msg, ticket, contact);
 		} catch (err) {
+			Sentry.captureException(err);
 			console.log(err);
 		}
 	});
@@ -171,6 +173,7 @@ const wbotMessageListener = () => {
 				message: messageToUpdate,
 			});
 		} catch (err) {
+			Sentry.captureException(err);
 			console.log(err);
 		}
 	});

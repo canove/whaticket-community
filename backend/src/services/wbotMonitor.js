@@ -1,3 +1,5 @@
+const Sentry = require("@sentry/node");
+
 const Whatsapp = require("../models/Whatsapp");
 const wbotMessageListener = require("./wbotMessageListener");
 
@@ -19,6 +21,7 @@ const wbotMonitor = () => {
 			try {
 				await Whatsapp.update({ battery, plugged }, { where: { id: 1 } });
 			} catch (err) {
+				Sentry.captureException(err);
 				console.log(err);
 			}
 
@@ -34,7 +37,10 @@ const wbotMonitor = () => {
 							wbotMessageListener();
 							wbotMonitor();
 						})
-						.catch(err => console.log(err)),
+						.catch(err => {
+							Sentry.captureException(err);
+							console.log(err);
+						}),
 				2000
 			);
 		});
@@ -43,6 +49,7 @@ const wbotMonitor = () => {
 		// 	wbot.resetState();
 		// }, 20000);
 	} catch (err) {
+		Sentry.captureException(err);
 		console.log(err);
 	}
 };
