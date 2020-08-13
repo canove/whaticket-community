@@ -20,7 +20,7 @@ If a contact sent a new message in less than 2 hours, and there is no ticket fro
 
 ## Screenshots
 
-<img src="images/chat2.png" width="300"> <img src="images/chat3.png" width="330">
+<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat3.png" width="350">
 
 ## Installation and Usage (Linux Debian/Ubuntu)
 
