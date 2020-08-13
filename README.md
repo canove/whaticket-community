@@ -50,7 +50,6 @@ sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service l
 - Go to http://localhost:3000/signup
 - Create an user and login with it.
 - On the sidebard, go to _Connection_ and read QRCode with your WhatsApp.
-- Go to _Tickets_.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
 ## Features
