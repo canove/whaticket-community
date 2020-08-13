@@ -34,16 +34,20 @@ sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service l
 ```
 
 - Clone this repo
-- Install all dependencies with yarn or npm
-- On backend folder, copy .env.example to .env and fill it with database details
-- On frontend folder, copy .env.example to .env and fill it with backend URL
-- Start backend: `cd backend && yarn start`
-- In another terminal, start frontend: `cd frontend && yarn start`
+- On backend folder:
+  - Copy .env.example to .env and fill it with database details
+  - Install dependecies: `npm install` (Only in the first time)
+  - Create database tables: `npx sequelize db:migrate` (Only in the first time)
+  - Start backend: `npm start`
+- In another terminal, on frontend folder:
+  - Copy .env.example to .env and fill it with backend URL (normally localhost:port)
+  - Install dependecies: `npm install` (Only in the first time)
+  - Start frontend: `npm start`
 - Go to http://localhost:3000/signup
 - Create an user and login with it.
-- In navigation menu, go to _Whatsapp >> Connection_ and read QRCode with your WhatsApp.
-- Go to _Whatsapp >> Chat_.
-- Done. Every message received by your synced WhatsApp number will appear in Chat.
+- On the sidebard, go to _Connection_ and read QRCode with your WhatsApp.
+- Go to _Tickets_.
+- Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
 ## Features
 
