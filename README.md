@@ -6,6 +6,8 @@ Backend uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) t
 
 Frontend is a full-featured multi-user _chat app_ bootstrapped with react-create-app and Material UI, that comunicates with backend using REST API and Websockets. It allows you to interact with contacts, tickets, send and receive WhatsApp messagees.
 
+**NOTE**: I can't guarantee you will not be blocked by using this method, although it has worked for me. WhatsApp does not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.
+
 ## Motivation
 
 I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Since WhatsApp Web doesn't allow multiple users, and 90% of our tickets comes from this channel, we created this to avoid the: 'Can I use Whatsapp now?' shoulder taps.
