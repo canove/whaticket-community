@@ -47,7 +47,7 @@ sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service l
   - Copy .env.example to .env and fill it with backend URL (normally localhost:port)
   - Install dependecies: `npm install` (Only in the first time)
   - Start frontend: `npm start`
-- Go to http://localhost:3000/signup
+- Go to http://your_server_ip:3000/signup
 - Create an user and login with it.
 - On the sidebard, go to _Connection_ and read QRCode with your WhatsApp.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
