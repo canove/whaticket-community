@@ -11,6 +11,12 @@ routes.get(
 	WhatsAppSessionController.show
 );
 
+routes.delete(
+	"/whatsapp/session/:sessionId",
+	isAuth,
+	WhatsAppSessionController.delete
+);
+
 // fetch contacts in user cellphone, not in use
 // routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts);
 

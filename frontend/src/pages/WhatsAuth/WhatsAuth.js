@@ -5,7 +5,6 @@ import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import SessionInfo from "../../components/SessionInfo";
 import Qrcode from "../../components/Qrcode";
@@ -13,19 +12,19 @@ import Qrcode from "../../components/Qrcode";
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
 		padding: theme.spacing(4),
 	},
 
-	content: {
-		flexGrow: 1,
-		overflow: "auto",
-	},
 	paper: {
 		padding: theme.spacing(2),
 		display: "flex",
+		width: 400,
 		overflow: "auto",
-		alignItems: "center",
 		flexDirection: "column",
+		alignItems: "center",
+		justifyContent: "center",
 	},
 	fixedHeight: {
 		height: 640,
@@ -42,9 +41,9 @@ const WhatsAuth = () => {
 	useEffect(() => {
 		const fetchSession = async () => {
 			try {
-				const res = await api.get("/whatsapp/session/1");
-				setQrCode(res.data.qrcode);
-				setSession(res.data);
+				const { data } = await api.get("/whatsapp/session/1");
+				setQrCode(data.qrcode);
+				setSession(data);
 			} catch (err) {
 				console.log(err);
 			}
@@ -52,20 +51,35 @@ const WhatsAuth = () => {
 		fetchSession();
 	}, []);
 
+	console.log("session", session);
+
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
-		socket.on("qrcode", data => {
+		socket.on("session", data => {
 			if (data.action === "update") {
 				setQrCode(data.qr);
+				setSession(data.session);
 			}
 		});
 
-		socket.on("whats_auth", data => {
+		socket.on("session", data => {
+			if (data.action === "update") {
+				setSession(data.session);
+			}
+		});
+
+		socket.on("session", data => {
 			if (data.action === "authentication") {
 				setQrCode("");
 				setSession(data.session);
 				history.push("/chat");
+			}
+		});
+
+		socket.on("session", data => {
+			if (data.action === "logout") {
+				setSession(data.session);
 			}
 		});
 
@@ -76,21 +90,15 @@ const WhatsAuth = () => {
 
 	return (
 		<div className={classes.root}>
-			<Grid container spacing={3}>
-				{session.status === "pending" ? (
-					<Grid item xs={12}>
-						<Paper className={classes.paper}>
-							<Qrcode qrCode={qrCode} />
-						</Paper>
-					</Grid>
-				) : (
-					<Grid item xs={12}>
-						<Paper className={classes.paper}>
-							<SessionInfo session={session} />
-						</Paper>
-					</Grid>
-				)}
-			</Grid>
+			{session && session.status === "disconnected" ? (
+				<Paper className={classes.paper}>
+					<Qrcode qrCode={qrCode} />
+				</Paper>
+			) : (
+				<Paper className={classes.paper}>
+					<SessionInfo session={session} />
+				</Paper>
+			)}
 		</div>
 	);
 };

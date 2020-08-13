@@ -66,9 +66,9 @@ io.on("connection", socket => {
 
 wBot
 	.init()
-	.then(() => {
+	.then(({ dbSession }) => {
 		wbotMessageListener();
-		wbotMonitor();
+		wbotMonitor(dbSession);
 	})
 	.catch(err => console.log(err));
 

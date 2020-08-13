@@ -10,7 +10,7 @@ const Qrcode = ({ qrCode }) => {
 			<Typography color="primary" gutterBottom>
 				{i18n.t("qrCode.message")}
 			</Typography>
-			<QRCode value={qrCode} size={256} />
+			{qrCode ? <QRCode value={qrCode} size={256} /> : <span>loading</span>}
 		</div>
 	);
 };

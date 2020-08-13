@@ -1,41 +1,67 @@
 const Sentry = require("@sentry/node");
 
-const Whatsapp = require("../models/Whatsapp");
 const wbotMessageListener = require("./wbotMessageListener");
 
 const { getIO } = require("../libs/socket");
 const { getWbot, init } = require("../libs/wbot");
 
-const wbotMonitor = () => {
+const wbotMonitor = dbSession => {
 	const io = getIO();
 	const wbot = getWbot();
 
 	try {
-		wbot.on("change_state", newState => {
+		wbot.on("change_state", async newState => {
 			console.log("monitor", newState);
-		});
-
-		wbot.on("change_battery", async batteryInfo => {
-			// Battery percentage for attached device has changed
-			const { battery, plugged } = batteryInfo;
 			try {
-				await Whatsapp.update({ battery, plugged }, { where: { id: 1 } });
+				await dbSession.update({ status: newState });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
 			}
 
-			console.log(`Battery: ${battery}% - Charging? ${plugged}`); //todo> save batery state to db
+			io.emit("session", {
+				action: "update",
+				session: dbSession,
+			});
 		});
 
-		wbot.on("disconnected", reason => {
-			console.log("disconnected", reason); //todo> save connection status to DB
+		wbot.on("change_battery", async batteryInfo => {
+			const { battery, plugged } = batteryInfo;
+			console.log(`Battery: ${battery}% - Charging? ${plugged}`);
+
+			try {
+				await dbSession.update({ battery, plugged });
+			} catch (err) {
+				Sentry.captureException(err);
+				console.log(err);
+			}
+
+			io.emit("session", {
+				action: "update",
+				session: dbSession,
+			});
+		});
+
+		wbot.on("disconnected", async reason => {
+			console.log("disconnected", reason);
+			try {
+				await dbSession.update({ status: "disconnected" });
+			} catch (err) {
+				Sentry.captureException(err);
+				console.log(err);
+			}
+
+			io.emit("session", {
+				action: "logout",
+				session: dbSession,
+			});
+
 			setTimeout(
 				() =>
 					init()
-						.then(res => {
+						.then(({ dbSession }) => {
 							wbotMessageListener();
-							wbotMonitor();
+							wbotMonitor(dbSession);
 						})
 						.catch(err => {
 							Sentry.captureException(err);

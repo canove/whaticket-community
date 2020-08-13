@@ -45,6 +45,10 @@ const messages = {
 				status: "Status: ",
 				battery: "Bateria: ",
 				charging: "Carregando: ",
+				updatedAt: "Atualizado em:",
+				buttons: {
+					disconnect: "Desconectar",
+				},
 			},
 			qrCode: {
 				message: "Leia o QrCode para iniciar a sessão",

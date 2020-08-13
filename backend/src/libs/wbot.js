@@ -9,7 +9,12 @@ module.exports = {
 	init: async () => {
 		let sessionCfg;
 
-		const dbSession = await Whatsapp.findOne({ where: { id: 1 } });
+		const [dbSession] = await Whatsapp.findOrCreate({
+			where: { id: 1 },
+			defaults: {
+				id: 1,
+			},
+		});
 		if (dbSession && dbSession.session) {
 			sessionCfg = JSON.parse(dbSession.session);
 		}
@@ -21,20 +26,21 @@ module.exports = {
 		wbot.initialize();
 		wbot.on("qr", async qr => {
 			qrCode.generate(qr, { small: true });
-			await Whatsapp.upsert({ id: 1, qrcode: qr, status: "pending" });
-			getIO().emit("qrcode", {
+			await dbSession.update({ id: 1, qrcode: qr, status: "disconnected" });
+			getIO().emit("session", {
 				action: "update",
 				qr: qr,
+				session: dbSession,
 			});
 		});
 		wbot.on("authenticated", async session => {
 			console.log("AUTHENTICATED");
-			await Whatsapp.upsert({
+			await dbSession.update({
 				id: 1,
 				session: JSON.stringify(session),
 				status: "authenticated",
 			});
-			getIO().emit("whats_auth", {
+			getIO().emit("session", {
 				action: "authentication",
 				session: dbSession,
 			});
@@ -45,8 +51,8 @@ module.exports = {
 		});
 		wbot.on("ready", async () => {
 			console.log("READY");
-			await Whatsapp.update(
-				{ status: "online", qrcode: "" },
+			await dbSession.update(
+				{ status: "CONNECTED", qrcode: "" },
 				{ where: { id: 1 } }
 			);
 			// const chats = await wbot.getChats(); // pega as mensagens nao lidas (recebidas quando o bot estava offline)
@@ -62,7 +68,7 @@ module.exports = {
 			// console.log(unreadMessages);
 			wbot.sendPresenceAvailable();
 		});
-		return wbot;
+		return { wbot, dbSession };
 	},
 
 	getWbot: () => {
