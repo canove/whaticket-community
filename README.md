@@ -18,7 +18,13 @@ Subsequent messages from same contact will be related to first **open/pending** 
 
 If a contact sent a new message in less than 2 hours, and there is no ticket from this contact with **pending/open** status, the newest **closed** ticket will be reopen, instead of creating a new one.
 
-## Installation and Usage (Linux)
+## Screenshots
+
+<img src="images/chat1.png" width="150"> 
+<img src="images/chat2.png" width="150"> 
+<img src="images/chat3.png" width="150">
+
+## Installation and Usage (Linux Debian/Ubuntu)
 
 Create Mysql Database using docker:
 _Note_: change dbname, username password.
