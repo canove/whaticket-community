@@ -17,7 +17,7 @@ const messages = {
 					login: "Already have an account? Log in!",
 				},
 			},
-			Login: {
+			login: {
 				title: "Login",
 				form: {
 					email: "Email",
