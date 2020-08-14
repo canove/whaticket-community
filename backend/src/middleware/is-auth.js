@@ -1,17 +1,22 @@
 const jwt = require("jsonwebtoken");
+
 const authConfig = require("../config/auth");
 
-module.exports = (req, res, next) => {
-	let decodedToken;
+module.exports = async (req, res, next) => {
+	const authHeader = req.headers.authorization;
 
-	const [, token] = req.get("Authorization").split(" ");
-	decodedToken = jwt.verify(token, authConfig.secret);
-	// todo >> find user in DB and store in req.user to use latter, or throw an error if user not exists anymore
-	req.userId = decodedToken.userId;
-
-	if (!decodedToken) {
-		return res.status(401).json({ message: "Unauthorized" });
+	if (!authHeader) {
+		return res.status(401).json({ error: "Token not provided" });
 	}
 
-	next();
+	const [, token] = authHeader.split(" ");
+
+	jwt.verify(token, authConfig.secret, (error, result) => {
+		if (error) {
+			return res.status(401).json({ error: "Invalid token" });
+		}
+		req.userId = token.userId;
+		// todo >> find user in DB and store in req.user to use latter, or throw an error if user not exists anymore
+		next();
+	});
 };
