@@ -9,21 +9,25 @@ const Sequelize = require("sequelize");
 
 const { MessageMedia } = require("whatsapp-web.js");
 
-const setMessagesAsRead = async ticketId => {
+const setMessagesAsRead = async ticket => {
 	const io = getIO();
+	const wbot = getWbot();
+
 	await Message.update(
 		{ read: true },
 		{
 			where: {
-				ticketId: ticketId,
+				ticketId: ticket.id,
 				read: false,
 			},
 		}
 	);
 
+	await wbot.sendSeen(`${ticket.contact.number}@c.us`);
+
 	io.to("notification").emit("ticket", {
 		action: "updateUnread",
-		ticketId: ticketId,
+		ticketId: ticket.id,
 	});
 };
 
@@ -64,7 +68,7 @@ exports.index = async (req, res, next) => {
 		return res.status(404).json({ error: "No ticket found with this ID" });
 	}
 
-	await setMessagesAsRead(ticketId);
+	await setMessagesAsRead(ticket);
 
 	const ticketMessages = await ticket.getMessages({
 		where: whereCondition,
@@ -157,7 +161,7 @@ exports.store = async (req, res, next) => {
 		contact: ticket.contact,
 	});
 
-	await setMessagesAsRead(ticketId);
+	await setMessagesAsRead(ticket);
 
 	return res.json({ message: "Mensagem enviada", newMessage, ticket });
 };
