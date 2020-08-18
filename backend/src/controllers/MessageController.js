@@ -46,8 +46,8 @@ exports.index = async (req, res, next) => {
 		),
 	};
 
-	let limit = 20;
-	let offset = limit * (pageNumber - 1);
+	const limit = 20;
+	const offset = limit * (pageNumber - 1);
 
 	const ticket = await Ticket.findByPk(ticketId, {
 		include: [
@@ -90,10 +90,13 @@ exports.index = async (req, res, next) => {
 		};
 	});
 
+	const hasMore = count > offset + ticketMessages.length;
+
 	return res.json({
 		messages: serializedMessages.reverse(),
 		ticket,
 		count,
+		hasMore,
 	});
 };
 
@@ -163,5 +166,5 @@ exports.store = async (req, res, next) => {
 
 	await setMessagesAsRead(ticket);
 
-	return res.json({ message: "Mensagem enviada", newMessage, ticket });
+	return res.json({ newMessage, ticket });
 };

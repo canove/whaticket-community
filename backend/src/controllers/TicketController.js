@@ -15,8 +15,8 @@ exports.index = async (req, res) => {
 		searchParam = "",
 	} = req.query;
 
-	let limit = 20;
-	let offset = limit * (pageNumber - 1);
+	const limit = 20;
+	const offset = limit * (pageNumber - 1);
 
 	let whereCondition = {};
 	let includeCondition = [
@@ -96,7 +96,9 @@ exports.index = async (req, res) => {
 		order: [["updatedAt", "DESC"]],
 	});
 
-	return res.json({ count, tickets });
+	const hasMore = count > offset + tickets.length;
+
+	return res.json({ count, tickets, hasMore });
 };
 
 exports.store = async (req, res) => {

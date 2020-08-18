@@ -233,7 +233,7 @@ const MessagesList = () => {
 	const [contact, setContact] = useState({});
 	const [ticket, setTicket] = useState({});
 	const [messagesList, setMessagesList] = useState([]);
-	const [count, setCount] = useState(0);
+	const [hasMore, setHasMore] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const lastMessageRef = useRef();
@@ -259,7 +259,7 @@ const MessagesList = () => {
 					setMessagesList(prevMessages => {
 						return [...data.messages, ...prevMessages];
 					});
-					setCount(data.count);
+					setHasMore(data.hasMore);
 					setLoading(false);
 					if (pageNumber === 1 && data.messages.length > 1) {
 						scrollToBottom();
@@ -339,7 +339,7 @@ const MessagesList = () => {
 	};
 
 	const handleScroll = e => {
-		if (count === messagesList.length) return;
+		if (!hasMore) return;
 		const { scrollTop } = e.currentTarget;
 
 		if (scrollTop === 0) {
@@ -354,6 +354,8 @@ const MessagesList = () => {
 			loadMore();
 		}
 	};
+
+	console.log(messagesList);
 
 	const checkMessaageMedia = message => {
 		if (message.mediaType === "image") {

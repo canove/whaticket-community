@@ -170,7 +170,7 @@ const Tickets = () => {
 	const [showAllTickets, setShowAllTickets] = useState(false);
 
 	const [pageNumber, setPageNumber] = useState(1);
-	const [count, setCount] = useState(0);
+	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -193,17 +193,17 @@ const Tickets = () => {
 					const { data } = await api.get("/tickets", {
 						params: { searchParam, pageNumber, status: tab },
 					});
-					setTickets(prevState => {
-						return [...prevState, ...data.tickets];
+					data.tickets.forEach(ticket => {
+						updateTickets(ticket);
 					});
-					setCount(data.count);
+					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
 				}
 			};
 			fetchTickets();
-		}, 1000);
+		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, pageNumber, token, tab]);
 
@@ -212,14 +212,13 @@ const Tickets = () => {
 		socket.emit("joinNotification");
 
 		socket.on("ticket", data => {
-			if (loading) return;
-
 			if (data.action === "updateUnread") {
 				resetUnreadMessages(data);
 			}
 
 			if (data.action === "updateStatus" || data.action === "create") {
-				updateTickets(data);
+				console.log("WSS TICKET");
+				updateTickets(data.ticket);
 			}
 
 			if (data.action === "delete") {
@@ -232,10 +231,9 @@ const Tickets = () => {
 		});
 
 		socket.on("appMessage", data => {
-			if (loading) return;
-
 			if (data.action === "create") {
-				updateTickets(data);
+				console.log("WSS MSG");
+				updateTickets(data.ticket);
 				if (
 					(ticketId &&
 						data.message.ticketId === +ticketId &&
@@ -250,22 +248,24 @@ const Tickets = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [history, ticketId, userId, loading]);
+	}, [history, ticketId, userId]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
 	};
 
-	const updateTickets = ({ ticket }) => {
+	const updateTickets = ticket => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
 			if (ticketIndex !== -1) {
-				let aux = [...prevState];
+				const aux = [...prevState];
 				aux[ticketIndex] = ticket;
-				aux.unshift(aux.splice(ticketIndex, 1)[0]);
+				if (ticket.unreadMessages > 0) {
+					aux.unshift(aux.splice(ticketIndex, 1)[0]);
+				}
 				return aux;
 			} else {
-				return [ticket, ...prevState];
+				return [...prevState, ticket];
 			}
 		});
 	};
@@ -274,12 +274,12 @@ const Tickets = () => {
 		setTickets(prevState => {
 			const ticketIndex = prevState.findIndex(ticket => ticket.id === ticketId);
 
-			if (ticketIndex === -1) {
-				return prevState;
-			} else {
+			if (ticketIndex !== -1) {
 				let aux = [...prevState];
 				aux.splice(ticketIndex, 1);
 				return aux;
+			} else {
+				return prevState;
 			}
 		});
 	};
@@ -338,7 +338,7 @@ const Tickets = () => {
 	};
 
 	const handleScroll = e => {
-		if (count === tickets.length || loading) return;
+		if (!hasMore || loading) return;
 		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
 		if (scrollHeight - (scrollTop + 100) < clientHeight) {
