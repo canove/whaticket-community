@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import openSocket from "socket.io-client";
 import { format } from "date-fns";
@@ -155,6 +155,63 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_TICKETS") {
+		const newTickets = action.payload;
+
+		newTickets.forEach(ticket => {
+			const ticketIndex = state.findIndex(t => t.id === ticket.id);
+			if (ticketIndex !== -1) {
+				state[ticketIndex] = ticket;
+				if (ticket.unreadMessages > 0) {
+					state.unshift(state.splice(ticketIndex, 1)[0]);
+				}
+			} else {
+				state.push(ticket);
+			}
+		});
+
+		return [...state];
+	}
+
+	if (action.type === "UPDATE_TICKETS") {
+		const ticket = action.payload;
+
+		const ticketIndex = state.findIndex(t => t.id === ticket.id);
+		if (ticketIndex !== -1) {
+			state[ticketIndex] = ticket;
+			state.unshift(state.splice(ticketIndex, 1)[0]);
+		} else {
+			state.push(ticket);
+		}
+		return [...state];
+	}
+
+	if (action.type === "DELETE_TICKET") {
+		const ticketId = action.payload;
+
+		const ticketIndex = state.findIndex(t => t.id === ticketId);
+		if (ticketIndex !== -1) {
+			state.splice(ticketIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET_UNREAD") {
+		const ticketId = action.payload;
+
+		const ticketIndex = state.findIndex(t => t.id === ticketId);
+		if (ticketIndex !== -1) {
+			state[ticketIndex].unreadMessages = 0;
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
+
 const Tickets = () => {
 	const classes = useStyles();
 	const history = useHistory();
@@ -162,7 +219,6 @@ const Tickets = () => {
 	const token = localStorage.getItem("token");
 	const userId = +localStorage.getItem("userId");
 	const { ticketId } = useParams();
-	const [tickets, setTickets] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
@@ -171,6 +227,7 @@ const Tickets = () => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
+	const [tickets, dispatch] = useReducer(reducer, []);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -181,7 +238,7 @@ const Tickets = () => {
 	}, []);
 
 	useEffect(() => {
-		setTickets([]);
+		dispatch({ type: "RESET" });
 		setPageNumber(1);
 	}, [searchParam, tab]);
 
@@ -193,8 +250,9 @@ const Tickets = () => {
 					const { data } = await api.get("/tickets", {
 						params: { searchParam, pageNumber, status: tab },
 					});
-					data.tickets.forEach(ticket => {
-						updateTickets(ticket);
+					dispatch({
+						type: "LOAD_TICKETS",
+						payload: data.tickets,
 					});
 					setHasMore(data.hasMore);
 					setLoading(false);
@@ -213,16 +271,15 @@ const Tickets = () => {
 
 		socket.on("ticket", data => {
 			if (data.action === "updateUnread") {
-				resetUnreadMessages(data);
+				dispatch({ type: "RESET_UNREAD", payload: data.ticketId });
 			}
 
 			if (data.action === "updateStatus" || data.action === "create") {
-				console.log("WSS TICKET");
-				updateTickets(data.ticket);
+				dispatch({ type: "UPDATE_TICKETS", payload: data.ticket });
 			}
 
 			if (data.action === "delete") {
-				deleteTicket(data);
+				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
 				if (ticketId && data.ticketId === +ticketId) {
 					toast.warn(i18n.t("tickets.toasts.deleted"));
 					history.push("/chat");
@@ -232,8 +289,7 @@ const Tickets = () => {
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
-				console.log("WSS MSG");
-				updateTickets(data.ticket);
+				dispatch({ type: "UPDATE_TICKETS", payload: data.ticket });
 				if (
 					(ticketId &&
 						data.message.ticketId === +ticketId &&
@@ -252,36 +308,6 @@ const Tickets = () => {
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
-	};
-
-	const updateTickets = ticket => {
-		setTickets(prevState => {
-			const ticketIndex = prevState.findIndex(t => t.id === ticket.id);
-			if (ticketIndex !== -1) {
-				const aux = [...prevState];
-				aux[ticketIndex] = ticket;
-				if (ticket.unreadMessages > 0) {
-					aux.unshift(aux.splice(ticketIndex, 1)[0]);
-				}
-				return aux;
-			} else {
-				return [...prevState, ticket];
-			}
-		});
-	};
-
-	const deleteTicket = ({ ticketId }) => {
-		setTickets(prevState => {
-			const ticketIndex = prevState.findIndex(ticket => ticket.id === ticketId);
-
-			if (ticketIndex !== -1) {
-				let aux = [...prevState];
-				aux.splice(ticketIndex, 1);
-				return aux;
-			} else {
-				return prevState;
-			}
-		});
 	};
 
 	const showDesktopNotification = ({ message, contact, ticket }) => {
@@ -307,21 +333,6 @@ const Tickets = () => {
 		});
 
 		document.getElementById("sound").play();
-	};
-
-	const resetUnreadMessages = ({ ticketId }) => {
-		setTickets(prevState => {
-			const ticketIndex = prevState.findIndex(
-				ticket => ticket.id === +ticketId
-			);
-			if (ticketIndex !== -1) {
-				let aux = [...prevState];
-				aux[ticketIndex].unreadMessages = 0;
-				return aux;
-			} else {
-				return prevState;
-			}
-		});
 	};
 
 	const handleSelectTicket = (e, ticket) => {
