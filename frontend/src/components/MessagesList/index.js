@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useReducer } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
@@ -222,6 +222,52 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_MESSAGES") {
+		const messages = action.payload;
+		const newMessages = [];
+
+		messages.forEach(message => {
+			const messageIndex = state.findIndex(m => m.id === message.id);
+			if (messageIndex !== -1) {
+				state[messageIndex] = message;
+			} else {
+				newMessages.push(message);
+			}
+		});
+
+		return [...newMessages, ...state];
+	}
+
+	if (action.type === "ADD_MESSAGE") {
+		const newMessage = action.payload;
+		const messageIndex = state.findIndex(m => m.id === newMessage.id);
+
+		if (messageIndex !== -1) {
+			state[messageIndex] = newMessage;
+		} else {
+			state.push(newMessage);
+		}
+
+		return [...state];
+	}
+
+	if (action.type === "UPDATE_MESSAGE") {
+		const messageToUpdate = action.payload;
+		const messageIndex = state.findIndex(m => m.id === messageToUpdate.id);
+
+		if (messageIndex !== -1) {
+			state[messageIndex].ack = messageToUpdate.ack;
+		}
+
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
+
 const MessagesList = () => {
 	const { ticketId } = useParams();
 	const history = useHistory();
@@ -232,18 +278,19 @@ const MessagesList = () => {
 	const [loading, setLoading] = useState(true);
 	const [contact, setContact] = useState({});
 	const [ticket, setTicket] = useState({});
-	const [messagesList, setMessagesList] = useState([]);
-	const [hasMore, setHasMore] = useState(false);
-	const [pageNumber, setPageNumber] = useState(1);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const lastMessageRef = useRef();
+
+	const [messagesList, dispatch] = useReducer(reducer, []);
+	const [hasMore, setHasMore] = useState(false);
+	const [pageNumber, setPageNumber] = useState(1);
 
 	const [anchorEl, setAnchorEl] = useState(null);
 	const moreMenuOpen = Boolean(anchorEl);
 
 	useEffect(() => {
+		dispatch({ type: "RESET" });
 		setPageNumber(1);
-		setMessagesList([]);
 	}, [ticketId]);
 
 	useEffect(() => {
@@ -256,9 +303,7 @@ const MessagesList = () => {
 					});
 					setContact(data.ticket.contact);
 					setTicket(data.ticket);
-					setMessagesList(prevMessages => {
-						return [...data.messages, ...prevMessages];
-					});
+					dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
 					setHasMore(data.hasMore);
 					setLoading(false);
 					if (pageNumber === 1 && data.messages.length > 1) {
@@ -280,14 +325,12 @@ const MessagesList = () => {
 		socket.emit("joinChatBox", ticketId, () => {});
 
 		socket.on("appMessage", data => {
-			if (loading) return;
-
 			if (data.action === "create") {
-				addMessage(data.message);
+				dispatch({ type: "ADD_MESSAGE", payload: data.message });
 				scrollToBottom();
 			}
 			if (data.action === "update") {
-				updateMessageAck(data.message);
+				dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
 			}
 		});
 
@@ -300,36 +343,10 @@ const MessagesList = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [ticketId, loading]);
+	}, [ticketId]);
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);
-	};
-
-	const addMessage = message => {
-		setMessagesList(prevState => {
-			if (prevState.length >= 20) {
-				let aux = [...prevState];
-				aux.shift();
-				aux.push(message);
-				return aux;
-			} else {
-				return [...prevState, message];
-			}
-		});
-	};
-
-	const updateMessageAck = message => {
-		setMessagesList(prevState => {
-			const messageIndex = prevState.findIndex(m => m.id === message.id);
-			if (messageIndex !== -1) {
-				let aux = [...prevState];
-				aux[messageIndex].ack = message.ack;
-				return aux;
-			} else {
-				return prevState;
-			}
-		});
 	};
 
 	const scrollToBottom = () => {
@@ -354,8 +371,6 @@ const MessagesList = () => {
 			loadMore();
 		}
 	};
-
-	console.log(messagesList);
 
 	const checkMessaageMedia = message => {
 		if (message.mediaType === "image") {

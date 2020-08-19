@@ -182,7 +182,7 @@ const reducer = (state, action) => {
 			state[ticketIndex] = ticket;
 			state.unshift(state.splice(ticketIndex, 1)[0]);
 		} else {
-			state.push(ticket);
+			state.unshift(ticket);
 		}
 		return [...state];
 	}
