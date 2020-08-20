@@ -23,7 +23,13 @@ const setMessagesAsRead = async ticket => {
 		}
 	);
 
-	await wbot.sendSeen(`${ticket.contact.number}@c.us`);
+	try {
+		await wbot.sendSeen(`${ticket.contact.number}@c.us`);
+	} catch (err) {
+		console.log(
+			"Could not mark messages as read. Maybe whatsapp session disconnected?"
+		);
+	}
 
 	io.to("notification").emit("ticket", {
 		action: "updateUnread",
