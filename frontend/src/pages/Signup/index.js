@@ -67,10 +67,10 @@ const SignUp = () => {
 		e.preventDefault();
 		try {
 			await api.post("/auth/signup", user);
-			toast.success(i18n.t("signup.toast.success"));
+			toast.success(i18n.t("signup.toasts.success"));
 			history.push("/login");
 		} catch (err) {
-			toast.error(i18n.t("signup.toast.fail"));
+			toast.error(i18n.t("signup.toasts.fail"));
 		}
 	};
 

@@ -4,7 +4,7 @@ const messages = {
 			signup: {
 				title: "Sign up",
 				toasts: {
-					success: "User created successfully! Please login !!!.",
+					success: "User created successfully! Please login!",
 					fail: "Error creating user. Check the reported data.",
 				},
 				form: {
