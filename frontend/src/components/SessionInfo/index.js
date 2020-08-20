@@ -7,8 +7,6 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 
 const SessionInfo = ({ session }) => {
-	console.log(session);
-
 	const handleDisconectSession = async () => {
 		try {
 			await api.delete("/whatsapp/session/1");
