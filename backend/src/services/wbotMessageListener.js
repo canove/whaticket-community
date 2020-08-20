@@ -137,8 +137,12 @@ const wbotMessageListener = () => {
 	const io = getIO();
 
 	wbot.on("message", async msg => {
-		// console.log(msg);
-		if (msg.from === "status@broadcast" || msg.type === "location") {
+		console.log(msg);
+		if (
+			msg.from === "status@broadcast" ||
+			msg.type === "location" ||
+			msg.type === "call_log"
+		) {
 			return;
 		}
 
