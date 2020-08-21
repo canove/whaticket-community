@@ -9,7 +9,7 @@ const Ticket = require("../models/Ticket");
 const Message = require("../models/Message");
 
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot } = require("../libs/wbot");
 
 const verifyContact = async (msgContact, profilePicUrl) => {
 	let contact = await Contact.findOne({
@@ -136,8 +136,8 @@ const wbotMessageListener = () => {
 	const wbot = getWbot();
 	const io = getIO();
 
-	wbot.on("message", async msg => {
-		// console.log(msg);
+	wbot.on("message_create", async msg => {
+		console.log(msg);
 		if (
 			msg.from === "status@broadcast" ||
 			msg.type === "location" ||
@@ -147,7 +147,22 @@ const wbotMessageListener = () => {
 		}
 
 		try {
-			const msgContact = await msg.getContact();
+			let msgContact;
+
+			if (msg.fromMe) {
+				const alreadyExists = await Message.findOne({
+					where: { id: msg.id.id },
+				});
+				// return if message was already created by messagesController
+				if (alreadyExists) {
+					return;
+				}
+
+				msgContact = await wbot.getContactById(msg.to);
+			} else {
+				msgContact = await msg.getContact();
+			}
+
 			const profilePicUrl = await msgContact.getProfilePicUrl();
 			const contact = await verifyContact(msgContact, profilePicUrl);
 			const ticket = await verifyTicket(contact);
@@ -164,12 +179,11 @@ const wbotMessageListener = () => {
 			const messageToUpdate = await Message.findOne({
 				where: { id: msg.id.id },
 			});
+
 			if (!messageToUpdate) {
-				// will throw an error if msg was sent from cellphone
-				const error = new Error("No message with this ID found in database");
-				error.statusCode = 404;
-				throw error;
+				return;
 			}
+
 			await messageToUpdate.update({ ack: ack });
 
 			io.to(messageToUpdate.ticketId).emit("appMessage", {
