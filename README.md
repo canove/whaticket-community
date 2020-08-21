@@ -24,6 +24,18 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 
 <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat3.png" width="350">
 
+## Demo
+
+**Note**: It's not a good idea to sync your whatsapp account is this demo enviroment, because all your received messages will be stored in database and will be accessible by everyone that access this URL and creates an account.
+
+That said, theres not much to test without syncing an whatsapp account, since adding contacts or tickets simple throws an error if app is not synced with whatassp. I will create a better test enviroment in future.
+
+Meanwhile, if you want to test it, remember to disconnect session and delete all tickets and contacts after your tests.
+
+https://whaticket.economicros.com.br/
+
+It's online thanks to [@ramphyx](https://github.com/ramphyx), that provided the VPS to create installation instructions.
+
 ## Installation and Usage (Linux Debian/Ubuntu)
 
 Create Mysql Database using docker:
@@ -256,16 +268,6 @@ Enable SSL on nginx (Accept all information asked):
 ```bash
 sudo certbot --nginx
 ```
-
-## Demo
-
-**Note**: It's not a good idea to sync your whatsapp account is this demo enviroment, because all your received messages will be stored in database and will be accessible by everyone that access this URL and creates an account.
-
-That said, theres not much to test without syncing an whatsapp account, since adding contacts or tickets simple throws an error if app is not synced with whatassp. I will create a better test enviroment in future.
-
-Meanwhile, if you want to test it, remember to disconnect session and delete all tickets and contacts after your tests.
-
-https://whaticket.economicros.com.br/
 
 ## Features
 
