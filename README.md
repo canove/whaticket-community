@@ -142,12 +142,6 @@ Copy the last line outputed from previus command and run it, its something like:
 sudo env PATH=\$PATH:/usr/bin pm2 startup ubuntu -u YOUR_USERNAME --hp /home/YOUR_USERNAM
 ```
 
-Finally, save process list that should start at boot:
-
-```bash
-pm2 save
-```
-
 Now, lets prepare frontend:
 
 ```bash
