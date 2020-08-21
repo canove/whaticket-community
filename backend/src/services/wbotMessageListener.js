@@ -9,7 +9,7 @@ const Ticket = require("../models/Ticket");
 const Message = require("../models/Message");
 
 const { getIO } = require("../libs/socket");
-const { getWbot } = require("../libs/wbot");
+const { getWbot, init } = require("../libs/wbot");
 
 const verifyContact = async (msgContact, profilePicUrl) => {
 	let contact = await Contact.findOne({
@@ -66,7 +66,7 @@ const verifyTicket = async contact => {
 const handlMedia = async (msg, ticket) => {
 	const media = await msg.downloadMedia();
 	let newMessage;
-
+	console.log("criando midia");
 	if (media) {
 		if (!media.filename) {
 			let ext = media.mimetype.split("/")[1].split(";")[0];
@@ -150,14 +150,6 @@ const wbotMessageListener = () => {
 			let msgContact;
 
 			if (msg.fromMe) {
-				const alreadyExists = await Message.findOne({
-					where: { id: msg.id.id },
-				});
-				// return if message was already created by messagesController
-				if (alreadyExists) {
-					return;
-				}
-
 				msgContact = await wbot.getContactById(msg.to);
 			} else {
 				msgContact = await msg.getContact();
@@ -166,6 +158,17 @@ const wbotMessageListener = () => {
 			const profilePicUrl = await msgContact.getProfilePicUrl();
 			const contact = await verifyContact(msgContact, profilePicUrl);
 			const ticket = await verifyTicket(contact);
+
+			//return if message was already created by messageController
+			if (msg.fromMe) {
+				const alreadyExists = await Message.findOne({
+					where: { id: msg.id.id },
+				});
+
+				if (alreadyExists) {
+					return;
+				}
+			}
 
 			await handleMessage(msg, ticket, contact);
 		} catch (err) {
@@ -179,11 +182,9 @@ const wbotMessageListener = () => {
 			const messageToUpdate = await Message.findOne({
 				where: { id: msg.id.id },
 			});
-
 			if (!messageToUpdate) {
 				return;
 			}
-
 			await messageToUpdate.update({ ack: ack });
 
 			io.to(messageToUpdate.ticketId).emit("appMessage", {
