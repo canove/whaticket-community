@@ -261,7 +261,9 @@ sudo certbot --nginx
 
 **Note**: It's not a good idea to sync your whatsapp account is this demo enviroment, because all your received messages will be stored in database and will be accessible by everyone that access this URL and creates an account.
 
-If you want to test it, do it with a dummy whatsapp number and delete all tickets and contacts after your tests.
+That said, theres not much to test without syncing an whatsapp account, since adding contacts or tickets simple throws an error if app is not synced with whatassp. I will create a better test enviroment in future.
+
+Meanwhile, if you want to test it, remember to disconnect session and delete all tickets and contacts after your tests.
 
 https://whaticket.economicros.com.br/
 
