@@ -10,7 +10,7 @@ Frontend is a full-featured multi-user _chat app_ bootstrapped with react-create
 
 ## Motivation
 
-I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Since WhatsApp Web doesn't allow multiple users, and 90% of our tickets comes from this channel, we created this to avoid the: 'Can I use Whatsapp now?' shoulder taps.
+I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Since WhatsApp Web doesn't allow multiple users, and 90% of our tickets comes from this channel, we created this to share same whatsapp account cross our team.
 
 ## How it works?
 
@@ -53,6 +53,223 @@ sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service l
 - Create an user and login with it.
 - On the sidebard, go to _Connection_ and read QRCode with your WhatsApp.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
+
+## Basic production deployment (Ubuntu 18.04 VPS)
+
+You need two subdomains forwarding to youts VPS ip to follow these instructions. We'll use `myapp.mydomain.com` and `api.mydomain.com` in examples.
+
+Update all system packages:
+
+```bash
+apt update && apt upgrade
+```
+
+Install node and confirm node command is available:
+
+```bash
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+npm -v
+```
+
+Install docker:
+
+```bash
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+sudo apt update
+sudo apt install docker-ce
+sudo systemctl status docker
+```
+
+Add current user to docker group:
+
+```bash
+sudo usermod -aG docker \${USER}
+su - \${USER}
+```
+
+Create database container (Instructions in installation)
+
+Clone this repository:
+
+```bash
+git clone https://github.com/canove/whaticket whaticket
+```
+
+Create the backend .env file and fill with database details:
+
+```bash
+cp whaticket/backend/.env.example whaticket/backend/.env
+nano whaticket/backend/.env
+```
+
+Install puppeteer dependencies(Instructions in installation)
+
+Install backend dependencies and run migrations:
+
+```bash
+cd whaticket/backend
+npm install
+npx sequelize db:migrate
+```
+
+Start backend to confirm its working, you should see: `Server started on port...` on console.
+
+Install pm2 **with sudo**:
+
+```bash
+sudo npm install -g pm2
+```
+
+Start backend with pm2:
+
+```bash
+pm2 start src/app.js --name whaticket-backend
+```
+
+Make pm2 auto start afeter reboot:
+
+```bash
+pm2 startup ubuntu -u YOUR_USERNAME
+```
+
+Copy the last line outputed from previus command and run it, its something like:
+
+```bash
+sudo env PATH=\$PATH:/usr/bin pm2 startup ubuntu -u YOUR_USERNAME --hp /home/YOUR_USERNAM
+```
+
+Finally, save process list that should start at boot:
+
+```bash
+pm2 save
+```
+
+Now, lets prepare frontend:
+
+```bash
+cd ../whaticket/frontend
+npm install
+```
+
+Edit .env file and fill it with your backend address, it should look like this:
+
+```bash
+REACT_APP_BACKEND_URL = https://api.mydomain.com/
+```
+
+Build frontend app:
+
+```bash
+npm run build
+```
+
+Start frotend with pm2:
+
+```bash
+pm2 start server.js --name whaticket-frontend
+```
+
+Save pm2 process list to start automatically after reboot:
+
+```bash
+pm2 save
+```
+
+Install nginx:
+
+```bash
+sudo apt install nginx
+```
+
+Remove nginx default site:
+
+```bash
+sudo rm /etc/nginx/sites-enabled/default
+sudo service nginx restart
+```
+
+Create a new nginx site to frontend app:
+
+```bash
+sudo nano /etc/nginx/sites-available/whaticket-frontend
+```
+
+Edit and fill it with this information, changing `server_name` to yours equivalent to `myapp.mydomain.com`:
+
+```bash
+server {
+  server_name myapp.mydomain.com;
+
+  location / {
+    proxy_pass http://127.0.0.1:3333;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
+```
+
+Create another one to backend api, changing `server_name` to yours equivalent to `api.mydomain.com`, and `proxy_pass` to you localhost backend node server URL:
+
+```bash
+sudo cp /etc/nginx/sites-available/whaticket-frontend /etc/nginx/sites-available/whaticket-backend
+sudo nano /etc/nginx/sites-available/whaticket-backend
+```
+
+```bash
+server {
+  server_name api.mydomain.com;
+
+  location / {
+    proxy_pass http://127.0.0.1:8080;
+    ......
+}
+```
+
+Create a symbolic link to enalbe nginx site:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/whaticket-frontend /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/whaticket-backend /etc/nginx/sites-enabled
+```
+
+Test nginx configuration and restart server:
+
+```bash
+sudo nginx -t
+sudo service nginx restart
+```
+
+Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. A easy way to this is using Certbot:
+
+Install certbor with snapd:
+
+```bash
+sudo snap install --classic certbot
+```
+
+Enable SSL on nginx (Accept all information asked):
+
+```bash
+sudo certbot --nginx
+```
+
+## Demo
+
+**Note**: It's not a good idea to sync your whatsapp account is this demo enviroment, because all your received messages will be stored in database and will be accessible by everyone that access this URL and creates an account.
+
+If you want to test it, do it with a dummy whatsapp number and delete all tickets and contacts after your tests.
+
+https://whaticket.economicros.com.br/
 
 ## Features
 
