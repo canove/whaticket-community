@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
-import MainDrawer from "../components/MainDrawer";
+import MainDrawer from "../components/_layout";
 import Dashboard from "../pages/Dashboard/";
 import Chat from "../pages/Chat/";
 import Signup from "../pages/Signup/";

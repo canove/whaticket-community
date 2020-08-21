@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -23,8 +23,8 @@ import Menu from "@material-ui/core/Menu";
 
 import openSocket from "socket.io-client";
 import { format } from "date-fns";
-import { toast } from "react-toastify";
-import { useHistory, useParams } from "react-router-dom";
+// import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom";
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -119,9 +119,10 @@ const MainDrawer = ({ appTitle, children }) => {
 	const drawerState = localStorage.getItem("drawerOpen");
 
 	const history = useHistory();
+	const ticketId = +history.location.pathname.split("/")[2];
+	const soundAlert = useRef(new Audio(require("../../assets/sound.mp3")));
 	const userId = +localStorage.getItem("userId");
-	const { ticketId } = useParams();
-	const [notifications, setNotifications] = useState([]);
+	// const [notifications, setNotifications] = useState([]);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -181,7 +182,7 @@ const MainDrawer = ({ appTitle, children }) => {
 			}
 		});
 
-		document.getElementById("sound").play();
+		soundAlert.current.play();
 	};
 
 	const handleDrawerOpen = () => {
@@ -290,11 +291,6 @@ const MainDrawer = ({ appTitle, children }) => {
 
 				{children ? children : null}
 			</main>
-			<audio id="sound" preload="auto">
-				<source src={require("../../assets/sound.mp3")} type="audio/mpeg" />
-				<source src={require("../../assets/sound.ogg")} type="audio/ogg" />
-				<embed hidden={true} autostart="false" loop={false} src="./sound.mp3" />
-			</audio>
 		</div>
 	);
 };

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useReducer } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import openSocket from "socket.io-client";
-import { format } from "date-fns";
 import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -230,14 +229,6 @@ const Tickets = () => {
 	const [tickets, dispatch] = useReducer(reducer, []);
 
 	useEffect(() => {
-		if (!("Notification" in window)) {
-			console.log("This browser doesn't support notifications");
-		} else {
-			Notification.requestPermission();
-		}
-	}, []);
-
-	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
 	}, [searchParam, tab]);
@@ -290,14 +281,6 @@ const Tickets = () => {
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
 				dispatch({ type: "UPDATE_TICKETS", payload: data.ticket });
-				if (
-					(ticketId &&
-						data.message.ticketId === +ticketId &&
-						document.visibilityState === "visible") ||
-					(data.ticket.userId !== userId && data.ticket.userId)
-				)
-					return;
-				showDesktopNotification(data);
 			}
 		});
 
@@ -308,31 +291,6 @@ const Tickets = () => {
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
-	};
-
-	const showDesktopNotification = ({ message, contact, ticket }) => {
-		const options = {
-			body: `${message.body} - ${format(new Date(), "HH:mm")}`,
-			icon: contact.profilePicUrl,
-			tag: ticket.id,
-		};
-		let notification = new Notification(
-			`${i18n.t("tickets.notification.message")} ${contact.name}`,
-			options
-		);
-
-		notification.onclick = function (event) {
-			event.preventDefault(); //
-			window.open(`/chat/${ticket.id}`, "_self");
-		};
-
-		document.addEventListener("visibilitychange", () => {
-			if (document.visibilityState === "visible") {
-				notification.close();
-			}
-		});
-
-		document.getElementById("sound").play();
 	};
 
 	const handleSelectTicket = (e, ticket) => {
@@ -559,11 +517,6 @@ const Tickets = () => {
 					</List>
 				</Paper>
 			</TabPanel>
-			<audio id="sound" preload="auto">
-				<source src={require("../../assets/sound.mp3")} type="audio/mpeg" />
-				<source src={require("../../assets/sound.ogg")} type="audio/ogg" />
-				<embed hidden={true} autostart="false" loop={false} src="./sound.mp3" />
-			</audio>
 		</Paper>
 	);
 };
