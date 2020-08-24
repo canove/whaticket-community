@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import openSocket from "socket.io-client";
-import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -16,14 +14,19 @@ import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 
 import TicketsSkeleton from "../TicketsSkeleton";
 import NewTicketModal from "../NewTicketModal";
-import TicketsList from "../TicketsList";
+// import TicketsList from "../TicketsList";
+import TicketListItem from "../TicketListItem";
+
 import TabPanel from "../TabPanel";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
+import useTickets from "../../hooks/useTickets";
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -154,140 +157,45 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const reducer = (state, action) => {
-	if (action.type === "LOAD_TICKETS") {
-		const newTickets = action.payload;
-
-		newTickets.forEach(ticket => {
-			const ticketIndex = state.findIndex(t => t.id === ticket.id);
-			if (ticketIndex !== -1) {
-				state[ticketIndex] = ticket;
-				if (ticket.unreadMessages > 0) {
-					state.unshift(state.splice(ticketIndex, 1)[0]);
-				}
-			} else {
-				state.push(ticket);
-			}
-		});
-
-		return [...state];
-	}
-
-	if (action.type === "UPDATE_TICKETS") {
-		const ticket = action.payload;
-
-		const ticketIndex = state.findIndex(t => t.id === ticket.id);
-		if (ticketIndex !== -1) {
-			state[ticketIndex] = ticket;
-			state.unshift(state.splice(ticketIndex, 1)[0]);
-		} else {
-			state.unshift(ticket);
-		}
-		return [...state];
-	}
-
-	if (action.type === "DELETE_TICKET") {
-		const ticketId = action.payload;
-
-		const ticketIndex = state.findIndex(t => t.id === ticketId);
-		if (ticketIndex !== -1) {
-			state.splice(ticketIndex, 1);
-		}
-		return [...state];
-	}
-
-	if (action.type === "RESET_UNREAD") {
-		const ticketId = action.payload;
-
-		const ticketIndex = state.findIndex(t => t.id === ticketId);
-		if (ticketIndex !== -1) {
-			state[ticketIndex].unreadMessages = 0;
-		}
-		return [...state];
-	}
-
-	if (action.type === "RESET") {
-		return [];
-	}
-};
-
 const Tickets = () => {
 	const classes = useStyles();
 	const history = useHistory();
 
-	const token = localStorage.getItem("token");
 	const userId = +localStorage.getItem("userId");
 	const { ticketId } = useParams();
-	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 	const [showAllTickets, setShowAllTickets] = useState(false);
-
 	const [pageNumber, setPageNumber] = useState(1);
-	const [hasMore, setHasMore] = useState(false);
-	const [tickets, dispatch] = useReducer(reducer, []);
+
+	const {
+		tickets: ticketsOpen,
+		hasMore: hasMoreOpen,
+		loading: loadingOpen,
+		dispatch: dispatchOpen,
+	} = useTickets({
+		pageNumber,
+		searchParam,
+		status: "open",
+	});
+
+	const {
+		tickets: ticketsPending,
+		hasMore: hasMorePending,
+		loading: loadingPending,
+		dispatch: dispatchPending,
+	} = useTickets({
+		pageNumber,
+		searchParam,
+		status: "pending",
+	});
 
 	useEffect(() => {
-		dispatch({ type: "RESET" });
+		dispatchOpen({ type: "RESET" });
+		dispatchPending({ type: "RESET" });
 		setPageNumber(1);
-	}, [searchParam, tab]);
-
-	useEffect(() => {
-		setLoading(true);
-		const delayDebounceFn = setTimeout(() => {
-			const fetchTickets = async () => {
-				try {
-					const { data } = await api.get("/tickets", {
-						params: { searchParam, pageNumber, status: tab },
-					});
-					dispatch({
-						type: "LOAD_TICKETS",
-						payload: data.tickets,
-					});
-					setHasMore(data.hasMore);
-					setLoading(false);
-				} catch (err) {
-					console.log(err);
-				}
-			};
-			fetchTickets();
-		}, 500);
-		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, token, tab]);
-
-	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinNotification");
-
-		socket.on("ticket", data => {
-			if (data.action === "updateUnread") {
-				dispatch({ type: "RESET_UNREAD", payload: data.ticketId });
-			}
-
-			if (data.action === "updateStatus" || data.action === "create") {
-				dispatch({ type: "UPDATE_TICKETS", payload: data.ticket });
-			}
-
-			if (data.action === "delete") {
-				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
-				if (ticketId && data.ticketId === +ticketId) {
-					toast.warn(i18n.t("tickets.toasts.deleted"));
-					history.push("/chat");
-				}
-			}
-		});
-
-		socket.on("appMessage", data => {
-			if (data.action === "create") {
-				dispatch({ type: "UPDATE_TICKETS", payload: data.ticket });
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, [history, ticketId, userId]);
+	}, [searchParam, tab, dispatchOpen, dispatchPending]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
@@ -297,9 +205,12 @@ const Tickets = () => {
 		history.push(`/chat/${ticket.id}`);
 	};
 
+	// console.log(tickets);
+
 	const handleSearchContact = e => {
 		if (e.target.value === "") {
 			setSearchParam(e.target.value.toLowerCase());
+			setTab("open");
 			return;
 		}
 		setSearchParam(e.target.value.toLowerCase());
@@ -307,7 +218,7 @@ const Tickets = () => {
 	};
 
 	const handleScroll = e => {
-		if (!hasMore || loading) return;
+		if (!hasMoreOpen || loadingOpen) return;
 		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
 		if (scrollHeight - (scrollTop + 100) < clientHeight) {
@@ -331,16 +242,16 @@ const Tickets = () => {
 		history.push(`/chat/${ticketId}`);
 	};
 
-	const countTickets = (status, userId) => {
-		const ticketsFound = tickets.filter(
-			t =>
-				(t.status === status && t.userId === userId) ||
-				(t.status === status && showAllTickets)
-		).length;
+	// const countTickets = (status, userId) => {
+	// 	const ticketsFound = tickets.filter(
+	// 		t =>
+	// 			(t.status === status && t.userId === userId) ||
+	// 			(t.status === status && showAllTickets)
+	// 	).length;
 
-		if (ticketsFound === 0) return "";
-		return ticketsFound;
-	};
+	// 	if (ticketsFound === 0) return "";
+	// 	return ticketsFound;
+	// };
 
 	return (
 		<Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
@@ -397,9 +308,7 @@ const Tickets = () => {
 				>
 					<div className={classes.ticketsListHeader}>
 						{i18n.t("tickets.tabs.open.assignedHeader")}
-						<span className={classes.ticketsCount}>
-							{countTickets("open", userId)}
-						</span>
+						<span className={classes.ticketsCount}>{ticketsOpen.length}</span>
 						<div className={classes.ticketsListActions}>
 							<FormControlLabel
 								label={i18n.t("tickets.buttons.showAll")}
@@ -424,21 +333,25 @@ const Tickets = () => {
 						</div>
 					</div>
 					<List style={{ paddingTop: 0 }}>
-						<TicketsList
-							tickets={tickets}
-							loading={loading}
-							handleSelectTicket={handleSelectTicket}
-							showAllTickets={showAllTickets}
-							ticketId={ticketId}
-							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle={i18n.t("tickets.tabs.open.openNoTicketsTitle")}
-							noTicketsMessage={i18n.t(
-								"tickets.tabs.open.openNoTicketsMessage"
-							)}
-							status="open"
-							userId={userId}
-						/>
-						{loading && <TicketsSkeleton />}
+						{ticketsOpen.length === 0 ? (
+							<ListItem>
+								<ListItemText>
+									You haven&apos;t received any messages yet.
+								</ListItemText>
+							</ListItem>
+						) : (
+							ticketsOpen.map(ticket => (
+								<TicketListItem
+									ticket={ticket}
+									key={ticket.id}
+									// loading={loading}
+									handleSelectTicket={handleSelectTicket}
+									handleAcepptTicket={handleAcepptTicket}
+									ticketId={ticketId}
+								/>
+							))
+						)}
+						{loadingOpen && <TicketsSkeleton />}
 					</List>
 				</Paper>
 				<Paper
@@ -450,25 +363,29 @@ const Tickets = () => {
 					<div className={classes.ticketsListHeader}>
 						{i18n.t("tickets.tabs.open.pendingHeader")}
 						<span className={classes.ticketsCount}>
-							{countTickets("pending", null)}
+							{ticketsPending.length}
 						</span>
 					</div>
 					<List style={{ paddingTop: 0 }}>
-						<TicketsList
-							tickets={tickets}
-							loading={loading}
-							handleSelectTicket={handleSelectTicket}
-							showAllTickets={showAllTickets}
-							ticketId={ticketId}
-							handleAcepptTicket={handleAcepptTicket}
-							noTicketsTitle={i18n.t("tickets.tabs.open.pendingNoTicketsTitle")}
-							noTicketsMessage={i18n.t(
-								"tickets.tabs.open.pendingNoTicketsMessage"
-							)}
-							status="pending"
-							userId={null}
-						/>
-						{loading && <TicketsSkeleton />}
+						{ticketsPending.length === 0 ? (
+							<ListItem>
+								<ListItemText>
+									You haven&apos;t received any messages yet.
+								</ListItemText>
+							</ListItem>
+						) : (
+							ticketsPending.map(ticket => (
+								<TicketListItem
+									ticket={ticket}
+									key={ticket.id}
+									// loading={loading}
+									handleSelectTicket={handleSelectTicket}
+									handleAcepptTicket={handleAcepptTicket}
+									ticketId={ticketId}
+								/>
+							))
+						)}
+						{loadingPending && <TicketsSkeleton />}
 					</List>
 				</Paper>
 			</TabPanel>
@@ -480,7 +397,7 @@ const Tickets = () => {
 					onScroll={handleScroll}
 				>
 					<List style={{ paddingTop: 0 }}>
-						<TicketsList
+						{/* <TicketsList
 							tickets={tickets}
 							loading={loading}
 							handleSelectTicket={handleSelectTicket}
@@ -490,7 +407,7 @@ const Tickets = () => {
 							status="closed"
 							userId={null}
 						/>
-						{loading && <TicketsSkeleton />}
+						{loading && <TicketsSkeleton />} */}
 					</List>
 				</Paper>
 			</TabPanel>
@@ -502,7 +419,7 @@ const Tickets = () => {
 					onScroll={handleScroll}
 				>
 					<List style={{ paddingTop: 0 }}>
-						<TicketsList
+						{/* <TicketsList
 							tickets={tickets}
 							loading={loading}
 							handleSelectTicket={handleSelectTicket}
@@ -513,7 +430,7 @@ const Tickets = () => {
 							noTicketsMessage={i18n.t("tickets.tabs.search.noTicketsMessage")}
 							status="all"
 						/>
-						{loading && <TicketsSkeleton />}
+						{loading && <TicketsSkeleton />} */}
 					</List>
 				</Paper>
 			</TabPanel>

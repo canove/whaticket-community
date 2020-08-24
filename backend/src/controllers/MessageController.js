@@ -126,7 +126,6 @@ exports.store = async (req, res, next) => {
 	});
 
 	if (media) {
-		console.log(media);
 		const newMedia = MessageMedia.fromFilePath(req.file.path);
 
 		message.mediaUrl = req.file.filename;

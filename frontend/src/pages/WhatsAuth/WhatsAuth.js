@@ -51,8 +51,6 @@ const WhatsAuth = () => {
 		fetchSession();
 	}, []);
 
-	console.log("session", session);
-
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 

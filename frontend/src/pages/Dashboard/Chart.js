@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import {
 	BarChart,
@@ -14,12 +14,14 @@ import { startOfHour, parseISO, format } from "date-fns";
 import { i18n } from "../../translate/i18n";
 
 import Title from "./Title";
-import api from "../../services/api";
+import useTickets from "../../hooks/useTickets";
 
 const Chart = () => {
 	const theme = useTheme();
 
-	const [tickets, setTickets] = useState([]);
+	const date = useRef(new Date().toISOString());
+	const { tickets } = useTickets({ date: date.current });
+
 	const [chartData, setChartData] = useState([
 		{ time: "08:00", amount: 0 },
 		{ time: "09:00", amount: 0 },
@@ -36,38 +38,25 @@ const Chart = () => {
 	]);
 
 	useEffect(() => {
-		const feathTickets = async () => {
-			try {
-				const { data } = await api.get("/tickets", {
-					params: { date: new Date().toISOString() },
-				});
-				const ticketsData = data.tickets;
-				setTickets(ticketsData);
-				setChartData(prevState => {
-					let aux = [...prevState];
+		setChartData(prevState => {
+			let aux = [...prevState];
 
-					aux.map(a => {
-						ticketsData.forEach(ticket => {
-							if (
-								format(startOfHour(parseISO(ticket.createdAt)), "HH:mm") ===
-								a.time
-							) {
-								return a.amount++;
-							} else {
-								return a;
-							}
-						});
+			aux.map(a => {
+				tickets.forEach(ticket => {
+					if (
+						format(startOfHour(parseISO(ticket.createdAt)), "HH:mm") === a.time
+					) {
+						return a.amount++;
+					} else {
 						return a;
-					});
-
-					return aux;
+					}
 				});
-			} catch (err) {
-				console.log(err);
-			}
-		};
-		feathTickets();
-	}, []);
+				return a;
+			});
+
+			return aux;
+		});
+	}, [tickets]);
 
 	return (
 		<React.Fragment>

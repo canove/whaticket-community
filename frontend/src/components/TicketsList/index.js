@@ -110,7 +110,7 @@ const TicketsList = ({
 						dense
 						button
 						onClick={e => {
-							if (ticket.status === "pending") return;
+							if (ticket.status === "pending" && handleAcepptTicket) return;
 							handleSelectTicket(e, ticket);
 						}}
 						selected={ticketId && +ticketId === ticket.id}
@@ -179,7 +179,7 @@ const TicketsList = ({
 								</span>
 							}
 						/>
-						{ticket.status === "pending" ? (
+						{ticket.status === "pending" && handleAcepptTicket ? (
 							<Button
 								variant="contained"
 								size="small"

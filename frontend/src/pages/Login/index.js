@@ -20,8 +20,8 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 const Copyright = () => {
 	return (
 		<Typography variant="body2" color="textSecondary" align="center">
-			{"Copyright © "}
-			<Link color="inherit" href="https://economicros.com.br/">
+			{"Copyleft "}
+			<Link color="inherit" href="https://github.com/canove">
 				Canove
 			</Link>{" "}
 			{new Date().getFullYear()}

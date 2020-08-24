@@ -1,32 +1,22 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Drawer from "@material-ui/core/Drawer";
-
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
-
 import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import MainListItems from "./MainListItems";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
+import IconButton from "@material-ui/core/IconButton";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import AccountCircle from "@material-ui/icons/AccountCircle";
 
-import openSocket from "socket.io-client";
-import { format } from "date-fns";
-// import { toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
-import { i18n } from "../../translate/i18n";
-
+import MainListItems from "./MainListItems";
+import NotificationsPopOver from "./NotificationsPopOver";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
 const drawerWidth = 240;
@@ -115,22 +105,8 @@ const MainDrawer = ({ appTitle, children }) => {
 	const classes = useStyles();
 	const [open, setOpen] = useState(true);
 	const [anchorEl, setAnchorEl] = React.useState(null);
-	const menuOpen = Boolean(anchorEl);
+	const [menuOpen, setMenuOpen] = useState(false);
 	const drawerState = localStorage.getItem("drawerOpen");
-
-	const history = useHistory();
-	const ticketId = +history.location.pathname.split("/")[2];
-	const soundAlert = useRef(new Audio(require("../../assets/sound.mp3")));
-	const userId = +localStorage.getItem("userId");
-	// const [notifications, setNotifications] = useState([]);
-
-	useEffect(() => {
-		if (!("Notification" in window)) {
-			console.log("This browser doesn't support notifications");
-		} else {
-			Notification.requestPermission();
-		}
-	}, []);
 
 	useEffect(() => {
 		if (drawerState === "0") {
@@ -138,57 +114,11 @@ const MainDrawer = ({ appTitle, children }) => {
 		}
 	}, [drawerState]);
 
-	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinNotification");
-
-		socket.on("appMessage", data => {
-			if (data.action === "create") {
-				if (
-					(ticketId &&
-						data.message.ticketId === +ticketId &&
-						document.visibilityState === "visible") ||
-					(data.ticket.userId !== userId && data.ticket.userId)
-				)
-					return;
-				showDesktopNotification(data);
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, [history, ticketId, userId]);
-
-	const showDesktopNotification = ({ message, contact, ticket }) => {
-		const options = {
-			body: `${message.body} - ${format(new Date(), "HH:mm")}`,
-			icon: contact.profilePicUrl,
-			tag: ticket.id,
-		};
-		let notification = new Notification(
-			`${i18n.t("tickets.notification.message")} ${contact.name}`,
-			options
-		);
-
-		notification.onclick = function (event) {
-			event.preventDefault(); //
-			window.open(`/chat/${ticket.id}`, "_self");
-		};
-
-		document.addEventListener("visibilitychange", () => {
-			if (document.visibilityState === "visible") {
-				notification.close();
-			}
-		});
-
-		soundAlert.current.play();
-	};
-
 	const handleDrawerOpen = () => {
 		setOpen(true);
 		localStorage.setItem("drawerOpen", 1);
 	};
+
 	const handleDrawerClose = () => {
 		setOpen(false);
 		localStorage.setItem("drawerOpen", 0);
@@ -196,10 +126,12 @@ const MainDrawer = ({ appTitle, children }) => {
 
 	const handleMenu = event => {
 		setAnchorEl(event.currentTarget);
+		setMenuOpen(true);
 	};
 
-	const handleClose = () => {
+	const handleCloseMenu = () => {
 		setAnchorEl(null);
+		setMenuOpen(false);
 	};
 
 	return (
@@ -225,7 +157,7 @@ const MainDrawer = ({ appTitle, children }) => {
 			<AppBar
 				position="absolute"
 				className={clsx(classes.appBar, open && classes.appBarShift)}
-				color={process.env.NODE_ENV === "development" ? "secondary" : "primary"}
+				color={process.env.NODE_ENV === "development" ? "inherit" : "primary"}
 			>
 				<Toolbar variant="dense" className={classes.toolbar}>
 					<IconButton
@@ -249,11 +181,7 @@ const MainDrawer = ({ appTitle, children }) => {
 					>
 						{appTitle}
 					</Typography>
-					<IconButton color="inherit">
-						<Badge badgeContent={0} color="secondary">
-							<NotificationsIcon />
-						</Badge>
-					</IconButton>
+					<NotificationsPopOver />
 
 					<div>
 						<IconButton
@@ -278,9 +206,9 @@ const MainDrawer = ({ appTitle, children }) => {
 								horizontal: "right",
 							}}
 							open={menuOpen}
-							onClose={handleClose}
+							onClose={handleCloseMenu}
 						>
-							<MenuItem onClick={handleClose}>Profile</MenuItem>
+							<MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
 							<MenuItem onClick={handleLogout}>Logout</MenuItem>
 						</Menu>
 					</div>

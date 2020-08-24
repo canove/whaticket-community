@@ -27,14 +27,16 @@ exports.index = async (req, res) => {
 		},
 	];
 
-	if (status === "open") {
+	if (status) {
 		whereCondition = {
 			...whereCondition,
-			status: { [Sequelize.Op.or]: ["pending", "open"] },
+			status: status,
 		};
-	} else if (status === "closed") {
-		whereCondition = { ...whereCondition, status: "closed" };
-	} else if (searchParam) {
+	}
+	// else if (status === "closed") {
+	// 	whereCondition = { ...whereCondition, status: "closed" };
+	// }
+	else if (searchParam) {
 		includeCondition = [
 			...includeCondition,
 			{
