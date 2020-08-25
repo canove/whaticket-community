@@ -100,7 +100,7 @@ const Contacts = () => {
 				}
 			};
 			fetchContacts();
-		}, 1000);
+		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, page, rowsPerPage]);
 

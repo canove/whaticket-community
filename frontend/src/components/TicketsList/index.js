@@ -1,38 +1,55 @@
-import React from "react";
-import { parseISO, format, isSameDay } from "date-fns";
+import React, { useState, useEffect } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
-import Divider from "@material-ui/core/Divider";
-import Badge from "@material-ui/core/Badge";
-import Button from "@material-ui/core/Button";
+import List from "@material-ui/core/List";
+import Paper from "@material-ui/core/Paper";
 
+import TicketListItem from "../TicketListItem";
+import TicketsSkeleton from "../TicketsSkeleton";
+import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles(theme => ({
-	ticket: {
+	ticketsListWrapper: {
 		position: "relative",
-		"& .hidden-button": {
-			display: "none",
-		},
-		"&:hover .hidden-button": {
-			display: "flex",
-			position: "absolute",
-			left: "50%",
-		},
-	},
-	noTicketsDiv: {
 		display: "flex",
-		height: "100px",
-		margin: 40,
+		height: "100%",
 		flexDirection: "column",
+		overflow: "hidden",
+		borderTopRightRadius: 0,
+		borderBottomRightRadius: 0,
+	},
+
+	ticketsList: {
+		flex: 1,
+		overflowY: "scroll",
+		"&::-webkit-scrollbar": {
+			width: "8px",
+			height: "8px",
+		},
+		"&::-webkit-scrollbar-thumb": {
+			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
+			backgroundColor: "#e8e8e8",
+		},
+		borderTop: "2px solid rgba(0, 0, 0, 0.12)",
+	},
+
+	ticketsListHeader: {
+		display: "flex",
 		alignItems: "center",
-		justifyContent: "center",
+		fontWeight: 500,
+		fontSize: "16px",
+		height: "56px",
+		color: "rgb(67, 83, 105)",
+		padding: "0px 12px",
+		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+	},
+
+	ticketsCount: {
+		fontWeight: "normal",
+		color: "rgb(104, 121, 146)",
+		marginLeft: "8px",
+		fontSize: "14px",
 	},
 
 	noTicketsText: {
@@ -49,163 +66,100 @@ const useStyles = makeStyles(theme => ({
 		margin: "0px",
 	},
 
-	contactNameWrapper: {
+	noTicketsDiv: {
 		display: "flex",
-		justifyContent: "space-between",
-	},
-
-	lastMessageTime: {
-		justifySelf: "flex-end",
-	},
-
-	closedBadge: {
-		alignSelf: "center",
-		justifySelf: "flex-end",
-		marginRight: 32,
-		marginLeft: "auto",
-	},
-
-	contactLastMessage: {
-		paddingRight: 20,
-	},
-
-	newMessagesCount: {
-		alignSelf: "center",
-		marginRight: 8,
-		marginLeft: "auto",
-	},
-
-	badgeStyle: {
-		color: "white",
-		backgroundColor: green[500],
+		height: "100px",
+		margin: 40,
+		flexDirection: "column",
+		alignItems: "center",
+		justifyContent: "center",
 	},
 }));
 
 const TicketsList = ({
-	tickets,
 	status,
-	userId,
+	searchParam,
 	handleSelectTicket,
-	showAllTickets,
-	ticketId,
-	noTicketsTitle,
-	loading,
-	noTicketsMessage,
 	handleAcepptTicket,
+	selectedTicketId,
+	showAll,
 }) => {
 	const classes = useStyles();
+	const [pageNumber, setPageNumber] = useState(1);
 
-	let viewTickets = [];
-
-	tickets.forEach(ticket => {
-		if (
-			(ticket.status === status && ticket.userId === userId) ||
-			(ticket.status === status && showAllTickets) ||
-			(ticket.status === "closed" && status === "closed") ||
-			status === "all"
-		)
-			viewTickets.push(
-				<React.Fragment key={ticket.id}>
-					<ListItem
-						dense
-						button
-						onClick={e => {
-							if (ticket.status === "pending" && handleAcepptTicket) return;
-							handleSelectTicket(e, ticket);
-						}}
-						selected={ticketId && +ticketId === ticket.id}
-						className={classes.ticket}
-					>
-						<ListItemAvatar>
-							<Avatar
-								src={
-									ticket.contact.profilePicUrl && ticket.contact.profilePicUrl
-								}
-							></Avatar>
-						</ListItemAvatar>
-						<ListItemText
-							primary={
-								<span className={classes.contactNameWrapper}>
-									<Typography
-										noWrap
-										component="span"
-										variant="body2"
-										color="textPrimary"
-									>
-										{ticket.contact.name}
-									</Typography>
-									{ticket.status === "closed" && (
-										<Badge
-											className={classes.closedBadge}
-											badgeContent={"closed"}
-											color="primary"
-										/>
-									)}
-									{ticket.lastMessage && (
-										<Typography
-											className={classes.lastMessageTime}
-											component="span"
-											variant="body2"
-											color="textSecondary"
-										>
-											{isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
-												<>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
-											) : (
-												<>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
-											)}
-										</Typography>
-									)}
-								</span>
-							}
-							secondary={
-								<span className={classes.contactNameWrapper}>
-									<Typography
-										className={classes.contactLastMessage}
-										noWrap
-										component="span"
-										variant="body2"
-										color="textSecondary"
-									>
-										{ticket.lastMessage || <br />}
-									</Typography>
-
-									<Badge
-										className={classes.newMessagesCount}
-										badgeContent={ticket.unreadMessages}
-										classes={{
-											badge: classes.badgeStyle,
-										}}
-									/>
-								</span>
-							}
-						/>
-						{ticket.status === "pending" && handleAcepptTicket ? (
-							<Button
-								variant="contained"
-								size="small"
-								color="primary"
-								className="hidden-button"
-								onClick={e => handleAcepptTicket(ticket.id)}
-							>
-								{i18n.t("ticketsList.buttons.accept")}
-							</Button>
-						) : null}
-					</ListItem>
-					<Divider variant="inset" component="li" />
-				</React.Fragment>
-			);
+	const { tickets, hasMore, loading, dispatch } = useTickets({
+		pageNumber,
+		searchParam,
+		status,
+		showAll,
 	});
 
-	if (viewTickets.length > 0) {
-		return viewTickets;
-	} else if (!loading) {
-		return (
-			<div className={classes.noTicketsDiv}>
-				<span className={classes.noTicketsTitle}>{noTicketsTitle}</span>
-				<p className={classes.noTicketsText}>{noTicketsMessage}</p>
-			</div>
-		);
-	} else return null;
+	useEffect(() => {
+		dispatch({ type: "RESET" });
+		setPageNumber(1);
+	}, [status, searchParam, dispatch, showAll]);
+
+	const loadMore = () => {
+		setPageNumber(prevState => prevState + 1);
+	};
+
+	const handleScroll = e => {
+		if (!hasMore || loading) return;
+
+		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+		if (scrollHeight - (scrollTop + 100) < clientHeight) {
+			loadMore();
+		}
+	};
+
+	return (
+		<div className={classes.ticketsListWrapper}>
+			<Paper
+				square
+				name="closed"
+				elevation={0}
+				className={classes.ticketsList}
+				onScroll={handleScroll}
+			>
+				<List style={{ paddingTop: 0 }}>
+					{status === "open" && (
+						<div className={classes.ticketsListHeader}>
+							{i18n.t("tickets.tabs.open.assignedHeader")}
+							<span className={classes.ticketsCount}>{tickets.length}</span>
+						</div>
+					)}
+					{status === "pending" && (
+						<div className={classes.ticketsListHeader}>
+							{i18n.t("tickets.tabs.open.pendingHeader")}
+							<span className={classes.ticketsCount}>{tickets.length}</span>
+						</div>
+					)}
+					{tickets.length === 0 && !loading ? (
+						<div className={classes.noTicketsDiv}>
+							<span className={classes.noTicketsTitle}>Nothing here!</span>
+							<p className={classes.noTicketsText}>
+								No tickets found with this status or search term.
+							</p>
+						</div>
+					) : (
+						<>
+							{tickets.map(ticket => (
+								<TicketListItem
+									ticket={ticket}
+									key={ticket.id}
+									handleSelectTicket={handleSelectTicket}
+									handleAcepptTicket={handleAcepptTicket}
+									selectedTicketId={selectedTicketId}
+								/>
+							))}
+						</>
+					)}
+					{loading && <TicketsSkeleton />}
+				</List>
+			</Paper>
+		</div>
+	);
 };
 
 export default TicketsList;

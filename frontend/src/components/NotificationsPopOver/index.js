@@ -56,6 +56,7 @@ const NotificationsPopOver = () => {
 	const ticketId = +history.location.pathname.split("/")[2];
 	const anchorEl = useRef();
 	const [isOpen, setIsOpen] = useState(false);
+	const [notifications, setNotifications] = useState([]);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -87,7 +88,27 @@ const NotificationsPopOver = () => {
 		};
 	}, [history, ticketId, userId]);
 
-	const { tickets } = useTickets({ status: "open" });
+	const { tickets: openTickets } = useTickets({ status: "open" });
+	const { tickets: pendingTickets } = useTickets({ status: "pending" });
+
+	useEffect(() => {
+		if (openTickets.length > 0 || pendingTickets.length > 0) {
+			let aux = [];
+
+			openTickets.forEach(ticket => {
+				if (ticket.unreadMessages > 0) {
+					aux.push(ticket);
+				}
+			});
+			pendingTickets.forEach(ticket => {
+				if (ticket.unreadMessages > 0) {
+					aux.push(ticket);
+				}
+			});
+
+			setNotifications(aux);
+		}
+	}, [openTickets, pendingTickets]);
 
 	const showDesktopNotification = ({ message, contact, ticket }) => {
 		const options = {
@@ -135,7 +156,7 @@ const NotificationsPopOver = () => {
 				aria-label="Open Notifications"
 				color="inherit"
 			>
-				<Badge badgeContent={tickets.length} color="secondary">
+				<Badge badgeContent={notifications.length} color="secondary">
 					<ChatIcon />
 				</Badge>
 			</IconButton>
@@ -155,14 +176,12 @@ const NotificationsPopOver = () => {
 				onClose={handleClickAway}
 			>
 				<List dense className={classes.tabContainer}>
-					{tickets.length === 0 ? (
+					{notifications.length === 0 ? (
 						<ListItem>
-							<ListItemText>
-								You haven&apos;t received any messages yet.
-							</ListItemText>
+							<ListItemText>No tickets with unread messages.</ListItemText>
 						</ListItem>
 					) : (
-						tickets.map(ticket => (
+						notifications.map(ticket => (
 							<TicketListItem
 								key={ticket.id}
 								ticket={ticket}

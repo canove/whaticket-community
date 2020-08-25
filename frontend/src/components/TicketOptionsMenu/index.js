@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
@@ -11,11 +12,13 @@ import ConfirmationModal from "../ConfirmationModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
+	const history = useHistory();
 
 	const handleDeleteTicket = async () => {
 		try {
 			await api.delete(`/tickets/${ticket.id}`);
 			toast.success("Ticket deletado com sucesso.");
+			history.push("/chat");
 		} catch (err) {
 			toast.error("Erro ao deletar o ticket");
 		}

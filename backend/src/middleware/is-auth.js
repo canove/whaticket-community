@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
 		if (error) {
 			return res.status(401).json({ error: "Invalid token" });
 		}
-		req.userId = token.userId;
+		req.userId = result.userId;
 		// todo >> find user in DB and store in req.user to use latter, or throw an error if user not exists anymore
 		next();
 	});

@@ -16,7 +16,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 
 import MainListItems from "./MainListItems";
-import NotificationsPopOver from "./NotificationsPopOver";
+import NotificationsPopOver from "../NotificationsPopOver";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
 const drawerWidth = 240;
@@ -181,7 +181,7 @@ const MainDrawer = ({ appTitle, children }) => {
 					>
 						{appTitle}
 					</Typography>
-					<NotificationsPopOver />
+					{/* <NotificationsPopOver /> */}
 
 					<div>
 						<IconButton

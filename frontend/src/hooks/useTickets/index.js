@@ -1,6 +1,5 @@
 import { useState, useEffect, useReducer } from "react";
 import openSocket from "socket.io-client";
-import { useHistory } from "react-router-dom";
 
 import api from "../../services/api";
 
@@ -24,17 +23,22 @@ const reducer = (state, action) => {
 	}
 
 	if (action.type === "UPDATE_TICKETS") {
-		const ticket = action.payload;
+		const { ticket, status, loggedUser } = action.payload;
 
 		const ticketIndex = state.findIndex(t => t.id === ticket.id);
 		if (ticketIndex !== -1) {
-			if (ticket.status !== state[ticketIndex]) {
+			if (ticket.status !== state[ticketIndex].status) {
 				state.splice(ticketIndex, 1);
 			} else {
 				state[ticketIndex] = ticket;
 				state.unshift(state.splice(ticketIndex, 1)[0]);
 			}
-		} else {
+		} else if (
+			ticket.status === status &&
+			(ticket.userId === loggedUser ||
+				!ticket.userId ||
+				ticket.status === "closed")
+		) {
 			state.unshift(ticket);
 		}
 		return [...state];
@@ -65,12 +69,13 @@ const reducer = (state, action) => {
 	}
 };
 
-const useTickets = ({ searchParam, pageNumber, status, date }) => {
-	const history = useHistory();
-
+const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
+	const userId = +localStorage.getItem("userId");
 	const [loading, setLoading] = useState(true);
 	const [hasMore, setHasMore] = useState(false);
 	const [tickets, dispatch] = useReducer(reducer, []);
+
+	console.log("rendering");
 
 	useEffect(() => {
 		setLoading(true);
@@ -83,6 +88,7 @@ const useTickets = ({ searchParam, pageNumber, status, date }) => {
 							pageNumber,
 							status,
 							date,
+							showAll,
 						},
 					});
 					dispatch({
@@ -98,7 +104,7 @@ const useTickets = ({ searchParam, pageNumber, status, date }) => {
 			fetchTickets();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, status, date]);
+	}, [searchParam, pageNumber, status, date, showAll]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
@@ -110,11 +116,13 @@ const useTickets = ({ searchParam, pageNumber, status, date }) => {
 			}
 
 			if (data.action === "updateStatus" || data.action === "create") {
-				console.log("to aqui", status, data.ticket);
 				dispatch({
 					type: "UPDATE_TICKETS",
-					payload: data.ticket,
-					status: status,
+					payload: {
+						ticket: data.ticket,
+						status: status,
+						loggedUser: userId,
+					},
 				});
 			}
 
@@ -125,14 +133,21 @@ const useTickets = ({ searchParam, pageNumber, status, date }) => {
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
-				dispatch({ type: "UPDATE_TICKETS", payload: data.ticket });
+				dispatch({
+					type: "UPDATE_TICKETS",
+					payload: {
+						ticket: data.ticket,
+						status: status,
+						loggedUser: userId,
+					},
+				});
 			}
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [status]);
+	}, [status, userId]);
 
 	return { loading, tickets, hasMore, dispatch };
 };

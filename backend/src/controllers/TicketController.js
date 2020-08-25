@@ -13,12 +13,14 @@ exports.index = async (req, res) => {
 		status = "",
 		date = "",
 		searchParam = "",
+		showAll,
 	} = req.query;
+
+	const userId = req.userId;
 
 	const limit = 20;
 	const offset = limit * (pageNumber - 1);
 
-	let whereCondition = {};
 	let includeCondition = [
 		{
 			model: Contact,
@@ -27,16 +29,20 @@ exports.index = async (req, res) => {
 		},
 	];
 
+	let whereCondition = { userId: userId };
+
+	if (showAll === "true") {
+		whereCondition = {};
+	}
+
 	if (status) {
 		whereCondition = {
 			...whereCondition,
 			status: status,
 		};
 	}
-	// else if (status === "closed") {
-	// 	whereCondition = { ...whereCondition, status: "closed" };
-	// }
-	else if (searchParam) {
+
+	if (searchParam) {
 		includeCondition = [
 			...includeCondition,
 			{
@@ -56,7 +62,6 @@ exports.index = async (req, res) => {
 		];
 
 		whereCondition = {
-			...whereCondition,
 			[Sequelize.Op.or]: [
 				{
 					"$contact.name$": Sequelize.where(

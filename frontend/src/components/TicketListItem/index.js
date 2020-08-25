@@ -86,7 +86,7 @@ const TicketListItem = ({
 	ticket,
 	handleAcepptTicket,
 	handleSelectTicket,
-	ticketId,
+	selectedTicketId,
 }) => {
 	const classes = useStyles();
 
@@ -99,7 +99,7 @@ const TicketListItem = ({
 					if (ticket.status === "pending" && handleAcepptTicket) return;
 					handleSelectTicket(e, ticket);
 				}}
-				selected={ticketId && +ticketId === ticket.id}
+				selected={selectedTicketId && +selectedTicketId === ticket.id}
 				className={classes.ticket}
 			>
 				<ListItemAvatar>
