@@ -32,11 +32,13 @@ That said, theres not much to test without syncing an whatsapp account, since ad
 
 Meanwhile, if you want to test it, remember to disconnect session and delete all tickets and contacts after your tests.
 
-https://whaticket.economicros.com.br/
+https://whaticket.economicros.com.br/login
+email: demo@demo.com
+password: demo123
 
-It's online thanks to [@ramphyx](https://github.com/ramphyx), that provided the VPS to create installation instructions.
+It's online thanks to [@ramphy](https://github.com/ramphy), that provided the VPS to create installation instructions.
 
-## Installation and Usage (Linux Debian/Ubuntu)
+## Installation and Usage (Linux Ubuntu - Development)
 
 Create Mysql Database using docker:
 _Note_: change dbname, username password.
