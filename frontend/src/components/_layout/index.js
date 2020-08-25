@@ -181,7 +181,7 @@ const MainDrawer = ({ appTitle, children }) => {
 					>
 						{appTitle}
 					</Typography>
-					{/* <NotificationsPopOver /> */}
+					<NotificationsPopOver />
 
 					<div>
 						<IconButton
