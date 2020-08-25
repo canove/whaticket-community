@@ -36,7 +36,7 @@ https://whaticket.economicros.com.br/login
 email: demo@demo.com
 password: demo123
 
-It's online thanks to [@ramphy](https://github.com/ramphy), that provided the VPS to create installation instructions.
+It's online thanks to [@ramphy](https://github.com/ramphy), who provided a VPS for me to create these installation instructions.
 
 ## Installation and Usage (Linux Ubuntu - Development)
 
