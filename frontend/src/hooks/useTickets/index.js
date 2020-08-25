@@ -75,8 +75,6 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 	const [hasMore, setHasMore] = useState(false);
 	const [tickets, dispatch] = useReducer(reducer, []);
 
-	console.log("rendering");
-
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
