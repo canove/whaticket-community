@@ -114,7 +114,7 @@ const handleMessage = async (msg, ticket, contact) => {
 		...newMessage.dataValues,
 		mediaUrl: `${
 			newMessage.mediaUrl
-				? `http://${process.env.HOST}:${process.env.PORT}/public/${newMessage.mediaUrl}`
+				? `${process.env.BACKEND_URL}:${process.env.PROXY_PORT}/public/${newMessage.mediaUrl}`
 				: ""
 		}`,
 	};

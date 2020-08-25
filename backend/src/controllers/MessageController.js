@@ -90,7 +90,7 @@ exports.index = async (req, res, next) => {
 			...message.dataValues,
 			mediaUrl: `${
 				message.mediaUrl
-					? `http://${process.env.HOST}:${process.env.PORT}/public/${message.mediaUrl}`
+					? `${process.env.BACKEND_URL}:${process.env.PROXY_PORT}/public/${message.mediaUrl}`
 					: ""
 			}`,
 		};
@@ -157,7 +157,7 @@ exports.store = async (req, res, next) => {
 		...newMessage.dataValues,
 		mediaUrl: `${
 			message.mediaUrl
-				? `http://${process.env.HOST}:${process.env.PORT}/public/${message.mediaUrl}`
+				? `${process.env.BACKEND_URL}:${process.env.PROXY_PORT}/public/${message.mediaUrl}`
 				: ""
 		}`,
 	};
