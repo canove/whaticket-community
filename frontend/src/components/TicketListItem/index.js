@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +15,8 @@ import Badge from "@material-ui/core/Badge";
 import Button from "@material-ui/core/Button";
 
 import { i18n } from "../../translate/i18n";
+
+import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -82,13 +85,27 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const TicketListItem = ({
-	ticket,
-	handleAcepptTicket,
-	handleSelectTicket,
-	selectedTicketId,
-}) => {
+const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
+	const history = useHistory();
+	const userId = +localStorage.getItem("userId");
+	const { ticketId } = useParams();
+
+	const handleAcepptTicket = async ticketId => {
+		try {
+			await api.put(`/tickets/${ticketId}`, {
+				status: "open",
+				userId: userId,
+			});
+		} catch (err) {
+			alert(err);
+		}
+		history.push(`/chat/${ticketId}`);
+	};
+
+	const handleSelectTicket = (e, ticket) => {
+		history.push(`/chat/${ticket.id}`);
+	};
 
 	return (
 		<React.Fragment key={ticket.id}>
@@ -99,7 +116,7 @@ const TicketListItem = ({
 					if (ticket.status === "pending" && handleAcepptTicket) return;
 					handleSelectTicket(e, ticket);
 				}}
-				selected={selectedTicketId && +selectedTicketId === ticket.id}
+				selected={ticketId && +ticketId === ticket.id}
 				className={classes.ticket}
 			>
 				<ListItemAvatar>

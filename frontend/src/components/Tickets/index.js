@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -19,7 +18,6 @@ import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
 
 import { i18n } from "../../translate/i18n";
-import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -85,18 +83,11 @@ const useStyles = makeStyles(theme => ({
 
 const Tickets = () => {
 	const classes = useStyles();
-	const history = useHistory();
 
-	const userId = +localStorage.getItem("userId");
-	const { ticketId } = useParams();
 	const [searchParam, setSearchParam] = useState("");
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 	const [showAllTickets, setShowAllTickets] = useState(false);
-
-	const handleSelectTicket = (e, ticket) => {
-		history.push(`/chat/${ticket.id}`);
-	};
 
 	const handleSearchContact = e => {
 		if (e.target.value === "") {
@@ -110,18 +101,6 @@ const Tickets = () => {
 
 	const handleChangeTab = (e, newValue) => {
 		setTab(newValue);
-	};
-
-	const handleAcepptTicket = async ticketId => {
-		try {
-			await api.put(`/tickets/${ticketId}`, {
-				status: "open",
-				userId: userId,
-			});
-		} catch (err) {
-			alert(err);
-		}
-		history.push(`/chat/${ticketId}`);
 	};
 
 	return (
@@ -194,35 +173,14 @@ const Tickets = () => {
 				</div>
 			</Paper>
 			<TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
-				{/* <TicketsList
-					status="open"
-					handleSelectTicket={handleSelectTicket}
-					selectedTicketId={ticketId}
-					showAll={showAllTickets}
-				/> */}
-				<TicketsList
-					status="pending"
-					handleSelectTicket={handleSelectTicket}
-					handleAcepptTicket={handleAcepptTicket}
-					selectedTicketId={ticketId}
-					showAll={true}
-				/>
+				<TicketsList status="open" showAll={showAllTickets} />
+				<TicketsList status="pending" showAll={true} />
 			</TabPanel>
 			<TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
-				<TicketsList
-					status="closed"
-					handleSelectTicket={handleSelectTicket}
-					selectedTicketId={ticketId}
-					showAll={true}
-				/>
+				<TicketsList status="closed" showAll={true} />
 			</TabPanel>
 			<TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
-				<TicketsList
-					handleSelectTicket={handleSelectTicket}
-					selectedTicketId={ticketId}
-					searchParam={searchParam}
-					showAll={true}
-				/>
+				<TicketsList searchParam={searchParam} showAll={true} />
 			</TabPanel>
 		</Paper>
 	);

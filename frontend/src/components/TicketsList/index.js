@@ -76,14 +76,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const TicketsList = ({
-	status,
-	searchParam,
-	handleSelectTicket,
-	handleAcepptTicket,
-	selectedTicketId,
-	showAll,
-}) => {
+const TicketsList = ({ status, searchParam, showAll }) => {
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 
@@ -105,9 +98,7 @@ const TicketsList = ({
 
 	const handleScroll = e => {
 		if (!hasMore || loading) return;
-
 		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-
 		if (scrollHeight - (scrollTop + 100) < clientHeight) {
 			loadMore();
 		}
@@ -145,13 +136,7 @@ const TicketsList = ({
 					) : (
 						<>
 							{tickets.map(ticket => (
-								<TicketListItem
-									ticket={ticket}
-									key={ticket.id}
-									handleSelectTicket={handleSelectTicket}
-									handleAcepptTicket={handleAcepptTicket}
-									selectedTicketId={selectedTicketId}
-								/>
+								<TicketListItem ticket={ticket} key={ticket.id} />
 							))}
 						</>
 					)}
