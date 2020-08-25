@@ -113,11 +113,23 @@ Clone this repository:
 git clone https://github.com/canove/whaticket whaticket
 ```
 
-Create the backend .env file and fill with database details:
+Create backend .env file and fill with details:
 
 ```bash
 cp whaticket/backend/.env.example whaticket/backend/.env
 nano whaticket/backend/.env
+```
+
+```bash
+NODE_ENV=
+BACKEND_URL=https://api.mydomain.com
+PROXY_PORT=443
+PORT=8080
+
+DB_HOST=
+DB_USER=
+DB_PASS=
+DB_NAME=
 ```
 
 Install puppeteer dependencies(Instructions in installation)
