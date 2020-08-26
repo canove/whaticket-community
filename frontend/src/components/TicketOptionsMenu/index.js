@@ -59,12 +59,16 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				</MenuItem>
 			</Menu>
 			<ConfirmationModal
-				title={`Deletar o ticket #${ticket.id} do contato ${ticket.contact.name}?`}
+				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${
+					ticket.id
+				} ${i18n.t("ticketOptionsMenu.confirmationModal.titleFrom")} ${
+					ticket.contact.name
+				}?`}
 				open={confirmationOpen}
 				setOpen={setConfirmationOpen}
 				onConfirm={handleDeleteTicket}
 			>
-				Atenção, todas as mensagens relacionadas a este ticket serão apagadas.
+				{i18n.t("ticketOptionsMenu.confirmationModal.message")}
 			</ConfirmationModal>
 		</>
 	);

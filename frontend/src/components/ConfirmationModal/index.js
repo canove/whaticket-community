@@ -6,6 +6,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 
+import { i18n } from "../../translate/i18n";
+
 const ConfirmationModal = ({ title, children, open, setOpen, onConfirm }) => {
 	return (
 		<Dialog
@@ -21,9 +23,9 @@ const ConfirmationModal = ({ title, children, open, setOpen, onConfirm }) => {
 				<Button
 					variant="contained"
 					onClick={() => setOpen(false)}
-					color="secondary"
+					color="default"
 				>
-					Cancelar
+					{i18n.t("confirmationModal.buttons.cancel")}
 				</Button>
 				<Button
 					variant="contained"
@@ -31,9 +33,9 @@ const ConfirmationModal = ({ title, children, open, setOpen, onConfirm }) => {
 						setOpen(false);
 						onConfirm();
 					}}
-					color="default"
+					color="secondary"
 				>
-					Confirmar
+					{i18n.t("confirmationModal.buttons.confirm")}
 				</Button>
 			</DialogActions>
 		</Dialog>

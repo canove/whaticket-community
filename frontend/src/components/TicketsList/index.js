@@ -116,21 +116,23 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 				<List style={{ paddingTop: 0 }}>
 					{status === "open" && (
 						<div className={classes.ticketsListHeader}>
-							{i18n.t("tickets.tabs.open.assignedHeader")}
+							{i18n.t("ticketsList.assignedHeader")}
 							<span className={classes.ticketsCount}>{tickets.length}</span>
 						</div>
 					)}
 					{status === "pending" && (
 						<div className={classes.ticketsListHeader}>
-							{i18n.t("tickets.tabs.open.pendingHeader")}
+							{i18n.t("ticketsList.pendingHeader")}
 							<span className={classes.ticketsCount}>{tickets.length}</span>
 						</div>
 					)}
 					{tickets.length === 0 && !loading ? (
 						<div className={classes.noTicketsDiv}>
-							<span className={classes.noTicketsTitle}>Nothing here!</span>
+							<span className={classes.noTicketsTitle}>
+								{i18n.t("ticketsList.noTicketsTitle")}
+							</span>
 							<p className={classes.noTicketsText}>
-								No tickets found with this status or search term.
+								{i18n.t("ticketsList.noTicketsMessage")}
 							</p>
 						</div>
 					) : (

@@ -107,21 +107,9 @@ const messages = {
 					message: "Mensagem de",
 				},
 				tabs: {
-					open: {
-						title: "Inbox",
-						assignedHeader: "Atendendo",
-						pendingHeader: "Aguardando",
-						openNoTicketsTitle: "Pronto pra mais?",
-						openNoTicketsMessage: "Aceite um ticket da fila para começar.",
-						pendingNoTicketsTitle: "Tudo resolvido!",
-						pendingNoTicketsMessage: "Nenhum ticket pendente.",
-					},
+					open: { title: "Inbox" },
 					closed: { title: "Resolvidos" },
-					search: {
-						title: "Busca",
-						noTicketsTitle: "Nada encontrado!",
-						noTicketsMessage: "Tente pesquisar por outro termo.",
-					},
+					search: { title: "Busca" },
 				},
 				search: {
 					placeholder: "Pesquisar tickets e mensagens.",
@@ -131,6 +119,11 @@ const messages = {
 				},
 			},
 			ticketsList: {
+				pendingHeader: "Aguardando",
+				assignedHeader: "Atendendo",
+				noTicketsTitle: "Nada aqui!",
+				noTicketsMessage:
+					"Nenhum ticket encontrado com esse status ou termo pesquisado",
 				buttons: {
 					accept: "Aceitar",
 				},
@@ -174,6 +167,18 @@ const messages = {
 			ticketOptionsMenu: {
 				delete: "Deletar",
 				transfer: "Transferir",
+				confirmationModal: {
+					title: "Deletar o ticket #",
+					titleFrom: "do contato ",
+					message:
+						"Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
+				},
+			},
+			confirmationModal: {
+				buttons: {
+					confirm: "Ok",
+					cancel: "Cancelar",
+				},
 			},
 		},
 	},
