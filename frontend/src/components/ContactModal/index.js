@@ -86,7 +86,8 @@ const ContactModal = ({ open, onClose, contactId }) => {
 				await api.post("/contacts", values);
 			}
 		} catch (err) {
-			alert(err);
+			alert(err.response.data.error);
+			console.log(err);
 		}
 		handleClose();
 	};

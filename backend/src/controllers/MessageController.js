@@ -125,51 +125,62 @@ exports.store = async (req, res, next) => {
 		],
 	});
 
-	if (media) {
-		const newMedia = MessageMedia.fromFilePath(req.file.path);
+	try {
+		if (media) {
+			const newMedia = MessageMedia.fromFilePath(req.file.path);
 
-		message.mediaUrl = req.file.filename;
-		if (newMedia.mimetype) {
-			message.mediaType = newMedia.mimetype.split("/")[0];
+			message.mediaUrl = req.file.filename;
+			if (newMedia.mimetype) {
+				message.mediaType = newMedia.mimetype.split("/")[0];
+			} else {
+				message.mediaType = "other";
+			}
+
+			sentMessage = await wbot.sendMessage(
+				`${ticket.contact.number}@c.us`,
+				newMedia
+			);
+
+			await ticket.update({ lastMessage: message.mediaUrl });
 		} else {
-			message.mediaType = "other";
+			sentMessage = await wbot.sendMessage(
+				`${ticket.contact.number}@c.us`,
+				message.body
+			);
+			await ticket.update({ lastMessage: message.body });
 		}
-
-		sentMessage = await wbot.sendMessage(
-			`${ticket.contact.number}@c.us`,
-			newMedia
+	} catch (err) {
+		console.log(
+			"Could not create whatsapp message. Is session details valid? "
 		);
-
-		await ticket.update({ lastMessage: message.mediaUrl });
-	} else {
-		sentMessage = await wbot.sendMessage(
-			`${ticket.contact.number}@c.us`,
-			message.body
-		);
-		await ticket.update({ lastMessage: message.body });
 	}
 
-	message.id = sentMessage.id.id;
+	if (sentMessage) {
+		message.id = sentMessage.id.id;
+		const newMessage = await ticket.createMessage(message);
 
-	const newMessage = await ticket.createMessage(message);
+		const serialziedMessage = {
+			...newMessage.dataValues,
+			mediaUrl: `${
+				message.mediaUrl
+					? `${process.env.BACKEND_URL}:${process.env.PROXY_PORT}/public/${message.mediaUrl}`
+					: ""
+			}`,
+		};
 
-	const serialziedMessage = {
-		...newMessage.dataValues,
-		mediaUrl: `${
-			message.mediaUrl
-				? `${process.env.BACKEND_URL}:${process.env.PROXY_PORT}/public/${message.mediaUrl}`
-				: ""
-		}`,
-	};
+		io.to(ticketId).to("notification").emit("appMessage", {
+			action: "create",
+			message: serialziedMessage,
+			ticket: ticket,
+			contact: ticket.contact,
+		});
 
-	io.to(ticketId).to("notification").emit("appMessage", {
-		action: "create",
-		message: serialziedMessage,
-		ticket: ticket,
-		contact: ticket.contact,
-	});
+		await setMessagesAsRead(ticket);
 
-	await setMessagesAsRead(ticket);
+		return res.json({ newMessage, ticket });
+	}
 
-	return res.json({ newMessage, ticket });
+	return res
+		.status(500)
+		.json({ error: "Cannot sent whatsapp message. Check connection page." });
 };

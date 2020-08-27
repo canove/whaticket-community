@@ -41,13 +41,23 @@ exports.store = async (req, res) => {
 	const io = getIO();
 	const newContact = req.body;
 
-	const result = await wbot.isRegisteredUser(`${newContact.number}@c.us`);
+	let isValidNumber;
 
-	if (!result) {
+	try {
+		isValidNumber = await wbot.isRegisteredUser(`${newContact.number}@c.us`);
+	} catch (err) {
+		console.log("Could not check whatsapp contact. Is session details valid?");
+		return res.status(500).json({
+			error: "Could not check whatsapp contact. Check connection page.",
+		});
+	}
+
+	if (!isValidNumber) {
 		return res
 			.status(400)
 			.json({ error: "The suplied number is not a valid Whatsapp number" });
 	}
+
 	const profilePicUrl = await wbot.getProfilePicUrl(
 		`${newContact.number}@c.us`
 	);

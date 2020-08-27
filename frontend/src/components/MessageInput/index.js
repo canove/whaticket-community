@@ -163,8 +163,8 @@ const MessageInput = () => {
 		try {
 			await api.post(`/messages/${ticketId}`, formData);
 		} catch (err) {
+			alert(err.response.data.error);
 			console.log(err);
-			alert(err);
 		}
 		setLoading(false);
 		setMedia(mediaInitialState);
@@ -182,7 +182,8 @@ const MessageInput = () => {
 		try {
 			await api.post(`/messages/${ticketId}`, message);
 		} catch (err) {
-			alert(err);
+			alert(err.response.data.error);
+			console.log(err);
 		}
 		setInputMessage("");
 		setShowEmoji(false);
@@ -217,20 +218,19 @@ const MessageInput = () => {
 				}
 				const formData = new FormData();
 				const filename = `${new Date().getTime()}.mp3`;
-				console.log(blob);
 				formData.append("media", blob, filename);
 				formData.append("body", filename);
 				formData.append("fromMe", true);
 				try {
 					await api.post(`/messages/${ticketId}`, formData);
 				} catch (err) {
+					alert(err.response.data.error);
 					console.log(err);
-					alert(err);
 				}
 				setRecording(false);
 				setLoading(false);
 			})
-			.catch(e => console.log(e));
+			.catch(err => console.log(err));
 	};
 
 	const handleCancelAudio = () => {

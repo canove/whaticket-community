@@ -32,11 +32,7 @@ const RouteWrapper = ({ component: Component, isPrivate = false, ...rest }) => {
 	}
 
 	if (isAuth && !isPrivate) {
-		return (
-			<Redirect
-				to={{ pathname: "/dashboard", state: { from: rest.location } }}
-			/>
-		);
+		return <Redirect to={{ pathname: "/", state: { from: rest.location } }} />;
 	}
 
 	return <Route {...rest} component={Component} />;
