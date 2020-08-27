@@ -27,7 +27,7 @@ class Ticket extends Sequelize.Model {
 			}
 		});
 
-		this.addHook("afterUpdate", async ticket => {
+		this.addHook("beforeUpdate", async ticket => {
 			ticket.unreadMessages = await Message.count({
 				where: { ticketId: ticket.id, read: false },
 			});
