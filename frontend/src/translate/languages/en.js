@@ -141,6 +141,9 @@ const messages = {
 					connection: "Connection",
 					tickets: "Tickets",
 					contacts: "Contacts",
+					administration: "Administration",
+					users: "Users",
+					settings: "Settings",
 				},
 			},
 			messagesList: {

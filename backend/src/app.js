@@ -16,6 +16,7 @@ const ContactsRoutes = require("./routes/contacts");
 const AuthRoutes = require("./routes/auth");
 const TicketsRoutes = require("./routes/tickets");
 const WhatsRoutes = require("./routes/whatsapp");
+const UsersRoutes = require("./routes/users");
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use(ContactsRoutes);
 app.use(TicketsRoutes);
 app.use(MessagesRoutes);
 app.use(WhatsRoutes);
+app.use(UsersRoutes);
 
 const io = require("./libs/socket").init(server);
 io.on("connection", socket => {

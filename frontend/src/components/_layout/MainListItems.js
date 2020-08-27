@@ -4,9 +4,13 @@ import { Link as RouterLink } from "react-router-dom";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import Divider from "@material-ui/core/Divider";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
+import SettingsIcon from "@material-ui/icons/Settings";
+import GroupIcon from "@material-ui/icons/Group";
 
 import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
 
@@ -52,6 +56,18 @@ const MainListItems = () => {
 				to="/contacts"
 				primary={i18n.t("mainDrawer.listItems.contacts")}
 				icon={<ContactPhoneIcon />}
+			/>
+			<Divider />
+			<ListSubheader inset>Administration</ListSubheader>
+			<ListItemLink
+				to="/chat"
+				primary={i18n.t("mainDrawer.listItems.users")}
+				icon={<GroupIcon />}
+			/>
+			<ListItemLink
+				to="/chat"
+				primary={i18n.t("mainDrawer.listItems.settings")}
+				icon={<SettingsIcon />}
 			/>
 		</div>
 	);

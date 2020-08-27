@@ -66,7 +66,7 @@ const SignUp = () => {
 	const handleSignUp = async e => {
 		e.preventDefault();
 		try {
-			await api.post("/auth/signup", user);
+			await api.post("/users", user);
 			toast.success(i18n.t("signup.toasts.success"));
 			history.push("/login");
 		} catch (err) {
