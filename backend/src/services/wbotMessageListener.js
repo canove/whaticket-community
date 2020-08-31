@@ -141,7 +141,8 @@ const wbotMessageListener = () => {
 		if (
 			msg.from === "status@broadcast" ||
 			msg.type === "location" ||
-			msg.type === "call_log"
+			msg.type === "call_log" ||
+			msg.author != null // Ignore Group Messages
 		) {
 			return;
 		}
