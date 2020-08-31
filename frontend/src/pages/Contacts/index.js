@@ -33,10 +33,15 @@ import { i18n } from "../../translate/i18n";
 const useStyles = makeStyles(theme => ({
 	mainContainer: {
 		flex: 1,
-		// backgroundColor: "#eee",
 		padding: theme.spacing(2),
 		height: `calc(100% - 48px)`,
+	},
+
+	contentWrapper: {
+		height: "100%",
 		overflowY: "hidden",
+		display: "flex",
+		flexDirection: "column",
 	},
 
 	contactsHeader: {
@@ -46,6 +51,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	actionButtons: {
+		flex: "none",
 		marginLeft: "auto",
 		"& > *": {
 			margin: theme.spacing(1),
@@ -53,16 +59,14 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	mainPaper: {
-		height: "87%",
+		flex: 1,
 		padding: theme.spacing(2),
-
 		overflowY: "scroll",
 		"&::-webkit-scrollbar": {
 			width: "8px",
 			height: "8px",
 		},
 		"&::-webkit-scrollbar-thumb": {
-			// borderRadius: "2px",
 			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
 			backgroundColor: "#e8e8e8",
 		},
@@ -107,11 +111,11 @@ const Contacts = () => {
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.on("contact", data => {
-			if ((data.action === "update" || data.action === "create") && !loading) {
+			if (data.action === "update" || data.action === "create") {
 				updateContacts(data.contact);
 			}
 
-			if (data.action === "delete" && !loading) {
+			if (data.action === "delete") {
 				deleteContact(data.contactId);
 			}
 		});
@@ -119,7 +123,7 @@ const Contacts = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [loading]);
+	}, []);
 
 	const updateContacts = contact => {
 		setContacts(prevState => {
@@ -221,109 +225,111 @@ const Contacts = () => {
 					? `${i18n.t("contacts.confirmationModal.deleteMessage")}`
 					: `${i18n.t("contacts.confirmationModal.importMessage")}`}
 			</ConfirmationModal>
-			<div className={classes.contactsHeader}>
-				<Typography variant="h5" gutterBottom>
-					{i18n.t("contacts.title")}
-				</Typography>
+			<div className={classes.contentWrapper}>
+				<div className={classes.contactsHeader}>
+					<Typography variant="h5" gutterBottom>
+						{i18n.t("contacts.title")}
+					</Typography>
 
-				<div className={classes.actionButtons}>
-					<TextField
-						placeholder={i18n.t("contacts.searchPlaceholder")}
-						type="search"
-						value={searchParam}
-						onChange={handleSearch}
-						InputProps={{
-							startAdornment: (
-								<InputAdornment position="start">
-									<SearchIcon style={{ color: "gray" }} />
-								</InputAdornment>
-							),
-						}}
-					/>
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={e => setConfirmOpen(true)}
-					>
-						{i18n.t("contacts.buttons.import")}
-					</Button>
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={handleOpenContactModal}
-					>
-						{i18n.t("contacts.buttons.add")}
-					</Button>
+					<div className={classes.actionButtons}>
+						<TextField
+							placeholder={i18n.t("contacts.searchPlaceholder")}
+							type="search"
+							value={searchParam}
+							onChange={handleSearch}
+							InputProps={{
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon style={{ color: "gray" }} />
+									</InputAdornment>
+								),
+							}}
+						/>
+						<Button
+							variant="contained"
+							color="primary"
+							onClick={e => setConfirmOpen(true)}
+						>
+							{i18n.t("contacts.buttons.import")}
+						</Button>
+						<Button
+							variant="contained"
+							color="primary"
+							onClick={handleOpenContactModal}
+						>
+							{i18n.t("contacts.buttons.add")}
+						</Button>
+					</div>
 				</div>
-			</div>
-			<Paper className={classes.mainPaper}>
-				<Table size="small">
-					<TableHead>
-						<TableRow>
-							<TableCell padding="checkbox" />
-							<TableCell>{i18n.t("contacts.table.name")}</TableCell>
-							<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
-							<TableCell>{i18n.t("contacts.table.email")}</TableCell>
-							<TableCell align="right">
-								{i18n.t("contacts.table.actions")}
-							</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{loading ? (
-							<ContactsSekeleton />
-						) : (
-							<>
-								{contacts.map(contact => (
-									<TableRow key={contact.id}>
-										<TableCell style={{ paddingRight: 0 }}>
-											{<Avatar src={contact.profilePicUrl} />}
-										</TableCell>
-										<TableCell>{contact.name}</TableCell>
-										<TableCell>{contact.number}</TableCell>
-										<TableCell>{contact.email}</TableCell>
-										<TableCell align="right">
-											<IconButton
-												size="small"
-												onClick={() => hadleEditContact(contact.id)}
-											>
-												<EditIcon />
-											</IconButton>
+				<Paper className={classes.mainPaper} variant="outlined">
+					<Table size="small">
+						<TableHead>
+							<TableRow>
+								<TableCell padding="checkbox" />
+								<TableCell>{i18n.t("contacts.table.name")}</TableCell>
+								<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
+								<TableCell>{i18n.t("contacts.table.email")}</TableCell>
+								<TableCell align="right">
+									{i18n.t("contacts.table.actions")}
+								</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{loading ? (
+								<ContactsSekeleton />
+							) : (
+								<>
+									{contacts.map(contact => (
+										<TableRow key={contact.id}>
+											<TableCell style={{ paddingRight: 0 }}>
+												{<Avatar src={contact.profilePicUrl} />}
+											</TableCell>
+											<TableCell>{contact.name}</TableCell>
+											<TableCell>{contact.number}</TableCell>
+											<TableCell>{contact.email}</TableCell>
+											<TableCell align="right">
+												<IconButton
+													size="small"
+													onClick={() => hadleEditContact(contact.id)}
+												>
+													<EditIcon />
+												</IconButton>
 
-											<IconButton
-												size="small"
-												onClick={e => {
-													setConfirmOpen(true);
-													setDeletingContact(contact);
-												}}
-											>
-												<DeleteOutlineIcon />
-											</IconButton>
-										</TableCell>
-									</TableRow>
-								))}
-							</>
-						)}
-					</TableBody>
-					<TableFooter>
-						<TableRow>
-							<TablePagination
-								colSpan={5}
-								count={count}
-								rowsPerPage={rowsPerPage}
-								page={page}
-								SelectProps={{
-									inputProps: { "aria-label": "rows per page" },
-									native: true,
-								}}
-								onChangePage={handleChangePage}
-								onChangeRowsPerPage={handleChangeRowsPerPage}
-								ActionsComponent={PaginationActions}
-							/>
-						</TableRow>
-					</TableFooter>
-				</Table>
-			</Paper>
+												<IconButton
+													size="small"
+													onClick={e => {
+														setConfirmOpen(true);
+														setDeletingContact(contact);
+													}}
+												>
+													<DeleteOutlineIcon />
+												</IconButton>
+											</TableCell>
+										</TableRow>
+									))}
+								</>
+							)}
+						</TableBody>
+						<TableFooter>
+							<TableRow>
+								<TablePagination
+									colSpan={5}
+									count={count}
+									rowsPerPage={rowsPerPage}
+									page={page}
+									SelectProps={{
+										inputProps: { "aria-label": "rows per page" },
+										native: true,
+									}}
+									onChangePage={handleChangePage}
+									onChangeRowsPerPage={handleChangeRowsPerPage}
+									ActionsComponent={PaginationActions}
+								/>
+							</TableRow>
+						</TableFooter>
+					</Table>
+				</Paper>
+			</div>
 		</Container>
 	);
 };
