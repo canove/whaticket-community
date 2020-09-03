@@ -85,7 +85,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 				userId: userId,
 				status: "open",
 			});
-			history.push(`/chat/${ticket.id}`);
+			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
 			alert(err);
 		}

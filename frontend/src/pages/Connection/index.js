@@ -71,7 +71,7 @@ const WhatsAuth = () => {
 			if (data.action === "authentication") {
 				setQrCode("");
 				setSession(data.session);
-				history.push("/chat");
+				history.push("/tickets");
 			}
 		});
 

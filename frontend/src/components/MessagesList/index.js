@@ -304,7 +304,7 @@ const MessagesList = () => {
 				} catch (err) {
 					console.log(err);
 					toast.error("Ticket não encontrado");
-					history.push("/chat");
+					history.push("/tickets");
 				}
 			};
 			fetchMessages();
@@ -418,7 +418,7 @@ const MessagesList = () => {
 		} catch (err) {
 			console.log(err);
 		}
-		history.push("/chat");
+		history.push("/tickets");
 	};
 
 	const handleDrawerOpen = () => {

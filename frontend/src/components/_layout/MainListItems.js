@@ -42,12 +42,12 @@ const MainListItems = () => {
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
 			<ListItemLink
-				to="/whats-auth"
+				to="/connection"
 				primary={i18n.t("mainDrawer.listItems.connection")}
 				icon={<SyncAltIcon />}
 			/>
 			<ListItemLink
-				to="/chat"
+				to="/tickets"
 				primary={i18n.t("mainDrawer.listItems.tickets")}
 				icon={<WhatsAppIcon />}
 			/>

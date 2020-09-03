@@ -51,7 +51,7 @@ const useAuth = () => {
 			api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
-			history.push("/chat");
+			history.push("/tickets");
 		} catch (err) {
 			toast.error(i18n.t("auth.toasts.fail"));
 		}

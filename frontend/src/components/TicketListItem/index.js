@@ -100,11 +100,11 @@ const TicketListItem = ({ ticket }) => {
 		} catch (err) {
 			alert(err);
 		}
-		history.push(`/chat/${ticketId}`);
+		history.push(`/tickets/${ticketId}`);
 	};
 
 	const handleSelectTicket = (e, ticket) => {
-		history.push(`/chat/${ticket.id}`);
+		history.push(`/tickets/${ticket.id}`);
 	};
 
 	return (

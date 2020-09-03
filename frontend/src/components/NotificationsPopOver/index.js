@@ -116,7 +116,7 @@ const NotificationsPopOver = () => {
 
 		notification.onclick = function (event) {
 			event.preventDefault(); //
-			window.open(`/chat/${ticket.id}`, "_self");
+			window.open(`/tickets/${ticket.id}`, "_self");
 		};
 
 		document.addEventListener("visibilitychange", () => {
@@ -137,7 +137,7 @@ const NotificationsPopOver = () => {
 	}, [setIsOpen]);
 
 	const handleSelectTicket = (e, ticket) => {
-		history.push(`/chat/${ticket.id}`);
+		history.push(`/tickets/${ticket.id}`);
 		handleClickAway();
 	};
 
