@@ -60,12 +60,12 @@ const MainListItems = () => {
 			<Divider />
 			<ListSubheader inset>Administration</ListSubheader>
 			<ListItemLink
-				to="/chat"
+				to="/users"
 				primary={i18n.t("mainDrawer.listItems.users")}
 				icon={<GroupIcon />}
 			/>
 			<ListItemLink
-				to="/chat"
+				to="/settings"
 				primary={i18n.t("mainDrawer.listItems.settings")}
 				icon={<SettingsIcon />}
 			/>

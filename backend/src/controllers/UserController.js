@@ -1,34 +1,101 @@
-const { validationResult } = require("express-validator");
+const Sequelize = require("sequelize");
+const Yup = require("yup");
+const { Op } = require("sequelize");
 
 const User = require("../models/User");
 
+const { getIO } = require("../libs/socket");
+
 exports.index = async (req, res) => {
-	// const { searchParam = "", pageNumber = 1 } = req.query;
+	const { searchParam = "", pageNumber = 1, rowsPerPage = 10 } = req.query;
 
-	const users = await User.findAll({ attributes: ["name", "id", "email"] });
+	const whereCondition = {
+		[Op.or]: [
+			{
+				name: Sequelize.where(
+					Sequelize.fn("LOWER", Sequelize.col("name")),
+					"LIKE",
+					"%" + searchParam.toLowerCase() + "%"
+				),
+			},
+			{ email: { [Op.like]: `%${searchParam.toLowerCase()}%` } },
+		],
+	};
 
-	return res.status(200).json(users);
+	let limit = +rowsPerPage;
+	let offset = limit * (pageNumber - 1);
+
+	const { count, rows: users } = await User.findAndCountAll({
+		attributes: ["name", "id", "email", "profile"],
+		where: whereCondition,
+		limit,
+		offset,
+		order: [["createdAt", "DESC"]],
+	});
+
+	return res.status(200).json({ users, count });
 };
 
 exports.store = async (req, res, next) => {
-	const errors = validationResult(req);
+	const schema = Yup.object().shape({
+		name: Yup.string().required().min(2),
+		email: Yup.string()
+			.email()
+			.required()
+			.test(
+				"Check-email",
+				"An user with this email already exists",
+				async value => {
+					const userFound = await User.findOne({ where: { email: value } });
+					return !Boolean(userFound);
+				}
+			),
+		password: Yup.string().required().min(5),
+	});
 
-	if (!errors.isEmpty()) {
-		return res
-			.status(400)
-			.json({ error: "Validation failed", data: errors.array() });
-	}
+	await schema.validate(req.body);
 
-	const { name, id, email } = await User.create(req.body);
+	const io = getIO();
 
-	res.status(201).json({ message: "User created!", userId: id });
+	const { name, id, email, profile } = await User.create(req.body);
+
+	io.emit("user", {
+		action: "create",
+		user: { name, id, email, profile },
+	});
+
+	return res.status(201).json({ message: "User created!", userId: id });
+};
+
+exports.show = async (req, res) => {
+	const { userId } = req.params;
+
+	const { id, name, email, profile } = await User.findByPk(userId);
+
+	return res.status(200).json({
+		id,
+		name,
+		email,
+		profile,
+	});
 };
 
 exports.update = async (req, res) => {
+	const schema = Yup.object().shape({
+		name: Yup.string().min(2),
+		email: Yup.string().email(),
+		password: Yup.string(),
+	});
+
+	console.log("cai aqui");
+
+	await schema.validate(req.body);
+
+	const io = getIO();
 	const { userId } = req.params;
 
 	const user = await User.findByPk(userId, {
-		attributes: ["name", "id", "email"],
+		attributes: ["name", "id", "email", "profile"],
 	});
 
 	if (!user) {
@@ -37,12 +104,16 @@ exports.update = async (req, res) => {
 
 	await user.update(req.body);
 
-	//todo, send socket IO to users channel.
+	io.emit("user", {
+		action: "update",
+		user: user,
+	});
 
-	res.status(200).json(user);
+	return res.status(200).json(user);
 };
 
 exports.delete = async (req, res) => {
+	const io = getIO();
 	const { userId } = req.params;
 
 	const user = await User.findByPk(userId);
@@ -53,5 +124,10 @@ exports.delete = async (req, res) => {
 
 	await user.destroy();
 
-	res.status(200).json({ message: "User deleted" });
+	io.emit("user", {
+		action: "delete",
+		userId: userId,
+	});
+
+	return res.status(200).json({ message: "User deleted" });
 };

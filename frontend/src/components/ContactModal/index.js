@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-import { Formik, FieldArray } from "formik";
+import * as Yup from "yup";
+import { Formik, FieldArray, Form, Field } from "formik";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -52,6 +53,15 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const ContactSchema = Yup.object().shape({
+	name: Yup.string()
+		.min(2, "Too Short!")
+		.max(50, "Too Long!")
+		.required("Required"),
+	number: Yup.string().min(8, "Too Short!").max(50, "Too Long!"),
+	email: Yup.string().email("Invalid email"),
+});
+
 const ContactModal = ({ open, onClose, contactId }) => {
 	const classes = useStyles();
 
@@ -86,7 +96,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 				await api.post("/contacts", values);
 			}
 		} catch (err) {
-			alert(err.response.data.error);
+			alert(JSON.stringify(err.response.data, null, 2));
 			console.log(err);
 		}
 		handleClose();
@@ -94,69 +104,57 @@ const ContactModal = ({ open, onClose, contactId }) => {
 
 	return (
 		<div className={classes.root}>
-			<Dialog
-				open={open}
-				onClose={handleClose}
-				maxWidth="lg"
-				scroll="paper"
-				className={classes.modal}
-			>
+			<Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
+				<DialogTitle id="form-dialog-title">
+					{contactId
+						? `${i18n.t("contactModal.title.edit")}`
+						: `${i18n.t("contactModal.title.add")}`}
+				</DialogTitle>
 				<Formik
 					initialValues={contact}
 					enableReinitialize={true}
-					onSubmit={(values, { setSubmitting }) => {
+					validationSchema={ContactSchema}
+					onSubmit={(values, actions) => {
 						setTimeout(() => {
 							handleSaveContact(values);
-							setSubmitting(false);
+							actions.setSubmitting(false);
 						}, 400);
 					}}
 				>
-					{({
-						values,
-						errors,
-						touched,
-						handleChange,
-						handleBlur,
-						handleSubmit,
-						isSubmitting,
-					}) => (
-						<form onSubmit={handleSubmit}>
-							<DialogTitle id="form-dialog-title">
-								{contactId
-									? `${i18n.t("contactModal.title.edit")}`
-									: `${i18n.t("contactModal.title.add")}`}
-							</DialogTitle>
+					{({ values, errors, touched, isSubmitting }) => (
+						<Form>
 							<DialogContent dividers>
 								<Typography variant="subtitle1" gutterBottom>
 									{i18n.t("contactModal.form.mainInfo")}
 								</Typography>
-								<TextField
+								<Field
+									as={TextField}
 									label={i18n.t("contactModal.form.name")}
 									name="name"
-									value={values.name || ""}
-									onChange={handleChange}
+									error={touched.name && Boolean(errors.name)}
+									helperText={touched.name && errors.name}
 									variant="outlined"
 									margin="dense"
-									required
 									className={classes.textField}
 								/>
-								<TextField
+								<Field
+									as={TextField}
 									label={i18n.t("contactModal.form.number")}
 									name="number"
-									value={values.number || ""}
-									onChange={handleChange}
+									error={touched.number && Boolean(errors.number)}
+									helperText={touched.number && errors.number}
 									placeholder="5513912344321"
 									variant="outlined"
 									margin="dense"
-									required
 								/>
 								<div>
-									<TextField
+									<Field
+										as={TextField}
 										label={i18n.t("contactModal.form.email")}
 										name="email"
-										value={values.email || ""}
-										onChange={handleChange}
-										placeholder="Endereço de Email"
+										error={touched.email && Boolean(errors.email)}
+										helperText={touched.email && errors.email}
+										placeholder="Email address"
 										fullWidth
 										margin="dense"
 										variant="outlined"
@@ -179,25 +177,21 @@ const ContactModal = ({ open, onClose, contactId }) => {
 														className={classes.extraAttr}
 														key={`${index}-info`}
 													>
-														<TextField
+														<Field
+															as={TextField}
 															label={i18n.t("contactModal.form.extraName")}
 															name={`extraInfo[${index}].name`}
-															value={info.name || ""}
-															onChange={handleChange}
 															variant="outlined"
 															margin="dense"
-															required
 															className={classes.textField}
 														/>
-														<TextField
+														<Field
+															as={TextField}
 															label={i18n.t("contactModal.form.extraValue")}
 															name={`extraInfo[${index}].value`}
-															value={info.value || ""}
-															onChange={handleChange}
 															variant="outlined"
 															margin="dense"
 															className={classes.textField}
-															required
 														/>
 														<IconButton
 															size="small"
@@ -248,7 +242,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 									)}
 								</Button>
 							</DialogActions>
-						</form>
+						</Form>
 					)}
 				</Formik>
 			</Dialog>

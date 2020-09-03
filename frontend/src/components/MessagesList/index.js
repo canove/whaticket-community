@@ -101,15 +101,7 @@ const useStyles = makeStyles(theme => ({
 		padding: "20px 20px 20px 20px",
 		// scrollBehavior: "smooth",
 		overflowY: "scroll",
-		"&::-webkit-scrollbar": {
-			width: "8px",
-			height: "8px",
-		},
-		"&::-webkit-scrollbar-thumb": {
-			// borderRadius: "2px",
-			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
-			backgroundColor: "#e8e8e8",
-		},
+		...theme.scrollbarStyles,
 	},
 
 	circleLoading: {

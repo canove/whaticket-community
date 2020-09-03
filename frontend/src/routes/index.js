@@ -8,6 +8,7 @@ import Chat from "../pages/Chat/";
 import Signup from "../pages/Signup/";
 import Login from "../pages/Login/";
 import WhatsAuth from "../pages/WhatsAuth/WhatsAuth";
+import Users from "../pages/Users";
 import Contacts from "../pages/Contacts/";
 import { AuthProvider } from "../context/Auth/AuthContext";
 import Route from "./Route";
@@ -24,6 +25,7 @@ const Routes = () => {
 						<Route exact path="/chat/:ticketId?" component={Chat} isPrivate />
 						<Route exact path="/whats-auth" component={WhatsAuth} isPrivate />
 						<Route exact path="/contacts" component={Contacts} isPrivate />
+						<Route exact path="/users" component={Users} isPrivate />
 					</MainDrawer>
 				</Switch>
 				<ToastContainer autoClose={3000} />

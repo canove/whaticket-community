@@ -8,7 +8,7 @@ const { getIO } = require("../libs/socket");
 const { getWbot } = require("../libs/wbot");
 
 exports.index = async (req, res) => {
-	const { searchParam = "", pageNumber = 1, rowsPerPage = 10 } = req.query;
+	const { searchParam = "", pageNumber = 1 } = req.query;
 
 	const whereCondition = {
 		[Op.or]: [
@@ -23,7 +23,7 @@ exports.index = async (req, res) => {
 		],
 	};
 
-	let limit = +rowsPerPage;
+	let limit = 20;
 	let offset = limit * (pageNumber - 1);
 
 	const { count, rows: contacts } = await Contact.findAndCountAll({
@@ -33,7 +33,9 @@ exports.index = async (req, res) => {
 		order: [["createdAt", "DESC"]],
 	});
 
-	return res.json({ contacts, count });
+	const hasMore = count > offset + contacts.length;
+
+	return res.json({ contacts, count, hasMore });
 };
 
 exports.store = async (req, res) => {

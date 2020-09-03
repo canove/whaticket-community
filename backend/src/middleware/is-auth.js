@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
+const util = require("util");
 
+const User = require("../models/User");
 const authConfig = require("../config/auth");
 
 module.exports = async (req, res, next) => {
@@ -11,12 +13,24 @@ module.exports = async (req, res, next) => {
 
 	const [, token] = authHeader.split(" ");
 
-	jwt.verify(token, authConfig.secret, (error, result) => {
-		if (error) {
-			return res.status(401).json({ error: "Invalid token" });
+	try {
+		const decoded = await util.promisify(jwt.verify)(token, authConfig.secret);
+
+		const user = await User.findByPk(decoded.userId, {
+			attributes: ["id", "name", "profile", "email"],
+		});
+
+		if (!user) {
+			return res
+				.status(401)
+				.json({ error: "The token corresponding user does not exists." });
 		}
-		req.userId = result.userId;
-		// todo >> find user in DB and store in req.user to use latter, or throw an error if user not exists anymore
-		next();
-	});
+
+		req.user = user;
+
+		return next();
+	} catch (err) {
+		console.log(err);
+		return res.status(401).json({ error: "Invalid Token" });
+	}
 };

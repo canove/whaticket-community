@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -10,93 +10,100 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Avatar from "@material-ui/core/Avatar";
-import TableFooter from "@material-ui/core/TableFooter";
-import TablePagination from "@material-ui/core/TablePagination";
+
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
-import Container from "@material-ui/core/Container";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import Typography from "@material-ui/core/Typography";
 
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
 
-import PaginationActions from "../../components/PaginationActions";
 import api from "../../services/api";
-import ContactsSekeleton from "../../components/ContactsSekeleton";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
 
 import { i18n } from "../../translate/i18n";
+import MainHeader from "../../components/MainHeader";
+import Title from "../../components/Title";
+import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
+import MainContainer from "../../components/MainContainer";
+
+const reducer = (state, action) => {
+	if (action.type === "LOAD_CONTACTS") {
+		const contacts = action.payload;
+		const newContacts = [];
+
+		contacts.forEach(contact => {
+			const contactIndex = state.findIndex(c => c.id === contact.id);
+			if (contactIndex !== -1) {
+				state[contactIndex] = contact;
+			} else {
+				newContacts.push(contact);
+			}
+		});
+
+		return [...state, ...newContacts];
+	}
+
+	if (action.type === "UPDATE_CONTACT") {
+		const updatedContact = action.payload;
+		const contactIndex = state.findIndex(c => c.id === updatedContact.id);
+
+		if (contactIndex !== -1) {
+			state[contactIndex] = updatedContact;
+		}
+
+		return [...state];
+	}
+
+	if (action.type === "DELETE_CONTACT") {
+		const contactId = action.payload;
+		console.log("cai aqui", contactId);
+
+		const contactIndex = state.findIndex(c => c.id === contactId);
+		if (contactIndex !== -1) {
+			console.log("cai no if");
+
+			state.splice(contactIndex, 1);
+		}
+		return [...state];
+	}
+};
 
 const useStyles = makeStyles(theme => ({
-	mainContainer: {
-		flex: 1,
-		padding: theme.spacing(2),
-		height: `calc(100% - 48px)`,
-	},
-
-	contentWrapper: {
-		height: "100%",
-		overflowY: "hidden",
-		display: "flex",
-		flexDirection: "column",
-	},
-
-	contactsHeader: {
-		display: "flex",
-		alignItems: "center",
-		padding: "0px 6px 6px 6px",
-	},
-
-	actionButtons: {
-		flex: "none",
-		marginLeft: "auto",
-		"& > *": {
-			margin: theme.spacing(1),
-		},
-	},
-
 	mainPaper: {
 		flex: 1,
-		padding: theme.spacing(2),
+		padding: theme.spacing(1),
 		overflowY: "scroll",
-		"&::-webkit-scrollbar": {
-			width: "8px",
-			height: "8px",
-		},
-		"&::-webkit-scrollbar-thumb": {
-			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
-			backgroundColor: "#e8e8e8",
-		},
+		...theme.scrollbarStyles,
 	},
 }));
 
 const Contacts = () => {
 	const classes = useStyles();
 
-	const [loading, setLoading] = useState(true);
-	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(10);
-	const [count, setCount] = useState(0);
+	const [loading, setLoading] = useState(false);
+	const [pageNumber, setPageNumber] = useState(1);
 	const [searchParam, setSearchParam] = useState("");
-	const [contacts, setContacts] = useState([]);
+	const [contacts, dispatch] = useReducer(reducer, []);
 	const [selectedContactId, setSelectedContactId] = useState(null);
 	const [contactModalOpen, setContactModalOpen] = useState(false);
 	const [deletingContact, setDeletingContact] = useState(null);
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchContacts = async () => {
 				try {
-					const res = await api.get("/contacts/", {
-						params: { searchParam, pageNumber: page + 1, rowsPerPage },
+					const { data } = await api.get("/contacts/", {
+						params: { searchParam, pageNumber },
 					});
-					setContacts(res.data.contacts);
-					setCount(res.data.count);
+					dispatch({ type: "LOAD_CONTACTS", payload: data.contacts });
+					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
@@ -106,17 +113,17 @@ const Contacts = () => {
 			fetchContacts();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, page, rowsPerPage]);
+	}, [searchParam, pageNumber]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.on("contact", data => {
 			if (data.action === "update" || data.action === "create") {
-				updateContacts(data.contact);
+				dispatch({ type: "UPDATE_CONTACT", payload: data.contact });
 			}
 
 			if (data.action === "delete") {
-				deleteContact(data.contactId);
+				dispatch({ type: "DELETE_CONTACT", payload: +data.contactId });
 			}
 		});
 
@@ -124,40 +131,6 @@ const Contacts = () => {
 			socket.disconnect();
 		};
 	}, []);
-
-	const updateContacts = contact => {
-		setContacts(prevState => {
-			const contactIndex = prevState.findIndex(c => c.id === contact.id);
-
-			if (contactIndex === -1) {
-				return [contact, ...prevState];
-			}
-			const aux = [...prevState];
-			aux[contactIndex] = contact;
-			return aux;
-		});
-	};
-
-	const deleteContact = contactId => {
-		setContacts(prevState => {
-			const contactIndex = prevState.findIndex(c => c.id === +contactId);
-
-			if (contactIndex === -1) return prevState;
-
-			const aux = [...prevState];
-			aux.splice(contactIndex, 1);
-			return aux;
-		});
-	};
-
-	const handleChangePage = (event, newPage) => {
-		setPage(newPage);
-	};
-
-	const handleChangeRowsPerPage = event => {
-		setRowsPerPage(+event.target.value);
-		setPage(0);
-	};
 
 	const handleSearch = event => {
 		setSearchParam(event.target.value.toLowerCase());
@@ -186,7 +159,7 @@ const Contacts = () => {
 		}
 		setDeletingContact(null);
 		setSearchParam("");
-		setPage(0);
+		setPageNumber(1);
 	};
 
 	const handleimportContact = async () => {
@@ -197,8 +170,20 @@ const Contacts = () => {
 		}
 	};
 
+	const loadMore = () => {
+		setPageNumber(prevState => prevState + 1);
+	};
+
+	const handleScroll = e => {
+		if (!hasMore || loading) return;
+		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+		if (scrollHeight - (scrollTop + 100) < clientHeight) {
+			loadMore();
+		}
+	};
+
 	return (
-		<Container className={classes.mainContainer}>
+		<MainContainer className={classes.mainContainer}>
 			<ContactModal
 				open={contactModalOpen}
 				onClose={handleCloseContactModal}
@@ -225,112 +210,91 @@ const Contacts = () => {
 					? `${i18n.t("contacts.confirmationModal.deleteMessage")}`
 					: `${i18n.t("contacts.confirmationModal.importMessage")}`}
 			</ConfirmationModal>
-			<div className={classes.contentWrapper}>
-				<div className={classes.contactsHeader}>
-					<Typography variant="h5" gutterBottom>
-						{i18n.t("contacts.title")}
-					</Typography>
+			<MainHeader>
+				<Title>{i18n.t("contacts.title")}</Title>
+				<MainHeaderButtonsWrapper>
+					<TextField
+						placeholder={i18n.t("contacts.searchPlaceholder")}
+						type="search"
+						value={searchParam}
+						onChange={handleSearch}
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<SearchIcon style={{ color: "gray" }} />
+								</InputAdornment>
+							),
+						}}
+					/>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={e => setConfirmOpen(true)}
+					>
+						{i18n.t("contacts.buttons.import")}
+					</Button>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={handleOpenContactModal}
+					>
+						{i18n.t("contacts.buttons.add")}
+					</Button>
+				</MainHeaderButtonsWrapper>
+			</MainHeader>
+			<Paper
+				className={classes.mainPaper}
+				variant="outlined"
+				onScroll={handleScroll}
+			>
+				<Table size="small">
+					<TableHead>
+						<TableRow>
+							<TableCell padding="checkbox" />
+							<TableCell>{i18n.t("contacts.table.name")}</TableCell>
+							<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
+							<TableCell>{i18n.t("contacts.table.email")}</TableCell>
+							<TableCell align="right">
+								{i18n.t("contacts.table.actions")}
+							</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						<>
+							{contacts.map(contact => (
+								<TableRow key={contact.id}>
+									<TableCell style={{ paddingRight: 0 }}>
+										{<Avatar src={contact.profilePicUrl} />}
+									</TableCell>
+									<TableCell>{contact.name}</TableCell>
+									<TableCell>{contact.number}</TableCell>
+									<TableCell>{contact.email}</TableCell>
+									<TableCell align="right">
+										<IconButton
+											size="small"
+											onClick={() => hadleEditContact(contact.id)}
+										>
+											<EditIcon />
+										</IconButton>
 
-					<div className={classes.actionButtons}>
-						<TextField
-							placeholder={i18n.t("contacts.searchPlaceholder")}
-							type="search"
-							value={searchParam}
-							onChange={handleSearch}
-							InputProps={{
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon style={{ color: "gray" }} />
-									</InputAdornment>
-								),
-							}}
-						/>
-						<Button
-							variant="contained"
-							color="primary"
-							onClick={e => setConfirmOpen(true)}
-						>
-							{i18n.t("contacts.buttons.import")}
-						</Button>
-						<Button
-							variant="contained"
-							color="primary"
-							onClick={handleOpenContactModal}
-						>
-							{i18n.t("contacts.buttons.add")}
-						</Button>
-					</div>
-				</div>
-				<Paper className={classes.mainPaper} variant="outlined">
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell padding="checkbox" />
-								<TableCell>{i18n.t("contacts.table.name")}</TableCell>
-								<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
-								<TableCell>{i18n.t("contacts.table.email")}</TableCell>
-								<TableCell align="right">
-									{i18n.t("contacts.table.actions")}
-								</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{loading ? (
-								<ContactsSekeleton />
-							) : (
-								<>
-									{contacts.map(contact => (
-										<TableRow key={contact.id}>
-											<TableCell style={{ paddingRight: 0 }}>
-												{<Avatar src={contact.profilePicUrl} />}
-											</TableCell>
-											<TableCell>{contact.name}</TableCell>
-											<TableCell>{contact.number}</TableCell>
-											<TableCell>{contact.email}</TableCell>
-											<TableCell align="right">
-												<IconButton
-													size="small"
-													onClick={() => hadleEditContact(contact.id)}
-												>
-													<EditIcon />
-												</IconButton>
-
-												<IconButton
-													size="small"
-													onClick={e => {
-														setConfirmOpen(true);
-														setDeletingContact(contact);
-													}}
-												>
-													<DeleteOutlineIcon />
-												</IconButton>
-											</TableCell>
-										</TableRow>
-									))}
-								</>
-							)}
-						</TableBody>
-						<TableFooter>
-							<TableRow>
-								<TablePagination
-									colSpan={5}
-									count={count}
-									rowsPerPage={rowsPerPage}
-									page={page}
-									SelectProps={{
-										inputProps: { "aria-label": "rows per page" },
-										native: true,
-									}}
-									onChangePage={handleChangePage}
-									onChangeRowsPerPage={handleChangeRowsPerPage}
-									ActionsComponent={PaginationActions}
-								/>
-							</TableRow>
-						</TableFooter>
-					</Table>
-				</Paper>
-			</div>
-		</Container>
+										<IconButton
+											size="small"
+											onClick={e => {
+												setConfirmOpen(true);
+												setDeletingContact(contact);
+											}}
+										>
+											<DeleteOutlineIcon />
+										</IconButton>
+									</TableCell>
+								</TableRow>
+							))}
+							{loading && <TableRowSkeleton />}
+						</>
+					</TableBody>
+				</Table>
+			</Paper>
+		</MainContainer>
 	);
 };
 

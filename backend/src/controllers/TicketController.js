@@ -16,7 +16,7 @@ exports.index = async (req, res) => {
 		showAll,
 	} = req.query;
 
-	const userId = req.userId;
+	const userId = req.user.id;
 
 	const limit = 20;
 	const offset = limit * (pageNumber - 1);
