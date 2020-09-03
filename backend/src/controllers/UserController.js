@@ -7,7 +7,7 @@ const User = require("../models/User");
 const { getIO } = require("../libs/socket");
 
 exports.index = async (req, res) => {
-	const { searchParam = "", pageNumber = 1, rowsPerPage = 10 } = req.query;
+	const { searchParam = "", pageNumber = 1 } = req.query;
 
 	const whereCondition = {
 		[Op.or]: [
@@ -22,7 +22,7 @@ exports.index = async (req, res) => {
 		],
 	};
 
-	let limit = +rowsPerPage;
+	let limit = 20;
 	let offset = limit * (pageNumber - 1);
 
 	const { count, rows: users } = await User.findAndCountAll({
@@ -33,7 +33,9 @@ exports.index = async (req, res) => {
 		order: [["createdAt", "DESC"]],
 	});
 
-	return res.status(200).json({ users, count });
+	const hasMore = count > offset + users.length;
+
+	return res.status(200).json({ users, count, hasMore });
 };
 
 exports.store = async (req, res, next) => {

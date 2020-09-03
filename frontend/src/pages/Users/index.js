@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 
 import openSocket from "socket.io-client";
 
@@ -28,6 +28,45 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_USERS") {
+		const users = action.payload;
+		const newUsers = [];
+
+		users.forEach(user => {
+			const userIndex = state.findIndex(u => u.id === user.id);
+			if (userIndex !== -1) {
+				state[userIndex] = user;
+			} else {
+				newUsers.push(user);
+			}
+		});
+
+		return [...state, ...newUsers];
+	}
+
+	if (action.type === "UPDATE_USERS") {
+		const user = action.payload;
+		const userIndex = state.findIndex(u => u.id === user.id);
+
+		if (userIndex !== -1) {
+			state[userIndex] = user;
+		}
+
+		return [user, ...state];
+	}
+
+	if (action.type === "DELETE_USER") {
+		const userId = action.payload;
+
+		const userIndex = state.findIndex(u => u.id === userId);
+		if (userIndex !== -1) {
+			state.splice(userIndex, 1);
+		}
+		return [...state];
+	}
+};
+
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
 		flex: 1,
@@ -42,22 +81,24 @@ const Users = () => {
 
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
 	const [selectedUserId, setSelectedUserId] = useState(null);
 	const [userModalOpen, setUserModalOpen] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [deletingUser, setDeletingUser] = useState(null);
 	const [searchParam, setSearchParam] = useState("");
-	const [users, setUsers] = useState([]);
+	const [users, dispatch] = useReducer(reducer, []);
 
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
-					const res = await api.get("/users/", {
+					const { data } = await api.get("/users/", {
 						params: { searchParam, pageNumber },
 					});
-					setUsers(res.data.users);
+					dispatch({ type: "LOAD_USERS", payload: data.users });
+					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
@@ -73,11 +114,11 @@ const Users = () => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.on("user", data => {
 			if (data.action === "update" || data.action === "create") {
-				updateUsers(data.user);
+				dispatch({ type: "UPDATE_USERS", payload: data.user });
 			}
 
 			if (data.action === "delete") {
-				deleteUser(data.userId);
+				dispatch({ type: "DELETE_USER", payload: +data.userId });
 			}
 		});
 
@@ -85,31 +126,6 @@ const Users = () => {
 			socket.disconnect();
 		};
 	}, []);
-
-	const updateUsers = user => {
-		setUsers(prevState => {
-			const userIndex = prevState.findIndex(c => c.id === user.id);
-
-			if (userIndex === -1) {
-				return [user, ...prevState];
-			}
-			const aux = [...prevState];
-			aux[userIndex] = user;
-			return aux;
-		});
-	};
-
-	const deleteUser = userId => {
-		setUsers(prevState => {
-			const userIndex = prevState.findIndex(c => c.id === +userId);
-
-			if (userIndex === -1) return prevState;
-
-			const aux = [...prevState];
-			aux.splice(userIndex, 1);
-			return aux;
-		});
-	};
 
 	const handleOpenUserModal = () => {
 		setSelectedUserId(null);
@@ -139,6 +155,18 @@ const Users = () => {
 		setDeletingUser(null);
 		setSearchParam("");
 		setPageNumber(1);
+	};
+
+	const loadMore = () => {
+		setPageNumber(prevState => prevState + 1);
+	};
+
+	const handleScroll = e => {
+		if (!hasMore || loading) return;
+		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+		if (scrollHeight - (scrollTop + 100) < clientHeight) {
+			loadMore();
+		}
 	};
 
 	return (
@@ -182,7 +210,11 @@ const Users = () => {
 					</Button>
 				</MainHeaderButtonsWrapper>
 			</MainHeader>
-			<Paper className={classes.mainPaper} variant="outlined">
+			<Paper
+				className={classes.mainPaper}
+				variant="outlined"
+				onScroll={handleScroll}
+			>
 				<Table size="small">
 					<TableHead>
 						<TableRow>

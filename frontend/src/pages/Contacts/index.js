@@ -47,25 +47,22 @@ const reducer = (state, action) => {
 		return [...state, ...newContacts];
 	}
 
-	if (action.type === "UPDATE_CONTACT") {
-		const updatedContact = action.payload;
-		const contactIndex = state.findIndex(c => c.id === updatedContact.id);
+	if (action.type === "UPDATE_CONTACTS") {
+		const contact = action.payload;
+		const contactIndex = state.findIndex(c => c.id === contact.id);
 
 		if (contactIndex !== -1) {
-			state[contactIndex] = updatedContact;
+			state[contactIndex] = contact;
 		}
 
-		return [...state];
+		return [contact, ...state];
 	}
 
 	if (action.type === "DELETE_CONTACT") {
 		const contactId = action.payload;
-		console.log("cai aqui", contactId);
 
 		const contactIndex = state.findIndex(c => c.id === contactId);
 		if (contactIndex !== -1) {
-			console.log("cai no if");
-
 			state.splice(contactIndex, 1);
 		}
 		return [...state];
@@ -119,7 +116,7 @@ const Contacts = () => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.on("contact", data => {
 			if (data.action === "update" || data.action === "create") {
-				dispatch({ type: "UPDATE_CONTACT", payload: data.contact });
+				dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
 			}
 
 			if (data.action === "delete") {
