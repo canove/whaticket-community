@@ -21,7 +21,7 @@ exports.delete = async (req, res) => {
 	const dbSession = await Whatsapp.findByPk(sessionId);
 
 	if (!dbSession) {
-		return res.status(200).json({ message: "Session not found" });
+		return res.status(404).json({ message: "Session not found" });
 	}
 
 	await dbSession.update({ session: "", status: "pending" });

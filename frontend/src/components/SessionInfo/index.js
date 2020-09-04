@@ -2,6 +2,7 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { format, parseISO } from "date-fns";
+import { toast } from "react-toastify";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -12,6 +13,9 @@ const SessionInfo = ({ session }) => {
 			await api.delete("/whatsapp/session/1");
 		} catch (err) {
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 

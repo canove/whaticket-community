@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer } from "react";
 import openSocket from "socket.io-client";
+import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -114,7 +115,9 @@ const Contacts = () => {
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
-					alert(err);
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+					}
 				}
 			};
 			fetchContacts();
@@ -161,8 +164,12 @@ const Contacts = () => {
 	const handleDeleteContact = async contactId => {
 		try {
 			await api.delete(`/contacts/${contactId}`);
+			toast.success("Contact deleted sucessfully!");
 		} catch (err) {
-			alert(err);
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		setDeletingContact(null);
 		setSearchParam("");
@@ -172,8 +179,10 @@ const Contacts = () => {
 	const handleimportContact = async () => {
 		try {
 			await api.post("/contacts/import");
+			window.location.reload(false);
 		} catch (err) {
 			console.log(err);
+			window.location.reload(false);
 		}
 	};
 

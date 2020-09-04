@@ -35,7 +35,10 @@ const useAuth = () => {
 			} catch (err) {
 				setLoading(false);
 				setIsAuth(false);
-				toast.error(i18n.t("auth.toasts.fail"));
+				console.log(err);
+				if (err.response && err.response.data && err.response.data.error) {
+					toast.error(err.response.data.error);
+				}
 			}
 		};
 		checkAuth();
@@ -53,7 +56,10 @@ const useAuth = () => {
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");
 		} catch (err) {
-			toast.error(i18n.t("auth.toasts.fail"));
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 

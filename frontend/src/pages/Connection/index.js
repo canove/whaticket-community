@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../../services/api";
 import openSocket from "socket.io-client";
+import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -46,6 +47,9 @@ const WhatsAuth = () => {
 				setSession(data);
 			} catch (err) {
 				console.log(err);
+				if (err.response && err.response.data && err.response.data.error) {
+					toast.error(err.response.data.error);
+				}
 			}
 		};
 		fetchSession();

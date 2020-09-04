@@ -1,5 +1,6 @@
 import { useState, useEffect, useReducer } from "react";
 import openSocket from "socket.io-client";
+import { toast } from "react-toastify";
 
 import api from "../../services/api";
 
@@ -97,6 +98,9 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+					}
 				}
 			};
 			fetchTickets();

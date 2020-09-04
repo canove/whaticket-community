@@ -78,7 +78,10 @@ const SignUp = () => {
 			toast.success(i18n.t("signup.toasts.success"));
 			history.push("/login");
 		} catch (err) {
-			toast.error(i18n.t("signup.toasts.fail"));
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 

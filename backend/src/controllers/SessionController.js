@@ -8,7 +8,7 @@ exports.store = async (req, res, next) => {
 
 	const user = await User.findOne({ where: { email: email } });
 	if (!user) {
-		return res.status(401).json({ error: "No user found with this email" });
+		return res.status(404).json({ error: "No user found with this email" });
 	}
 
 	if (!(await user.checkPassword(password))) {

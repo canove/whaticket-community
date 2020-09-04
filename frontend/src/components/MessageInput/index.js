@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "emoji-mart/css/emoji-mart.css";
 import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
+import { toast } from "react-toastify";
 import MicRecorder from "mic-recorder-to-mp3";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -163,8 +164,10 @@ const MessageInput = () => {
 		try {
 			await api.post(`/messages/${ticketId}`, formData);
 		} catch (err) {
-			alert(err.response.data.error);
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		setLoading(false);
 		setMedia(mediaInitialState);
@@ -182,8 +185,10 @@ const MessageInput = () => {
 		try {
 			await api.post(`/messages/${ticketId}`, message);
 		} catch (err) {
-			alert(err.response.data.error);
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		setInputMessage("");
 		setShowEmoji(false);
@@ -224,8 +229,10 @@ const MessageInput = () => {
 				try {
 					await api.post(`/messages/${ticketId}`, formData);
 				} catch (err) {
-					alert(err.response.data.error);
 					console.log(err);
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+					}
 				}
 				setRecording(false);
 				setLoading(false);

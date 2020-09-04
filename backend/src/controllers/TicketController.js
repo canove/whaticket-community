@@ -105,7 +105,7 @@ exports.index = async (req, res) => {
 
 	const hasMore = count > offset + tickets.length;
 
-	return res.json({ count, tickets, hasMore });
+	return res.status(200).json({ count, tickets, hasMore });
 };
 
 exports.store = async (req, res) => {
@@ -139,7 +139,7 @@ exports.update = async (req, res) => {
 	});
 
 	if (!ticket) {
-		return res.status(400).json({ error: "No ticket found with this ID" });
+		return res.status(404).json({ error: "No ticket found with this ID" });
 	}
 
 	await ticket.update(req.body);

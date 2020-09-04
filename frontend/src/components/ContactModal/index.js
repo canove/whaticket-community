@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import * as Yup from "yup";
 import { Formik, FieldArray, Form, Field } from "formik";
+import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -76,8 +77,15 @@ const ContactModal = ({ open, onClose, contactId }) => {
 	useEffect(() => {
 		const fetchContact = async () => {
 			if (!contactId) return;
-			const res = await api.get(`/contacts/${contactId}`);
-			setContact(res.data);
+			try {
+				const { data } = await api.get(`/contacts/${contactId}`);
+				setContact(data);
+			} catch (err) {
+				console.log(err);
+				if (err.response && err.response.data && err.response.data.error) {
+					toast.error(err.response.data.error);
+				}
+			}
 		};
 
 		fetchContact();
@@ -95,9 +103,12 @@ const ContactModal = ({ open, onClose, contactId }) => {
 			} else {
 				await api.post("/contacts", values);
 			}
+			toast.success("Contact saved sucessfully!");
 		} catch (err) {
-			alert(JSON.stringify(err.response.data, null, 2));
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		handleClose();
 	};
@@ -131,6 +142,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 									as={TextField}
 									label={i18n.t("contactModal.form.name")}
 									name="name"
+									autoFocus
 									error={touched.name && Boolean(errors.name)}
 									helperText={touched.name && errors.name}
 									variant="outlined"

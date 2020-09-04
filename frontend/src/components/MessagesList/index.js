@@ -303,8 +303,12 @@ const MessagesList = () => {
 					}
 				} catch (err) {
 					console.log(err);
-					toast.error("Ticket não encontrado");
-					history.push("/tickets");
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+						if (err.response.status === 404) {
+							history.push("/tickets");
+						}
+					}
 				}
 			};
 			fetchMessages();
@@ -417,6 +421,9 @@ const MessagesList = () => {
 			});
 		} catch (err) {
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		history.push("/tickets");
 	};

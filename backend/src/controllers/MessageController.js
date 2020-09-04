@@ -38,9 +38,6 @@ const setMessagesAsRead = async ticket => {
 };
 
 exports.index = async (req, res, next) => {
-	// const wbot = getWbot();
-	// const io = getIO();
-
 	const { ticketId } = req.params;
 	const { searchParam = "", pageNumber = 1 } = req.query;
 
@@ -124,6 +121,10 @@ exports.store = async (req, res, next) => {
 			},
 		],
 	});
+
+	if (!ticket) {
+		return res.status(404).json({ error: "No ticket found with this ID" });
+	}
 
 	try {
 		if (media) {

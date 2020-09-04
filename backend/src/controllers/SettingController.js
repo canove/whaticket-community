@@ -13,7 +13,7 @@ exports.update = async (req, res) => {
 	const setting = await Setting.findByPk(settingKey);
 
 	if (!setting) {
-		return res.status(400).json({ error: "No setting found with this ID" });
+		return res.status(404).json({ error: "No setting found with this ID" });
 	}
 
 	await setting.update(req.body);

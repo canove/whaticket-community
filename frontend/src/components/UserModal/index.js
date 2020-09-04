@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
+import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -76,10 +77,17 @@ const UserModal = ({ open, onClose, userId }) => {
 	useEffect(() => {
 		const fetchUser = async () => {
 			if (!userId) return;
-			const { data } = await api.get(`/users/${userId}`);
-			setUser(prevState => {
-				return { ...prevState, ...data };
-			});
+			try {
+				const { data } = await api.get(`/users/${userId}`);
+				setUser(prevState => {
+					return { ...prevState, ...data };
+				});
+			} catch (err) {
+				console.log(err);
+				if (err.response && err.response.data && err.response.data.error) {
+					toast.error(err.response.data.error);
+				}
+			}
 		};
 
 		fetchUser();
@@ -97,9 +105,12 @@ const UserModal = ({ open, onClose, userId }) => {
 			} else {
 				await api.post("/users", values);
 			}
+			toast.success("Success!");
 		} catch (err) {
-			alert(JSON.stringify(err.response.data, null, 2));
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		handleClose();
 	};
@@ -127,6 +138,7 @@ const UserModal = ({ open, onClose, userId }) => {
 								<Field
 									as={TextField}
 									label="Name"
+									autoFocus
 									name="name"
 									error={touched.name && Boolean(errors.name)}
 									helperText={touched.name && errors.name}

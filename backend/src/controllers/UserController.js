@@ -71,7 +71,11 @@ exports.store = async (req, res, next) => {
 			.json({ error: "Only administrators can create users." });
 	}
 
-	await schema.validate(req.body);
+	try {
+		await schema.validate(req.body);
+	} catch (err) {
+		return res.status(400).json({ error: err.message });
+	}
 
 	const io = getIO();
 
@@ -88,14 +92,15 @@ exports.store = async (req, res, next) => {
 exports.show = async (req, res) => {
 	const { userId } = req.params;
 
-	const { id, name, email, profile } = await User.findByPk(userId);
-
-	return res.status(200).json({
-		id,
-		name,
-		email,
-		profile,
+	const user = await User.findByPk(userId, {
+		attributes: ["id", "name", "email", "profile"],
 	});
+
+	if (!user) {
+		res.status(400).json({ error: "No user found with this id." });
+	}
+
+	return res.status(200).json(user);
 };
 
 exports.update = async (req, res) => {
@@ -121,7 +126,7 @@ exports.update = async (req, res) => {
 	});
 
 	if (!user) {
-		res.status(400).json({ error: "No user found with this id." });
+		res.status(404).json({ error: "No user found with this id." });
 	}
 
 	if (user.profile === "admin" && req.body.profile === "user") {

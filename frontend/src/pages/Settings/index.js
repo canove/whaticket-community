@@ -43,6 +43,9 @@ const Settings = () => {
 				setSettings(data);
 			} catch (err) {
 				console.log(err);
+				if (err.response && err.response.data && err.response.data.error) {
+					toast.error(err.response.data.error);
+				}
 			}
 		};
 		fetchSession();
@@ -77,14 +80,16 @@ const Settings = () => {
 			});
 			toast.success("Setting updated");
 		} catch (err) {
-			alert(err);
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 
 	const getSettingValue = key => {
-		const setting = settings.find(s => s.key === key);
-		return setting.value;
+		const { value } = settings.find(s => s.key === key);
+		return value;
 	};
 
 	return (

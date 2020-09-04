@@ -6,7 +6,16 @@ exports.store = async (req, res, next) => {
 	const io = getIO();
 	const wbot = getWbot();
 
-	const phoneContacts = await wbot.getContacts();
+	let phoneContacts;
+
+	try {
+		phoneContacts = await wbot.getContacts();
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({
+			error: "Could not check whatsapp contact. Check connection page.",
+		});
+	}
 
 	await Promise.all(
 		phoneContacts.map(async ({ number, name }) => {
