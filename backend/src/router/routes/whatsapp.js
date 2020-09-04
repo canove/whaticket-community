@@ -1,7 +1,7 @@
 const express = require("express");
-const isAuth = require("../middleware/is-auth");
+const isAuth = require("../../middleware/is-auth");
 
-const WhatsAppSessionController = require("../controllers/WhatsAppSessionController");
+const WhatsAppSessionController = require("../../controllers/WhatsAppSessionController");
 
 const routes = express.Router();
 

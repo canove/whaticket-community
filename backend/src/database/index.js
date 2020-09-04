@@ -7,8 +7,17 @@ const Ticket = require("../models/Ticket");
 const Message = require("../models/Message");
 const Whatsapp = require("../models/Whatsapp");
 const ContactCustomField = require("../models/ContactCustomField");
+const Setting = require("../models/Setting");
 
-const models = [User, Contact, Ticket, Message, Whatsapp, ContactCustomField];
+const models = [
+	User,
+	Contact,
+	Ticket,
+	Message,
+	Whatsapp,
+	ContactCustomField,
+	Setting,
+];
 
 class Database {
 	constructor() {

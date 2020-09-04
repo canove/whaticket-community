@@ -11,12 +11,7 @@ const wBot = require("./libs/wbot");
 const wbotMessageListener = require("./services/wbotMessageListener");
 const wbotMonitor = require("./services/wbotMonitor");
 
-const MessagesRoutes = require("./routes/messages");
-const ContactsRoutes = require("./routes/contacts");
-const AuthRoutes = require("./routes/auth");
-const TicketsRoutes = require("./routes/tickets");
-const WhatsRoutes = require("./routes/whatsapp");
-const UsersRoutes = require("./routes/users");
+const Router = require("./router");
 
 const app = express();
 
@@ -40,13 +35,7 @@ app.use(cors());
 app.use(express.json());
 app.use(multer({ storage: fileStorage }).single("media"));
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
-
-app.use("/auth", AuthRoutes);
-app.use(ContactsRoutes);
-app.use(TicketsRoutes);
-app.use(MessagesRoutes);
-app.use(WhatsRoutes);
-app.use(UsersRoutes);
+app.use(Router);
 
 const io = require("./libs/socket").init(server);
 io.on("connection", socket => {
