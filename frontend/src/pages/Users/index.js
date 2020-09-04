@@ -51,9 +51,10 @@ const reducer = (state, action) => {
 
 		if (userIndex !== -1) {
 			state[userIndex] = user;
+			return [...state];
+		} else {
+			return [user, ...state];
 		}
-
-		return [user, ...state];
 	}
 
 	if (action.type === "DELETE_USER") {
@@ -64,6 +65,10 @@ const reducer = (state, action) => {
 			state.splice(userIndex, 1);
 		}
 		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
 	}
 };
 
@@ -88,6 +93,11 @@ const Users = () => {
 	const [deletingUser, setDeletingUser] = useState(null);
 	const [searchParam, setSearchParam] = useState("");
 	const [users, dispatch] = useReducer(reducer, []);
+
+	useEffect(() => {
+		dispatch({ type: "RESET" });
+		setPageNumber(1);
+	}, [searchParam]);
 
 	useEffect(() => {
 		setLoading(true);

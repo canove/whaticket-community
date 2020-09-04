@@ -1,6 +1,5 @@
-const Sequelize = require("sequelize");
-
 const Setting = require("../models/Setting");
+const { getIO } = require("../libs/socket");
 
 exports.index = async (req, res) => {
 	const settings = await Setting.findAll();
@@ -9,8 +8,8 @@ exports.index = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+	const io = getIO();
 	const { settingKey } = req.params;
-
 	const setting = await Setting.findByPk(settingKey);
 
 	if (!setting) {
@@ -18,6 +17,11 @@ exports.update = async (req, res) => {
 	}
 
 	await setting.update(req.body);
+
+	io.emit("settings", {
+		action: "update",
+		setting,
+	});
 
 	return res.status(200).json(setting);
 };

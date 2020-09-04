@@ -53,9 +53,10 @@ const reducer = (state, action) => {
 
 		if (contactIndex !== -1) {
 			state[contactIndex] = contact;
+			return [...state];
+		} else {
+			return [contact, ...state];
 		}
-
-		return [contact, ...state];
 	}
 
 	if (action.type === "DELETE_CONTACT") {
@@ -66,6 +67,10 @@ const reducer = (state, action) => {
 			state.splice(contactIndex, 1);
 		}
 		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
 	}
 };
 
@@ -90,6 +95,11 @@ const Contacts = () => {
 	const [deletingContact, setDeletingContact] = useState(null);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [hasMore, setHasMore] = useState(false);
+
+	useEffect(() => {
+		dispatch({ type: "RESET" });
+		setPageNumber(1);
+	}, [searchParam]);
 
 	useEffect(() => {
 		setLoading(true);

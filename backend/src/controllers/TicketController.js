@@ -121,7 +121,7 @@ exports.store = async (req, res) => {
 		ticket: serializaedTicket,
 	});
 
-	res.status(200).json(ticket);
+	return res.status(200).json(ticket);
 };
 
 exports.update = async (req, res) => {
@@ -149,7 +149,7 @@ exports.update = async (req, res) => {
 		ticket: ticket,
 	});
 
-	res.status(200).json(ticket);
+	return res.status(200).json(ticket);
 };
 
 exports.delete = async (req, res) => {
@@ -169,5 +169,5 @@ exports.delete = async (req, res) => {
 		ticketId: ticket.id,
 	});
 
-	res.status(200).json({ message: "ticket deleted" });
+	return res.status(200).json({ message: "ticket deleted" });
 };
