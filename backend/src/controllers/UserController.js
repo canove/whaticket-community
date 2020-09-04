@@ -3,6 +3,7 @@ const Yup = require("yup");
 const { Op } = require("sequelize");
 
 const User = require("../models/User");
+const Setting = require("../models/Setting");
 
 const { getIO } = require("../libs/socket");
 
@@ -54,6 +55,14 @@ exports.store = async (req, res, next) => {
 			),
 		password: Yup.string().required().min(5),
 	});
+
+	const { value: userCreation } = await Setting.findByPk("userCreation");
+
+	if (userCreation === "disabled") {
+		return res
+			.status(403)
+			.json({ error: "User creation is disabled by administrator" });
+	}
 
 	await schema.validate(req.body);
 
