@@ -40,6 +40,7 @@ exports.index = async (req, res) => {
 };
 
 exports.store = async (req, res, next) => {
+	console.log(req.url);
 	const schema = Yup.object().shape({
 		name: Yup.string().required().min(2),
 		email: Yup.string()
@@ -56,12 +57,18 @@ exports.store = async (req, res, next) => {
 		password: Yup.string().required().min(5),
 	});
 
-	const { value: userCreation } = await Setting.findByPk("userCreation");
+	if (req.url === "/signup") {
+		const { value: userCreation } = await Setting.findByPk("userCreation");
 
-	if (userCreation === "disabled") {
+		if (userCreation === "disabled") {
+			return res
+				.status(403)
+				.json({ error: "User creation is disabled by administrator." });
+		}
+	} else if (req.user.profile !== "admin") {
 		return res
 			.status(403)
-			.json({ error: "User creation is disabled by administrator" });
+			.json({ error: "Only administrators can create users." });
 	}
 
 	await schema.validate(req.body);
@@ -98,7 +105,11 @@ exports.update = async (req, res) => {
 		password: Yup.string(),
 	});
 
-	console.log("cai aqui");
+	if (req.user.profile !== "admin") {
+		return res
+			.status(403)
+			.json({ error: "Only administrators can edit users." });
+	}
 
 	await schema.validate(req.body);
 
@@ -111,6 +122,16 @@ exports.update = async (req, res) => {
 
 	if (!user) {
 		res.status(400).json({ error: "No user found with this id." });
+	}
+
+	if (user.profile === "admin" && req.body.profile === "user") {
+		const adminUsers = await User.count({ where: { profile: "admin" } });
+		if (adminUsers <= 1) {
+			return res
+				.status(403)
+				.json({ error: "There must be at leat one admin user." });
+		}
+		console.log("found", adminUsers);
 	}
 
 	await user.update(req.body);
@@ -131,6 +152,12 @@ exports.delete = async (req, res) => {
 
 	if (!user) {
 		res.status(400).json({ error: "No user found with this id." });
+	}
+
+	if (req.user.profile !== "admin") {
+		return res
+			.status(403)
+			.json({ error: "Only administrators can edit users." });
 	}
 
 	await user.destroy();
