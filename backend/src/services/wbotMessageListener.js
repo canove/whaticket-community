@@ -132,12 +132,13 @@ const handleMessage = async (msg, ticket, contact) => {
 	});
 };
 
-const wbotMessageListener = () => {
-	const wbot = getWbot();
+const wbotMessageListener = dbSession => {
+	const wbot = getWbot(dbSession.name);
 	const io = getIO();
 
 	wbot.on("message_create", async msg => {
 		console.log(msg);
+
 		if (
 			msg.from === "status@broadcast" ||
 			msg.type === "location" ||

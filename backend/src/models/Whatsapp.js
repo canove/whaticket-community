@@ -6,6 +6,7 @@ class Whatsapp extends Sequelize.Model {
 			{
 				session: { type: Sequelize.TEXT },
 				qrcode: { type: Sequelize.TEXT },
+				name: { type: Sequelize.STRING, unique: true, allowNull: false },
 				status: { type: Sequelize.STRING },
 				battery: { type: Sequelize.STRING },
 				plugged: { type: Sequelize.BOOLEAN },

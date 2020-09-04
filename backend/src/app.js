@@ -10,6 +10,7 @@ const Sentry = require("@sentry/node");
 const wBot = require("./libs/wbot");
 const wbotMessageListener = require("./services/wbotMessageListener");
 const wbotMonitor = require("./services/wbotMonitor");
+const Whatsapp = require("./models/Whatsapp");
 
 const Router = require("./router");
 
@@ -55,13 +56,30 @@ io.on("connection", socket => {
 	});
 });
 
-wBot
-	.init()
-	.then(({ dbSession }) => {
-		wbotMessageListener();
-		wbotMonitor(dbSession);
-	})
-	.catch(err => console.log(err));
+const startWhatsAppSessions = async () => {
+	const whatsapps = await Whatsapp.findAll();
+
+	if (whatsapps.length > 0) {
+		whatsapps.forEach(dbSession => {
+			wBot
+				.init(dbSession)
+				.then(() => {
+					wbotMessageListener(dbSession);
+					wbotMonitor(dbSession);
+				})
+				.catch(err => console.log(err));
+		});
+	}
+};
+startWhatsAppSessions();
+
+// wBot
+// 	.init()
+// 	.then(({ dbSession }) => {
+// 		wbotMessageListener();
+// 		wbotMonitor(dbSession);
+// 	})
+// 	.catch(err => console.log(err));
 
 app.use(Sentry.Handlers.errorHandler());
 

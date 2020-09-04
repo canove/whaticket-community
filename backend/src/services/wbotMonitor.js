@@ -7,7 +7,7 @@ const { getWbot, init } = require("../libs/wbot");
 
 const wbotMonitor = dbSession => {
 	const io = getIO();
-	const wbot = getWbot();
+	const wbot = getWbot(dbSession.name);
 
 	try {
 		wbot.on("change_state", async newState => {
@@ -58,8 +58,8 @@ const wbotMonitor = dbSession => {
 
 			setTimeout(
 				() =>
-					init()
-						.then(({ dbSession }) => {
+					init(dbSession)
+						.then(() => {
 							wbotMessageListener();
 							wbotMonitor(dbSession);
 						})
