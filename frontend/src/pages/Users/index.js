@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from "react";
-
+import { toast } from "react-toastify";
 import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -87,10 +87,9 @@ const Users = () => {
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
-	const [selectedUserId, setSelectedUserId] = useState(null);
+	const [selectedUser, setSelectedUser] = useState(null);
 	const [userModalOpen, setUserModalOpen] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-	const [deletingUser, setDeletingUser] = useState(null);
 	const [searchParam, setSearchParam] = useState("");
 	const [users, dispatch] = useReducer(reducer, []);
 
@@ -112,7 +111,9 @@ const Users = () => {
 					setLoading(false);
 				} catch (err) {
 					console.log(err);
-					alert(err);
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+					}
 				}
 			};
 			fetchUsers();
@@ -138,12 +139,12 @@ const Users = () => {
 	}, []);
 
 	const handleOpenUserModal = () => {
-		setSelectedUserId(null);
+		setSelectedUser(null);
 		setUserModalOpen(true);
 	};
 
 	const handleCloseUserModal = () => {
-		setSelectedUserId(null);
+		setSelectedUser(null);
 		setUserModalOpen(false);
 	};
 
@@ -151,18 +152,22 @@ const Users = () => {
 		setSearchParam(event.target.value.toLowerCase());
 	};
 
-	const handleEditUser = userId => {
-		setSelectedUserId(userId);
+	const handleEditUser = user => {
+		setSelectedUser(user);
 		setUserModalOpen(true);
 	};
 
 	const handleDeleteUser = async userId => {
 		try {
 			await api.delete(`/users/${userId}`);
+			toast.success("User deleted!");
 		} catch (err) {
-			alert(err);
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
-		setDeletingUser(null);
+		setSelectedUser(null);
 		setSearchParam("");
 		setPageNumber(1);
 	};
@@ -182,10 +187,10 @@ const Users = () => {
 	return (
 		<MainContainer>
 			<ConfirmationModal
-				title={deletingUser && `Delete ${deletingUser.name}?`}
+				title={selectedUser && `Delete ${selectedUser.name}?`}
 				open={confirmModalOpen}
 				setOpen={setConfirmModalOpen}
-				onConfirm={e => handleDeleteUser(deletingUser.id)}
+				onConfirm={e => handleDeleteUser(selectedUser.id)}
 			>
 				Are you sure? It canoot be reverted.
 			</ConfirmationModal>
@@ -193,7 +198,7 @@ const Users = () => {
 				open={userModalOpen}
 				onClose={handleCloseUserModal}
 				aria-labelledby="form-dialog-title"
-				userId={selectedUserId}
+				userId={selectedUser && selectedUser.id}
 			/>
 			<MainHeader>
 				<Title>Usuários</Title>
@@ -247,7 +252,7 @@ const Users = () => {
 										<TableCell align="right">
 											<IconButton
 												size="small"
-												onClick={() => handleEditUser(user.id)}
+												onClick={() => handleEditUser(user)}
 											>
 												<EditIcon />
 											</IconButton>
@@ -256,7 +261,7 @@ const Users = () => {
 												size="small"
 												onClick={e => {
 													setConfirmModalOpen(true);
-													setDeletingUser(user);
+													setSelectedUser(user);
 												}}
 											>
 												<DeleteOutlineIcon />

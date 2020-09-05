@@ -30,7 +30,7 @@ exports.store = async (req, res) => {
 		session: dbSession,
 	});
 
-	return res.status(200).json({ message: "Session created sucessfully." });
+	return res.status(200).json(dbSession);
 };
 
 exports.show = async (req, res) => {

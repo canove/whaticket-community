@@ -23,7 +23,7 @@ const QrcodeModal = ({ open, onClose, session }) => {
 						{session.qrcode ? (
 							<QRCode value={session.qrcode} size={256} />
 						) : (
-							<span>loading</span>
+							<span>Waiting for QR Code</span>
 						)}
 					</Paper>
 				</DialogContent>

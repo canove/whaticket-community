@@ -23,7 +23,8 @@ import Title from "../../components/Title";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 import api from "../../services/api";
-import QrcodeModal from "../../components/QrcodeModal";
+import SessionModal from "../../components/SessionModal";
+import ConfirmationModal from "../../components/ConfirmationModal";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_SESSIONS") {
@@ -46,8 +47,6 @@ const reducer = (state, action) => {
 
 	if (action.type === "DELETE_SESSION") {
 		const sessionId = action.payload;
-
-		console.log("cai aqui", sessionId);
 
 		const sessionIndex = state.findIndex(s => s.id === sessionId);
 		if (sessionIndex !== -1) {
@@ -98,8 +97,11 @@ const WhatsAuth = () => {
 
 	const [sessions, dispatch] = useReducer(reducer, []);
 
-	const [qrModalOpen, setQrModalOpen] = useState(false);
+	const [sessionModalOpen, setSessionModalOpen] = useState(false);
+	// const [sessionModalOpen, setSessionModalOpen] = useState(false);
 	const [selectedSession, setSelectedSession] = useState(null);
+	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+	// const [deletingSession, setDeletingSession] = useState(null);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -150,46 +152,55 @@ const WhatsAuth = () => {
 		}
 	};
 
-	console.log(sessions);
-
-	const handleOpenQrMoral = session => {
-		setQrModalOpen(true);
-		setSelectedSession(session);
+	const handleOpenSessionModal = session => {
+		setSelectedSession(null);
+		setSessionModalOpen(true);
 	};
 
-	const handleCloseQrModal = () => {
-		setQrModalOpen(false);
+	const handleCloseSessionModal = () => {
+		setSessionModalOpen(false);
 		setSelectedSession(null);
+	};
+
+	const handleEditUser = session => {
+		setSelectedSession(session);
+		setSessionModalOpen(true);
+	};
+
+	const handleDeleteSession = async sessionId => {
+		try {
+			await api.delete(`/whatsapp/session/${sessionId}`);
+		} catch (err) {
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
+		}
 	};
 
 	return (
 		<MainContainer>
-			<QrcodeModal
-				open={qrModalOpen}
-				onClose={handleCloseQrModal}
-				aria-labelledby="form-dialog-title"
-				session={selectedSession}
-			/>
-			{/* <Dialog
-				open={qrModalOpen}
-				onClose={handleCloseQrModal}
-				maxWidth="lg"
-				scroll="paper"
+			<ConfirmationModal
+				title={selectedSession && `Delete ${selectedSession.name}?`}
+				open={confirmModalOpen}
+				setOpen={setConfirmModalOpen}
+				onConfirm={e => handleDeleteSession(selectedSession.id)}
 			>
-				<DialogTitle>Qr Code</DialogTitle>
-				<DialogContent>
-					<Paper className={classes.paper}>
-						<Qrcode qrCode={selectedSession && selectedSession.qrcode} />
-					</Paper>
-				</DialogContent>
-			</Dialog> */}
+				Are you sure? It cannot be reverted.
+			</ConfirmationModal>
+			<SessionModal
+				open={sessionModalOpen}
+				onClose={handleCloseSessionModal}
+				aria-labelledby="form-dialog-title"
+				sessionId={selectedSession && selectedSession.id}
+			/>
 			<MainHeader>
 				<Title>Connections</Title>
 				<MainHeaderButtonsWrapper>
 					<Button
 						variant="contained"
 						color="primary"
-						// onClick={handleOpenUserModal}
+						onClick={handleOpenSessionModal}
 					>
 						Add Whatsapp
 					</Button>
@@ -216,7 +227,7 @@ const WhatsAuth = () => {
 							<>
 								{sessions &&
 									sessions.length > 0 &&
-									sessions.map(session => (
+									sessions.map((session, index) => (
 										<TableRow key={session.id}>
 											<TableCell align="center">{session.name}</TableCell>
 											<TableCell align="center">
@@ -225,7 +236,7 @@ const WhatsAuth = () => {
 														size="small"
 														variant="contained"
 														color="primary"
-														onClick={() => handleOpenQrMoral(session)}
+														onClick={() => handleEditUser(session)}
 													>
 														QR CODE
 													</Button>
@@ -247,8 +258,8 @@ const WhatsAuth = () => {
 												<IconButton
 													size="small"
 													onClick={e => {
-														// setConfirmModalOpen(true);
-														// setDeletingUser(user);
+														setConfirmModalOpen(true);
+														setSelectedSession(session);
 													}}
 												>
 													<DeleteOutline />
