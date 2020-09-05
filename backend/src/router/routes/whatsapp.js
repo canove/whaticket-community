@@ -5,19 +5,18 @@ const WhatsAppSessionController = require("../../controllers/WhatsAppSessionCont
 
 const routes = express.Router();
 
+routes.get("/whatsapp/session/", isAuth, WhatsAppSessionController.index);
+
 routes.get(
 	"/whatsapp/session/:sessionId",
 	isAuth,
 	WhatsAppSessionController.show
 );
 
-routes.delete(
+routes.put(
 	"/whatsapp/session/:sessionId",
 	isAuth,
-	WhatsAppSessionController.delete
+	WhatsAppSessionController.update
 );
-
-// fetch contacts in user cellphone, not in use
-// routes.get("/whatsapp/contacts", isAuth, WhatsappController.getContacts);
 
 module.exports = routes;

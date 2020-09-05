@@ -7,11 +7,12 @@ const { getWbot, init } = require("../libs/wbot");
 
 const wbotMonitor = dbSession => {
 	const io = getIO();
-	const wbot = getWbot(dbSession.name);
+	const sessionName = dbSession.name;
+	const wbot = getWbot(dbSession.id);
 
 	try {
 		wbot.on("change_state", async newState => {
-			console.log("monitor", newState);
+			console.log("Monitor session:", sessionName, newState);
 			try {
 				await dbSession.update({ status: newState });
 			} catch (err) {
@@ -27,7 +28,9 @@ const wbotMonitor = dbSession => {
 
 		wbot.on("change_battery", async batteryInfo => {
 			const { battery, plugged } = batteryInfo;
-			console.log(`Battery: ${battery}% - Charging? ${plugged}`);
+			console.log(
+				`Battery session: ${sessionName} ${battery}% - Charging? ${plugged}`
+			);
 
 			try {
 				await dbSession.update({ battery, plugged });
@@ -43,7 +46,7 @@ const wbotMonitor = dbSession => {
 		});
 
 		wbot.on("disconnected", async reason => {
-			console.log("disconnected", reason);
+			console.log("Disconnected session:", sessionName, reason);
 			try {
 				await dbSession.update({ status: "disconnected" });
 			} catch (err) {
@@ -52,7 +55,7 @@ const wbotMonitor = dbSession => {
 			}
 
 			io.emit("session", {
-				action: "logout",
+				action: "update",
 				session: dbSession,
 			});
 
@@ -60,7 +63,7 @@ const wbotMonitor = dbSession => {
 				() =>
 					init(dbSession)
 						.then(() => {
-							wbotMessageListener();
+							wbotMessageListener(dbSession);
 							wbotMonitor(dbSession);
 						})
 						.catch(err => {

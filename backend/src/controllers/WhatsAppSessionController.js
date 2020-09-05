@@ -2,6 +2,12 @@ const Whatsapp = require("../models/Whatsapp");
 const { getIO } = require("../libs/socket");
 const { getWbot } = require("../libs/wbot");
 
+exports.index = async (req, res) => {
+	const dbSession = await Whatsapp.findAll();
+
+	return res.status(200).json(dbSession);
+};
+
 exports.show = async (req, res) => {
 	const { sessionId } = req.params;
 	const dbSession = await Whatsapp.findByPk(sessionId);
@@ -13,33 +19,25 @@ exports.show = async (req, res) => {
 	return res.status(200).json(dbSession);
 };
 
-exports.delete = async (req, res) => {
-	const wbot = getWbot();
-	const io = getIO();
-
+exports.update = async (req, res) => {
 	const { sessionId } = req.params;
+
 	const dbSession = await Whatsapp.findByPk(sessionId);
 
 	if (!dbSession) {
 		return res.status(404).json({ message: "Session not found" });
 	}
 
-	await dbSession.update({ session: "", status: "pending" });
+	const wbot = getWbot(dbSession.id);
+	const io = getIO();
+
+	await dbSession.update(req.body);
 	wbot.logout();
 
 	io.emit("session", {
-		action: "logout",
+		action: "update",
 		session: dbSession,
 	});
 
 	return res.status(200).json({ message: "session disconnected" });
 };
-
-// exports.getContacts = async (req, res, next) => {
-// 	const io = getIO();
-// 	const wbot = getWbot();
-
-// 	const phoneContacts = await wbot.getContacts();
-
-// 	return res.status(200).json(phoneContacts);
-// };

@@ -133,7 +133,7 @@ const handleMessage = async (msg, ticket, contact) => {
 };
 
 const wbotMessageListener = dbSession => {
-	const wbot = getWbot(dbSession.name);
+	const wbot = getWbot(dbSession.id);
 	const io = getIO();
 
 	wbot.on("message_create", async msg => {

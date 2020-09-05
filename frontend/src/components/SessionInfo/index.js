@@ -10,7 +10,7 @@ import api from "../../services/api";
 const SessionInfo = ({ session }) => {
 	const handleDisconectSession = async () => {
 		try {
-			await api.delete("/whatsapp/session/1");
+			await api.put(`/whatsapp/session/${session.id}`);
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -27,7 +27,7 @@ const SessionInfo = ({ session }) => {
 			<Typography variant="body2" gutterBottom>
 				{`${i18n.t("sessionInfo.updatedAt")}`}{" "}
 				{session.updatedAt &&
-					format(parseISO(session.updatedAt), "dd/mm/yy HH:mm")}
+					format(parseISO(session.updatedAt), "dd/MM/yy HH:mm")}
 			</Typography>
 			<Button
 				color="primary"

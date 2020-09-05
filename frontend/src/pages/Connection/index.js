@@ -1,50 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import api from "../../services/api";
+import React, { useState, useEffect, useReducer } from "react";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
+import { format, parseISO } from "date-fns";
 
 import { makeStyles } from "@material-ui/core/styles";
+import {
+	Button,
+	TableBody,
+	TableRow,
+	TableCell,
+	IconButton,
+	Table,
+	TableHead,
+	Paper,
+} from "@material-ui/core";
+import { WifiOff, DeleteOutline } from "@material-ui/icons";
 
-import Paper from "@material-ui/core/Paper";
-import SessionInfo from "../../components/SessionInfo";
-import Qrcode from "../../components/Qrcode";
+import MainContainer from "../../components/MainContainer";
+import MainHeader from "../../components/MainHeader";
+import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
+import Title from "../../components/Title";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
+
+import api from "../../services/api";
+import QrcodeModal from "../../components/QrcodeModal";
+
+const reducer = (state, action) => {
+	if (action.type === "LOAD_SESSIONS") {
+		const sessions = action.payload;
+
+		return [...sessions];
+	}
+
+	if (action.type === "UPDATE_SESSIONS") {
+		const session = action.payload;
+		const sessionIndex = state.findIndex(s => s.id === session.id);
+
+		if (sessionIndex !== -1) {
+			state[sessionIndex] = session;
+			return [...state];
+		} else {
+			return [session, ...state];
+		}
+	}
+
+	if (action.type === "DELETE_SESSION") {
+		const sessionId = action.payload;
+
+		const sessionIndex = state.findIndex(s => s.id === sessionId);
+		if (sessionIndex !== -1) {
+			state.splice(sessionIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
 
 const useStyles = makeStyles(theme => ({
-	root: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center",
-		padding: theme.spacing(4),
+	// root: {
+	// 	display: "flex",
+	// 	alignItems: "center",
+	// 	justifyContent: "center",
+	// 	padding: theme.spacing(4),
+	// },
+
+	mainPaper: {
+		flex: 1,
+		padding: theme.spacing(1),
+		overflowY: "scroll",
+		...theme.scrollbarStyles,
 	},
 
-	paper: {
-		padding: theme.spacing(2),
-		display: "flex",
-		width: 400,
-		overflow: "auto",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	fixedHeight: {
-		height: 640,
-	},
+	// paper: {
+	// 	padding: theme.spacing(2),
+	// 	margin: theme.spacing(1),
+	// 	display: "flex",
+	// 	width: 400,
+	// 	height: 270,
+	// 	overflow: "auto",
+	// 	flexDirection: "column",
+	// 	alignItems: "center",
+	// 	justifyContent: "center",
+	// },
+
+	// fixedHeight: {
+	// 	height: 640,
+	// },
 }));
 
 const WhatsAuth = () => {
 	const classes = useStyles();
-	const history = useHistory();
 
-	const [qrCode, setQrCode] = useState("");
-	const [session, setSession] = useState({});
+	const [sessions, dispatch] = useReducer(reducer, []);
+
+	const [qrModalOpen, setQrModalOpen] = useState(false);
+	const [selectedSession, setSelectedSession] = useState(null);
 
 	useEffect(() => {
 		const fetchSession = async () => {
 			try {
-				const { data } = await api.get("/whatsapp/session/1");
-				setQrCode(data.qrcode);
-				setSession(data);
+				const { data } = await api.get("/whatsapp/session/");
+				dispatch({ type: "LOAD_SESSIONS", payload: data });
 			} catch (err) {
 				console.log(err);
 				if (err.response && err.response.data && err.response.data.error) {
@@ -60,48 +119,161 @@ const WhatsAuth = () => {
 
 		socket.on("session", data => {
 			if (data.action === "update") {
-				setQrCode(data.qr);
-				setSession(data.session);
-			}
-		});
-
-		socket.on("session", data => {
-			if (data.action === "update") {
-				setSession(data.session);
-			}
-		});
-
-		socket.on("session", data => {
-			if (data.action === "authentication") {
-				setQrCode("");
-				setSession(data.session);
-				history.push("/tickets");
-			}
-		});
-
-		socket.on("session", data => {
-			if (data.action === "logout") {
-				setSession(data.session);
+				dispatch({ type: "UPDATE_SESSIONS", payload: data.session });
 			}
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [history]);
+	}, []);
+
+	const handleDisconnectSession = async sessionId => {
+		try {
+			await api.put(`/whatsapp/session/${sessionId}`, {
+				session: "",
+				status: "pending",
+			});
+		} catch (err) {
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
+		}
+	};
+
+	console.log(sessions);
+
+	const handleOpenQrMoral = session => {
+		setQrModalOpen(true);
+		setSelectedSession(session);
+	};
+
+	const handleCloseQrModal = () => {
+		setQrModalOpen(false);
+		setSelectedSession(null);
+	};
 
 	return (
-		<div className={classes.root}>
-			{session && session.status === "disconnected" ? (
-				<Paper className={classes.paper}>
-					<Qrcode qrCode={qrCode} />
-				</Paper>
-			) : (
-				<Paper className={classes.paper}>
-					<SessionInfo session={session} />
-				</Paper>
-			)}
-		</div>
+		<MainContainer>
+			<QrcodeModal
+				open={qrModalOpen}
+				onClose={handleCloseQrModal}
+				aria-labelledby="form-dialog-title"
+				session={selectedSession}
+			/>
+			{/* <Dialog
+				open={qrModalOpen}
+				onClose={handleCloseQrModal}
+				maxWidth="lg"
+				scroll="paper"
+			>
+				<DialogTitle>Qr Code</DialogTitle>
+				<DialogContent>
+					<Paper className={classes.paper}>
+						<Qrcode qrCode={selectedSession && selectedSession.qrcode} />
+					</Paper>
+				</DialogContent>
+			</Dialog> */}
+			<MainHeader>
+				<Title>Connections</Title>
+				<MainHeaderButtonsWrapper>
+					<Button
+						variant="contained"
+						color="primary"
+						// onClick={handleOpenUserModal}
+					>
+						Add Whatsapp
+					</Button>
+				</MainHeaderButtonsWrapper>
+			</MainHeader>
+			<Paper
+				className={classes.mainPaper}
+				variant="outlined"
+				// onScroll={handleScroll}
+			>
+				<Table size="small">
+					<TableHead>
+						<TableRow>
+							<TableCell align="center">Name</TableCell>
+							<TableCell align="center">Status</TableCell>
+							<TableCell align="center">Last update</TableCell>
+							<TableCell align="center">Actions</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{false ? (
+							<TableRowSkeleton />
+						) : (
+							<>
+								{sessions &&
+									sessions.length > 0 &&
+									sessions.map(session => (
+										<TableRow key={session.id}>
+											<TableCell align="center">{session.name}</TableCell>
+											<TableCell align="center">
+												{session.status === "qrcode" ? (
+													<Button
+														size="small"
+														variant="contained"
+														color="primary"
+														onClick={() => handleOpenQrMoral(session)}
+													>
+														QR CODE
+													</Button>
+												) : (
+													session.status
+												)}
+											</TableCell>
+											<TableCell align="center">
+												{format(parseISO(session.updatedAt), "dd/MM/yy HH:mm")}
+											</TableCell>
+											<TableCell align="center">
+												<IconButton
+													size="small"
+													onClick={() => handleDisconnectSession(session.id)}
+												>
+													<WifiOff />
+												</IconButton>
+
+												<IconButton
+													size="small"
+													onClick={e => {
+														// setConfirmModalOpen(true);
+														// setDeletingUser(user);
+													}}
+												>
+													<DeleteOutline />
+												</IconButton>
+											</TableCell>
+										</TableRow>
+									))}
+							</>
+						)}
+					</TableBody>
+				</Table>
+			</Paper>
+
+			{/* <div className={classes.root}>
+				{sessions &&
+					sessions.length > 0 &&
+					sessions.map(session => {
+						if (session.status === "disconnected")
+							return (
+								<Paper className={classes.paper}>
+									<Qrcode qrCode={qrCode} />
+								</Paper>
+							);
+						else {
+							return (
+								<Paper className={classes.paper}>
+									<SessionInfo session={session} />
+								</Paper>
+							);
+						}
+					})}
+			</div> */}
+		</MainContainer>
 	);
 };
 
