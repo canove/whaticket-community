@@ -1,6 +1,6 @@
 const Contact = require("../models/Contact");
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot, initWbot } = require("../libs/wbot");
 
 exports.store = async (req, res, next) => {
 	const io = getIO();

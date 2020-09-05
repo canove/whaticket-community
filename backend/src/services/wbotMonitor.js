@@ -3,7 +3,7 @@ const Sentry = require("@sentry/node");
 const wbotMessageListener = require("./wbotMessageListener");
 
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot, initWbot } = require("../libs/wbot");
 
 const wbotMonitor = dbSession => {
 	const io = getIO();
@@ -61,7 +61,7 @@ const wbotMonitor = dbSession => {
 
 			setTimeout(
 				() =>
-					init(dbSession)
+					initWbot(dbSession)
 						.then(() => {
 							wbotMessageListener(dbSession);
 							wbotMonitor(dbSession);

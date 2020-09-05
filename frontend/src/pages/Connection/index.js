@@ -47,6 +47,8 @@ const reducer = (state, action) => {
 	if (action.type === "DELETE_SESSION") {
 		const sessionId = action.payload;
 
+		console.log("cai aqui", sessionId);
+
 		const sessionIndex = state.findIndex(s => s.id === sessionId);
 		if (sessionIndex !== -1) {
 			state.splice(sessionIndex, 1);
@@ -120,6 +122,12 @@ const WhatsAuth = () => {
 		socket.on("session", data => {
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_SESSIONS", payload: data.session });
+			}
+		});
+
+		socket.on("session", data => {
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_SESSION", payload: data.sessionId });
 			}
 		});
 

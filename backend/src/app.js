@@ -7,7 +7,7 @@ const cors = require("cors");
 const multer = require("multer");
 const Sentry = require("@sentry/node");
 
-const wBot = require("./libs/wbot");
+const { initWbot } = require("./libs/wbot");
 const wbotMessageListener = require("./services/wbotMessageListener");
 const wbotMonitor = require("./services/wbotMonitor");
 const Whatsapp = require("./models/Whatsapp");
@@ -61,8 +61,7 @@ const startWhatsAppSessions = async () => {
 
 	if (whatsapps.length > 0) {
 		whatsapps.forEach(dbSession => {
-			wBot
-				.init(dbSession)
+			initWbot(dbSession)
 				.then(() => {
 					wbotMessageListener(dbSession);
 					wbotMonitor(dbSession);

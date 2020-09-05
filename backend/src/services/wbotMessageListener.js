@@ -9,7 +9,7 @@ const Ticket = require("../models/Ticket");
 const Message = require("../models/Message");
 
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot, initWbot } = require("../libs/wbot");
 
 const verifyContact = async (msgContact, profilePicUrl) => {
 	let contact = await Contact.findOne({
