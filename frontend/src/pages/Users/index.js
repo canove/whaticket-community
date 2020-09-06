@@ -88,6 +88,7 @@ const Users = () => {
 	const [pageNumber, setPageNumber] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [deletingUser, setDeletingUser] = useState(null);
 	const [userModalOpen, setUserModalOpen] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
@@ -167,7 +168,7 @@ const Users = () => {
 				toast.error(err.response.data.error);
 			}
 		}
-		setSelectedUser(null);
+		setDeletingUser(null);
 		setSearchParam("");
 		setPageNumber(1);
 	};
@@ -187,10 +188,10 @@ const Users = () => {
 	return (
 		<MainContainer>
 			<ConfirmationModal
-				title={selectedUser && `Delete ${selectedUser.name}?`}
+				title={deletingUser && `Delete ${deletingUser.name}?`}
 				open={confirmModalOpen}
 				setOpen={setConfirmModalOpen}
-				onConfirm={e => handleDeleteUser(selectedUser.id)}
+				onConfirm={e => handleDeleteUser(deletingUser.id)}
 			>
 				Are you sure? It canoot be reverted.
 			</ConfirmationModal>
@@ -261,7 +262,7 @@ const Users = () => {
 												size="small"
 												onClick={e => {
 													setConfirmModalOpen(true);
-													setSelectedUser(user);
+													setDeletingUser(user);
 												}}
 											>
 												<DeleteOutlineIcon />

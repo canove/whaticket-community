@@ -132,8 +132,8 @@ const handleMessage = async (msg, ticket, contact) => {
 	});
 };
 
-const wbotMessageListener = dbSession => {
-	const wbot = getWbot(dbSession.id);
+const wbotMessageListener = whatsapp => {
+	const wbot = getWbot(whatsapp.id);
 	const io = getIO();
 
 	wbot.on("message_create", async msg => {

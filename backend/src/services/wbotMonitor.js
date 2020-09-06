@@ -5,16 +5,16 @@ const wbotMessageListener = require("./wbotMessageListener");
 const { getIO } = require("../libs/socket");
 const { getWbot, initWbot } = require("../libs/wbot");
 
-const wbotMonitor = dbSession => {
+const wbotMonitor = whatsapp => {
 	const io = getIO();
-	const sessionName = dbSession.name;
-	const wbot = getWbot(dbSession.id);
+	const sessionName = whatsapp.name;
+	const wbot = getWbot(whatsapp.id);
 
 	try {
 		wbot.on("change_state", async newState => {
 			console.log("Monitor session:", sessionName, newState);
 			try {
-				await dbSession.update({ status: newState });
+				await whatsapp.update({ status: newState });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
@@ -22,7 +22,7 @@ const wbotMonitor = dbSession => {
 
 			io.emit("session", {
 				action: "update",
-				session: dbSession,
+				session: whatsapp,
 			});
 		});
 
@@ -33,7 +33,7 @@ const wbotMonitor = dbSession => {
 			);
 
 			try {
-				await dbSession.update({ battery, plugged });
+				await whatsapp.update({ battery, plugged });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
@@ -41,14 +41,14 @@ const wbotMonitor = dbSession => {
 
 			io.emit("session", {
 				action: "update",
-				session: dbSession,
+				session: whatsapp,
 			});
 		});
 
 		wbot.on("disconnected", async reason => {
 			console.log("Disconnected session:", sessionName, reason);
 			try {
-				await dbSession.update({ status: "disconnected" });
+				await whatsapp.update({ status: "disconnected" });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
@@ -56,15 +56,15 @@ const wbotMonitor = dbSession => {
 
 			io.emit("session", {
 				action: "update",
-				session: dbSession,
+				session: whatsapp,
 			});
 
 			setTimeout(
 				() =>
-					initWbot(dbSession)
+					initWbot(whatsapp)
 						.then(() => {
-							wbotMessageListener(dbSession);
-							wbotMonitor(dbSession);
+							wbotMessageListener(whatsapp);
+							wbotMonitor(whatsapp);
 						})
 						.catch(err => {
 							Sentry.captureException(err);

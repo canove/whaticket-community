@@ -1,30 +1,18 @@
 const express = require("express");
 const isAuth = require("../../middleware/is-auth");
 
-const WhatsAppSessionController = require("../../controllers/WhatsAppSessionController");
+const WhatsAppController = require("../../controllers/WhatsAppController");
 
 const routes = express.Router();
 
-routes.get("/whatsapp/session/", isAuth, WhatsAppSessionController.index);
+routes.get("/whatsapp/", isAuth, WhatsAppController.index);
 
-routes.post("/whatsapp/session", isAuth, WhatsAppSessionController.store);
+routes.post("/whatsapp/", isAuth, WhatsAppController.store);
 
-routes.get(
-	"/whatsapp/session/:sessionId",
-	isAuth,
-	WhatsAppSessionController.show
-);
+routes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
 
-routes.put(
-	"/whatsapp/session/:sessionId",
-	isAuth,
-	WhatsAppSessionController.update
-);
+routes.put("/whatsapp/:whatsappId", isAuth, WhatsAppController.update);
 
-routes.delete(
-	"/whatsapp/session/:sessionId",
-	isAuth,
-	WhatsAppSessionController.delete
-);
+routes.delete("/whatsapp/:whatsappId", isAuth, WhatsAppController.delete);
 
 module.exports = routes;

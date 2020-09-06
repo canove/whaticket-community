@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import QRCode from "qrcode.react";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
@@ -10,21 +9,29 @@ import { green } from "@material-ui/core/colors";
 import {
 	Dialog,
 	DialogContent,
-	Paper,
-	Typography,
 	DialogTitle,
 	Button,
 	DialogActions,
 	CircularProgress,
 	TextField,
+	Switch,
+	FormControlLabel,
 } from "@material-ui/core";
 
-import { i18n } from "../../translate/i18n";
+// import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
+	form: {
+		display: "flex",
+		alignItems: "center",
+		justifySelf: "center",
+		"& > *": {
+			margin: theme.spacing(1),
+		},
+	},
+
 	textField: {
-		marginRight: theme.spacing(1),
 		flex: 1,
 	},
 
@@ -49,21 +56,21 @@ const SessionSchema = Yup.object().shape({
 		.required("Required"),
 });
 
-const SessionModal = ({ open, onClose, sessionId }) => {
+const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const classes = useStyles();
 	const initialState = {
 		name: "",
-		status: "",
+		default: false,
 	};
-	const [session, setSession] = useState(initialState);
+	const [whatsApp, setWhatsApp] = useState(initialState);
 
 	useEffect(() => {
 		const fetchSession = async () => {
-			if (!sessionId) return;
+			if (!whatsAppId) return;
 
 			try {
-				const { data } = await api.get(`whatsapp/session/${sessionId}`);
-				setSession(data);
+				const { data } = await api.get(`whatsapp/${whatsAppId}`);
+				setWhatsApp(data);
 			} catch (err) {
 				console.log(err);
 				if (err.response && err.response.data && err.response.data.error) {
@@ -72,16 +79,19 @@ const SessionModal = ({ open, onClose, sessionId }) => {
 			}
 		};
 		fetchSession();
-	}, [sessionId]);
+	}, [whatsAppId]);
 
-	const handleSaveSession = async values => {
+	const handleSaveWhatsApp = async values => {
 		try {
-			if (sessionId) {
-				await api.put(`/whatsapp/session/${sessionId}`, values);
+			if (whatsAppId) {
+				await api.put(`/whatsapp/${whatsAppId}`, {
+					name: values.name,
+					default: values.default,
+				});
 			} else {
-				await api.post("/whatsapp/session", values);
+				await api.post("/whatsapp", values);
 			}
-			toast.success("Session created!");
+			toast.success("Success!");
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -93,26 +103,27 @@ const SessionModal = ({ open, onClose, sessionId }) => {
 
 	const handleClose = () => {
 		onClose();
-		setSession(initialState);
+		setWhatsApp(initialState);
 	};
 
 	return (
 		<Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
-			<DialogTitle>Edit Session</DialogTitle>
+			<DialogTitle>WhatsApp</DialogTitle>
 			<Formik
-				initialValues={session}
+				initialValues={whatsApp}
 				enableReinitialize={true}
 				validationSchema={SessionSchema}
 				onSubmit={(values, actions) => {
 					setTimeout(() => {
-						handleSaveSession(values);
+						handleSaveWhatsApp(values);
+						// alert(JSON.stringify(values, null, 2));
 						actions.setSubmitting(false);
 					}, 400);
 				}}
 			>
-				{({ touched, errors, isSubmitting }) => (
+				{({ values, touched, errors, isSubmitting }) => (
 					<Form>
-						<DialogContent dividers>
+						<DialogContent dividers className={classes.form}>
 							<Field
 								as={TextField}
 								label="Name"
@@ -124,13 +135,16 @@ const SessionModal = ({ open, onClose, sessionId }) => {
 								margin="dense"
 								className={classes.textField}
 							/>
-							<Field
-								as={TextField}
-								label="Status"
-								name="status"
-								disabled
-								variant="outlined"
-								margin="dense"
+							<FormControlLabel
+								control={
+									<Field
+										as={Switch}
+										color="primary"
+										name="default"
+										checked={values.default}
+									/>
+								}
+								label="Default"
 							/>
 						</DialogContent>
 						<DialogActions>
@@ -165,4 +179,4 @@ const SessionModal = ({ open, onClose, sessionId }) => {
 	);
 };
 
-export default SessionModal;
+export default React.memo(WhatsAppModal);

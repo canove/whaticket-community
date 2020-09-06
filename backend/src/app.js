@@ -60,25 +60,17 @@ const startWhatsAppSessions = async () => {
 	const whatsapps = await Whatsapp.findAll();
 
 	if (whatsapps.length > 0) {
-		whatsapps.forEach(dbSession => {
-			initWbot(dbSession)
+		whatsapps.forEach(whatsapp => {
+			initWbot(whatsapp)
 				.then(() => {
-					wbotMessageListener(dbSession);
-					wbotMonitor(dbSession);
+					wbotMessageListener(whatsapp);
+					wbotMonitor(whatsapp);
 				})
 				.catch(err => console.log(err));
 		});
 	}
 };
 startWhatsAppSessions();
-
-// wBot
-// 	.init()
-// 	.then(({ dbSession }) => {
-// 		wbotMessageListener();
-// 		wbotMonitor(dbSession);
-// 	})
-// 	.catch(err => console.log(err));
 
 app.use(Sentry.Handlers.errorHandler());
 
@@ -88,5 +80,6 @@ app.use(async (err, req, res, next) => {
 		console.log(err);
 		return res.status(500).json(errors);
 	}
+
 	return res.status(500).json({ error: "Internal server error" });
 });

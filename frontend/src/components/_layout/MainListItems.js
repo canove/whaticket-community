@@ -42,8 +42,8 @@ const MainListItems = () => {
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
 			<ListItemLink
-				to="/connection"
-				primary={i18n.t("mainDrawer.listItems.connection")}
+				to="/whatsapps"
+				primary="WhatsApps"
 				icon={<SyncAltIcon />}
 			/>
 			<ListItemLink

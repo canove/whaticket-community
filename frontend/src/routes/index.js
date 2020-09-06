@@ -7,7 +7,7 @@ import Dashboard from "../pages/Dashboard/";
 import Tickets from "../pages/Tickets/";
 import Signup from "../pages/Signup/";
 import Login from "../pages/Login/";
-import Connection from "../pages/Connection/";
+import WhatsApps from "../pages/WhatsApps/";
 import Settings from "../pages/Settings/";
 import Users from "../pages/Users";
 import Contacts from "../pages/Contacts/";
@@ -29,7 +29,7 @@ const Routes = () => {
 							component={Tickets}
 							isPrivate
 						/>
-						<Route exact path="/connection" component={Connection} isPrivate />
+						<Route exact path="/whatsapps" component={WhatsApps} isPrivate />
 						<Route exact path="/contacts" component={Contacts} isPrivate />
 						<Route exact path="/users" component={Users} isPrivate />
 						<Route exact path="/Settings" component={Settings} isPrivate />

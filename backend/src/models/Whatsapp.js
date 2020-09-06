@@ -10,6 +10,11 @@ class Whatsapp extends Sequelize.Model {
 				status: { type: Sequelize.STRING },
 				battery: { type: Sequelize.STRING },
 				plugged: { type: Sequelize.BOOLEAN },
+				default: {
+					type: Sequelize.BOOLEAN,
+					defaultValue: false,
+					allowNull: false,
+				},
 			},
 			{
 				sequelize,
