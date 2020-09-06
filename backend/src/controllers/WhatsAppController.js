@@ -22,10 +22,10 @@ exports.store = async (req, res) => {
 				async value => {
 					// console.log("cai no if", value);
 					if (value === true) {
-						const defaultFound = await Whatsapp.findOne({
+						const whatsappFound = await Whatsapp.findOne({
 							where: { default: true },
 						});
-						return !Boolean(defaultFound);
+						return !Boolean(whatsappFound);
 					} else return true;
 				}
 			),
@@ -72,6 +72,8 @@ exports.show = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+	const { whatsappId } = req.params;
+
 	const schema = Yup.object().shape({
 		name: Yup.string().required().min(2),
 		default: Yup.boolean()
@@ -80,12 +82,13 @@ exports.update = async (req, res) => {
 				"Check-default",
 				"Only one default whatsapp is permited",
 				async value => {
-					// console.log("cai no if", value);
 					if (value === true) {
-						const defaultFound = await Whatsapp.findOne({
+						const whatsappFound = await Whatsapp.findOne({
 							where: { default: true },
 						});
-						return !Boolean(defaultFound);
+						if (whatsappFound) {
+							return !(whatsappFound.id !== +whatsappId);
+						}
 					} else return true;
 				}
 			),
@@ -98,7 +101,6 @@ exports.update = async (req, res) => {
 	}
 
 	const io = getIO();
-	const { whatsappId } = req.params;
 
 	const whatsapp = await Whatsapp.findByPk(whatsappId);
 
