@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
 const Contact = require("../models/Contact");
+const Whatsapp = require("../models/Whatsapp");
 const ContactCustomField = require("../models/ContactCustomField");
 
 const { getIO } = require("../libs/socket");
@@ -39,7 +40,17 @@ exports.index = async (req, res) => {
 };
 
 exports.store = async (req, res) => {
-	const wbot = getWbot();
+	const defaultWhatsapp = await Whatsapp.findOne({
+		where: { default: true },
+	});
+
+	if (!defaultWhatsapp) {
+		return res
+			.status(404)
+			.json({ error: "No default WhatsApp found. Check Connection page." });
+	}
+
+	const wbot = getWbot(defaultWhatsapp);
 	const io = getIO();
 	const newContact = req.body;
 
