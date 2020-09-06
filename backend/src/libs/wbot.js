@@ -90,7 +90,8 @@ module.exports = {
 		const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
 		if (sessionIndex === -1) {
-			throw new Error("This Wbot session is not initialized");
+			console.log("This Wbot session is not initialized");
+			return null;
 		}
 		return sessions[sessionIndex];
 	},

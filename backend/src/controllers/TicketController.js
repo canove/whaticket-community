@@ -4,6 +4,7 @@ const { startOfDay, endOfDay, parseISO } = require("date-fns");
 const Ticket = require("../models/Ticket");
 const Contact = require("../models/Contact");
 const Message = require("../models/Message");
+const Whatsapp = require("../models/Whatsapp");
 
 const { getIO } = require("../libs/socket");
 
@@ -110,7 +111,18 @@ exports.index = async (req, res) => {
 
 exports.store = async (req, res) => {
 	const io = getIO();
-	const ticket = await Ticket.create(req.body);
+
+	const defaultWhatsapp = await Whatsapp.findOne({
+		where: { default: true },
+	});
+
+	if (!defaultWhatsapp) {
+		return res
+			.status(404)
+			.json({ error: "No default WhatsApp found. Check Connection page." });
+	}
+
+	const ticket = await defaultWhatsapp.createTicket(req.body);
 
 	const contact = await ticket.getContact();
 

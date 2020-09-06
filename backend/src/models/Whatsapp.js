@@ -23,6 +23,10 @@ class Whatsapp extends Sequelize.Model {
 
 		return this;
 	}
+
+	static associate(models) {
+		this.hasMany(models.Ticket, { foreignKey: "whatsappId", as: "tickets" });
+	}
 }
 
 module.exports = Whatsapp;

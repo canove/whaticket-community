@@ -20,7 +20,6 @@ exports.store = async (req, res) => {
 				"Check-default",
 				"Only one default whatsapp is permited",
 				async value => {
-					// console.log("cai no if", value);
 					if (value === true) {
 						const whatsappFound = await Whatsapp.findOne({
 							where: { default: true },
@@ -88,6 +87,8 @@ exports.update = async (req, res) => {
 						});
 						if (whatsappFound) {
 							return !(whatsappFound.id !== +whatsappId);
+						} else {
+							return true;
 						}
 					} else return true;
 				}
