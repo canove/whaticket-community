@@ -1,3 +1,4 @@
+const Yup = require("yup");
 const Whatsapp = require("../models/Whatsapp");
 const { getIO } = require("../libs/socket");
 const { getWbot, initWbot, removeWbot } = require("../libs/wbot");
@@ -5,13 +6,39 @@ const wbotMessageListener = require("../services/wbotMessageListener");
 const wbotMonitor = require("../services/wbotMonitor");
 
 exports.index = async (req, res) => {
-	const whatsapp = await Whatsapp.findAll();
+	const whatsapps = await Whatsapp.findAll();
 
-	return res.status(200).json(whatsapp);
+	return res.status(200).json(whatsapps);
 };
 
 exports.store = async (req, res) => {
+	const schema = Yup.object().shape({
+		name: Yup.string().required().min(2),
+		default: Yup.boolean()
+			.required()
+			.test(
+				"Check-default",
+				"Only one default whatsapp is permited",
+				async value => {
+					// console.log("cai no if", value);
+					if (value === true) {
+						const defaultFound = await Whatsapp.findOne({
+							where: { default: true },
+						});
+						return !Boolean(defaultFound);
+					} else return true;
+				}
+			),
+	});
+
+	try {
+		await schema.validate(req.body);
+	} catch (err) {
+		return res.status(400).json({ error: err.message });
+	}
+
 	const io = getIO();
+
 	const whatsapp = await Whatsapp.create(req.body);
 
 	if (!whatsapp) {
@@ -45,6 +72,31 @@ exports.show = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+	const schema = Yup.object().shape({
+		name: Yup.string().required().min(2),
+		default: Yup.boolean()
+			.required()
+			.test(
+				"Check-default",
+				"Only one default whatsapp is permited",
+				async value => {
+					// console.log("cai no if", value);
+					if (value === true) {
+						const defaultFound = await Whatsapp.findOne({
+							where: { default: true },
+						});
+						return !Boolean(defaultFound);
+					} else return true;
+				}
+			),
+	});
+
+	try {
+		await schema.validate(req.body);
+	} catch (err) {
+		return res.status(400).json({ error: err.message });
+	}
+
 	const io = getIO();
 	const { whatsappId } = req.params;
 

@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 
 import { makeStyles } from "@material-ui/core/styles";
+import { green } from "@material-ui/core/colors";
 import {
 	Button,
 	TableBody,
@@ -14,7 +15,7 @@ import {
 	TableHead,
 	Paper,
 } from "@material-ui/core";
-import { Edit, DeleteOutline } from "@material-ui/icons";
+import { Edit, DeleteOutline, CheckCircle } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -228,6 +229,7 @@ const WhatsApps = () => {
 							<TableCell align="center">Name</TableCell>
 							<TableCell align="center">Status</TableCell>
 							<TableCell align="center">Last update</TableCell>
+							<TableCell align="center">Default</TableCell>
 							<TableCell align="center">Actions</TableCell>
 						</TableRow>
 					</TableHead>
@@ -257,6 +259,11 @@ const WhatsApps = () => {
 											</TableCell>
 											<TableCell align="center">
 												{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
+											</TableCell>
+											<TableCell align="center">
+												{whatsApp.default && (
+													<CheckCircle style={{ color: green[500] }} />
+												)}
 											</TableCell>
 											<TableCell align="center">
 												<IconButton
