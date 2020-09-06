@@ -86,10 +86,8 @@ module.exports = {
 		return null;
 	},
 
-	getWbot: sessionId => {
-		console.log(sessionId);
-		console.log(sessions.map(session => session.id));
-		const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+	getWbot: whatsappId => {
+		const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
 		if (sessionIndex === -1) {
 			throw new Error("This Wbot session is not initialized");
@@ -97,9 +95,9 @@ module.exports = {
 		return sessions[sessionIndex];
 	},
 
-	removeWbot: sessionId => {
+	removeWbot: whatsappId => {
 		try {
-			const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+			const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 			if (sessionIndex !== -1) {
 				sessions[sessionIndex].destroy();
 				sessions.splice(sessionIndex, 1);
