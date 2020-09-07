@@ -8,6 +8,12 @@ const Setting = require("../models/Setting");
 const { getIO } = require("../libs/socket");
 
 exports.index = async (req, res) => {
+	if (req.user.profile !== "admin") {
+		return res
+			.status(403)
+			.json({ error: "Only administrators can access this route." });
+	}
+
 	const { searchParam = "", pageNumber = 1 } = req.query;
 
 	const whereCondition = {

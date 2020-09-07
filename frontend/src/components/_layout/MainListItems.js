@@ -38,6 +38,7 @@ function ListItemLink(props) {
 }
 
 const MainListItems = () => {
+	const userProfile = localStorage.getItem("profile");
 	return (
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
@@ -57,18 +58,22 @@ const MainListItems = () => {
 				primary={i18n.t("mainDrawer.listItems.contacts")}
 				icon={<ContactPhoneIcon />}
 			/>
-			<Divider />
-			<ListSubheader inset>Administration</ListSubheader>
-			<ListItemLink
-				to="/users"
-				primary={i18n.t("mainDrawer.listItems.users")}
-				icon={<GroupIcon />}
-			/>
-			<ListItemLink
-				to="/settings"
-				primary={i18n.t("mainDrawer.listItems.settings")}
-				icon={<SettingsIcon />}
-			/>
+			{userProfile === "admin" && (
+				<>
+					<Divider />
+					<ListSubheader inset>Administration</ListSubheader>
+					<ListItemLink
+						to="/users"
+						primary={i18n.t("mainDrawer.listItems.users")}
+						icon={<GroupIcon />}
+					/>
+					<ListItemLink
+						to="/settings"
+						primary={i18n.t("mainDrawer.listItems.settings")}
+						icon={<SettingsIcon />}
+					/>
+				</>
+			)}
 		</div>
 	);
 };

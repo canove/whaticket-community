@@ -23,7 +23,10 @@ exports.store = async (req, res, next) => {
 		}
 	);
 
-	return res
-		.status(200)
-		.json({ token: token, username: user.name, userId: user.id });
+	return res.status(200).json({
+		token: token,
+		username: user.name,
+		profile: user.profile,
+		userId: user.id,
+	});
 };

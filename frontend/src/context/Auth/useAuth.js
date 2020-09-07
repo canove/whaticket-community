@@ -47,11 +47,12 @@ const useAuth = () => {
 	const handleLogin = async (e, user) => {
 		e.preventDefault();
 		try {
-			const res = await api.post("/auth/login", user);
-			localStorage.setItem("token", JSON.stringify(res.data.token));
-			localStorage.setItem("username", res.data.username);
-			localStorage.setItem("userId", res.data.userId);
-			api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
+			const { data } = await api.post("/auth/login", user);
+			localStorage.setItem("token", JSON.stringify(data.token));
+			localStorage.setItem("username", data.username);
+			localStorage.setItem("profile", data.profile);
+			localStorage.setItem("userId", data.userId);
+			api.defaults.headers.Authorization = `Bearer ${data.token}`;
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");
@@ -68,6 +69,7 @@ const useAuth = () => {
 		setIsAuth(false);
 		localStorage.removeItem("token");
 		localStorage.removeItem("username");
+		localStorage.removeItem("profile");
 		localStorage.removeItem("userId");
 		api.defaults.headers.Authorization = undefined;
 		history.push("/login");
