@@ -1,7 +1,7 @@
 const express = require("express");
-const isAuth = require("../middleware/is-auth");
+const isAuth = require("../../middleware/is-auth");
 
-const MessageController = require("../controllers/MessageController");
+const MessageController = require("../../controllers/MessageController");
 
 const routes = express.Router();
 

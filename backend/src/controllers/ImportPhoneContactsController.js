@@ -1,12 +1,32 @@
 const Contact = require("../models/Contact");
+const Whatsapp = require("../models/Whatsapp");
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot, initWbot } = require("../libs/wbot");
 
 exports.store = async (req, res, next) => {
-	const io = getIO();
-	const wbot = getWbot();
+	const defaultWhatsapp = await Whatsapp.findOne({
+		where: { default: true },
+	});
 
-	const phoneContacts = await wbot.getContacts();
+	if (!defaultWhatsapp) {
+		return res
+			.status(404)
+			.json({ error: "No default WhatsApp found. Check Connection page." });
+	}
+
+	const io = getIO();
+	const wbot = getWbot(defaultWhatsapp);
+
+	let phoneContacts;
+
+	try {
+		phoneContacts = await wbot.getContacts();
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({
+			error: "Could not check whatsapp contact. Check connection page.",
+		});
+	}
 
 	await Promise.all(
 		phoneContacts.map(async ({ number, name }) => {

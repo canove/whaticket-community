@@ -1,8 +1,11 @@
 const express = require("express");
-const SessionController = require("../controllers/SessionController");
-const isAuth = require("../middleware/is-auth");
+const SessionController = require("../../controllers/SessionController");
+const UserController = require("../../controllers/UserController");
+const isAuth = require("../../middleware/is-auth");
 
 const routes = express.Router();
+
+routes.post("/signup", UserController.store);
 
 routes.post("/login", SessionController.store);
 

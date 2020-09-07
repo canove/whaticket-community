@@ -6,9 +6,15 @@ class Whatsapp extends Sequelize.Model {
 			{
 				session: { type: Sequelize.TEXT },
 				qrcode: { type: Sequelize.TEXT },
+				name: { type: Sequelize.STRING, unique: true, allowNull: false },
 				status: { type: Sequelize.STRING },
 				battery: { type: Sequelize.STRING },
 				plugged: { type: Sequelize.BOOLEAN },
+				default: {
+					type: Sequelize.BOOLEAN,
+					defaultValue: false,
+					allowNull: false,
+				},
 			},
 			{
 				sequelize,
@@ -16,6 +22,10 @@ class Whatsapp extends Sequelize.Model {
 		);
 
 		return this;
+	}
+
+	static associate(models) {
+		this.hasMany(models.Ticket, { foreignKey: "whatsappId", as: "tickets" });
 	}
 }
 

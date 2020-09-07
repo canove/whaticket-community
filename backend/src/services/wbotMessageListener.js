@@ -7,9 +7,10 @@ const Sentry = require("@sentry/node");
 const Contact = require("../models/Contact");
 const Ticket = require("../models/Ticket");
 const Message = require("../models/Message");
+const Whatsapp = require("../models/Whatsapp");
 
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot, initWbot } = require("../libs/wbot");
 
 const verifyContact = async (msgContact, profilePicUrl) => {
 	let contact = await Contact.findOne({
@@ -29,7 +30,7 @@ const verifyContact = async (msgContact, profilePicUrl) => {
 	return contact;
 };
 
-const verifyTicket = async contact => {
+const verifyTicket = async (contact, whatsappId) => {
 	let ticket = await Ticket.findOne({
 		where: {
 			status: {
@@ -57,6 +58,7 @@ const verifyTicket = async contact => {
 		ticket = await Ticket.create({
 			contactId: contact.id,
 			status: "pending",
+			whatsappId,
 		});
 	}
 
@@ -132,12 +134,14 @@ const handleMessage = async (msg, ticket, contact) => {
 	});
 };
 
-const wbotMessageListener = () => {
-	const wbot = getWbot();
+const wbotMessageListener = whatsapp => {
+	const whatsappId = whatsapp.id;
+	const wbot = getWbot(whatsappId);
 	const io = getIO();
 
 	wbot.on("message_create", async msg => {
 		// console.log(msg);
+
 		if (
 			msg.from === "status@broadcast" ||
 			msg.type === "location" ||
@@ -158,7 +162,7 @@ const wbotMessageListener = () => {
 
 			const profilePicUrl = await msgContact.getProfilePicUrl();
 			const contact = await verifyContact(msgContact, profilePicUrl);
-			const ticket = await verifyTicket(contact);
+			const ticket = await verifyTicket(contact, whatsappId);
 
 			//return if message was already created by messageController
 			if (msg.fromMe) {

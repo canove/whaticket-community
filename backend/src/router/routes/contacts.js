@@ -1,8 +1,8 @@
 const express = require("express");
-const isAuth = require("../middleware/is-auth");
+const isAuth = require("../../middleware/is-auth");
 
-const ContactController = require("../controllers/ContactController");
-const ImportPhoneContactsController = require("../controllers/ImportPhoneContactsController");
+const ContactController = require("../../controllers/ContactController");
+const ImportPhoneContactsController = require("../../controllers/ImportPhoneContactsController");
 
 const routes = express.Router();
 

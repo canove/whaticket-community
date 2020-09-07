@@ -35,7 +35,10 @@ const useAuth = () => {
 			} catch (err) {
 				setLoading(false);
 				setIsAuth(false);
-				toast.error(i18n.t("auth.toasts.fail"));
+				console.log(err);
+				if (err.response && err.response.data && err.response.data.error) {
+					toast.error(err.response.data.error);
+				}
 			}
 		};
 		checkAuth();
@@ -44,16 +47,20 @@ const useAuth = () => {
 	const handleLogin = async (e, user) => {
 		e.preventDefault();
 		try {
-			const res = await api.post("/auth/login", user);
-			localStorage.setItem("token", JSON.stringify(res.data.token));
-			localStorage.setItem("username", res.data.username);
-			localStorage.setItem("userId", res.data.userId);
-			api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
+			const { data } = await api.post("/auth/login", user);
+			localStorage.setItem("token", JSON.stringify(data.token));
+			localStorage.setItem("username", data.username);
+			localStorage.setItem("profile", data.profile);
+			localStorage.setItem("userId", data.userId);
+			api.defaults.headers.Authorization = `Bearer ${data.token}`;
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
-			history.push("/chat");
+			history.push("/tickets");
 		} catch (err) {
-			toast.error(i18n.t("auth.toasts.fail"));
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 
@@ -62,6 +69,7 @@ const useAuth = () => {
 		setIsAuth(false);
 		localStorage.removeItem("token");
 		localStorage.removeItem("username");
+		localStorage.removeItem("profile");
 		localStorage.removeItem("userId");
 		api.defaults.headers.Authorization = undefined;
 		history.push("/login");

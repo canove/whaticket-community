@@ -2,13 +2,14 @@ const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
 const Contact = require("../models/Contact");
+const Whatsapp = require("../models/Whatsapp");
 const ContactCustomField = require("../models/ContactCustomField");
 
 const { getIO } = require("../libs/socket");
 const { getWbot } = require("../libs/wbot");
 
 exports.index = async (req, res) => {
-	const { searchParam = "", pageNumber = 1, rowsPerPage = 10 } = req.query;
+	const { searchParam = "", pageNumber = 1 } = req.query;
 
 	const whereCondition = {
 		[Op.or]: [
@@ -23,7 +24,7 @@ exports.index = async (req, res) => {
 		],
 	};
 
-	let limit = +rowsPerPage;
+	let limit = 20;
 	let offset = limit * (pageNumber - 1);
 
 	const { count, rows: contacts } = await Contact.findAndCountAll({
@@ -33,29 +34,40 @@ exports.index = async (req, res) => {
 		order: [["createdAt", "DESC"]],
 	});
 
-	return res.json({ contacts, count });
+	const hasMore = count > offset + contacts.length;
+
+	return res.json({ contacts, count, hasMore });
 };
 
 exports.store = async (req, res) => {
-	const wbot = getWbot();
+	const defaultWhatsapp = await Whatsapp.findOne({
+		where: { default: true },
+	});
+
+	if (!defaultWhatsapp) {
+		return res
+			.status(404)
+			.json({ error: "No default WhatsApp found. Check Connection page." });
+	}
+
+	const wbot = getWbot(defaultWhatsapp);
 	const io = getIO();
 	const newContact = req.body;
 
-	let isValidNumber;
-
 	try {
-		isValidNumber = await wbot.isRegisteredUser(`${newContact.number}@c.us`);
+		const isValidNumber = await wbot.isRegisteredUser(
+			`${newContact.number}@c.us`
+		);
+		if (!isValidNumber) {
+			return res
+				.status(400)
+				.json({ error: "The suplied number is not a valid Whatsapp number" });
+		}
 	} catch (err) {
-		console.log("Could not check whatsapp contact. Is session details valid?");
+		console.log(err);
 		return res.status(500).json({
 			error: "Could not check whatsapp contact. Check connection page.",
 		});
-	}
-
-	if (!isValidNumber) {
-		return res
-			.status(400)
-			.json({ error: "The suplied number is not a valid Whatsapp number" });
 	}
 
 	const profilePicUrl = await wbot.getProfilePicUrl(
@@ -74,26 +86,22 @@ exports.store = async (req, res) => {
 		contact: contact,
 	});
 
-	res.status(200).json(contact);
+	return res.status(200).json(contact);
 };
 
 exports.show = async (req, res) => {
 	const { contactId } = req.params;
 
-	const { id, name, number, email, extraInfo } = await Contact.findByPk(
-		contactId,
-		{
-			include: "extraInfo",
-		}
-	);
-
-	res.status(200).json({
-		id,
-		name,
-		number,
-		email,
-		extraInfo,
+	const contact = await Contact.findByPk(contactId, {
+		include: "extraInfo",
+		attributes: ["id", "name", "number", "email"],
 	});
+
+	if (!contact) {
+		return res.status(404).json({ error: "No contact found with this id." });
+	}
+
+	return res.status(200).json(contact);
 };
 
 exports.update = async (req, res) => {
@@ -108,7 +116,7 @@ exports.update = async (req, res) => {
 	});
 
 	if (!contact) {
-		return res.status(400).json({ error: "No contact found with this ID" });
+		return res.status(404).json({ error: "No contact found with this ID" });
 	}
 
 	if (updatedContact.extraInfo) {
@@ -138,7 +146,7 @@ exports.update = async (req, res) => {
 		contact: contact,
 	});
 
-	res.status(200).json(contact);
+	return res.status(200).json(contact);
 };
 
 exports.delete = async (req, res) => {
@@ -148,7 +156,7 @@ exports.delete = async (req, res) => {
 	const contact = await Contact.findByPk(contactId);
 
 	if (!contact) {
-		return res.status(400).json({ error: "No contact found with this ID" });
+		return res.status(404).json({ error: "No contact found with this ID" });
 	}
 
 	await contact.destroy();
@@ -158,5 +166,5 @@ exports.delete = async (req, res) => {
 		contactId: contactId,
 	});
 
-	res.status(200).json({ message: "Contact deleted" });
+	return res.status(200).json({ message: "Contact deleted" });
 };

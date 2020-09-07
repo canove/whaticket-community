@@ -1,45 +1,32 @@
-const Whatsapp = require("../models/Whatsapp");
-const { getIO } = require("../libs/socket");
-const { getWbot } = require("../libs/wbot");
+// const Whatsapp = require("../models/Whatsapp");
+// const { getIO } = require("../libs/socket");
+// const { getWbot, initWbot, removeWbot } = require("../libs/wbot");
+// const wbotMessageListener = require("../services/wbotMessageListener");
+// const wbotMonitor = require("../services/wbotMonitor");
 
-exports.show = async (req, res) => {
-	const { sessionId } = req.params;
-	const dbSession = await Whatsapp.findByPk(sessionId);
+// exports.show = async (req, res) => {
+// 	const { whatsappId } = req.params;
+// 	const dbSession = await Whatsapp.findByPk(whatsappId);
 
-	if (!dbSession) {
-		return res.status(200).json({ message: "Session not found" });
-	}
+// 	if (!dbSession) {
+// 		return res.status(200).json({ message: "Session not found" });
+// 	}
 
-	return res.status(200).json(dbSession);
-};
+// 	return res.status(200).json(dbSession);
+// };
 
-exports.delete = async (req, res) => {
-	const wbot = getWbot();
-	const io = getIO();
+// exports.delete = async (req, res) => {
+// 	const { whatsappId } = req.params;
 
-	const { sessionId } = req.params;
-	const dbSession = await Whatsapp.findByPk(sessionId);
+// 	const dbSession = await Whatsapp.findByPk(whatsappId);
 
-	if (!dbSession) {
-		return res.status(200).json({ message: "Session not found" });
-	}
+// 	if (!dbSession) {
+// 		return res.status(404).json({ message: "Session not found" });
+// 	}
 
-	await dbSession.update({ session: "", status: "pending" });
-	wbot.logout();
+// 	const wbot = getWbot(dbSession.id);
 
-	io.emit("session", {
-		action: "logout",
-		session: dbSession,
-	});
+// 	wbot.logout();
 
-	return res.status(200).json({ message: "session disconnected" });
-};
-
-// exports.getContacts = async (req, res, next) => {
-// 	const io = getIO();
-// 	const wbot = getWbot();
-
-// 	const phoneContacts = await wbot.getContacts();
-
-// 	return res.status(200).json(phoneContacts);
+// 	return res.status(200).json({ message: "Session disconnected." });
 // };

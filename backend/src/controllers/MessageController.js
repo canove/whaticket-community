@@ -1,6 +1,7 @@
 const Message = require("../models/Message");
 const Contact = require("../models/Contact");
 const User = require("../models/User");
+const Whatsapp = require("../models/Whatsapp");
 
 const Ticket = require("../models/Ticket");
 const { getIO } = require("../libs/socket");
@@ -11,7 +12,7 @@ const { MessageMedia } = require("whatsapp-web.js");
 
 const setMessagesAsRead = async ticket => {
 	const io = getIO();
-	const wbot = getWbot();
+	const wbot = getWbot(ticket.whatsappId);
 
 	await Message.update(
 		{ read: true },
@@ -38,9 +39,6 @@ const setMessagesAsRead = async ticket => {
 };
 
 exports.index = async (req, res, next) => {
-	// const wbot = getWbot();
-	// const io = getIO();
-
 	const { ticketId } = req.params;
 	const { searchParam = "", pageNumber = 1 } = req.query;
 
@@ -107,7 +105,6 @@ exports.index = async (req, res, next) => {
 };
 
 exports.store = async (req, res, next) => {
-	const wbot = getWbot();
 	const io = getIO();
 
 	const { ticketId } = req.params;
@@ -124,6 +121,26 @@ exports.store = async (req, res, next) => {
 			},
 		],
 	});
+
+	if (!ticket) {
+		return res.status(404).json({ error: "No ticket found with this ID" });
+	}
+
+	if (!ticket.whatsappId) {
+		const defaultWhatsapp = await Whatsapp.findOne({
+			where: { default: true },
+		});
+
+		if (!defaultWhatsapp) {
+			return res
+				.status(404)
+				.json({ error: "No default WhatsApp found. Check Connection page." });
+		}
+
+		await ticket.setWhatsapp(defaultWhatsapp);
+	}
+
+	const wbot = getWbot(ticket.whatsappId);
 
 	try {
 		if (media) {
@@ -177,7 +194,7 @@ exports.store = async (req, res, next) => {
 
 		await setMessagesAsRead(ticket);
 
-		return res.json({ newMessage, ticket });
+		return res.status(200).json({ newMessage, ticket });
 	}
 
 	return res

@@ -101,15 +101,7 @@ const useStyles = makeStyles(theme => ({
 		padding: "20px 20px 20px 20px",
 		// scrollBehavior: "smooth",
 		overflowY: "scroll",
-		"&::-webkit-scrollbar": {
-			width: "8px",
-			height: "8px",
-		},
-		"&::-webkit-scrollbar-thumb": {
-			// borderRadius: "2px",
-			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
-			backgroundColor: "#e8e8e8",
-		},
+		...theme.scrollbarStyles,
 	},
 
 	circleLoading: {
@@ -311,8 +303,12 @@ const MessagesList = () => {
 					}
 				} catch (err) {
 					console.log(err);
-					toast.error("Ticket não encontrado");
-					history.push("/chat");
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+						if (err.response.status === 404) {
+							history.push("/tickets");
+						}
+					}
 				}
 			};
 			fetchMessages();
@@ -425,8 +421,11 @@ const MessagesList = () => {
 			});
 		} catch (err) {
 			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
-		history.push("/chat");
+		history.push("/tickets");
 	};
 
 	const handleDrawerOpen = () => {

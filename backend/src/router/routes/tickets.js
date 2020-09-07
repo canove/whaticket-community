@@ -1,7 +1,7 @@
 const express = require("express");
-const isAuth = require("../middleware/is-auth");
+const isAuth = require("../../middleware/is-auth");
 
-const TicketController = require("../controllers/TicketController");
+const TicketController = require("../../controllers/TicketController");
 
 const routes = express.Router();
 

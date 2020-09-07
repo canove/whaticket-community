@@ -23,14 +23,7 @@ const useStyles = makeStyles(theme => ({
 	ticketsList: {
 		flex: 1,
 		overflowY: "scroll",
-		"&::-webkit-scrollbar": {
-			width: "8px",
-			height: "8px",
-		},
-		"&::-webkit-scrollbar-thumb": {
-			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
-			backgroundColor: "#e8e8e8",
-		},
+		...theme.scrollbarStyles,
 		borderTop: "2px solid rgba(0, 0, 0, 0.12)",
 	},
 

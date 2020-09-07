@@ -22,7 +22,6 @@
 		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
 		"express-async-errors": "^3.1.1",
-		"express-validator": "^6.5.0",
 		"jsonwebtoken": "^8.5.1",
 		"multer": "^1.4.2",
 		"mysql2": "^2.1.0",
@@ -30,7 +29,8 @@
 		"sequelize": "^6.3.4",
 		"socket.io": "^2.3.0",
 		"whatsapp-web.js": "^1.8.0",
-		"youch": "^2.0.10"
+		"youch": "^2.0.10",
+		"yup": "^0.29.3"
 	},
 	"devDependencies": {
 		"nodemon": "^2.0.4",

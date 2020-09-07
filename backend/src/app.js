@@ -7,16 +7,12 @@ const cors = require("cors");
 const multer = require("multer");
 const Sentry = require("@sentry/node");
 
-const wBot = require("./libs/wbot");
+const { initWbot } = require("./libs/wbot");
 const wbotMessageListener = require("./services/wbotMessageListener");
 const wbotMonitor = require("./services/wbotMonitor");
+const Whatsapp = require("./models/Whatsapp");
 
-const MessagesRoutes = require("./routes/messages");
-const ContactsRoutes = require("./routes/contacts");
-const AuthRoutes = require("./routes/auth");
-const TicketsRoutes = require("./routes/tickets");
-const WhatsRoutes = require("./routes/whatsapp");
-const UsersRoutes = require("./routes/users");
+const Router = require("./router");
 
 const app = express();
 
@@ -40,13 +36,7 @@ app.use(cors());
 app.use(express.json());
 app.use(multer({ storage: fileStorage }).single("media"));
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
-
-app.use("/auth", AuthRoutes);
-app.use(ContactsRoutes);
-app.use(TicketsRoutes);
-app.use(MessagesRoutes);
-app.use(WhatsRoutes);
-app.use(UsersRoutes);
+app.use(Router);
 
 const io = require("./libs/socket").init(server);
 io.on("connection", socket => {
@@ -66,13 +56,21 @@ io.on("connection", socket => {
 	});
 });
 
-wBot
-	.init()
-	.then(({ dbSession }) => {
-		wbotMessageListener();
-		wbotMonitor(dbSession);
-	})
-	.catch(err => console.log(err));
+const startWhatsAppSessions = async () => {
+	const whatsapps = await Whatsapp.findAll();
+
+	if (whatsapps.length > 0) {
+		whatsapps.forEach(whatsapp => {
+			initWbot(whatsapp)
+				.then(() => {
+					wbotMessageListener(whatsapp);
+					wbotMonitor(whatsapp);
+				})
+				.catch(err => console.log(err));
+		});
+	}
+};
+startWhatsAppSessions();
 
 app.use(Sentry.Handlers.errorHandler());
 
@@ -82,6 +80,6 @@ app.use(async (err, req, res, next) => {
 		console.log(err);
 		return res.status(500).json(errors);
 	}
-	console.log(err);
+
 	return res.status(500).json({ error: "Internal server error" });
 });

@@ -7,6 +7,7 @@ class User extends Sequelize.Model {
 			{
 				name: { type: Sequelize.STRING },
 				password: { type: Sequelize.VIRTUAL },
+				profile: { type: Sequelize.STRING, defaultValue: "admin" },
 				passwordHash: { type: Sequelize.STRING },
 				email: { type: Sequelize.STRING },
 			},

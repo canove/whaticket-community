@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -38,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
+const NewTicketModal = ({ modalOpen, onClose }) => {
 	const history = useHistory();
 	const classes = useStyles();
 	const userId = +localStorage.getItem("userId");
@@ -54,18 +55,21 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchContacts = async () => {
 				try {
-					const res = await api.get("contacts", {
-						params: { searchParam, rowsPerPage: 20 },
+					const { data } = await api.get("contacts", {
+						params: { searchParam },
 					});
-					setOptions(res.data.contacts);
+					setOptions(data.contacts);
 					setLoading(false);
 				} catch (err) {
-					alert(err);
+					console.log(err);
+					if (err.response && err.response.data && err.response.data.error) {
+						toast.error(err.response.data.error);
+					}
 				}
 			};
 
 			fetchContacts();
-		}, 1000);
+		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);
 
@@ -85,9 +89,12 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 				userId: userId,
 				status: "open",
 			});
-			history.push(`/chat/${ticket.id}`);
+			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
-			alert(err);
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 		setLoading(false);
 		handleClose();
@@ -107,13 +114,14 @@ const NewTicketModal = ({ modalOpen, onClose, contactId }) => {
 					</DialogTitle>
 					<DialogContent dividers>
 						<Autocomplete
-							id="asynchronous-demo"
+							id="contacts-finder"
 							style={{ width: 300 }}
 							getOptionLabel={option => `${option.name} - ${option.number}`}
 							onChange={(e, newValue) => {
 								setSelectedContact(newValue);
 							}}
 							options={options}
+							noOptionsText="No contacts found. Try another term."
 							loading={loading}
 							renderInput={params => (
 								<TextField

@@ -3,17 +3,18 @@ const Sentry = require("@sentry/node");
 const wbotMessageListener = require("./wbotMessageListener");
 
 const { getIO } = require("../libs/socket");
-const { getWbot, init } = require("../libs/wbot");
+const { getWbot, initWbot } = require("../libs/wbot");
 
-const wbotMonitor = dbSession => {
+const wbotMonitor = whatsapp => {
 	const io = getIO();
-	const wbot = getWbot();
+	const sessionName = whatsapp.name;
+	const wbot = getWbot(whatsapp.id);
 
 	try {
 		wbot.on("change_state", async newState => {
-			console.log("monitor", newState);
+			console.log("Monitor session:", sessionName, newState);
 			try {
-				await dbSession.update({ status: newState });
+				await whatsapp.update({ status: newState });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
@@ -21,16 +22,18 @@ const wbotMonitor = dbSession => {
 
 			io.emit("session", {
 				action: "update",
-				session: dbSession,
+				session: whatsapp,
 			});
 		});
 
 		wbot.on("change_battery", async batteryInfo => {
 			const { battery, plugged } = batteryInfo;
-			console.log(`Battery: ${battery}% - Charging? ${plugged}`);
+			console.log(
+				`Battery session: ${sessionName} ${battery}% - Charging? ${plugged}`
+			);
 
 			try {
-				await dbSession.update({ battery, plugged });
+				await whatsapp.update({ battery, plugged });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
@@ -38,30 +41,30 @@ const wbotMonitor = dbSession => {
 
 			io.emit("session", {
 				action: "update",
-				session: dbSession,
+				session: whatsapp,
 			});
 		});
 
 		wbot.on("disconnected", async reason => {
-			console.log("disconnected", reason);
+			console.log("Disconnected session:", sessionName, reason);
 			try {
-				await dbSession.update({ status: "disconnected" });
+				await whatsapp.update({ status: "disconnected" });
 			} catch (err) {
 				Sentry.captureException(err);
 				console.log(err);
 			}
 
 			io.emit("session", {
-				action: "logout",
-				session: dbSession,
+				action: "update",
+				session: whatsapp,
 			});
 
 			setTimeout(
 				() =>
-					init()
-						.then(({ dbSession }) => {
-							wbotMessageListener();
-							wbotMonitor(dbSession);
+					initWbot(whatsapp)
+						.then(() => {
+							wbotMessageListener(whatsapp);
+							wbotMonitor(whatsapp);
 						})
 						.catch(err => {
 							Sentry.captureException(err);

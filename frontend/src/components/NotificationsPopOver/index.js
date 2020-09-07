@@ -24,14 +24,7 @@ const useStyles = makeStyles(theme => ({
 	tabContainer: {
 		overflowY: "auto",
 		maxHeight: 350,
-		"&::-webkit-scrollbar": {
-			width: "8px",
-			height: "8px",
-		},
-		"&::-webkit-scrollbar-thumb": {
-			boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
-			backgroundColor: "#e8e8e8",
-		},
+		...theme.scrollbarStyles,
 	},
 	popoverPaper: {
 		width: "100%",
@@ -123,7 +116,7 @@ const NotificationsPopOver = () => {
 
 		notification.onclick = function (event) {
 			event.preventDefault(); //
-			window.open(`/chat/${ticket.id}`, "_self");
+			window.open(`/tickets/${ticket.id}`, "_self");
 		};
 
 		document.addEventListener("visibilitychange", () => {
@@ -144,7 +137,7 @@ const NotificationsPopOver = () => {
 	}, [setIsOpen]);
 
 	const handleSelectTicket = (e, ticket) => {
-		history.push(`/chat/${ticket.id}`);
+		history.push(`/tickets/${ticket.id}`);
 		handleClickAway();
 	};
 
