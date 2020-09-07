@@ -84,7 +84,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const WhatsApps = () => {
+const Connections = () => {
 	const classes = useStyles();
 
 	const [whatsApps, dispatch] = useReducer(reducer, []);
@@ -211,7 +211,7 @@ const WhatsApps = () => {
 				whatsAppId={selectedWhatsApp && !qrModalOpen && selectedWhatsApp.id}
 			/>
 			<MainHeader>
-				<Title>WhatsApps</Title>
+				<Title>Connections</Title>
 				<MainHeaderButtonsWrapper>
 					<Button
 						variant="contained"
@@ -294,4 +294,4 @@ const WhatsApps = () => {
 	);
 };
 
-export default WhatsApps;
+export default Connections;

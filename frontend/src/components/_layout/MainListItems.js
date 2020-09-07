@@ -43,8 +43,8 @@ const MainListItems = () => {
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
 			<ListItemLink
-				to="/whatsapps"
-				primary="WhatsApps"
+				to="/connections"
+				primary="Connections"
 				icon={<SyncAltIcon />}
 			/>
 			<ListItemLink
