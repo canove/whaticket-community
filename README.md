@@ -22,7 +22,7 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 
 ## Screenshots
 
-<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/tickets2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/tickets3.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/multiple-whatsapps2.png" width="350">
+<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat3.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/multiple-whatsapps2.png" width="350">
 
 ## Features
 
