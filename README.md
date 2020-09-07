@@ -22,12 +22,12 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 
 ## Screenshots
 
-<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat3.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/multiple-whatsapps2.png" width="350">
+<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/chat3.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/multiple-whatsapps2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/contacts1.png" width="350">
 
 ## Features
 
 - Have multiple users chating in same WhatsApp Number ✅
-- Connect to multiple WhatsApp accounts and receive all messages in one place.
+- Connect to multiple WhatsApp accounts and receive all messages in one place. ✅ 🆕
 - Create and chat with new contacts without touching cellphone ✅
 - Send and receive message ✅
 - Send media (images/audio/documents) ✅
