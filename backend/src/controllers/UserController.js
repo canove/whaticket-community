@@ -142,7 +142,6 @@ exports.update = async (req, res) => {
 				.status(403)
 				.json({ error: "There must be at leat one admin user." });
 		}
-		console.log("found", adminUsers);
 	}
 
 	await user.update(req.body);
