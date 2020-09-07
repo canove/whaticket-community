@@ -22,7 +22,16 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 
 ## Screenshots
 
-<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/tickets2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/tickets3.png" width="350">
+<img src="https://raw.githubusercontent.com/canove/whaticket/master/images/tickets2.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/tickets3.png" width="350"> <img src="https://raw.githubusercontent.com/canove/whaticket/master/images/multiple-whatsapps2.png" width="350">
+
+## Features
+
+- Have multiple users chating in same WhatsApp Number ✅
+- Connect to multiple WhatsApp accounts and receive all messages in one place.
+- Create and chat with new contacts without touching cellphone ✅
+- Send and receive message ✅
+- Send media (images/audio/documents) ✅
+- Receive media (images/audio/video/documents) ✅
 
 ## Demo
 
@@ -131,7 +140,7 @@ BACKEND_URL=https://api.mydomain.com      #USE HTTPS HERE, WE WILL ADD SSL LATTE
 PROXY_PORT=443                            #USE NGINX REVERSE PROXY PORT HERE, WE WILL CONFIGURE IT LATTER
 PORT=8080
 
-DB_HOST=
+DB_HOST=localhost
 DB_USER=
 DB_PASS=
 DB_NAME=
@@ -176,7 +185,7 @@ sudo env PATH=\$PATH:/usr/bin pm2 startup ubuntu -u YOUR_USERNAME --hp /home/YOU
 Go to frontend folder and install dependencies:
 
 ```bash
-cd ../whaticket/frontend
+cd ../frontend
 npm install
 ```
 
@@ -294,14 +303,6 @@ Enable SSL on nginx (Accept all information asked):
 ```bash
 sudo certbot --nginx
 ```
-
-## Features
-
-- Have multiple users chating in same WhatsApp Number ✅
-- Create and chat with new contacts without touching cellphone ✅
-- Send and receive message ✅
-- Send media (images/audio/documents) ✅
-- Receive media (images/audio/video/documents) ✅
 
 ## Contributing
 
