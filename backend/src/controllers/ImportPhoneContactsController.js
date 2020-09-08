@@ -15,7 +15,7 @@ exports.store = async (req, res, next) => {
 	}
 
 	const io = getIO();
-	const wbot = getWbot(defaultWhatsapp);
+	const wbot = getWbot(defaultWhatsapp.id);
 
 	let phoneContacts;
 
