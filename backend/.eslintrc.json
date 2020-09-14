@@ -17,6 +17,7 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "no-console": "off",
+    "no-param-reassign": "off",
     "prettier/prettier": "error",
     "import/extensions": [
       "error",

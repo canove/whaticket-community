@@ -42,7 +42,7 @@ const CreateUserService = async ({
 
   const user = User.create({
     email,
-    passwordHash: password,
+    password,
     name,
     profile
   });

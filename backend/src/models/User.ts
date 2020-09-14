@@ -4,23 +4,22 @@ import {
   CreatedAt,
   UpdatedAt,
   Model,
-  DataType
+  DataType,
+  BeforeCreate,
+  BeforeUpdate
 } from "sequelize-typescript";
+import { hash, compare } from "bcryptjs";
 
 @Table
 class User extends Model<User> {
-  @Column({
-    defaultValue: DataType.UUIDV4,
-    primaryKey: true,
-    type: DataType.UUID
-  })
-  id: string;
-
   @Column
   name: string;
 
   @Column
   email: string;
+
+  @Column(DataType.VIRTUAL)
+  password: string;
 
   @Column
   passwordHash: string;
@@ -36,47 +35,20 @@ class User extends Model<User> {
   @UpdatedAt
   updatedAt: Date;
 
-  // @BeforeUpdate
-  // @BeforeInsert
-  // hashPassword = async () => {
-  //   if (this.passwordHash) {
-  //     this.passwordHash = await hash(this.passwordHash, 8);
-  //   }
-  // };
+  @BeforeUpdate
+  @BeforeCreate
+  static hashPassword = async (instance: User): Promise<void> => {
+    if (instance.password) {
+      instance.passwordHash = await hash(instance.password, 8);
+    }
+  };
 
-  // checkPassword = async (password: string) => {
-  //   return await compare(password, this.passwordHash);
+  // static checkPassword = async ( // maybe not work like this.
+  //   instance: User,
+  //   password: string
+  // ): Promise<boolean> => {
+  //   return compare(password, instance.passwordHash);
   // };
 }
 
 export default User;
-
-// const bcrypt = require("bcryptjs");
-// @Table
-// class User extends Model<User> {
-//   static init(sequelize) {
-//     super.init(
-//       {
-//         name: { type: Sequelize.STRING },
-//         password: { type: Sequelize.VIRTUAL },
-//         profile: { type: Sequelize.STRING, defaultValue: "admin" },
-//         passwordHash: { type: Sequelize.STRING },
-//         email: { type: Sequelize.STRING }
-//       },
-//       {
-//         sequelize
-//       }
-//     );
-
-//     this.addHook("beforeSave", async user => {
-//       if (user.password) {
-//         user.passwordHash = await bcrypt.hash(user.password, 8);
-//       }
-//     });
-//     return this;
-//   }
-
-//   checkPassword(password) {
-//     return bcrypt.compare(password, this.passwordHash);
-//   }
-// }
