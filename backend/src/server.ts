@@ -1,12 +1,12 @@
 import "express-async-errors";
 import express from "express";
-import path from "path";
-import cors from "cors";
-import multer from "multer";
+
+import routes from "./routes";
+// import path from "path";
+// import cors from "cors";
+// import multer from "multer";
 // import Sentry from "@sentry/node";
 // require("./database");
-
-console.log("eae");
 
 // const { initWbot } = require("./libs/wbot");
 // const wbotMessageListener = require("./services/wbotMessageListener");
@@ -15,7 +15,12 @@ console.log("eae");
 
 // const Router = require("./router");
 
-// const app = express();
+const app = express();
+
+app.use(routes);
+app.listen(8080, () => {
+  console.log("stated");
+});
 
 // const server = app.listen(process.env.PORT, () => {
 // 	console.log(`Server started on port: ${process.env.PORT}`);
