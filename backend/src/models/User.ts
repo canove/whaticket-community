@@ -15,7 +15,7 @@ class User extends Model<User> {
   @Column
   name: string;
 
-  @Column
+  @Column(DataType.STRING)
   email: string;
 
   @Column(DataType.VIRTUAL)
@@ -43,12 +43,12 @@ class User extends Model<User> {
     }
   };
 
-  // static checkPassword = async ( // maybe not work like this.
-  //   instance: User,
-  //   password: string
-  // ): Promise<boolean> => {
-  //   return compare(password, instance.passwordHash);
-  // };
+  public checkPassword = async (
+    // maybe not work like this.
+    password: string
+  ): Promise<boolean> => {
+    return compare(password, this.getDataValue("passwordHash"));
+  };
 }
 
 export default User;

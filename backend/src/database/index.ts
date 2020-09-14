@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import User from "../models/User";
+import Setting from "../models/Setting";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -10,18 +11,17 @@ const dbConfig = require("../config/database");
 // const Message = require("../models/Message");
 // const Whatsapp = require("../models/Whatsapp");
 // const ContactCustomField = require("../models/ContactCustomField");
-// const Setting = require("../models/Setting");
 
 const sequelize = new Sequelize(dbConfig);
 
 const models = [
-  User
+  User,
   // Contact,
   // Ticket,
   // Message,
   // Whatsapp,
   // ContactCustomField,
-  // Setting,
+  Setting
 ];
 
 sequelize.addModels(models);

@@ -1,10 +1,8 @@
-import AppError from "../errors/AppError";
 import Setting from "../models/Setting";
+import AppError from "../errors/AppError";
 
 const CheckSettings = async (key: string): Promise<string> => {
-  const settingsRepository = getRepository(Setting);
-
-  const setting = await settingsRepository.findOne({
+  const setting = await Setting.findOne({
     where: { key }
   });
 

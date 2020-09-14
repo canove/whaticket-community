@@ -1,8 +1,8 @@
 import { Router } from "express";
 
 import userRoutes from "./userRoutes";
+import authRoutes from "./authRoutes";
 
-// const AuthRoutes = require("./routes/auth");
 // const TicketsRoutes = require("./routes/tickets");
 // const MessagesRoutes = require("./routes/messages");
 // const ContactsRoutes = require("./routes/contacts");
@@ -13,7 +13,7 @@ import userRoutes from "./userRoutes";
 const routes = Router();
 
 routes.use(userRoutes);
-// routes.use("/auth", AuthRoutes);
+routes.use("/auth", authRoutes);
 // routes.use(TicketsRoutes);
 // routes.use(MessagesRoutes);
 // routes.use(ContactsRoutes);
