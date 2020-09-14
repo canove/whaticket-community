@@ -1,6 +1,6 @@
-import "dotenv/config";
+require("dotenv/config");
 
-const dbConfig = {
+module.exports = {
   define: {
     charset: "utf8mb4",
     collate: "utf8mb4_bin"
@@ -13,5 +13,3 @@ const dbConfig = {
   password: process.env.DB_PASS,
   logging: false
 };
-
-export default dbConfig;

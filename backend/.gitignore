@@ -1,6 +1,7 @@
 node_modules
 public/*
-!public/.gitkeep 
+dist
+!public/.gitkeep
 .env
 
 package-lock.json
