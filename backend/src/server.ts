@@ -1,12 +1,14 @@
+import "dotenv/config";
 import "express-async-errors";
 import express from "express";
+import cors from "cors";
 
 import routes from "./routes";
+
 // import path from "path";
-// import cors from "cors";
 // import multer from "multer";
 // import Sentry from "@sentry/node";
-// require("./database");
+import "./database";
 
 // const { initWbot } = require("./libs/wbot");
 // const wbotMessageListener = require("./services/wbotMessageListener");
@@ -17,14 +19,13 @@ import routes from "./routes";
 
 const app = express();
 
+app.use(cors());
+app.use(express.json());
 app.use(routes);
-app.listen(8080, () => {
-  console.log("stated");
-});
 
-// const server = app.listen(process.env.PORT, () => {
-// 	console.log(`Server started on port: ${process.env.PORT}`);
-// });
+const server = app.listen(process.env.PORT, () => {
+  console.log(`Server started on port: ${process.env.PORT}`);
+});
 
 // Sentry.init({ dsn: process.env.SENTRY_DSN });
 
@@ -38,8 +39,6 @@ app.listen(8080, () => {
 // });
 
 // app.use(Sentry.Handlers.requestHandler());
-// app.use(cors());
-// app.use(express.json());
 // app.use(multer({ storage: fileStorage }).single("media"));
 // app.use("/public", express.static(path.join(__dirname, "..", "public")));
 // app.use(Router);
