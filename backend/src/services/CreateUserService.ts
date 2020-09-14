@@ -57,12 +57,14 @@ const CreateUserService = async ({
     profile
   });
 
-  return {
+  const serializedUser = {
     id: user.id,
     name: user.name,
     email: user.email,
     profile: user.profile
   };
+
+  return serializedUser;
 };
 
 export default CreateUserService;

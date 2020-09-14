@@ -1,61 +1,68 @@
-import { getRepository } from "typeorm";
 import * as Yup from "yup";
 
 import AppError from "../errors/AppError";
 import User from "../models/User";
 
 interface UserData {
-	email?: string;
-	password?: string;
-	name?: string;
-	profile?: string;
+  email?: string;
+  password?: string;
+  name?: string;
+  profile?: string;
 }
 
 interface Request {
-	userData: UserData;
-	userId: string;
+  userData: UserData;
+  userId: string;
+}
+
+interface Response {
+  id: number;
+  name: string;
+  email: string;
+  profile: string;
 }
 
 const UpdateUserService = async ({
-	userData,
-	userId,
-}: Request): Promise<User | undefined> => {
-	const usersRepository = getRepository(User);
+  userData,
+  userId
+}: Request): Promise<Response | undefined> => {
+  const schema = Yup.object().shape({
+    name: Yup.string().min(2),
+    email: Yup.string().email(),
+    password: Yup.string()
+  });
 
-	const schema = Yup.object().shape({
-		name: Yup.string().min(2),
-		email: Yup.string().email(),
-		password: Yup.string(),
-	});
+  const { email, password, name } = userData;
 
-	const { email, password, name } = userData;
+  try {
+    await schema.validate({ email, password, name });
+  } catch (err) {
+    throw new AppError(err.message);
+  }
 
-	try {
-		await schema.validate({ email, password, name });
-	} catch (err) {
-		throw new AppError(err.message);
-	}
+  const user = await User.findOne({
+    where: { id: userId },
+    attributes: ["name", "id", "email", "profile"]
+  });
 
-	const user = await usersRepository.findOne({
-		where: { id: userId },
-		select: ["name", "id", "email", "profile"],
-	});
+  if (!user) {
+    throw new AppError("No user found with this ID.", 404);
+  }
 
-	if (!user) {
-		throw new AppError("No user found with this ID.", 404);
-	}
+  await user.update({
+    email,
+    password,
+    name
+  });
 
-	const teste = await usersRepository.update(userId, {
-		email,
-		passwordHash: password,
-		name,
-	});
+  const serializedUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    profile: user.profile
+  };
 
-	console.log(teste);
-
-	delete user.passwordHash;
-
-	return user;
+  return serializedUser;
 };
 
 export default UpdateUserService;

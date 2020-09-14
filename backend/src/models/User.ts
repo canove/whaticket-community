@@ -6,12 +6,17 @@ import {
   Model,
   DataType,
   BeforeCreate,
-  BeforeUpdate
+  BeforeUpdate,
+  PrimaryKey
 } from "sequelize-typescript";
 import { hash, compare } from "bcryptjs";
 
 @Table
 class User extends Model<User> {
+  @PrimaryKey
+  @Column
+  id: number;
+
   @Column
   name: string;
 
