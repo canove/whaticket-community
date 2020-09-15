@@ -7,20 +7,23 @@ import {
   DataType,
   BeforeCreate,
   BeforeUpdate,
-  PrimaryKey
+  PrimaryKey,
+  AutoIncrement,
+  Default
 } from "sequelize-typescript";
 import { hash, compare } from "bcryptjs";
 
 @Table
 class User extends Model<User> {
   @PrimaryKey
+  @AutoIncrement
   @Column
   id: number;
 
   @Column
   name: string;
 
-  @Column(DataType.STRING)
+  @Column
   email: string;
 
   @Column(DataType.VIRTUAL)
@@ -29,9 +32,8 @@ class User extends Model<User> {
   @Column
   passwordHash: string;
 
-  @Column({
-    defaultValue: "admin"
-  })
+  @Default("admin")
+  @Column
   profile: string;
 
   @CreatedAt
@@ -48,10 +50,7 @@ class User extends Model<User> {
     }
   };
 
-  public checkPassword = async (
-    // maybe not work like this.
-    password: string
-  ): Promise<boolean> => {
+  public checkPassword = async (password: string): Promise<boolean> => {
     return compare(password, this.getDataValue("passwordHash"));
   };
 }

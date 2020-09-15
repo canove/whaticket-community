@@ -1,5 +1,5 @@
 import { Sequelize, Op } from "sequelize";
-import User from "../../models/User";
+import Contact from "../../models/Contact";
 
 interface Request {
   searchParam?: string;
@@ -7,12 +7,12 @@ interface Request {
 }
 
 interface Response {
-  users: User[];
+  contacts: Contact[];
   count: number;
   hasMore: boolean;
 }
 
-const ListUsersService = async ({
+const ListContactsService = async ({
   searchParam = "",
   pageNumber = "1"
 }: Request): Promise<Response> => {
@@ -25,27 +25,26 @@ const ListUsersService = async ({
           `%${searchParam.toLowerCase()}%`
         )
       },
-      { email: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
+      { number: { [Op.like]: `%${searchParam}%` } }
     ]
   };
-  const limit = 10;
+  const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
-  const { count, rows: users } = await User.findAndCountAll({
+  const { count, rows: contacts } = await Contact.findAndCountAll({
     where: whereCondition,
-    attributes: ["name", "id", "email", "profile"],
     limit,
     offset,
     order: [["createdAt", "DESC"]]
   });
 
-  const hasMore = count > offset + users.length;
+  const hasMore = count > offset + contacts.length;
 
   return {
-    users,
+    contacts,
     count,
     hasMore
   };
 };
 
-export default ListUsersService;
+export default ListContactsService;

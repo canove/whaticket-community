@@ -6,14 +6,19 @@ import AppError from "../errors/AppError";
 import CreateUserService from "../services/UserServices/CreateUserService";
 import ListUsersService from "../services/UserServices/ListUsersService";
 import UpdateUserService from "../services/UserServices/UpdateUserService";
-import FindUserService from "../services/UserServices/FindUserService";
+import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
+
+type RequestQuery = {
+  searchParam: string;
+  pageNumber: string;
+};
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   if (req.user.profile !== "admin") {
     throw new AppError("Only administrators can access this route.", 403); // should be handled better.
   }
-  const { searchParam, pageNumber } = req.query as any;
+  const { searchParam, pageNumber } = req.query as RequestQuery;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
@@ -48,7 +53,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { userId } = req.params;
 
-  const user = await FindUserService(userId);
+  const user = await ShowUserService(userId);
 
   return res.status(200).json(user);
 };
