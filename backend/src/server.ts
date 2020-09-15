@@ -5,11 +5,11 @@ import cors from "cors";
 import AppError from "./errors/AppError";
 
 import routes from "./routes";
+import "./database";
 
 // import path from "path";
 // import multer from "multer";
 // import Sentry from "@sentry/node";
-import "./database";
 
 // const { initWbot } = require("./libs/wbot");
 // const wbotMessageListener = require("./services/wbotMessageListener");
@@ -22,7 +22,7 @@ app.use(cors());
 app.use(express.json());
 app.use(routes);
 
-app.use(async (err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({ error: err.message });
   }

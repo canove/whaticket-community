@@ -16,6 +16,10 @@
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "_" }
+    ],
     "no-console": "off",
     "no-param-reassign": "off",
     "prettier/prettier": "error",
