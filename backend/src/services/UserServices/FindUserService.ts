@@ -1,5 +1,5 @@
-import User from "../models/User";
-import AppError from "../errors/AppError";
+import User from "../../models/User";
+import AppError from "../../errors/AppError";
 
 const FindUserService = async (id: string): Promise<User | undefined> => {
   const user = await User.findOne({

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import AuthUserService from "../services/AuthUserSerice";
+import AuthUserService from "../services/UserServices/AuthUserSerice";
 
 const store = async (req: Request, res: Response): Promise<Response> => {
   const { email, password } = req.body;

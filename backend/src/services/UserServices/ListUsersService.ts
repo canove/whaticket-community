@@ -1,5 +1,5 @@
 import { Sequelize, Op } from "sequelize";
-import User from "../models/User";
+import User from "../../models/User";
 
 interface Request {
   searchParam?: string;

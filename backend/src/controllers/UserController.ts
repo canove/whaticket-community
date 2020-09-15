@@ -3,11 +3,11 @@ import { Request, Response } from "express";
 import CheckSettingsHelper from "../helpers/CheckSettingsHelper";
 import AppError from "../errors/AppError";
 
-import CreateUserService from "../services/CreateUserService";
-import ListUsersService from "../services/ListUsersService";
-import UpdateUserService from "../services/UpdateUserService";
-import FindUserService from "../services/FindUserService";
-import DeleteUserService from "../services/DeleteUserService";
+import CreateUserService from "../services/UserServices/CreateUserService";
+import ListUsersService from "../services/UserServices/ListUsersService";
+import UpdateUserService from "../services/UserServices/UpdateUserService";
+import FindUserService from "../services/UserServices/FindUserService";
+import DeleteUserService from "../services/UserServices/DeleteUserService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   if (req.user.profile !== "admin") {
