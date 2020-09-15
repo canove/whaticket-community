@@ -146,6 +146,7 @@ const wbotMessageListener = whatsapp => {
 			msg.from === "status@broadcast" ||
 			msg.type === "location" ||
 			msg.type === "call_log" ||
+			msg.type === "e2e_notification" || // Ignore Empty Messages Generated When Someone Changes His Account from Personal to Business or vice-versa
 			msg.author != null // Ignore Group Messages
 		) {
 			return;
