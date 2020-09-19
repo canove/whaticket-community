@@ -9,14 +9,14 @@ whatsappRoutes.get("/whatsapp/", isAuth, WhatsAppController.index);
 
 whatsappRoutes.post("/whatsapp/", isAuth, WhatsAppController.store);
 
-// whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
+whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
 
-// whatsappRoutes.put("/whatsapp/:whatsappId", isAuth, WhatsAppController.update);
+whatsappRoutes.put("/whatsapp/:whatsappId", isAuth, WhatsAppController.update);
 
-// whatsappRoutes.remove(
-//   "/whatsapp/:whatsappId",
-//   isAuth,
-//   WhatsAppController.delete
-// );
+whatsappRoutes.delete(
+  "/whatsapp/:whatsappId",
+  isAuth,
+  WhatsAppController.remove
+);
 
 export default whatsappRoutes;

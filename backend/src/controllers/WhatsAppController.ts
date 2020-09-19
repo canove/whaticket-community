@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
+
 import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
+import DeleteWhatsApprService from "../services/WhatsappService/DeleteWhatsApprService";
+import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
+import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 // import Yup from "yup";
 // import Whatsapp from "../models/Whatsapp";
 // import { getIO } from "../libs/socket";
 // import { getWbot, initWbot, removeWbot } from "../libs/wbot";
 // import wbotMessageListener from "../services/wbotMessageListener";
 // import wbotMonitor from "../services/wbotMonitor";
-
-import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const whatsapps = await ListWhatsAppsService();
@@ -47,89 +50,54 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(whatsapp);
 };
 
-// export const show = async (req: Request, res: Response): Promise<Response> => {
-//   const { whatsappId } = req.params;
-//   const whatsapp = await Whatsapp.findByPk(whatsappId);
+export const show = async (req: Request, res: Response): Promise<Response> => {
+  const { whatsappId } = req.params;
 
-//   if (!whatsapp) {
-//     return res.status(200).json({ message: "Session not found" });
-//   }
+  const whatsapp = await ShowWhatsAppService(whatsappId);
 
-//   return res.status(200).json(whatsapp);
-// };
+  return res.status(200).json(whatsapp);
+};
 
-// export const update = async (
-//   req: Request,
-//   res: Response
-// ): Promise<Response> => {
-//   const { whatsappId } = req.params;
+export const update = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { whatsappId } = req.params;
+  const whatsappData = req.body;
 
-//   const schema = Yup.object().shape({
-//     name: Yup.string().required().min(2),
-//     default: Yup.boolean()
-//       .required()
-//       .test(
-//         "Check-default",
-//         "Only one default whatsapp is permited",
-//         async value => {
-//           if (value === true) {
-//             const whatsappFound = await Whatsapp.findOne({
-//               where: { default: true }
-//             });
-//             if (whatsappFound) {
-//               return !(whatsappFound.id !== +whatsappId);
-//             } else {
-//               return true;
-//             }
-//           } else return true;
-//         }
-//       )
-//   });
+  const whatsapp = await UpdateWhatsAppService({ whatsappData, whatsappId });
+  // const io = getIO();
 
-//   try {
-//     await schema.validate(req.body);
-//   } catch (err) {
-//     return res.status(400).json({ error: err.message });
-//   }
+  // const whatsapp = await Whatsapp.findByPk(whatsappId);
 
-//   const io = getIO();
+  // if (!whatsapp) {
+  //   return res.status(404).json({ message: "Whatsapp not found" });
+  // }
 
-//   const whatsapp = await Whatsapp.findByPk(whatsappId);
+  // await whatsapp.update(req.body);
 
-//   if (!whatsapp) {
-//     return res.status(404).json({ message: "Whatsapp not found" });
-//   }
+  // io.emit("whatsapp", {
+  //   action: "update",
+  //   whatsapp: whatsapp
+  // });
 
-//   await whatsapp.update(req.body);
+  return res.status(200).json(whatsapp);
+};
 
-//   io.emit("whatsapp", {
-//     action: "update",
-//     whatsapp: whatsapp
-//   });
+export const remove = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  // const io = getIO();
+  const { whatsappId } = req.params;
 
-//   return res.status(200).json({ message: "Whatsapp updated" });
-// };
+  await DeleteWhatsApprService(whatsappId);
+  // removeWbot(whatsapp.id);
 
-// export const remove = async (
-//   req: Request,
-//   res: Response
-// ): Promise<Response> => {
-//   const io = getIO();
-//   const { whatsappId } = req.params;
+  // io.emit("whatsapp", {
+  //   action: "delete",
+  //   whatsappId: whatsapp.id
+  // });
 
-//   const whatsapp = await Whatsapp.findByPk(whatsappId);
-
-//   if (!whatsapp) {
-//     return res.status(404).json({ message: "Whatsapp not found" });
-//   }
-
-//   await whatsapp.destroy();
-//   removeWbot(whatsapp.id);
-
-//   io.emit("whatsapp", {
-//     action: "delete",
-//     whatsappId: whatsapp.id
-//   });
-
-//   return res.status(200).json({ message: "Whatsapp deleted." });
-// };
+  return res.status(200).json({ message: "Whatsapp deleted." });
+};
