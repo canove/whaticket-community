@@ -21,6 +21,9 @@ class Whatsapp extends Model<Whatsapp> {
   id: number;
 
   @Column(DataType.TEXT)
+  name: string;
+
+  @Column(DataType.TEXT)
   session: string;
 
   @Column(DataType.TEXT)
