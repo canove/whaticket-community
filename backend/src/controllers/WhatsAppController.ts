@@ -17,14 +17,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 interface WhatsappData {
   name: string;
-  status: string;
+  status?: string;
   isDefault?: boolean;
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   // const io = getIO();
-
-  console.log("aqui");
 
   const { name, status, isDefault }: WhatsappData = req.body;
 

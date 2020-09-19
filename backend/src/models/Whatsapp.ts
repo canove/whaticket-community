@@ -9,7 +9,8 @@ import {
   AutoIncrement,
   Default,
   AllowNull,
-  HasMany
+  HasMany,
+  Unique
 } from "sequelize-typescript";
 import Ticket from "./Ticket";
 
@@ -20,6 +21,8 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   id: number;
 
+  @AllowNull
+  @Unique
   @Column(DataType.TEXT)
   name: string;
 

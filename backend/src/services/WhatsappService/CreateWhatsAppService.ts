@@ -15,12 +15,27 @@ const CreateWhatsAppService = async ({
   isDefault = false
 }: Request): Promise<Whatsapp> => {
   const schema = Yup.object().shape({
-    name: Yup.string().required().min(2),
+    name: Yup.string()
+      .required()
+      .min(2)
+      .test(
+        "Check-name",
+        "This whatsapp name is already used.",
+        async value => {
+          if (value) {
+            const whatsappFound = await Whatsapp.findOne({
+              where: { name: value }
+            });
+            return !whatsappFound;
+          }
+          return true;
+        }
+      ),
     isDefault: Yup.boolean()
       .required()
       .test(
         "Check-default",
-        "Only one default whatsapp is permited",
+        "Only one default whatsapp is permitted",
         async value => {
           if (value === true) {
             const whatsappFound = await Whatsapp.findOne({
