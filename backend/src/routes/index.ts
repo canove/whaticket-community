@@ -5,10 +5,8 @@ import authRoutes from "./authRoutes";
 import settingRoutes from "./settingRoutes";
 import contactRoutes from "./contactRoutes";
 import ticketRoutes from "./ticketRoutes";
-
-// const MessagesRoutes = require("./routes/messages");
-// const WhatsRoutes = require("./routes/whatsapp");
-// const UsersRoutes = require("./routes/users");
+import whatsappRoutes from "./whatsappRoutes";
+import messageRoutes from "./messageRoutes";
 
 const routes = Router();
 
@@ -17,7 +15,7 @@ routes.use("/auth", authRoutes);
 routes.use(settingRoutes);
 routes.use(contactRoutes);
 routes.use(ticketRoutes);
-// routes.use(MessagesRoutes);
-// routes.use(WhatsRoutes);
+routes.use(whatsappRoutes);
+routes.use(messageRoutes);
 
 export default routes;

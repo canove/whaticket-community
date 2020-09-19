@@ -109,7 +109,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   }
 
   const ticket: Ticket = await defaultWhatsapp.$create("ticket", req.body);
-  const contact = await ticket.$get("contact");
+
+  await ticket.$get("contact");
 
   const wapp = await ticket.$get("whatsapp");
 
@@ -122,7 +123,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   //     ticket: serializaedTicket
   //   });
 
-  return res.status(200).json({ ticket, contact, wapp, tickets });
+  return res.status(200).json({ ticket });
 };
 
 // export const update = (req: Request, res: Response): Promise<Response> => {
