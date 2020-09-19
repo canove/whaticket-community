@@ -18,6 +18,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 interface WhatsappData {
   name: string;
   status: string;
+  isDefault?: boolean;
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
@@ -25,9 +26,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   console.log("aqui");
 
-  const { name, status }: WhatsappData = req.body;
+  const { name, status, isDefault }: WhatsappData = req.body;
 
-  const whatsapp = await CreateWhatsAppService({ name, status });
+  const whatsapp = await CreateWhatsAppService({ name, status, isDefault });
 
   // if (!whatsapp) {
   //   return res.status(400).json({ error: "Cannot create whatsapp session." });
