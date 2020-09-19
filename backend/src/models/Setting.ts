@@ -4,17 +4,16 @@ import {
   CreatedAt,
   UpdatedAt,
   Model,
-  DataType,
   PrimaryKey
 } from "sequelize-typescript";
 
 @Table
 class Setting extends Model<Setting> {
   @PrimaryKey
-  @Column(DataType.STRING)
+  @Column
   key: string;
 
-  @Column(DataType.STRING)
+  @Column
   value: string;
 
   @CreatedAt

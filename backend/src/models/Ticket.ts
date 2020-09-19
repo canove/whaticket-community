@@ -5,25 +5,32 @@ import {
   UpdatedAt,
   Model,
   DataType,
-  PrimaryKey
+  PrimaryKey,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+  AutoIncrement
 } from "sequelize-typescript";
+
+import Contact from "./Contact";
+import Message from "./Message";
+import User from "./User";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class Ticket extends Model<Ticket> {
   @PrimaryKey
-  @Column(DataType.NUMBER)
+  @AutoIncrement
+  @Column
   id: number;
 
   @Column({ defaultValue: "pending" })
   status: string;
 
-  // @Column({ allowNull: false, unique: true })
-  // userId: string;
-
   @Column(DataType.VIRTUAL)
   unreadMessages: string;
 
-  @Column(DataType.STRING)
+  @Column
   lastMessage: string;
 
   @CreatedAt
@@ -31,6 +38,30 @@ class Ticket extends Model<Ticket> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @ForeignKey(() => User)
+  @Column
+  userId: number;
+
+  @BelongsTo(() => User)
+  user: User;
+
+  @ForeignKey(() => Contact)
+  @Column
+  contactId: number;
+
+  @BelongsTo(() => Contact)
+  contact: Contact;
+
+  @ForeignKey(() => Whatsapp)
+  @Column
+  whatsappId: number;
+
+  @BelongsTo(() => Whatsapp)
+  whatsapp: Whatsapp;
+
+  @HasMany(() => Message)
+  messages: Message[];
 }
 
 export default Ticket;

@@ -4,38 +4,41 @@ import {
   CreatedAt,
   UpdatedAt,
   Model,
+  DataType,
   PrimaryKey,
   AutoIncrement,
-  AllowNull,
-  Unique,
   Default,
+  AllowNull,
   HasMany
 } from "sequelize-typescript";
-import ContactCustomField from "./ContactCustomField";
 import Ticket from "./Ticket";
 
 @Table
-class Contact extends Model<Contact> {
+class Whatsapp extends Model<Whatsapp> {
   @PrimaryKey
   @AutoIncrement
   @Column
   id: number;
 
-  @Column
-  name: string;
+  @Column(DataType.TEXT)
+  session: string;
 
-  @AllowNull(false)
-  @Unique
-  @Column
-  number: string;
-
-  @AllowNull(false)
-  @Default("")
-  @Column
-  email: string;
+  @Column(DataType.TEXT)
+  qrcode: string;
 
   @Column
-  profilePicUrl: string;
+  status: string;
+
+  @Column
+  battery: string;
+
+  @Column
+  plugged: boolean;
+
+  @Default(false)
+  @AllowNull
+  @Column
+  default: boolean;
 
   @CreatedAt
   createdAt: Date;
@@ -45,9 +48,6 @@ class Contact extends Model<Contact> {
 
   @HasMany(() => Ticket)
   tickets: Ticket[];
-
-  @HasMany(() => ContactCustomField)
-  extraInfo: ContactCustomField[];
 }
 
-export default Contact;
+export default Whatsapp;

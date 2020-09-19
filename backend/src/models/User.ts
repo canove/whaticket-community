@@ -9,9 +9,11 @@ import {
   BeforeUpdate,
   PrimaryKey,
   AutoIncrement,
-  Default
+  Default,
+  HasMany
 } from "sequelize-typescript";
 import { hash, compare } from "bcryptjs";
+import Ticket from "./Ticket";
 
 @Table
 class User extends Model<User> {
@@ -41,6 +43,9 @@ class User extends Model<User> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @HasMany(() => Ticket)
+  tickets: Ticket[];
 
   @BeforeUpdate
   @BeforeCreate
