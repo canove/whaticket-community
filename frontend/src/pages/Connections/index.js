@@ -199,13 +199,13 @@ const Connections = () => {
 			>
 				Are you sure? It cannot be reverted.
 			</ConfirmationModal>
-			{/* <QrcodeModal
+			<QrcodeModal
 				open={qrModalOpen}
 				onClose={handleCloseQrModal}
 				whatsAppId={
 					selectedWhatsApp && !whatsAppModalOpen && selectedWhatsApp.id
 				}
-			/> */}
+			/>
 			<WhatsAppModal
 				open={whatsAppModalOpen}
 				onClose={handleCloseWhatsAppModal}
