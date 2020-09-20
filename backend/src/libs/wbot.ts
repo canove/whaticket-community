@@ -3,7 +3,11 @@ import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 
-const sessions: Client[] = [];
+interface Session extends Client {
+  id?: number;
+}
+
+const sessions: Session[] = [];
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<void> => {
   console.log("starting");
@@ -84,7 +88,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<void> => {
   }
 };
 
-export const getWbot = (whatsappId: number): Client | null => {
+export const getWbot = (whatsappId: number): Session | null => {
   const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
   if (sessionIndex === -1) {
