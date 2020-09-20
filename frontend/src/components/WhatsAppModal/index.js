@@ -86,7 +86,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			if (whatsAppId) {
 				await api.put(`/whatsapp/${whatsAppId}`, {
 					name: values.name,
-					default: values.default,
+					isDefault: values.isDefault,
 				});
 			} else {
 				await api.post("/whatsapp", values);
@@ -140,8 +140,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 									<Field
 										as={Switch}
 										color="primary"
-										name="default"
-										checked={values.default}
+										name="isDefault"
+										checked={values.isDefault}
 									/>
 								}
 								label="Default"
