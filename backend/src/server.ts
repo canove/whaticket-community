@@ -1,25 +1,33 @@
+import "reflect-metadata";
 import "dotenv/config";
 import "express-async-errors";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import AppError from "./errors/AppError";
+import multer from "multer";
+import Sentry from "@sentry/node";
 
+import uploadConfig from "./config/upload";
+import AppError from "./errors/AppError";
 import routes from "./routes";
 import "./database";
 
 // import path from "path";
-// import multer from "multer";
-// import Sentry from "@sentry/node";
 
 // const { initWbot } = require("./libs/wbot");
 // const wbotMessageListener = require("./services/wbotMessageListener");
 // const wbotMonitor = require("./services/wbotMonitor");
 // const Whatsapp = require("./models/Whatsapp");
 
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+
+const upload = multer(uploadConfig);
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(Sentry.Handlers.requestHandler());
+app.use(upload.single("media"));
+app.use("/public", express.static(uploadConfig.directory));
 app.use(routes);
 
 app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
@@ -34,22 +42,6 @@ app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server started on port: ${process.env.PORT}`);
 });
-
-// Sentry.init({ dsn: process.env.SENTRY_DSN });
-
-// const fileStorage = multer.diskStorage({
-// 	destination: (req, file, cb) => {
-// 		cb(null, path.resolve(__dirname, "..", "public"));
-// 	},
-// 	filename: (req, file, cb) => {
-// 		cb(null, new Date().getTime() + path.extname(file.originalname));
-// 	},
-// });
-
-// app.use(Sentry.Handlers.requestHandler());
-// app.use(multer({ storage: fileStorage }).single("media"));
-// app.use("/public", express.static(path.join(__dirname, "..", "public")));
-// app.use(Router);
 
 // const io = require("./libs/socket").init(server);
 // io.on("connection", socket => {
