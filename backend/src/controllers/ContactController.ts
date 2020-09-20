@@ -6,23 +6,16 @@ import FindContactService from "../services/ContactServices/FindContactService";
 import UpdateContactService from "../services/ContactServices/UpdateContactService";
 import DeleteContactService from "../services/ContactServices/DeleteContactService";
 
-// const Sequelize = require("sequelize");
-// const { Op } = require("sequelize");
-
-// const Contact = require("../models/Contact");
-// const Whatsapp = require("../models/Whatsapp");
-// const ContactCustomField = require("../models/ContactCustomField");
-
 // const { getIO } = require("../libs/socket");
 // const { getWbot } = require("../libs/wbot");
 
-type RequestQuery = {
+type IndexQuery = {
   searchParam: string;
   pageNumber: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber } = req.query as RequestQuery;
+  const { searchParam, pageNumber } = req.query as IndexQuery;
 
   const { contacts, count, hasMore } = await ListContactsService({
     searchParam,
@@ -32,16 +25,26 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   return res.json({ contacts, count, hasMore });
 };
 
+interface ExtraInfo {
+  name: string;
+  value: string;
+}
 interface ContactData {
   name: string;
   number: string;
   email?: string;
+  extraInfo?: ExtraInfo[];
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { name, number, email }: ContactData = req.body;
+  const { name, number, email, extraInfo }: ContactData = req.body;
 
-  const contact = await CreateContactService({ name, number, email });
+  const contact = await CreateContactService({
+    name,
+    number,
+    email,
+    extraInfo
+  });
 
   // const defaultWhatsapp = await Whatsapp.findOne({
   //   where: { default: true }
@@ -103,43 +106,13 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const contactData = req.body;
+  const contactData: ContactData = req.body;
 
   const { contactId } = req.params;
 
   const contact = await UpdateContactService({ contactData, contactId });
 
   // const io = getIO();
-  // const contact = await Contact.findByPk(contactId, {
-  //   include: "extraInfo"
-  // });
-
-  // if (!contact) {
-  //   return res.status(404).json({ error: "No contact found with this ID" });
-  // }
-
-  // if (updatedContact.extraInfo) {
-  //   await Promise.all(
-  //     updatedContact.extraInfo.map(async info => {
-  //       await ContactCustomField.upsert({ ...info, contactId: contact.id });
-  //     })
-  //   );
-
-  //   await Promise.all(
-  //     contact.extraInfo.map(async oldInfo => {
-  //       let stillExists = updatedContact.extraInfo.findIndex(
-  //         info => info.id === oldInfo.id
-  //       );
-
-  //       if (stillExists === -1) {
-  //         await ContactCustomField.destroy({ where: { id: oldInfo.id } });
-  //       }
-  //     })
-  //   );
-  // }
-
-  // await contact.update(updatedContact);
-
   // io.emit("contact", {
   //   action: "update",
   //   contact: contact
@@ -152,19 +125,11 @@ export const remove = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  // const io = getIO();
   const { contactId } = req.params;
 
   await DeleteContactService(contactId);
 
-  // const contact = await Contact.findByPk(contactId);
-
-  // if (!contact) {
-  //   return res.status(404).json({ error: "No contact found with this ID" });
-  // }
-
-  // await contact.destroy();
-
+  // const io = getIO();
   // io.emit("contact", {
   //   action: "delete",
   //   contactId: contactId
