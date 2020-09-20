@@ -4,11 +4,12 @@ import "express-async-errors";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import multer from "multer";
-import Sentry from "@sentry/node";
+import * as Sentry from "@sentry/node";
 
 import uploadConfig from "./config/upload";
 import AppError from "./errors/AppError";
 import routes from "./routes";
+import { initIO } from "./libs/socket";
 import "./database";
 
 // import path from "path";
@@ -43,23 +44,23 @@ const server = app.listen(process.env.PORT, () => {
   console.log(`Server started on port: ${process.env.PORT}`);
 });
 
-// const io = require("./libs/socket").init(server);
-// io.on("connection", socket => {
-// 	console.log("Client Connected");
-// 	socket.on("joinChatBox", ticketId => {
-// 		console.log("A client joined a ticket channel");
-// 		socket.join(ticketId);
-// 	});
+const io = initIO(server);
+io.on("connection", socket => {
+  console.log("Client Connected");
+  socket.on("joinChatBox", ticketId => {
+    console.log("A client joined a ticket channel");
+    socket.join(ticketId);
+  });
 
-// 	socket.on("joinNotification", () => {
-// 		console.log("A client joined notification channel");
-// 		socket.join("notification");
-// 	});
+  socket.on("joinNotification", () => {
+    console.log("A client joined notification channel");
+    socket.join("notification");
+  });
 
-// 	socket.on("disconnect", () => {
-// 		console.log("Client disconnected");
-// 	});
-// });
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 // const startWhatsAppSessions = async () => {
 // 	const whatsapps = await Whatsapp.findAll();
