@@ -16,8 +16,8 @@ interface Request {
 const CreateContactService = async ({
   name,
   number,
-  email,
-  extraInfo
+  email = "",
+  extraInfo = []
 }: Request): Promise<Contact> => {
   const numberExists = await Contact.findOne({
     where: { number }
@@ -26,6 +26,8 @@ const CreateContactService = async ({
   if (numberExists) {
     throw new AppError("A contact with this number already exists.");
   }
+
+  console.log("extra", extraInfo);
 
   const contact = await Contact.create(
     {

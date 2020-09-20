@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { getIO } from "../libs/socket";
 
 import ListContactsService from "../services/ContactServices/ListContactsService";
 import CreateContactService from "../services/ContactServices/CreateContactService";
@@ -6,7 +7,6 @@ import ShowContactService from "../services/ContactServices/ShowContactService";
 import UpdateContactService from "../services/ContactServices/UpdateContactService";
 import DeleteContactService from "../services/ContactServices/DeleteContactService";
 
-// const { getIO } = require("../libs/socket");
 // const { getWbot } = require("../libs/wbot");
 
 type IndexQuery = {
@@ -57,7 +57,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   // }
 
   // const wbot = getWbot(defaultWhatsapp);
-  // const io = getIO();
 
   // try {
   //   const isValidNumber = await wbot.isRegisteredUser(
@@ -86,10 +85,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   //   }
   // );
 
-  // io.emit("contact", {
-  //   action: "create",
-  //   contact: contact
-  // });
+  const io = getIO();
+  io.emit("contact", {
+    action: "create",
+    contact
+  });
 
   return res.status(200).json(contact);
 };
@@ -112,11 +112,11 @@ export const update = async (
 
   const contact = await UpdateContactService({ contactData, contactId });
 
-  // const io = getIO();
-  // io.emit("contact", {
-  //   action: "update",
-  //   contact: contact
-  // });
+  const io = getIO();
+  io.emit("contact", {
+    action: "update",
+    contact
+  });
 
   return res.status(200).json(contact);
 };
@@ -129,11 +129,11 @@ export const remove = async (
 
   await DeleteContactService(contactId);
 
-  // const io = getIO();
-  // io.emit("contact", {
-  //   action: "delete",
-  //   contactId: contactId
-  // });
+  const io = getIO();
+  io.emit("contact", {
+    action: "delete",
+    contactId
+  });
 
   return res.status(200).json({ message: "Contact deleted" });
 };
