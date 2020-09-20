@@ -9,7 +9,7 @@ ticketRoutes.get("/tickets", isAuth, TicketController.index);
 
 ticketRoutes.post("/tickets", isAuth, TicketController.store);
 
-// ticketRoutes.put("/tickets/:ticketId", isAuth, TicketController.update);
+ticketRoutes.put("/tickets/:ticketId", isAuth, TicketController.update);
 
 // ticketRoutes.delete("/tickets/:ticketId", isAuth, TicketController.remove);
 

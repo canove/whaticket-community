@@ -3,6 +3,7 @@ import GetDefaultWhatsapp from "../helpers/GetDefaultWhatsapp";
 import Ticket from "../models/Ticket";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
+import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 // const Sequelize = require("sequelize");
 // const { startOfDay, endOfDay, parseISO } = require("date-fns");
 
@@ -100,14 +101,11 @@ interface TicketData {
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  // const io = getIO();
-
   const { contactId, status }: TicketData = req.body;
 
   const ticket = await CreateTicketService({ contactId, status });
 
-  //   const serializaedTicket = { ...ticket.dataValues, contact: contact };
-
+  // const io = getIO();
   //   io.to("notification").emit("ticket", {
   //     action: "create",
   //     ticket: serializaedTicket
@@ -116,33 +114,39 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(ticket);
 };
 
-// export const update = (req: Request, res: Response): Promise<Response> => {
-//   const io = getIO();
-//   const { ticketId } = req.params;
+export const update = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  // const io = getIO();
+  const { ticketId } = req.params;
+  const ticketData: TicketData = req.body;
 
-//   const ticket = await Ticket.findByPk(ticketId, {
-//     include: [
-//       {
-//         model: Contact,
-//         as: "contact",
-//         attributes: ["name", "number", "profilePicUrl"]
-//       }
-//     ]
-//   });
+  const ticket = await UpdateTicketService({ ticketData, ticketId });
 
-//   if (!ticket) {
-//     return res.status(404).json({ error: "No ticket found with this ID" });
-//   }
+  // const ticket = await Ticket.findByPk(ticketId, {
+  //   include: [
+  //     {
+  //       model: Contact,
+  //       as: "contact",
+  //       attributes: ["name", "number", "profilePicUrl"]
+  //     }
+  //   ]
+  // });
 
-//   await ticket.update(req.body);
+  // if (!ticket) {
+  //   return res.status(404).json({ error: "No ticket found with this ID" });
+  // }
 
-//   io.to("notification").emit("ticket", {
-//     action: "updateStatus",
-//     ticket: ticket
-//   });
+  // await ticket.update(req.body);
 
-//   return res.status(200).json(ticket);
-// };
+  // io.to("notification").emit("ticket", {
+  //   action: "updateStatus",
+  //   ticket: ticket
+  // });
+
+  return res.status(200).json(ticket);
+};
 
 // export const remove = (req: Request, res: Response): Promise<Response> => {
 //   const io = getIO();
