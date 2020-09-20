@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { getIO } from "../libs/socket";
 
 import CheckSettingsHelper from "../helpers/CheckSettings";
 import AppError from "../errors/AppError";
@@ -47,6 +48,12 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     profile
   });
 
+  const io = getIO();
+  io.emit("user", {
+    action: "create",
+    user
+  });
+
   return res.status(200).json(user);
 };
 
@@ -71,6 +78,12 @@ export const update = async (
 
   const user = await UpdateUserService({ userData, userId });
 
+  const io = getIO();
+  io.emit("user", {
+    action: "update",
+    user
+  });
+
   return res.status(200).json(user);
 };
 
@@ -85,6 +98,12 @@ export const remove = async (
   }
 
   await DeleteUserService(userId);
+
+  const io = getIO();
+  io.emit("user", {
+    action: "delete",
+    userId
+  });
 
   return res.status(200).json({ message: "User deleted" });
 };
