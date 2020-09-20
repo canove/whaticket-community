@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import GetDefaultWhatsapp from "../helpers/GetDefaultWhatsapp";
 import Ticket from "../models/Ticket";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
+import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 // const Sequelize = require("sequelize");
@@ -118,28 +119,12 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  // const io = getIO();
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
   const ticket = await UpdateTicketService({ ticketData, ticketId });
 
-  // const ticket = await Ticket.findByPk(ticketId, {
-  //   include: [
-  //     {
-  //       model: Contact,
-  //       as: "contact",
-  //       attributes: ["name", "number", "profilePicUrl"]
-  //     }
-  //   ]
-  // });
-
-  // if (!ticket) {
-  //   return res.status(404).json({ error: "No ticket found with this ID" });
-  // }
-
-  // await ticket.update(req.body);
-
+  // const io = getIO();
   // io.to("notification").emit("ticket", {
   //   action: "updateStatus",
   //   ticket: ticket
@@ -148,22 +133,19 @@ export const update = async (
   return res.status(200).json(ticket);
 };
 
-// export const remove = (req: Request, res: Response): Promise<Response> => {
-//   const io = getIO();
-//   const { ticketId } = req.params;
+export const remove = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
 
-//   const ticket = await Ticket.findByPk(ticketId);
+  await DeleteTicketService(ticketId);
 
-//   if (!ticket) {
-//     return res.status(400).json({ error: "No ticket found with this ID" });
-//   }
+  // const io = getIO();
+  // io.to("notification").emit("ticket", {
+  //   action: "delete",
+  //   ticketId: ticket.id
+  // });
 
-//   await ticket.destroy();
-
-//   io.to("notification").emit("ticket", {
-//     action: "delete",
-//     ticketId: ticket.id
-//   });
-
-//   return res.status(200).json({ message: "ticket deleted" });
-// };
+  return res.status(200).json({ message: "ticket deleted" });
+};

@@ -11,6 +11,6 @@ ticketRoutes.post("/tickets", isAuth, TicketController.store);
 
 ticketRoutes.put("/tickets/:ticketId", isAuth, TicketController.update);
 
-// ticketRoutes.delete("/tickets/:ticketId", isAuth, TicketController.remove);
+ticketRoutes.delete("/tickets/:ticketId", isAuth, TicketController.remove);
 
 export default ticketRoutes;

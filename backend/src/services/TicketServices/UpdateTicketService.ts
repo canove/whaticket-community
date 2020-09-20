@@ -1,4 +1,5 @@
 import AppError from "../../errors/AppError";
+import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
 
 interface TicketData {
@@ -18,7 +19,14 @@ const UpdateTicketService = async ({
   const { status, userId } = ticketData;
 
   const ticket = await Ticket.findOne({
-    where: { id: ticketId }
+    where: { id: ticketId },
+    include: [
+      {
+        model: Contact,
+        as: "contact",
+        attributes: ["name", "number", "profilePicUrl"]
+      }
+    ]
   });
 
   if (!ticket) {

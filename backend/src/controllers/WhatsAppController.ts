@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
-import DeleteWhatsApprService from "../services/WhatsappService/DeleteWhatsApprService";
+import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppService";
 import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
 import FindWhatsAppService from "../services/WhatsappService/FindWhatsAppService";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
@@ -91,7 +91,7 @@ export const remove = async (
   // const io = getIO();
   const { whatsappId } = req.params;
 
-  await DeleteWhatsApprService(whatsappId);
+  await DeleteWhatsAppService(whatsappId);
   // removeWbot(whatsapp.id);
 
   // io.emit("whatsapp", {
