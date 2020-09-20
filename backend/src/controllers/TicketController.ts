@@ -1,29 +1,23 @@
 import { Request, Response } from "express";
-import GetDefaultWhatsapp from "../helpers/GetDefaultWhatsapp";
-import Ticket from "../models/Ticket";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
-// const Sequelize = require("sequelize");
-// const { startOfDay, endOfDay, parseISO } = require("date-fns");
-
-// const Ticket = require("../models/Ticket");
-// const Contact = require("../models/Contact");
-// const Message = require("../models/Message");
-// const Whatsapp = require("../models/Whatsapp");
 
 // const { getIO } = require("../libs/socket");
 
-// import FindWhatsAppService from "../services/WhatsappService/FindWhatsAppService";
-
-type RequestQuery = {
+type IndexQuery = {
   searchParam: string;
   pageNumber: string;
   status: string;
   date: string;
   showAll: string;
 };
+
+interface TicketData {
+  contactId: number;
+  status: string;
+}
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const {
@@ -32,7 +26,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     date,
     searchParam,
     showAll
-  } = req.query as RequestQuery;
+  } = req.query as IndexQuery;
 
   const userId = req.user.id;
 
@@ -95,11 +89,6 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   return res.status(200).json({ tickets, count, hasMore });
 };
-
-interface TicketData {
-  contactId: number;
-  status: string;
-}
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { contactId, status }: TicketData = req.body;

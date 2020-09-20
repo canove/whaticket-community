@@ -16,16 +16,6 @@ const ListContactsService = async ({
   searchParam = "",
   pageNumber = "1"
 }: Request): Promise<Response> => {
-  let includeCondition = [
-    {
-      model: Contact,
-      as: "contact",
-      attributes: ["name", "number", "profilePicUrl"]
-    }
-  ];
-
-  // let whereCondition = {};
-
   const whereCondition = {
     [Op.or]: [
       {
@@ -43,7 +33,6 @@ const ListContactsService = async ({
 
   const { count, rows: contacts } = await Contact.findAndCountAll({
     where: whereCondition,
-    include: includeCondition,
     limit,
     offset,
     order: [["createdAt", "DESC"]]

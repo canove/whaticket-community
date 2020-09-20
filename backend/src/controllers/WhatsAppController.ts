@@ -53,7 +53,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
 
-  const whatsapp = await FindWhatsAppService(whatsappId);
+  const whatsapp = await FindWhatsAppService({ where: { id: +whatsappId } });
 
   return res.status(200).json(whatsapp);
 };

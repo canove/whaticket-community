@@ -9,7 +9,7 @@ import UpdateUserService from "../services/UserServices/UpdateUserService";
 import FindUserService from "../services/UserServices/FindUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 
-type RequestQuery = {
+type IndexQuery = {
   searchParam: string;
   pageNumber: string;
 };
@@ -18,7 +18,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   if (req.user.profile !== "admin") {
     throw new AppError("Only administrators can access this route.", 403); // should be handled better.
   }
-  const { searchParam, pageNumber } = req.query as RequestQuery;
+  const { searchParam, pageNumber } = req.query as IndexQuery;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
