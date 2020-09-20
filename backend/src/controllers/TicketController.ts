@@ -1,4 +1,7 @@
 import { Request, Response } from "express";
+import GetDefaultWhatsapp from "../helpers/GetDefaultWhatsapp";
+import Ticket from "../models/Ticket";
+import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 // const Sequelize = require("sequelize");
 // const { startOfDay, endOfDay, parseISO } = require("date-fns");
@@ -10,9 +13,7 @@ import ListTicketsService from "../services/TicketServices/ListTicketsService";
 
 // const { getIO } = require("../libs/socket");
 
-import Whatsapp from "../models/Whatsapp";
-import Ticket from "../models/Ticket";
-import Whatsapp from "../models/Whatsapp";
+// import FindWhatsAppService from "../services/WhatsappService/FindWhatsAppService";
 
 type RequestQuery = {
   searchParam: string;
@@ -93,28 +94,17 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json({ tickets, count, hasMore });
 };
 
+interface TicketData {
+  contactId: number;
+  status: string;
+}
+
 export const store = async (req: Request, res: Response): Promise<Response> => {
   // const io = getIO();
 
-  const defaultWhatsapp = await Whatsapp.findOne({
-    where: { default: true }
-  });
+  const { contactId, status }: TicketData = req.body;
 
-  const ticketData = req.body;
-
-  if (!defaultWhatsapp) {
-    return res
-      .status(404)
-      .json({ error: "No default WhatsApp found. Check Connection page." });
-  }
-
-  const ticket: Ticket = await defaultWhatsapp.$create("ticket", req.body);
-
-  await ticket.$get("contact");
-
-  const wapp = await ticket.$get("whatsapp");
-
-  const tickets = await wapp?.$get("tickets");
+  const ticket = await CreateTicketService({ contactId, status });
 
   //   const serializaedTicket = { ...ticket.dataValues, contact: contact };
 
@@ -123,7 +113,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   //     ticket: serializaedTicket
   //   });
 
-  return res.status(200).json({ ticket });
+  return res.status(200).json(ticket);
 };
 
 // export const update = (req: Request, res: Response): Promise<Response> => {

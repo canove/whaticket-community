@@ -1,24 +1,34 @@
-import * as Yup from "yup";
-
 import AppError from "../../errors/AppError";
-import User from "../../models/User";
+import GetDefaultWhatsapp from "../../helpers/GetDefaultWhatsapp";
+import Ticket from "../../models/Ticket";
 
 interface Request {
-  email: string;
-  password: string;
-  name: string;
-  profile?: string;
+  contactId: number;
+  status?: string;
 }
 
-interface Response {
-  email: string;
-  name: string;
-  id: number;
-  profile: string;
-}
+const CreateTicketService = async ({
+  contactId,
+  status
+}: Request): Promise<Ticket> => {
+  const defaultWhatsapp = await GetDefaultWhatsapp();
 
-const CreateTicketService = async (): Promise<boolean> => {
-  return true;
+  if (!defaultWhatsapp) {
+    throw new AppError("No default WhatsApp found. Check Connection page.");
+  }
+
+  const { id } = await defaultWhatsapp.$create("ticket", {
+    contactId,
+    status
+  });
+
+  const ticket = await Ticket.findByPk(id, { include: ["contact"] });
+
+  if (!ticket) {
+    throw new AppError("Error, ticket not created.");
+  }
+
+  return ticket;
 };
 
 export default CreateTicketService;

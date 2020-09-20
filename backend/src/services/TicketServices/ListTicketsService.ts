@@ -1,7 +1,9 @@
-import { Op } from "sequelize";
+import { Op, fn, where, col } from "sequelize";
 import { startOfDay, endOfDay, parseISO } from "date-fns";
 
 import Ticket from "../../models/Ticket";
+import Contact from "../../models/Contact";
+import Message from "../../models/Message";
 
 interface Request {
   searchParam?: string;
@@ -27,6 +29,15 @@ const ListTicketsService = async ({
   userId
 }: Request): Promise<Response> => {
   let whereCondition = {};
+  let includeCondition = [];
+
+  includeCondition = [
+    {
+      model: Contact,
+      as: "contact",
+      attributes: ["name", "number", "profilePicUrl"]
+    }
+  ];
 
   if (showAll === "true") {
     whereCondition = {};
@@ -38,6 +49,46 @@ const ListTicketsService = async ({
     whereCondition = {
       ...whereCondition,
       status
+    };
+  }
+
+  if (searchParam) {
+    includeCondition = [
+      ...includeCondition,
+      {
+        model: Message,
+        as: "messages",
+        attributes: ["id", "body"],
+        where: {
+          body: where(
+            fn("LOWER", col("body")),
+            "LIKE",
+            `%${searchParam.toLowerCase()}%`
+          )
+        },
+        required: false,
+        duplicating: false
+      }
+    ];
+
+    whereCondition = {
+      [Op.or]: [
+        {
+          "$contact.name$": where(
+            fn("LOWER", col("name")),
+            "LIKE",
+            `%${searchParam.toLowerCase()}%`
+          )
+        },
+        { "$contact.number$": { [Op.like]: `%${searchParam}%` } },
+        {
+          "$message.body$": where(
+            fn("LOWER", col("body")),
+            "LIKE",
+            `%${searchParam.toLowerCase()}%`
+          )
+        }
+      ]
     };
   }
 
@@ -55,8 +106,8 @@ const ListTicketsService = async ({
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,
-    // distinct: true,
-    // include: includeCondition,
+    include: includeCondition,
+    distinct: true,
     limit,
     offset,
     order: [["updatedAt", "DESC"]]

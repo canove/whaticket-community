@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import CheckSettingsHelper from "../helpers/CheckSettingsHelper";
+import CheckSettingsHelper from "../helpers/CheckSettings";
 import AppError from "../errors/AppError";
 
 import CreateUserService from "../services/UserServices/CreateUserService";
