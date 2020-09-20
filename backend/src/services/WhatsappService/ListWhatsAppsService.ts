@@ -1,13 +1,9 @@
 import Whatsapp from "../../models/Whatsapp";
 
-interface Response {
-  whatsapps: Whatsapp[];
-}
-
-const ListWhatsAppsService = async (): Promise<Response> => {
+const ListWhatsAppsService = async (): Promise<Whatsapp[]> => {
   const whatsapps = await Whatsapp.findAll();
 
-  return { whatsapps };
+  return whatsapps;
 };
 
 export default ListWhatsAppsService;

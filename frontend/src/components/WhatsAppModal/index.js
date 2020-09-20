@@ -60,7 +60,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const classes = useStyles();
 	const initialState = {
 		name: "",
-		default: false,
+		isDefault: false,
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 

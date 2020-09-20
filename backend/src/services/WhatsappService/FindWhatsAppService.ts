@@ -1,24 +1,10 @@
 import Whatsapp from "../../models/Whatsapp";
 import AppError from "../../errors/AppError";
 
-interface WhereParams {
-  id?: number;
-  name?: string;
-  isDefault?: boolean;
-}
-
-interface Request {
-  where?: WhereParams;
-}
-
-const FindWhatsAppService = async ({
-  where
-}: Request): Promise<Whatsapp | undefined> => {
-  const whereCondition = { ...where };
-
-  const whatsapp = await Whatsapp.findOne({
-    where: whereCondition
-  });
+const FindWhatsAppService = async (
+  id: string | number
+): Promise<Whatsapp | undefined> => {
+  const whatsapp = await Whatsapp.findByPk(id);
 
   if (!whatsapp) {
     throw new AppError("No whatsapp found with this conditions.", 404);

@@ -12,17 +12,17 @@ import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppSer
 // import wbotMessageListener from "../services/wbotMessageListener";
 // import wbotMonitor from "../services/wbotMonitor";
 
-export const index = async (req: Request, res: Response): Promise<Response> => {
-  const whatsapps = await ListWhatsAppsService();
-
-  return res.status(200).json(whatsapps);
-};
-
 interface WhatsappData {
   name: string;
   status?: string;
   isDefault?: boolean;
 }
+
+export const index = async (req: Request, res: Response): Promise<Response> => {
+  const whatsapps = await ListWhatsAppsService();
+
+  return res.status(200).json(whatsapps);
+};
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   // const io = getIO();
@@ -53,7 +53,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
 
-  const whatsapp = await FindWhatsAppService({ where: { id: +whatsappId } });
+  console.log(whatsappId);
+
+  const whatsapp = await FindWhatsAppService(whatsappId);
 
   return res.status(200).json(whatsapp);
 };
