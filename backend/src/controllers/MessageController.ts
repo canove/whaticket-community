@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
+// import { getIO } from "../libs/socket";
+
 import CreateMessageService from "../services/MessageServices/CreateMessageService";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
+
 // import Sequelize from "sequelize";
 // import { MessageMedia } from "whatsapp-web.js";
 // import Message from "../models/Message";
@@ -9,7 +12,6 @@ import ListMessagesService from "../services/MessageServices/ListMessagesService
 // import Whatsapp from "../models/Whatsapp";
 
 // import Ticket from "../models/Ticket";
-// import { getIO } from "../libs/socket";
 // import { getWbot } from "../libs/wbot";
 
 // const setMessagesAsRead = async ticket => {

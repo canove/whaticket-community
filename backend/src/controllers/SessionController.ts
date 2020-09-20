@@ -8,7 +8,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const { token, user } = await AuthUserService({ email, password });
 
   return res.status(200).json({
-    user,
-    token
+    token,
+    username: user.name,
+    profile: user.profile,
+    userId: user.id
   });
 };
