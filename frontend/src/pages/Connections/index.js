@@ -111,31 +111,31 @@ const Connections = () => {
 		fetchSession();
 	}, []);
 
-	// useEffect(() => {
-	// 	const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
-	// 	socket.on("whatsapp", data => {
-	// 		if (data.action === "update") {
-	// 			dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-	// 		}
-	// 	});
+		socket.on("whatsapp", data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
+			}
+		});
 
-	// 	socket.on("whatsapp", data => {
-	// 		if (data.action === "delete") {
-	// 			dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-	// 		}
-	// 	});
+		socket.on("whatsapp", data => {
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
+			}
+		});
 
-	// 	socket.on("whatsappSession", data => {
-	// 		if (data.action === "update") {
-	// 			dispatch({ type: "UPDATE_SESSION", payload: data.session });
-	// 		}
-	// 	});
+		socket.on("whatsappSession", data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_SESSION", payload: data.session });
+			}
+		});
 
-	// 	return () => {
-	// 		socket.disconnect();
-	// 	};
-	// }, []);
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
 
 	// const handleDisconnectSession = async whatsAppId => {
 	// 	try {
