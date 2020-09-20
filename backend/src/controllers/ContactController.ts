@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import ListContactsService from "../services/ContactServices/ListContactsService";
 import CreateContactService from "../services/ContactServices/CreateContactService";
-import ShowContactService from "../services/ContactServices/ShowContactService";
+import FindContactService from "../services/ContactServices/FindContactService";
 import UpdateContactService from "../services/ContactServices/UpdateContactService";
 import DeleteContactService from "../services/ContactServices/DeleteContactService";
 
@@ -94,7 +94,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { contactId } = req.params;
 
-  const contact = await ShowContactService(contactId);
+  const contact = await FindContactService(contactId);
 
   return res.status(200).json(contact);
 };

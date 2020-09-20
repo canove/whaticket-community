@@ -1,7 +1,7 @@
 import User from "../../models/User";
 import AppError from "../../errors/AppError";
 
-const ShowUserService = async (id: string): Promise<User | undefined> => {
+const FindUserService = async (id: string): Promise<User | undefined> => {
   const user = await User.findOne({
     where: { id },
     attributes: ["name", "id", "email", "profile"]
@@ -14,4 +14,4 @@ const ShowUserService = async (id: string): Promise<User | undefined> => {
   return user;
 };
 
-export default ShowUserService;
+export default FindUserService;

@@ -6,7 +6,7 @@ import AppError from "../errors/AppError";
 import CreateUserService from "../services/UserServices/CreateUserService";
 import ListUsersService from "../services/UserServices/ListUsersService";
 import UpdateUserService from "../services/UserServices/UpdateUserService";
-import ShowUserService from "../services/UserServices/ShowUserService";
+import FindUserService from "../services/UserServices/FindUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 
 type RequestQuery = {
@@ -53,7 +53,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { userId } = req.params;
 
-  const user = await ShowUserService(userId);
+  const user = await FindUserService(userId);
 
   return res.status(200).json(user);
 };

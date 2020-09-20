@@ -1,7 +1,7 @@
 import Contact from "../../models/Contact";
 import AppError from "../../errors/AppError";
 
-const ShowContactService = async (id: string): Promise<Contact> => {
+const FindContactService = async (id: string): Promise<Contact> => {
   const user = await Contact.findOne({
     where: { id },
     attributes: ["id", "name", "number", "email"]
@@ -14,4 +14,4 @@ const ShowContactService = async (id: string): Promise<Contact> => {
   return user;
 };
 
-export default ShowContactService;
+export default FindContactService;
