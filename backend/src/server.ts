@@ -11,13 +11,13 @@ import AppError from "./errors/AppError";
 import routes from "./routes";
 import { initIO } from "./libs/socket";
 import "./database";
+import { initWbot } from "./libs/wbot";
 
 // import path from "path";
 
-// const { initWbot } = require("./libs/wbot");
 // const wbotMessageListener = require("./services/wbotMessageListener");
 // const wbotMonitor = require("./services/wbotMonitor");
-// const Whatsapp = require("./models/Whatsapp");
+import Whatsapp from "./models/Whatsapp";
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 
@@ -62,21 +62,21 @@ io.on("connection", socket => {
   });
 });
 
-// const startWhatsAppSessions = async () => {
-// 	const whatsapps = await Whatsapp.findAll();
-
-// 	if (whatsapps.length > 0) {
-// 		whatsapps.forEach(whatsapp => {
-// 			initWbot(whatsapp)
-// 				.then(() => {
-// 					wbotMessageListener(whatsapp);
-// 					wbotMonitor(whatsapp);
-// 				})
-// 				.catch(err => console.log(err));
-// 		});
-// 	}
-// };
-// startWhatsAppSessions();
+const startWhatsAppSessions = async () => {
+  const whatsapps = await Whatsapp.findAll();
+  if (whatsapps.length > 0) {
+    whatsapps.forEach(whatsapp => {
+      initWbot(whatsapp)
+        .then(() => {
+          console.log("initialized!!");
+          // wbotMessageListener(whatsapp);
+          // wbotMonitor(whatsapp);
+        })
+        .catch(err => console.log(err));
+    });
+  }
+};
+startWhatsAppSessions();
 
 // app.use(Sentry.Handlers.errorHandler());
 
