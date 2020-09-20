@@ -1,9 +1,8 @@
 import AppError from "../errors/AppError";
 import Whatsapp from "../models/Whatsapp";
-import FindWhatsAppService from "../services/WhatsappService/FindWhatsAppService";
 
-const GetDefaultWhatsapp = async (): Promise<Whatsapp> => {
-  const defaultWhatsapp = await FindWhatsAppService({
+const GetDefaultWhatsApp = async (): Promise<Whatsapp> => {
+  const defaultWhatsapp = await Whatsapp.findOne({
     where: { isDefault: true }
   });
 
@@ -14,4 +13,4 @@ const GetDefaultWhatsapp = async (): Promise<Whatsapp> => {
   return defaultWhatsapp;
 };
 
-export default GetDefaultWhatsapp;
+export default GetDefaultWhatsApp;

@@ -1,7 +1,7 @@
 import { where, fn, col } from "sequelize";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
-import FindTicketService from "../TicketServices/FindTicketService";
+import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Request {
   ticketId: string;
@@ -30,7 +30,7 @@ const ListMessagesService = async ({
     ticketId
   };
 
-  const ticket = await FindTicketService({ where: { id: +ticketId } });
+  const ticket = await ShowTicketService(ticketId);
 
   if (!ticket) {
     throw new Error("No ticket found with this ID");

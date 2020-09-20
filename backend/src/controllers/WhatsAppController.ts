@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
 import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppService";
 import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
-import FindWhatsAppService from "../services/WhatsappService/FindWhatsAppService";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 // import Yup from "yup";
 // import Whatsapp from "../models/Whatsapp";
@@ -53,9 +53,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
 
-  console.log(whatsappId);
-
-  const whatsapp = await FindWhatsAppService(whatsappId);
+  const whatsapp = await ShowWhatsAppService(whatsappId);
 
   return res.status(200).json(whatsapp);
 };

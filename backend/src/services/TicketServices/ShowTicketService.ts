@@ -3,23 +3,8 @@ import AppError from "../../errors/AppError";
 import Contact from "../../models/Contact";
 import User from "../../models/User";
 
-interface WhereParams {
-  id?: number;
-  status?: string;
-  userId?: number;
-  contactId?: number;
-  whatsappId?: number;
-}
-
-interface Request {
-  where?: WhereParams;
-}
-
-const FindTicketService = async ({ where }: Request): Promise<Ticket> => {
-  const whereCondition = { ...where };
-
-  const ticket = await Ticket.findOne({
-    where: whereCondition,
+const ShowTicketService = async (id: string | number): Promise<Ticket> => {
+  const ticket = await Ticket.findByPk(id, {
     include: [
       {
         model: Contact,
@@ -42,4 +27,4 @@ const FindTicketService = async ({ where }: Request): Promise<Ticket> => {
   return ticket;
 };
 
-export default FindTicketService;
+export default ShowTicketService;

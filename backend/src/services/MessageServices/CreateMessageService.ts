@@ -1,5 +1,5 @@
 import Message from "../../models/Message";
-import FindTicketService from "../TicketServices/FindTicketService";
+import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Request {
   ticketId: string;
@@ -10,7 +10,7 @@ const CreateMessageService = async ({
   messageData,
   ticketId
 }: Request): Promise<Message> => {
-  const ticket = await FindTicketService({ where: { id: +ticketId } });
+  const ticket = await ShowTicketService(ticketId);
 
   if (!ticket) {
     throw new Error("No ticket found with this ID");

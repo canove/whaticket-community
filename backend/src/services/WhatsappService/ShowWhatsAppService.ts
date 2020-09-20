@@ -1,7 +1,7 @@
 import Whatsapp from "../../models/Whatsapp";
 import AppError from "../../errors/AppError";
 
-const FindWhatsAppService = async (
+const ShowWhatsAppService = async (
   id: string | number
 ): Promise<Whatsapp | undefined> => {
   const whatsapp = await Whatsapp.findByPk(id);
@@ -13,4 +13,4 @@ const FindWhatsAppService = async (
   return whatsapp;
 };
 
-export default FindWhatsAppService;
+export default ShowWhatsAppService;
