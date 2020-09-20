@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { getIO } from "../libs/socket";
 
 import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
 import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppService";
@@ -25,8 +26,6 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  // const io = getIO();
-
   const { name, status, isDefault }: WhatsappData = req.body;
 
   const whatsapp = await CreateWhatsAppService({ name, status, isDefault });
@@ -42,10 +41,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   //   })
   //   .catch(err => console.log(err));
 
-  // io.emit("whatsapp", {
-  //   action: "update",
-  //   whatsapp: whatsapp
-  // });
+  const io = getIO();
+  io.emit("whatsapp", {
+    action: "update",
+    whatsapp
+  });
 
   return res.status(200).json(whatsapp);
 };
@@ -66,7 +66,6 @@ export const update = async (
   const whatsappData = req.body;
 
   const whatsapp = await UpdateWhatsAppService({ whatsappData, whatsappId });
-  // const io = getIO();
 
   // const whatsapp = await Whatsapp.findByPk(whatsappId);
 
@@ -76,10 +75,11 @@ export const update = async (
 
   // await whatsapp.update(req.body);
 
-  // io.emit("whatsapp", {
-  //   action: "update",
-  //   whatsapp: whatsapp
-  // });
+  const io = getIO();
+  io.emit("whatsapp", {
+    action: "update",
+    whatsapp
+  });
 
   return res.status(200).json(whatsapp);
 };
@@ -88,16 +88,16 @@ export const remove = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  // const io = getIO();
   const { whatsappId } = req.params;
 
   await DeleteWhatsAppService(whatsappId);
   // removeWbot(whatsapp.id);
 
-  // io.emit("whatsapp", {
-  //   action: "delete",
-  //   whatsappId: whatsapp.id
-  // });
+  const io = getIO();
+  io.emit("whatsapp", {
+    action: "delete",
+    whatsappId: +whatsappId
+  });
 
   return res.status(200).json({ message: "Whatsapp deleted." });
 };
