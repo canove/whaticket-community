@@ -1,16 +1,18 @@
-const path = require("path");
-const fs = require("fs");
-const { Op } = require("sequelize");
-const { subHours } = require("date-fns");
-const Sentry = require("@sentry/node");
+import path from "path";
+import fs from "fs";
+import { Op } from "sequelize";
+import { subHours } from "date-fns";
+import Sentry from "@sentry/node";
 
-const Contact = require("../models/Contact");
-const Ticket = require("../models/Ticket");
-const Message = require("../models/Message");
-const Whatsapp = require("../models/Whatsapp");
+import { Client, Message } from "whatsapp-web.js";
 
-const { getIO } = require("../libs/socket");
-const { getWbot, initWbot } = require("../libs/wbot");
+import Contact from "../../models/Contact";
+import Ticket from "../../models/Ticket";
+import Message from "../../models/Message";
+import Whatsapp from "../../models/Whatsapp";
+
+import { getIO } from "../../libs/socket";
+import { getWbot } from "../../libs/wbot";
 
 const verifyContact = async (msgContact, profilePicUrl) => {
   let contact = await Contact.findOne({
@@ -134,53 +136,60 @@ const handleMessage = async (msg, ticket, contact) => {
   });
 };
 
-const wbotMessageListener = whatsapp => {
+const wbotMessageListener = (whatsapp: Whatsapp): void => {
   const whatsappId = whatsapp.id;
   const wbot = getWbot(whatsappId);
   const io = getIO();
 
-  wbot.on("message_create", async msg => {
-    // console.log(msg);
+  if (!wbot) {
+    console.log("Wbot not initialized");
+    return;
+  }
 
-    if (
-      msg.from === "status@broadcast" ||
-      msg.type === "location" ||
-      msg.type === "call_log" ||
-      msg.author != null // Ignore Group Messages
-    ) {
-      return;
-    }
+  wbot.on(
+    "message_create",
+    async (msg): Promise<void> => {
+      // console.log(msg);
 
-    try {
-      let msgContact;
-
-      if (msg.fromMe) {
-        msgContact = await wbot.getContactById(msg.to);
-      } else {
-        msgContact = await msg.getContact();
+      if (
+        msg.from === "status@broadcast" ||
+        msg.type === "location" ||
+        msg.author !== null // Ignore Group Messages
+      ) {
+        return;
       }
 
-      const profilePicUrl = await msgContact.getProfilePicUrl();
-      const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId);
+      try {
+        let msgContact;
 
-      //return if message was already created by messageController
-      if (msg.fromMe) {
-        const alreadyExists = await Message.findOne({
-          where: { id: msg.id.id }
-        });
-
-        if (alreadyExists) {
-          return;
+        if (msg.fromMe) {
+          msgContact = await wbot.getContactById(msg.to);
+        } else {
+          msgContact = await msg.getContact();
         }
-      }
 
-      await handleMessage(msg, ticket, contact);
-    } catch (err) {
-      Sentry.captureException(err);
-      console.log(err);
+        const profilePicUrl = await msgContact.getProfilePicUrl();
+        const contact = await verifyContact(msgContact, profilePicUrl);
+        const ticket = await verifyTicket(contact, whatsappId);
+
+        //return if message was already created by messageController
+        if (msg.fromMe) {
+          const alreadyExists = await Message.findOne({
+            where: { id: msg.id.id }
+          });
+
+          if (alreadyExists) {
+            return;
+          }
+        }
+
+        await handleMessage(msg, ticket, contact);
+      } catch (err) {
+        Sentry.captureException(err);
+        console.log(err);
+      }
     }
-  });
+  );
 
   wbot.on("message_ack", async (msg, ack) => {
     try {
@@ -203,4 +212,4 @@ const wbotMessageListener = whatsapp => {
   });
 };
 
-module.exports = wbotMessageListener;
+export default wbotMessageListener;

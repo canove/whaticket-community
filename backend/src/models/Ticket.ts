@@ -9,7 +9,9 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
-  AutoIncrement
+  AutoIncrement,
+  AfterFind,
+  BeforeUpdate
 } from "sequelize-typescript";
 
 import Contact from "./Contact";
@@ -28,7 +30,7 @@ class Ticket extends Model<Ticket> {
   status: string;
 
   @Column(DataType.VIRTUAL)
-  unreadMessages: string;
+  unreadMessages: number;
 
   @Column
   lastMessage: string;
@@ -62,6 +64,26 @@ class Ticket extends Model<Ticket> {
 
   @HasMany(() => Message)
   messages: Message[];
+
+  @AfterFind
+  static async countTicketsUnreadMessages(tickets: Ticket[]): Promise<void> {
+    if (tickets && tickets.length > 0) {
+      await Promise.all(
+        tickets.map(async ticket => {
+          ticket.unreadMessages = await Message.count({
+            where: { ticketId: ticket.id, read: false }
+          });
+        })
+      );
+    }
+  }
+
+  @BeforeUpdate
+  static async countTicketUnreadMessags(ticket: Ticket): Promise<void> {
+    ticket.unreadMessages = await Message.count({
+      where: { ticketId: ticket.id, read: false }
+    });
+  }
 }
 
 export default Ticket;
