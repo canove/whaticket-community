@@ -16,9 +16,8 @@ import Ticket from "./Ticket";
 @Table
 class Message extends Model<Message> {
   @PrimaryKey
-  @AutoIncrement
   @Column
-  id: number;
+  id: string;
 
   @Default(0)
   @Column
@@ -35,8 +34,15 @@ class Message extends Model<Message> {
   @Column(DataType.TEXT)
   body: string;
 
-  @Column
-  mediaUrl: string;
+  @Column(DataType.STRING)
+  get mediaUrl(): string | null {
+    if (this.getDataValue("mediaUrl")) {
+      return `${process.env.BACKEND_URL}:${
+        process.env.PROXY_PORT
+      }/public/${this.getDataValue("mediaUrl")}`;
+    }
+    return null;
+  }
 
   @Column
   mediaType: string;

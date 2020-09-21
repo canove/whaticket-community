@@ -17,7 +17,7 @@ const CreateTicketService = async ({
     throw new AppError("No default WhatsApp found. Check Connection page.");
   }
 
-  const { id } = await defaultWhatsapp.$create("ticket", {
+  const { id }: Ticket = await defaultWhatsapp.$create("ticket", {
     contactId,
     status
   });
