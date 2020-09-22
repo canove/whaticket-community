@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 import { initWbot } from "../libs/wbot";
 import wbotMessageListener from "../services/WbotServices/wbotMessageListener";
+import wbotMonitor from "../services/WbotServices/wbotMonitor";
 
 import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
 import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppService";
@@ -39,7 +40,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   initWbot(whatsapp)
     .then(() => {
       wbotMessageListener(whatsapp);
-      // wbotMonitor(whatsapp);
+      wbotMonitor(whatsapp);
     })
     .catch(err => console.log(err));
 

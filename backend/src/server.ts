@@ -16,6 +16,7 @@ import { initWbot } from "./libs/wbot";
 // const wbotMonitor = require("./services/wbotMonitor");
 import Whatsapp from "./models/Whatsapp";
 import wbotMessageListener from "./services/WbotServices/wbotMessageListener";
+import wbotMonitor from "./services/WbotServices/wbotMonitor";
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 
@@ -58,7 +59,7 @@ const startWhatsAppSessions = async () => {
       initWbot(whatsapp)
         .then(() => {
           wbotMessageListener(whatsapp);
-          // wbotMonitor(whatsapp);
+          wbotMonitor(whatsapp);
         })
         .catch(err => console.log(err));
     });
