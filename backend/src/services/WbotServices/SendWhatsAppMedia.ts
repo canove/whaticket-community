@@ -15,14 +15,12 @@ const SendWhatsAppMedia = async ({
 
   const newMedia = MessageMedia.fromFilePath(media.path);
 
-  const mediaUrl = media.filename;
-
   const sentMessage = await wbot.sendMessage(
     `${ticket.contact.number}@c.us`,
     newMedia
   );
 
-  await ticket.update({ lastMessage: mediaUrl });
+  await ticket.update({ lastMessage: media.filename });
   return sentMessage;
 };
 

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-// import { getIO } from "../libs/socket";
 
 import { Message as WbotMessage } from "whatsapp-web.js";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
@@ -10,16 +9,6 @@ import ListMessagesService from "../services/MessageServices/ListMessagesService
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
-
-// import Sequelize from "sequelize";
-// import { MessageMedia } from "whatsapp-web.js";
-// import Message from "../models/Message";
-// import Contact from "../models/Contact";
-// import User from "../models/User";
-// import Whatsapp from "../models/Whatsapp";
-
-// import Ticket from "../models/Ticket";
-// import { getWbot } from "../libs/wbot";
 
 type IndexQuery = {
   searchParam: string;

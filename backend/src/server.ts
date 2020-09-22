@@ -6,16 +6,13 @@ import cors from "cors";
 import multer from "multer";
 import * as Sentry from "@sentry/node";
 
+import "./database";
 import uploadConfig from "./config/upload";
 import AppError from "./errors/AppError";
 import routes from "./routes";
 import { initIO } from "./libs/socket";
-import "./database";
 import { initWbot } from "./libs/wbot";
 
-// import path from "path";
-
-// const wbotMessageListener = require("./services/wbotMessageListener");
 // const wbotMonitor = require("./services/wbotMonitor");
 import Whatsapp from "./models/Whatsapp";
 import wbotMessageListener from "./services/WbotServices/wbotMessageListener";

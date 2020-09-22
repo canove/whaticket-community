@@ -1,11 +1,9 @@
 import { getIO } from "../libs/socket";
-import { getWbot } from "../libs/wbot";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
+import GetTicketWbot from "./GetTicketWbot";
 
 const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
-  const wbot = getWbot(ticket.whatsappId);
-
   await Message.update(
     { read: true },
     {
@@ -17,6 +15,7 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
   );
 
   try {
+    const wbot = await GetTicketWbot(ticket);
     await wbot.sendSeen(`${ticket.contact.number}@c.us`);
   } catch (err) {
     console.log(
