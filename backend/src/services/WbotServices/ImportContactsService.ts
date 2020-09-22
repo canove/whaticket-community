@@ -13,16 +13,19 @@ const ImportContactsService = async (): Promise<void> => {
   try {
     phoneContacts = await wbot.getContacts();
   } catch (err) {
-    throw new AppError(
-      "Could not check whatsapp contact. Check connection page."
+    console.log(
+      "Could not get whatsapp contacts from phone. Check connection page.",
+      err
     );
   }
 
-  await Promise.all(
-    phoneContacts.map(async ({ number, name }) => {
-      await Contact.create({ number, name });
-    })
-  );
+  if (phoneContacts) {
+    await Promise.all(
+      phoneContacts.map(async ({ number, name }) => {
+        await Contact.create({ number, name });
+      })
+    );
+  }
 };
 
 export default ImportContactsService;

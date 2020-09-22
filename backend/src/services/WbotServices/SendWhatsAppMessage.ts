@@ -1,4 +1,5 @@
 import { Message as WbotMessage } from "whatsapp-web.js";
+import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Ticket from "../../models/Ticket";
 
@@ -11,15 +12,22 @@ const SendWhatsAppMessage = async ({
   body,
   ticket
 }: Request): Promise<WbotMessage> => {
-  const wbot = await GetTicketWbot(ticket);
+  try {
+    const wbot = await GetTicketWbot(ticket);
 
-  const sentMessage = await wbot.sendMessage(
-    `${ticket.contact.number}@c.us`,
-    body
-  );
+    const sentMessage = await wbot.sendMessage(
+      `${ticket.contact.number}@c.us`,
+      body
+    );
 
-  await ticket.update({ lastMessage: body });
-  return sentMessage;
+    await ticket.update({ lastMessage: body });
+    return sentMessage;
+  } catch (err) {
+    console.log(err);
+    throw new AppError(
+      "Could not send whatsapp message. Check connections page."
+    );
+  }
 };
 
 export default SendWhatsAppMessage;

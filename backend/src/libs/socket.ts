@@ -6,6 +6,22 @@ let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
   io = socketIo(httpServer);
+  io.on("connection", socket => {
+    console.log("Client Connected");
+    socket.on("joinChatBox", ticketId => {
+      console.log("A client joined a ticket channel");
+      socket.join(ticketId);
+    });
+
+    socket.on("joinNotification", () => {
+      console.log("A client joined notification channel");
+      socket.join("notification");
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Client disconnected");
+    });
+  });
   return io;
 };
 export const getIO = (): SocketIO => {

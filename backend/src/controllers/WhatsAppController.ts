@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
-import { initWbot } from "../libs/wbot";
+import { initWbot, removeWbot } from "../libs/wbot";
 import wbotMessageListener from "../services/WbotServices/wbotMessageListener";
 import wbotMonitor from "../services/WbotServices/wbotMonitor";
 
@@ -32,10 +32,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const { name, status, isDefault }: WhatsappData = req.body;
 
   const whatsapp = await CreateWhatsAppService({ name, status, isDefault });
-
-  // if (!whatsapp) {
-  //   return res.status(400).json({ error: "Cannot create whatsapp session." });
-  // }
 
   initWbot(whatsapp)
     .then(() => {
@@ -70,14 +66,6 @@ export const update = async (
 
   const whatsapp = await UpdateWhatsAppService({ whatsappData, whatsappId });
 
-  // const whatsapp = await Whatsapp.findByPk(whatsappId);
-
-  // if (!whatsapp) {
-  //   return res.status(404).json({ message: "Whatsapp not found" });
-  // }
-
-  // await whatsapp.update(req.body);
-
   const io = getIO();
   io.emit("whatsapp", {
     action: "update",
@@ -94,7 +82,7 @@ export const remove = async (
   const { whatsappId } = req.params;
 
   await DeleteWhatsAppService(whatsappId);
-  // removeWbot(whatsapp.id);
+  removeWbot(+whatsappId);
 
   const io = getIO();
   io.emit("whatsapp", {
