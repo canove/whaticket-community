@@ -146,6 +146,21 @@ const handleMessage = async (
   });
 };
 
+const isValidMsg = (msg: WbotMessage): boolean => {
+  if (msg.from === "status@broadcast" || msg.author) return false;
+  if (
+    msg.type === "chat" ||
+    msg.type === "audio" ||
+    msg.type === "ptt" ||
+    msg.type === "video" ||
+    msg.type === "image" ||
+    msg.type === "document" ||
+    msg.type === "vcard"
+  )
+    return true;
+  return false;
+};
+
 const wbotMessageListener = (whatsapp: Whatsapp): void => {
   const whatsappId = whatsapp.id;
   const wbot = getWbot(whatsappId);
@@ -159,12 +174,7 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
   wbot.on("message_create", async msg => {
     console.log(msg.type);
 
-    if (
-      msg.from === "status@broadcast" ||
-      msg.type === "location" ||
-      msg.type === "call_log" ||
-      msg.author // Ignore Group Messages
-    ) {
+    if (!isValidMsg(msg)) {
       return;
     }
 
