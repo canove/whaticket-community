@@ -29,15 +29,6 @@ app.use(upload.single("media"));
 app.use("/public", express.static(uploadConfig.directory));
 app.use(routes);
 
-app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ error: err.message });
-  }
-
-  console.error(err);
-  return res.status(500).json({ error: "Internal server error" });
-});
-
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server started on port: ${process.env.PORT}`);
 });
@@ -75,14 +66,13 @@ const startWhatsAppSessions = async () => {
 };
 startWhatsAppSessions();
 
-// app.use(Sentry.Handlers.errorHandler());
+app.use(Sentry.Handlers.errorHandler());
 
-// app.use(async (err, req, res, next) => {
-// 	if (process.env.NODE_ENV === "DEVELOPMENT") {
-// 		const errors = await new Youch(err, req).toJSON();
-// 		console.log(err);
-// 		return res.status(500).json(errors);
-// 	}
+app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({ error: err.message });
+  }
 
-// 	return res.status(500).json({ error: "Internal server error" });
-// });
+  console.error(err);
+  return res.status(500).json({ error: "Internal server error" });
+});
