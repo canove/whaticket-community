@@ -7,7 +7,8 @@ import ShowContactService from "../services/ContactServices/ShowContactService";
 import UpdateContactService from "../services/ContactServices/UpdateContactService";
 import DeleteContactService from "../services/ContactServices/DeleteContactService";
 
-// const { getWbot } = require("../libs/wbot");
+import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
+import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 
 type IndexQuery = {
   searchParam: string;
@@ -37,53 +38,16 @@ interface ContactData {
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { name, number, email, extraInfo }: ContactData = req.body;
+  const newContact: ContactData = req.body;
+
+  await CheckIsValidContact(newContact.number);
+
+  const profilePicUrl = await GetProfilePicUrl(newContact.number);
 
   const contact = await CreateContactService({
-    name,
-    number,
-    email,
-    extraInfo
+    ...newContact,
+    profilePicUrl
   });
-
-  // const defaultWhatsapp = await Whatsapp.findOne({
-  //   where: { default: true }
-  // });
-
-  // if (!defaultWhatsapp) {
-  //   return res
-  //     .status(404)
-  //     .json({ error: "No default WhatsApp found. Check Connection page." });
-  // }
-
-  // const wbot = getWbot(defaultWhatsapp);
-
-  // try {
-  //   const isValidNumber = await wbot.isRegisteredUser(
-  //     `${newContact.number}@c.us`
-  //   );
-  //   if (!isValidNumber) {
-  //     return res
-  //       .status(400)
-  //       .json({ error: "The suplied number is not a valid Whatsapp number" });
-  //   }
-  // } catch (err) {
-  //   console.log(err);
-  //   return res.status(500).json({
-  //     error: "Could not check whatsapp contact. Check connection page."
-  //   });
-  // }
-
-  // const profilePicUrl = await wbot.getProfilePicUrl(
-  //   `${newContact.number}@c.us`
-  // );
-
-  // const contact = await Contact.create(
-  //   { ...newContact, profilePicUrl },
-  //   {
-  //     include: "extraInfo"
-  //   }
-  // );
 
   const io = getIO();
   io.emit("contact", {

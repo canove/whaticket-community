@@ -1,9 +1,18 @@
+import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 
+interface MessageData {
+  id: string;
+  body: string;
+  fromMe: boolean;
+  read: boolean;
+  mediaType: string;
+  mediaUrl?: string;
+}
 interface Request {
-  ticketId: string;
-  messageData: Message;
+  ticketId: string | number;
+  messageData: MessageData;
 }
 
 const CreateMessageService = async ({
@@ -13,10 +22,10 @@ const CreateMessageService = async ({
   const ticket = await ShowTicketService(ticketId);
 
   if (!ticket) {
-    throw new Error("No ticket found with this ID");
+    throw new AppError("No ticket found with this ID");
   }
 
-  const message = Message.create({ ...messageData, ticketId });
+  const message: Message = await ticket.$create("message", messageData);
 
   return message;
 };

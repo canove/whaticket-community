@@ -124,7 +124,6 @@ const handleMessage = async (
   ticket: Ticket,
   contact: Contact
 ) => {
-  const io = getIO();
   let newMessage: Message;
 
   if (msg.hasMedia) {
@@ -138,6 +137,7 @@ const handleMessage = async (
     await ticket.update({ lastMessage: msg.body });
   }
 
+  const io = getIO();
   io.to(ticket.id.toString()).to("notification").emit("appMessage", {
     action: "create",
     message: newMessage,
@@ -157,7 +157,7 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
   }
 
   wbot.on("message_create", async msg => {
-    // console.log(msg);
+    console.log(msg.type);
 
     if (
       msg.from === "status@broadcast" ||

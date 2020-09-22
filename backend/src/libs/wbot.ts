@@ -2,6 +2,7 @@ import qrCode from "qrcode-terminal";
 import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
+import AppError from "../errors/AppError";
 
 interface Session extends Client {
   id?: number;
@@ -10,7 +11,6 @@ interface Session extends Client {
 const sessions: Session[] = [];
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<void> => {
-  console.log("starting");
   try {
     const io = getIO();
     const sessionName = whatsapp.name;
@@ -26,7 +26,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<void> => {
       sessions.splice(sessionIndex, 1);
     }
 
-    const wbot = new Client({
+    const wbot: Session = new Client({
       session: sessionCfg,
       restartOnAuthFail: true
     });
@@ -88,12 +88,11 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<void> => {
   }
 };
 
-export const getWbot = (whatsappId: number): Session | null => {
+export const getWbot = (whatsappId: number): Session => {
   const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
   if (sessionIndex === -1) {
-    console.log("This Wbot session is not initialized");
-    return null;
+    throw new AppError("This WhatsApp session is not initialized.");
   }
   return sessions[sessionIndex];
 };

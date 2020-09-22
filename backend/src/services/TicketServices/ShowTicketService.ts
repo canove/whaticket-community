@@ -21,7 +21,7 @@ const ShowTicketService = async (id: string | number): Promise<Ticket> => {
   });
 
   if (!ticket) {
-    throw new AppError("No ticket found with this conditions.", 404);
+    throw new AppError("No ticket found with this ID");
   }
 
   return ticket;
