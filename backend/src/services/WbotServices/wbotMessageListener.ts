@@ -166,11 +166,6 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
   const wbot = getWbot(whatsappId);
   const io = getIO();
 
-  if (!wbot) {
-    console.log("Wbot not initialized");
-    return;
-  }
-
   wbot.on("message_create", async msg => {
     console.log(msg.type);
 
