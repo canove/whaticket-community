@@ -147,7 +147,7 @@ const handleMessage = async (
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {
-  if (msg.from === "status@broadcast" || msg.author) return false;
+  if (msg.author) return false;
   if (
     msg.type === "chat" ||
     msg.type === "audio" ||
