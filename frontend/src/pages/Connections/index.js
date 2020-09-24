@@ -262,7 +262,7 @@ const Connections = () => {
 												{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
 											</TableCell>
 											<TableCell align="center">
-												{whatsApp.default && (
+												{whatsApp.isDefault && (
 													<CheckCircle style={{ color: green[500] }} />
 												)}
 											</TableCell>

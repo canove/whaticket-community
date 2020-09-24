@@ -64,24 +64,70 @@ Install puppeteer dependencies:
 sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils
 ```
 
-- Clone this repo
-- On backend folder:
-  - Copy .env.example to .env and fill it with database details.
-  - Install dependecies: `npm install` (Only in the first time)
-  - Create database tables: `npx sequelize db:migrate` (Only in the first time)
-  - Fill database with initial values: `npx sequelize db:seed:all`
-  - Start backend: `npm start`
-- In another terminal, on frontend folder:
-  - Copy .env.example to .env and fill it with backend URL (normally localhost:port)
-  - Install dependecies: `npm install` (Only in the first time)
-  - Start frontend: `npm start`
+Clone this repo
+
+```bash
+git clone https://github.com/canove/whaticket/ whaticket
+```
+
+Go to backend folder and create .env file:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Fill `.env` file with environment variables:
+
+```bash
+NODE_ENV=DEVELOPMENT #it helps on debugging
+BACKEND_URL=http://localhost
+PROXY_PORT=8080
+PORT=8080
+
+DB_HOST= #DB host IP, usually localhost
+DB_USER=
+DB_PASS=
+DB_NAME=
+```
+
+Install backend dependencies, build app, run migrations and seeds:
+
+```bash
+npm install
+npm build
+npx sequelize db:migrate
+npx sequelize db:seed:all
+```
+
+Start backend:
+
+```bash
+npm start
+```
+
+Open a second terminal, go to frontend folder and create .env file:
+
+```bash
+nano .env
+REACT_APP_BACKEND_URL = http://localhost:8080/ # Your previous configured backend app URL.
+```
+
+Start frontend app:
+
+```bash
+npm start
+```
+
 - Go to http://your_server_ip:3000/signup
 - Create an user and login with it.
-- On the sidebard, go to _Connections_ and create your first WhatsApp connection.
+- On the sidebard, go to _Connections_ page and create your first WhatsApp connection.
 - Wait for QR CODE button to appear, click it and read qr code.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
 ## Basic production deployment (Ubuntu 18.04 VPS)
+
+All instructions below assumes you are NOT running as root, since it will give error in puppeteer. See
 
 You'll need two subdomains forwarding to yours VPS ip to follow these instructions. We'll use `myapp.mydomain.com` to frontend and `api.mydomain.com` to backend in the following example. We'll also use an dedicated user with sudo privileges no deploy it (not root).
 
@@ -152,11 +198,12 @@ Install puppeteer dependencies:
 sudo apt-get install -y libgbm-dev wget unzip fontconfig locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils
 ```
 
-Install backend dependencies, run migrations and seeds:
+Install backend dependencies, build app, run migrations and seeds:
 
 ```bash
 cd whaticket/backend
 npm install
+npm build
 npx sequelize db:migrate
 npx sequelize db:seed:all
 ```

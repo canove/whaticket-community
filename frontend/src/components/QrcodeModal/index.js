@@ -12,6 +12,8 @@ const QrcodeModal = ({ open, onClose, whatsAppId }) => {
 
 	useEffect(() => {
 		const fetchSession = async () => {
+			if (!whatsAppId) return;
+
 			try {
 				const { data } = await api.get(`/whatsapp/${whatsAppId}`);
 				setQrCode(data.qrcode);

@@ -1,39 +1,58 @@
 {
-	"name": "backend",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"start": "nodemon src/app.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"nodemonConfig": {
-		"ignore": [
-			"controllers/session.json"
-		]
-	},
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"@sentry/node": "5.22.3",
-		"bcryptjs": "^2.4.3",
-		"cors": "^2.8.5",
-		"date-fns": "^2.16.1",
-		"dotenv": "^8.2.0",
-		"express": "^4.17.1",
-		"express-async-errors": "^3.1.1",
-		"jsonwebtoken": "^8.5.1",
-		"multer": "^1.4.2",
-		"mysql2": "^2.1.0",
-		"qrcode-terminal": "^0.12.0",
-		"sequelize": "^6.3.5",
-		"socket.io": "^2.3.0",
-		"whatsapp-web.js": "^1.8.2",
-		"youch": "^2.0.10",
-		"yup": "^0.29.3"
-	},
-	"devDependencies": {
-		"nodemon": "^2.0.4",
-		"sequelize-cli": "^6.2.0"
-	}
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "nodemon dist/server.js",
+    "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@sentry/node": "5.22.3",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "date-fns": "^2.16.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
+    "mysql2": "^2.1.0",
+    "qrcode-terminal": "^0.12.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "5",
+    "sequelize-cli": "5",
+    "sequelize-typescript": "^1.1.0",
+    "socket.io": "^2.3.0",
+    "whatsapp-web.js": "^1.8.2",
+    "yup": "^0.29.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/bluebird": "^3.5.32",
+    "@types/cors": "^2.8.7",
+    "@types/express": "^4.17.8",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/multer": "^1.4.4",
+    "@types/node": "^14.10.1",
+    "@types/socket.io": "^2.1.11",
+    "@types/validator": "^13.1.0",
+    "@types/yup": "^0.29.7",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.9.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.1.1",
+    "ts-node-dev": "^1.0.0-pre.62",
+    "typescript": "^4.0.2"
+  }
 }
