@@ -82,7 +82,10 @@ const NotificationsPopOver = () => {
 	}, [history, ticketId, userId]);
 
 	const { tickets: openTickets } = useTickets({ status: "open" });
-	const { tickets: pendingTickets } = useTickets({ status: "pending" });
+	const { tickets: pendingTickets } = useTickets({
+		status: "pending",
+		showAll: true,
+	});
 
 	useEffect(() => {
 		if (openTickets.length > 0 || pendingTickets.length > 0) {
@@ -136,9 +139,8 @@ const NotificationsPopOver = () => {
 		setIsOpen(false);
 	}, [setIsOpen]);
 
-	const handleSelectTicket = (e, ticket) => {
-		history.push(`/tickets/${ticket.id}`);
-		handleClickAway();
+	const NotificationTicket = ({ children }) => {
+		return <div onClick={handleClickAway}>{children}</div>;
 	};
 
 	return (
@@ -175,11 +177,9 @@ const NotificationsPopOver = () => {
 						</ListItem>
 					) : (
 						notifications.map(ticket => (
-							<TicketListItem
-								key={ticket.id}
-								ticket={ticket}
-								handleSelectTicket={handleSelectTicket}
-							/>
+							<NotificationTicket key={ticket.id}>
+								<TicketListItem ticket={ticket} />
+							</NotificationTicket>
 						))
 					)}
 				</List>

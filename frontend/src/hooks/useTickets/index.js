@@ -79,6 +79,7 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
+			console.log(showAll);
 			const fetchTickets = async () => {
 				try {
 					const { data } = await api.get("/tickets", {
