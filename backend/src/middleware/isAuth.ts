@@ -21,13 +21,17 @@ const isAuth = (req: Request, res: Response, next: NextFunction): void => {
 
   const [, token] = authHeader.split(" ");
 
-  const decoded = verify(token, authConfig.secret);
-  const { id, profile } = decoded as TokenPayload;
+  try {
+    const decoded = verify(token, authConfig.secret);
+    const { id, profile } = decoded as TokenPayload;
 
-  req.user = {
-    id,
-    profile
-  };
+    req.user = {
+      id,
+      profile
+    };
+  } catch (err) {
+    throw new AppError("Invalid token.", 403);
+  }
 
   return next();
 };
