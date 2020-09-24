@@ -21,6 +21,12 @@ const ListMessagesService = async ({
   pageNumber = "1",
   ticketId
 }: Request): Promise<Response> => {
+  const ticket = await ShowTicketService(ticketId);
+
+  if (!ticket) {
+    throw new Error("No ticket found with this ID");
+  }
+
   const whereCondition = {
     body: where(
       fn("LOWER", col("body")),
@@ -29,12 +35,6 @@ const ListMessagesService = async ({
     ),
     ticketId
   };
-
-  const ticket = await ShowTicketService(ticketId);
-
-  if (!ticket) {
-    throw new Error("No ticket found with this ID");
-  }
 
   // await setMessagesAsRead(ticket);
   const limit = 20;

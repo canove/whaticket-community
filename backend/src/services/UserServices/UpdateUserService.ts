@@ -26,6 +26,15 @@ const UpdateUserService = async ({
   userData,
   userId
 }: Request): Promise<Response | undefined> => {
+  const user = await User.findOne({
+    where: { id: userId },
+    attributes: ["name", "id", "email", "profile"]
+  });
+
+  if (!user) {
+    throw new AppError("No user found with this ID.", 404);
+  }
+
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
     email: Yup.string().email(),
@@ -38,15 +47,6 @@ const UpdateUserService = async ({
     await schema.validate({ email, password, name });
   } catch (err) {
     throw new AppError(err.message);
-  }
-
-  const user = await User.findOne({
-    where: { id: userId },
-    attributes: ["name", "id", "email", "profile"]
-  });
-
-  if (!user) {
-    throw new AppError("No user found with this ID.", 404);
   }
 
   await user.update({
