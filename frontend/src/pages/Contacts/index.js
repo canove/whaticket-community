@@ -182,7 +182,9 @@ const Contacts = () => {
 			window.location.reload(false);
 		} catch (err) {
 			console.log(err);
-			window.location.reload(false);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 
@@ -210,8 +212,8 @@ const Contacts = () => {
 				title={
 					deletingContact
 						? `${i18n.t("contacts.confirmationModal.deleteTitle")} ${
-								deletingContact.name
-						  }?`
+						deletingContact.name
+						}?`
 						: `${i18n.t("contacts.confirmationModal.importTitlte")}`
 				}
 				open={confirmOpen}
