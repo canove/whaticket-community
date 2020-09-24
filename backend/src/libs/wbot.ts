@@ -92,7 +92,9 @@ export const getWbot = (whatsappId: number): Session => {
   const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
   if (sessionIndex === -1) {
-    throw new AppError("This WhatsApp session is not initialized.");
+    throw new AppError(
+      "This WhatsApp session is not initialized. Check connections page."
+    );
   }
   return sessions[sessionIndex];
 };

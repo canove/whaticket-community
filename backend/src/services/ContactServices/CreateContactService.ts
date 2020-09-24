@@ -28,8 +28,6 @@ const CreateContactService = async ({
     throw new AppError("A contact with this number already exists.");
   }
 
-  console.log("extra", extraInfo);
-
   const contact = await Contact.create(
     {
       name,
