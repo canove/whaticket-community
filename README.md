@@ -95,7 +95,7 @@ Install backend dependencies, build app, run migrations and seeds:
 
 ```bash
 npm install
-npm build
+npm run build
 npx sequelize db:migrate
 npx sequelize db:seed:all
 ```
@@ -203,7 +203,7 @@ Install backend dependencies, build app, run migrations and seeds:
 ```bash
 cd whaticket/backend
 npm install
-npm build
+npm run build
 npx sequelize db:migrate
 npx sequelize db:seed:all
 ```
