@@ -214,7 +214,7 @@ Install pm2 **with sudo**, and start backend with it:
 
 ```bash
 sudo npm install -g pm2
-pm2 start src/app.js --name whaticket-backend
+pm2 start dist/server.js --name whaticket-backend
 ```
 
 Make pm2 auto start afeter reboot:
