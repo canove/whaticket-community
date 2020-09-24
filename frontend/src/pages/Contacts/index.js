@@ -179,7 +179,6 @@ const Contacts = () => {
 	const handleimportContact = async () => {
 		try {
 			await api.post("/contacts/import");
-			window.location.reload(false);
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -212,8 +211,8 @@ const Contacts = () => {
 				title={
 					deletingContact
 						? `${i18n.t("contacts.confirmationModal.deleteTitle")} ${
-						deletingContact.name
-						}?`
+								deletingContact.name
+						  }?`
 						: `${i18n.t("contacts.confirmationModal.importTitlte")}`
 				}
 				open={confirmOpen}
