@@ -12,6 +12,7 @@ interface Request {
   date?: string;
   showAll?: string;
   userId: string;
+  withUnreadMessages?: string;
 }
 
 interface Response {
@@ -26,24 +27,24 @@ const ListTicketsService = async ({
   status,
   date,
   showAll,
-  userId
+  userId,
+  withUnreadMessages
 }: Request): Promise<Response> => {
-  let whereCondition: Filterable["where"];
+  let whereCondition: Filterable["where"] = {
+    [Op.or]: [{ userId }, { status: "pending" }]
+  };
   let includeCondition: Includeable[];
 
   includeCondition = [
     {
       model: Contact,
       as: "contact",
-      attributes: ["id", "name", "number", "profilePicUrl"],
-      include: ["extraInfo"]
+      attributes: ["id", "name", "number", "profilePicUrl"]
     }
   ];
 
   if (showAll === "true") {
     whereCondition = {};
-  } else {
-    whereCondition = { userId };
   }
 
   if (status) {
@@ -100,6 +101,21 @@ const ListTicketsService = async ({
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       }
     };
+  }
+
+  if (withUnreadMessages === "true") {
+    includeCondition = [
+      ...includeCondition,
+      {
+        model: Message,
+        as: "messages",
+        attributes: [],
+        where: {
+          read: false,
+          fromMe: false
+        }
+      }
+    ];
   }
 
   const limit = 20;

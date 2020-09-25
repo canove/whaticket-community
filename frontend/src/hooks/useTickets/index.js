@@ -24,7 +24,7 @@ const reducer = (state, action) => {
 	}
 
 	if (action.type === "UPDATE_TICKETS") {
-		const { ticket, status, loggedUser } = action.payload;
+		const { ticket, status, loggedUser, withUnreadMessages } = action.payload;
 
 		const ticketIndex = state.findIndex(t => t.id === ticket.id);
 		if (ticketIndex !== -1) {
@@ -41,6 +41,8 @@ const reducer = (state, action) => {
 				ticket.status === "closed")
 		) {
 			state.unshift(ticket);
+		} else if (withUnreadMessages) {
+			state.unshift(ticket);
 		}
 		return [...state];
 	}
@@ -56,11 +58,14 @@ const reducer = (state, action) => {
 	}
 
 	if (action.type === "RESET_UNREAD") {
-		const ticketId = action.payload;
+		const { ticketId, withUnreadMessages } = action.payload;
 
 		const ticketIndex = state.findIndex(t => t.id === ticketId);
 		if (ticketIndex !== -1) {
 			state[ticketIndex].unreadMessages = 0;
+			if (withUnreadMessages) {
+				state.splice(ticketIndex, 1);
+			}
 		}
 		return [...state];
 	}
@@ -70,7 +75,14 @@ const reducer = (state, action) => {
 	}
 };
 
-const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
+const useTickets = ({
+	searchParam,
+	pageNumber,
+	status,
+	date,
+	showAll,
+	withUnreadMessages,
+}) => {
 	const userId = +localStorage.getItem("userId");
 	const [loading, setLoading] = useState(true);
 	const [hasMore, setHasMore] = useState(false);
@@ -79,7 +91,6 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
-			console.log(showAll);
 			const fetchTickets = async () => {
 				try {
 					const { data } = await api.get("/tickets", {
@@ -89,6 +100,7 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 							status,
 							date,
 							showAll,
+							withUnreadMessages,
 						},
 					});
 					dispatch({
@@ -107,7 +119,7 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 			fetchTickets();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, status, date, showAll]);
+	}, [searchParam, pageNumber, status, date, showAll, withUnreadMessages]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
@@ -115,7 +127,13 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 
 		socket.on("ticket", data => {
 			if (data.action === "updateUnread") {
-				dispatch({ type: "RESET_UNREAD", payload: data.ticketId });
+				dispatch({
+					type: "RESET_UNREAD",
+					payload: {
+						ticketId: data.ticketId,
+						withUnreadMessages: withUnreadMessages,
+					},
+				});
 			}
 
 			if (data.action === "updateStatus" || data.action === "create") {
@@ -141,6 +159,7 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 					payload: {
 						ticket: data.ticket,
 						status: status,
+						withUnreadMessages: withUnreadMessages,
 						loggedUser: userId,
 					},
 				});
@@ -150,7 +169,7 @@ const useTickets = ({ searchParam, pageNumber, status, date, showAll }) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, userId]);
+	}, [status, withUnreadMessages, userId]);
 
 	return { loading, tickets, hasMore, dispatch };
 };

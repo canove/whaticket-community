@@ -167,8 +167,6 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
   const io = getIO();
 
   wbot.on("message_create", async msg => {
-    console.log(msg.type);
-
     if (!isValidMsg(msg)) {
       return;
     }

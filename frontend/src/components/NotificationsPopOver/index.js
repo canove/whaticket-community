@@ -49,7 +49,7 @@ const NotificationsPopOver = () => {
 	const ticketId = +history.location.pathname.split("/")[2];
 	const anchorEl = useRef();
 	const [isOpen, setIsOpen] = useState(false);
-	const [notifications, setNotifications] = useState([]);
+	// const [notifications, setNotifications] = useState([]);
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -81,30 +81,7 @@ const NotificationsPopOver = () => {
 		};
 	}, [history, ticketId, userId]);
 
-	const { tickets: openTickets } = useTickets({ status: "open" });
-	const { tickets: pendingTickets } = useTickets({
-		status: "pending",
-		showAll: true,
-	});
-
-	useEffect(() => {
-		if (openTickets.length > 0 || pendingTickets.length > 0) {
-			let aux = [];
-
-			openTickets.forEach(ticket => {
-				if (ticket.unreadMessages > 0) {
-					aux.push(ticket);
-				}
-			});
-			pendingTickets.forEach(ticket => {
-				if (ticket.unreadMessages > 0) {
-					aux.push(ticket);
-				}
-			});
-
-			setNotifications(aux);
-		}
-	}, [openTickets, pendingTickets]);
+	const { tickets: notifications } = useTickets({ withUnreadMessages: "true" });
 
 	const showDesktopNotification = ({ message, contact, ticket }) => {
 		const options = {
@@ -176,6 +153,8 @@ const NotificationsPopOver = () => {
 							<ListItemText>No tickets with unread messages.</ListItemText>
 						</ListItem>
 					) : (
+						notifications &&
+						notifications.length > 0 &&
 						notifications.map(ticket => (
 							<NotificationTicket key={ticket.id}>
 								<TicketListItem ticket={ticket} />
