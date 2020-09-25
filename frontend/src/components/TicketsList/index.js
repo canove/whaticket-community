@@ -96,6 +96,7 @@ const reducer = (state, action) => {
 		if (ticketIndex !== -1) {
 			state[ticketIndex].unreadMessages = 0;
 		}
+
 		return [...state];
 	}
 
@@ -108,6 +109,7 @@ const reducer = (state, action) => {
 		} else {
 			state.unshift(ticket);
 		}
+
 		return [...state];
 	}
 
@@ -119,6 +121,7 @@ const reducer = (state, action) => {
 			state[ticketIndex] = ticket;
 			state.unshift(state.splice(ticketIndex, 1)[0]);
 		}
+
 		return [...state];
 	}
 
@@ -128,6 +131,7 @@ const reducer = (state, action) => {
 		if (ticketIndex !== -1) {
 			state.splice(ticketIndex, 1);
 		}
+
 		return [...state];
 	}
 

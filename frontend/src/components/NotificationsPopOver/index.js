@@ -49,7 +49,9 @@ const NotificationsPopOver = () => {
 	const ticketId = +history.location.pathname.split("/")[2];
 	const anchorEl = useRef();
 	const [isOpen, setIsOpen] = useState(false);
-	// const [notifications, setNotifications] = useState([]);
+	const [notifications, setNotifications] = useState([]);
+
+	const { tickets } = useTickets({ withUnreadMessages: "true" });
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -60,11 +62,40 @@ const NotificationsPopOver = () => {
 	}, []);
 
 	useEffect(() => {
+		setNotifications(tickets);
+	}, [tickets]);
+
+	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 		socket.emit("joinNotification");
 
+		socket.on("ticket", data => {
+			if (data.action === "updateUnread") {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticketId);
+					if (ticketIndex !== -1) {
+						prevState.splice(ticketIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+			}
+		});
+
 		socket.on("appMessage", data => {
-			if (data.action === "create") {
+			if (
+				(data.action === "create" && data.ticket.userId === userId) ||
+				!data.ticket.userId
+			) {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticket.id);
+					if (ticketIndex !== -1) {
+						prevState[ticketIndex] = data.ticket;
+						return [...prevState];
+					}
+					return [data.ticket, ...prevState];
+				});
+
 				if (
 					(ticketId &&
 						data.message.ticketId === +ticketId &&
@@ -80,8 +111,6 @@ const NotificationsPopOver = () => {
 			socket.disconnect();
 		};
 	}, [history, ticketId, userId]);
-
-	const { tickets: notifications } = useTickets({ withUnreadMessages: "true" });
 
 	const showDesktopNotification = ({ message, contact, ticket }) => {
 		const options = {
