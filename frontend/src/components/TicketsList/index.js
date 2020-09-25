@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
+import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -69,11 +70,84 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_TICKETS") {
+		const newTickets = action.payload;
+
+		newTickets.forEach(ticket => {
+			const ticketIndex = state.findIndex(t => t.id === ticket.id);
+			if (ticketIndex !== -1) {
+				state[ticketIndex] = ticket;
+				if (ticket.unreadMessages > 0) {
+					state.unshift(state.splice(ticketIndex, 1)[0]);
+				}
+			} else {
+				state.push(ticket);
+			}
+		});
+
+		return [...state];
+	}
+
+	if (action.type === "RESET_UNREAD") {
+		const ticketId = action.payload;
+
+		const ticketIndex = state.findIndex(t => t.id === ticketId);
+		if (ticketIndex !== -1) {
+			state[ticketIndex].unreadMessages = 0;
+		}
+		return [...state];
+	}
+
+	if (action.type === "UPDATE_TICKET") {
+		const ticket = action.payload;
+
+		const ticketIndex = state.findIndex(t => t.id === ticket.id);
+		if (ticketIndex !== -1) {
+			state[ticketIndex] = ticket;
+		} else {
+			state.unshift(ticket);
+		}
+		return [...state];
+	}
+
+	if (action.type === "UPDATE_TICKET_MESSAGES_COUNT") {
+		const ticket = action.payload;
+
+		const ticketIndex = state.findIndex(t => t.id === ticket.id);
+		if (ticketIndex !== -1) {
+			state[ticketIndex] = ticket;
+			state.unshift(state.splice(ticketIndex, 1)[0]);
+		}
+		return [...state];
+	}
+
+	if (action.type === "DELETE_TICKET") {
+		const ticketId = action.payload;
+		const ticketIndex = state.findIndex(t => t.id === ticketId);
+		if (ticketIndex !== -1) {
+			state.splice(ticketIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
+
 const TicketsList = ({ status, searchParam, showAll }) => {
+	const userId = +localStorage.getItem("userId");
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
+	const [ticketsList, dispatch] = useReducer(reducer, []);
 
-	const { tickets, hasMore, loading, dispatch } = useTickets({
+	useEffect(() => {
+		dispatch({ type: "RESET" });
+		setPageNumber(1);
+	}, [status, searchParam, dispatch, showAll]);
+
+	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
 		searchParam,
 		status,
@@ -81,9 +155,52 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 	});
 
 	useEffect(() => {
-		dispatch({ type: "RESET" });
-		setPageNumber(1);
-	}, [status, searchParam, dispatch, showAll]);
+		dispatch({
+			type: "LOAD_TICKETS",
+			payload: tickets,
+		});
+	}, [tickets]);
+
+	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		socket.emit("joinTickets", status);
+
+		socket.on("ticket", data => {
+			if (data.action === "updateUnread") {
+				dispatch({
+					type: "RESET_UNREAD",
+					payload: data.ticketId,
+				});
+			}
+
+			if (
+				(data.action === "updateStatus" || data.action === "create") &&
+				(!data.ticket.userId || data.ticket.userId === userId || showAll)
+			) {
+				dispatch({
+					type: "UPDATE_TICKET",
+					payload: data.ticket,
+				});
+			}
+
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
+			}
+		});
+
+		socket.on("appMessage", data => {
+			if (data.action === "create") {
+				dispatch({
+					type: "UPDATE_TICKET_MESSAGES_COUNT",
+					payload: data.ticket,
+				});
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [status, showAll, userId]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
@@ -91,7 +208,9 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 
 	const handleScroll = e => {
 		if (!hasMore || loading) return;
+
 		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
 		if (scrollHeight - (scrollTop + 100) < clientHeight) {
 			loadMore();
 		}
@@ -110,16 +229,16 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 					{status === "open" && (
 						<div className={classes.ticketsListHeader}>
 							{i18n.t("ticketsList.assignedHeader")}
-							<span className={classes.ticketsCount}>{tickets.length}</span>
+							<span className={classes.ticketsCount}>{ticketsList.length}</span>
 						</div>
 					)}
 					{status === "pending" && (
 						<div className={classes.ticketsListHeader}>
 							{i18n.t("ticketsList.pendingHeader")}
-							<span className={classes.ticketsCount}>{tickets.length}</span>
+							<span className={classes.ticketsCount}>{ticketsList.length}</span>
 						</div>
 					)}
-					{tickets.length === 0 && !loading ? (
+					{ticketsList.length === 0 && !loading ? (
 						<div className={classes.noTicketsDiv}>
 							<span className={classes.noTicketsTitle}>
 								{i18n.t("ticketsList.noTicketsTitle")}
@@ -130,7 +249,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 						</div>
 					) : (
 						<>
-							{tickets.map(ticket => (
+							{ticketsList.map(ticket => (
 								<TicketListItem ticket={ticket} key={ticket.id} />
 							))}
 						</>

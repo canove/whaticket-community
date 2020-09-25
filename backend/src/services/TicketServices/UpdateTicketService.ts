@@ -12,10 +12,15 @@ interface Request {
   ticketId: string;
 }
 
+interface Response {
+  ticket: Ticket;
+  oldStatus: string;
+}
+
 const UpdateTicketService = async ({
   ticketData,
   ticketId
-}: Request): Promise<Ticket> => {
+}: Request): Promise<Response> => {
   const { status, userId } = ticketData;
 
   const ticket = await Ticket.findOne({
@@ -33,12 +38,14 @@ const UpdateTicketService = async ({
     throw new AppError("No ticket found with this ID.", 404);
   }
 
+  const oldStatus = ticket.status;
+
   await ticket.update({
     status,
     userId
   });
 
-  return ticket;
+  return { ticket, oldStatus };
 };
 
 export default UpdateTicketService;

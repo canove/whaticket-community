@@ -4,12 +4,14 @@ import Ticket from "../../models/Ticket";
 
 interface Request {
   contactId: number;
-  status?: string;
+  status: string;
+  userId: number;
 }
 
 const CreateTicketService = async ({
   contactId,
-  status
+  status,
+  userId
 }: Request): Promise<Ticket> => {
   const defaultWhatsapp = await GetDefaultWhatsApp();
 
@@ -19,7 +21,8 @@ const CreateTicketService = async ({
 
   const { id }: Ticket = await defaultWhatsapp.$create("ticket", {
     contactId,
-    status
+    status,
+    userId
   });
 
   const ticket = await Ticket.findByPk(id, { include: ["contact"] });

@@ -66,7 +66,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.to(ticketId).to("notification").emit("appMessage", {
+  io.to(ticketId).to("notification").to(ticket.status).emit("appMessage", {
     action: "create",
     message,
     ticket,

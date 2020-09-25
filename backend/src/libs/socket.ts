@@ -18,6 +18,11 @@ export const initIO = (httpServer: Server): SocketIO => {
       socket.join("notification");
     });
 
+    socket.on("joinTickets", status => {
+      console.log(`A client joined to ${status} tickets channel.`);
+      socket.join(status);
+    });
+
     socket.on("disconnect", () => {
       console.log("Client disconnected");
     });
