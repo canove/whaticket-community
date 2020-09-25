@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 
+import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import openSocket from "socket.io-client";
 
@@ -14,8 +15,6 @@ import ChatIcon from "@material-ui/icons/Chat";
 
 import TicketListItem from "../TicketListItem";
 
-// import { toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
 import { i18n } from "../../translate/i18n";
 
 import useTickets from "../../hooks/useTickets";
@@ -46,7 +45,8 @@ const NotificationsPopOver = () => {
 	const history = useHistory();
 	const userId = +localStorage.getItem("userId");
 	const soundAlert = useRef(new Audio(require("../../assets/sound.mp3")));
-	const ticketId = +history.location.pathname.split("/")[2];
+	const ticketIdUrl = +history.location.pathname.split("/")[2];
+	const ticketIdRef = useRef(ticketIdUrl);
 	const anchorEl = useRef();
 	const [isOpen, setIsOpen] = useState(false);
 	const [notifications, setNotifications] = useState([]);
@@ -66,7 +66,12 @@ const NotificationsPopOver = () => {
 	}, [tickets]);
 
 	useEffect(() => {
+		ticketIdRef.current = ticketIdUrl;
+	}, [ticketIdUrl]);
+
+	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.emit("joinNotification");
 
 		socket.on("ticket", data => {
@@ -84,8 +89,8 @@ const NotificationsPopOver = () => {
 
 		socket.on("appMessage", data => {
 			if (
-				(data.action === "create" && data.ticket.userId === userId) ||
-				!data.ticket.userId
+				data.action === "create" &&
+				(data.ticket.userId === userId || !data.ticket.userId)
 			) {
 				setNotifications(prevState => {
 					const ticketIndex = prevState.findIndex(t => t.id === data.ticket.id);
@@ -97,8 +102,8 @@ const NotificationsPopOver = () => {
 				});
 
 				if (
-					(ticketId &&
-						data.message.ticketId === +ticketId &&
+					(ticketIdRef.current &&
+						data.message.ticketId === ticketIdRef.current &&
 						document.visibilityState === "visible") ||
 					(data.ticket.userId !== userId && data.ticket.userId)
 				)
@@ -110,7 +115,7 @@ const NotificationsPopOver = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [history, ticketId, userId]);
+	}, [userId]);
 
 	const showDesktopNotification = ({ message, contact, ticket }) => {
 		const options = {
@@ -125,7 +130,7 @@ const NotificationsPopOver = () => {
 
 		notification.onclick = function (event) {
 			event.preventDefault(); //
-			window.open(`/tickets/${ticket.id}`, "_self");
+			history.push(`/tickets/${ticket.id}`);
 		};
 
 		document.addEventListener("visibilitychange", () => {
@@ -182,8 +187,6 @@ const NotificationsPopOver = () => {
 							<ListItemText>No tickets with unread messages.</ListItemText>
 						</ListItem>
 					) : (
-						notifications &&
-						notifications.length > 0 &&
 						notifications.map(ticket => (
 							<NotificationTicket key={ticket.id}>
 								<TicketListItem ticket={ticket} />
