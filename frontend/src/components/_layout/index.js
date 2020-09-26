@@ -17,7 +17,9 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../NotificationsPopOver";
+import UserModal from "../UserModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import BackdropLoading from "../BackdropLoading";
 
 const drawerWidth = 240;
 
@@ -101,12 +103,14 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const MainDrawer = ({ appTitle, children }) => {
-	const { handleLogout } = useContext(AuthContext);
+	const drawerState = localStorage.getItem("drawerOpen");
+	const userId = +localStorage.getItem("userId");
 	const classes = useStyles();
 	const [open, setOpen] = useState(true);
-	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [userModalOpen, setUserModalOpen] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
 	const [menuOpen, setMenuOpen] = useState(false);
-	const drawerState = localStorage.getItem("drawerOpen");
+	const { handleLogout, loading } = useContext(AuthContext);
 
 	useEffect(() => {
 		if (drawerState === "0") {
@@ -134,6 +138,15 @@ const MainDrawer = ({ appTitle, children }) => {
 		setMenuOpen(false);
 	};
 
+	const handleOpenUserModal = () => {
+		setUserModalOpen(true);
+		handleCloseMenu();
+	};
+
+	if (loading) {
+		return <BackdropLoading />;
+	}
+
 	return (
 		<div className={classes.root}>
 			<Drawer
@@ -154,6 +167,11 @@ const MainDrawer = ({ appTitle, children }) => {
 				</List>
 				<Divider />
 			</Drawer>
+			<UserModal
+				open={userModalOpen}
+				onClose={() => setUserModalOpen(false)}
+				userId={userId}
+			/>
 			<AppBar
 				position="absolute"
 				className={clsx(classes.appBar, open && classes.appBarShift)}
@@ -179,7 +197,7 @@ const MainDrawer = ({ appTitle, children }) => {
 						noWrap
 						className={classes.title}
 					>
-						{appTitle}
+						WHATICKET
 					</Typography>
 					<NotificationsPopOver />
 
@@ -208,7 +226,7 @@ const MainDrawer = ({ appTitle, children }) => {
 							open={menuOpen}
 							onClose={handleCloseMenu}
 						>
-							<MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
+							<MenuItem onClick={handleOpenUserModal}>Profile</MenuItem>
 							<MenuItem onClick={handleLogout}>Logout</MenuItem>
 						</Menu>
 					</div>

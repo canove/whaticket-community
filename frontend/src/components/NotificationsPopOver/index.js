@@ -14,9 +14,7 @@ import Badge from "@material-ui/core/Badge";
 import ChatIcon from "@material-ui/icons/Chat";
 
 import TicketListItem from "../TicketListItem";
-
 import { i18n } from "../../translate/i18n";
-
 import useTickets from "../../hooks/useTickets";
 
 const useStyles = makeStyles(theme => ({

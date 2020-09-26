@@ -167,8 +167,8 @@ const Connections = () => {
 	};
 
 	const handleCloseQrModal = useCallback(() => {
-		setQrModalOpen(false);
 		setSelectedWhatsApp(null);
+		setQrModalOpen(false);
 	}, [setQrModalOpen, setSelectedWhatsApp]);
 
 	const handleEditWhatsApp = whatsApp => {
