@@ -81,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const Tickets = () => {
+const TicketsManager = () => {
 	const classes = useStyles();
 
 	const [searchParam, setSearchParam] = useState("");
@@ -186,4 +186,4 @@ const Tickets = () => {
 	);
 };
 
-export default Tickets;
+export default TicketsManager;

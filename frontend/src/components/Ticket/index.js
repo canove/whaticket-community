@@ -30,6 +30,9 @@ import whatsBackground from "../../assets/wa-background.png";
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
 import MessageInput from "../MessageInput/";
 import TicketOptionsMenu from "../TicketOptionsMenu";
+import TicketHeader from "../TicketHeader";
+import TicketInfo from "../TicketInfo";
+import TicketActionButtons from "../TicketActionButtons";
 
 const drawerWidth = 320;
 
@@ -65,24 +68,6 @@ const useStyles = makeStyles(theme => ({
 			duration: theme.transitions.duration.enteringScreen,
 		}),
 		marginRight: 0,
-	},
-
-	messagesHeader: {
-		display: "flex",
-		// cursor: "pointer",
-		backgroundColor: "#eee",
-		flex: "none",
-		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-	},
-
-	actionButtons: {
-		marginRight: 6,
-		flex: "none",
-		alignSelf: "center",
-		marginLeft: "auto",
-		"& > *": {
-			margin: theme.spacing(1),
-		},
 	},
 
 	messagesListWrapper: {
@@ -262,14 +247,13 @@ const reducer = (state, action) => {
 	}
 };
 
-const MessagesList = () => {
+const Ticket = () => {
 	const { ticketId } = useParams();
 	const history = useHistory();
 	const classes = useStyles();
 
-	const userId = +localStorage.getItem("userId");
-
 	const [loading, setLoading] = useState(true);
+	const [ticketLoading, setTicketLoading] = useState(true);
 	const [contact, setContact] = useState({});
 	const [ticket, setTicket] = useState({});
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -279,12 +263,10 @@ const MessagesList = () => {
 	const [hasMore, setHasMore] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
 
-	const [anchorEl, setAnchorEl] = useState(null);
-	const moreMenuOpen = Boolean(anchorEl);
-
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
+		setTicketLoading(true);
 	}, [ticketId]);
 
 	useEffect(() => {
@@ -301,6 +283,7 @@ const MessagesList = () => {
 					dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
 					setHasMore(data.hasMore);
 					setLoading(false);
+					setTicketLoading(false);
 
 					if (pageNumber === 1 && data.messages.length > 1) {
 						scrollToBottom();
@@ -418,29 +401,6 @@ const MessagesList = () => {
 				</a>
 			);
 		}
-	};
-
-	const handleOpenTicketOptionsMenu = e => {
-		setAnchorEl(e.currentTarget);
-	};
-
-	const handleCloseTicketOptionsMenu = e => {
-		setAnchorEl(null);
-	};
-
-	const handleUpdateTicketStatus = async (e, status, userId) => {
-		try {
-			await api.put(`/tickets/${ticketId}`, {
-				status: status,
-				userId: userId || null,
-			});
-		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
-			}
-		}
-		history.push("/tickets");
 	};
 
 	const handleDrawerOpen = () => {
@@ -575,81 +535,14 @@ const MessagesList = () => {
 					[classes.mainWrapperShift]: drawerOpen,
 				})}
 			>
-				<Card square className={classes.messagesHeader}>
-					<CardHeader
+				<TicketHeader loading={ticketLoading}>
+					<TicketInfo
+						contact={contact}
+						ticket={ticket}
 						onClick={handleDrawerOpen}
-						style={{ cursor: "pointer" }}
-						titleTypographyProps={{ noWrap: true }}
-						subheaderTypographyProps={{ noWrap: true }}
-						avatar={
-							loading ? (
-								<Skeleton animation="wave" variant="circle">
-									<Avatar alt="contact_image" />
-								</Skeleton>
-							) : (
-								<Avatar src={contact.profilePicUrl} alt="contact_image" />
-							)
-						}
-						title={
-							loading ? (
-								<Skeleton animation="wave" width={60} />
-							) : (
-								`${contact.name} #${ticket.id}`
-							)
-						}
-						subheader={
-							loading ? (
-								<Skeleton animation="wave" width={80} />
-							) : ticket.user ? (
-								`${i18n.t("messagesList.header.assignedTo")} ${
-									ticket.user.name
-								}`
-							) : (
-								"Pending"
-							)
-						}
 					/>
-					{!loading && (
-						<div className={classes.actionButtons}>
-							{ticket.status === "closed" ? (
-								<Button
-									startIcon={<ReplayIcon />}
-									size="small"
-									onClick={e => handleUpdateTicketStatus(e, "open", userId)}
-								>
-									{i18n.t("messagesList.header.buttons.reopen")}
-								</Button>
-							) : (
-								<>
-									<Button
-										startIcon={<ReplayIcon />}
-										size="small"
-										onClick={e => handleUpdateTicketStatus(e, "pending", null)}
-									>
-										{i18n.t("messagesList.header.buttons.return")}
-									</Button>
-									<Button
-										size="small"
-										variant="contained"
-										color="primary"
-										onClick={e => handleUpdateTicketStatus(e, "closed", userId)}
-									>
-										{i18n.t("messagesList.header.buttons.resolve")}
-									</Button>
-								</>
-							)}
-							<IconButton onClick={handleOpenTicketOptionsMenu}>
-								<MoreVertIcon />
-							</IconButton>
-							<TicketOptionsMenu
-								ticket={ticket}
-								anchorEl={anchorEl}
-								menuOpen={moreMenuOpen}
-								handleClose={handleCloseTicketOptionsMenu}
-							/>
-						</div>
-					)}
-				</Card>
+					<TicketActionButtons ticket={ticket} />
+				</TicketHeader>
 				<div className={classes.messagesListWrapper}>
 					<div
 						id="messagesList"
@@ -666,15 +559,14 @@ const MessagesList = () => {
 					) : null}
 				</div>
 			</Paper>
-
 			<ContactDrawer
 				open={drawerOpen}
 				handleDrawerClose={handleDrawerClose}
 				contact={contact}
-				loading={loading}
+				loading={ticketLoading}
 			/>
 		</div>
 	);
 };
 
-export default MessagesList;
+export default Ticket;
