@@ -551,7 +551,7 @@ const Ticket = () => {
 					>
 						{messagesList.length > 0 ? renderMessages() : []}
 					</div>
-					<MessageInput />
+					<MessageInput ticketStatus={ticket.status} />
 					{loading ? (
 						<div>
 							<CircularProgress className={classes.circleLoading} />

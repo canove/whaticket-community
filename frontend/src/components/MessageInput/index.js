@@ -104,7 +104,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const MessageInput = () => {
+const MessageInput = ({ ticketStatus }) => {
 	const classes = useStyles();
 	const { ticketId } = useParams();
 	const username = localStorage.getItem("username");
@@ -282,7 +282,7 @@ const MessageInput = () => {
 				<IconButton
 					aria-label="emojiPicker"
 					component="span"
-					disabled={loading || recording}
+					disabled={loading || recording || ticketStatus !== "open"}
 					onClick={e => setShowEmoji(prevState => !prevState)}
 				>
 					<MoodIcon className={classes.sendMessageIcons} />
@@ -301,7 +301,7 @@ const MessageInput = () => {
 				<input
 					type="file"
 					id="upload-button"
-					disabled={loading || recording}
+					disabled={loading || recording || ticketStatus !== "open"}
 					className={classes.uploadInput}
 					onChange={handleChangeMedia}
 				/>
@@ -309,7 +309,7 @@ const MessageInput = () => {
 					<IconButton
 						aria-label="upload"
 						component="span"
-						disabled={loading || recording}
+						disabled={loading || recording || ticketStatus !== "open"}
 					>
 						<AttachFileIcon className={classes.sendMessageIcons} />
 					</IconButton>
@@ -318,12 +318,16 @@ const MessageInput = () => {
 					<InputBase
 						inputRef={input => input && input.focus()}
 						className={classes.messageInput}
-						placeholder={i18n.t("messagesInput.placeholder")}
+						placeholder={
+							ticketStatus === "open"
+								? i18n.t("messagesInput.placeholder")
+								: "Reopen or accept this ticket to send a message"
+						}
 						multiline
 						rowsMax={5}
 						value={inputMessage}
 						onChange={handleChangeInput}
-						disabled={recording || loading}
+						disabled={recording || loading || ticketStatus !== "open"}
 						onPaste={handleInputPaste}
 						onKeyPress={e => {
 							if (loading || e.shiftKey) return;
@@ -374,7 +378,7 @@ const MessageInput = () => {
 					<IconButton
 						aria-label="showRecorder"
 						component="span"
-						disabled={loading}
+						disabled={loading || ticketStatus !== "open"}
 						onClick={handleStartRecording}
 					>
 						<MicIcon className={classes.sendMessageIcons} />
