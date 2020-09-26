@@ -125,6 +125,15 @@ const reducer = (state, action) => {
 		return [...state];
 	}
 
+	if (action.type === "UPDATE_TICKET_CONTACT") {
+		const contact = action.payload;
+		const ticketIndex = state.findIndex(t => t.contactId === contact.id);
+		if (ticketIndex !== -1) {
+			state[ticketIndex].contact = contact;
+		}
+		return [...state];
+	}
+
 	if (action.type === "DELETE_TICKET") {
 		const ticketId = action.payload;
 		const ticketIndex = state.findIndex(t => t.id === ticketId);
@@ -197,6 +206,15 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 				dispatch({
 					type: "UPDATE_TICKET_MESSAGES_COUNT",
 					payload: data.ticket,
+				});
+			}
+		});
+
+		socket.on("contact", data => {
+			if (data.action === "update") {
+				dispatch({
+					type: "UPDATE_TICKET_CONTACT",
+					payload: data.contact,
 				});
 			}
 		});
