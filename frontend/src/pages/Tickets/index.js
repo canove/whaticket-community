@@ -5,7 +5,7 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 
 import TicketsManager from "../../components/TicketsManager/";
-import MessagesList from "../../components/MessagesList/";
+import Ticket from "../../components/Ticket/";
 
 import { i18n } from "../../translate/i18n";
 
@@ -59,7 +59,7 @@ const Chat = () => {
 					<Grid item xs={8} className={classes.messagessWrapper}>
 						{ticketId ? (
 							<>
-								<MessagesList />
+								<Ticket />
 							</>
 						) : (
 							<Paper square variant="outlined" className={classes.welcomeMsg}>

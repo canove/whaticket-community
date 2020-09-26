@@ -6,7 +6,7 @@ import List from "@material-ui/core/List";
 import Paper from "@material-ui/core/Paper";
 
 import TicketListItem from "../TicketListItem";
-import TicketsSkeleton from "../TicketsSkeleton";
+import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 
@@ -276,7 +276,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 							))}
 						</>
 					)}
-					{loading && <TicketsSkeleton />}
+					{loading && <TicketsListSkeleton />}
 				</List>
 			</Paper>
 		</div>
