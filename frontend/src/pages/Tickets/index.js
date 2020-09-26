@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 
-import Tickets from "../../components/Tickets/";
+import TicketsManager from "../../components/TicketsManager/";
 import MessagesList from "../../components/MessagesList/";
 
 import { i18n } from "../../translate/i18n";
@@ -54,7 +54,7 @@ const Chat = () => {
 			<div className={classes.chatPapper}>
 				<Grid container spacing={0}>
 					<Grid item xs={4} className={classes.contactsWrapper}>
-						<Tickets />
+						<TicketsManager />
 					</Grid>
 					<Grid item xs={8} className={classes.messagessWrapper}>
 						{ticketId ? (
