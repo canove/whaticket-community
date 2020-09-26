@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
@@ -12,7 +11,6 @@ import ConfirmationModal from "../ConfirmationModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
-	const history = useHistory();
 
 	const handleDeleteTicket = async () => {
 		try {

@@ -108,39 +108,40 @@ const NotificationsPopOver = () => {
 					(data.ticket.userId !== userId && data.ticket.userId)
 				)
 					return;
-				showDesktopNotification(data);
+				else {
+					// show desktop notification
+					const { message, contact, ticket } = data;
+					const options = {
+						body: `${message.body} - ${format(new Date(), "HH:mm")}`,
+						icon: contact.profilePicUrl,
+						tag: ticket.id,
+					};
+					let notification = new Notification(
+						`${i18n.t("tickets.notification.message")} ${contact.name}`,
+						options
+					);
+
+					notification.onclick = function (event) {
+						event.preventDefault(); //
+						window.focus();
+						history.push(`/tickets/${ticket.id}`);
+					};
+
+					document.addEventListener("visibilitychange", () => {
+						if (document.visibilityState === "visible") {
+							notification.close();
+						}
+					});
+
+					soundAlert.current.play();
+				}
 			}
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [userId]);
-
-	const showDesktopNotification = ({ message, contact, ticket }) => {
-		const options = {
-			body: `${message.body} - ${format(new Date(), "HH:mm")}`,
-			icon: contact.profilePicUrl,
-			tag: ticket.id,
-		};
-		let notification = new Notification(
-			`${i18n.t("tickets.notification.message")} ${contact.name}`,
-			options
-		);
-
-		notification.onclick = function (event) {
-			event.preventDefault(); //
-			history.push(`/tickets/${ticket.id}`);
-		};
-
-		document.addEventListener("visibilitychange", () => {
-			if (document.visibilityState === "visible") {
-				notification.close();
-			}
-		});
-
-		soundAlert.current.play();
-	};
+	}, [history, userId]);
 
 	const handleClick = useCallback(() => {
 		setIsOpen(!isOpen);

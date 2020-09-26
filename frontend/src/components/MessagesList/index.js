@@ -338,7 +338,7 @@ const MessagesList = () => {
 			}
 
 			if (data.action === "delete") {
-				toast.success("The deleted sucessfully.");
+				toast.success("Ticket deleted sucessfully.");
 				history.push("/tickets");
 			}
 		});
