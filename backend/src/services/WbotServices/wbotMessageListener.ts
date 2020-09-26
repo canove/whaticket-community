@@ -138,12 +138,15 @@ const handleMessage = async (
   }
 
   const io = getIO();
-  io.to(ticket.id.toString()).to("notification").emit("appMessage", {
-    action: "create",
-    message: newMessage,
-    ticket,
-    contact
-  });
+  io.to(ticket.id.toString())
+    .to(ticket.status)
+    .to("notification")
+    .emit("appMessage", {
+      action: "create",
+      message: newMessage,
+      ticket,
+      contact
+    });
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {

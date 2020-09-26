@@ -293,11 +293,13 @@ const MessagesList = () => {
 					const { data } = await api.get("/messages/" + ticketId, {
 						params: { pageNumber },
 					});
+
 					setContact(data.ticket.contact);
 					setTicket(data.ticket);
 					dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
 					setHasMore(data.hasMore);
 					setLoading(false);
+
 					if (pageNumber === 1 && data.messages.length > 1) {
 						scrollToBottom();
 					}
@@ -318,7 +320,7 @@ const MessagesList = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinChatBox", ticketId, () => {});
+		socket.emit("joinChatBox", ticketId);
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {
@@ -327,6 +329,17 @@ const MessagesList = () => {
 			}
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+			}
+		});
+
+		socket.on("ticket", data => {
+			if (data.action === "updateStatus") {
+				setTicket({ ...data.ticket, user: data.user });
+			}
+
+			if (data.action === "delete") {
+				toast.success("Ticket deleted sucessfully.");
+				history.push("/tickets");
 			}
 		});
 
@@ -339,7 +352,7 @@ const MessagesList = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [ticketId]);
+	}, [ticketId, history]);
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);
@@ -585,11 +598,12 @@ const MessagesList = () => {
 						subheader={
 							loading ? (
 								<Skeleton animation="wave" width={80} />
-							) : (
-								ticket.user &&
+							) : ticket.user ? (
 								`${i18n.t("messagesList.header.assignedTo")} ${
 									ticket.user.name
 								}`
+							) : (
+								"Pending"
 							)
 						}
 					/>

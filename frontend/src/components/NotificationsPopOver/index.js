@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 
+import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import openSocket from "socket.io-client";
 
@@ -13,11 +14,7 @@ import Badge from "@material-ui/core/Badge";
 import ChatIcon from "@material-ui/icons/Chat";
 
 import TicketListItem from "../TicketListItem";
-
-// import { toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
 import { i18n } from "../../translate/i18n";
-
 import useTickets from "../../hooks/useTickets";
 
 const useStyles = makeStyles(theme => ({
@@ -46,10 +43,13 @@ const NotificationsPopOver = () => {
 	const history = useHistory();
 	const userId = +localStorage.getItem("userId");
 	const soundAlert = useRef(new Audio(require("../../assets/sound.mp3")));
-	const ticketId = +history.location.pathname.split("/")[2];
+	const ticketIdUrl = +history.location.pathname.split("/")[2];
+	const ticketIdRef = useRef(ticketIdUrl);
 	const anchorEl = useRef();
 	const [isOpen, setIsOpen] = useState(false);
-	// const [notifications, setNotifications] = useState([]);
+	const [notifications, setNotifications] = useState([]);
+
+	const { tickets } = useTickets({ withUnreadMessages: "true" });
 
 	useEffect(() => {
 		if (!("Notification" in window)) {
@@ -60,53 +60,86 @@ const NotificationsPopOver = () => {
 	}, []);
 
 	useEffect(() => {
+		setNotifications(tickets);
+	}, [tickets]);
+
+	useEffect(() => {
+		ticketIdRef.current = ticketIdUrl;
+	}, [ticketIdUrl]);
+
+	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.emit("joinNotification");
 
+		socket.on("ticket", data => {
+			if (data.action === "updateUnread") {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticketId);
+					if (ticketIndex !== -1) {
+						prevState.splice(ticketIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+			}
+		});
+
 		socket.on("appMessage", data => {
-			if (data.action === "create") {
+			if (
+				data.action === "create" &&
+				(data.ticket.userId === userId || !data.ticket.userId)
+			) {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticket.id);
+					if (ticketIndex !== -1) {
+						prevState[ticketIndex] = data.ticket;
+						return [...prevState];
+					}
+					return [data.ticket, ...prevState];
+				});
+
 				if (
-					(ticketId &&
-						data.message.ticketId === +ticketId &&
+					(ticketIdRef.current &&
+						data.message.ticketId === ticketIdRef.current &&
 						document.visibilityState === "visible") ||
 					(data.ticket.userId !== userId && data.ticket.userId)
 				)
 					return;
-				showDesktopNotification(data);
+				else {
+					// show desktop notification
+					const { message, contact, ticket } = data;
+					const options = {
+						body: `${message.body} - ${format(new Date(), "HH:mm")}`,
+						icon: contact.profilePicUrl,
+						tag: ticket.id,
+					};
+					let notification = new Notification(
+						`${i18n.t("tickets.notification.message")} ${contact.name}`,
+						options
+					);
+
+					notification.onclick = function (event) {
+						event.preventDefault(); //
+						window.focus();
+						history.push(`/tickets/${ticket.id}`);
+					};
+
+					document.addEventListener("visibilitychange", () => {
+						if (document.visibilityState === "visible") {
+							notification.close();
+						}
+					});
+
+					soundAlert.current.play();
+				}
 			}
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [history, ticketId, userId]);
-
-	const { tickets: notifications } = useTickets({ withUnreadMessages: "true" });
-
-	const showDesktopNotification = ({ message, contact, ticket }) => {
-		const options = {
-			body: `${message.body} - ${format(new Date(), "HH:mm")}`,
-			icon: contact.profilePicUrl,
-			tag: ticket.id,
-		};
-		let notification = new Notification(
-			`${i18n.t("tickets.notification.message")} ${contact.name}`,
-			options
-		);
-
-		notification.onclick = function (event) {
-			event.preventDefault(); //
-			window.open(`/tickets/${ticket.id}`, "_self");
-		};
-
-		document.addEventListener("visibilitychange", () => {
-			if (document.visibilityState === "visible") {
-				notification.close();
-			}
-		});
-
-		soundAlert.current.play();
-	};
+	}, [history, userId]);
 
 	const handleClick = useCallback(() => {
 		setIsOpen(!isOpen);
@@ -153,8 +186,6 @@ const NotificationsPopOver = () => {
 							<ListItemText>No tickets with unread messages.</ListItemText>
 						</ListItem>
 					) : (
-						notifications &&
-						notifications.length > 0 &&
 						notifications.map(ticket => (
 							<NotificationTicket key={ticket.id}>
 								<TicketListItem ticket={ticket} />

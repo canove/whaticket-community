@@ -18,6 +18,7 @@ type IndexQuery = {
 interface TicketData {
   contactId: number;
   status: string;
+  userId: number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -46,12 +47,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId, status }: TicketData = req.body;
+  const { contactId, status, userId }: TicketData = req.body;
 
-  const ticket = await CreateTicketService({ contactId, status });
+  const ticket = await CreateTicketService({ contactId, status, userId });
 
   const io = getIO();
-  io.to("notification").emit("ticket", {
+  io.to(ticket.status).emit("ticket", {
     action: "create",
     ticket
   });
@@ -66,12 +67,24 @@ export const update = async (
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
-  const ticket = await UpdateTicketService({ ticketData, ticketId });
+  const { ticket, oldStatus, ticketUser } = await UpdateTicketService({
+    ticketData,
+    ticketId
+  });
 
   const io = getIO();
-  io.to("notification").emit("ticket", {
+
+  if (ticket.status !== oldStatus) {
+    io.to(oldStatus).emit("ticket", {
+      action: "delete",
+      ticketId: ticket.id
+    });
+  }
+
+  io.to(ticket.status).to(ticketId).emit("ticket", {
     action: "updateStatus",
-    ticket
+    ticket,
+    user: ticketUser
   });
 
   return res.status(200).json(ticket);
@@ -83,13 +96,15 @@ export const remove = async (
 ): Promise<Response> => {
   const { ticketId } = req.params;
 
-  await DeleteTicketService(ticketId);
+  const ticket = await DeleteTicketService(ticketId);
 
   const io = getIO();
-  io.to("notification").emit("ticket", {
-    action: "delete",
-    ticketId: +ticketId
-  });
+  io.to(ticket.status)
+    .to(ticketId)
+    .emit("ticket", {
+      action: "delete",
+      ticketId: +ticketId
+    });
 
   return res.status(200).json({ message: "ticket deleted" });
 };

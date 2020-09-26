@@ -27,7 +27,7 @@ const UpdateContactService = async ({
 
   const contact = await Contact.findOne({
     where: { id: contactId },
-    attributes: ["id", "name", "number", "email"],
+    attributes: ["id", "name", "number", "email", "profilePicUrl"],
     include: ["extraInfo"]
   });
 
