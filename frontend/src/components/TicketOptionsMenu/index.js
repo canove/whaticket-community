@@ -17,8 +17,6 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const handleDeleteTicket = async () => {
 		try {
 			await api.delete(`/tickets/${ticket.id}`);
-			toast.success("Ticket deletado com sucesso.");
-			history.push("/tickets");
 		} catch (err) {
 			toast.error("Erro ao deletar o ticket");
 		}

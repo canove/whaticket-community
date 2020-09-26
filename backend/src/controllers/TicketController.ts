@@ -81,7 +81,7 @@ export const update = async (
     });
   }
 
-  io.to(ticket.status).emit("ticket", {
+  io.to(ticket.status).to(ticketId).emit("ticket", {
     action: "updateStatus",
     ticket
   });
@@ -99,7 +99,7 @@ export const remove = async (
 
   const io = getIO();
   io.to(ticket.status)
-    .to("notification")
+    .to(ticketId)
     .emit("ticket", {
       action: "delete",
       ticketId: +ticketId

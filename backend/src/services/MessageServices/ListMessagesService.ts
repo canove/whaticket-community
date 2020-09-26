@@ -1,4 +1,5 @@
 import { where, fn, col } from "sequelize";
+import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import ShowTicketService from "../TicketServices/ShowTicketService";
@@ -24,7 +25,7 @@ const ListMessagesService = async ({
   const ticket = await ShowTicketService(ticketId);
 
   if (!ticket) {
-    throw new Error("No ticket found with this ID");
+    throw new AppError("No ticket found with this ID", 404);
   }
 
   const whereCondition = {

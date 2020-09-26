@@ -22,7 +22,7 @@ const CreateMessageService = async ({
   const ticket = await ShowTicketService(ticketId);
 
   if (!ticket) {
-    throw new AppError("No ticket found with this ID");
+    throw new AppError("No ticket found with this ID", 404);
   }
 
   const message: Message = await ticket.$create("message", messageData);
