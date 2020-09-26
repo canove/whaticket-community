@@ -165,6 +165,7 @@ const TicketsManager = () => {
 					<IconButton
 						aria-label="add ticket"
 						size="small"
+						color="primary"
 						onClick={e => setNewTicketModalOpen(true)}
 						style={{ marginLeft: 20 }}
 					>
