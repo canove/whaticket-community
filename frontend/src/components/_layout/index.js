@@ -102,7 +102,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const MainDrawer = ({ appTitle, children }) => {
+const LoggedInLayout = ({ appTitle, children }) => {
 	const drawerState = localStorage.getItem("drawerOpen");
 	const userId = +localStorage.getItem("userId");
 	const classes = useStyles();
@@ -241,4 +241,4 @@ const MainDrawer = ({ appTitle, children }) => {
 	);
 };
 
-export default MainDrawer;
+export default LoggedInLayout;

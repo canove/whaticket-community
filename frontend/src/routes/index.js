@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
-import MainDrawer from "../components/_layout";
+import LoggedInLayout from "../components/_layout";
 import Dashboard from "../pages/Dashboard/";
 import Tickets from "../pages/Tickets/";
 import Signup from "../pages/Signup/";
@@ -21,7 +21,7 @@ const Routes = () => {
 				<Switch>
 					<Route exact path="/login" component={Login} />
 					<Route exact path="/signup" component={Signup} />
-					<MainDrawer>
+					<LoggedInLayout>
 						<Route exact path="/" component={Dashboard} isPrivate />
 						<Route
 							exact
@@ -38,7 +38,7 @@ const Routes = () => {
 						<Route exact path="/contacts" component={Contacts} isPrivate />
 						<Route exact path="/users" component={Users} isPrivate />
 						<Route exact path="/Settings" component={Settings} isPrivate />
-					</MainDrawer>
+					</LoggedInLayout>
 				</Switch>
 				<ToastContainer autoClose={3000} />
 			</AuthProvider>
