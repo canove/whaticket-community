@@ -326,7 +326,7 @@ const MessageInput = () => {
 						disabled={recording || loading}
 						onPaste={handleInputPaste}
 						onKeyPress={e => {
-							if (loading) return;
+							if (loading || e.shiftKey) return;
 							else if (e.key === "Enter") {
 								handleSendMessage();
 							}
