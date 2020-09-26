@@ -334,7 +334,7 @@ const MessagesList = () => {
 
 		socket.on("ticket", data => {
 			if (data.action === "updateStatus") {
-				setTicket(data.ticket);
+				setTicket({ ...data.ticket, user: data.user });
 			}
 
 			if (data.action === "delete") {

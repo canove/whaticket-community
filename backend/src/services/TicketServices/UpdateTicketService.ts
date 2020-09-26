@@ -1,6 +1,7 @@
 import AppError from "../../errors/AppError";
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
+import User from "../../models/User";
 
 interface TicketData {
   status?: string;
@@ -14,6 +15,7 @@ interface Request {
 
 interface Response {
   ticket: Ticket;
+  ticketUser: User | null;
   oldStatus: string;
 }
 
@@ -44,8 +46,9 @@ const UpdateTicketService = async ({
     status,
     userId
   });
+  const ticketUser = await ticket.$get("user", { attributes: ["id", "name"] });
 
-  return { ticket, oldStatus };
+  return { ticket, oldStatus, ticketUser };
 };
 
 export default UpdateTicketService;

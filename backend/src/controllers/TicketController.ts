@@ -67,7 +67,7 @@ export const update = async (
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
-  const { ticket, oldStatus } = await UpdateTicketService({
+  const { ticket, oldStatus, ticketUser } = await UpdateTicketService({
     ticketData,
     ticketId
   });
@@ -83,7 +83,8 @@ export const update = async (
 
   io.to(ticket.status).to(ticketId).emit("ticket", {
     action: "updateStatus",
-    ticket
+    ticket,
+    user: ticketUser
   });
 
   return res.status(200).json(ticket);
