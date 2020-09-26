@@ -43,6 +43,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const ticket = await ShowTicketService(ticketId);
 
+  console.log(body);
+
   let sentMessage: WbotMessage;
 
   if (media) {

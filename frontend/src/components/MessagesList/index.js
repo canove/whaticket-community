@@ -122,6 +122,7 @@ const useStyles = makeStyles(theme => ({
 		display: "block",
 		position: "relative",
 
+		whiteSpace: "pre-wrap",
 		backgroundColor: "#ffffff",
 		color: "#303030",
 		alignSelf: "flex-start",
@@ -145,6 +146,7 @@ const useStyles = makeStyles(theme => ({
 		display: "block",
 		position: "relative",
 
+		whiteSpace: "pre-wrap",
 		backgroundColor: "#dcf8c6",
 		color: "#303030",
 		alignSelf: "flex-end",
