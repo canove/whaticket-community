@@ -180,7 +180,7 @@ const TicketListItem = ({ ticket }) => {
 						</span>
 					}
 				/>
-				{ticket.status === "pending" && handleAcepptTicket ? (
+				{ticket.status === "pending" ? (
 					<Button
 						variant="contained"
 						size="small"

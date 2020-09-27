@@ -15,6 +15,9 @@ import DoneIcon from "@material-ui/icons/Done";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
 import Paper from "@material-ui/core/Paper";
 
+import { IconButton } from "@material-ui/core";
+import { ExpandMore } from "@material-ui/icons";
+
 import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
 import whatsBackground from "../../assets/wa-background.png";
@@ -23,6 +26,8 @@ import MessageInput from "../MessageInput/";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
 import TicketActionButtons from "../TicketActionButtons";
+
+import MessageOptionsMenu from "../MessageOptionsMenu";
 
 const drawerWidth = 320;
 
@@ -74,7 +79,6 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: "column",
 		flexGrow: 1,
 		padding: "20px 20px 20px 20px",
-		// scrollBehavior: "smooth",
 		overflowY: "scroll",
 		...theme.scrollbarStyles,
 	},
@@ -121,6 +125,13 @@ const useStyles = makeStyles(theme => ({
 		display: "block",
 		position: "relative",
 
+		"&:hover #messageActionsButton": {
+			display: "flex",
+			position: "absolute",
+			top: 0,
+			right: 0,
+		},
+
 		whiteSpace: "pre-wrap",
 		backgroundColor: "#dcf8c6",
 		color: "#303030",
@@ -134,6 +145,15 @@ const useStyles = makeStyles(theme => ({
 		paddingTop: 5,
 		paddingBottom: 0,
 		boxShadow: "0 1px 1px #b3b3b3",
+	},
+
+	messageActionsButton: {
+		display: "none",
+		position: "relative",
+		color: "#999",
+		zIndex: 1,
+		backgroundColor: "#dcf8c6",
+		"&:hover, &.Mui-focusVisible": { backgroundColor: "#dcf8c6" },
 	},
 
 	textContentItem: {
@@ -242,16 +262,20 @@ const Ticket = () => {
 	const history = useHistory();
 	const classes = useStyles();
 
+	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [ticketLoading, setTicketLoading] = useState(true);
 	const [contact, setContact] = useState({});
 	const [ticket, setTicket] = useState({});
-	const [drawerOpen, setDrawerOpen] = useState(false);
-	const lastMessageRef = useRef();
 
 	const [messagesList, dispatch] = useReducer(reducer, []);
 	const [hasMore, setHasMore] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
+	const lastMessageRef = useRef();
+
+	const [selectedMessageId, setSelectedMessageId] = useState(null);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const messageOptionsMenuOpen = Boolean(anchorEl);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -328,6 +352,15 @@ const Ticket = () => {
 			socket.disconnect();
 		};
 	}, [ticketId, history]);
+
+	const handleOpenMessageOptionsMenu = (e, messageId) => {
+		setAnchorEl(e.currentTarget);
+		setSelectedMessageId(messageId);
+	};
+
+	const handleCloseMessageOptionsMenu = e => {
+		setAnchorEl(null);
+	};
 
 	const loadMore = () => {
 		setPageNumber(prevPageNumber => prevPageNumber + 1);
@@ -497,6 +530,15 @@ const Ticket = () => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageRight}>
+								<IconButton
+									variant="contained"
+									size="small"
+									id="messageActionsButton"
+									className={classes.messageActionsButton}
+									onClick={e => handleOpenMessageOptionsMenu(e, message.id)}
+								>
+									<ExpandMore />
+								</IconButton>
 								{message.mediaUrl && checkMessaageMedia(message)}
 								<div className={classes.textContentItem}>
 									{message.body}
@@ -512,7 +554,7 @@ const Ticket = () => {
 			});
 			return viewMessagesList;
 		} else {
-			return <div>Diga olá ao seu novo contato</div>;
+			return <div>Say hello to your new contact!</div>;
 		}
 	};
 
@@ -549,6 +591,12 @@ const Ticket = () => {
 					) : null}
 				</div>
 			</Paper>
+			<MessageOptionsMenu
+				messageId={selectedMessageId}
+				anchorEl={anchorEl}
+				menuOpen={messageOptionsMenuOpen}
+				handleClose={handleCloseMessageOptionsMenu}
+			/>
 			<ContactDrawer
 				open={drawerOpen}
 				handleDrawerClose={handleDrawerClose}
