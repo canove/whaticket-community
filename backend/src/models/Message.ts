@@ -6,7 +6,6 @@ import {
   Model,
   DataType,
   PrimaryKey,
-  AutoIncrement,
   Default,
   BelongsTo,
   ForeignKey
@@ -46,6 +45,10 @@ class Message extends Model<Message> {
 
   @Column
   mediaType: string;
+
+  @Default(false)
+  @Column
+  isDeleted: boolean;
 
   @CreatedAt
   @Column(DataType.DATE(6))

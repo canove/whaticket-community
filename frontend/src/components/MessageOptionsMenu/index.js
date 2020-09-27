@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
 // import { i18n } from "../../translate/i18n";
-// import api from "../../services/api";
+import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 
 const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
@@ -15,11 +15,11 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 	const handleDeleteMessage = async () => {
 		console.log("message deleted", messageId);
 
-		// try {
-		// 	await api.delete(`/messages/${message.id}`);
-		// } catch (err) {
-		// 	toast.error("Erro ao deletar o message");
-		// }
+		try {
+			await api.delete(`/messages/${messageId}`);
+		} catch (err) {
+			toast.error("Erro ao deletar o message");
+		}
 	};
 
 	const handleOpenConfirmationModal = e => {

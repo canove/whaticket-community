@@ -9,4 +9,6 @@ messageRoutes.get("/messages/:ticketId", isAuth, MessageController.index);
 
 messageRoutes.post("/messages/:ticketId", isAuth, MessageController.store);
 
+messageRoutes.delete("/messages/:messageId", isAuth, MessageController.remove);
+
 export default messageRoutes;

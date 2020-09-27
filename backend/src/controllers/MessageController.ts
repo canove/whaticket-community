@@ -6,7 +6,9 @@ import { getIO } from "../libs/socket";
 
 import CreateMessageService from "../services/MessageServices/CreateMessageService";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
+import UpdateMessageService from "../services/MessageServices/UpdateMessageService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
+import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
@@ -43,8 +45,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const ticket = await ShowTicketService(ticketId);
 
-  console.log(body);
-
   let sentMessage: WbotMessage;
 
   if (media) {
@@ -78,4 +78,19 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   await SetTicketMessagesAsRead(ticket);
 
   return res.status(200).json(message);
+};
+
+export const remove = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId } = req.params;
+
+  const messageDeleted = await DeleteWhatsAppMessage(messageId);
+
+  await UpdateMessageService({ messageData: { isDeleted: true }, messageId });
+
+  console.log(messageDeleted);
+
+  return res.json({ ok: true });
 };
