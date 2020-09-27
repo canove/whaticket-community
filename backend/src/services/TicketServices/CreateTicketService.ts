@@ -1,4 +1,5 @@
 import AppError from "../../errors/AppError";
+import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import Ticket from "../../models/Ticket";
 
@@ -18,6 +19,8 @@ const CreateTicketService = async ({
   if (!defaultWhatsapp) {
     throw new AppError("No default WhatsApp found. Check Connection page.");
   }
+
+  await CheckContactOpenTickets(contactId);
 
   const { id }: Ticket = await defaultWhatsapp.$create("ticket", {
     contactId,
