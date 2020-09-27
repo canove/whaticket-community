@@ -1,4 +1,5 @@
 import AppError from "../../errors/AppError";
+import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
 import User from "../../models/User";
@@ -39,6 +40,8 @@ const UpdateTicketService = async ({
   if (!ticket) {
     throw new AppError("No ticket found with this ID.", 404);
   }
+
+  await SetTicketMessagesAsRead(ticket);
 
   const oldStatus = ticket.status;
 
