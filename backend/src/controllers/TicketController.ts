@@ -81,7 +81,7 @@ export const update = async (
     });
   }
 
-  io.to(ticket.status).to(ticketId).emit("ticket", {
+  io.to(ticket.status).to("notification").to(ticketId).emit("ticket", {
     action: "updateStatus",
     ticket,
     user: ticketUser
