@@ -18,7 +18,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 
-// import { i18n } from "../../translate/i18n";
+import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 
@@ -105,7 +105,7 @@ const UserModal = ({ open, onClose, userId }) => {
 			} else {
 				await api.post("/users", values);
 			}
-			toast.success("Success!");
+			toast.success(i18n.t("userModal.success"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -119,7 +119,9 @@ const UserModal = ({ open, onClose, userId }) => {
 		<div className={classes.root}>
 			<Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
 				<DialogTitle id="form-dialog-title">
-					{userId ? `Edit User` : `New User`}
+					{userId
+						? `${i18n.t("userModal.title.edit")}`
+						: `${i18n.t("userModal.title.add")}`}
 				</DialogTitle>
 				<Formik
 					initialValues={user}
@@ -137,7 +139,7 @@ const UserModal = ({ open, onClose, userId }) => {
 							<DialogContent dividers>
 								<Field
 									as={TextField}
-									label="Name"
+									label={i18n.t("userModal.form.name")}
 									autoFocus
 									name="name"
 									error={touched.name && Boolean(errors.name)}
@@ -148,7 +150,7 @@ const UserModal = ({ open, onClose, userId }) => {
 								/>
 								<Field
 									as={TextField}
-									label="Email"
+									label={i18n.t("userModal.form.email")}
 									name="email"
 									error={touched.email && Boolean(errors.email)}
 									helperText={touched.email && errors.email}
@@ -158,7 +160,7 @@ const UserModal = ({ open, onClose, userId }) => {
 								<div>
 									<Field
 										as={TextField}
-										label="New Password"
+										label={i18n.t("userModal.form.password")}
 										type="password"
 										name="password"
 										error={touched.password && Boolean(errors.password)}
@@ -176,7 +178,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										</InputLabel>
 										<Field
 											as={Select}
-											label="Profile"
+											label={i18n.t("userModal.form.profile")}
 											name="profile"
 											labelId="profile-selection-label"
 											id="profile-selection"
@@ -195,7 +197,7 @@ const UserModal = ({ open, onClose, userId }) => {
 									disabled={isSubmitting}
 									variant="outlined"
 								>
-									Cancel
+									{i18n.t("userModal.buttons.cancel")}
 								</Button>
 								<Button
 									type="submit"
@@ -204,7 +206,9 @@ const UserModal = ({ open, onClose, userId }) => {
 									variant="contained"
 									className={classes.btnWrapper}
 								>
-									{"Ok"}
+									{userId
+										? `${i18n.t("userModal.buttons.okEdit")}`
+										: `${i18n.t("userModal.buttons.okAdd")}`}
 									{isSubmitting && (
 										<CircularProgress
 											size={24}

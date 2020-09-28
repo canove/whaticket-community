@@ -44,7 +44,7 @@ const MainListItems = () => {
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
 			<ListItemLink
 				to="/connections"
-				primary="Connections"
+				primary={i18n.t("mainDrawer.listItems.connections")}
 				icon={<SyncAltIcon />}
 			/>
 			<ListItemLink
@@ -61,7 +61,9 @@ const MainListItems = () => {
 			{userProfile === "admin" && (
 				<>
 					<Divider />
-					<ListSubheader inset>Administration</ListSubheader>
+					<ListSubheader inset>
+						{i18n.t("mainDrawer.listItems.administration")}
+					</ListSubheader>
 					<ListItemLink
 						to="/users"
 						primary={i18n.t("mainDrawer.listItems.users")}

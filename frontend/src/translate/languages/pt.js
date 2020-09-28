@@ -41,20 +41,50 @@ const messages = {
 					},
 				},
 			},
-			sessionInfo: {
-				status: "Status: ",
-				battery: "Bateria: ",
-				charging: "Carregando: ",
-				updatedAt: "Atualizado em:",
-				buttons: {
-					disconnect: "Desconectar",
+			connections: {
+				title: "Conexões",
+				toasts: {
+					deleted: "Conexão com o WhatsApp excluída com sucesso!",
 				},
+				confirmationModal: {
+					deleteTitle: "Deletar",
+					deleteMessage: "Você tem certeza? Essa ação não pode ser revertida.",
+				},
+				buttons: {
+					add: "Adicionar WhatsApp",
+				},
+				table: {
+					name: "Nome",
+					status: "Status",
+					lastUpdate: "Última atualização",
+					default: "Padrão",
+					actions: "Ações",
+				},
+			},
+			whatsappModal: {
+				title: {
+					add: "Adicionar WhatsApp",
+					edit: "Editar WhatsApp",
+				},
+				form: {
+					name: "Nome",
+					default: "Padrão",
+				},
+				buttons: {
+					okAdd: "Adicionar",
+					okEdit: "Salvar",
+					cancel: "Cancelar",
+				},
+				success: "WhatsApp salvo com sucesso.",
 			},
 			qrCode: {
 				message: "Leia o QrCode para iniciar a sessão",
 			},
 			contacts: {
 				title: "Contatos",
+				toasts: {
+					deleted: "Contato excluído com sucesso!",
+				},
 				searchPlaceholder: "Pesquisar...",
 				confirmationModal: {
 					deleteTitle: "Deletar ",
@@ -95,6 +125,25 @@ const messages = {
 					okEdit: "Salvar",
 					cancel: "Cancelar",
 				},
+				success: "Contato salvo com sucesso.",
+			},
+			userModal: {
+				title: {
+					add: "Adicionar usuário",
+					edit: "Editar usuário",
+				},
+				form: {
+					name: "Nome",
+					email: "Email",
+					password: "Senha",
+					profile: "Perfil",
+				},
+				buttons: {
+					okAdd: "Adicionar",
+					okEdit: "Salvar",
+					cancel: "Cancelar",
+				},
+				success: "Usuário salvo com sucesso.",
 			},
 			chat: {
 				noTicketMessage: "Selecione um ticket para começar a conversar.",
@@ -112,7 +161,7 @@ const messages = {
 					search: { title: "Busca" },
 				},
 				search: {
-					placeholder: "Pesquisar tickets e mensagens.",
+					placeholder: "Buscar tickets e mensagens",
 				},
 				buttons: {
 					showAll: "Todos",
@@ -139,9 +188,54 @@ const messages = {
 			mainDrawer: {
 				listItems: {
 					dashboard: "Dashboard",
-					connection: "Conexão",
+					connections: "Conexões",
 					tickets: "Tickets",
 					contacts: "Contatos",
+					administration: "Administração",
+					users: "Usuários",
+					settings: "Configurações",
+				},
+				appBar: {
+					user: {
+						profile: "Perfil",
+						logout: "Sair",
+					},
+				},
+			},
+			notifications: {
+				noTickets: "Nenhuma notificação.",
+			},
+			users: {
+				title: "Usuários",
+				table: {
+					name: "Nome",
+					email: "Email",
+					profile: "Perfil",
+					actions: "Ações",
+				},
+				buttons: {
+					add: "Adicionar usuário",
+				},
+				toasts: {
+					deleted: "Usuário excluído com sucesso.",
+				},
+				confirmationModal: {
+					deleteTitle: "Excluir",
+					deleteMessage:
+						"Todos os dados do usuário serão perdidos. Os tickets abertos deste usuário serão movidos para a fila.",
+				},
+			},
+			settings: {
+				success: "Configurações salvas com sucesso.",
+				title: "Configurações",
+				settings: {
+					userCreation: {
+						name: "Criação de usuário",
+						options: {
+							enabled: "Ativado",
+							disabled: "Desativado",
+						},
+					},
 				},
 			},
 			messagesList: {
@@ -173,11 +267,23 @@ const messages = {
 					message:
 						"Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
 				},
+				buttons: {
+					delete: "Excluir",
+					cancel: "Cancelar",
+				},
 			},
 			confirmationModal: {
 				buttons: {
 					confirm: "Ok",
 					cancel: "Cancelar",
+				},
+			},
+			messageOptionsMenu: {
+				delete: "Deletar",
+				reply: "Responder",
+				confirmationModal: {
+					title: "Apagar mensagem?",
+					message: "Esta ação não pode ser revertida.",
 				},
 			},
 		},

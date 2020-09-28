@@ -164,7 +164,7 @@ const Contacts = () => {
 	const handleDeleteContact = async contactId => {
 		try {
 			await api.delete(`/contacts/${contactId}`);
-			toast.success("Contact deleted sucessfully!");
+			toast.success(i18n.t("contacts.toasts.deleted"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {

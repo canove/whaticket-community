@@ -9,6 +9,7 @@ import Select from "@material-ui/core/Select";
 import { toast } from "react-toastify";
 
 import api from "../../services/api";
+import { i18n } from "../../translate/i18n.js";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -78,7 +79,7 @@ const Settings = () => {
 			await api.put(`/settings/${settingKey}`, {
 				value: selectedValue,
 			});
-			toast.success("Setting updated");
+			toast.success(i18n.t("settings.success"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -96,10 +97,12 @@ const Settings = () => {
 		<div className={classes.root}>
 			<Container className={classes.container} maxWidth="sm">
 				<Typography variant="body2" gutterBottom>
-					Settings
+					{i18n.t("settings.title")}
 				</Typography>
 				<Paper className={classes.paper}>
-					<Typography variant="body1">User creation</Typography>
+					<Typography variant="body1">
+						{i18n.t("settings.settings.userCreation.name")}
+					</Typography>
 					<Select
 						margin="dense"
 						variant="outlined"
@@ -112,8 +115,12 @@ const Settings = () => {
 						className={classes.settingOption}
 						onChange={handleChangeSetting}
 					>
-						<option value="enabled">Enabled</option>
-						<option value="disabled">Disabled</option>
+						<option value="enabled">
+							{i18n.t("settings.settings.userCreation.options.enabled")}
+						</option>
+						<option value="disabled">
+							{i18n.t("settings.settings.userCreation.options.disabled")}
+						</option>
 					</Select>
 				</Paper>
 			</Container>

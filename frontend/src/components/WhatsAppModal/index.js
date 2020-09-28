@@ -20,6 +20,7 @@ import {
 
 // import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles(theme => ({
 	form: {
@@ -91,7 +92,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			} else {
 				await api.post("/whatsapp", values);
 			}
-			toast.success("Success!");
+			toast.success(i18n.t("whatsappModal.success"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -108,7 +109,11 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 
 	return (
 		<Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
-			<DialogTitle>WhatsApp</DialogTitle>
+			<DialogTitle>
+				{whatsAppId
+					? i18n.t("whatsappModal.title.edit")
+					: i18n.t("whatsappModal.title.add")}
+			</DialogTitle>
 			<Formik
 				initialValues={whatsApp}
 				enableReinitialize={true}
@@ -116,7 +121,6 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				onSubmit={(values, actions) => {
 					setTimeout(() => {
 						handleSaveWhatsApp(values);
-						// alert(JSON.stringify(values, null, 2));
 						actions.setSubmitting(false);
 					}, 400);
 				}}
@@ -126,7 +130,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 						<DialogContent dividers className={classes.form}>
 							<Field
 								as={TextField}
-								label="Name"
+								label={i18n.t("whatsappModal.form.name")}
 								autoFocus
 								name="name"
 								error={touched.name && Boolean(errors.name)}
@@ -144,7 +148,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										checked={values.isDefault}
 									/>
 								}
-								label="Default"
+								label={i18n.t("whatsappModal.form.default")}
 							/>
 						</DialogContent>
 						<DialogActions>
@@ -154,7 +158,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								disabled={isSubmitting}
 								variant="outlined"
 							>
-								Cancel
+								{i18n.t("whatsappModal.buttons.cancel")}
 							</Button>
 							<Button
 								type="submit"
@@ -163,7 +167,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								variant="contained"
 								className={classes.btnWrapper}
 							>
-								Save
+								{whatsAppId
+									? i18n.t("whatsappModal.buttons.okEdit")
+									: i18n.t("whatsappModal.buttons.okAdd")}
 								{isSubmitting && (
 									<CircularProgress
 										size={24}

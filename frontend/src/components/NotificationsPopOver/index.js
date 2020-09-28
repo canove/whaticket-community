@@ -183,7 +183,7 @@ const NotificationsPopOver = () => {
 				<List dense className={classes.tabContainer}>
 					{notifications.length === 0 ? (
 						<ListItem>
-							<ListItemText>No tickets with unread messages.</ListItemText>
+							<ListItemText>{i18n.t("notifications.noTickets")}</ListItemText>
 						</ListItem>
 					) : (
 						notifications.map(ticket => (

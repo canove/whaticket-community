@@ -41,20 +41,50 @@ const messages = {
 					},
 				},
 			},
-			sessionInfo: {
-				status: "Status:",
-				battery: "Battery:",
-				charging: "Loading:",
-				updatedAt: "Updated at:",
-				buttons: {
-					disconnect: "Disconnect",
+			connections: {
+				title: "Connections",
+				toasts: {
+					deleted: "WhatsApp connection deleted sucessfully!",
 				},
+				confirmationModal: {
+					deleteTitle: "Delete",
+					deleteMessage: "Are you sure? It cannot be reverted.",
+				},
+				buttons: {
+					add: "Add WhatsApp",
+				},
+				table: {
+					name: "Name",
+					status: "Status",
+					lastUpdate: "Last Update",
+					default: "Default",
+					actions: "Actions",
+				},
+			},
+			whatsappModal: {
+				title: {
+					add: "Add WhatsApp",
+					edit: "Edit WhatsApp",
+				},
+				form: {
+					name: "Name",
+					default: "Default",
+				},
+				buttons: {
+					okAdd: "Add",
+					okEdit: "Save",
+					cancel: "Cancel",
+				},
+				success: "WhatsApp saved successfully.",
 			},
 			qrCode: {
 				message: "Read QrCode to start the session",
 			},
 			contacts: {
 				title: "Contacts",
+				toasts: {
+					deleted: "Contact deleted sucessfully!",
+				},
 				searchPlaceholder: "Search ...",
 				confirmationModal: {
 					deleteTitle: "Delete",
@@ -95,6 +125,25 @@ const messages = {
 					okEdit: "Save",
 					cancel: "Cancel",
 				},
+				success: "Contact saved successfully.",
+			},
+			userModal: {
+				title: {
+					add: "Add user",
+					edit: "Edit user",
+				},
+				form: {
+					name: "Name",
+					email: "Email",
+					password: "Password",
+					profile: "Profile",
+				},
+				buttons: {
+					okAdd: "Add",
+					okEdit: "Save",
+					cancel: "Cancel",
+				},
+				success: "User saved successfully.",
 			},
 			chat: {
 				noTicketMessage: "Select a ticket to start chatting.",
@@ -138,12 +187,54 @@ const messages = {
 			mainDrawer: {
 				listItems: {
 					dashboard: "Dashboard",
-					connection: "Connection",
+					connections: "Connections",
 					tickets: "Tickets",
 					contacts: "Contacts",
 					administration: "Administration",
 					users: "Users",
 					settings: "Settings",
+				},
+				appBar: {
+					user: {
+						profile: "Profile",
+						logout: "Logout",
+					},
+				},
+			},
+			notifications: {
+				noTickets: "No notifications.",
+			},
+			users: {
+				title: "Users",
+				table: {
+					name: "Name",
+					email: "Email",
+					profile: "Profile",
+					actions: "Actions",
+				},
+				buttons: {
+					add: "Add user",
+				},
+				toasts: {
+					deleted: "User deleted sucessfully.",
+				},
+				confirmationModal: {
+					deleteTitle: "Delete",
+					deleteMessage:
+						"All user data will be lost. Users' open tickets will be moved to queue.",
+				},
+			},
+			settings: {
+				success: "Settings saved successfully.",
+				title: "Settings",
+				settings: {
+					userCreation: {
+						name: "User creation",
+						options: {
+							enabled: "Enabled",
+							disabled: "Disabled",
+						},
+					},
 				},
 			},
 			messagesList: {
@@ -183,6 +274,14 @@ const messages = {
 				buttons: {
 					confirm: "Ok",
 					cancel: "Cancel",
+				},
+			},
+			messageOptionsMenu: {
+				delete: "Delete",
+				reply: "Reply",
+				confirmationModal: {
+					title: "Delete message?",
+					message: "This action cannot be reverted.",
 				},
 			},
 		},

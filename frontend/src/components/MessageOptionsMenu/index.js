@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
-// import { i18n } from "../../translate/i18n";
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 
@@ -31,12 +31,12 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 	return (
 		<>
 			<ConfirmationModal
-				title={`Delete message?`}
+				title={i18n.t("messageOptionsMenu.confirmationModal.title")}
 				open={confirmationOpen}
 				setOpen={setConfirmationOpen}
 				onConfirm={handleDeleteMessage}
 			>
-				This action cannot be reverted.
+				{i18n.t("messageOptionsMenu.confirmationModal.message")}
 			</ConfirmationModal>
 			<Menu
 				anchorEl={anchorEl}
@@ -53,9 +53,9 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 				onClose={handleClose}
 			>
 				<MenuItem onClick={handleOpenConfirmationModal}>
-					Delete Message
+					{i18n.t("messageOptionsMenu.delete")}
 				</MenuItem>
-				<MenuItem disabled>Reply Message</MenuItem>
+				<MenuItem disabled> {i18n.t("messageOptionsMenu.reply")}</MenuItem>
 			</Menu>
 		</>
 	);

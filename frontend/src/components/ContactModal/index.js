@@ -103,7 +103,7 @@ const ContactModal = ({ open, onClose, contactId }) => {
 			} else {
 				await api.post("/contacts", values);
 			}
-			toast.success("Contact saved sucessfully!");
+			toast.success(i18n.t("contactModal.success"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {

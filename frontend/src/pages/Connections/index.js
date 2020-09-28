@@ -27,6 +27,7 @@ import api from "../../services/api";
 import WhatsAppModal from "../../components/WhatsAppModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
+import { i18n } from "../../translate/i18n";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
@@ -179,7 +180,7 @@ const Connections = () => {
 	const handleDeleteWhatsApp = async whatsAppId => {
 		try {
 			await api.delete(`/whatsapp/${whatsAppId}`);
-			toast.success("Deleted!");
+			toast.success(i18n.t("connections.toasts.deleted"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -192,12 +193,17 @@ const Connections = () => {
 	return (
 		<MainContainer>
 			<ConfirmationModal
-				title={deletingWhatsApp && `Delete ${deletingWhatsApp.name}?`}
+				title={
+					deletingWhatsApp &&
+					`${i18n.t("connections.confirmationModal.deleteTitle")} ${
+						deletingWhatsApp.name
+					}?`
+				}
 				open={confirmModalOpen}
 				setOpen={setConfirmModalOpen}
 				onConfirm={() => handleDeleteWhatsApp(deletingWhatsApp.id)}
 			>
-				Are you sure? It cannot be reverted.
+				{i18n.t("connections.confirmationModal.deleteMessage")}
 			</ConfirmationModal>
 			<QrcodeModal
 				open={qrModalOpen}
@@ -212,14 +218,14 @@ const Connections = () => {
 				whatsAppId={selectedWhatsApp && !qrModalOpen && selectedWhatsApp.id}
 			/>
 			<MainHeader>
-				<Title>Connections</Title>
+				<Title>{i18n.t("connections.title")}</Title>
 				<MainHeaderButtonsWrapper>
 					<Button
 						variant="contained"
 						color="primary"
 						onClick={handleOpenWhatsAppModal}
 					>
-						Add Whatsapp
+						{i18n.t("connections.buttons.add")}
 					</Button>
 				</MainHeaderButtonsWrapper>
 			</MainHeader>
@@ -227,11 +233,21 @@ const Connections = () => {
 				<Table size="small">
 					<TableHead>
 						<TableRow>
-							<TableCell align="center">Name</TableCell>
-							<TableCell align="center">Status</TableCell>
-							<TableCell align="center">Last update</TableCell>
-							<TableCell align="center">Default</TableCell>
-							<TableCell align="center">Actions</TableCell>
+							<TableCell align="center">
+								{i18n.t("connections.table.name")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("connections.table.status")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("connections.table.lastUpdate")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("connections.table.default")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("connections.table.actions")}
+							</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>

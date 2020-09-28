@@ -24,6 +24,7 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 
 import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
@@ -161,7 +162,7 @@ const Users = () => {
 	const handleDeleteUser = async userId => {
 		try {
 			await api.delete(`/users/${userId}`);
-			toast.success("User deleted!");
+			toast.success(i18n.t("users.toasts.deleted"));
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
@@ -188,12 +189,17 @@ const Users = () => {
 	return (
 		<MainContainer>
 			<ConfirmationModal
-				title={deletingUser && `Delete ${deletingUser.name}?`}
+				title={
+					deletingUser &&
+					`${i18n.t("users.confirmationModal.deleteTitle")} ${
+						deletingUser.name
+					}?`
+				}
 				open={confirmModalOpen}
 				setOpen={setConfirmModalOpen}
-				onConfirm={e => handleDeleteUser(deletingUser.id)}
+				onConfirm={() => handleDeleteUser(deletingUser.id)}
 			>
-				Are you sure? It canoot be reverted.
+				{i18n.t("users.confirmationModal.deleteMessage")}
 			</ConfirmationModal>
 			<UserModal
 				open={userModalOpen}
@@ -202,10 +208,10 @@ const Users = () => {
 				userId={selectedUser && selectedUser.id}
 			/>
 			<MainHeader>
-				<Title>Usuários</Title>
+				<Title>{i18n.t("users.title")}</Title>
 				<MainHeaderButtonsWrapper>
 					<TextField
-						placeholder="Search..."
+						placeholder={i18n.t("contacts.searchPlaceholder")}
 						type="search"
 						value={searchParam}
 						onChange={handleSearch}
@@ -222,7 +228,7 @@ const Users = () => {
 						color="primary"
 						onClick={handleOpenUserModal}
 					>
-						Novo Usuário
+						{i18n.t("users.buttons.add")}
 					</Button>
 				</MainHeaderButtonsWrapper>
 			</MainHeader>
@@ -234,10 +240,12 @@ const Users = () => {
 				<Table size="small">
 					<TableHead>
 						<TableRow>
-							<TableCell>Name</TableCell>
-							<TableCell>Email</TableCell>
-							<TableCell>Profile</TableCell>
-							<TableCell align="right">Actions</TableCell>
+							<TableCell>{i18n.t("users.table.name")}</TableCell>
+							<TableCell>{i18n.t("users.table.email")}</TableCell>
+							<TableCell>{i18n.t("users.table.profile")}</TableCell>
+							<TableCell align="right">
+								{i18n.t("users.table.actions")}
+							</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>

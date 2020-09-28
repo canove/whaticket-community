@@ -20,6 +20,7 @@ import NotificationsPopOver from "../NotificationsPopOver";
 import UserModal from "../UserModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import BackdropLoading from "../BackdropLoading";
+import { i18n } from "../../translate/i18n";
 
 const drawerWidth = 240;
 
@@ -197,7 +198,7 @@ const LoggedInLayout = ({ appTitle, children }) => {
 						noWrap
 						className={classes.title}
 					>
-						WHATICKET
+						WhaTicket
 					</Typography>
 					<NotificationsPopOver />
 
@@ -226,8 +227,12 @@ const LoggedInLayout = ({ appTitle, children }) => {
 							open={menuOpen}
 							onClose={handleCloseMenu}
 						>
-							<MenuItem onClick={handleOpenUserModal}>Profile</MenuItem>
-							<MenuItem onClick={handleLogout}>Logout</MenuItem>
+							<MenuItem onClick={handleOpenUserModal}>
+								{i18n.t("mainDrawer.appBar.user.profile")}
+							</MenuItem>
+							<MenuItem onClick={handleLogout}>
+								{i18n.t("mainDrawer.appBar.user.logout")}
+							</MenuItem>
 						</Menu>
 					</div>
 				</Toolbar>
