@@ -13,12 +13,13 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 
 	const handleDeleteMessage = async () => {
-		console.log("message deleted", messageId);
-
 		try {
 			await api.delete(`/messages/${messageId}`);
 		} catch (err) {
-			toast.error("Erro ao deletar o message");
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
 	};
 
@@ -54,9 +55,7 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 				<MenuItem onClick={handleOpenConfirmationModal}>
 					Delete Message
 				</MenuItem>
-				<MenuItem onClick={e => console.log("clicked reply")}>
-					Reply Message
-				</MenuItem>
+				<MenuItem disabled>Reply Message</MenuItem>
 			</Menu>
 		</>
 	);

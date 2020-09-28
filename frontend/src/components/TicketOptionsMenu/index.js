@@ -16,13 +16,11 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		try {
 			await api.delete(`/tickets/${ticket.id}`);
 		} catch (err) {
-			toast.error("Erro ao deletar o ticket");
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
 		}
-	};
-
-	const handleTransferTicket = e => {
-		console.log("transfered");
-		handleClose();
 	};
 
 	const handleOpenConfirmationModal = e => {
@@ -50,9 +48,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				<MenuItem onClick={handleOpenConfirmationModal}>
 					{i18n.t("ticketOptionsMenu.delete")}
 				</MenuItem>
-				<MenuItem onClick={handleTransferTicket}>
-					{i18n.t("ticketOptionsMenu.transfer")}
-				</MenuItem>
+				<MenuItem disabled>{i18n.t("ticketOptionsMenu.transfer")}</MenuItem>
 			</Menu>
 			<ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${

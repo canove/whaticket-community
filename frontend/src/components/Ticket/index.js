@@ -16,7 +16,7 @@ import DoneAllIcon from "@material-ui/icons/DoneAll";
 import Paper from "@material-ui/core/Paper";
 
 import { IconButton } from "@material-ui/core";
-import { ExpandMore } from "@material-ui/icons";
+import { Block, ExpandMore } from "@material-ui/icons";
 
 import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
@@ -161,6 +161,13 @@ const useStyles = makeStyles(theme => ({
 		padding: "3px 80px 6px 6px",
 	},
 
+	textContentItemDeleted: {
+		fontStyle: "italic",
+		color: "rgba(0, 0, 0, 0.36)",
+		overflowWrap: "break-word",
+		padding: "3px 80px 6px 6px",
+	},
+
 	messageMedia: {
 		objectFit: "cover",
 		width: 250,
@@ -201,6 +208,12 @@ const useStyles = makeStyles(theme => ({
 		fontSize: 18,
 		verticalAlign: "middle",
 		marginLeft: 4,
+	},
+
+	deletedIcon: {
+		fontSize: 18,
+		verticalAlign: "middle",
+		marginRight: 4,
 	},
 
 	ackDoneAllIcon: {
@@ -246,7 +259,7 @@ const reducer = (state, action) => {
 		const messageIndex = state.findIndex(m => m.id === messageToUpdate.id);
 
 		if (messageIndex !== -1) {
-			state[messageIndex].ack = messageToUpdate.ack;
+			state[messageIndex] = messageToUpdate;
 		}
 
 		return [...state];
@@ -534,13 +547,26 @@ const Ticket = () => {
 									variant="contained"
 									size="small"
 									id="messageActionsButton"
+									disabled={message.isDeleted}
 									className={classes.messageActionsButton}
 									onClick={e => handleOpenMessageOptionsMenu(e, message.id)}
 								>
 									<ExpandMore />
 								</IconButton>
 								{message.mediaUrl && checkMessaageMedia(message)}
-								<div className={classes.textContentItem}>
+								{/* <div className={classes.textContentItem}> */}
+								<div
+									className={clsx(classes.textContentItem, {
+										[classes.textContentItemDeleted]: message.isDeleted,
+									})}
+								>
+									{message.isDeleted && (
+										<Block
+											color="disabled"
+											fontSize="small"
+											className={classes.deletedIcon}
+										/>
+									)}
 									{message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}

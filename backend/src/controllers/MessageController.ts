@@ -6,7 +6,7 @@ import { getIO } from "../libs/socket";
 
 import CreateMessageService from "../services/MessageServices/CreateMessageService";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
-import UpdateMessageService from "../services/MessageServices/UpdateMessageService";
+import DeleteMessageService from "../services/MessageServices/DeleteMessageService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
@@ -88,9 +88,13 @@ export const remove = async (
 
   const messageDeleted = await DeleteWhatsAppMessage(messageId);
 
-  await UpdateMessageService({ messageData: { isDeleted: true }, messageId });
+  const message = await DeleteMessageService(messageDeleted);
 
-  console.log(messageDeleted);
+  const io = getIO();
+  io.to(message.ticketId.toString()).emit("appMessage", {
+    action: "update",
+    message
+  });
 
   return res.json({ ok: true });
 };
