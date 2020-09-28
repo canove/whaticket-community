@@ -6,7 +6,6 @@ import { getIO } from "../libs/socket";
 
 import CreateMessageService from "../services/MessageServices/CreateMessageService";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
-import DeleteMessageService from "../services/MessageServices/DeleteMessageService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
@@ -86,9 +85,7 @@ export const remove = async (
 ): Promise<Response> => {
   const { messageId } = req.params;
 
-  const messageDeleted = await DeleteWhatsAppMessage(messageId);
-
-  const message = await DeleteMessageService(messageDeleted);
+  const message = await DeleteWhatsAppMessage(messageId);
 
   const io = getIO();
   io.to(message.ticketId.toString()).emit("appMessage", {

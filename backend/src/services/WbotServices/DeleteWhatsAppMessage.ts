@@ -30,6 +30,8 @@ const DeleteWhatsAppMessage = async (messageId: string): Promise<Message> => {
     );
   }
 
+  await message.update({ isDeleted: true });
+
   return message;
 };
 
