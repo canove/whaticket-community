@@ -120,6 +120,8 @@ const reducer = (state, action) => {
 		if (ticketIndex !== -1) {
 			state[ticketIndex] = ticket;
 			state.unshift(state.splice(ticketIndex, 1)[0]);
+		} else {
+			state.unshift(ticket);
 		}
 
 		return [...state];
