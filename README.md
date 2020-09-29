@@ -127,14 +127,25 @@ npm start
 
 ## Basic production deployment (Ubuntu 18.04 VPS)
 
-All instructions below assumes you are NOT running as root, since it will give error in puppeteer. See
+All instructions below assumes you are NOT running as root, since it will give an error in puppeteer. So let's start creating a new user and granting sudo privileges to it:
 
-You'll need two subdomains forwarding to yours VPS ip to follow these instructions. We'll use `myapp.mydomain.com` to frontend and `api.mydomain.com` to backend in the following example. We'll also use an dedicated user with sudo privileges no deploy it (not root).
+```bash
+adduser deploy
+usermod -aG sudo deploy
+```
+
+Now we can login with this new user:
+
+```bash
+su deploy
+```
+
+You'll need two subdomains forwarding to yours VPS ip to follow these instructions. We'll use `myapp.mydomain.com` to frontend and `api.mydomain.com` to backend in the following example.
 
 Update all system packages:
 
 ```bash
-apt update && apt upgrade
+sudo apt update && sudo apt upgrade
 ```
 
 Install node and confirm node command is available:
@@ -155,8 +166,8 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt update
 sudo apt install docker-ce
 sudo systemctl status docker
-sudo usermod -aG docker \${USER}
-su - \${USER}
+sudo usermod -aG docker ${USER}
+su - ${USER}
 ```
 
 Create Mysql Database using docker:
