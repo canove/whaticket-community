@@ -1,8 +1,9 @@
-import { sign } from "jsonwebtoken";
-
 import User from "../../models/User";
 import AppError from "../../errors/AppError";
-import authConfig from "../../config/auth";
+import {
+  createAccessToken,
+  createRefreshToken
+} from "../../helpers/CreateTokens";
 
 interface Request {
   email: string;
@@ -12,6 +13,7 @@ interface Request {
 interface Response {
   user: User;
   token: string;
+  refreshToken: string;
 }
 
 const AuthUserService = async ({
@@ -30,18 +32,13 @@ const AuthUserService = async ({
     throw new AppError("Incorrect user/password combination.", 401);
   }
 
-  const { secret, expiresIn } = authConfig;
-  const token = sign(
-    { usarname: user.name, profile: user.profile, id: user.id },
-    secret,
-    {
-      expiresIn
-    }
-  );
+  const token = createAccessToken(user);
+  const refreshToken = createRefreshToken(user);
 
   return {
     user,
-    token
+    token,
+    refreshToken
   };
 };
 

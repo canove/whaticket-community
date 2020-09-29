@@ -5,7 +5,7 @@ const ShowUserService = async (
   id: string | number
 ): Promise<User | undefined> => {
   const user = await User.findByPk(id, {
-    attributes: ["name", "id", "email", "profile"]
+    attributes: ["name", "id", "email", "profile", "tokenVersion"]
   });
 
   if (!user) {
