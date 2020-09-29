@@ -178,9 +178,7 @@ const SignUp = () => {
 					)}
 				</Formik>
 			</div>
-			<Box mt={5}>
-				<Copyright />
-			</Box>
+			<Box mt={5}>{/* <Copyright /> */}</Box>
 		</Container>
 	);
 };
