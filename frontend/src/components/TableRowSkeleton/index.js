@@ -14,62 +14,12 @@ const TableRowSkeleton = () => {
 					<Skeleton animation="wave" height={20} width={80} />
 				</TableCell>
 				<TableCell>
-					<Skeleton animation="wave" height={20} width={70} />
-				</TableCell>
-				<TableCell></TableCell>
-				<TableCell align="right"></TableCell>
-			</TableRow>
-			<TableRow>
-				<TableCell style={{ paddingRight: 0 }}>
-					<Skeleton animation="wave" variant="circle" width={40} height={40} />
+					<Skeleton animation="wave" height={20} width={80} />
 				</TableCell>
 				<TableCell>
 					<Skeleton animation="wave" height={20} width={80} />
 				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={70} />
-				</TableCell>
 				<TableCell></TableCell>
-				<TableCell align="right"></TableCell>
-			</TableRow>
-			<TableRow>
-				<TableCell style={{ paddingRight: 0 }}>
-					<Skeleton animation="wave" variant="circle" width={40} height={40} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={80} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={70} />
-				</TableCell>
-				<TableCell></TableCell>
-				<TableCell align="right"></TableCell>
-			</TableRow>
-			<TableRow>
-				<TableCell style={{ paddingRight: 0 }}>
-					<Skeleton animation="wave" variant="circle" width={40} height={40} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={80} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={70} />
-				</TableCell>
-				<TableCell></TableCell>
-				<TableCell align="right"></TableCell>
-			</TableRow>
-			<TableRow>
-				<TableCell style={{ paddingRight: 0 }}>
-					<Skeleton animation="wave" variant="circle" width={40} height={40} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={80} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={70} />
-				</TableCell>
-				<TableCell></TableCell>
-				<TableCell align="right"></TableCell>
 			</TableRow>
 		</>
 	);

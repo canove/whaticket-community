@@ -249,37 +249,34 @@ const Users = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{loading ? (
-							<TableRowSkeleton />
-						) : (
-							<>
-								{users.map(user => (
-									<TableRow key={user.id}>
-										<TableCell>{user.name}</TableCell>
-										<TableCell>{user.email}</TableCell>
-										<TableCell>{user.profile}</TableCell>
-										<TableCell align="right">
-											<IconButton
-												size="small"
-												onClick={() => handleEditUser(user)}
-											>
-												<EditIcon />
-											</IconButton>
+						<>
+							{users.map(user => (
+								<TableRow key={user.id}>
+									<TableCell>{user.name}</TableCell>
+									<TableCell>{user.email}</TableCell>
+									<TableCell>{user.profile}</TableCell>
+									<TableCell align="right">
+										<IconButton
+											size="small"
+											onClick={() => handleEditUser(user)}
+										>
+											<EditIcon />
+										</IconButton>
 
-											<IconButton
-												size="small"
-												onClick={e => {
-													setConfirmModalOpen(true);
-													setDeletingUser(user);
-												}}
-											>
-												<DeleteOutlineIcon />
-											</IconButton>
-										</TableCell>
-									</TableRow>
-								))}
-							</>
-						)}
+										<IconButton
+											size="small"
+											onClick={e => {
+												setConfirmModalOpen(true);
+												setDeletingUser(user);
+											}}
+										>
+											<DeleteOutlineIcon />
+										</IconButton>
+									</TableCell>
+								</TableRow>
+							))}
+							{loading && <TableRowSkeleton />}
+						</>
 					</TableBody>
 				</Table>
 			</Paper>
