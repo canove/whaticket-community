@@ -73,7 +73,7 @@ const NotificationsPopOver = () => {
 		socket.emit("joinNotification");
 
 		socket.on("ticket", data => {
-			if (data.action === "updateUnread") {
+			if (data.action === "updateUnread" || data.action === "delete") {
 				setNotifications(prevState => {
 					const ticketIndex = prevState.findIndex(t => t.id === data.ticketId);
 					if (ticketIndex !== -1) {
@@ -103,7 +103,7 @@ const NotificationsPopOver = () => {
 					(ticketIdRef.current &&
 						data.message.ticketId === ticketIdRef.current &&
 						document.visibilityState === "visible") ||
-					(data.ticket.userId !== userId && data.ticket.userId)
+					(data.ticket.userId && data.ticket.userId !== userId)
 				)
 					return;
 				else {

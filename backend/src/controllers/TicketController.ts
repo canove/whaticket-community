@@ -101,6 +101,7 @@ export const remove = async (
   const io = getIO();
   io.to(ticket.status)
     .to(ticketId)
+    .to("notification")
     .emit("ticket", {
       action: "delete",
       ticketId: +ticketId
