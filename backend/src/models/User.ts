@@ -34,6 +34,10 @@ class User extends Model<User> {
   @Column
   passwordHash: string;
 
+  @Default(0)
+  @Column
+  tokenVersion: number;
+
   @Default("admin")
   @Column
   profile: string;
