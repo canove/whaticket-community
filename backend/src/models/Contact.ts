@@ -37,6 +37,10 @@ class Contact extends Model<Contact> {
   @Column
   profilePicUrl: string;
 
+  @Default(false)
+  @Column
+  isGroup: boolean;
+
   @CreatedAt
   createdAt: Date;
 

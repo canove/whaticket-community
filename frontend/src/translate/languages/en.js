@@ -243,7 +243,8 @@ const messages = {
 					buttons: {
 						return: "Return",
 						resolve: "Resolve",
-						reopen: "Reopen",
+            reopen: "Reopen",
+            accept: "Accept"
 					},
 				},
 			},

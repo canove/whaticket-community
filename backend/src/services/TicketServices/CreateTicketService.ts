@@ -2,6 +2,7 @@ import AppError from "../../errors/AppError";
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import Ticket from "../../models/Ticket";
+import ShowContactService from "../ContactServices/ShowContactService";
 
 interface Request {
   contactId: number;
@@ -22,9 +23,12 @@ const CreateTicketService = async ({
 
   await CheckContactOpenTickets(contactId);
 
+  const { isGroup } = await ShowContactService(contactId);
+
   const { id }: Ticket = await defaultWhatsapp.$create("ticket", {
     contactId,
     status,
+    isGroup,
     userId
   });
 

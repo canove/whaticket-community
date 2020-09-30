@@ -103,7 +103,7 @@ const TicketActionButtons = ({ ticket }) => {
 					color="primary"
 					onClick={e => handleUpdateTicketStatus(e, "open", userId)}
 				>
-					ACCEPT
+					{i18n.t("messagesList.header.buttons.accept")}
 				</Button>
 			)}
 		</div>

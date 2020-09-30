@@ -245,6 +245,7 @@ const messages = {
 						return: "Retornar",
 						resolve: "Resolver",
 						reopen: "Reabrir",
+						accept: "Aceitar",
 					},
 				},
 			},
