@@ -9,6 +9,7 @@ import TicketListItem from "../TicketListItem";
 import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
+import { ListSubheader } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	ticketsListWrapper: {
@@ -29,13 +30,14 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	ticketsListHeader: {
-		display: "flex",
-		alignItems: "center",
-		fontWeight: 500,
-		fontSize: "16px",
-		height: "56px",
+		// display: "flex",
+		// alignItems: "center",
+		// fontWeight: 500,
+		// fontSize: "16px",
+		// height: "56px",
 		color: "rgb(67, 83, 105)",
-		padding: "0px 12px",
+		// padding: "0px 12px",
+		backgroundColor: "white",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
@@ -255,16 +257,16 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 			>
 				<List style={{ paddingTop: 0 }}>
 					{status === "open" && (
-						<div className={classes.ticketsListHeader}>
+						<ListSubheader className={classes.ticketsListHeader}>
 							{i18n.t("ticketsList.assignedHeader")}
 							<span className={classes.ticketsCount}>{ticketsList.length}</span>
-						</div>
+						</ListSubheader>
 					)}
 					{status === "pending" && (
-						<div className={classes.ticketsListHeader}>
+						<ListSubheader className={classes.ticketsListHeader}>
 							{i18n.t("ticketsList.pendingHeader")}
 							<span className={classes.ticketsCount}>{ticketsList.length}</span>
-						</div>
+						</ListSubheader>
 					)}
 					{ticketsList.length === 0 && !loading ? (
 						<div className={classes.noTicketsDiv}>

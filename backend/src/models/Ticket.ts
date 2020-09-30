@@ -11,7 +11,8 @@ import {
   HasMany,
   AutoIncrement,
   AfterFind,
-  BeforeUpdate
+  BeforeUpdate,
+  Default
 } from "sequelize-typescript";
 
 import Contact from "./Contact";
@@ -34,6 +35,10 @@ class Ticket extends Model<Ticket> {
 
   @Column
   lastMessage: string;
+
+  @Default(false)
+  @Column
+  isGroup: boolean;
 
   @CreatedAt
   createdAt: Date;

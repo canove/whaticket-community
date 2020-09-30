@@ -9,7 +9,9 @@ export const GetWbotMessage = async (
 ): Promise<WbotMessage> => {
   const wbot = await GetTicketWbot(ticket);
 
-  const wbotChat = await wbot.getChatById(`${ticket.contact.number}@c.us`);
+  const wbotChat = await wbot.getChatById(
+    `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`
+  );
 
   try {
     const chatMessages = await wbotChat.fetchMessages({ limit: 20 });

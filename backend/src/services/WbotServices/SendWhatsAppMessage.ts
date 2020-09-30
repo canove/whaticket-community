@@ -16,7 +16,7 @@ const SendWhatsAppMessage = async ({
     const wbot = await GetTicketWbot(ticket);
 
     const sentMessage = await wbot.sendMessage(
-      `${ticket.contact.number}@c.us`,
+      `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       body
     );
 

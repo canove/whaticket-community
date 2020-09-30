@@ -88,6 +88,7 @@ const NotificationsPopOver = () => {
 		socket.on("appMessage", data => {
 			if (
 				data.action === "create" &&
+				!data.message.read &&
 				(data.ticket.userId === userId || !data.ticket.userId)
 			) {
 				setNotifications(prevState => {
@@ -103,7 +104,8 @@ const NotificationsPopOver = () => {
 					(ticketIdRef.current &&
 						data.message.ticketId === ticketIdRef.current &&
 						document.visibilityState === "visible") ||
-					(data.ticket.userId && data.ticket.userId !== userId)
+					(data.ticket.userId && data.ticket.userId !== userId) ||
+					data.ticket.isGroup
 				)
 					return;
 				else {

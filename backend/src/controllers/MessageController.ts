@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 
-import { Message as WbotMessage } from "whatsapp-web.js";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../libs/socket";
 
-import CreateMessageService from "../services/MessageServices/CreateMessageService";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
@@ -39,44 +37,20 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { body, fromMe, read }: MessageData = req.body;
+  const { body }: MessageData = req.body;
   const media = req.file;
 
   const ticket = await ShowTicketService(ticketId);
 
-  let sentMessage: WbotMessage;
-
   if (media) {
-    sentMessage = await SendWhatsAppMedia({ media, ticket });
+    await SendWhatsAppMedia({ media, ticket });
   } else {
-    sentMessage = await SendWhatsAppMessage({ body, ticket });
+    await SendWhatsAppMessage({ body, ticket });
   }
-
-  const newMessage = {
-    id: sentMessage.id.id,
-    body,
-    fromMe,
-    read,
-    mediaType: sentMessage.type,
-    mediaUrl: media?.filename
-  };
-
-  const message = await CreateMessageService({
-    messageData: newMessage,
-    ticketId: ticket.id
-  });
-
-  const io = getIO();
-  io.to(ticketId).to("notification").to(ticket.status).emit("appMessage", {
-    action: "create",
-    message,
-    ticket,
-    contact: ticket.contact
-  });
 
   await SetTicketMessagesAsRead(ticket);
 
-  return res.status(200).json(message);
+  return res.send();
 };
 
 export const remove = async (
@@ -93,5 +67,5 @@ export const remove = async (
     message
   });
 
-  return res.json({ ok: true });
+  return res.send();
 };

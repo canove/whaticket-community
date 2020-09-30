@@ -1,3 +1,4 @@
+import fs from "fs";
 import { MessageMedia, Message as WbotMessage } from "whatsapp-web.js";
 import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
@@ -18,11 +19,14 @@ const SendWhatsAppMedia = async ({
     const newMedia = MessageMedia.fromFilePath(media.path);
 
     const sentMessage = await wbot.sendMessage(
-      `${ticket.contact.number}@c.us`,
+      `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       newMedia
     );
 
     await ticket.update({ lastMessage: media.filename });
+
+    fs.unlinkSync(media.path);
+
     return sentMessage;
   } catch (err) {
     console.log(err);

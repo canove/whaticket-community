@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import { Op } from "sequelize";
 import { subHours } from "date-fns";
-import Sentry from "@sentry/node";
+import * as Sentry from "@sentry/node";
 
 import {
   Contact as WbotContact,
@@ -24,35 +24,80 @@ const verifyContact = async (
   profilePicUrl: string
 ): Promise<Contact> => {
   let contact = await Contact.findOne({
-    where: { number: msgContact.number }
+    where: { number: msgContact.id.user }
   });
 
   if (contact) {
     await contact.update({ profilePicUrl });
   } else {
     contact = await Contact.create({
-      name: msgContact.pushname || msgContact.number.toString(),
-      number: msgContact.number,
+      name: msgContact.name || msgContact.pushname || msgContact.id.user,
+      number: msgContact.id.user,
       profilePicUrl
+    });
+    const io = getIO();
+    io.emit("contact", {
+      action: "create",
+      contact
     });
   }
 
   return contact;
 };
 
+const verifyGroup = async (msgGroupContact: WbotContact) => {
+  const profilePicUrl = await msgGroupContact.getProfilePicUrl();
+
+  let groupContact = await Contact.findOne({
+    where: { number: msgGroupContact.id.user }
+  });
+  if (groupContact) {
+    await groupContact.update({ profilePicUrl });
+  } else {
+    groupContact = await Contact.create({
+      name: msgGroupContact.name,
+      number: msgGroupContact.id.user,
+      isGroup: msgGroupContact.isGroup,
+      profilePicUrl
+    });
+    const io = getIO();
+    io.emit("contact", {
+      action: "create",
+      contact: groupContact
+    });
+  }
+
+  return groupContact;
+};
+
 const verifyTicket = async (
   contact: Contact,
-  whatsappId: number
+  whatsappId: number,
+  groupContact?: Contact
 ): Promise<Ticket> => {
   let ticket = await Ticket.findOne({
     where: {
       status: {
         [Op.or]: ["open", "pending"]
       },
-      contactId: contact.id
+      contactId: groupContact ? groupContact.id : contact.id
     },
     include: ["contact"]
   });
+
+  if (!ticket && groupContact) {
+    ticket = await Ticket.findOne({
+      where: {
+        contactId: groupContact.id
+      },
+      order: [["createdAt", "DESC"]],
+      include: ["contact"]
+    });
+
+    if (ticket) {
+      await ticket.update({ status: "pending", userId: null });
+    }
+  }
 
   if (!ticket) {
     ticket = await Ticket.findOne({
@@ -60,7 +105,7 @@ const verifyTicket = async (
         createdAt: {
           [Op.between]: [+subHours(new Date(), 2), +new Date()]
         },
-        contactId: contact.id
+        contactId: groupContact ? groupContact.id : contact.id
       },
       order: [["createdAt", "DESC"]],
       include: ["contact"]
@@ -73,8 +118,9 @@ const verifyTicket = async (
 
   if (!ticket) {
     const { id } = await Ticket.create({
-      contactId: contact.id,
+      contactId: groupContact ? groupContact.id : contact.id,
       status: "pending",
+      isGroup: !!groupContact,
       whatsappId
     });
 
@@ -86,7 +132,8 @@ const verifyTicket = async (
 
 const handlMedia = async (
   msg: WbotMessage,
-  ticket: Ticket
+  ticket: Ticket,
+  contact: Contact
 ): Promise<Message> => {
   const media = await msg.downloadMedia();
 
@@ -110,7 +157,9 @@ const handlMedia = async (
 
   const newMessage: Message = await ticket.$create("message", {
     id: msg.id.id,
-    body: msg.body || media.filename,
+    body: msg.fromMe
+      ? msg.body
+      : `${contact.name}: ${msg.body ? msg.body : media.filename}`,
     fromMe: msg.fromMe,
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0]
@@ -127,12 +176,13 @@ const handleMessage = async (
   let newMessage: Message;
 
   if (msg.hasMedia) {
-    newMessage = await handlMedia(msg, ticket);
+    newMessage = await handlMedia(msg, ticket, contact);
   } else {
     newMessage = await ticket.$create("message", {
       id: msg.id.id,
-      body: msg.body,
-      fromMe: msg.fromMe
+      body: msg.fromMe ? msg.body : `${contact.name}: ${msg.body}`,
+      fromMe: msg.fromMe,
+      read: msg.fromMe
     });
     await ticket.update({ lastMessage: msg.body });
   }
@@ -150,7 +200,6 @@ const handleMessage = async (
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {
-  if (msg.author) return false;
   if (
     msg.type === "chat" ||
     msg.type === "audio" ||
@@ -176,28 +225,22 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
 
     try {
       let msgContact: WbotContact;
+      let msgGroupContact: WbotContact | null = null;
+      let groupContact: Contact | undefined;
 
       if (msg.fromMe) {
         msgContact = await wbot.getContactById(msg.to);
       } else {
         msgContact = await msg.getContact();
       }
+      if (msg.author) {
+        msgGroupContact = await wbot.getContactById(msg.from);
+        groupContact = await verifyGroup(msgGroupContact);
+      }
 
       const profilePicUrl = await msgContact.getProfilePicUrl();
       const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId);
-
-      // return if message was already created by messageController
-
-      if (msg.fromMe) {
-        const alreadyExists = await Message.findOne({
-          where: { id: msg.id.id }
-        });
-
-        if (alreadyExists) {
-          return;
-        }
-      }
+      const ticket = await verifyTicket(contact, whatsappId, groupContact);
 
       await handleMessage(msg, ticket, contact);
     } catch (err) {
