@@ -1,4 +1,6 @@
 export default {
   secret: "mysecret",
-  expiresIn: "7d"
+  expiresIn: "15m",
+  refreshSecret: "myanothersecret",
+  refreshExpiresIn: "7d"
 };

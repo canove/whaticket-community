@@ -3,6 +3,7 @@ import "dotenv/config";
 import "express-async-errors";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import multer from "multer";
 import * as Sentry from "@sentry/node";
 
@@ -18,7 +19,13 @@ Sentry.init({ dsn: process.env.SENTRY_DSN });
 const upload = multer(uploadConfig);
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.FRONTEND_URL
+  })
+);
+app.use(cookieParser());
 app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
 app.use(upload.single("media"));
