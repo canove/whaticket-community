@@ -268,10 +268,6 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 							{i18n.t("ticketsList.assignedHeader")}
 							<span className={classes.ticketsCount}>{ticketsList.length}</span>
 						</ListSubheader>
-						// <div className={classes.ticketsListHeader}>
-						// 	{i18n.t("ticketsList.assignedHeader")}
-						// 	<span className={classes.ticketsCount}>{ticketsList.length}</span>
-						// </div>
 					)}
 					{status === "pending" && (
 						<ListSubheader className={classes.ticketsListHeader}>
