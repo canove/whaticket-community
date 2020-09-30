@@ -55,6 +55,8 @@ const ListTicketsService = async ({
   }
 
   if (searchParam) {
+    const sanitizedSearchParam = searchParam.toLocaleLowerCase().trim();
+
     includeCondition = [
       ...includeCondition,
       {
@@ -65,7 +67,7 @@ const ListTicketsService = async ({
           body: where(
             fn("LOWER", col("body")),
             "LIKE",
-            `%${searchParam.toLowerCase()}%`
+            `%${sanitizedSearchParam}%`
           )
         },
         required: false,
@@ -79,15 +81,15 @@ const ListTicketsService = async ({
           "$contact.name$": where(
             fn("LOWER", col("name")),
             "LIKE",
-            `%${searchParam.toLowerCase()}%`
+            `%${sanitizedSearchParam}%`
           )
         },
-        { "$contact.number$": { [Op.like]: `%${searchParam}%` } },
+        { "$contact.number$": { [Op.like]: `%${sanitizedSearchParam}%` } },
         {
           "$message.body$": where(
             fn("LOWER", col("body")),
             "LIKE",
-            `%${searchParam.toLowerCase()}%`
+            `%${sanitizedSearchParam}%`
           )
         }
       ]

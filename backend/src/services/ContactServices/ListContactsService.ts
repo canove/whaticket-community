@@ -22,10 +22,10 @@ const ListContactsService = async ({
         name: Sequelize.where(
           Sequelize.fn("LOWER", Sequelize.col("name")),
           "LIKE",
-          `%${searchParam.toLowerCase()}%`
+          `%${searchParam.toLowerCase().trim()}%`
         )
       },
-      { number: { [Op.like]: `%${searchParam}%` } }
+      { number: { [Op.like]: `%${searchParam.toLowerCase().trim()}%` } }
     ]
   };
   const limit = 20;

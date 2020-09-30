@@ -20,8 +20,6 @@ interface Response {
 export const RefreshTokenService = async (token: string): Promise<Response> => {
   let decoded;
 
-  console.log(token);
-
   try {
     decoded = verify(token, authConfig.refreshSecret);
   } catch (err) {

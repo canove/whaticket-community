@@ -180,6 +180,7 @@ const messages = {
 			newTicketModal: {
 				title: "Criar Ticket",
 				fieldLabel: "Digite para pesquisar o contato",
+				noOptions: "Nenhum contato encotrado. Tente outro nome.",
 				buttons: {
 					ok: "Salvar",
 					cancel: "Cancelar",
