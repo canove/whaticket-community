@@ -70,13 +70,6 @@ const useStyles = makeStyles(theme => ({
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	listSection: {
-		backgroundColor: "inherit",
-	},
-	ul: {
-		backgroundColor: "white",
-		// padding: 0,
-	},
 }));
 
 const reducer = (state, action) => {
