@@ -201,6 +201,7 @@ const handleMessage = async (
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {
+  if (msg.from === "status@broadcast") return false;
   if (
     msg.type === "chat" ||
     msg.type === "audio" ||

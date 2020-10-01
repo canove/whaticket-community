@@ -554,7 +554,6 @@ const Ticket = () => {
 									<ExpandMore />
 								</IconButton>
 								{message.mediaUrl && checkMessaageMedia(message)}
-								{/* <div className={classes.textContentItem}> */}
 								<div
 									className={clsx(classes.textContentItem, {
 										[classes.textContentItemDeleted]: message.isDeleted,
