@@ -158,7 +158,7 @@ const handlMedia = async (
   const newMessage: Message = await ticket.$create("message", {
     id: msg.id.id,
     body: msg.fromMe
-      ? msg.body
+      ? `${msg.body ? msg.body : media.filename}`
       : `${contact.name}: ${msg.body ? msg.body : media.filename}`,
     fromMe: msg.fromMe,
     mediaUrl: media.filename,
@@ -182,6 +182,7 @@ const handleMessage = async (
       id: msg.id.id,
       body: msg.fromMe ? msg.body : `${contact.name}: ${msg.body}`,
       fromMe: msg.fromMe,
+      mediaType: msg.type,
       read: msg.fromMe
     });
     await ticket.update({ lastMessage: msg.body });
