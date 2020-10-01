@@ -15,7 +15,16 @@ import DoneIcon from "@material-ui/icons/Done";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
 import Paper from "@material-ui/core/Paper";
 
-import { IconButton } from "@material-ui/core";
+import {
+	Avatar,
+	Button,
+	Card,
+	CardActions,
+	CardContent,
+	CardHeader,
+	IconButton,
+	Typography,
+} from "@material-ui/core";
 import { Block, ExpandMore } from "@material-ui/icons";
 
 import api from "../../services/api";
@@ -222,6 +231,11 @@ const useStyles = makeStyles(theme => ({
 		verticalAlign: "middle",
 		marginLeft: 4,
 	},
+
+	vcard: {
+		// display: "flex",
+		marginBottom: 10,
+	},
 }));
 
 const reducer = (state, action) => {
@@ -402,6 +416,50 @@ const Ticket = () => {
 		}
 	};
 
+	const parseVcard = vcard => {
+		var Re1 = /^(version|fn|title|org):(.+)$/i;
+		var Re2 = /^([^:;]+);([^:]+):(.+)$/;
+		var ReKey = /item\d{1,2}\./;
+		var fields = {};
+
+		vcard.split(/\r\n|\r|\n/).forEach(function (line) {
+			var results, key;
+
+			if (Re1.test(line)) {
+				results = line.match(Re1);
+				key = results[1].toLowerCase();
+				fields[key] = results[2];
+			} else if (Re2.test(line)) {
+				results = line.match(Re2);
+				key = results[1].replace(ReKey, "").toLowerCase();
+
+				var meta = {};
+				results[2]
+					.split(";")
+					.map(function (p, i) {
+						var match = p.match(/([a-z]+)=(.*)/i);
+						if (match) {
+							return [match[1], match[2]];
+						} else {
+							return ["TYPE" + (i === 0 ? "" : i), p];
+						}
+					})
+					.forEach(function (p) {
+						meta[p[0]] = p[1];
+					});
+
+				if (!fields[key]) fields[key] = [];
+
+				fields[key].push({
+					meta: meta,
+					value: results[3].split(";"),
+				});
+			}
+		});
+
+		return fields;
+	};
+
 	const checkMessaageMedia = message => {
 		if (message.mediaType === "image") {
 			return (
@@ -429,6 +487,25 @@ const Ticket = () => {
 					src={message.mediaUrl}
 					controls
 				/>
+			);
+		}
+		if (message.mediaType === "vcard") {
+			const contactVcard = parseVcard(message.body);
+
+			console.log(contactVcard);
+
+			return (
+				<Card className={classes.vcard} variant="outlined">
+					<CardHeader
+						avatar={<Avatar aria-label="recipe" />}
+						// action={<Button size="small">Enviar Mensagem</Button>}
+						title={contactVcard.fn}
+						subheader={contactVcard.tel[0].meta.waid}
+					/>
+					<CardActions>
+						<Button size="small">Adicionar Contato</Button>
+					</CardActions>
+				</Card>
 			);
 		} else {
 			return (
@@ -527,9 +604,10 @@ const Ticket = () => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
-								{message.mediaUrl && checkMessaageMedia(message)}
+								{(message.mediaUrl || message.mediaType === "vcard") &&
+									checkMessaageMedia(message)}
 								<div className={classes.textContentItem}>
-									{message.body}
+									{message.mediaType !== "vcard" && message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
 									</span>
@@ -553,7 +631,8 @@ const Ticket = () => {
 								>
 									<ExpandMore />
 								</IconButton>
-								{message.mediaUrl && checkMessaageMedia(message)}
+								{(message.mediaUrl || message.mediaType === "vcard") &&
+									checkMessaageMedia(message)}
 								<div
 									className={clsx(classes.textContentItem, {
 										[classes.textContentItemDeleted]: message.isDeleted,
@@ -566,7 +645,7 @@ const Ticket = () => {
 											className={classes.deletedIcon}
 										/>
 									)}
-									{message.body}
+									{message.mediaType !== "vcard" && message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
 										{renderMessageAck(message)}

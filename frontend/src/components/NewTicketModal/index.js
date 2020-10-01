@@ -42,9 +42,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const filterOptions = createFilterOptions({
-	matchFrom: "start",
 	trim: true,
-	stringify: option => option.name,
 });
 
 const NewTicketModal = ({ modalOpen, onClose }) => {

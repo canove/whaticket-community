@@ -209,7 +209,8 @@ const isValidMsg = (msg: WbotMessage): boolean => {
     msg.type === "video" ||
     msg.type === "image" ||
     msg.type === "document" ||
-    msg.type === "vcard"
+    msg.type === "vcard" ||
+    msg.type === "sticker"
   )
     return true;
   return false;
