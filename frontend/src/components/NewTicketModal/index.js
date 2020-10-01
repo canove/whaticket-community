@@ -81,8 +81,6 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);
 
-	console.log(options);
-
 	const handleClose = () => {
 		onClose();
 		setSearchParam("");
