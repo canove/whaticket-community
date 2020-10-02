@@ -1,5 +1,6 @@
-import path from "path";
-import fs from "fs";
+import { join } from "path";
+import { promisify } from "util";
+import { writeFile } from "fs";
 import { Op } from "sequelize";
 import { subHours } from "date-fns";
 import * as Sentry from "@sentry/node";
@@ -18,6 +19,8 @@ import { getIO } from "../../libs/socket";
 import { getWbot } from "../../libs/wbot";
 import AppError from "../../errors/AppError";
 import ShowTicketService from "../TicketServices/ShowTicketService";
+
+const writeFileAsync = promisify(writeFile);
 
 const verifyContact = async (
   msgContact: WbotContact,
@@ -146,14 +149,15 @@ const handlMedia = async (
     media.filename = `${new Date().getTime()}.${ext}`;
   }
 
-  fs.writeFile(
-    path.join(__dirname, "..", "..", "..", "public", media.filename),
-    media.data,
-    "base64",
-    err => {
-      console.log(err);
-    }
-  );
+  try {
+    await writeFileAsync(
+      join(__dirname, "..", "..", "..", "public", media.filename),
+      media.data,
+      "base64"
+    );
+  } catch (err) {
+    console.log(err);
+  }
 
   const newMessage: Message = await ticket.$create("message", {
     id: msg.id.id,
@@ -222,22 +226,49 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
   const io = getIO();
 
   wbot.on("message_create", async msg => {
+    // console.log(msg);
     if (!isValidMsg(msg)) {
       return;
     }
 
     try {
       let msgContact: WbotContact;
-      let msgGroupContact: WbotContact | null = null;
       let groupContact: Contact | undefined;
 
       if (msg.fromMe) {
         msgContact = await wbot.getContactById(msg.to);
+
+        // return if it's a media message, it will be handled by media_uploaded event
+
+        if (msg.hasMedia || msg.type !== "chat") return;
       } else {
         msgContact = await msg.getContact();
       }
+
+      // if message has an author, its a gruop message.
+
       if (msg.author) {
-        msgGroupContact = await wbot.getContactById(msg.from);
+        const msgGroupContact = await wbot.getContactById(msg.from);
+        groupContact = await verifyGroup(msgGroupContact);
+      }
+
+      const profilePicUrl = await msgContact.getProfilePicUrl();
+      const contact = await verifyContact(msgContact, profilePicUrl);
+      const ticket = await verifyTicket(contact, whatsappId, groupContact);
+
+      await handleMessage(msg, ticket, contact);
+    } catch (err) {
+      Sentry.captureException(err);
+      console.log(err);
+    }
+  });
+
+  wbot.on("media_uploaded", async msg => {
+    try {
+      let groupContact: Contact | undefined;
+      const msgContact = await wbot.getContactById(msg.to);
+      if (msg.author) {
+        const msgGroupContact = await wbot.getContactById(msg.from);
         groupContact = await verifyGroup(msgGroupContact);
       }
 
@@ -253,6 +284,8 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
   });
 
   wbot.on("message_ack", async (msg, ack) => {
+    await new Promise(r => setTimeout(r, 500));
+
     try {
       const messageToUpdate = await Message.findOne({
         where: { id: msg.id.id }
