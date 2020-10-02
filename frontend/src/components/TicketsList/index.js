@@ -210,7 +210,10 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		});
 
 		socket.on("appMessage", data => {
-			if (data.action === "create") {
+			if (
+				data.action === "create" &&
+				(!data.ticket.userId || data.ticket.userId === userId || showAll)
+			) {
 				dispatch({
 					type: "UPDATE_TICKET_MESSAGES_COUNT",
 					payload: data.ticket,
