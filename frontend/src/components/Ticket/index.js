@@ -460,7 +460,7 @@ const Ticket = () => {
 		return fields;
 	};
 
-	const checkMessaageMedia = message => {
+	const checkMessageMedia = message => {
 		if (message.mediaType === "image") {
 			return (
 				<ModalImage
@@ -605,7 +605,7 @@ const Ticket = () => {
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
 								{(message.mediaUrl || message.mediaType === "vcard") &&
-									checkMessaageMedia(message)}
+									checkMessageMedia(message)}
 								<div className={classes.textContentItem}>
 									{message.mediaType !== "vcard" && message.body}
 									<span className={classes.timestamp}>
@@ -632,7 +632,7 @@ const Ticket = () => {
 									<ExpandMore />
 								</IconButton>
 								{(message.mediaUrl || message.mediaType === "vcard") &&
-									checkMessaageMedia(message)}
+									checkMessageMedia(message)}
 								<div
 									className={clsx(classes.textContentItem, {
 										[classes.textContentItemDeleted]: message.isDeleted,
