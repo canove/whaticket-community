@@ -30,13 +30,8 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	ticketsListHeader: {
-		// display: "flex",
-		// alignItems: "center",
-		// fontWeight: 500,
-		// fontSize: "16px",
-		// height: "56px",
 		color: "rgb(67, 83, 105)",
-		// padding: "0px 12px",
+		zIndex: 2,
 		backgroundColor: "white",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 	},
