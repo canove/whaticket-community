@@ -402,7 +402,7 @@ const Ticket = () => {
 		}
 	};
 
-	const checkMessaageMedia = message => {
+	const checkMessageMedia = message => {
 		if (message.mediaType === "image") {
 			return (
 				<ModalImage
@@ -527,7 +527,7 @@ const Ticket = () => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
-								{message.mediaUrl && checkMessaageMedia(message)}
+								{message.mediaUrl && checkMessageMedia(message)}
 								<div className={classes.textContentItem}>
 									{message.body}
 									<span className={classes.timestamp}>
@@ -553,7 +553,7 @@ const Ticket = () => {
 								>
 									<ExpandMore />
 								</IconButton>
-								{message.mediaUrl && checkMessaageMedia(message)}
+								{message.mediaUrl && checkMessageMedia(message)}
 								{/* <div className={classes.textContentItem}> */}
 								<div
 									className={clsx(classes.textContentItem, {
