@@ -21,7 +21,7 @@ const wbotMonitor = (whatsapp: Whatsapp): void => {
         console.log(err);
       }
 
-      io.emit("session", {
+      io.emit("whatsappSession", {
         action: "update",
         session: whatsapp
       });
@@ -40,7 +40,7 @@ const wbotMonitor = (whatsapp: Whatsapp): void => {
         console.log(err);
       }
 
-      io.emit("session", {
+      io.emit("whatsappSession", {
         action: "update",
         session: whatsapp
       });
@@ -55,7 +55,7 @@ const wbotMonitor = (whatsapp: Whatsapp): void => {
         console.log(err);
       }
 
-      io.emit("session", {
+      io.emit("whatsappSession", {
         action: "update",
         session: whatsapp
       });

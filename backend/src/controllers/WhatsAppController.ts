@@ -9,12 +9,6 @@ import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppSer
 import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
-// import Yup from "yup";
-// import Whatsapp from "../models/Whatsapp";
-// import { getIO } from "../libs/socket";
-// import { getWbot, initWbot, removeWbot } from "../libs/wbot";
-// import wbotMessageListener from "../services/wbotMessageListener";
-// import wbotMonitor from "../services/wbotMonitor";
 
 interface WhatsappData {
   name: string;
