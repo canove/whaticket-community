@@ -12,6 +12,13 @@ const useAuth = () => {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
+		if (
+			history.location.pathname === "/login" ||
+			history.location.pathname === "/signup"
+		) {
+			setLoading(false);
+			return;
+		}
 		const token = localStorage.getItem("token");
 		if (token) {
 			api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
@@ -61,10 +68,10 @@ const useAuth = () => {
 				return Promise.reject(error);
 			}
 		);
-	}, []);
+	}, [history]);
 
 	const handleLogin = async (e, user) => {
-		// setLoading(true);
+		setLoading(true);
 		e.preventDefault();
 		try {
 			const { data } = await api.post("/auth/login", user);
@@ -75,18 +82,19 @@ const useAuth = () => {
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
-			// setLoading(false);
+			setLoading(false);
 			history.push("/tickets");
 		} catch (err) {
 			console.log(err);
 			if (err.response && err.response.data && err.response.data.error) {
 				toast.error(err.response.data.error);
 			}
+			setLoading(false);
 		}
 	};
 
 	const handleLogout = e => {
-		// setLoading(true);
+		setLoading(true);
 		e.preventDefault();
 		setIsAuth(false);
 		localStorage.removeItem("token");
@@ -94,7 +102,7 @@ const useAuth = () => {
 		localStorage.removeItem("profile");
 		localStorage.removeItem("userId");
 		api.defaults.headers.Authorization = undefined;
-		// setLoading(false);
+		setLoading(false);
 		history.push("/login");
 	};
 
