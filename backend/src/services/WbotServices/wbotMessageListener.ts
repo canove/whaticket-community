@@ -305,8 +305,8 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
     await new Promise(r => setTimeout(r, 500));
 
     try {
-      const messageToUpdate = await Message.findOne({
-        where: { id: msg.id.id }
+      const messageToUpdate = await Message.findByPk(msg.id.id, {
+        include: ["contact", "vcardContact"]
       });
       if (!messageToUpdate) {
         return;

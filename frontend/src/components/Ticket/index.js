@@ -455,13 +455,13 @@ const Ticket = () => {
 								src={message.vcardContact?.profilePicUrl}
 							/>
 						}
-						title={message?.vcardContact?.name}
-						subheader={message?.vcardContact?.number}
+						title={message.vcardContact?.name}
+						subheader={message.vcardContact?.number}
 					/>
 					<CardActions>
-						<Button size="small" variant="contained">
+						{/* <Button size="small" variant="contained">
 							Send Message
-						</Button>
+						</Button> */}
 					</CardActions>
 				</Card>
 			);
