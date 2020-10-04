@@ -10,6 +10,7 @@ import {
   BelongsTo,
   ForeignKey
 } from "sequelize-typescript";
+import Contact from "./Contact";
 import Ticket from "./Ticket";
 
 @Table
@@ -64,6 +65,20 @@ class Message extends Model<Message> {
 
   @BelongsTo(() => Ticket)
   ticket: Ticket;
+
+  @ForeignKey(() => Contact)
+  @Column
+  contactId: number;
+
+  @BelongsTo(() => Contact, "contactId")
+  contact: Contact;
+
+  @ForeignKey(() => Contact)
+  @Column
+  vcardContactId: number;
+
+  @BelongsTo(() => Contact, "vcardContactId")
+  vcardContact: Contact;
 }
 
 export default Message;

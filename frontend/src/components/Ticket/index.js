@@ -20,10 +20,8 @@ import {
 	Button,
 	Card,
 	CardActions,
-	CardContent,
 	CardHeader,
 	IconButton,
-	Typography,
 } from "@material-ui/core";
 import { Block, ExpandMore } from "@material-ui/icons";
 
@@ -233,8 +231,10 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	vcard: {
-		// display: "flex",
+		display: "flex",
+		backgroundColor: "inherit",
 		marginBottom: 10,
+		marginRight: 10,
 	},
 }));
 
@@ -416,50 +416,6 @@ const Ticket = () => {
 		}
 	};
 
-	const parseVcard = vcard => {
-		var Re1 = /^(version|fn|title|org):(.+)$/i;
-		var Re2 = /^([^:;]+);([^:]+):(.+)$/;
-		var ReKey = /item\d{1,2}\./;
-		var fields = {};
-
-		vcard.split(/\r\n|\r|\n/).forEach(function (line) {
-			var results, key;
-
-			if (Re1.test(line)) {
-				results = line.match(Re1);
-				key = results[1].toLowerCase();
-				fields[key] = results[2];
-			} else if (Re2.test(line)) {
-				results = line.match(Re2);
-				key = results[1].replace(ReKey, "").toLowerCase();
-
-				var meta = {};
-				results[2]
-					.split(";")
-					.map(function (p, i) {
-						var match = p.match(/([a-z]+)=(.*)/i);
-						if (match) {
-							return [match[1], match[2]];
-						} else {
-							return ["TYPE" + (i === 0 ? "" : i), p];
-						}
-					})
-					.forEach(function (p) {
-						meta[p[0]] = p[1];
-					});
-
-				if (!fields[key]) fields[key] = [];
-
-				fields[key].push({
-					meta: meta,
-					value: results[3].split(";"),
-				});
-			}
-		});
-
-		return fields;
-	};
-
 	const checkMessageMedia = message => {
 		if (message.mediaType === "image") {
 			return (
@@ -490,20 +446,22 @@ const Ticket = () => {
 			);
 		}
 		if (message.mediaType === "vcard") {
-			const contactVcard = parseVcard(message.body);
-
-			console.log(contactVcard);
-
 			return (
 				<Card className={classes.vcard} variant="outlined">
 					<CardHeader
-						avatar={<Avatar aria-label="recipe" />}
-						// action={<Button size="small">Enviar Mensagem</Button>}
-						title={contactVcard.fn}
-						subheader={contactVcard.tel[0].meta.waid}
+						avatar={
+							<Avatar
+								aria-label="contact-avatar"
+								src={message.vcardContact?.profilePicUrl}
+							/>
+						}
+						title={message?.vcardContact?.name}
+						subheader={message?.vcardContact?.number}
 					/>
 					<CardActions>
-						<Button size="small">Adicionar Contato</Button>
+						<Button size="small" variant="contained">
+							Send Message
+						</Button>
 					</CardActions>
 				</Card>
 			);

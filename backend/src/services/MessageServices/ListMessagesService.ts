@@ -44,6 +44,7 @@ const ListMessagesService = async ({
   const { count, rows: messages } = await Message.findAndCountAll({
     where: whereCondition,
     limit,
+    include: ["contact", "vcardContact"],
     offset,
     order: [["createdAt", "DESC"]]
   });

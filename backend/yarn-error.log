@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/bin/node /usr/share/yarn/bin/yarn.js add -D @types/qrcode-terminal
+  /usr/bin/node /usr/share/yarn/bin/yarn.js add -D @types/vdata-parser
 
 PATH: 
-  /home/canove/.vscode-server/bin/58bb7b2331731bf72587010e943852e13e6fd3cf/bin:/home/canove/.zinit/polaris/sbin:/home/canove/.zinit/polaris/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Microsoft VS Code/bin:/mnt/c/Program Files (x86)/GNU/GnuPG/pub:/mnt/c/Users/cassio/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/cassio/AppData/Local/GitHubDesktop/bin
+  /home/canove/.vscode-server/bin/e5e9e69aed6e1984f7499b7af85b3d05f9a6883a/bin:/home/canove/.zinit/polaris/sbin:/home/canove/.zinit/polaris/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/Microsoft VS Code/bin:/mnt/c/Program Files (x86)/GNU/GnuPG/pub:/mnt/c/Program Files/Calibre2/:/mnt/c/Users/cassio/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/cassio/AppData/Local/GitHubDesktop/bin
 
 Yarn version: 
   1.22.4
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fqrcode-terminal: Not found
+  Error: https://registry.yarnpkg.com/@types%2fvdata-parser: Not found
       at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66987:18)
       at Request.self.callback (/usr/share/yarn/lib/cli.js:140748:22)
       at Request.emit (events.js:315:20)
@@ -34,6 +34,7 @@ npm manifest:
     "main": "index.js",
     "scripts": {
       "build": "tsc",
+      "watch": "tsc -w",
       "start": "nodemon dist/server.js",
       "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts"
     },
@@ -42,6 +43,7 @@ npm manifest:
     "dependencies": {
       "@sentry/node": "5.22.3",
       "bcryptjs": "^2.4.3",
+      "cookie-parser": "^1.4.5",
       "cors": "^2.8.5",
       "date-fns": "^2.16.1",
       "dotenv": "^8.2.0",
@@ -56,12 +58,14 @@ npm manifest:
       "sequelize-cli": "5",
       "sequelize-typescript": "^1.1.0",
       "socket.io": "^2.3.0",
+      "vdata-parser": "^0.1.5",
       "whatsapp-web.js": "^1.8.2",
       "yup": "^0.29.3"
     },
     "devDependencies": {
       "@types/bcryptjs": "^2.4.2",
       "@types/bluebird": "^3.5.32",
+      "@types/cookie-parser": "^1.4.2",
       "@types/cors": "^2.8.7",
       "@types/express": "^4.17.8",
       "@types/jsonwebtoken": "^8.5.0",
@@ -272,6 +276,13 @@ Lockfile:
     integrity sha512-2+FrkXY4zllzTNfJth7jOqEHC+enpLeGslEhpnTAkg21GkRrWV4SsAtqchtT4YS9/nODBU2/ZfsBY2X4J/dX7A==
     dependencies:
       "@types/node" "*"
+  
+  "@types/cookie-parser@^1.4.2":
+    version "1.4.2"
+    resolved "https://registry.yarnpkg.com/@types/cookie-parser/-/cookie-parser-1.4.2.tgz#e4d5c5ffda82b80672a88a4281aaceefb1bd9df5"
+    integrity sha512-uwcY8m6SDQqciHsqcKDGbo10GdasYsPCYkH3hVegj9qAah6pX5HivOnOuI3WYmyQMnOATV39zv/Ybs0bC/6iVg==
+    dependencies:
+      "@types/express" "*"
   
   "@types/cors@^2.8.7":
     version "2.8.7"
@@ -1029,6 +1040,14 @@ Lockfile:
     version "1.0.4"
     resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
     integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
+  
+  cookie-parser@^1.4.5:
+    version "1.4.5"
+    resolved "https://registry.yarnpkg.com/cookie-parser/-/cookie-parser-1.4.5.tgz#3e572d4b7c0c80f9c61daf604e4336831b5d1d49"
+    integrity sha512-f13bPUj/gG/5mDr+xLmSxxDsB9DQiTIfhJS/sqjrmfAWiAN+x2O4i/XguTL9yDZ+/IFDanJ+5x7hC4CXT9Tdzw==
+    dependencies:
+      cookie "0.4.0"
+      cookie-signature "1.0.6"
   
   cookie-signature@1.0.6:
     version "1.0.6"
@@ -4148,6 +4167,11 @@ Lockfile:
     version "1.1.2"
     resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
     integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
+  
+  vdata-parser@^0.1.5:
+    version "0.1.5"
+    resolved "https://registry.yarnpkg.com/vdata-parser/-/vdata-parser-0.1.5.tgz#e57cf30065cf69d29a9d822e85fd2734c686bcfd"
+    integrity sha1-5XzzAGXPadKanYIuhf0nNMaGvP0=
   
   whatsapp-web.js@^1.8.2:
     version "1.8.2"

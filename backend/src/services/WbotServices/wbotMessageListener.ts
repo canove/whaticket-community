@@ -19,6 +19,7 @@ import { getIO } from "../../libs/socket";
 import { getWbot } from "../../libs/wbot";
 import AppError from "../../errors/AppError";
 import ShowTicketService from "../TicketServices/ShowTicketService";
+import ParseVcardToJson from "../../helpers/ParseVcardToJson";
 
 const writeFileAsync = promisify(writeFile);
 
@@ -161,9 +162,8 @@ const handlMedia = async (
 
   const newMessage: Message = await ticket.$create("message", {
     id: msg.id.id,
-    body: msg.fromMe
-      ? `${msg.body ? msg.body : media.filename}`
-      : `${contact.name}: ${msg.body ? msg.body : media.filename}`,
+    contactId: msg.fromMe ? null : contact.id,
+    body: msg.body || media.filename,
     fromMe: msg.fromMe,
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0]
@@ -175,21 +175,28 @@ const handlMedia = async (
 const handleMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  vcardContact?: Contact
 ) => {
-  let newMessage: Message;
+  let newMessage: Message | null;
 
   if (msg.hasMedia) {
     newMessage = await handlMedia(msg, ticket, contact);
   } else {
-    newMessage = await ticket.$create("message", {
+    const { id } = await ticket.$create("message", {
       id: msg.id.id,
-      body: msg.fromMe ? msg.body : `${contact.name}: ${msg.body}`,
+      contactId: msg.fromMe ? null : contact.id,
+      vcardContactId: vcardContact ? vcardContact.id : null,
+      body: msg.body,
       fromMe: msg.fromMe,
       mediaType: msg.type,
       read: msg.fromMe
     });
     await ticket.update({ lastMessage: msg.body });
+
+    newMessage = await Message.findByPk(id, {
+      include: ["contact", "vcardContact"]
+    });
   }
 
   const io = getIO();
@@ -234,13 +241,15 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
     try {
       let msgContact: WbotContact;
       let groupContact: Contact | undefined;
+      let vcardContact: Contact | undefined;
 
       if (msg.fromMe) {
         msgContact = await wbot.getContactById(msg.to);
 
         // return if it's a media message, it will be handled by media_uploaded event
 
-        if (msg.hasMedia || msg.type !== "chat") return;
+        if (msg.hasMedia || (msg.type !== "chat" && msg.type !== "vcard"))
+          return;
       } else {
         msgContact = await msg.getContact();
       }
@@ -252,11 +261,20 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
         groupContact = await verifyGroup(msgGroupContact);
       }
 
+      if (msg.type === "vcard") {
+        const { tel } = ParseVcardToJson(msg.body);
+        const vcardWaid = tel[0]?.meta?.waid;
+        const vcardMsgContact = await wbot.getContactById(`${vcardWaid}@c.us`);
+        const profilePicUrl = await vcardMsgContact.getProfilePicUrl();
+
+        vcardContact = await verifyContact(vcardMsgContact, profilePicUrl);
+      }
+
       const profilePicUrl = await msgContact.getProfilePicUrl();
       const contact = await verifyContact(msgContact, profilePicUrl);
       const ticket = await verifyTicket(contact, whatsappId, groupContact);
 
-      await handleMessage(msg, ticket, contact);
+      await handleMessage(msg, ticket, contact, vcardContact);
     } catch (err) {
       Sentry.captureException(err);
       console.log(err);
