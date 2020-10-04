@@ -1,3 +1,4 @@
+import * as Yup from "yup";
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
@@ -9,21 +10,11 @@ import DeleteContactService from "../services/ContactServices/DeleteContactServi
 
 import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
 import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
+import AppError from "../errors/AppError";
 
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
-};
-
-export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber } = req.query as IndexQuery;
-
-  const { contacts, count, hasMore } = await ListContactsService({
-    searchParam,
-    pageNumber
-  });
-
-  return res.json({ contacts, count, hasMore });
 };
 
 interface ExtraInfo {
@@ -37,8 +28,32 @@ interface ContactData {
   extraInfo?: ExtraInfo[];
 }
 
+export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam, pageNumber } = req.query as IndexQuery;
+
+  const { contacts, count, hasMore } = await ListContactsService({
+    searchParam,
+    pageNumber
+  });
+
+  return res.json({ contacts, count, hasMore });
+};
+
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const newContact: ContactData = req.body;
+
+  const schema = Yup.object().shape({
+    name: Yup.string().required(),
+    number: Yup.string()
+      .required()
+      .matches(/^\d+$/, "Invalid number format. Only numbers is allowed.")
+  });
+
+  try {
+    await schema.validate(newContact);
+  } catch (err) {
+    throw new AppError(err.message);
+  }
 
   await CheckIsValidContact(newContact.number);
 
@@ -71,6 +86,22 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   const contactData: ContactData = req.body;
+
+  const schema = Yup.object().shape({
+    name: Yup.string(),
+    number: Yup.string().matches(
+      /^\d+$/,
+      "Invalid number format. Only numbers is allowed."
+    )
+  });
+
+  try {
+    await schema.validate(contactData);
+  } catch (err) {
+    throw new AppError(err.message);
+  }
+
+  await CheckIsValidContact(contactData.number);
 
   const { contactId } = req.params;
 
