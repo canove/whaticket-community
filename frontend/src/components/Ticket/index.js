@@ -17,7 +17,6 @@ import Paper from "@material-ui/core/Paper";
 
 import {
 	Avatar,
-	Button,
 	Card,
 	CardActions,
 	CardHeader,
@@ -161,6 +160,12 @@ const useStyles = makeStyles(theme => ({
 		zIndex: 1,
 		backgroundColor: "#dcf8c6",
 		"&:hover, &.Mui-focusVisible": { backgroundColor: "#dcf8c6" },
+	},
+
+	messageContactName: {
+		paddingLeft: 6,
+		color: "#6bcbef",
+		fontWeight: 500,
 	},
 
 	textContentItem: {
@@ -564,6 +569,11 @@ const Ticket = () => {
 							<div className={classes.messageLeft}>
 								{(message.mediaUrl || message.mediaType === "vcard") &&
 									checkMessageMedia(message)}
+								{ticket.isGroup && (
+									<span className={classes.messageContactName}>
+										{message.contact?.name}
+									</span>
+								)}
 								<div className={classes.textContentItem}>
 									{message.mediaType !== "vcard" && message.body}
 									<span className={classes.timestamp}>
