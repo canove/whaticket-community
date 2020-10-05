@@ -20,7 +20,8 @@ const SendWhatsAppMedia = async ({
 
     const sentMessage = await wbot.sendMessage(
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
-      newMedia
+      newMedia,
+      { sendAudioAsVoice: true }
     );
 
     await ticket.update({ lastMessage: media.filename });
