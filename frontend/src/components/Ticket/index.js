@@ -4,7 +4,6 @@ import { useParams, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "socket.io-client";
-import ModalImage from "react-modal-image";
 import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -34,6 +33,7 @@ import TicketInfo from "../TicketInfo";
 import TicketActionButtons from "../TicketActionButtons";
 
 import MessageOptionsMenu from "../MessageOptionsMenu";
+import ModalImageCors from "../ModalImageCors";
 
 const drawerWidth = 320;
 
@@ -423,15 +423,7 @@ const Ticket = () => {
 
 	const checkMessageMedia = message => {
 		if (message.mediaType === "image") {
-			return (
-				<ModalImage
-					className={classes.messageMedia}
-					smallSrcSet={message.mediaUrl}
-					medium={message.mediaUrl}
-					large={message.mediaUrl}
-					alt="image"
-				/>
-			);
+			return <ModalImageCors imageUrl={message.mediaUrl} />;
 		}
 		if (message.mediaType === "audio") {
 			return (
