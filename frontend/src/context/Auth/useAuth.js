@@ -23,7 +23,6 @@ const useAuth = () => {
 		if (token) {
 			api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
 			setIsAuth(true);
-			setLoading(false);
 		}
 		setLoading(false);
 
@@ -32,8 +31,8 @@ const useAuth = () => {
 				const token = localStorage.getItem("token");
 				if (token) {
 					config.headers["Authorization"] = `Bearer ${JSON.parse(token)}`;
+					setIsAuth(true);
 				}
-				setIsAuth(true);
 				return config;
 			},
 			error => {
