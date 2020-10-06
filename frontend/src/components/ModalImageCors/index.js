@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 const ModalImageCors = ({ imageUrl }) => {
 	const classes = useStyles();
 	const [fetching, setFetching] = useState(true);
-	const [url, setUrl] = useState("");
+	const [blobUrl, setBlobUrl] = useState("");
 
 	useEffect(() => {
 		if (!imageUrl) return;
@@ -27,10 +27,10 @@ const ModalImageCors = ({ imageUrl }) => {
 			const { data, headers } = await api.get(imageUrl, {
 				responseType: "blob",
 			});
-			const blobUrl = window.URL.createObjectURL(
+			const url = window.URL.createObjectURL(
 				new Blob([data], { type: headers["content-type"] })
 			);
-			setUrl(blobUrl);
+			setBlobUrl(url);
 			setFetching(false);
 		};
 		fetchImage();
@@ -39,9 +39,9 @@ const ModalImageCors = ({ imageUrl }) => {
 	return (
 		<ModalImage
 			className={classes.messageMedia}
-			smallSrcSet={fetching ? imageUrl : url}
-			medium={fetching ? imageUrl : url}
-			large={fetching ? imageUrl : url}
+			smallSrcSet={fetching ? imageUrl : blobUrl}
+			medium={fetching ? imageUrl : blobUrl}
+			large={fetching ? imageUrl : blobUrl}
 			alt="image"
 		/>
 	);
