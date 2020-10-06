@@ -174,7 +174,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 									>
 										<InputLabel id="profile-selection-input-label">
-											Profile
+											{i18n.t("userModal.form.profile")}
 										</InputLabel>
 										<Field
 											as={Select}
