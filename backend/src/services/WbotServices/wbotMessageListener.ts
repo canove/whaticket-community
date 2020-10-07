@@ -165,6 +165,7 @@ const handlMedia = async (
     contactId: msg.fromMe ? null : contact.id,
     body: msg.body || media.filename,
     fromMe: msg.fromMe,
+    read: msg.fromMe,
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0]
   });
@@ -248,7 +249,7 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
 
         // return if it's a media message, it will be handled by media_uploaded event
 
-        if (msg.hasMedia || (msg.type !== "chat" && msg.type !== "vcard"))
+        if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard")
           return;
       } else {
         msgContact = await msg.getContact();
@@ -281,25 +282,25 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
     }
   });
 
-  wbot.on("media_uploaded", async msg => {
-    try {
-      let groupContact: Contact | undefined;
-      const msgContact = await wbot.getContactById(msg.to);
-      if (msg.author) {
-        const msgGroupContact = await wbot.getContactById(msg.from);
-        groupContact = await verifyGroup(msgGroupContact);
-      }
+  // wbot.on("media_uploaded", async msg => {
+  //   try {
+  //     let groupContact: Contact | undefined;
+  //     const msgContact = await wbot.getContactById(msg.to);
+  //     if (msg.author) {
+  //       const msgGroupContact = await wbot.getContactById(msg.from);
+  //       groupContact = await verifyGroup(msgGroupContact);
+  //     }
 
-      const profilePicUrl = await msgContact.getProfilePicUrl();
-      const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId, groupContact);
+  //     const profilePicUrl = await msgContact.getProfilePicUrl();
+  //     const contact = await verifyContact(msgContact, profilePicUrl);
+  //     const ticket = await verifyTicket(contact, whatsappId, groupContact);
 
-      await handleMessage(msg, ticket, contact);
-    } catch (err) {
-      Sentry.captureException(err);
-      console.log(err);
-    }
-  });
+  //     await handleMessage(msg, ticket, contact);
+  //   } catch (err) {
+  //     Sentry.captureException(err);
+  //     console.log(err);
+  //   }
+  // });
 
   wbot.on("message_ack", async (msg, ack) => {
     await new Promise(r => setTimeout(r, 500));
