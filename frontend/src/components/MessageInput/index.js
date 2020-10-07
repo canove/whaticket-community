@@ -329,7 +329,7 @@ const MessageInput = ({ ticketStatus }) => {
 						onChange={handleChangeInput}
 						disabled={recording || loading || ticketStatus !== "open"}
 						onPaste={e => {
-							ticketStatus === "open" && handleInputPaste();
+							ticketStatus === "open" && handleInputPaste(e);
 						}}
 						onKeyPress={e => {
 							if (loading || e.shiftKey) return;
