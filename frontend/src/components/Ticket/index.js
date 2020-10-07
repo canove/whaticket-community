@@ -385,6 +385,14 @@ const Ticket = () => {
 		};
 	}, [ticketId, history]);
 
+	const handleDrawerOpen = () => {
+		setDrawerOpen(true);
+	};
+
+	const handleDrawerClose = () => {
+		setDrawerOpen(false);
+	};
+
 	const handleOpenMessageOptionsMenu = (e, messageId) => {
 		setAnchorEl(e.currentTarget);
 		setSelectedMessageId(messageId);
@@ -469,14 +477,6 @@ const Ticket = () => {
 				</a>
 			);
 		}
-	};
-
-	const handleDrawerOpen = () => {
-		setDrawerOpen(true);
-	};
-
-	const handleDrawerClose = () => {
-		setDrawerOpen(false);
 	};
 
 	const renderMessageAck = message => {
