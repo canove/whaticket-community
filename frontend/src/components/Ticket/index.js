@@ -14,8 +14,8 @@ import DoneIcon from "@material-ui/icons/Done";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
 import Paper from "@material-ui/core/Paper";
 
-import { IconButton } from "@material-ui/core";
-import { Block, ExpandMore } from "@material-ui/icons";
+import { Button, Divider, IconButton } from "@material-ui/core";
+import { Block, ExpandMore, GetApp } from "@material-ui/icons";
 
 import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
@@ -157,6 +157,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	messageContactName: {
+		display: "flex",
 		paddingLeft: 6,
 		color: "#6bcbef",
 		fontWeight: 500,
@@ -229,11 +230,12 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: 4,
 	},
 
-	vcard: {
+	downloadMedia: {
 		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
 		backgroundColor: "inherit",
-		marginBottom: 10,
-		marginRight: 10,
+		padding: 10,
 	},
 }));
 
@@ -445,9 +447,20 @@ const Ticket = () => {
 			);
 		} else {
 			return (
-				<a href={message.mediaUrl} target="_blank" rel="noopener noreferrer">
-					Download
-				</a>
+				<>
+					<div className={classes.downloadMedia}>
+						<Button
+							startIcon={<GetApp />}
+							color="primary"
+							variant="outlined"
+							target="_blank"
+							href={message.mediaUrl}
+						>
+							Download
+						</Button>
+					</div>
+					<Divider />
+				</>
 			);
 		}
 	};
@@ -532,12 +545,12 @@ const Ticket = () => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
-								{message.mediaUrl && checkMessageMedia(message)}
 								{ticket.isGroup && (
 									<span className={classes.messageContactName}>
 										{message.contact?.name}
 									</span>
 								)}
+								{message.mediaUrl && checkMessageMedia(message)}
 								<div className={classes.textContentItem}>
 									{message.body}
 									<span className={classes.timestamp}>
