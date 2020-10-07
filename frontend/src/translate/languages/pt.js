@@ -251,7 +251,9 @@ const messages = {
 				},
 			},
 			messagesInput: {
-				placeholder: "Digite uma mensagem",
+				placeholderOpen: "Digite uma mensagem",
+				placeholderClosed:
+					"Reabra ou aceite esse ticket para enviar uma mensagem.",
 			},
 			contactDrawer: {
 				header: "Dados do contato",

@@ -4,7 +4,8 @@ const messages = {
 			signup: {
 				title: "Registro",
 				toasts: {
-					success: "¡El usuario ha sido creado satisfactoriamente! ¡Ahora inicia sesión!",
+					success:
+						"¡El usuario ha sido creado satisfactoriamente! ¡Ahora inicia sesión!",
 					fail: "Error creando el usuario. Verifica la data reportada.",
 				},
 				form: {
@@ -44,7 +45,8 @@ const messages = {
 			connections: {
 				title: "Conexiones",
 				toasts: {
-					deleted: "¡La conexión de WhatsApp ha sido borrada satisfactoriamente!",
+					deleted:
+						"¡La conexión de WhatsApp ha sido borrada satisfactoriamente!",
 				},
 				confirmationModal: {
 					deleteTitle: "Borrar",
@@ -171,7 +173,8 @@ const messages = {
 				pendingHeader: "Cola",
 				assignedHeader: "Trabajando en",
 				noTicketsTitle: "¡Nada acá!",
-				noTicketsMessage: "No se encontraron tickets con este estado o término de búsqueda",
+				noTicketsMessage:
+					"No se encontraron tickets con este estado o término de búsqueda",
 				buttons: {
 					accept: "Acceptar",
 				},
@@ -250,7 +253,9 @@ const messages = {
 				},
 			},
 			messagesInput: {
-				placeholder: "Escribe un mensaje",
+				placeholderOpen: "Escribe un mensaje",
+				placeholderClosed:
+					"Vuelva a abrir o acepte este ticket para enviar un mensaje.",
 			},
 			contactDrawer: {
 				header: "Detalles del contacto",
@@ -265,7 +270,8 @@ const messages = {
 				confirmationModal: {
 					title: "¿Borrar ticket #",
 					titleFrom: "del contacto ",
-					message: "¡Atención! Todos los mensajes Todos los mensajes relacionados con el ticket se perderán.",
+					message:
+						"¡Atención! Todos los mensajes Todos los mensajes relacionados con el ticket se perderán.",
 				},
 				buttons: {
 					delete: "Borrar",

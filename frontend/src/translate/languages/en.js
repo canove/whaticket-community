@@ -250,7 +250,8 @@ const messages = {
 				},
 			},
 			messagesInput: {
-				placeholder: "Type a message",
+				placeholderOpen: "Type a message",
+				placeholderClosed: "Reopen or accept this ticket to send a message.",
 			},
 			contactDrawer: {
 				header: "Contact details",

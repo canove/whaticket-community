@@ -320,8 +320,8 @@ const MessageInput = ({ ticketStatus }) => {
 						className={classes.messageInput}
 						placeholder={
 							ticketStatus === "open"
-								? i18n.t("messagesInput.placeholder")
-								: "Reopen or accept this ticket to send a message"
+								? i18n.t("messagesInput.placeholderOpen")
+								: i18n.t("messagesInput.placeholderClosed")
 						}
 						multiline
 						rowsMax={5}
