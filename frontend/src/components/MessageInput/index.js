@@ -271,6 +271,7 @@ const MessageInput = ({ ticketStatus }) => {
 					aria-label="send-upload"
 					component="span"
 					onClick={handleUploadMedia}
+					disabled={loading}
 				>
 					<SendIcon className={classes.sendMessageIcons} />
 				</IconButton>
