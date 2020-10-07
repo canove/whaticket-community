@@ -72,13 +72,6 @@ class Message extends Model<Message> {
 
   @BelongsTo(() => Contact, "contactId")
   contact: Contact;
-
-  @ForeignKey(() => Contact)
-  @Column
-  vcardContactId: number;
-
-  @BelongsTo(() => Contact, "vcardContactId")
-  vcardContact: Contact;
 }
 
 export default Message;

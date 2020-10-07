@@ -19,7 +19,6 @@ import { getIO } from "../../libs/socket";
 import { getWbot } from "../../libs/wbot";
 import AppError from "../../errors/AppError";
 import ShowTicketService from "../TicketServices/ShowTicketService";
-import ParseVcardToJson from "../../helpers/ParseVcardToJson";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 
 const writeFileAsync = promisify(writeFile);
@@ -181,8 +180,7 @@ const handlMedia = async (
 const handleMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact,
-  vcardContact?: Contact
+  contact: Contact
 ) => {
   let newMessage: Message | null;
 
@@ -193,7 +191,6 @@ const handleMessage = async (
       id: msg.id.id,
       ticketId: ticket.id,
       contactId: msg.fromMe ? undefined : contact.id,
-      vcardContactId: vcardContact ? vcardContact.id : undefined,
       body: msg.body,
       fromMe: msg.fromMe,
       mediaType: msg.type,
@@ -246,7 +243,6 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
     try {
       let msgContact: WbotContact;
       let groupContact: Contact | undefined;
-      let vcardContact: Contact | undefined;
 
       if (msg.fromMe) {
         msgContact = await wbot.getContactById(msg.to);
@@ -259,27 +255,25 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
         msgContact = await msg.getContact();
       }
 
-      // if message has an author, its a gruop message.
+      const chat = await msg.getChat();
 
-      if (msg.author) {
-        const msgGroupContact = await wbot.getContactById(msg.from);
+      if (chat.isGroup) {
+        let msgGroupContact;
+
+        if (msg.fromMe) {
+          msgGroupContact = await wbot.getContactById(msg.to);
+        } else {
+          msgGroupContact = await wbot.getContactById(msg.from);
+        }
+
         groupContact = await verifyGroup(msgGroupContact);
-      }
-
-      if (msg.type === "vcard") {
-        const { tel } = ParseVcardToJson(msg.body);
-        const vcardWaid = tel[0]?.meta?.waid;
-        const vcardMsgContact = await wbot.getContactById(`${vcardWaid}@c.us`);
-        const profilePicUrl = await vcardMsgContact.getProfilePicUrl();
-
-        vcardContact = await verifyContact(vcardMsgContact, profilePicUrl);
       }
 
       const profilePicUrl = await msgContact.getProfilePicUrl();
       const contact = await verifyContact(msgContact, profilePicUrl);
       const ticket = await verifyTicket(contact, whatsappId, groupContact);
 
-      await handleMessage(msg, ticket, contact, vcardContact);
+      await handleMessage(msg, ticket, contact);
     } catch (err) {
       Sentry.captureException(err);
       console.log(err);
@@ -311,7 +305,7 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
 
     try {
       const messageToUpdate = await Message.findByPk(msg.id.id, {
-        include: ["contact", "vcardContact"]
+        include: ["contact"]
       });
       if (!messageToUpdate) {
         return;

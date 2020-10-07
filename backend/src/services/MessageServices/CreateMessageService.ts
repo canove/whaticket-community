@@ -7,7 +7,6 @@ interface MessageData {
   ticketId: number;
   body: string;
   contactId?: number;
-  vcardContactId?: number;
   fromMe?: boolean;
   read?: boolean;
   mediaType?: string;
@@ -29,7 +28,7 @@ const CreateMessageService = async ({
   await Message.upsert(messageData);
 
   const message = await Message.findByPk(messageData.id, {
-    include: ["contact", "vcardContact"]
+    include: ["contact"]
   });
 
   if (!message) {

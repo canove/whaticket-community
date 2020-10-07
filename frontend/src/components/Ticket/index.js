@@ -14,13 +14,7 @@ import DoneIcon from "@material-ui/icons/Done";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
 import Paper from "@material-ui/core/Paper";
 
-import {
-	Avatar,
-	Card,
-	CardActions,
-	CardHeader,
-	IconButton,
-} from "@material-ui/core";
+import { IconButton } from "@material-ui/core";
 import { Block, ExpandMore } from "@material-ui/icons";
 
 import api from "../../services/api";
@@ -449,27 +443,6 @@ const Ticket = () => {
 					controls
 				/>
 			);
-		}
-		if (message.mediaType === "vcard") {
-			return (
-				<Card className={classes.vcard} variant="outlined">
-					<CardHeader
-						avatar={
-							<Avatar
-								aria-label="contact-avatar"
-								src={message.vcardContact?.profilePicUrl}
-							/>
-						}
-						title={message.vcardContact?.name}
-						subheader={message.vcardContact?.number}
-					/>
-					<CardActions>
-						{/* <Button size="small" variant="contained">
-							Send Message
-						</Button> */}
-					</CardActions>
-				</Card>
-			);
 		} else {
 			return (
 				<a href={message.mediaUrl} target="_blank" rel="noopener noreferrer">
@@ -559,15 +532,14 @@ const Ticket = () => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
-								{(message.mediaUrl || message.mediaType === "vcard") &&
-									checkMessageMedia(message)}
+								{message.mediaUrl && checkMessageMedia(message)}
 								{ticket.isGroup && (
 									<span className={classes.messageContactName}>
 										{message.contact?.name}
 									</span>
 								)}
 								<div className={classes.textContentItem}>
-									{message.mediaType !== "vcard" && message.body}
+									{message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
 									</span>
