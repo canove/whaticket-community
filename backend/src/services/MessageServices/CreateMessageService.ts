@@ -4,28 +4,37 @@ import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface MessageData {
   id: string;
+  ticketId: number;
   body: string;
-  fromMe: boolean;
-  read: boolean;
-  mediaType: string;
+  contactId?: number;
+  vcardContactId?: number;
+  fromMe?: boolean;
+  read?: boolean;
+  mediaType?: string;
   mediaUrl?: string;
 }
 interface Request {
-  ticketId: string | number;
   messageData: MessageData;
 }
 
 const CreateMessageService = async ({
-  messageData,
-  ticketId
+  messageData
 }: Request): Promise<Message> => {
-  const ticket = await ShowTicketService(ticketId);
+  const ticket = await ShowTicketService(messageData.ticketId);
 
   if (!ticket) {
     throw new AppError("No ticket found with this ID", 404);
   }
 
-  const message: Message = await ticket.$create("message", messageData);
+  await Message.upsert(messageData);
+
+  const message = await Message.findByPk(messageData.id, {
+    include: ["contact", "vcardContact"]
+  });
+
+  if (!message) {
+    throw new AppError("Error while creating message on database.", 501);
+  }
 
   return message;
 };

@@ -20,6 +20,7 @@ import { getWbot } from "../../libs/wbot";
 import AppError from "../../errors/AppError";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 import ParseVcardToJson from "../../helpers/ParseVcardToJson";
+import CreateMessageService from "../MessageServices/CreateMessageService";
 
 const writeFileAsync = promisify(writeFile);
 
@@ -160,15 +161,19 @@ const handlMedia = async (
     console.log(err);
   }
 
-  const newMessage: Message = await ticket.$create("message", {
+  const messageData = {
     id: msg.id.id,
-    contactId: msg.fromMe ? null : contact.id,
+    ticketId: ticket.id,
+    contactId: msg.fromMe ? undefined : contact.id,
     body: msg.body || media.filename,
     fromMe: msg.fromMe,
     read: msg.fromMe,
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0]
-  });
+  };
+
+  const newMessage = await CreateMessageService({ messageData });
+
   await ticket.update({ lastMessage: msg.body || media.filename });
   return newMessage;
 };
@@ -184,20 +189,19 @@ const handleMessage = async (
   if (msg.hasMedia) {
     newMessage = await handlMedia(msg, ticket, contact);
   } else {
-    const { id } = await ticket.$create("message", {
+    const messageData = {
       id: msg.id.id,
-      contactId: msg.fromMe ? null : contact.id,
-      vcardContactId: vcardContact ? vcardContact.id : null,
+      ticketId: ticket.id,
+      contactId: msg.fromMe ? undefined : contact.id,
+      vcardContactId: vcardContact ? vcardContact.id : undefined,
       body: msg.body,
       fromMe: msg.fromMe,
       mediaType: msg.type,
       read: msg.fromMe
-    });
-    await ticket.update({ lastMessage: msg.body });
+    };
 
-    newMessage = await Message.findByPk(id, {
-      include: ["contact", "vcardContact"]
-    });
+    newMessage = await CreateMessageService({ messageData });
+    await ticket.update({ lastMessage: msg.body });
   }
 
   const io = getIO();
@@ -282,25 +286,25 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
     }
   });
 
-  // wbot.on("media_uploaded", async msg => {
-  //   try {
-  //     let groupContact: Contact | undefined;
-  //     const msgContact = await wbot.getContactById(msg.to);
-  //     if (msg.author) {
-  //       const msgGroupContact = await wbot.getContactById(msg.from);
-  //       groupContact = await verifyGroup(msgGroupContact);
-  //     }
+  wbot.on("media_uploaded", async msg => {
+    try {
+      let groupContact: Contact | undefined;
+      const msgContact = await wbot.getContactById(msg.to);
+      if (msg.author) {
+        const msgGroupContact = await wbot.getContactById(msg.from);
+        groupContact = await verifyGroup(msgGroupContact);
+      }
 
-  //     const profilePicUrl = await msgContact.getProfilePicUrl();
-  //     const contact = await verifyContact(msgContact, profilePicUrl);
-  //     const ticket = await verifyTicket(contact, whatsappId, groupContact);
+      const profilePicUrl = await msgContact.getProfilePicUrl();
+      const contact = await verifyContact(msgContact, profilePicUrl);
+      const ticket = await verifyTicket(contact, whatsappId, groupContact);
 
-  //     await handleMessage(msg, ticket, contact);
-  //   } catch (err) {
-  //     Sentry.captureException(err);
-  //     console.log(err);
-  //   }
-  // });
+      await handleMessage(msg, ticket, contact);
+    } catch (err) {
+      Sentry.captureException(err);
+      console.log(err);
+    }
+  });
 
   wbot.on("message_ack", async (msg, ack) => {
     await new Promise(r => setTimeout(r, 500));
