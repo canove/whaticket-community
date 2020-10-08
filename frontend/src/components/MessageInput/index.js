@@ -195,55 +195,54 @@ const MessageInput = ({ ticketStatus }) => {
 		setLoading(false);
 	};
 
-	const handleStartRecording = () => {
-		navigator.getUserMedia(
-			{ audio: true },
-			() => {
-				Mp3Recorder.start()
-					.then(() => {
-						setRecording(true);
-					})
-					.catch(e => console.error(e));
-			},
-			() => {
-				console.log("Permission Denied");
-			}
-		);
-	};
-
-	const handleUploadAudio = () => {
+	const handleStartRecording = async () => {
 		setLoading(true);
-		Mp3Recorder.stop()
-			.getMp3()
-			.then(async ([buffer, blob]) => {
-				if (blob.size < 10000) {
-					setLoading(false);
-					setRecording(false);
-					return;
-				}
-				const formData = new FormData();
-				const filename = `${new Date().getTime()}.mp3`;
-				formData.append("media", blob, filename);
-				formData.append("body", filename);
-				formData.append("fromMe", true);
-				try {
-					await api.post(`/messages/${ticketId}`, formData);
-				} catch (err) {
-					console.log(err);
-					if (err.response && err.response.data && err.response.data.error) {
-						toast.error(err.response.data.error);
-					}
-				}
-				setRecording(false);
-				setLoading(false);
-			})
-			.catch(err => console.log(err));
+		try {
+			await navigator.mediaDevices.getUserMedia({ audio: true });
+			await Mp3Recorder.start();
+			setRecording(true);
+			setLoading(false);
+		} catch (err) {
+			console.log(err);
+			setLoading(false);
+		}
 	};
 
-	const handleCancelAudio = () => {
-		Mp3Recorder.stop()
-			.getMp3()
-			.then(() => setRecording(false));
+	const handleUploadAudio = async () => {
+		setLoading(true);
+		try {
+			const [, blob] = await Mp3Recorder.stop().getMp3();
+			if (blob.size < 10000) {
+				setLoading(false);
+				setRecording(false);
+				return;
+			}
+
+			const formData = new FormData();
+			const filename = `${new Date().getTime()}.mp3`;
+			formData.append("media", blob, filename);
+			formData.append("body", filename);
+			formData.append("fromMe", true);
+
+			await api.post(`/messages/${ticketId}`, formData);
+
+			setRecording(false);
+			setLoading(false);
+		} catch (err) {
+			console.log(err);
+			if (err.response && err.response.data && err.response.data.error) {
+				toast.error(err.response.data.error);
+			}
+		}
+	};
+
+	const handleCancelAudio = async () => {
+		try {
+			await Mp3Recorder.stop().getMp3();
+			setRecording(false);
+		} catch (err) {
+			console.log(err);
+		}
 	};
 
 	if (media.preview)

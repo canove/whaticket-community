@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
@@ -12,23 +12,15 @@ import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
-import Button from "@material-ui/core/Button";
 
 import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
+import ButtonWithSpinner from "../ButtonWithSpinner";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
-		"& .hidden-button": {
-			display: "none",
-		},
-		"&:hover .hidden-button": {
-			display: "flex",
-			position: "absolute",
-			left: "50%",
-		},
 	},
 	noTicketsDiv: {
 		display: "flex",
@@ -83,22 +75,40 @@ const useStyles = makeStyles(theme => ({
 		color: "white",
 		backgroundColor: green[500],
 	},
+
+	acceptButton: {
+		position: "absolute",
+		left: "50%",
+	},
 }));
 
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
 	const history = useHistory();
 	const userId = +localStorage.getItem("userId");
+	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
+	const isMounted = useRef(true);
+
+	useEffect(() => {
+		return () => {
+			isMounted.current = false;
+		};
+	}, []);
 
 	const handleAcepptTicket = async ticketId => {
+		setLoading(true);
 		try {
 			await api.put(`/tickets/${ticketId}`, {
 				status: "open",
 				userId: userId,
 			});
 		} catch (err) {
+			setLoading(false);
 			alert(err);
+		}
+		if (isMounted.current) {
+			setLoading(false);
 		}
 		history.push(`/tickets/${ticketId}`);
 	};
@@ -180,17 +190,18 @@ const TicketListItem = ({ ticket }) => {
 						</span>
 					}
 				/>
-				{ticket.status === "pending" ? (
-					<Button
-						variant="contained"
-						size="small"
+				{ticket.status === "pending" && (
+					<ButtonWithSpinner
 						color="primary"
-						className="hidden-button"
+						variant="contained"
+						className={classes.acceptButton}
+						size="small"
+						loading={loading}
 						onClick={e => handleAcepptTicket(ticket.id)}
 					>
 						{i18n.t("ticketsList.buttons.accept")}
-					</Button>
-				) : null}
+					</ButtonWithSpinner>
+				)}
 			</ListItem>
 			<Divider variant="inset" component="li" />
 		</React.Fragment>

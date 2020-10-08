@@ -16,12 +16,16 @@ const useStyles = makeStyles(theme => ({
 const TicketHeader = ({ loading, children }) => {
 	const classes = useStyles();
 
-	if (loading) return <TicketHeaderSkeleton />;
-
 	return (
-		<Card square className={classes.ticketHeader}>
-			{children}
-		</Card>
+		<>
+			{loading ? (
+				<TicketHeaderSkeleton />
+			) : (
+				<Card square className={classes.ticketHeader}>
+					{children}
+				</Card>
+			)}
+		</>
 	);
 };
 

@@ -13,12 +13,12 @@ import Autocomplete, {
 	createFilterOptions,
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { green } from "@material-ui/core/colors";
 
 import { makeStyles } from "@material-ui/core/styles";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
+import ButtonWithSpinner from "../ButtonWithSpinner";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -26,19 +26,11 @@ const useStyles = makeStyles(theme => ({
 		flexWrap: "wrap",
 	},
 
-	btnWrapper: {
-		// margin: theme.spacing(1),
-		position: "relative",
-	},
-
-	buttonProgress: {
-		color: green[500],
-		position: "absolute",
-		top: "50%",
-		left: "50%",
-		marginTop: -12,
-		marginLeft: -12,
-	},
+	// btnWrapper: {
+	// 	// margin: theme.spacing(1),
+	// 	// position: "relative",
+	// 	display: "flex",
+	// },
 }));
 
 const filterOptions = createFilterOptions({
@@ -163,21 +155,14 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 						>
 							{i18n.t("newTicketModal.buttons.cancel")}
 						</Button>
-						<Button
+						<ButtonWithSpinner
+							variant="contained"
 							type="submit"
 							color="primary"
-							disabled={loading}
-							variant="contained"
-							className={classes.btnWrapper}
+							loading={loading}
 						>
 							{i18n.t("newTicketModal.buttons.ok")}
-							{loading && (
-								<CircularProgress
-									size={24}
-									className={classes.buttonProgress}
-								/>
-							)}
-						</Button>
+						</ButtonWithSpinner>
 					</DialogActions>
 				</form>
 			</Dialog>
