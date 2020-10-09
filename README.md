@@ -342,6 +342,17 @@ sudo ln -s /etc/nginx/sites-available/whaticket-frontend /etc/nginx/sites-enable
 sudo ln -s /etc/nginx/sites-available/whaticket-backend /etc/nginx/sites-enabled
 ```
 
+By default, nginx limit body size to 1MB, what isn't enough to some media uploads. Lets change it to 20MB adding a new line to config file:
+
+```bash
+sudo nano /etc/nginx/nginx.conf
+...
+http {
+    ...
+    client_max_body_size 20M; # HANDLE BIGGER UPLOADS
+}
+```
+
 Test nginx configuration and restart server:
 
 ```bash
