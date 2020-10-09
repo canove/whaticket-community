@@ -46,7 +46,7 @@ const useAuth = () => {
 			},
 			async error => {
 				const originalRequest = error.config;
-				if (error.response.status === 403 && !originalRequest._retry) {
+				if (error?.response?.status === 403 && !originalRequest._retry) {
 					originalRequest._retry = true;
 
 					const { data } = await api.post("/auth/refresh_token");
@@ -56,7 +56,7 @@ const useAuth = () => {
 					}
 					return api(originalRequest);
 				}
-				if (error.response.status === 401) {
+				if (error?.response?.status === 401) {
 					localStorage.removeItem("token");
 					localStorage.removeItem("username");
 					localStorage.removeItem("profile");
