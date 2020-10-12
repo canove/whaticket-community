@@ -589,8 +589,7 @@ const Ticket = () => {
 								>
 									<ExpandMore />
 								</IconButton>
-								{(message.mediaUrl || message.mediaType === "vcard") &&
-									checkMessageMedia(message)}
+								{message.mediaUrl && checkMessageMedia(message)}
 								<div
 									className={clsx(classes.textContentItem, {
 										[classes.textContentItemDeleted]: message.isDeleted,
@@ -603,7 +602,7 @@ const Ticket = () => {
 											className={classes.deletedIcon}
 										/>
 									)}
-									{message.mediaType !== "vcard" && message.body}
+									{message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
 										{renderMessageAck(message)}
