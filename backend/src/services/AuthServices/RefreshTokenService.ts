@@ -30,10 +30,6 @@ export const RefreshTokenService = async (token: string): Promise<Response> => {
 
   const user = await ShowUserService(id);
 
-  if (!user) {
-    throw new AppError("No user found with this ID.", 401);
-  }
-
   if (user.tokenVersion !== tokenVersion) {
     throw new AppError("Session revoked. Please login.", 401);
   }

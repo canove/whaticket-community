@@ -1,9 +1,7 @@
 import User from "../../models/User";
 import AppError from "../../errors/AppError";
 
-const ShowUserService = async (
-  id: string | number
-): Promise<User | undefined> => {
+const ShowUserService = async (id: string | number): Promise<User> => {
   const user = await User.findByPk(id, {
     attributes: ["name", "id", "email", "profile", "tokenVersion"]
   });
