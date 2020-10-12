@@ -353,7 +353,15 @@ const Ticket = () => {
 			if (data.action === "create") {
 				dispatch({ type: "ADD_MESSAGE", payload: data.message });
 				scrollToBottom();
+
+				setContact(prevState => {
+					if (prevState.id === data.contact?.id) {
+						return data.contact;
+					}
+					return prevState;
+				});
 			}
+
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
 			}
@@ -372,7 +380,12 @@ const Ticket = () => {
 
 		socket.on("contact", data => {
 			if (data.action === "update") {
-				setContact(data.contact);
+				setContact(prevState => {
+					if (prevState.id === data.contact?.id) {
+						return data.contact;
+					}
+					return prevState;
+				});
 			}
 		});
 
