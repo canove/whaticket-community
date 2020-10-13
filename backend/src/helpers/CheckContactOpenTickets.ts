@@ -8,9 +8,7 @@ const CheckContactOpenTickets = async (contactId: number): Promise<void> => {
   });
 
   if (ticket) {
-    throw new AppError(
-      "There's already an open or pending ticket for this contact."
-    );
+    throw new AppError("ERR_OTHER_OPEN_TICKET");
   }
 };
 

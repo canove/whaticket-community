@@ -156,6 +156,7 @@ const MessageInput = ({ ticketStatus }) => {
 	const handleUploadMedia = async e => {
 		setLoading(true);
 		e.preventDefault();
+
 		const formData = new FormData();
 		formData.append("media", media.raw);
 		formData.append("fromMe", true);
@@ -164,11 +165,14 @@ const MessageInput = ({ ticketStatus }) => {
 		try {
 			await api.post(`/messages/${ticketId}`, formData);
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg === "ERR_SENDING_WAPP_MSG") {
+				toast.error(i18n.t("messagesInput.toasts.error"));
+			} else {
 				toast.error(err.response.data.error);
 			}
 		}
+
 		setLoading(false);
 		setMedia(mediaInitialState);
 	};
@@ -176,6 +180,7 @@ const MessageInput = ({ ticketStatus }) => {
 	const handleSendMessage = async () => {
 		if (inputMessage.trim() === "") return;
 		setLoading(true);
+
 		const message = {
 			read: 1,
 			fromMe: true,
@@ -185,11 +190,18 @@ const MessageInput = ({ ticketStatus }) => {
 		try {
 			await api.post(`/messages/${ticketId}`, message);
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
 			}
 		}
+
 		setInputMessage("");
 		setShowEmoji(false);
 		setLoading(false);
@@ -225,15 +237,21 @@ const MessageInput = ({ ticketStatus }) => {
 			formData.append("fromMe", true);
 
 			await api.post(`/messages/${ticketId}`, formData);
-
-			setRecording(false);
-			setLoading(false);
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
 			}
 		}
+
+		setRecording(false);
+		setLoading(false);
 	};
 
 	const handleCancelAudio = async () => {

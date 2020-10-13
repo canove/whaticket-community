@@ -17,10 +17,6 @@ const CreateTicketService = async ({
 }: Request): Promise<Ticket> => {
   const defaultWhatsapp = await GetDefaultWhatsApp();
 
-  if (!defaultWhatsapp) {
-    throw new AppError("No default WhatsApp found. Check Connection page.");
-  }
-
   await CheckContactOpenTickets(contactId);
 
   const { isGroup } = await ShowContactService(contactId);

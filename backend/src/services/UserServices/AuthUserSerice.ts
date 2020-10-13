@@ -25,11 +25,11 @@ const AuthUserService = async ({
   });
 
   if (!user) {
-    throw new AppError("Incorrect user/password combination.", 401);
+    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
   }
 
   if (!(await user.checkPassword(password))) {
-    throw new AppError("Incorrect user/password combination.", 401);
+    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
   }
 
   const token = createAccessToken(user);

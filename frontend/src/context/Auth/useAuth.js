@@ -72,6 +72,7 @@ const useAuth = () => {
 	const handleLogin = async (e, user) => {
 		setLoading(true);
 		e.preventDefault();
+
 		try {
 			const { data } = await api.post("/auth/login", user);
 			localStorage.setItem("token", JSON.stringify(data.token));
@@ -79,17 +80,24 @@ const useAuth = () => {
 			localStorage.setItem("profile", data.profile);
 			localStorage.setItem("userId", data.userId);
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
+
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
-			setLoading(false);
 			history.push("/tickets");
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
 			}
-			setLoading(false);
 		}
+
+		setLoading(false);
 	};
 
 	const handleLogout = e => {

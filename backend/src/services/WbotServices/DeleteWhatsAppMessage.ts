@@ -25,9 +25,7 @@ const DeleteWhatsAppMessage = async (messageId: string): Promise<Message> => {
   try {
     await messageToDelete.delete(true);
   } catch (err) {
-    throw new AppError(
-      "Couldn't delete message from WhatsApp. Check connections page."
-    );
+    throw new AppError("ERR_DELETE_WAPP_MSG");
   }
 
   await message.update({ isDeleted: true });

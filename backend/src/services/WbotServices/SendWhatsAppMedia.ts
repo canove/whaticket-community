@@ -31,9 +31,7 @@ const SendWhatsAppMedia = async ({
     return sentMessage;
   } catch (err) {
     console.log(err);
-    throw new AppError(
-      "Could not send whatsapp message. Check connections page."
-    );
+    throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };
 

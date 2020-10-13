@@ -31,7 +31,6 @@ const messages = {
 			auth: {
 				toasts: {
 					success: "Login efetuado com sucesso!",
-					fail: "Erro de autenticação. Por favor, faça login novamente",
 				},
 			},
 			dashboard: {
@@ -289,6 +288,18 @@ const messages = {
 					title: "Apagar mensagem?",
 					message: "Esta ação não pode ser revertida.",
 				},
+			},
+			backendErrors: {
+				ERR_NO_WAPP_FOUND:
+					"Nenhum WhatsApp padrão encontrado. Verifique a página de conexões.",
+				ERR_INVALID_CREDENTIALS:
+					"Erro de autenticação. Por favor, tente novamente.",
+				ERR_SENDING_WAPP_MSG:
+					"Erro ao enviar mensagem do WhatsApp. Verifique a página de conexões.",
+				ERR_DELETE_WAPP_MSG:
+					"Não foi possível excluir a mensagem do WhatsApp. Verifique a página de conexões.",
+				ERR_OTHER_OPEN_TICKET:
+					"Já existe um tíquete aberto ou pendente para este contato.",
 			},
 		},
 	},

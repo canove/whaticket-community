@@ -31,7 +31,6 @@ const messages = {
 			auth: {
 				toasts: {
 					success: "Login successfully!",
-					fail: "Authentication error. Please log in again",
 				},
 			},
 			dashboard: {
@@ -286,6 +285,16 @@ const messages = {
 					title: "Delete message?",
 					message: "This action cannot be reverted.",
 				},
+			},
+			backendErrors: {
+				ERR_NO_WAPP_FOUND: "No default WhatsApp found. Check connections page.",
+				ERR_INVALID_CREDENTIALS: "Authentication error. Please try again.",
+				ERR_SENDING_WAPP_MSG:
+					"Error sending WhatsApp message. Check connections page.",
+				ERR_DELETE_WAPP_MSG:
+					"Couldn't delete message from WhatsApp. Check connections page.",
+				ERR_OTHER_OPEN_TICKET:
+					"There's already an open or pending ticket for this contact.",
 			},
 		},
 	},

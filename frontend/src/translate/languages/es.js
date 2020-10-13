@@ -32,7 +32,6 @@ const messages = {
 			auth: {
 				toasts: {
 					success: "¡Inicio de sesión exitoso!",
-					fail: "Error de autenticación. Por favor intenta de nuevo.",
 				},
 			},
 			dashboard: {
@@ -291,6 +290,17 @@ const messages = {
 					title: "¿Borrar mensaje?",
 					message: "Esta acción no puede ser revertida.",
 				},
+			},
+			backendErrors: {
+				ERR_NO_WAPP_FOUND:
+					"No se encontró WhatsApp predeterminado. Verifique la página de conexiones.",
+				ERR_INVALID_CREDENTIALS: "Error de autenticación. Vuelva a intentarlo.",
+				ERR_SENDING_WAPP_MSG:
+					"Error al enviar el mensaje de WhatsApp. Verifique la página de conexiones.",
+				ERR_DELETE_WAPP_MSG:
+					"No se pudo borrar el mensaje de WhatsApp. Verifique la página de conexiones.",
+				ERR_OTHER_OPEN_TICKET:
+					"Ya hay un ticket abierto o pendiente para este contacto.",
 			},
 		},
 	},
