@@ -27,19 +27,26 @@ const verifyContact = async (
   msgContact: WbotContact,
   profilePicUrl: string
 ): Promise<Contact> => {
+  const io = getIO();
+
   let contact = await Contact.findOne({
     where: { number: msgContact.id.user }
   });
 
   if (contact) {
     await contact.update({ profilePicUrl });
+
+    io.emit("contact", {
+      action: "update",
+      contact
+    });
   } else {
     contact = await Contact.create({
       name: msgContact.name || msgContact.pushname || msgContact.id.user,
       number: msgContact.id.user,
       profilePicUrl
     });
-    const io = getIO();
+
     io.emit("contact", {
       action: "create",
       contact

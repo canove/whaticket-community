@@ -56,8 +56,12 @@ const UpdateContactService = async ({
   await contact.update({
     name,
     number,
-    email,
-    extraInfo
+    email
+  });
+
+  await contact.reload({
+    attributes: ["id", "name", "number", "email", "profilePicUrl"],
+    include: ["extraInfo"]
   });
 
   return contact;

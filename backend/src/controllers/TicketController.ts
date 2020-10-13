@@ -4,6 +4,7 @@ import { getIO } from "../libs/socket";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
+import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 
 type IndexQuery = {
@@ -58,6 +59,14 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.status(200).json(ticket);
+};
+
+export const show = async (req: Request, res: Response): Promise<Response> => {
+  const { ticketId } = req.params;
+
+  const contact = await ShowTicketService(ticketId);
+
+  return res.status(200).json(contact);
 };
 
 export const update = async (
