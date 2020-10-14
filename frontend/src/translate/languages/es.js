@@ -292,8 +292,15 @@ const messages = {
 				},
 			},
 			backendErrors: {
-				ERR_NO_WAPP_FOUND:
+				ERR_NO_DEF_WAPP_FOUND:
 					"No se encontró WhatsApp predeterminado. Verifique la página de conexiones.",
+				ERR_WAPP_NOT_INITIALIZED:
+					"Esta sesión de WhatsApp no ​​está inicializada. Verifique la página de conexiones.",
+				ERR_WAPP_CHECK_CONTACT:
+					"No se pudo verificar el contacto de WhatsApp. Verifique la página de conexiones.",
+				ERR_WAPP_INVALID_CONTACT: "Este no es un número de whatsapp válido.",
+				ERR_WAPP_DOWNLOAD_MEDIA:
+					"No se pudieron descargar los medios de WhatsApp. Verifique la página de conexiones.",
 				ERR_INVALID_CREDENTIALS: "Error de autenticación. Vuelva a intentarlo.",
 				ERR_SENDING_WAPP_MSG:
 					"Error al enviar el mensaje de WhatsApp. Verifique la página de conexiones.",
@@ -301,6 +308,19 @@ const messages = {
 					"No se pudo borrar el mensaje de WhatsApp. Verifique la página de conexiones.",
 				ERR_OTHER_OPEN_TICKET:
 					"Ya hay un ticket abierto o pendiente para este contacto.",
+				ERR_SESSION_EXPIRED: "Sesión caducada. Inicie sesión.",
+				ERR_USER_CREATION_DISABLED:
+					"La creación de usuarios fue deshabilitada por el administrador.",
+				ERR_NO_PERMISSION: "No tienes permiso para acceder a este recurso.",
+				ERR_DUPLICATED_CONTACT: "Ya existe un contacto con este número.",
+				ERR_NO_SETTING_FOUND:
+					"No se encontró ninguna configuración con este ID.",
+				ERR_NO_CONTACT_FOUND: "No se encontró ningún contacto con este ID.",
+				ERR_NO_TICKET_FOUND: "No se encontró ningún ticket con este ID.",
+				ERR_NO_USER_FOUND: "No se encontró ningún usuario con este ID.",
+				ERR_NO_WAPP_FOUND: "No se encontró WhatsApp con este ID.",
+				ERR_CREATING_MESSAGE: "Error al crear el mensaje en la base de datos.",
+				ERR_CREATING_TICKET: "Error al crear el ticket en la base de datos.",
 			},
 		},
 	},

@@ -15,11 +15,9 @@ const CheckIsValidContact = async (number: string): Promise<void> => {
   } catch (err) {
     console.log(err);
     if (err.message === "invalidNumber") {
-      throw new AppError("This is not a valid whatsapp number.");
+      throw new AppError("ERR_WAPP_INVALID_CONTACT");
     }
-    throw new AppError(
-      "Could not valid WhatsApp contact. Check connections page"
-    );
+    throw new AppError("ERR_WAPP_CHECK_CONTACT");
   }
 };
 

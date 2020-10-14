@@ -287,7 +287,15 @@ const messages = {
 				},
 			},
 			backendErrors: {
-				ERR_NO_WAPP_FOUND: "No default WhatsApp found. Check connections page.",
+				ERR_NO_DEF_WAPP_FOUND:
+					"No default WhatsApp found. Check connections page.",
+				ERR_WAPP_NOT_INITIALIZED:
+					"This WhatsApp session is not initialized. Check connections page.",
+				ERR_WAPP_CHECK_CONTACT:
+					"Could not check WhatsApp contact. Check connections page.",
+				ERR_WAPP_INVALID_CONTACT: "This is not a valid whatsapp number.",
+				ERR_WAPP_DOWNLOAD_MEDIA:
+					"Could not download media from WhatsApp. Check connections page.",
 				ERR_INVALID_CREDENTIALS: "Authentication error. Please try again.",
 				ERR_SENDING_WAPP_MSG:
 					"Error sending WhatsApp message. Check connections page.",
@@ -295,6 +303,18 @@ const messages = {
 					"Couldn't delete message from WhatsApp. Check connections page.",
 				ERR_OTHER_OPEN_TICKET:
 					"There's already an open or pending ticket for this contact.",
+				ERR_SESSION_EXPIRED: "Session expired. Please login.",
+				ERR_USER_CREATION_DISABLED:
+					"User creation was disabled by administrator.",
+				ERR_NO_PERMISSION: "You don't have permission to access this resource.",
+				ERR_DUPLICATED_CONTACT: "A contact with this number already exists.",
+				ERR_NO_SETTING_FOUND: "No setting found with this ID.",
+				ERR_NO_CONTACT_FOUND: "No contact found with this ID.",
+				ERR_NO_TICKET_FOUND: "No ticket found with this ID.",
+				ERR_NO_USER_FOUND: "No user found with this ID.",
+				ERR_NO_WAPP_FOUND: "No WhatsApp found with this ID.",
+				ERR_CREATING_MESSAGE: "Error while creating message on database.",
+				ERR_CREATING_TICKET: "Error while creating ticket on database.",
 			},
 		},
 	},

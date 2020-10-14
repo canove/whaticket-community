@@ -22,7 +22,7 @@ const CreateMessageService = async ({
   const ticket = await ShowTicketService(messageData.ticketId);
 
   if (!ticket) {
-    throw new AppError("No ticket found with this ID", 404);
+    throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
   await Message.upsert(messageData);
@@ -32,7 +32,7 @@ const CreateMessageService = async ({
   });
 
   if (!message) {
-    throw new AppError("Error while creating message on database.", 501);
+    throw new AppError("ERR_CREATING_MESSAGE", 501);
   }
 
   return message;

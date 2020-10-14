@@ -149,7 +149,7 @@ const handlMedia = async (
   const media = await msg.downloadMedia();
 
   if (!media) {
-    throw new AppError("Cannot download media from whatsapp.");
+    throw new AppError("ERR_WAPP_DOWNLOAD_MEDIA");
   }
 
   if (!media.filename) {

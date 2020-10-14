@@ -7,7 +7,7 @@ const DeleteTicketService = async (id: string): Promise<Ticket> => {
   });
 
   if (!ticket) {
-    throw new AppError("No ticket found with this ID.", 404);
+    throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
   await ticket.destroy();

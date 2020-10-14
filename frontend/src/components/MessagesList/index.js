@@ -26,6 +26,7 @@ import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
 import whatsBackground from "../../assets/wa-background.png";
 
+import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 
@@ -284,9 +285,15 @@ const MessagesList = ({ ticketId, isGroup }) => {
 						scrollToBottom();
 					}
 				} catch (err) {
-					console.log(err);
-					if (err.response && err.response.data && err.response.data.error) {
-						toast.error(err.response.data.error);
+					const errorMsg = err.response?.data?.error;
+					if (errorMsg) {
+						if (i18n.exists(`backendErrors.${errorMsg}`)) {
+							toast.error(i18n.t(`backendErrors.${errorMsg}`));
+						} else {
+							toast.error(err.response.data.error);
+						}
+					} else {
+						toast.error("Unknown error");
 					}
 				}
 			};

@@ -7,7 +7,7 @@ const GetDefaultWhatsApp = async (): Promise<Whatsapp> => {
   });
 
   if (!defaultWhatsapp) {
-    throw new AppError("ERR_NO_WAPP_FOUND");
+    throw new AppError("ERR_NO_DEF_WAPP_FOUND");
   }
 
   return defaultWhatsapp;

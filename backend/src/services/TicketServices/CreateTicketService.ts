@@ -31,7 +31,7 @@ const CreateTicketService = async ({
   const ticket = await Ticket.findByPk(id, { include: ["contact"] });
 
   if (!ticket) {
-    throw new AppError("Error, ticket not created.");
+    throw new AppError("ERR_CREATING_TICKET");
   }
 
   return ticket;

@@ -8,7 +8,7 @@ import ListSettingsService from "../services/SettingServices/ListSettingsService
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   if (req.user.profile !== "admin") {
-    throw new AppError("Only administrators can access resource.", 403);
+    throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
   const settings = await ListSettingsService();
@@ -21,7 +21,7 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   if (req.user.profile !== "admin") {
-    throw new AppError("Only administrators can access this route.", 403);
+    throw new AppError("ERR_NO_PERMISSION", 403);
   }
   const { settingKey: key } = req.params;
   const { value } = req.body;

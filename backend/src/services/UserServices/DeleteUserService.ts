@@ -9,7 +9,7 @@ const DeleteUserService = async (id: string): Promise<void> => {
   });
 
   if (!user) {
-    throw new AppError("No user found with this ID.", 404);
+    throw new AppError("ERR_NO_USER_FOUND", 404);
   }
 
   const userOpenTickets: Ticket[] = await user.$get("tickets", {

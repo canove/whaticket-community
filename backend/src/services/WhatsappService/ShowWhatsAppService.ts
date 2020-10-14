@@ -7,7 +7,7 @@ const ShowWhatsAppService = async (
   const whatsapp = await Whatsapp.findByPk(id);
 
   if (!whatsapp) {
-    throw new AppError("No whatsapp found with this conditions.", 404);
+    throw new AppError("ERR_NO_WAPP_FOUND", 404);
   }
 
   return whatsapp;

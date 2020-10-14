@@ -14,6 +14,7 @@ import TicketInfo from "../TicketInfo";
 import TicketActionButtons from "../TicketActionButtons";
 import MessagesList from "../MessagesList";
 import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 
 const drawerWidth = 320;
 
@@ -76,12 +77,18 @@ const Ticket = () => {
 					setTicket(data);
 					setLoading(false);
 				} catch (err) {
-					console.log(err);
-					if (err.response && err.response.data && err.response.data.error) {
-						toast.error(err.response.data.error);
+					const errorMsg = err.response?.data?.error;
+					if (errorMsg) {
+						if (i18n.exists(`backendErrors.${errorMsg}`)) {
+							toast.error(i18n.t(`backendErrors.${errorMsg}`));
+						} else {
+							toast.error(err.response.data.error);
+						}
 						if (err.response.status === 404) {
 							history.push("/tickets");
 						}
+					} else {
+						toast.error("Unknown error");
 					}
 				}
 			};

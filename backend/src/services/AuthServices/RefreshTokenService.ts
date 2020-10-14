@@ -23,7 +23,7 @@ export const RefreshTokenService = async (token: string): Promise<Response> => {
   try {
     decoded = verify(token, authConfig.refreshSecret);
   } catch (err) {
-    throw new AppError("Session expire. Please login.", 401);
+    throw new AppError("ERR_SESSION_EXPIRED", 401);
   }
 
   const { id, tokenVersion } = decoded as RefreshTokenPayload;
@@ -31,7 +31,7 @@ export const RefreshTokenService = async (token: string): Promise<Response> => {
   const user = await ShowUserService(id);
 
   if (user.tokenVersion !== tokenVersion) {
-    throw new AppError("Session revoked. Please login.", 401);
+    throw new AppError("ERR_SESSION_EXPIRED", 401);
   }
 
   const newToken = createAccessToken(user);

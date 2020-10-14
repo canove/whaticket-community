@@ -19,20 +19,13 @@ export const GetWbotMessage = async (
     const msgToDelete = chatMessages.find(msg => msg.id.id === messageId);
 
     if (!msgToDelete) {
-      throw new AppError("msgNotFound");
+      throw new Error();
     }
 
     return msgToDelete;
   } catch (err) {
     console.log(err);
-    if (err.message === "msgNotFound") {
-      throw new AppError(
-        "Could not find a message witht this ID in WhatsApp chat."
-      );
-    }
-    throw new AppError(
-      "Could not valid WhatsApp contact. Check connections page"
-    );
+    throw new AppError("ERR_DELETE_WAPP_MSG");
   }
 };
 

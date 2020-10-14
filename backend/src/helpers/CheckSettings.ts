@@ -7,7 +7,7 @@ const CheckSettings = async (key: string): Promise<string> => {
   });
 
   if (!setting) {
-    throw new AppError("No setting found with this id.", 404);
+    throw new AppError("ERR_NO_SETTING_FOUND", 404);
   }
 
   return setting.value;

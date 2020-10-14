@@ -32,7 +32,7 @@ const UpdateUserService = async ({
   });
 
   if (!user) {
-    throw new AppError("No user found with this ID.", 404);
+    throw new AppError("ERR_NO_USER_FOUND", 404);
   }
 
   const schema = Yup.object().shape({

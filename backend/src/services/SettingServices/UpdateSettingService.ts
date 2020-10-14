@@ -15,7 +15,7 @@ const UpdateSettingService = async ({
   });
 
   if (!setting) {
-    throw new AppError("No setting found with this ID.", 404);
+    throw new AppError("ERR_NO_SETTING_FOUND", 404);
   }
 
   await setting.update({ value });

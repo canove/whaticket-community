@@ -17,7 +17,7 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   if (req.user.profile !== "admin") {
-    throw new AppError("Only administrators can access this route.", 403); // should be handled better.
+    throw new AppError("ERR_NO_PERMISSION", 403); // should be handled better.
   }
   const { searchParam, pageNumber } = req.query as IndexQuery;
 
@@ -36,9 +36,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     req.url === "/signup" &&
     (await CheckSettingsHelper("userCreation")) === "disabled"
   ) {
-    throw new AppError("User creation is disabled by administrator.", 403);
+    throw new AppError("ERR_USER_CREATION_DISABLED", 403);
   } else if (req.url !== "/signup" && req.user.profile !== "admin") {
-    throw new AppError("Only administrators can create users.", 403);
+    throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
   const user = await CreateUserService({
@@ -70,7 +70,7 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   if (req.user.profile !== "admin") {
-    throw new AppError("Only administrators can edit users.", 403);
+    throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
   const { userId } = req.params;
@@ -94,7 +94,7 @@ export const remove = async (
   const { userId } = req.params;
 
   if (req.user.profile !== "admin") {
-    throw new AppError("Only administrators can delete users.", 403);
+    throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
   await DeleteUserService(userId);

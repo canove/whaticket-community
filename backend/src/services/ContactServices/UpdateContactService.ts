@@ -32,7 +32,7 @@ const UpdateContactService = async ({
   });
 
   if (!contact) {
-    throw new AppError("No contact found with this ID.", 404);
+    throw new AppError("ERR_NO_CONTACT_FOUND", 404);
   }
 
   if (extraInfo) {

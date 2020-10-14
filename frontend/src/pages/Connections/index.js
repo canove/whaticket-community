@@ -103,9 +103,15 @@ const Connections = () => {
 				const { data } = await api.get("/whatsapp/");
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 			} catch (err) {
-				console.log(err);
-				if (err.response && err.response.data && err.response.data.error) {
-					toast.error(err.response.data.error);
+				const errorMsg = err.response?.data?.error;
+				if (errorMsg) {
+					if (i18n.exists(`backendErrors.${errorMsg}`)) {
+						toast.error(i18n.t(`backendErrors.${errorMsg}`));
+					} else {
+						toast.error(err.response.data.error);
+					}
+				} else {
+					toast.error("Unknown error");
 				}
 			}
 		};
@@ -182,9 +188,15 @@ const Connections = () => {
 			await api.delete(`/whatsapp/${whatsAppId}`);
 			toast.success(i18n.t("connections.toasts.deleted"));
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
 			}
 		}
 		setDeletingWhatsApp(null);
