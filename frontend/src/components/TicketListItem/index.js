@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
+import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -22,6 +23,11 @@ const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
 	},
+
+	pendingTicket: {
+		cursor: "unset",
+	},
+
 	noTicketsDiv: {
 		display: "flex",
 		height: "100px",
@@ -123,11 +129,13 @@ const TicketListItem = ({ ticket }) => {
 				dense
 				button
 				onClick={e => {
-					if (ticket.status === "pending" && handleAcepptTicket) return;
+					if (ticket.status === "pending") return;
 					handleSelectTicket(e, ticket);
 				}}
 				selected={ticketId && +ticketId === ticket.id}
-				className={classes.ticket}
+				className={clsx(classes.ticket, {
+					[classes.pendingTicket]: ticket.status === "pending",
+				})}
 			>
 				<ListItemAvatar>
 					<Avatar
