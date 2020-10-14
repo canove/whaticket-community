@@ -250,7 +250,7 @@ const reducer = (state, action) => {
 	}
 };
 
-const MessagesList = ({ ticketId }) => {
+const MessagesList = ({ ticketId, isGroup }) => {
 	const classes = useStyles();
 
 	const [messagesList, dispatch] = useReducer(reducer, []);
@@ -471,11 +471,11 @@ const MessagesList = ({ ticketId }) => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
-								{/* {ticket.isGroup && (
+								{isGroup && (
 									<span className={classes.messageContactName}>
 										{message.contact?.name}
 									</span>
-								)} */}
+								)}
 								{message.mediaUrl && checkMessageMedia(message)}
 								<div className={classes.textContentItem}>
 									{message.body}

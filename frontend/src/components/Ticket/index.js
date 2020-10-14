@@ -8,7 +8,6 @@ import clsx from "clsx";
 import { Paper, makeStyles } from "@material-ui/core";
 
 import ContactDrawer from "../ContactDrawer";
-
 import MessageInput from "../MessageInput/";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
@@ -147,7 +146,10 @@ const Ticket = () => {
 					/>
 					<TicketActionButtons ticket={ticket} />
 				</TicketHeader>
-				<MessagesList ticketId={ticketId}></MessagesList>
+				<MessagesList
+					ticketId={ticketId}
+					isGroup={ticket.isGroup}
+				></MessagesList>
 				<MessageInput ticketStatus={ticket.status} />
 			</Paper>
 			<ContactDrawer
