@@ -116,7 +116,7 @@ const Ticket = () => {
 			if (data.action === "update") {
 				setContact(prevState => {
 					if (prevState.id === data.contact?.id) {
-						return data.contact;
+						return { ...prevState, ...data.contact };
 					}
 					return prevState;
 				});
