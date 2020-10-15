@@ -111,13 +111,13 @@ const reducer = (state, action) => {
 	}
 
 	if (action.type === "UPDATE_TICKET_MESSAGES_COUNT") {
-		const ticket = action.payload;
+		const { ticket, searchParam } = action.payload;
 
 		const ticketIndex = state.findIndex(t => t.id === ticket.id);
 		if (ticketIndex !== -1) {
 			state[ticketIndex] = ticket;
 			state.unshift(state.splice(ticketIndex, 1)[0]);
-		} else {
+		} else if (!searchParam) {
 			state.unshift(ticket);
 		}
 
@@ -211,7 +211,10 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 			) {
 				dispatch({
 					type: "UPDATE_TICKET_MESSAGES_COUNT",
-					payload: data.ticket,
+					payload: {
+						ticket: data.ticket,
+						searchParam,
+					},
 				});
 			}
 		});
@@ -228,7 +231,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, showAll, userId]);
+	}, [status, showAll, userId, searchParam]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
