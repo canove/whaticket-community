@@ -410,7 +410,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 		if (message.ack === 2) {
 			return <DoneAll fontSize="small" className={classes.ackIcons} />;
 		}
-		if (message.ack === 3) {
+		if (message.ack === 3 || message.ack === 4) {
 			return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} />;
 		}
 	};
