@@ -14,7 +14,7 @@ const ImportContactsService = async (): Promise<void> => {
     phoneContacts = await wbot.getContacts();
   } catch (err) {
     console.log(
-      "Could not get whatsapp contacts from phone. Check connection page.",
+      "import - Could not get whatsapp contacts from phone. Check connection page.",
       err
     );
   }
@@ -22,7 +22,36 @@ const ImportContactsService = async (): Promise<void> => {
   if (phoneContacts) {
     await Promise.all(
       phoneContacts.map(async ({ number, name }) => {
-        await Contact.create({ number, name });
+        if (name===null)  {
+          console.log(
+            `import - whatsapp contact with name equal null - number=[${number}] name=[${name}]`
+          );
+        } else if (number===null)  {
+          console.log(
+            `import - whatsapp contact with number equal null - number=[${number}] name=[${name}]`
+          );
+        } else {
+
+          const numberExists = await Contact.findOne({
+            where: { number }
+          });
+        
+          if (numberExists) {
+            console.log(
+              `import - whatsapp contact with number ${number} already exists`
+            );
+          } else {
+            if( (name==='') || (name===undefined) ) {
+              name = 'idenfinido';
+              console.log(
+                `import - whatsapp contact name is blank. Resetting to UNDEFINED.`
+              );              
+            }
+            console.log(`import - Contact number=[${number}] name=[${name}]`)
+            await Contact.create({ number, name });
+          }
+
+        }
       })
     );
   }
