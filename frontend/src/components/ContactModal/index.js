@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import * as Yup from "yup";
 import { Formik, FieldArray, Form, Field } from "formik";
@@ -65,6 +65,7 @@ const ContactSchema = Yup.object().shape({
 
 const ContactModal = ({ open, onClose, contactId }) => {
 	const classes = useStyles();
+	const isMounted = useRef(true);
 
 	const initialState = {
 		name: "",
@@ -75,11 +76,19 @@ const ContactModal = ({ open, onClose, contactId }) => {
 	const [contact, setContact] = useState(initialState);
 
 	useEffect(() => {
+		return () => {
+			isMounted.current = false;
+		};
+	}, []);
+
+	useEffect(() => {
 		const fetchContact = async () => {
 			if (!contactId) return;
 			try {
 				const { data } = await api.get(`/contacts/${contactId}`);
-				setContact(data);
+				if (isMounted.current) {
+					setContact(data);
+				}
 			} catch (err) {
 				const errorMsg = err.response?.data?.error;
 				if (errorMsg) {

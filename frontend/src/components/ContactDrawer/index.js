@@ -127,7 +127,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 						<Button
 							variant="outlined"
 							color="primary"
-							onClick={e => setModalOpen(true)}
+							onClick={() => setModalOpen(true)}
 						>
 							{i18n.t("contactDrawer.buttons.edit")}
 						</Button>
@@ -135,30 +135,27 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 					<Paper square variant="outlined" className={classes.contactDetails}>
 						<ContactModal
 							open={modalOpen}
-							onClose={e => setModalOpen(false)}
-							aria-labelledby="form-dialog-title"
+							onClose={() => setModalOpen(false)}
 							contactId={contact.id}
 						></ContactModal>
 						<Typography variant="subtitle1">
 							{i18n.t("contactDrawer.extraInfo")}
 						</Typography>
-						{contact &&
-							contact.extraInfo &&
-							contact.extraInfo.map(info => (
-								<Paper
-									key={info.id}
-									square
-									variant="outlined"
-									className={classes.contactExtraInfo}
-								>
-									<InputLabel>{info.name}</InputLabel>
-									<LinkifyWithTargetBlank>
-										<Typography noWrap style={{ paddingTop: 2 }}>
-											{info.value}
-										</Typography>
-									</LinkifyWithTargetBlank>
-								</Paper>
-							))}
+						{contact?.extraInfo?.map(info => (
+							<Paper
+								key={info.id}
+								square
+								variant="outlined"
+								className={classes.contactExtraInfo}
+							>
+								<InputLabel>{info.name}</InputLabel>
+								<LinkifyWithTargetBlank>
+									<Typography noWrap style={{ paddingTop: 2 }}>
+										{info.value}
+									</Typography>
+								</LinkifyWithTargetBlank>
+							</Paper>
+						))}
 					</Paper>
 				</div>
 			)}
