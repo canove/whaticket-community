@@ -66,7 +66,7 @@ const Ticket = () => {
 	useEffect(() => {
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
-			const fetchMessages = async () => {
+			const fetchTicket = async () => {
 				try {
 					const { data } = await api.get("/tickets/" + ticketId);
 
@@ -89,7 +89,7 @@ const Ticket = () => {
 					}
 				}
 			};
-			fetchMessages();
+			fetchTicket();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [ticketId, history]);
