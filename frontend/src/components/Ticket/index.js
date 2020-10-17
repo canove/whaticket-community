@@ -65,9 +65,6 @@ const Ticket = () => {
 
 	useEffect(() => {
 		setLoading(true);
-	}, [ticketId]);
-
-	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchMessages = async () => {
 				try {
