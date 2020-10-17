@@ -1,17 +1,20 @@
 import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
 
-import Drawer from "@material-ui/core/Drawer";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
+import {
+	Popover,
+	makeStyles,
+	Drawer,
+	AppBar,
+	Toolbar,
+	List,
+	Typography,
+	Divider,
+	MenuItem,
+	IconButton,
+} from "@material-ui/core";
+
 import MenuIcon from "@material-ui/icons/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 
@@ -21,7 +24,6 @@ import UserModal from "../UserModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import BackdropLoading from "../BackdropLoading";
 import { i18n } from "../../translate/i18n";
-import { Popover } from "@material-ui/core";
 
 const drawerWidth = 240;
 
