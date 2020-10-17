@@ -35,6 +35,7 @@ const useTickets = ({
 					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
+					setLoading(false);
 					const errorMsg = err.response?.data?.error;
 					if (errorMsg) {
 						if (i18n.exists(`backendErrors.${errorMsg}`)) {

@@ -21,6 +21,7 @@ import UserModal from "../UserModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import BackdropLoading from "../BackdropLoading";
 import { i18n } from "../../translate/i18n";
+import { Popover } from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -212,14 +213,13 @@ const LoggedInLayout = ({ appTitle, children }) => {
 						>
 							<AccountCircle />
 						</IconButton>
-						<Menu
+						<Popover
 							id="menu-appbar"
 							anchorEl={anchorEl}
 							anchorOrigin={{
-								vertical: "top",
+								vertical: "bottom",
 								horizontal: "right",
 							}}
-							keepMounted
 							transformOrigin={{
 								vertical: "top",
 								horizontal: "right",
@@ -233,7 +233,7 @@ const LoggedInLayout = ({ appTitle, children }) => {
 							<MenuItem onClick={handleLogout}>
 								{i18n.t("mainDrawer.appBar.user.logout")}
 							</MenuItem>
-						</Menu>
+						</Popover>
 					</div>
 				</Toolbar>
 			</AppBar>

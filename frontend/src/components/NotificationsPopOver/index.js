@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
@@ -100,41 +100,39 @@ const NotificationsPopOver = () => {
 					return [data.ticket, ...prevState];
 				});
 
-				if (
-					(ticketIdRef.current &&
-						data.message.ticketId === ticketIdRef.current &&
+				const shouldNotNotificate =
+					(data.message.ticketId === ticketIdRef.current &&
 						document.visibilityState === "visible") ||
 					(data.ticket.userId && data.ticket.userId !== userId) ||
-					data.ticket.isGroup
-				)
-					return;
-				else {
-					// show desktop notification
-					const { message, contact, ticket } = data;
-					const options = {
-						body: `${message.body} - ${format(new Date(), "HH:mm")}`,
-						icon: contact.profilePicUrl,
-						tag: ticket.id,
-					};
-					let notification = new Notification(
-						`${i18n.t("tickets.notification.message")} ${contact.name}`,
-						options
-					);
+					data.ticket.isGroup;
 
-					notification.onclick = function (event) {
-						event.preventDefault(); //
-						window.focus();
-						history.push(`/tickets/${ticket.id}`);
-					};
+				if (shouldNotNotificate) return;
 
-					document.addEventListener("visibilitychange", () => {
-						if (document.visibilityState === "visible") {
-							notification.close();
-						}
-					});
+				// show desktop notification
+				const { message, contact, ticket } = data;
+				const options = {
+					body: `${message.body} - ${format(new Date(), "HH:mm")}`,
+					icon: contact.profilePicUrl,
+					tag: ticket.id,
+				};
+				let notification = new Notification(
+					`${i18n.t("tickets.notification.message")} ${contact.name}`,
+					options
+				);
 
-					soundAlert.current.play();
-				}
+				notification.onclick = function (event) {
+					event.preventDefault(); //
+					window.focus();
+					history.push(`/tickets/${ticket.id}`);
+				};
+
+				document.addEventListener("visibilitychange", () => {
+					if (document.visibilityState === "visible") {
+						notification.close();
+					}
+				});
+
+				soundAlert.current.play();
 			}
 		});
 
@@ -143,13 +141,13 @@ const NotificationsPopOver = () => {
 		};
 	}, [history, userId]);
 
-	const handleClick = useCallback(() => {
-		setIsOpen(!isOpen);
-	}, [isOpen, setIsOpen]);
+	const handleClick = () => {
+		setIsOpen(prevState => !prevState);
+	};
 
-	const handleClickAway = useCallback(() => {
+	const handleClickAway = () => {
 		setIsOpen(false);
-	}, [setIsOpen]);
+	};
 
 	const NotificationTicket = ({ children }) => {
 		return <div onClick={handleClickAway}>{children}</div>;
@@ -173,7 +171,7 @@ const NotificationsPopOver = () => {
 				anchorEl={anchorEl.current}
 				anchorOrigin={{
 					vertical: "bottom",
-					horizontal: "left",
+					horizontal: "right",
 				}}
 				transformOrigin={{
 					vertical: "top",

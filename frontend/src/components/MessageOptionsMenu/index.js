@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 
 import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
+import { Popover } from "@material-ui/core";
 
 const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
@@ -44,13 +44,12 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 			>
 				{i18n.t("messageOptionsMenu.confirmationModal.message")}
 			</ConfirmationModal>
-			<Menu
+			<Popover
 				anchorEl={anchorEl}
 				anchorOrigin={{
-					vertical: "top",
+					vertical: "bottom",
 					horizontal: "right",
 				}}
-				keepMounted
 				transformOrigin={{
 					vertical: "top",
 					horizontal: "right",
@@ -62,7 +61,7 @@ const MessageOptionsMenu = ({ messageId, menuOpen, handleClose, anchorEl }) => {
 					{i18n.t("messageOptionsMenu.delete")}
 				</MenuItem>
 				<MenuItem disabled> {i18n.t("messageOptionsMenu.reply")}</MenuItem>
-			</Menu>
+			</Popover>
 		</>
 	);
 };
