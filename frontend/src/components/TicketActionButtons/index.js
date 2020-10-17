@@ -54,6 +54,7 @@ const TicketActionButtons = ({ ticket }) => {
 				history.push("/tickets");
 			}
 		} catch (err) {
+			setLoading(false);
 			const errorMsg = err.response?.data?.error;
 			if (errorMsg) {
 				if (i18n.exists(`backendErrors.${errorMsg}`)) {

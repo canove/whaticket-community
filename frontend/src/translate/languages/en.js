@@ -301,7 +301,7 @@ const messages = {
 				ERR_DELETE_WAPP_MSG:
 					"Couldn't delete message from WhatsApp. Check connections page.",
 				ERR_OTHER_OPEN_TICKET:
-					"There's already an open or pending ticket for this contact.",
+					"There's already an open ticket for this contact.",
 				ERR_SESSION_EXPIRED: "Session expired. Please login.",
 				ERR_USER_CREATION_DISABLED:
 					"User creation was disabled by administrator.",

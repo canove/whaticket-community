@@ -306,8 +306,7 @@ const messages = {
 					"Error al enviar el mensaje de WhatsApp. Verifique la página de conexiones.",
 				ERR_DELETE_WAPP_MSG:
 					"No se pudo borrar el mensaje de WhatsApp. Verifique la página de conexiones.",
-				ERR_OTHER_OPEN_TICKET:
-					"Ya hay un ticket abierto o pendiente para este contacto.",
+				ERR_OTHER_OPEN_TICKET: "Ya hay un ticket abierto para este contacto.",
 				ERR_SESSION_EXPIRED: "Sesión caducada. Inicie sesión.",
 				ERR_USER_CREATION_DISABLED:
 					"La creación de usuarios fue deshabilitada por el administrador.",

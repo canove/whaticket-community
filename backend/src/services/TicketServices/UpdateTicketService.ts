@@ -1,4 +1,5 @@
 import AppError from "../../errors/AppError";
+import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
@@ -44,6 +45,10 @@ const UpdateTicketService = async ({
   await SetTicketMessagesAsRead(ticket);
 
   const oldStatus = ticket.status;
+
+  if (oldStatus === "closed") {
+    await CheckContactOpenTickets(ticket.contact.id);
+  }
 
   await ticket.update({
     status,
