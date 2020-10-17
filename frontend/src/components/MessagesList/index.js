@@ -263,10 +263,13 @@ const MessagesList = ({ ticketId, isGroup }) => {
 	const [selectedMessageId, setSelectedMessageId] = useState(null);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const messageOptionsMenuOpen = Boolean(anchorEl);
+	const currentTicketId = useRef(ticketId);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
+
+		currentTicketId.current = ticketId;
 	}, [ticketId]);
 
 	useEffect(() => {
@@ -278,13 +281,17 @@ const MessagesList = ({ ticketId, isGroup }) => {
 						params: { pageNumber },
 					});
 
-					dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
-					setHasMore(data.hasMore);
+					if (currentTicketId.current === ticketId) {
+						dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
+						setHasMore(data.hasMore);
+						setLoading(false);
+					}
 
 					if (pageNumber === 1 && data.messages.length > 1) {
 						scrollToBottom();
 					}
 				} catch (err) {
+					setLoading(false);
 					const errorMsg = err.response?.data?.error;
 					if (errorMsg) {
 						if (i18n.exists(`backendErrors.${errorMsg}`)) {
@@ -297,11 +304,11 @@ const MessagesList = ({ ticketId, isGroup }) => {
 					}
 				}
 			};
-
-			setLoading(false);
 			fetchMessages();
 		}, 500);
-		return () => clearTimeout(delayDebounceFn);
+		return () => {
+			clearTimeout(delayDebounceFn);
+		};
 	}, [pageNumber, ticketId]);
 
 	useEffect(() => {
