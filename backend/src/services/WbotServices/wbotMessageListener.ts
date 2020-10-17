@@ -118,7 +118,7 @@ const verifyTicket = async (
         },
         contactId: groupContact ? groupContact.id : contact.id
       },
-      order: [["createdAt", "DESC"]],
+      order: [["updatedAt", "DESC"]],
       include: ["contact"]
     });
 
