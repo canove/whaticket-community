@@ -90,8 +90,7 @@ const messages = {
 					importTitlte: "Import contacts",
 					deleteMessage:
 						"Are you sure you want to delete this contact? All related tickets will be lost.",
-					importMessage:
-						"Do you want to import all contacts from the phone? This function is experimental, you will have to reload the page after importing.",
+					importMessage: "Do you want to import all contacts from the phone?",
 				},
 				buttons: {
 					import: "Import Contacts",

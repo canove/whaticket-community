@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer } from "react";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -86,6 +87,7 @@ const useStyles = makeStyles(theme => ({
 
 const Contacts = () => {
 	const classes = useStyles();
+	const history = useHistory();
 
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -191,6 +193,7 @@ const Contacts = () => {
 	const handleimportContact = async () => {
 		try {
 			await api.post("/contacts/import");
+			history.go(0);
 		} catch (err) {
 			const errorMsg = err.response?.data?.error;
 			if (errorMsg) {

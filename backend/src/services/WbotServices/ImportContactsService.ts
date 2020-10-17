@@ -1,4 +1,3 @@
-import AppError from "../../errors/AppError";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getWbot } from "../../libs/wbot";
 import Contact from "../../models/Contact";
@@ -22,7 +21,20 @@ const ImportContactsService = async (): Promise<void> => {
   if (phoneContacts) {
     await Promise.all(
       phoneContacts.map(async ({ number, name }) => {
-        await Contact.create({ number, name });
+        if (!number) {
+          return null;
+        }
+        if (!name) {
+          name = number;
+        }
+
+        const numberExists = await Contact.findOne({
+          where: { number }
+        });
+
+        if (numberExists) return null;
+
+        return Contact.create({ number, name });
       })
     );
   }

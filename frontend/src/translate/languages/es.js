@@ -93,7 +93,7 @@ const messages = {
 					deleteMessage:
 						"¿Estás seguro que deseas borrar este contacto? Todos los tickets relacionados se perderán.",
 					importMessage:
-						"¿Quieres importar todos los contactos desde tu teléfono? Esta función es experimental, tendrás que recargar la página después de importar.",
+						"¿Quieres importar todos los contactos desde tu teléfono?",
 				},
 				buttons: {
 					import: "Importar Contactos",
