@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
 
 import {
-	Popover,
 	makeStyles,
 	Drawer,
 	AppBar,
@@ -12,6 +11,7 @@ import {
 	Divider,
 	MenuItem,
 	IconButton,
+	Menu,
 } from "@material-ui/core";
 
 import MenuIcon from "@material-ui/icons/Menu";
@@ -215,9 +215,10 @@ const LoggedInLayout = ({ appTitle, children }) => {
 						>
 							<AccountCircle />
 						</IconButton>
-						<Popover
+						<Menu
 							id="menu-appbar"
 							anchorEl={anchorEl}
+							getContentAnchorEl={null}
 							anchorOrigin={{
 								vertical: "bottom",
 								horizontal: "right",
@@ -235,7 +236,7 @@ const LoggedInLayout = ({ appTitle, children }) => {
 							<MenuItem onClick={handleLogout}>
 								{i18n.t("mainDrawer.appBar.user.logout")}
 							</MenuItem>
-						</Popover>
+						</Menu>
 					</div>
 				</Toolbar>
 			</AppBar>
