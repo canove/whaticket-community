@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import openSocket from "socket.io-client";
+import useSound from "use-sound";
 
 import Popover from "@material-ui/core/Popover";
 import IconButton from "@material-ui/core/IconButton";
@@ -16,6 +17,7 @@ import ChatIcon from "@material-ui/icons/Chat";
 import TicketListItem from "../TicketListItem";
 import { i18n } from "../../translate/i18n";
 import useTickets from "../../hooks/useTickets";
+import alertSound from "../../assets/sound.mp3";
 
 const useStyles = makeStyles(theme => ({
 	tabContainer: {
@@ -42,22 +44,27 @@ const NotificationsPopOver = () => {
 
 	const history = useHistory();
 	const userId = +localStorage.getItem("userId");
-	const soundAlert = useRef(new Audio(require("../../assets/sound.mp3")));
 	const ticketIdUrl = +history.location.pathname.split("/")[2];
 	const ticketIdRef = useRef(ticketIdUrl);
 	const anchorEl = useRef();
 	const [isOpen, setIsOpen] = useState(false);
 	const [notifications, setNotifications] = useState([]);
 
+	const [, setDesktopNotifications] = useState([]);
+
 	const { tickets } = useTickets({ withUnreadMessages: "true" });
+	const [play] = useSound(alertSound);
+	const soundAlertRef = useRef();
 
 	useEffect(() => {
+		soundAlertRef.current = play;
+
 		if (!("Notification" in window)) {
 			console.log("This browser doesn't support notifications");
 		} else {
 			Notification.requestPermission();
 		}
-	}, []);
+	}, [play]);
 
 	useEffect(() => {
 		setNotifications(tickets);
@@ -78,6 +85,18 @@ const NotificationsPopOver = () => {
 					const ticketIndex = prevState.findIndex(t => t.id === data.ticketId);
 					if (ticketIndex !== -1) {
 						prevState.splice(ticketIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+
+				setDesktopNotifications(prevState => {
+					const notfiticationIndex = prevState.findIndex(
+						n => n.tag === String(data.ticketId)
+					);
+					if (notfiticationIndex !== -1) {
+						prevState[notfiticationIndex].close();
+						prevState.splice(notfiticationIndex, 1);
 						return [...prevState];
 					}
 					return prevState;
@@ -108,31 +127,7 @@ const NotificationsPopOver = () => {
 
 				if (shouldNotNotificate) return;
 
-				// show desktop notification
-				const { message, contact, ticket } = data;
-				const options = {
-					body: `${message.body} - ${format(new Date(), "HH:mm")}`,
-					icon: contact.profilePicUrl,
-					tag: ticket.id,
-				};
-				let notification = new Notification(
-					`${i18n.t("tickets.notification.message")} ${contact.name}`,
-					options
-				);
-
-				notification.onclick = function (event) {
-					event.preventDefault(); //
-					window.focus();
-					history.push(`/tickets/${ticket.id}`);
-				};
-
-				document.addEventListener("visibilitychange", () => {
-					if (document.visibilityState === "visible") {
-						notification.close();
-					}
-				});
-
-				soundAlert.current.play();
+				handleNotifications(data, history);
 			}
 		});
 
@@ -140,6 +135,41 @@ const NotificationsPopOver = () => {
 			socket.disconnect();
 		};
 	}, [history, userId]);
+
+	const handleNotifications = (data, history) => {
+		const { message, contact, ticket } = data;
+
+		const options = {
+			body: `${message.body} - ${format(new Date(), "HH:mm")}`,
+			icon: contact.profilePicUrl,
+			tag: ticket.id,
+			renotify: true,
+		};
+
+		const notification = new Notification(
+			`${i18n.t("tickets.notification.message")} ${contact.name}`,
+			options
+		);
+
+		notification.onclick = e => {
+			e.preventDefault();
+			window.focus();
+			history.push(`/tickets/${ticket.id}`);
+		};
+
+		setDesktopNotifications(prevState => {
+			const notfiticationIndex = prevState.findIndex(
+				n => n.tag === notification.tag
+			);
+			if (notfiticationIndex !== -1) {
+				prevState[notfiticationIndex] = notification;
+				return [...prevState];
+			}
+			return [notification, ...prevState];
+		});
+
+		soundAlertRef.current();
+	};
 
 	const handleClick = () => {
 		setIsOpen(prevState => !prevState);

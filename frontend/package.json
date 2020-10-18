@@ -26,6 +26,7 @@
     "react-toastify": "^6.0.9",
     "recharts": "^1.8.5",
     "socket.io-client": "^2.3.1",
+    "use-sound": "^1.0.2",
     "yup": "^0.29.3"
   },
   "scripts": {
