@@ -80,12 +80,14 @@ nano .env
 Fill `.env` file with environment variables:
 
 ```bash
-NODE_ENV=DEVELOPMENT #it helps on debugging
+NODE_ENV=DEVELOPMENT      #it helps on debugging
 BACKEND_URL=http://localhost
+FRONTEND_URL=https://localhost:3000
 PROXY_PORT=8080
 PORT=8080
 
-DB_HOST= #DB host IP, usually localhost
+DB_HOST=                  #DB host IP, usually localhost
+DB_DIALECT=
 DB_USER=
 DB_PASS=
 DB_NAME=
@@ -199,6 +201,7 @@ PROXY_PORT=443                            #USE NGINX REVERSE PROXY PORT HERE, WE
 PORT=8080
 
 DB_HOST=localhost
+DB_DIALECT=
 DB_USER=
 DB_PASS=
 DB_NAME=

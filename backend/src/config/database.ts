@@ -5,7 +5,7 @@ module.exports = {
     charset: "utf8mb4",
     collate: "utf8mb4_bin"
   },
-  dialect: process.env.DB_DIALECT,
+  dialect: process.env.DB_DIALECT || "mysql",
   timezone: "-03:00",
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
