@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { Op } from "sequelize";
 
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
@@ -14,28 +15,18 @@ interface Request {
   whatsappId: string;
 }
 
+interface Response {
+  whatsapp: Whatsapp;
+  oldDefaultWhatsapp: Whatsapp | null;
+}
+
 const UpdateWhatsAppService = async ({
   whatsappData,
   whatsappId
-}: Request): Promise<Whatsapp> => {
+}: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
-    default: Yup.boolean().test(
-      "Check-default",
-      "Only one default whatsapp is permited",
-      async value => {
-        if (value === true) {
-          const whatsappFound = await Whatsapp.findOne({
-            where: { default: true }
-          });
-          if (whatsappFound) {
-            return !(whatsappFound.id !== +whatsappId);
-          }
-          return true;
-        }
-        return true;
-      }
-    )
+    isDefault: Yup.boolean()
   });
 
   const { name, status, isDefault } = whatsappData;
@@ -46,6 +37,17 @@ const UpdateWhatsAppService = async ({
     throw new AppError(err.message);
   }
 
+  let oldDefaultWhatsapp: Whatsapp | null = null;
+
+  if (isDefault) {
+    oldDefaultWhatsapp = await Whatsapp.findOne({
+      where: { isDefault: true, id: { [Op.not]: whatsappId } }
+    });
+    if (oldDefaultWhatsapp) {
+      await oldDefaultWhatsapp.update({ isDefault: false });
+    }
+  }
+
   const whatsapp = await Whatsapp.findOne({
     where: { id: whatsappId }
   });
@@ -53,14 +55,13 @@ const UpdateWhatsAppService = async ({
   if (!whatsapp) {
     throw new AppError("ERR_NO_WAPP_FOUND", 404);
   }
-
   await whatsapp.update({
     name,
     status,
     isDefault
   });
 
-  return whatsapp;
+  return { whatsapp, oldDefaultWhatsapp };
 };
 
 export default UpdateWhatsAppService;

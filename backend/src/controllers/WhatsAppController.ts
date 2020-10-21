@@ -25,7 +25,11 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { name, status, isDefault }: WhatsappData = req.body;
 
-  const whatsapp = await CreateWhatsAppService({ name, status, isDefault });
+  const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
+    name,
+    status,
+    isDefault
+  });
 
   initWbot(whatsapp)
     .then(() => {
@@ -39,6 +43,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     action: "update",
     whatsapp
   });
+
+  if (oldDefaultWhatsapp) {
+    io.emit("whatsapp", {
+      action: "update",
+      whatsapp: oldDefaultWhatsapp
+    });
+  }
 
   return res.status(200).json(whatsapp);
 };
@@ -58,13 +69,23 @@ export const update = async (
   const { whatsappId } = req.params;
   const whatsappData = req.body;
 
-  const whatsapp = await UpdateWhatsAppService({ whatsappData, whatsappId });
+  const { whatsapp, oldDefaultWhatsapp } = await UpdateWhatsAppService({
+    whatsappData,
+    whatsappId
+  });
 
   const io = getIO();
   io.emit("whatsapp", {
     action: "update",
     whatsapp
   });
+
+  if (oldDefaultWhatsapp) {
+    io.emit("whatsapp", {
+      action: "update",
+      whatsapp: oldDefaultWhatsapp
+    });
+  }
 
   return res.status(200).json(whatsapp);
 };

@@ -9,11 +9,16 @@ interface Request {
   isDefault?: boolean;
 }
 
+interface Response {
+  whatsapp: Whatsapp;
+  oldDefaultWhatsapp: Whatsapp | null;
+}
+
 const CreateWhatsAppService = async ({
   name,
   status = "INITIALIZING",
   isDefault = false
-}: Request): Promise<Whatsapp> => {
+}: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
       .required()
@@ -31,21 +36,7 @@ const CreateWhatsAppService = async ({
           return true;
         }
       ),
-    isDefault: Yup.boolean()
-      .required()
-      .test(
-        "Check-default",
-        "Only one default whatsapp is permitted",
-        async value => {
-          if (value === true) {
-            const whatsappFound = await Whatsapp.findOne({
-              where: { isDefault: true }
-            });
-            return !whatsappFound;
-          }
-          return true;
-        }
-      )
+    isDefault: Yup.boolean().required()
   });
 
   try {
@@ -54,13 +45,30 @@ const CreateWhatsAppService = async ({
     throw new AppError(err.message);
   }
 
+  const whatsappFound = await Whatsapp.findOne();
+
+  if (!whatsappFound) {
+    isDefault = !whatsappFound;
+  }
+
+  let oldDefaultWhatsapp: Whatsapp | null = null;
+
+  if (isDefault) {
+    oldDefaultWhatsapp = await Whatsapp.findOne({
+      where: { isDefault: true }
+    });
+    if (oldDefaultWhatsapp) {
+      await oldDefaultWhatsapp.update({ isDefault: false });
+    }
+  }
+
   const whatsapp = await Whatsapp.create({
     name,
     status,
     isDefault
   });
 
-  return whatsapp;
+  return { whatsapp, oldDefaultWhatsapp };
 };
 
 export default CreateWhatsAppService;
