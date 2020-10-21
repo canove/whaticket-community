@@ -63,7 +63,7 @@ const ContactSchema = Yup.object().shape({
 	email: Yup.string().email("Invalid email"),
 });
 
-const ContactModal = ({ open, onClose, contactId }) => {
+const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	const classes = useStyles();
 	const isMounted = useRef(true);
 
@@ -83,7 +83,14 @@ const ContactModal = ({ open, onClose, contactId }) => {
 
 	useEffect(() => {
 		const fetchContact = async () => {
+			if (initialValues) {
+				setContact(prevState => {
+					return { ...prevState, ...initialValues };
+				});
+			}
+
 			if (!contactId) return;
+
 			try {
 				const { data } = await api.get(`/contacts/${contactId}`);
 				if (isMounted.current) {
@@ -104,10 +111,14 @@ const ContactModal = ({ open, onClose, contactId }) => {
 		};
 
 		fetchContact();
-	}, [contactId, open]);
+	}, [contactId, open, initialValues]);
 
-	const handleClose = () => {
-		onClose();
+	const handleClose = contactId => {
+		if (contactId) {
+			onClose(contactId);
+		} else {
+			onClose();
+		}
 		setContact(initialState);
 	};
 
@@ -115,8 +126,13 @@ const ContactModal = ({ open, onClose, contactId }) => {
 		try {
 			if (contactId) {
 				await api.put(`/contacts/${contactId}`, values);
+				handleClose();
 			} else {
-				await api.post("/contacts", values);
+				const { data } = await api.post("/contacts", values);
+				if (onSave) {
+					onSave(data);
+				}
+				handleClose();
 			}
 			toast.success(i18n.t("contactModal.success"));
 		} catch (err) {
@@ -131,7 +147,6 @@ const ContactModal = ({ open, onClose, contactId }) => {
 				toast.error("Unknown error");
 			}
 		}
-		handleClose();
 	};
 
 	return (

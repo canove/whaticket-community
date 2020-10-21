@@ -178,7 +178,7 @@ const messages = {
 			newTicketModal: {
 				title: "Criar Ticket",
 				fieldLabel: "Digite para pesquisar o contato",
-				noOptions: "Nenhum contato encontrado. Tente outro nome.",
+				add: "Adicionar",
 				buttons: {
 					ok: "Salvar",
 					cancel: "Cancelar",
