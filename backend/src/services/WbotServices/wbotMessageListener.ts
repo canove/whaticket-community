@@ -7,6 +7,7 @@ import * as Sentry from "@sentry/node";
 
 import {
   Contact as WbotContact,
+  MessageMedia as WbotMessageMedia,
   Message as WbotMessage
 } from "whatsapp-web.js";
 
