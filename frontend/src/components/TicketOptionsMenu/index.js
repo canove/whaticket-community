@@ -8,9 +8,11 @@ import Menu from "@material-ui/core/Menu";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
+import TransferTicketModal from "../TransferTicketModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
+	const [TicketOpen, setTicketOpen] = useState(false);
 
 	const handleDeleteTicket = async () => {
 		try {
@@ -55,7 +57,9 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				<MenuItem onClick={handleOpenConfirmationModal}>
 					{i18n.t("ticketOptionsMenu.delete")}
 				</MenuItem>
-				<MenuItem disabled>{i18n.t("ticketOptionsMenu.transfer")}</MenuItem>
+				<MenuItem
+				onClick={e => setTicketOpen(true)}
+				>{i18n.t("ticketOptionsMenu.transfer")}</MenuItem>
 			</Menu>
 			<ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${
@@ -69,6 +73,21 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			>
 				{i18n.t("ticketOptionsMenu.confirmationModal.message")}
 			</ConfirmationModal>
+			<TransferTicketModal
+				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${
+					ticket.id
+				} ${i18n.t("ticketOptionsMenu.confirmationModal.titleFrom")} ${
+					ticket.contact.name
+				}?`}
+				modalOpen={TicketOpen}
+				onClose={e => setTicketOpen(false)}
+				contactId = {ticket.contactId}
+				ticketid = {ticket.id}
+
+			>
+
+			</TransferTicketModal>
+
 		</>
 	);
 };
