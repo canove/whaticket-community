@@ -3,6 +3,7 @@ public/*
 dist
 !public/.gitkeep
 .env
+.env.test
 
 package-lock.json
 yarn.lock
