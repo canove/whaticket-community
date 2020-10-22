@@ -38,12 +38,16 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const { body }: MessageData = req.body;
-  const media = req.file;
+  const medias = req.files as Express.Multer.File[];
 
   const ticket = await ShowTicketService(ticketId);
 
-  if (media) {
-    await SendWhatsAppMedia({ media, ticket });
+  if (medias) {
+    await Promise.all(
+      medias.map(async (media: Express.Multer.File) => {
+        await SendWhatsAppMedia({ media, ticket });
+      })
+    );
   } else {
     await SendWhatsAppMessage({ body, ticket });
   }

@@ -109,8 +109,7 @@ const MessageInput = ({ ticketStatus }) => {
 	const { ticketId } = useParams();
 	const username = localStorage.getItem("username");
 
-	const mediaInitialState = { preview: "", raw: "", name: "" };
-	const [media, setMedia] = useState(mediaInitialState);
+	const [medias, setMedias] = useState([]);
 	const [inputMessage, setInputMessage] = useState("");
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -120,7 +119,7 @@ const MessageInput = ({ ticketStatus }) => {
 		return () => {
 			setInputMessage("");
 			setShowEmoji(false);
-			setMedia({});
+			setMedias([]);
 		};
 	}, [ticketId]);
 
@@ -133,23 +132,18 @@ const MessageInput = ({ ticketStatus }) => {
 		setInputMessage(prevState => prevState + emoji);
 	};
 
-	const handleChangeMedia = e => {
-		if (e.target.files.length) {
-			setMedia({
-				preview: URL.createObjectURL(e.target.files[0]),
-				raw: e.target.files[0],
-				name: e.target.files[0].name,
-			});
+	const handleChangeMedias = e => {
+		if (!e.target.files) {
+			return;
 		}
+
+		const selectedMedias = Array.from(e.target.files);
+		setMedias(selectedMedias);
 	};
 
 	const handleInputPaste = e => {
 		if (e.clipboardData.files[0]) {
-			setMedia({
-				preview: URL.createObjectURL(e.clipboardData.files[0]),
-				raw: e.clipboardData.files[0],
-				name: e.clipboardData.files[0].name,
-			});
+			setMedias([e.clipboardData.files[0]]);
 		}
 	};
 
@@ -158,9 +152,11 @@ const MessageInput = ({ ticketStatus }) => {
 		e.preventDefault();
 
 		const formData = new FormData();
-		formData.append("media", media.raw);
 		formData.append("fromMe", true);
-		formData.append("body", media.name);
+		medias.forEach(media => {
+			formData.append("medias", media);
+			formData.append("body", media.name);
+		});
 
 		try {
 			await api.post(`/messages/${ticketId}`, formData);
@@ -178,7 +174,7 @@ const MessageInput = ({ ticketStatus }) => {
 		}
 
 		setLoading(false);
-		setMedia(mediaInitialState);
+		setMedias([]);
 	};
 
 	const handleSendMessage = async () => {
@@ -267,13 +263,13 @@ const MessageInput = ({ ticketStatus }) => {
 		}
 	};
 
-	if (media.preview)
+	if (medias.length > 0)
 		return (
 			<Paper elevation={0} square className={classes.viewMediaInputWrapper}>
 				<IconButton
 					aria-label="cancel-upload"
 					component="span"
-					onClick={e => setMedia(mediaInitialState)}
+					onClick={e => setMedias([])}
 				>
 					<CancelIcon className={classes.sendMessageIcons} />
 				</IconButton>
@@ -284,7 +280,7 @@ const MessageInput = ({ ticketStatus }) => {
 					</div>
 				) : (
 					<span>
-						{media.name}
+						{medias[0]?.name}
 						{/* <img src={media.preview} alt=""></img> */}
 					</span>
 				)}
@@ -321,11 +317,12 @@ const MessageInput = ({ ticketStatus }) => {
 				) : null}
 
 				<input
+					multiple
 					type="file"
 					id="upload-button"
 					disabled={loading || recording || ticketStatus !== "open"}
 					className={classes.uploadInput}
-					onChange={handleChangeMedia}
+					onChange={handleChangeMedias}
 				/>
 				<label htmlFor="upload-button">
 					<IconButton

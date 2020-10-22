@@ -4,11 +4,10 @@ import "express-async-errors";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import multer from "multer";
 import * as Sentry from "@sentry/node";
 
-import "./database";
 import uploadConfig from "./config/upload";
+import "./database";
 import AppError from "./errors/AppError";
 import routes from "./routes";
 import { initIO } from "./libs/socket";
@@ -16,7 +15,6 @@ import { StartWhatsAppSessions } from "./services/WbotServices/StartWhatsAppSess
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 
-const upload = multer(uploadConfig);
 const app = express();
 
 app.use(
@@ -28,7 +26,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
-app.use(upload.single("media"));
 app.use("/public", express.static(uploadConfig.directory));
 app.use(routes);
 
