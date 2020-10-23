@@ -32,13 +32,10 @@ const CreateUserService = async ({
         "Check-email",
         "An user with this email already exists.",
         async value => {
-          if (value) {
-            const emailExists = await User.findOne({
-              where: { email: value }
-            });
-            return !emailExists;
-          }
-          return false;
+          const emailExists = await User.findOne({
+            where: { email: value! }
+          });
+          return !emailExists;
         }
       ),
     password: Yup.string().required().min(5)
