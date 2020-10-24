@@ -165,6 +165,17 @@ const messages = {
 					showAll: "Todos",
 				},
 			},
+			TransferTicketModal : {
+				title:"Transferir Chamado",
+				fieldLabel: "Digite aqui o nome do técnico",
+				buttons: {
+					 ok : "Transferir",
+					 cancel: "Cancelar",
+				}
+
+
+
+			},
 			ticketsList: {
 				pendingHeader: "Aguardando",
 				assignedHeader: "Atendendo",
