@@ -165,16 +165,14 @@ const messages = {
 					showAll: "Todos",
 				},
 			},
-			TransferTicketModal : {
-				title:"Transferir Chamado",
-				fieldLabel: "Digite aqui o nome do técnico",
+			transferTicketModal: {
+				title: "Transferir Ticket",
+				fieldLabel: "Digite aqui o nome do usuário",
+				noOptions: "Nenhum usuário encontrado com esse nome.",
 				buttons: {
-					 ok : "Transferir",
-					 cancel: "Cancelar",
-				}
-
-
-
+					ok: "Transferir",
+					cancel: "Cancelar",
+				},
 			},
 			ticketsList: {
 				pendingHeader: "Aguardando",

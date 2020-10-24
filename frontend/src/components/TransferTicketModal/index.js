@@ -14,48 +14,37 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { makeStyles } from "@material-ui/core/styles";
-
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
-
-const useStyles = makeStyles(theme => ({
-	root: {
-		display: "flex",
-		flexWrap: "wrap",
-	},
-}));
 
 const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const TransferTicketModal = ({ modalOpen, onClose,TechinicalId,ticketid }) => {
+const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 	const history = useHistory();
-	const classes = useStyles();
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
-	const [selectedTechinical, setSelectedTechinical] = useState(null);
-	//const [hasMore, setHasMore] = useState(false);
-
-	//const [user, setUser] = useState(null);
-
+	const [selectedUser, setSelectedUser] = useState(null);
 
 	useEffect(() => {
+		if (!modalOpen || searchParam.length < 3) {
+			setLoading(false);
+			return;
+		}
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
 					const { data } = await api.get("/users/", {
-						params: { searchParam, pageNumber : 1 },
+						params: { searchParam },
 					});
 					setOptions(data.users);
-					//setUser({ type: "LOAD_USERS", payload: data.users });
-					//setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
+					setLoading(false);
 					const errorMsg = err.response?.data?.error;
 					if (errorMsg) {
 						if (i18n.exists(`backendErrors.${errorMsg}`)) {
@@ -68,33 +57,31 @@ const TransferTicketModal = ({ modalOpen, onClose,TechinicalId,ticketid }) => {
 					}
 				}
 			};
+
 			fetchUsers();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);
 
-
 	const handleClose = () => {
 		onClose();
 		setSearchParam("");
-		setSelectedTechinical(null);
+		setSelectedUser(null);
 	};
 
 	const handleSaveTicket = async e => {
 		e.preventDefault();
-		if (!selectedTechinical) return;
+		if (!ticketid || !selectedUser) return;
 		setLoading(true);
 		try {
-
-
-
-			const { data: ticket } = await api.put("/tickets/"+ticketid , {
-				TechinicalId: TechinicalId,
-				userId: selectedTechinical.id,
+			await api.put(`/tickets/${ticketid}`, {
+				userId: selectedUser.id,
 				status: "open",
 			});
-			history.push(`/tickets/${ticket.id}`);
+			setLoading(false);
+			history.push(`/tickets`);
 		} catch (err) {
+			setLoading(false);
 			const errorMsg = err.response?.data?.error;
 			if (errorMsg) {
 				if (i18n.exists(`backendErrors.${errorMsg}`)) {
@@ -103,84 +90,71 @@ const TransferTicketModal = ({ modalOpen, onClose,TechinicalId,ticketid }) => {
 					toast.error(err.response.data.error);
 				}
 			} else {
-				toast.error("Unknown error"+ err);
+				toast.error("Unknown error");
 			}
 		}
-		setLoading(false);
-		handleClose();
 	};
 
 	return (
-		<div className={classes.root}>
-			<Dialog
-				open={modalOpen}
-				onClose={handleClose}
-				maxWidth="lg"
-				scroll="paper"
-			>
-				<form onSubmit={handleSaveTicket}>
-					<DialogTitle id="form-dialog-title">
-						{i18n.t("TransferTicketModal.title")}
-
-						
-					</DialogTitle>
-					<DialogContent dividers>
-						<Autocomplete
-							id="Techinicals-finder"
-							style={{ width: 300 }}
-							getOptionLabel={option => `${option.name}`}
-							onChange={(e, newValue) => {
-								setSelectedTechinical(newValue);
-							}}
-							options={options}
-							filterOptions={filterOptions}
-							noOptionsText={i18n.t("newTicketModal.noOptions")}
-							loading={loading}
-							renderInput={params => (
-								<TextField
-									{...params}
-									label={i18n.t("TransferTicketModal.fieldLabel") }
-									variant="outlined"
-									required
-									autoFocus
-									onChange={e => setSearchParam(e.target.value)}
-									id="my-input"
-									InputProps={{
-										...params.InputProps,
-										endAdornment: (
-											<React.Fragment>
-												{loading ? (
-													<CircularProgress color="inherit" size={20} />
-												) : null}
-												{params.InputProps.endAdornment}
-											</React.Fragment>
-										),
-									}}
-								/>
-							)}
-						/>
-					</DialogContent>
-					<DialogActions>
-						<Button
-							onClick={handleClose}
-							color="secondary"
-							disabled={loading}
-							variant="outlined"
-						>
-							{i18n.t("newTicketModal.buttons.cancel")}
-						</Button>
-						<ButtonWithSpinner
-							variant="contained"
-							type="submit"
-							color="primary"
-							loading={loading}
-						>
-							{i18n.t("newTicketModal.buttons.ok")}
-						</ButtonWithSpinner>
-					</DialogActions>
-				</form>
-			</Dialog>
-		</div>
+		<Dialog open={modalOpen} onClose={handleClose} maxWidth="lg" scroll="paper">
+			<form onSubmit={handleSaveTicket}>
+				<DialogTitle id="form-dialog-title">
+					{i18n.t("transferTicketModal.title")}
+				</DialogTitle>
+				<DialogContent dividers>
+					<Autocomplete
+						style={{ width: 300 }}
+						getOptionLabel={option => `${option.name}`}
+						onChange={(e, newValue) => {
+							setSelectedUser(newValue);
+						}}
+						options={options}
+						filterOptions={filterOptions}
+						noOptionsText={i18n.t("transferTicketModal.noOptions")}
+						loading={loading}
+						renderInput={params => (
+							<TextField
+								{...params}
+								label={i18n.t("transferTicketModal.fieldLabel")}
+								variant="outlined"
+								required
+								autoFocus
+								onChange={e => setSearchParam(e.target.value)}
+								InputProps={{
+									...params.InputProps,
+									endAdornment: (
+										<React.Fragment>
+											{loading ? (
+												<CircularProgress color="inherit" size={20} />
+											) : null}
+											{params.InputProps.endAdornment}
+										</React.Fragment>
+									),
+								}}
+							/>
+						)}
+					/>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						onClick={handleClose}
+						color="secondary"
+						disabled={loading}
+						variant="outlined"
+					>
+						{i18n.t("transferTicketModal.buttons.cancel")}
+					</Button>
+					<ButtonWithSpinner
+						variant="contained"
+						type="submit"
+						color="primary"
+						loading={loading}
+					>
+						{i18n.t("transferTicketModal.buttons.ok")}
+					</ButtonWithSpinner>
+				</DialogActions>
+			</form>
+		</Dialog>
 	);
 };
 

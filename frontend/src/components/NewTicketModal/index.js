@@ -14,19 +14,10 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { makeStyles } from "@material-ui/core/styles";
-
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
-
-const useStyles = makeStyles(theme => ({
-	root: {
-		display: "flex",
-		flexWrap: "wrap",
-	},
-}));
 
 const filter = createFilterOptions({
 	trim: true,
@@ -34,7 +25,6 @@ const filter = createFilterOptions({
 
 const NewTicketModal = ({ modalOpen, onClose }) => {
 	const history = useHistory();
-	const classes = useStyles();
 	const userId = +localStorage.getItem("userId");
 
 	const [options, setOptions] = useState([]);
@@ -156,7 +146,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	};
 
 	return (
-		<div className={classes.root}>
+		<>
 			<ContactModal
 				open={contactModalOpen}
 				initialValues={newContact}
@@ -228,7 +218,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					</ButtonWithSpinner>
 				</DialogActions>
 			</Dialog>
-		</div>
+		</>
 	);
 };
 
