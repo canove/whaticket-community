@@ -3,7 +3,7 @@ import User from "../../models/User";
 
 interface Request {
   searchParam?: string;
-  pageNumber?: string;
+  pageNumber?: string | number;
 }
 
 interface Response {

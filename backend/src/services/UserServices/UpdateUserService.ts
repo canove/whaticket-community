@@ -12,7 +12,7 @@ interface UserData {
 
 interface Request {
   userData: UserData;
-  userId: string;
+  userId: string | number;
 }
 
 interface Response {
