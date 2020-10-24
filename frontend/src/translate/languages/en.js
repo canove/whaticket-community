@@ -166,12 +166,12 @@ const messages = {
 				},
 			},
 			transferTicketModal: {
-				title: "Transferir Ticket",
-				fieldLabel: "Digite aqui o nome do usuário",
-				noOptions: "Nenhum usuário encontrado com esse nome.",
+				title: "Transfer Ticket",
+				fieldLabel: "Type to search for users",
+				noOptions: "No user found with this name",
 				buttons: {
-					ok: "Transferir",
-					cancel: "Cancelar",
+					ok: "Transfer",
+					cancel: "Cancel",
 				},
 			},
 			ticketsList: {

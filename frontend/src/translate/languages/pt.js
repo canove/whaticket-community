@@ -167,8 +167,8 @@ const messages = {
 			},
 			transferTicketModal: {
 				title: "Transferir Ticket",
-				fieldLabel: "Digite aqui o nome do usuário",
-				noOptions: "Nenhum usuário encontrado com esse nome.",
+				fieldLabel: "Digite para buscar usuários",
+				noOptions: "Nenhum usuário encontrado com esse nome",
 				buttons: {
 					ok: "Transferir",
 					cancel: "Cancelar",
