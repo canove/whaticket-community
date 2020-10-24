@@ -3,9 +3,14 @@ public/*
 dist
 !public/.gitkeep
 .env
+.env.test
 
 package-lock.json
 yarn.lock
 yarn-error.log
 
 /src/config/sentry.js
+
+# Ignore test-related files
+/coverage.data
+/coverage/

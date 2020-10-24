@@ -1,4 +1,4 @@
-require("dotenv/config");
+require("../bootstrap");
 
 module.exports = {
   define: {
