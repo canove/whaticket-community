@@ -165,6 +165,15 @@ const messages = {
 					showAll: "All",
 				},
 			},
+			transferTicketModal: {
+				title: "Transfer Ticket",
+				fieldLabel: "Type to search for users",
+				noOptions: "No user found with this name",
+				buttons: {
+					ok: "Transfer",
+					cancel: "Cancel",
+				},
+			},
 			ticketsList: {
 				pendingHeader: "Queue",
 				assignedHeader: "Working on",

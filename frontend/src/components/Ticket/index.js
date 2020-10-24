@@ -101,7 +101,7 @@ const Ticket = () => {
 
 		socket.on("ticket", data => {
 			if (data.action === "updateStatus") {
-				setTicket({ ...data.ticket, user: data.user });
+				setTicket(data.ticket);
 			}
 
 			if (data.action === "delete") {

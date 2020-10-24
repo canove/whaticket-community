@@ -16,9 +16,6 @@ type IndexQuery = {
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  if (req.user.profile !== "admin") {
-    throw new AppError("ERR_NO_PERMISSION", 403); // should be handled better.
-  }
   const { searchParam, pageNumber } = req.query as IndexQuery;
 
   const { users, count, hasMore } = await ListUsersService({

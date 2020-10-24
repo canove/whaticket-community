@@ -17,22 +17,17 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
-import ContactModal from "../ContactModal";
 
-const filter = createFilterOptions({
+const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const NewTicketModal = ({ modalOpen, onClose }) => {
+const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
-
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
-	const [selectedContact, setSelectedContact] = useState(null);
-	const [newContact, setNewContact] = useState({});
-	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [selectedUser, setSelectedUser] = useState(null);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -41,12 +36,12 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		}
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
-			const fetchContacts = async () => {
+			const fetchUsers = async () => {
 				try {
-					const { data } = await api.get("contacts", {
+					const { data } = await api.get("/users/", {
 						params: { searchParam },
 					});
-					setOptions(data.contacts);
+					setOptions(data.users);
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
@@ -63,7 +58,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 				}
 			};
 
-			fetchContacts();
+			fetchUsers();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);
@@ -71,20 +66,22 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	const handleClose = () => {
 		onClose();
 		setSearchParam("");
-		setSelectedContact(null);
+		setSelectedUser(null);
 	};
 
-	const handleSaveTicket = async contactId => {
-		if (!contactId) return;
+	const handleSaveTicket = async e => {
+		e.preventDefault();
+		if (!ticketid || !selectedUser) return;
 		setLoading(true);
 		try {
-			const { data: ticket } = await api.post("/tickets", {
-				contactId: contactId,
-				userId: userId,
+			await api.put(`/tickets/${ticketid}`, {
+				userId: selectedUser.id,
 				status: "open",
 			});
-			history.push(`/tickets/${ticket.id}`);
+			setLoading(false);
+			history.push(`/tickets`);
 		} catch (err) {
+			setLoading(false);
 			const errorMsg = err.response?.data?.error;
 			if (errorMsg) {
 				if (i18n.exists(`backendErrors.${errorMsg}`)) {
@@ -96,92 +93,34 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 				toast.error("Unknown error");
 			}
 		}
-		setLoading(false);
-		handleClose();
-	};
-
-	const handleSelectOption = (e, newValue) => {
-		if (newValue?.number) {
-			setSelectedContact(newValue);
-		} else if (newValue?.name) {
-			setNewContact({ name: newValue.name });
-			setContactModalOpen(true);
-		}
-	};
-
-	const handleCloseContactModal = () => {
-		setContactModalOpen(false);
-	};
-
-	const handleAddNewContactTicket = contact => {
-		handleSaveTicket(contact.id);
-	};
-
-	const createAddContactOption = (options, params) => {
-		const filtered = filter(options, params);
-
-		if (params.inputValue !== "" && !loading && searchParam.length >= 3) {
-			filtered.push({
-				name: `${params.inputValue}`,
-			});
-		}
-
-		return filtered;
-	};
-
-	const renderOption = option => {
-		if (option.number) {
-			return `${option.name} - ${option.number}`;
-		} else {
-			return `${i18n.t("newTicketModal.add")} ${option.name}`;
-		}
-	};
-
-	const renderOptionLabel = option => {
-		if (option.number) {
-			return `${option.name} - ${option.number}`;
-		} else {
-			return `${option.name}`;
-		}
 	};
 
 	return (
-		<>
-			<ContactModal
-				open={contactModalOpen}
-				initialValues={newContact}
-				onClose={handleCloseContactModal}
-				onSave={handleAddNewContactTicket}
-			></ContactModal>
-			<Dialog open={modalOpen} onClose={handleClose}>
+		<Dialog open={modalOpen} onClose={handleClose} maxWidth="lg" scroll="paper">
+			<form onSubmit={handleSaveTicket}>
 				<DialogTitle id="form-dialog-title">
-					{i18n.t("newTicketModal.title")}
+					{i18n.t("transferTicketModal.title")}
 				</DialogTitle>
 				<DialogContent dividers>
 					<Autocomplete
-						options={options}
-						loading={loading}
 						style={{ width: 300 }}
-						clearOnBlur
+						getOptionLabel={option => `${option.name}`}
+						onChange={(e, newValue) => {
+							setSelectedUser(newValue);
+						}}
+						options={options}
+						filterOptions={filterOptions}
 						freeSolo
-						clearOnEscape
-						getOptionLabel={renderOptionLabel}
-						renderOption={renderOption}
-						filterOptions={createAddContactOption}
-						onChange={(e, newValue) => handleSelectOption(e, newValue)}
+						noOptionsText={i18n.t("transferTicketModal.noOptions")}
+						loading={loading}
 						renderInput={params => (
 							<TextField
 								{...params}
-								label={i18n.t("newTicketModal.fieldLabel")}
+								label={i18n.t("transferTicketModal.fieldLabel")}
 								variant="outlined"
+								required
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
-								onKeyPress={e => {
-									if (loading || !selectedContact) return;
-									else if (e.key === "Enter") {
-										handleSaveTicket(selectedContact.id);
-									}
-								}}
 								InputProps={{
 									...params.InputProps,
 									endAdornment: (
@@ -204,22 +143,20 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 						disabled={loading}
 						variant="outlined"
 					>
-						{i18n.t("newTicketModal.buttons.cancel")}
+						{i18n.t("transferTicketModal.buttons.cancel")}
 					</Button>
 					<ButtonWithSpinner
 						variant="contained"
-						type="button"
-						disabled={!selectedContact}
-						onClick={() => handleSaveTicket(selectedContact.id)}
+						type="submit"
 						color="primary"
 						loading={loading}
 					>
-						{i18n.t("newTicketModal.buttons.ok")}
+						{i18n.t("transferTicketModal.buttons.ok")}
 					</ButtonWithSpinner>
 				</DialogActions>
-			</Dialog>
-		</>
+			</form>
+		</Dialog>
 	);
 };
 
-export default NewTicketModal;
+export default TransferTicketModal;

@@ -165,6 +165,15 @@ const messages = {
 					showAll: "Todos",
 				},
 			},
+			transferTicketModal: {
+				title: "Transferir Ticket",
+				fieldLabel: "Digite para buscar usuários",
+				noOptions: "Nenhum usuário encontrado com esse nome",
+				buttons: {
+					ok: "Transferir",
+					cancel: "Cancelar",
+				},
+			},
 			ticketsList: {
 				pendingHeader: "Aguardando",
 				assignedHeader: "Atendendo",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { toast } from "react-toastify";
 
@@ -8,9 +8,18 @@ import Menu from "@material-ui/core/Menu";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
+import TransferTicketModal from "../TransferTicketModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
+	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
+	const isMounted = useRef(true);
+
+	useEffect(() => {
+		return () => {
+			isMounted.current = false;
+		};
+	}, []);
 
 	const handleDeleteTicket = async () => {
 		try {
@@ -34,6 +43,17 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		handleClose();
 	};
 
+	const handleOpenTransferModal = e => {
+		setTransferTicketModalOpen(true);
+		handleClose();
+	};
+
+	const handleCloseTransferTicketModal = () => {
+		if (isMounted.current) {
+			setTransferTicketModalOpen(false);
+		}
+	};
+
 	return (
 		<>
 			<Menu
@@ -55,7 +75,9 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				<MenuItem onClick={handleOpenConfirmationModal}>
 					{i18n.t("ticketOptionsMenu.delete")}
 				</MenuItem>
-				<MenuItem disabled>{i18n.t("ticketOptionsMenu.transfer")}</MenuItem>
+				<MenuItem onClick={handleOpenTransferModal}>
+					{i18n.t("ticketOptionsMenu.transfer")}
+				</MenuItem>
 			</Menu>
 			<ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${
@@ -69,6 +91,11 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			>
 				{i18n.t("ticketOptionsMenu.confirmationModal.message")}
 			</ConfirmationModal>
+			<TransferTicketModal
+				modalOpen={transferTicketModalOpen}
+				onClose={handleCloseTransferTicketModal}
+				ticketid={ticket.id}
+			/>
 		</>
 	);
 };
