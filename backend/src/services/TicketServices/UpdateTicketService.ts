@@ -17,8 +17,8 @@ interface Request {
 
 interface Response {
   ticket: Ticket;
-  ticketUser: User | null;
   oldStatus: string;
+  oldUserId: number | undefined;
 }
 
 const UpdateTicketService = async ({
@@ -34,6 +34,11 @@ const UpdateTicketService = async ({
         model: Contact,
         as: "contact",
         attributes: ["id", "name", "number", "profilePicUrl"]
+      },
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name"]
       }
     ]
   });
@@ -45,6 +50,7 @@ const UpdateTicketService = async ({
   await SetTicketMessagesAsRead(ticket);
 
   const oldStatus = ticket.status;
+  const oldUserId = ticket.user?.id;
 
   if (oldStatus === "closed") {
     await CheckContactOpenTickets(ticket.contact.id);
@@ -54,9 +60,10 @@ const UpdateTicketService = async ({
     status,
     userId
   });
-  const ticketUser = await ticket.$get("user", { attributes: ["id", "name"] });
 
-  return { ticket, oldStatus, ticketUser };
+  await ticket.reload();
+
+  return { ticket, oldStatus, oldUserId };
 };
 
 export default UpdateTicketService;

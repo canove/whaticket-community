@@ -8,7 +8,7 @@ const UpdateDeletedUserOpenTicketsStatus = async (
   tickets.forEach(async t => {
     const ticketId = t.id.toString();
 
-    const { ticket, oldStatus, ticketUser } = await UpdateTicketService({
+    const { ticket, oldStatus } = await UpdateTicketService({
       ticketData: { status: "pending" },
       ticketId
     });
@@ -23,8 +23,7 @@ const UpdateDeletedUserOpenTicketsStatus = async (
 
     io.to(ticket.status).to(ticketId).emit("ticket", {
       action: "updateStatus",
-      ticket,
-      user: ticketUser
+      ticket
     });
   });
 };

@@ -76,14 +76,14 @@ export const update = async (
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
-  const { ticket, oldStatus, ticketUser } = await UpdateTicketService({
+  const { ticket, oldStatus, oldUserId } = await UpdateTicketService({
     ticketData,
     ticketId
   });
 
   const io = getIO();
 
-  if (ticket.status !== oldStatus) {
+  if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
     io.to(oldStatus).emit("ticket", {
       action: "delete",
       ticketId: ticket.id
@@ -92,8 +92,7 @@ export const update = async (
 
   io.to(ticket.status).to("notification").to(ticketId).emit("ticket", {
     action: "updateStatus",
-    ticket,
-    user: ticketUser
+    ticket
   });
 
   return res.status(200).json(ticket);
