@@ -1,15 +1,22 @@
 import * as Sentry from "@sentry/node";
+import { Client } from "whatsapp-web.js";
 
 import wbotMessageListener from "./wbotMessageListener";
 
 import { getIO } from "../../libs/socket";
-import { getWbot, initWbot } from "../../libs/wbot";
+import { initWbot } from "../../libs/wbot";
 import Whatsapp from "../../models/Whatsapp";
 
-const wbotMonitor = (whatsapp: Whatsapp): void => {
+interface Session extends Client {
+  id?: number;
+}
+
+const wbotMonitor = async (
+  wbot: Session,
+  whatsapp: Whatsapp
+): Promise<void> => {
   const io = getIO();
   const sessionName = whatsapp.name;
-  const wbot = getWbot(whatsapp.id);
 
   try {
     wbot.on("change_state", async newState => {
@@ -60,12 +67,14 @@ const wbotMonitor = (whatsapp: Whatsapp): void => {
         session: whatsapp
       });
 
+      // to be removed after adding buttons to rebuild session on frontend
+
       setTimeout(
         () =>
           initWbot(whatsapp)
             .then(() => {
-              wbotMessageListener(whatsapp);
-              wbotMonitor(whatsapp);
+              wbotMessageListener(wbot);
+              wbotMonitor(wbot, whatsapp);
             })
             .catch(err => {
               Sentry.captureException(err);

@@ -31,12 +31,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isDefault
   });
 
-  initWbot(whatsapp)
-    .then(() => {
-      wbotMessageListener(whatsapp);
-      wbotMonitor(whatsapp);
-    })
-    .catch(err => console.log(err));
+  try {
+    const wbot = await initWbot(whatsapp);
+    wbotMessageListener(wbot);
+    wbotMonitor(wbot, whatsapp);
+  } catch (err) {
+    console.log(err);
+  }
 
   const io = getIO();
   io.emit("whatsapp", {

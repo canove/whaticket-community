@@ -7,19 +7,22 @@ import * as Sentry from "@sentry/node";
 
 import {
   Contact as WbotContact,
-  Message as WbotMessage
+  Message as WbotMessage,
+  Client
 } from "whatsapp-web.js";
 
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
 import Message from "../../models/Message";
-import Whatsapp from "../../models/Whatsapp";
 
 import { getIO } from "../../libs/socket";
-import { getWbot } from "../../libs/wbot";
 import AppError from "../../errors/AppError";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+
+interface Session extends Client {
+  id?: number;
+}
 
 const writeFileAsync = promisify(writeFile);
 
@@ -236,9 +239,8 @@ const isValidMsg = (msg: WbotMessage): boolean => {
   return false;
 };
 
-const wbotMessageListener = (whatsapp: Whatsapp): void => {
-  const whatsappId = whatsapp.id;
-  const wbot = getWbot(whatsappId);
+const wbotMessageListener = (wbot: Session): void => {
+  const whatsappId = wbot.id;
   const io = getIO();
 
   wbot.on("message_create", async msg => {
@@ -278,7 +280,7 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
 
       const profilePicUrl = await msgContact.getProfilePicUrl();
       const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId, groupContact);
+      const ticket = await verifyTicket(contact, whatsappId!, groupContact);
 
       await handleMessage(msg, ticket, contact);
     } catch (err) {
@@ -298,7 +300,7 @@ const wbotMessageListener = (whatsapp: Whatsapp): void => {
 
       const profilePicUrl = await msgContact.getProfilePicUrl();
       const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId, groupContact);
+      const ticket = await verifyTicket(contact, whatsappId!, groupContact);
 
       await handleMessage(msg, ticket, contact);
     } catch (err) {
