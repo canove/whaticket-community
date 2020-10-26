@@ -1,9 +1,7 @@
 import Whatsapp from "../../models/Whatsapp";
 import AppError from "../../errors/AppError";
 
-const ShowWhatsAppService = async (
-  id: string | number
-): Promise<Whatsapp | undefined> => {
+const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
   const whatsapp = await Whatsapp.findByPk(id);
 
   if (!whatsapp) {

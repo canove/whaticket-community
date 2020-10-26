@@ -3,6 +3,7 @@ import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
+import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 
 interface Session extends Client {
   id?: number;
@@ -37,6 +38,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         console.log("Session:", sessionName);
         qrCode.generate(qr, { small: true });
         await whatsapp.update({ qrcode: qr, status: "qrcode" });
+
         io.emit("whatsappSession", {
           action: "update",
           session: whatsapp
@@ -49,6 +51,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           session: JSON.stringify(session),
           status: "authenticated"
         });
+
         io.emit("whatsappSession", {
           action: "update",
           session: whatsapp
@@ -57,20 +60,40 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 
       wbot.on("auth_failure", async msg => {
         console.error("Session:", sessionName, "AUTHENTICATION FAILURE", msg);
-        await whatsapp.update({ status: "OFFLINE" });
+
+        if (whatsapp.retries > 2) {
+          await whatsapp.update({ session: "", retries: 0 });
+        }
+
+        const retry = whatsapp.retries;
+        await whatsapp.update({
+          status: "DISCONNECTED",
+          retries: retry + 1
+        });
+
+        io.emit("whatsappSession", {
+          action: "update",
+          session: whatsapp
+        });
+
+        StartWhatsAppSession(whatsapp);
         reject(new Error("Error starting whatsapp session."));
       });
 
       wbot.on("ready", async () => {
         console.log("Session:", sessionName, "READY");
+
         await whatsapp.update({
           status: "CONNECTED",
-          qrcode: ""
+          qrcode: "",
+          retries: 0
         });
+
         io.emit("whatsappSession", {
           action: "update",
           session: whatsapp
         });
+
         wbot.sendPresenceAvailable();
         wbot.id = whatsapp.id;
         sessions.push(wbot);

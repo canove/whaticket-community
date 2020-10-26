@@ -7,6 +7,7 @@ import contactRoutes from "./contactRoutes";
 import ticketRoutes from "./ticketRoutes";
 import whatsappRoutes from "./whatsappRoutes";
 import messageRoutes from "./messageRoutes";
+import whatsappSessionRoutes from "./whatsappSessionRoutes";
 
 const routes = Router();
 
@@ -17,5 +18,7 @@ routes.use(contactRoutes);
 routes.use(ticketRoutes);
 routes.use(whatsappRoutes);
 routes.use(messageRoutes);
+routes.use(messageRoutes);
+routes.use(whatsappSessionRoutes);
 
 export default routes;

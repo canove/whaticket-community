@@ -1,11 +1,9 @@
 import * as Sentry from "@sentry/node";
 import { Client } from "whatsapp-web.js";
 
-import wbotMessageListener from "./wbotMessageListener";
-
 import { getIO } from "../../libs/socket";
-import { initWbot } from "../../libs/wbot";
 import Whatsapp from "../../models/Whatsapp";
+import { StartWhatsAppSession } from "./StartWhatsAppSession";
 
 interface Session extends Client {
   id?: number;
@@ -56,7 +54,7 @@ const wbotMonitor = async (
     wbot.on("disconnected", async reason => {
       console.log("Disconnected session:", sessionName, reason);
       try {
-        await whatsapp.update({ status: "disconnected" });
+        await whatsapp.update({ status: "DISCONNECTED", session: "" });
       } catch (err) {
         Sentry.captureException(err);
         console.log(err);
@@ -67,26 +65,8 @@ const wbotMonitor = async (
         session: whatsapp
       });
 
-      // to be removed after adding buttons to rebuild session on frontend
-
-      setTimeout(
-        () =>
-          initWbot(whatsapp)
-            .then(() => {
-              wbotMessageListener(wbot);
-              wbotMonitor(wbot, whatsapp);
-            })
-            .catch(err => {
-              Sentry.captureException(err);
-              console.log(err);
-            }),
-        2000
-      );
+      setTimeout(() => StartWhatsAppSession(whatsapp), 2000);
     });
-
-    // setInterval(() => {
-    // 	wbot.resetState();
-    // }, 20000);
   } catch (err) {
     Sentry.captureException(err);
     console.log(err);

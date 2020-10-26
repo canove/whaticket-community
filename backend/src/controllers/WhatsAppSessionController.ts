@@ -1,32 +1,29 @@
-// const Whatsapp = require("../models/Whatsapp");
-// const { getIO } = require("../libs/socket");
-// const { getWbot, initWbot, removeWbot } = require("../libs/wbot");
-// const wbotMessageListener = require("../services/wbotMessageListener");
-// const wbotMonitor = require("../services/wbotMonitor");
+import { Request, Response } from "express";
+// import Whatsapp from "../models/Whatsapp";
+// import { getIO } from "../libs/socket";
+import { getWbot } from "../libs/wbot";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
+import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
+// import wbotMonitor from "../services/wbotMonitor";
 
-// exports.show = async (req, res) => {
-// 	const { whatsappId } = req.params;
-// 	const dbSession = await Whatsapp.findByPk(whatsappId);
+const store = async (req: Request, res: Response): Promise<Response> => {
+  const { whatsappId } = req.params;
+  const whatsapp = await ShowWhatsAppService(whatsappId);
 
-// 	if (!dbSession) {
-// 		return res.status(200).json({ message: "Session not found" });
-// 	}
+  StartWhatsAppSession(whatsapp);
 
-// 	return res.status(200).json(dbSession);
-// };
+  return res.status(200).json({ message: "Starting session." });
+};
 
-// exports.delete = async (req, res) => {
-// 	const { whatsappId } = req.params;
+const remove = async (req: Request, res: Response): Promise<Response> => {
+  const { whatsappId } = req.params;
+  const whatsapp = await ShowWhatsAppService(whatsappId);
 
-// 	const dbSession = await Whatsapp.findByPk(whatsappId);
+  const wbot = getWbot(whatsapp.id);
 
-// 	if (!dbSession) {
-// 		return res.status(404).json({ message: "Session not found" });
-// 	}
+  wbot.logout();
 
-// 	const wbot = getWbot(dbSession.id);
+  return res.status(200).json({ message: "Session disconnected." });
+};
 
-// 	wbot.logout();
-
-// 	return res.status(200).json({ message: "Session disconnected." });
-// };
+export default { store, remove };

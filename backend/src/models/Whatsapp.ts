@@ -41,6 +41,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   plugged: boolean;
 
+  @Column
+  retries: number;
+
   @Default(false)
   @AllowNull
   @Column

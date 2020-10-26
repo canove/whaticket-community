@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
-import { initWbot, removeWbot } from "../libs/wbot";
+import { removeWbot } from "../libs/wbot";
+import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 import wbotMessageListener from "../services/WbotServices/wbotMessageListener";
 import wbotMonitor from "../services/WbotServices/wbotMonitor";
 
@@ -31,13 +32,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isDefault
   });
 
-  try {
-    const wbot = await initWbot(whatsapp);
-    wbotMessageListener(wbot);
-    wbotMonitor(wbot, whatsapp);
-  } catch (err) {
-    console.log(err);
-  }
+  StartWhatsAppSession(whatsapp);
 
   const io = getIO();
   io.emit("whatsapp", {
