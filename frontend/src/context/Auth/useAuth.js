@@ -12,13 +12,6 @@ const useAuth = () => {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (
-			history.location.pathname === "/login" ||
-			history.location.pathname === "/signup"
-		) {
-			setLoading(false);
-			return;
-		}
 		const token = localStorage.getItem("token");
 		if (token) {
 			api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
@@ -67,7 +60,7 @@ const useAuth = () => {
 				return Promise.reject(error);
 			}
 		);
-	}, [history]);
+	}, []);
 
 	const handleLogin = async (e, user) => {
 		setLoading(true);
