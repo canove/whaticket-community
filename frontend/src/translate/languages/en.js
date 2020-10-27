@@ -49,8 +49,7 @@ const messages = {
 					deleteTitle: "Delete",
 					deleteMessage: "Are you sure? It cannot be reverted.",
 					disconnectTitle: "Disconnect",
-					disconnectMessage:
-						"You will need to read QR Code again to start receiving messages.",
+					disconnectMessage: "Are you sure? You'll need to read QR Code again.",
 				},
 				buttons: {
 					add: "Add WhatsApp",

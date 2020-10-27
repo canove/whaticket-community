@@ -50,7 +50,7 @@ const messages = {
 					deleteMessage: "Você tem certeza? Essa ação não pode ser revertida.",
 					disconnectTitle: "Desconectar",
 					disconnectMessage:
-						"Você precisará ler o código QR novamente para começar a receber mensagens.",
+						"Tem certeza? Você precisará ler o QR Code novamente.",
 				},
 				buttons: {
 					add: "Adicionar WhatsApp",
