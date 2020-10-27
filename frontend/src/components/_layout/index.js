@@ -106,7 +106,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const LoggedInLayout = ({ appTitle, children }) => {
+const LoggedInLayout = ({ children }) => {
 	const drawerState = localStorage.getItem("drawerOpen");
 	const userId = +localStorage.getItem("userId");
 	const classes = useStyles();

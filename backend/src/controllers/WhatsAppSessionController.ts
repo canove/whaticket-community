@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getWbot } from "../libs/wbot";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
+import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 
 const store = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
@@ -14,9 +15,11 @@ const store = async (req: Request, res: Response): Promise<Response> => {
 
 const update = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
-  const whatsapp = await ShowWhatsAppService(whatsappId);
 
-  await whatsapp.update({ session: "" });
+  const { whatsapp } = await UpdateWhatsAppService({
+    whatsappId,
+    whatsappData: { session: "" }
+  });
 
   StartWhatsAppSession(whatsapp);
 

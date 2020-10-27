@@ -21,12 +21,6 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const currentSessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
-      if (currentSessionIndex !== -1) {
-        sessions[currentSessionIndex].destroy();
-        sessions.splice(currentSessionIndex, 1);
-      }
-
       const wbot: Session = new Client({
         session: sessionCfg
       });

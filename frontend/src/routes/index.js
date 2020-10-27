@@ -12,6 +12,7 @@ import Settings from "../pages/Settings/";
 import Users from "../pages/Users";
 import Contacts from "../pages/Contacts/";
 import { AuthProvider } from "../context/Auth/AuthContext";
+import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import Route from "./Route";
 
 const Routes = () => {
@@ -21,24 +22,26 @@ const Routes = () => {
 				<Switch>
 					<Route exact path="/login" component={Login} />
 					<Route exact path="/signup" component={Signup} />
-					<LoggedInLayout>
-						<Route exact path="/" component={Dashboard} isPrivate />
-						<Route
-							exact
-							path="/tickets/:ticketId?"
-							component={Tickets}
-							isPrivate
-						/>
-						<Route
-							exact
-							path="/connections"
-							component={Connections}
-							isPrivate
-						/>
-						<Route exact path="/contacts" component={Contacts} isPrivate />
-						<Route exact path="/users" component={Users} isPrivate />
-						<Route exact path="/Settings" component={Settings} isPrivate />
-					</LoggedInLayout>
+					<WhatsAppsProvider>
+						<LoggedInLayout>
+							<Route exact path="/" component={Dashboard} isPrivate />
+							<Route
+								exact
+								path="/tickets/:ticketId?"
+								component={Tickets}
+								isPrivate
+							/>
+							<Route
+								exact
+								path="/connections"
+								component={Connections}
+								isPrivate
+							/>
+							<Route exact path="/contacts" component={Contacts} isPrivate />
+							<Route exact path="/users" component={Users} isPrivate />
+							<Route exact path="/Settings" component={Settings} isPrivate />
+						</LoggedInLayout>
+					</WhatsAppsProvider>
 				</Switch>
 				<ToastContainer autoClose={3000} />
 			</AuthProvider>

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
-import openSocket from "socket.io-client";
+import React, { useState, useCallback, useContext } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 
@@ -16,13 +15,13 @@ import {
 	Paper,
 	Tooltip,
 	Typography,
+	CircularProgress,
 } from "@material-ui/core";
 import {
 	Edit,
 	CheckCircle,
 	SignalCellularConnectedNoInternet2Bar,
 	SignalCellularConnectedNoInternet0Bar,
-	Schedule,
 	SignalCellular4Bar,
 	CropFree,
 	DeleteOutline,
@@ -37,58 +36,9 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import api from "../../services/api";
 import WhatsAppModal from "../../components/WhatsAppModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
-import ButtonWithSpinner from "../../components/ButtonWithSpinner";
 import QrcodeModal from "../../components/QrcodeModal";
 import { i18n } from "../../translate/i18n";
-
-const reducer = (state, action) => {
-	if (action.type === "LOAD_WHATSAPPS") {
-		const whatsApps = action.payload;
-
-		return [...whatsApps];
-	}
-
-	if (action.type === "UPDATE_WHATSAPPS") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex] = whatsApp;
-			return [...state];
-		} else {
-			return [whatsApp, ...state];
-		}
-	}
-
-	if (action.type === "UPDATE_SESSION") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex].status = whatsApp.status;
-			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
-			state[whatsAppIndex].qrcode = whatsApp.qrcode;
-			state[whatsAppIndex].retries = whatsApp.retries;
-			return [...state];
-		} else {
-			return [...state];
-		}
-	}
-
-	if (action.type === "DELETE_WHATSAPPS") {
-		const whatsAppId = action.payload;
-
-		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
-		if (whatsAppIndex !== -1) {
-			state.splice(whatsAppIndex, 1);
-		}
-		return [...state];
-	}
-
-	if (action.type === "RESET") {
-		return [];
-	}
-};
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -111,6 +61,9 @@ const useStyles = makeStyles(theme => ({
 	},
 	tooltipPopper: {
 		textAlign: "center",
+	},
+	buttonProgress: {
+		color: green[500],
 	},
 }));
 
@@ -141,12 +94,10 @@ const CustomToolTip = ({ title, content, children }) => {
 const Connections = () => {
 	const classes = useStyles();
 
-	const [whatsApps, dispatch] = useReducer(reducer, []);
-
+	const { whatsApps, loading } = useContext(WhatsAppsContext);
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [qrModalOpen, setQrModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
-	const [loading, setLoading] = useState(true);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const confirmationModalInitialState = {
 		action: "",
@@ -159,63 +110,19 @@ const Connections = () => {
 		confirmationModalInitialState
 	);
 
-	useEffect(() => {
-		setLoading(true);
-		const fetchSession = async () => {
-			try {
-				const { data } = await api.get("/whatsapp/");
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
-			}
-		};
-		fetchSession();
-	}, []);
-
-	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-
-		socket.on("whatsapp", data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-			}
-		});
-
-		socket.on("whatsapp", data => {
-			if (data.action === "delete") {
-				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-			}
-		});
-
-		socket.on("whatsappSession", data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_SESSION", payload: data.session });
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
 	const handleStartWhatsAppSession = async whatsAppId => {
 		try {
 			await api.post(`/whatsappsession/${whatsAppId}`);
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
 			}
 		}
 	};
@@ -224,9 +131,15 @@ const Connections = () => {
 		try {
 			await api.put(`/whatsappsession/${whatsAppId}`);
 		} catch (err) {
-			console.log(err);
-			if (err.response && err.response.data && err.response.data.error) {
-				toast.error(err.response.data.error);
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
 			}
 		}
 	};
@@ -254,108 +167,6 @@ const Connections = () => {
 	const handleEditWhatsApp = whatsApp => {
 		setSelectedWhatsApp(whatsApp);
 		setWhatsAppModalOpen(true);
-	};
-
-	const renderActionButtons = whatsApp => {
-		return (
-			<>
-				{whatsApp.status === "qrcode" && (
-					<Button
-						size="small"
-						variant="contained"
-						color="primary"
-						onClick={() => handleOpenQrModal(whatsApp)}
-					>
-						{i18n.t("connections.buttons.qrcode")}
-					</Button>
-				)}
-				{whatsApp.status === "DISCONNECTED" && (
-					<>
-						<Button
-							size="small"
-							variant="outlined"
-							color="primary"
-							onClick={() => handleStartWhatsAppSession(whatsApp.id)}
-						>
-							{i18n.t("connections.buttons.tryAgain")}
-						</Button>{" "}
-						<Button
-							size="small"
-							variant="outlined"
-							color="secondary"
-							onClick={() => handleRequestNewQrCode(whatsApp.id)}
-						>
-							{i18n.t("connections.buttons.newQr")}
-						</Button>
-					</>
-				)}
-				{(whatsApp.status === "CONNECTED" ||
-					whatsApp.status === "PAIRING" ||
-					whatsApp.status === "TIMEOUT") && (
-					<Button
-						size="small"
-						variant="outlined"
-						color="secondary"
-						onClick={() => {
-							handleOpenConfirmationModal("disconnect", whatsApp.id);
-						}}
-					>
-						{i18n.t("connections.buttons.disconnect")}
-					</Button>
-				)}
-				{whatsApp.status === "OPENING" && (
-					<ButtonWithSpinner
-						size="small"
-						variant="outlined"
-						loading={true}
-						color="default"
-					>
-						{i18n.t("connections.buttons.connecting")}
-					</ButtonWithSpinner>
-				)}
-			</>
-		);
-	};
-
-	const renderStatusToolTips = whatsApp => {
-		return (
-			<div className={classes.customTableCell}>
-				{whatsApp.status === "DISCONNECTED" && (
-					<CustomToolTip
-						title={i18n.t("connections.toolTips.disconnected.title")}
-						content={i18n.t("connections.toolTips.disconnected.content")}
-					>
-						<SignalCellularConnectedNoInternet0Bar color="secondary" />
-					</CustomToolTip>
-				)}
-				{whatsApp.status === "OPENING" && (
-					<CustomToolTip title={i18n.t("connections.toolTips.opening.title")}>
-						<Schedule color="disabled" />
-					</CustomToolTip>
-				)}
-				{whatsApp.status === "qrcode" && (
-					<CustomToolTip
-						title={i18n.t("connections.toolTips.qrcode.title")}
-						content={i18n.t("connections.toolTips.qrcode.content")}
-					>
-						<CropFree />
-					</CustomToolTip>
-				)}
-				{whatsApp.status === "CONNECTED" && (
-					<CustomToolTip title={i18n.t("connections.toolTips.connected.title")}>
-						<SignalCellular4Bar style={{ color: green[500] }} />
-					</CustomToolTip>
-				)}
-				{(whatsApp.status === "TIMEOUT" || whatsApp.status === "PAIRING") && (
-					<CustomToolTip
-						title={i18n.t("connections.toolTips.timeout.title")}
-						content={i18n.t("connections.toolTips.timeout.content")}
-					>
-						<SignalCellularConnectedNoInternet2Bar color="secondary" />
-					</CustomToolTip>
-				)}
-			</div>
-		);
 	};
 
 	const handleOpenConfirmationModal = (action, whatsAppId) => {
@@ -416,6 +227,101 @@ const Connections = () => {
 		}
 
 		setConfirmModalInfo(confirmationModalInitialState);
+	};
+
+	const renderActionButtons = whatsApp => {
+		return (
+			<>
+				{whatsApp.status === "qrcode" && (
+					<Button
+						size="small"
+						variant="contained"
+						color="primary"
+						onClick={() => handleOpenQrModal(whatsApp)}
+					>
+						{i18n.t("connections.buttons.qrcode")}
+					</Button>
+				)}
+				{whatsApp.status === "DISCONNECTED" && (
+					<>
+						<Button
+							size="small"
+							variant="outlined"
+							color="primary"
+							onClick={() => handleStartWhatsAppSession(whatsApp.id)}
+						>
+							{i18n.t("connections.buttons.tryAgain")}
+						</Button>{" "}
+						<Button
+							size="small"
+							variant="outlined"
+							color="secondary"
+							onClick={() => handleRequestNewQrCode(whatsApp.id)}
+						>
+							{i18n.t("connections.buttons.newQr")}
+						</Button>
+					</>
+				)}
+				{(whatsApp.status === "CONNECTED" ||
+					whatsApp.status === "PAIRING" ||
+					whatsApp.status === "TIMEOUT") && (
+					<Button
+						size="small"
+						variant="outlined"
+						color="secondary"
+						onClick={() => {
+							handleOpenConfirmationModal("disconnect", whatsApp.id);
+						}}
+					>
+						{i18n.t("connections.buttons.disconnect")}
+					</Button>
+				)}
+				{whatsApp.status === "OPENING" && (
+					<Button size="small" variant="outlined" disabled color="default">
+						{i18n.t("connections.buttons.connecting")}
+					</Button>
+				)}
+			</>
+		);
+	};
+
+	const renderStatusToolTips = whatsApp => {
+		return (
+			<div className={classes.customTableCell}>
+				{whatsApp.status === "DISCONNECTED" && (
+					<CustomToolTip
+						title={i18n.t("connections.toolTips.disconnected.title")}
+						content={i18n.t("connections.toolTips.disconnected.content")}
+					>
+						<SignalCellularConnectedNoInternet0Bar color="secondary" />
+					</CustomToolTip>
+				)}
+				{whatsApp.status === "OPENING" && (
+					<CircularProgress size={24} className={classes.buttonProgress} />
+				)}
+				{whatsApp.status === "qrcode" && (
+					<CustomToolTip
+						title={i18n.t("connections.toolTips.qrcode.title")}
+						content={i18n.t("connections.toolTips.qrcode.content")}
+					>
+						<CropFree />
+					</CustomToolTip>
+				)}
+				{whatsApp.status === "CONNECTED" && (
+					<CustomToolTip title={i18n.t("connections.toolTips.connected.title")}>
+						<SignalCellular4Bar style={{ color: green[500] }} />
+					</CustomToolTip>
+				)}
+				{(whatsApp.status === "TIMEOUT" || whatsApp.status === "PAIRING") && (
+					<CustomToolTip
+						title={i18n.t("connections.toolTips.timeout.title")}
+						content={i18n.t("connections.toolTips.timeout.content")}
+					>
+						<SignalCellularConnectedNoInternet2Bar color="secondary" />
+					</CustomToolTip>
+				)}
+			</div>
+		);
 	};
 
 	return (

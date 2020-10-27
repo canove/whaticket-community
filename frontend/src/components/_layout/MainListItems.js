@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import ListItem from "@material-ui/core/ListItem";
@@ -15,6 +15,9 @@ import GroupIcon from "@material-ui/icons/Group";
 import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
 
 import { i18n } from "../../translate/i18n";
+import { Badge } from "@material-ui/core";
+
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 function ListItemLink(props) {
 	const { icon, primary, to, className } = props;
@@ -39,13 +42,44 @@ function ListItemLink(props) {
 
 const MainListItems = () => {
 	const userProfile = localStorage.getItem("profile");
+	const { whatsApps } = useContext(WhatsAppsContext);
+	const [connectionWarning, setConnectionWarning] = useState(false);
+
+	useEffect(() => {
+		const delayDebounceFn = setTimeout(() => {
+			if (whatsApps.length > 0) {
+				const offlineWhats = whatsApps.filter(whats => {
+					if (
+						whats.status === "qrcode" ||
+						whats.status === "PAIRING" ||
+						whats.status === "DISCONNECTED" ||
+						whats.status === "TIMEOUT" ||
+						whats.status === "OPENING"
+					)
+						return true;
+					else return false;
+				});
+				if (offlineWhats.length > 0) {
+					setConnectionWarning(true);
+				} else {
+					setConnectionWarning(false);
+				}
+			}
+		}, 2000);
+		return () => clearTimeout(delayDebounceFn);
+	}, [whatsApps]);
+
 	return (
 		<div>
 			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
 			<ListItemLink
 				to="/connections"
 				primary={i18n.t("mainDrawer.listItems.connections")}
-				icon={<SyncAltIcon />}
+				icon={
+					<Badge badgeContent={connectionWarning ? "!" : 0} color="error">
+						<SyncAltIcon />
+					</Badge>
+				}
 			/>
 			<ListItemLink
 				to="/tickets"

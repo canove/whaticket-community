@@ -7,6 +7,7 @@ import Whatsapp from "../../models/Whatsapp";
 interface WhatsappData {
   name?: string;
   status?: string;
+  session?: string;
   isDefault?: boolean;
 }
 
@@ -29,7 +30,7 @@ const UpdateWhatsAppService = async ({
     isDefault: Yup.boolean()
   });
 
-  const { name, status, isDefault } = whatsappData;
+  const { name, status, isDefault, session } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
@@ -58,6 +59,7 @@ const UpdateWhatsAppService = async ({
   await whatsapp.update({
     name,
     status,
+    session,
     isDefault
   });
 

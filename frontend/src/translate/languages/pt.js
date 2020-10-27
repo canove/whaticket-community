@@ -66,9 +66,6 @@ const messages = {
 						content:
 							"Certifique-se de que seu celular esteja conectado à internet e tente novamente, ou solicite um novo QR Code",
 					},
-					opening: {
-						title: "Iniciando a sessão...",
-					},
 					qrcode: {
 						title: "Esperando leitura do QR Code",
 						content:

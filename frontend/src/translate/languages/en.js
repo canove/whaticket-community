@@ -65,9 +65,6 @@ const messages = {
 						content:
 							"Make sure your cell phone is connected to the internet and try again, or request a new QR Code",
 					},
-					opening: {
-						title: "Starting session...",
-					},
 					qrcode: {
 						title: "Waiting for QR Code read",
 						content:
