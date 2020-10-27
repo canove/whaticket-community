@@ -48,9 +48,40 @@ const messages = {
 				confirmationModal: {
 					deleteTitle: "Deletar",
 					deleteMessage: "Você tem certeza? Essa ação não pode ser revertida.",
+					disconnectTitle: "Desconectar",
+					disconnectMessage:
+						"Você precisará ler o código QR novamente para começar a receber mensagens.",
 				},
 				buttons: {
 					add: "Adicionar WhatsApp",
+					disconnect: "desconectar",
+					tryAgain: "Tentar novamente",
+					qrcode: "QR CODE",
+					newQr: "Novo QR CODE",
+					connecting: "Conectando",
+				},
+				toolTips: {
+					disconnected: {
+						title: "Falha ao iniciar sessão do WhatsApp",
+						content:
+							"Certifique-se de que seu celular esteja conectado à internet e tente novamente, ou solicite um novo QR Code",
+					},
+					opening: {
+						title: "Iniciando a sessão...",
+					},
+					qrcode: {
+						title: "Esperando leitura do QR Code",
+						content:
+							"Clique no botão 'QR CODE' e leia o QR Code com o seu celular para iniciar a sessão",
+					},
+					connected: {
+						title: "Conexão estabelecida!",
+					},
+					timeout: {
+						title: "A conexão com o celular foi perdida",
+						content:
+							"Certifique-se de que seu celular esteja conectado à internet e o WhatsApp esteja aberto, ou clique no botão 'Desconectar' para obter um novo QR Code",
+					},
 				},
 				table: {
 					name: "Nome",
@@ -58,6 +89,7 @@ const messages = {
 					lastUpdate: "Última atualização",
 					default: "Padrão",
 					actions: "Ações",
+					session: "Sessão",
 				},
 			},
 			whatsappModal: {

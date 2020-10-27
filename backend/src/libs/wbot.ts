@@ -3,7 +3,6 @@ import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
-import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 
 interface Session extends Client {
   id?: number;
@@ -22,10 +21,10 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const sessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
-      if (sessionIndex !== -1) {
-        sessions[sessionIndex].destroy();
-        sessions.splice(sessionIndex, 1);
+      const currentSessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
+      if (currentSessionIndex !== -1) {
+        sessions[currentSessionIndex].destroy();
+        sessions.splice(currentSessionIndex, 1);
       }
 
       const wbot: Session = new Client({
@@ -37,7 +36,13 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       wbot.on("qr", async qr => {
         console.log("Session:", sessionName);
         qrCode.generate(qr, { small: true });
-        await whatsapp.update({ qrcode: qr, status: "qrcode" });
+        await whatsapp.update({ qrcode: qr, status: "qrcode", retries: 0 });
+
+        const sessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
+        if (sessionIndex === -1) {
+          wbot.id = whatsapp.id;
+          sessions.push(wbot);
+        }
 
         io.emit("whatsappSession", {
           action: "update",
@@ -48,20 +53,14 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       wbot.on("authenticated", async session => {
         console.log("Session:", sessionName, "AUTHENTICATED");
         await whatsapp.update({
-          session: JSON.stringify(session),
-          status: "authenticated"
-        });
-
-        io.emit("whatsappSession", {
-          action: "update",
-          session: whatsapp
+          session: JSON.stringify(session)
         });
       });
 
       wbot.on("auth_failure", async msg => {
         console.error("Session:", sessionName, "AUTHENTICATION FAILURE", msg);
 
-        if (whatsapp.retries > 2) {
+        if (whatsapp.retries > 1) {
           await whatsapp.update({ session: "", retries: 0 });
         }
 
@@ -76,7 +75,6 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           session: whatsapp
         });
 
-        StartWhatsAppSession(whatsapp);
         reject(new Error("Error starting whatsapp session."));
       });
 
@@ -95,8 +93,13 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         });
 
         wbot.sendPresenceAvailable();
-        wbot.id = whatsapp.id;
-        sessions.push(wbot);
+
+        const sessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
+        if (sessionIndex === -1) {
+          wbot.id = whatsapp.id;
+          sessions.push(wbot);
+        }
+
         resolve(wbot);
       });
     } catch (err) {

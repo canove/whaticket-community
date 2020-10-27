@@ -16,7 +16,7 @@ interface Response {
 
 const CreateWhatsAppService = async ({
   name,
-  status = "INITIALIZING",
+  status = "OPENING",
   isDefault = false
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({

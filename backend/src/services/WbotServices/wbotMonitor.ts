@@ -54,7 +54,7 @@ const wbotMonitor = async (
     wbot.on("disconnected", async reason => {
       console.log("Disconnected session:", sessionName, reason);
       try {
-        await whatsapp.update({ status: "DISCONNECTED", session: "" });
+        await whatsapp.update({ status: "OPENING", session: "" });
       } catch (err) {
         Sentry.captureException(err);
         console.log(err);
