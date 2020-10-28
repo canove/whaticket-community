@@ -1,4 +1,3 @@
-import { where, fn, col } from "sequelize";
 import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
@@ -6,7 +5,6 @@ import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Request {
   ticketId: string;
-  searchParam?: string;
   pageNumber?: string;
 }
 
@@ -18,7 +16,6 @@ interface Response {
 }
 
 const ListMessagesService = async ({
-  searchParam = "",
   pageNumber = "1",
   ticketId
 }: Request): Promise<Response> => {
@@ -28,23 +25,14 @@ const ListMessagesService = async ({
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
-  const whereCondition = {
-    body: where(
-      fn("LOWER", col("body")),
-      "LIKE",
-      `%${searchParam.toLowerCase()}%`
-    ),
-    ticketId
-  };
-
   // await setMessagesAsRead(ticket);
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: messages } = await Message.findAndCountAll({
-    where: whereCondition,
+    where: { ticketId },
     limit,
-    include: ["contact"],
+    include: ["contact", "quotedMsg"],
     offset,
     order: [["createdAt", "DESC"]]
   });

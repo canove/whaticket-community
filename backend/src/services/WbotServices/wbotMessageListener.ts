@@ -149,10 +149,18 @@ const handlMedia = async (
   ticket: Ticket,
   contact: Contact
 ): Promise<Message> => {
+  let quotedMsg: Message | null = null;
+
   const media = await msg.downloadMedia();
 
   if (!media) {
     throw new AppError("ERR_WAPP_DOWNLOAD_MEDIA");
+  }
+
+  if (msg.hasQuotedMsg) {
+    const wbotQuotedMsg = await msg.getQuotedMessage();
+
+    quotedMsg = await Message.findByPk(wbotQuotedMsg.id.id);
   }
 
   if (!media.filename) {
@@ -178,7 +186,8 @@ const handlMedia = async (
     fromMe: msg.fromMe,
     read: msg.fromMe,
     mediaUrl: media.filename,
-    mediaType: media.mimetype.split("/")[0]
+    mediaType: media.mimetype.split("/")[0],
+    quotedMsgId: quotedMsg?.id
   };
 
   const newMessage = await CreateMessageService({ messageData });
@@ -193,6 +202,13 @@ const handleMessage = async (
   contact: Contact
 ) => {
   let newMessage: Message | null;
+  let quotedMsg: Message | null = null;
+
+  if (msg.hasQuotedMsg) {
+    const wbotQuotedMsg = await msg.getQuotedMessage();
+
+    quotedMsg = await Message.findByPk(wbotQuotedMsg.id.id);
+  }
 
   if (msg.hasMedia) {
     newMessage = await handlMedia(msg, ticket, contact);
@@ -204,7 +220,8 @@ const handleMessage = async (
       body: msg.body,
       fromMe: msg.fromMe,
       mediaType: msg.type,
-      read: msg.fromMe
+      read: msg.fromMe,
+      quotedMsgId: quotedMsg?.id
     };
 
     newMessage = await CreateMessageService({ messageData });

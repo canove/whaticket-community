@@ -10,7 +10,6 @@ import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
 type IndexQuery = {
-  searchParam: string;
   pageNumber: string;
 };
 
@@ -22,10 +21,9 @@ type MessageData = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { pageNumber } = req.query as IndexQuery;
 
   const { count, messages, ticket, hasMore } = await ListMessagesService({
-    searchParam,
     pageNumber,
     ticketId
   });

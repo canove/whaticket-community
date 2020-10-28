@@ -82,6 +82,30 @@ const useStyles = makeStyles(theme => ({
 		boxShadow: "0 1px 1px #b3b3b3",
 	},
 
+	quotedContainerLeft: {
+		margin: "-3px -80px 6px -6px",
+		overflow: "hidden",
+		backgroundColor: "#f0f0f0",
+		borderRadius: "7.5px",
+		display: "flex",
+		position: "relative",
+	},
+
+	quotedMsgLeft: {
+		padding: 10,
+		maxWidth: 300,
+		height: "auto",
+		display: "block",
+		whiteSpace: "pre-wrap",
+		overflow: "hidden",
+	},
+
+	quotedSideLeft: {
+		flex: "none",
+		width: "4px",
+		backgroundColor: "#6bcbef",
+	},
+
 	messageRight: {
 		marginLeft: 20,
 		marginTop: 2,
@@ -90,7 +114,6 @@ const useStyles = makeStyles(theme => ({
 		height: "auto",
 		display: "block",
 		position: "relative",
-
 		"&:hover #messageActionsButton": {
 			display: "flex",
 			position: "absolute",
@@ -113,6 +136,28 @@ const useStyles = makeStyles(theme => ({
 		boxShadow: "0 1px 1px #b3b3b3",
 	},
 
+	quotedContainerRight: {
+		margin: "-3px -80px 6px -6px",
+		overflowY: "hidden",
+		backgroundColor: "#cfe9ba",
+		borderRadius: "7.5px",
+		display: "flex",
+		position: "relative",
+	},
+
+	quotedMsgRight: {
+		padding: 10,
+		maxWidth: 300,
+		height: "auto",
+		whiteSpace: "pre-wrap",
+	},
+
+	quotedSideRight: {
+		flex: "none",
+		width: "4px",
+		backgroundColor: "#35cd96",
+	},
+
 	messageActionsButton: {
 		display: "none",
 		position: "relative",
@@ -124,7 +169,6 @@ const useStyles = makeStyles(theme => ({
 
 	messageContactName: {
 		display: "flex",
-		paddingLeft: 6,
 		color: "#6bcbef",
 		fontWeight: 500,
 	},
@@ -476,6 +520,30 @@ const MessagesList = ({ ticketId, isGroup }) => {
 		}
 	};
 
+	const renderQuotedMessage = message => {
+		return (
+			<div
+				className={clsx(classes.quotedContainerLeft, {
+					[classes.quotedContainerRight]: message.fromMe,
+				})}
+			>
+				<span
+					className={clsx(classes.quotedSideLeft, {
+						[classes.quotedSideRight]: message.quotedMsg?.fromMe,
+					})}
+				></span>
+				<div className={classes.quotedMsgLeft}>
+					{!message.quotedMsg?.fromMe && (
+						<span className={classes.messageContactName}>
+							{message.contact?.name}
+						</span>
+					)}
+					{message.quotedMsg?.body}
+				</div>
+			</div>
+		);
+	};
+
 	const renderMessages = () => {
 		if (messagesList.length > 0) {
 			const viewMessagesList = messagesList.map((message, index) => {
@@ -492,6 +560,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 								)}
 								{message.mediaUrl && checkMessageMedia(message)}
 								<div className={classes.textContentItem}>
+									{message.quotedMsg && renderQuotedMessage(message)}
 									{message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
@@ -529,6 +598,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 											className={classes.deletedIcon}
 										/>
 									)}
+									{message.quotedMsg && renderQuotedMessage(message)}
 									{message.body}
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}

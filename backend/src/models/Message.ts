@@ -59,6 +59,13 @@ class Message extends Model<Message> {
   @Column(DataType.DATE(6))
   updatedAt: Date;
 
+  @ForeignKey(() => Message)
+  @Column
+  quotedMsgId: string;
+
+  @BelongsTo(() => Message, "quotedMsgId")
+  quotedMsg: Message;
+
   @ForeignKey(() => Ticket)
   @Column
   ticketId: number;

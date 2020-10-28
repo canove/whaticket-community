@@ -28,7 +28,7 @@ const CreateMessageService = async ({
   await Message.upsert(messageData);
 
   const message = await Message.findByPk(messageData.id, {
-    include: ["contact"]
+    include: ["contact", "quotedMsg"]
   });
 
   if (!message) {
