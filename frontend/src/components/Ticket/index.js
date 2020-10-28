@@ -15,6 +15,7 @@ import TicketActionButtons from "../TicketActionButtons";
 import MessagesList from "../MessagesList";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
+import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 
 const drawerWidth = 320;
 
@@ -151,11 +152,13 @@ const Ticket = () => {
 					/>
 					<TicketActionButtons ticket={ticket} />
 				</TicketHeader>
-				<MessagesList
-					ticketId={ticketId}
-					isGroup={ticket.isGroup}
-				></MessagesList>
-				<MessageInput ticketStatus={ticket.status} />
+				<ReplyMessageProvider>
+					<MessagesList
+						ticketId={ticketId}
+						isGroup={ticket.isGroup}
+					></MessagesList>
+					<MessageInput ticketStatus={ticket.status} />
+				</ReplyMessageProvider>
 			</Paper>
 			<ContactDrawer
 				open={drawerOpen}

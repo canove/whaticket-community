@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "emoji-mart/css/emoji-mart.css";
 import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
 import { toast } from "react-toastify";
 import MicRecorder from "mic-recorder-to-mp3";
+import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -15,6 +16,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MoodIcon from "@material-ui/icons/Mood";
 import SendIcon from "@material-ui/icons/Send";
 import CancelIcon from "@material-ui/icons/Cancel";
+import ClearIcon from "@material-ui/icons/Clear";
 import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
@@ -22,20 +24,30 @@ import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import RecordingTimer from "./RecordingTimer";
+import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 const useStyles = makeStyles(theme => ({
-	newMessageBox: {
+	mainWrapper: {
 		background: "#eee",
 		display: "flex",
-		padding: "7px",
+		flexDirection: "column",
 		alignItems: "center",
 		borderTop: "1px solid rgba(0, 0, 0, 0.12)",
 	},
 
+	newMessageBox: {
+		background: "#eee",
+		width: "100%",
+		display: "flex",
+		padding: "7px",
+		alignItems: "center",
+	},
+
 	messageInputWrapper: {
 		padding: 6,
+		marginRight: 7,
 		background: "#fff",
 		display: "flex",
 		borderRadius: 20,
@@ -79,8 +91,6 @@ const useStyles = makeStyles(theme => ({
 		position: "absolute",
 		top: "20%",
 		left: "50%",
-		// marginTop: 8,
-		// marginBottom: 6,
 		marginLeft: -12,
 	},
 
@@ -102,6 +112,62 @@ const useStyles = makeStyles(theme => ({
 	sendAudioIcon: {
 		color: "green",
 	},
+
+	quotedMsgWrapper: {
+		display: "flex",
+		width: "100%",
+		alignItems: "center",
+		justifyContent: "center",
+		paddingTop: 8,
+		paddingLeft: 73,
+		paddingRight: 7,
+	},
+
+	quotedContainerRight: {
+		flex: 1,
+		marginRight: 5,
+		overflowY: "hidden",
+		backgroundColor: "rgba(0, 0, 0, 0.05)",
+		borderRadius: "7.5px",
+		display: "flex",
+		position: "relative",
+	},
+
+	quotedMsgRight: {
+		padding: 10,
+		maxWidth: 300,
+		height: "auto",
+		whiteSpace: "pre-wrap",
+	},
+
+	quotedSideRight: {
+		flex: "none",
+		width: "4px",
+		backgroundColor: "#35cd96",
+	},
+
+	quotedContainerLeft: {
+		overflow: "hidden",
+		backgroundColor: "rgba(0, 0, 0, 0.05)",
+		borderRadius: "7.5px",
+		display: "flex",
+		position: "relative",
+	},
+
+	quotedMsg: {
+		padding: 10,
+		maxWidth: 300,
+		height: "auto",
+		display: "block",
+		whiteSpace: "pre-wrap",
+		overflow: "hidden",
+	},
+
+	quotedSideLeft: {
+		flex: "none",
+		width: "4px",
+		backgroundColor: "#6bcbef",
+	},
 }));
 
 const MessageInput = ({ ticketStatus }) => {
@@ -114,6 +180,9 @@ const MessageInput = ({ ticketStatus }) => {
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [recording, setRecording] = useState(false);
+	const { setReplyingMessage, replyingMessage } = useContext(
+		ReplyMessageContext
+	);
 
 	useEffect(() => {
 		return () => {
@@ -263,6 +332,40 @@ const MessageInput = ({ ticketStatus }) => {
 		}
 	};
 
+	const renderQuotedMessage = message => {
+		return (
+			<div className={classes.quotedMsgWrapper}>
+				<div
+					className={clsx(classes.quotedContainerLeft, {
+						[classes.quotedContainerRight]: message.fromMe,
+					})}
+				>
+					<span
+						className={clsx(classes.quotedSideLeft, {
+							[classes.quotedSideRight]: message.quotedMsg?.fromMe,
+						})}
+					></span>
+					<div className={classes.quotedMsg}>
+						{!message.fromMe && (
+							<span className={classes.messageContactName}>
+								{message.contact?.name}
+							</span>
+						)}
+						{message.body}
+					</div>
+				</div>
+				<IconButton
+					aria-label="showRecorder"
+					component="span"
+					disabled={loading || ticketStatus !== "open"}
+					onClick={() => setReplyingMessage({})}
+				>
+					<ClearIcon className={classes.sendMessageIcons} />
+				</IconButton>
+			</div>
+		);
+	};
+
 	if (medias.length > 0)
 		return (
 			<Paper elevation={0} square className={classes.viewMediaInputWrapper}>
@@ -296,115 +399,118 @@ const MessageInput = ({ ticketStatus }) => {
 		);
 	else {
 		return (
-			<Paper square elevation={0} className={classes.newMessageBox}>
-				<IconButton
-					aria-label="emojiPicker"
-					component="span"
-					disabled={loading || recording || ticketStatus !== "open"}
-					onClick={e => setShowEmoji(prevState => !prevState)}
-				>
-					<MoodIcon className={classes.sendMessageIcons} />
-				</IconButton>
-				{showEmoji ? (
-					<div className={classes.emojiBox}>
-						<Picker
-							perLine={16}
-							showPreview={false}
-							showSkinTones={false}
-							onSelect={handleAddEmoji}
-						/>
-					</div>
-				) : null}
-
-				<input
-					multiple
-					type="file"
-					id="upload-button"
-					disabled={loading || recording || ticketStatus !== "open"}
-					className={classes.uploadInput}
-					onChange={handleChangeMedias}
-				/>
-				<label htmlFor="upload-button">
+			<Paper square elevation={0} className={classes.mainWrapper}>
+				{replyingMessage.id && renderQuotedMessage(replyingMessage)}
+				<div className={classes.newMessageBox}>
 					<IconButton
-						aria-label="upload"
+						aria-label="emojiPicker"
 						component="span"
 						disabled={loading || recording || ticketStatus !== "open"}
+						onClick={e => setShowEmoji(prevState => !prevState)}
 					>
-						<AttachFileIcon className={classes.sendMessageIcons} />
+						<MoodIcon className={classes.sendMessageIcons} />
 					</IconButton>
-				</label>
-				<div className={classes.messageInputWrapper}>
-					<InputBase
-						inputRef={input => input && input.focus()}
-						className={classes.messageInput}
-						placeholder={
-							ticketStatus === "open"
-								? i18n.t("messagesInput.placeholderOpen")
-								: i18n.t("messagesInput.placeholderClosed")
-						}
-						multiline
-						rowsMax={5}
-						value={inputMessage}
-						onChange={handleChangeInput}
-						disabled={recording || loading || ticketStatus !== "open"}
-						onPaste={e => {
-							ticketStatus === "open" && handleInputPaste(e);
-						}}
-						onKeyPress={e => {
-							if (loading || e.shiftKey) return;
-							else if (e.key === "Enter") {
-								handleSendMessage();
-							}
-						}}
-					/>
-				</div>
-				{inputMessage ? (
-					<IconButton
-						aria-label="sendMessage"
-						component="span"
-						onClick={handleSendMessage}
-						disabled={loading}
-					>
-						<SendIcon className={classes.sendMessageIcons} />
-					</IconButton>
-				) : recording ? (
-					<div className={classes.recorderWrapper}>
-						<IconButton
-							aria-label="cancelRecording"
-							component="span"
-							fontSize="large"
-							disabled={loading}
-							onClick={handleCancelAudio}
-						>
-							<HighlightOffIcon className={classes.cancelAudioIcon} />
-						</IconButton>
-						{loading ? (
-							<div>
-								<CircularProgress className={classes.audioLoading} />
-							</div>
-						) : (
-							<RecordingTimer />
-						)}
+					{showEmoji ? (
+						<div className={classes.emojiBox}>
+							<Picker
+								perLine={16}
+								showPreview={false}
+								showSkinTones={false}
+								onSelect={handleAddEmoji}
+							/>
+						</div>
+					) : null}
 
+					<input
+						multiple
+						type="file"
+						id="upload-button"
+						disabled={loading || recording || ticketStatus !== "open"}
+						className={classes.uploadInput}
+						onChange={handleChangeMedias}
+					/>
+					<label htmlFor="upload-button">
 						<IconButton
-							aria-label="sendRecordedAudio"
+							aria-label="upload"
 							component="span"
-							onClick={handleUploadAudio}
+							disabled={loading || recording || ticketStatus !== "open"}
+						>
+							<AttachFileIcon className={classes.sendMessageIcons} />
+						</IconButton>
+					</label>
+					<div className={classes.messageInputWrapper}>
+						<InputBase
+							inputRef={input => input && input.focus()}
+							className={classes.messageInput}
+							placeholder={
+								ticketStatus === "open"
+									? i18n.t("messagesInput.placeholderOpen")
+									: i18n.t("messagesInput.placeholderClosed")
+							}
+							multiline
+							rowsMax={5}
+							value={inputMessage}
+							onChange={handleChangeInput}
+							disabled={recording || loading || ticketStatus !== "open"}
+							onPaste={e => {
+								ticketStatus === "open" && handleInputPaste(e);
+							}}
+							onKeyPress={e => {
+								if (loading || e.shiftKey) return;
+								else if (e.key === "Enter") {
+									handleSendMessage();
+								}
+							}}
+						/>
+					</div>
+					{inputMessage ? (
+						<IconButton
+							aria-label="sendMessage"
+							component="span"
+							onClick={handleSendMessage}
 							disabled={loading}
 						>
-							<CheckCircleOutlineIcon className={classes.sendAudioIcon} />
+							<SendIcon className={classes.sendMessageIcons} />
 						</IconButton>
-					</div>
-				) : (
-					<IconButton
-						aria-label="showRecorder"
-						component="span"
-						disabled={loading || ticketStatus !== "open"}
-						onClick={handleStartRecording}
-					>
-						<MicIcon className={classes.sendMessageIcons} />
-					</IconButton>
-				)}
+					) : recording ? (
+						<div className={classes.recorderWrapper}>
+							<IconButton
+								aria-label="cancelRecording"
+								component="span"
+								fontSize="large"
+								disabled={loading}
+								onClick={handleCancelAudio}
+							>
+								<HighlightOffIcon className={classes.cancelAudioIcon} />
+							</IconButton>
+							{loading ? (
+								<div>
+									<CircularProgress className={classes.audioLoading} />
+								</div>
+							) : (
+								<RecordingTimer />
+							)}
+
+							<IconButton
+								aria-label="sendRecordedAudio"
+								component="span"
+								onClick={handleUploadAudio}
+								disabled={loading}
+							>
+								<CheckCircleOutlineIcon className={classes.sendAudioIcon} />
+							</IconButton>
+						</div>
+					) : (
+						<IconButton
+							aria-label="showRecorder"
+							component="span"
+							disabled={loading || ticketStatus !== "open"}
+							onClick={handleStartRecording}
+						>
+							<MicIcon className={classes.sendMessageIcons} />
+						</IconButton>
+					)}
+				</div>
 			</Paper>
 		);
 	}

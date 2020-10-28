@@ -295,7 +295,7 @@ const reducer = (state, action) => {
 	}
 };
 
-const MessagesList = ({ ticketId, isGroup }) => {
+const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 	const classes = useStyles();
 
 	const [messagesList, dispatch] = useReducer(reducer, []);
@@ -304,7 +304,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 	const [loading, setLoading] = useState(false);
 	const lastMessageRef = useRef();
 
-	const [selectedMessageId, setSelectedMessageId] = useState(null);
+	const [selectedMessage, setSelectedMessage] = useState({});
 	const [anchorEl, setAnchorEl] = useState(null);
 	const messageOptionsMenuOpen = Boolean(anchorEl);
 	const currentTicketId = useRef(ticketId);
@@ -402,9 +402,9 @@ const MessagesList = ({ ticketId, isGroup }) => {
 		}
 	};
 
-	const handleOpenMessageOptionsMenu = (e, messageId) => {
+	const handleOpenMessageOptionsMenu = (e, message) => {
 		setAnchorEl(e.currentTarget);
-		setSelectedMessageId(messageId);
+		setSelectedMessage(message);
 	};
 
 	const handleCloseMessageOptionsMenu = e => {
@@ -581,7 +581,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 									id="messageActionsButton"
 									disabled={message.isDeleted}
 									className={classes.messageActionsButton}
-									onClick={e => handleOpenMessageOptionsMenu(e, message.id)}
+									onClick={e => handleOpenMessageOptionsMenu(e, message)}
 								>
 									<ExpandMore />
 								</IconButton>
@@ -619,7 +619,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 	return (
 		<div className={classes.messagesListWrapper}>
 			<MessageOptionsMenu
-				messageId={selectedMessageId}
+				message={selectedMessage}
 				anchorEl={anchorEl}
 				menuOpen={messageOptionsMenuOpen}
 				handleClose={handleCloseMessageOptionsMenu}
