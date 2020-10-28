@@ -91,7 +91,7 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 	},
 
-	quotedMsgLeft: {
+	quotedMsg: {
 		padding: 10,
 		maxWidth: 300,
 		height: "auto",
@@ -532,7 +532,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 						[classes.quotedSideRight]: message.quotedMsg?.fromMe,
 					})}
 				></span>
-				<div className={classes.quotedMsgLeft}>
+				<div className={classes.quotedMsg}>
 					{!message.quotedMsg?.fromMe && (
 						<span className={classes.messageContactName}>
 							{message.contact?.name}
