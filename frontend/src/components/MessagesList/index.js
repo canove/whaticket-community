@@ -66,6 +66,12 @@ const useStyles = makeStyles(theme => ({
 		height: "auto",
 		display: "block",
 		position: "relative",
+		"&:hover #messageActionsButton": {
+			display: "flex",
+			position: "absolute",
+			top: 0,
+			right: 0,
+		},
 
 		whiteSpace: "pre-wrap",
 		backgroundColor: "#ffffff",
@@ -163,8 +169,8 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 		color: "#999",
 		zIndex: 1,
-		backgroundColor: "#dcf8c6",
-		"&:hover, &.Mui-focusVisible": { backgroundColor: "#dcf8c6" },
+		backgroundColor: "inherit",
+		"&:hover, &.Mui-focusVisible": { backgroundColor: "inherit" },
 	},
 
 	messageContactName: {
@@ -553,6 +559,16 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
+								<IconButton
+									variant="contained"
+									size="small"
+									id="messageActionsButton"
+									disabled={message.isDeleted}
+									className={classes.messageActionsButton}
+									onClick={e => handleOpenMessageOptionsMenu(e, message)}
+								>
+									<ExpandMore />
+								</IconButton>
 								{isGroup && (
 									<span className={classes.messageContactName}>
 										{message.contact?.name}

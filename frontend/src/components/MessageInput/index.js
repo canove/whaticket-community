@@ -123,7 +123,7 @@ const useStyles = makeStyles(theme => ({
 		paddingRight: 7,
 	},
 
-	quotedContainerRight: {
+	quotedContainer: {
 		flex: 1,
 		marginRight: 5,
 		overflowY: "hidden",
@@ -133,40 +133,30 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 	},
 
-	quotedMsgRight: {
+	quotedMsgBody: {
 		padding: 10,
-		maxWidth: 300,
-		height: "auto",
-		whiteSpace: "pre-wrap",
-	},
-
-	quotedSideRight: {
-		flex: "none",
-		width: "4px",
-		backgroundColor: "#35cd96",
-	},
-
-	quotedContainerLeft: {
-		overflow: "hidden",
-		backgroundColor: "rgba(0, 0, 0, 0.05)",
-		borderRadius: "7.5px",
-		display: "flex",
-		position: "relative",
-	},
-
-	quotedMsg: {
-		padding: 10,
-		maxWidth: 300,
 		height: "auto",
 		display: "block",
 		whiteSpace: "pre-wrap",
 		overflow: "hidden",
 	},
 
-	quotedSideLeft: {
+	quotedSideOther: {
+		flex: "none",
+		width: "4px",
+		backgroundColor: "#35cd96",
+	},
+
+	quotedSideMine: {
 		flex: "none",
 		width: "4px",
 		backgroundColor: "#6bcbef",
+	},
+
+	messageContactName: {
+		display: "flex",
+		color: "#6bcbef",
+		fontWeight: 500,
 	},
 }));
 
@@ -335,17 +325,13 @@ const MessageInput = ({ ticketStatus }) => {
 	const renderQuotedMessage = message => {
 		return (
 			<div className={classes.quotedMsgWrapper}>
-				<div
-					className={clsx(classes.quotedContainerLeft, {
-						[classes.quotedContainerRight]: message.fromMe,
-					})}
-				>
+				<div className={classes.quotedContainer}>
 					<span
-						className={clsx(classes.quotedSideLeft, {
-							[classes.quotedSideRight]: message.quotedMsg?.fromMe,
+						className={clsx(classes.quotedSideOther, {
+							[classes.quotedSideMine]: !message.fromMe,
 						})}
 					></span>
-					<div className={classes.quotedMsg}>
+					<div className={classes.quotedMsgBody}>
 						{!message.fromMe && (
 							<span className={classes.messageContactName}>
 								{message.contact?.name}
