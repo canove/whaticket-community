@@ -113,7 +113,7 @@ const useStyles = makeStyles(theme => ({
 		color: "green",
 	},
 
-	quotedMsgWrapper: {
+	replyginMsgWrapper: {
 		display: "flex",
 		width: "100%",
 		alignItems: "center",
@@ -123,7 +123,7 @@ const useStyles = makeStyles(theme => ({
 		paddingRight: 7,
 	},
 
-	quotedContainer: {
+	replyginMsgContainer: {
 		flex: 1,
 		marginRight: 5,
 		overflowY: "hidden",
@@ -133,7 +133,7 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 	},
 
-	quotedMsgBody: {
+	replyginMsgBody: {
 		padding: 10,
 		height: "auto",
 		display: "block",
@@ -141,13 +141,13 @@ const useStyles = makeStyles(theme => ({
 		overflow: "hidden",
 	},
 
-	quotedSideOther: {
+	replyginContactMsgSideColor: {
 		flex: "none",
 		width: "4px",
 		backgroundColor: "#35cd96",
 	},
 
-	quotedSideMine: {
+	replyginSelfMsgSideColor: {
 		flex: "none",
 		width: "4px",
 		backgroundColor: "#6bcbef",
@@ -322,16 +322,16 @@ const MessageInput = ({ ticketStatus }) => {
 		}
 	};
 
-	const renderQuotedMessage = message => {
+	const renderReplyingMessage = message => {
 		return (
-			<div className={classes.quotedMsgWrapper}>
-				<div className={classes.quotedContainer}>
+			<div className={classes.replyginMsgWrapper}>
+				<div className={classes.replyginMsgContainer}>
 					<span
-						className={clsx(classes.quotedSideOther, {
-							[classes.quotedSideMine]: !message.fromMe,
+						className={clsx(classes.replyginContactMsgSideColor, {
+							[classes.replyginSelfMsgSideColor]: !message.fromMe,
 						})}
 					></span>
-					<div className={classes.quotedMsgBody}>
+					<div className={classes.replyginMsgBody}>
 						{!message.fromMe && (
 							<span className={classes.messageContactName}>
 								{message.contact?.name}
@@ -386,7 +386,7 @@ const MessageInput = ({ ticketStatus }) => {
 	else {
 		return (
 			<Paper square elevation={0} className={classes.mainWrapper}>
-				{replyingMessage.id && renderQuotedMessage(replyingMessage)}
+				{replyingMessage.id && renderReplyingMessage(replyingMessage)}
 				<div className={classes.newMessageBox}>
 					<IconButton
 						aria-label="emojiPicker"
