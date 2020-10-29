@@ -274,9 +274,9 @@ const wbotMessageListener = (wbot: Session): void => {
         msgContact = await wbot.getContactById(msg.to);
 
         // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
-        // the media itself comes on body of message,in base64
+        // the media itself comes on body of message, as base64
         // if this is the case, return and let this media be handled by media_uploaded event
-        // it should be improove to handle the base64 media here in future versions
+        // it should be improoved to handle the base64 media here in future versions
 
         if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard")
           return;
