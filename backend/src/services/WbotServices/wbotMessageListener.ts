@@ -344,7 +344,14 @@ const wbotMessageListener = (wbot: Session): void => {
 
     try {
       const messageToUpdate = await Message.findByPk(msg.id.id, {
-        include: ["contact"]
+        include: [
+          "contact",
+          {
+            model: Message,
+            as: "quotedMsg",
+            include: ["contact"]
+          }
+        ]
       });
       if (!messageToUpdate) {
         return;

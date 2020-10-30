@@ -335,8 +335,7 @@ const messages = {
 				ERR_INVALID_CREDENTIALS: "Authentication error. Please try again.",
 				ERR_SENDING_WAPP_MSG:
 					"Error sending WhatsApp message. Check connections page.",
-				ERR_DELETE_WAPP_MSG:
-					"Couldn't delete message from WhatsApp. Check connections page.",
+				ERR_DELETE_WAPP_MSG: "Couldn't delete message from WhatsApp.",
 				ERR_OTHER_OPEN_TICKET:
 					"There's already an open ticket for this contact.",
 				ERR_SESSION_EXPIRED: "Session expired. Please login.",
@@ -351,6 +350,8 @@ const messages = {
 				ERR_NO_WAPP_FOUND: "No WhatsApp found with this ID.",
 				ERR_CREATING_MESSAGE: "Error while creating message on database.",
 				ERR_CREATING_TICKET: "Error while creating ticket on database.",
+				ERR_FETCH_WAPP_MSG:
+					"Error fetching the message in WhtasApp, maybe it is too old.",
 			},
 		},
 	},

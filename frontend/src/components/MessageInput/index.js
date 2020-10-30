@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "emoji-mart/css/emoji-mart.css";
 import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
@@ -170,17 +170,24 @@ const MessageInput = ({ ticketStatus }) => {
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [recording, setRecording] = useState(false);
+	const inputRef = useRef();
 	const { setReplyingMessage, replyingMessage } = useContext(
 		ReplyMessageContext
 	);
 
 	useEffect(() => {
+		inputRef.current.focus();
+	}, [replyingMessage]);
+
+	useEffect(() => {
+		inputRef.current.focus();
 		return () => {
 			setInputMessage("");
 			setShowEmoji(false);
 			setMedias([]);
+			setReplyingMessage(null);
 		};
-	}, [ticketId]);
+	}, [ticketId, setReplyingMessage]);
 
 	const handleChangeInput = e => {
 		setInputMessage(e.target.value);
@@ -245,6 +252,7 @@ const MessageInput = ({ ticketStatus }) => {
 			fromMe: true,
 			mediaUrl: "",
 			body: `${username}: ${inputMessage.trim()}`,
+			quotedMsg: replyingMessage,
 		};
 		try {
 			await api.post(`/messages/${ticketId}`, message);
@@ -264,6 +272,7 @@ const MessageInput = ({ ticketStatus }) => {
 		setInputMessage("");
 		setShowEmoji(false);
 		setLoading(false);
+		setReplyingMessage(null);
 	};
 
 	const handleStartRecording = async () => {
@@ -344,7 +353,7 @@ const MessageInput = ({ ticketStatus }) => {
 					aria-label="showRecorder"
 					component="span"
 					disabled={loading || ticketStatus !== "open"}
-					onClick={() => setReplyingMessage({})}
+					onClick={() => setReplyingMessage(null)}
 				>
 					<ClearIcon className={classes.sendMessageIcons} />
 				</IconButton>
@@ -386,7 +395,7 @@ const MessageInput = ({ ticketStatus }) => {
 	else {
 		return (
 			<Paper square elevation={0} className={classes.mainWrapper}>
-				{replyingMessage.id && renderReplyingMessage(replyingMessage)}
+				{replyingMessage && renderReplyingMessage(replyingMessage)}
 				<div className={classes.newMessageBox}>
 					<IconButton
 						aria-label="emojiPicker"
@@ -426,7 +435,10 @@ const MessageInput = ({ ticketStatus }) => {
 					</label>
 					<div className={classes.messageInputWrapper}>
 						<InputBase
-							inputRef={input => input && input.focus()}
+							inputRef={input => {
+								input && input.focus();
+								input && (inputRef.current = input);
+							}}
 							className={classes.messageInput}
 							placeholder={
 								ticketStatus === "open"

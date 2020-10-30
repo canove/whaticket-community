@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../libs/socket";
+import Message from "../models/Message";
 
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
@@ -17,6 +18,7 @@ type MessageData = {
   body: string;
   fromMe: boolean;
   read: boolean;
+  quotedMsg?: Message;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -35,7 +37,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { body }: MessageData = req.body;
+  const { body, quotedMsg }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
 
   const ticket = await ShowTicketService(ticketId);
@@ -47,7 +49,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket });
+    await SendWhatsAppMessage({ body, ticket, quotedMsg });
   }
 
   await SetTicketMessagesAsRead(ticket);

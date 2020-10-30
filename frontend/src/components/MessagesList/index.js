@@ -106,7 +106,7 @@ const useStyles = makeStyles(theme => ({
 		overflow: "hidden",
 	},
 
-	quotedSideLeft: {
+	quotedSideColorLeft: {
 		flex: "none",
 		width: "4px",
 		backgroundColor: "#6bcbef",
@@ -158,7 +158,7 @@ const useStyles = makeStyles(theme => ({
 		whiteSpace: "pre-wrap",
 	},
 
-	quotedSideRight: {
+	quotedSideColorRight: {
 		flex: "none",
 		width: "4px",
 		backgroundColor: "#35cd96",
@@ -170,6 +170,7 @@ const useStyles = makeStyles(theme => ({
 		color: "#999",
 		zIndex: 1,
 		backgroundColor: "inherit",
+		opacity: "90%",
 		"&:hover, &.Mui-focusVisible": { backgroundColor: "inherit" },
 	},
 
@@ -534,14 +535,14 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 				})}
 			>
 				<span
-					className={clsx(classes.quotedSideLeft, {
-						[classes.quotedSideRight]: message.quotedMsg?.fromMe,
+					className={clsx(classes.quotedSideColorLeft, {
+						[classes.quotedSideColorRight]: message.quotedMsg?.fromMe,
 					})}
 				></span>
 				<div className={classes.quotedMsg}>
 					{!message.quotedMsg?.fromMe && (
 						<span className={classes.messageContactName}>
-							{message.contact?.name}
+							{message.quotedMsg?.contact?.name}
 						</span>
 					)}
 					{message.quotedMsg?.body}

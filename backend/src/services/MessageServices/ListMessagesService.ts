@@ -32,7 +32,14 @@ const ListMessagesService = async ({
   const { count, rows: messages } = await Message.findAndCountAll({
     where: { ticketId },
     limit,
-    include: ["contact", "quotedMsg"],
+    include: [
+      "contact",
+      {
+        model: Message,
+        as: "quotedMsg",
+        include: ["contact"]
+      }
+    ],
     offset,
     order: [["createdAt", "DESC"]]
   });

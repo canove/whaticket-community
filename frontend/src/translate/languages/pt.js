@@ -340,8 +340,7 @@ const messages = {
 					"Erro de autenticação. Por favor, tente novamente.",
 				ERR_SENDING_WAPP_MSG:
 					"Erro ao enviar mensagem do WhatsApp. Verifique a página de conexões.",
-				ERR_DELETE_WAPP_MSG:
-					"Não foi possível excluir a mensagem do WhatsApp. Verifique a página de conexões.",
+				ERR_DELETE_WAPP_MSG: "Não foi possível excluir a mensagem do WhatsApp.",
 				ERR_OTHER_OPEN_TICKET: "Já existe um tíquete aberto para este contato.",
 				ERR_SESSION_EXPIRED: "Sessão expirada. Por favor entre.",
 				ERR_USER_CREATION_DISABLED:
@@ -355,6 +354,8 @@ const messages = {
 				ERR_NO_WAPP_FOUND: "Nenhum WhatsApp encontrado com este ID.",
 				ERR_CREATING_MESSAGE: "Erro ao criar mensagem no banco de dados.",
 				ERR_CREATING_TICKET: "Erro ao criar tíquete no banco de dados.",
+				ERR_FETCH_WAPP_MSG:
+					"Erro ao buscar a mensagem no WhtasApp, talvez ela seja muito antiga.",
 			},
 		},
 	},

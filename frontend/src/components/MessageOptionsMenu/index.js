@@ -65,9 +65,11 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 				open={menuOpen}
 				onClose={handleClose}
 			>
-				<MenuItem onClick={handleOpenConfirmationModal}>
-					{i18n.t("messageOptionsMenu.delete")}
-				</MenuItem>
+				{message.fromMe && (
+					<MenuItem onClick={handleOpenConfirmationModal}>
+						{i18n.t("messageOptionsMenu.delete")}
+					</MenuItem>
+				)}
 				<MenuItem onClick={hanldeReplyMessage}>
 					{i18n.t("messageOptionsMenu.reply")}
 				</MenuItem>

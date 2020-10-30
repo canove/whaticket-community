@@ -13,19 +13,32 @@ export const GetWbotMessage = async (
     `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`
   );
 
-  try {
-    const chatMessages = await wbotChat.fetchMessages({ limit: 20 });
+  let limit = 20;
 
-    const msgToDelete = chatMessages.find(msg => msg.id.id === messageId);
+  const fetchWbotMessagesGradually = async (): Promise<void | WbotMessage> => {
+    const chatMessages = await wbotChat.fetchMessages({ limit });
 
-    if (!msgToDelete) {
-      throw new Error();
+    const msgFound = chatMessages.find(msg => msg.id.id === messageId);
+
+    if (!msgFound && limit < 100) {
+      limit += 20;
+      return fetchWbotMessagesGradually();
     }
 
-    return msgToDelete;
+    return msgFound;
+  };
+
+  try {
+    const msgFound = await fetchWbotMessagesGradually();
+
+    if (!msgFound) {
+      throw new Error("Cannot found message within 100 last messages");
+    }
+
+    return msgFound;
   } catch (err) {
     console.log(err);
-    throw new AppError("ERR_DELETE_WAPP_MSG");
+    throw new AppError("ERR_FETCH_WAPP_MSG");
   }
 };
 
