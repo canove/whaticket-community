@@ -38,13 +38,14 @@ const UpdateUserService = async ({
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
     email: Yup.string().email(),
+    profile: Yup.string(),
     password: Yup.string()
   });
 
-  const { email, password, name } = userData;
+  const { email, password, profile, name } = userData;
 
   try {
-    await schema.validate({ email, password, name });
+    await schema.validate({ email, password, profile, name });
   } catch (err) {
     throw new AppError(err.message);
   }
@@ -52,6 +53,7 @@ const UpdateUserService = async ({
   await user.update({
     email,
     password,
+    profile,
     name
   });
 
