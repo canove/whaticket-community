@@ -116,7 +116,7 @@ const verifyTicket = async (
   if (!ticket) {
     ticket = await Ticket.findOne({
       where: {
-        createdAt: {
+        updatedAt: {
           [Op.between]: [+subHours(new Date(), 2), +new Date()]
         },
         contactId: groupContact ? groupContact.id : contact.id
