@@ -1,4 +1,5 @@
 import socketIo, { Server as SocketIO } from "socket.io";
+import socketRedis from "socket.io-redis";
 import { Server } from "http";
 import AppError from "../errors/AppError";
 
@@ -6,6 +7,14 @@ let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
   io = socketIo(httpServer);
+  if (process.env.IO_REDIS_SERVER) {
+    io.adapter(
+      socketRedis({
+        host: process.env.IO_REDIS_SERVER,
+        port: Number(process.env.IO_REDIS_PORT)
+      })
+    );
+  }
   io.on("connection", socket => {
     console.log("Client Connected");
     socket.on("joinChatBox", ticketId => {
