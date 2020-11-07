@@ -7,7 +7,8 @@ let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
   io = socketIo(httpServer);
-  if (process.env.IO_REDIS_SERVER) {
+
+  if (process.env.NODE_ENV === "PRODUCTION") {
     io.adapter(
       socketRedis({
         host: process.env.IO_REDIS_SERVER,
@@ -15,6 +16,7 @@ export const initIO = (httpServer: Server): SocketIO => {
       })
     );
   }
+
   io.on("connection", socket => {
     console.log("Client Connected");
     socket.on("joinChatBox", ticketId => {
