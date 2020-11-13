@@ -188,9 +188,7 @@ const Contacts = () => {
 			}
 		}
 		setLoading(false);
-		
 	};
-
 
 	const hadleEditContact = contactId => {
 		setSelectedContactId(contactId);
@@ -318,9 +316,13 @@ const Contacts = () => {
 						<TableRow>
 							<TableCell padding="checkbox" />
 							<TableCell>{i18n.t("contacts.table.name")}</TableCell>
-							<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
-							<TableCell>{i18n.t("contacts.table.email")}</TableCell>
-							<TableCell align="right">
+							<TableCell align="center">
+								{i18n.t("contacts.table.whatsapp")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("contacts.table.email")}
+							</TableCell>
+							<TableCell align="center">
 								{i18n.t("contacts.table.actions")}
 							</TableCell>
 						</TableRow>
@@ -333,24 +335,21 @@ const Contacts = () => {
 										{<Avatar src={contact.profilePicUrl} />}
 									</TableCell>
 									<TableCell>{contact.name}</TableCell>
-									<TableCell>{contact.number}</TableCell>
-									<TableCell>{contact.email}</TableCell>
-									<TableCell align="right">
-
-										<IconButton size = "small"
-										onClick = {()=> handleSaveTicket(contact.id)}
+									<TableCell align="center">{contact.number}</TableCell>
+									<TableCell align="center">{contact.email}</TableCell>
+									<TableCell align="center">
+										<IconButton
+											size="small"
+											onClick={() => handleSaveTicket(contact.id)}
 										>
-										   <WhatsAppIcon/>
+											<WhatsAppIcon />
 										</IconButton>
-
 										<IconButton
 											size="small"
 											onClick={() => hadleEditContact(contact.id)}
 										>
-										
-										<EditIcon />
+											<EditIcon />
 										</IconButton>
-
 										<IconButton
 											size="small"
 											onClick={e => {
