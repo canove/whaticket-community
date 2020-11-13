@@ -11,12 +11,15 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 
+
 import { i18n } from "../../translate/i18n";
 import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
 import ContactModal from "../ContactModal";
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
 
 const drawerWidth = 320;
+
+
 
 const useStyles = makeStyles(theme => ({
 	drawer: {
@@ -148,6 +151,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 								variant="outlined"
 								className={classes.contactExtraInfo}
 							>
+
 								<InputLabel>{info.name}</InputLabel>
 								<LinkifyWithTargetBlank>
 									<Typography noWrap style={{ paddingTop: 2 }}>
