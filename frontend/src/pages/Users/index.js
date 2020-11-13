@@ -28,6 +28,7 @@ import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import { Avatar } from "@material-ui/core";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_USERS") {
@@ -252,10 +253,15 @@ const Users = () => {
 				<Table size="small">
 					<TableHead>
 						<TableRow>
+							<TableCell padding="checkbox" />
 							<TableCell>{i18n.t("users.table.name")}</TableCell>
-							<TableCell>{i18n.t("users.table.email")}</TableCell>
-							<TableCell>{i18n.t("users.table.profile")}</TableCell>
-							<TableCell align="right">
+							<TableCell align="center">
+								{i18n.t("users.table.email")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("users.table.profile")}
+							</TableCell>
+							<TableCell align="center">
 								{i18n.t("users.table.actions")}
 							</TableCell>
 						</TableRow>
@@ -264,10 +270,13 @@ const Users = () => {
 						<>
 							{users.map(user => (
 								<TableRow key={user.id}>
+									<TableCell style={{ paddingRight: 0 }}>
+										{<Avatar />}
+									</TableCell>
 									<TableCell>{user.name}</TableCell>
-									<TableCell>{user.email}</TableCell>
-									<TableCell>{user.profile}</TableCell>
-									<TableCell align="right">
+									<TableCell align="center">{user.email}</TableCell>
+									<TableCell align="center">{user.profile}</TableCell>
+									<TableCell align="center">
 										<IconButton
 											size="small"
 											onClick={() => handleEditUser(user)}
