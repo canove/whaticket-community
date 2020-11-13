@@ -12,7 +12,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Avatar from "@material-ui/core/Avatar";
-
+import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -88,6 +88,7 @@ const useStyles = makeStyles(theme => ({
 const Contacts = () => {
 	const classes = useStyles();
 	const history = useHistory();
+	const userId = +localStorage.getItem("userId");
 
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -162,6 +163,31 @@ const Contacts = () => {
 	const handleCloseContactModal = () => {
 		setSelectedContactId(null);
 		setContactModalOpen(false);
+	};
+
+	const handleSaveTicket = async contactId => {
+		if (!contactId) return;
+		setLoading(true);
+		try {
+			const { data: ticket } = await api.post("/tickets", {
+				contactId: contactId,
+				userId: userId,
+				status: "open",
+			});
+			history.push(`/tickets/${ticket.id}`);
+		} catch (err) {
+			const errorMsg = err.response?.data?.error;
+			if (errorMsg) {
+				if (i18n.exists(`backendErrors.${errorMsg}`)) {
+					toast.error(i18n.t(`backendErrors.${errorMsg}`));
+				} else {
+					toast.error(err.response.data.error);
+				}
+			} else {
+				toast.error("Unknown error");
+			}
+		}
+		setLoading(false);
 	};
 
 	const hadleEditContact = contactId => {
@@ -290,9 +316,13 @@ const Contacts = () => {
 						<TableRow>
 							<TableCell padding="checkbox" />
 							<TableCell>{i18n.t("contacts.table.name")}</TableCell>
-							<TableCell>{i18n.t("contacts.table.whatsapp")}</TableCell>
-							<TableCell>{i18n.t("contacts.table.email")}</TableCell>
-							<TableCell align="right">
+							<TableCell align="center">
+								{i18n.t("contacts.table.whatsapp")}
+							</TableCell>
+							<TableCell align="center">
+								{i18n.t("contacts.table.email")}
+							</TableCell>
+							<TableCell align="center">
 								{i18n.t("contacts.table.actions")}
 							</TableCell>
 						</TableRow>
@@ -305,16 +335,21 @@ const Contacts = () => {
 										{<Avatar src={contact.profilePicUrl} />}
 									</TableCell>
 									<TableCell>{contact.name}</TableCell>
-									<TableCell>{contact.number}</TableCell>
-									<TableCell>{contact.email}</TableCell>
-									<TableCell align="right">
+									<TableCell align="center">{contact.number}</TableCell>
+									<TableCell align="center">{contact.email}</TableCell>
+									<TableCell align="center">
+										<IconButton
+											size="small"
+											onClick={() => handleSaveTicket(contact.id)}
+										>
+											<WhatsAppIcon />
+										</IconButton>
 										<IconButton
 											size="small"
 											onClick={() => hadleEditContact(contact.id)}
 										>
 											<EditIcon />
 										</IconButton>
-
 										<IconButton
 											size="small"
 											onClick={e => {
