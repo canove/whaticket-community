@@ -1,6 +1,6 @@
 import { initWbot } from "../../libs/wbot";
 import Whatsapp from "../../models/Whatsapp";
-import wbotMessageListener from "./wbotMessageListener";
+import { wbotMessageListener } from "./wbotMessageListener";
 import { getIO } from "../../libs/socket";
 import wbotMonitor from "./wbotMonitor";
 

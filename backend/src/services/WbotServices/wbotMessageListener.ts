@@ -8,6 +8,7 @@ import * as Sentry from "@sentry/node";
 import {
   Contact as WbotContact,
   Message as WbotMessage,
+  MessageAck,
   Client
 } from "whatsapp-web.js";
 
@@ -144,7 +145,7 @@ const verifyTicket = async (
   return ticket;
 };
 
-const handlMedia = async (
+const verifyMedia = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
@@ -196,7 +197,7 @@ const handlMedia = async (
   return newMessage;
 };
 
-const handleMessage = async (
+const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
@@ -211,7 +212,7 @@ const handleMessage = async (
   }
 
   if (msg.hasMedia) {
-    newMessage = await handlMedia(msg, ticket, contact);
+    newMessage = await verifyMedia(msg, ticket, contact);
   } else {
     const messageData = {
       id: msg.id.id,
@@ -256,117 +257,100 @@ const isValidMsg = (msg: WbotMessage): boolean => {
   return false;
 };
 
-const wbotMessageListener = (wbot: Session): void => {
-  const whatsappId = wbot.id;
-  const io = getIO();
+const handleMessage = async (
+  msg: WbotMessage,
+  wbot: Session
+): Promise<void> => {
+  if (!isValidMsg(msg)) {
+    return;
+  }
 
-  wbot.on("message_create", async msg => {
-    // console.log(msg);
-    if (!isValidMsg(msg)) {
-      return;
+  try {
+    let msgContact: WbotContact;
+    let groupContact: Contact | undefined;
+
+    if (msg.fromMe) {
+      msgContact = await wbot.getContactById(msg.to);
+
+      // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
+      // the media itself comes on body of message, as base64
+      // if this is the case, return and let this media be handled by media_uploaded event
+      // it should be improoved to handle the base64 media here in future versions
+
+      if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard") return;
+    } else {
+      msgContact = await msg.getContact();
     }
 
-    try {
-      let msgContact: WbotContact;
-      let groupContact: Contact | undefined;
+    const chat = await msg.getChat();
+
+    if (chat.isGroup) {
+      let msgGroupContact;
 
       if (msg.fromMe) {
-        msgContact = await wbot.getContactById(msg.to);
-
-        // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
-        // the media itself comes on body of message, as base64
-        // if this is the case, return and let this media be handled by media_uploaded event
-        // it should be improoved to handle the base64 media here in future versions
-
-        if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard")
-          return;
+        msgGroupContact = await wbot.getContactById(msg.to);
       } else {
-        msgContact = await msg.getContact();
+        msgGroupContact = await wbot.getContactById(msg.from);
       }
 
-      const chat = await msg.getChat();
-
-      if (chat.isGroup) {
-        let msgGroupContact;
-
-        if (msg.fromMe) {
-          msgGroupContact = await wbot.getContactById(msg.to);
-        } else {
-          msgGroupContact = await wbot.getContactById(msg.from);
-        }
-
-        groupContact = await verifyGroup(msgGroupContact);
-      }
-
-      const profilePicUrl = await msgContact.getProfilePicUrl();
-      const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId!, groupContact);
-
-      await handleMessage(msg, ticket, contact);
-    } catch (err) {
-      Sentry.captureException(err);
-      console.log(err);
+      groupContact = await verifyGroup(msgGroupContact);
     }
+
+    const profilePicUrl = await msgContact.getProfilePicUrl();
+    const contact = await verifyContact(msgContact, profilePicUrl);
+    const ticket = await verifyTicket(contact, wbot.id!, groupContact);
+
+    await verifyMessage(msg, ticket, contact);
+  } catch (err) {
+    Sentry.captureException(err);
+    console.log(err);
+  }
+};
+
+const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
+  await new Promise(r => setTimeout(r, 500));
+
+  const io = getIO();
+
+  try {
+    const messageToUpdate = await Message.findByPk(msg.id.id, {
+      include: [
+        "contact",
+        {
+          model: Message,
+          as: "quotedMsg",
+          include: ["contact"]
+        }
+      ]
+    });
+    if (!messageToUpdate) {
+      return;
+    }
+    await messageToUpdate.update({ ack });
+
+    io.to(messageToUpdate.ticketId.toString()).emit("appMessage", {
+      action: "update",
+      message: messageToUpdate
+    });
+  } catch (err) {
+    Sentry.captureException(err);
+    console.log(err);
+  }
+};
+
+const wbotMessageListener = (wbot: Session): void => {
+  wbot.on("message_create", async msg => {
+    // console.log(msg);
+    handleMessage(msg, wbot);
   });
 
   wbot.on("media_uploaded", async msg => {
-    try {
-      let groupContact: Contact | undefined;
-      const msgContact = await wbot.getContactById(msg.to);
-
-      const chat = await msg.getChat();
-
-      if (chat.isGroup) {
-        let msgGroupContact;
-
-        if (msg.fromMe) {
-          msgGroupContact = await wbot.getContactById(msg.to);
-        } else {
-          msgGroupContact = await wbot.getContactById(msg.from);
-        }
-
-        groupContact = await verifyGroup(msgGroupContact);
-      }
-
-      const profilePicUrl = await msgContact.getProfilePicUrl();
-      const contact = await verifyContact(msgContact, profilePicUrl);
-      const ticket = await verifyTicket(contact, whatsappId!, groupContact);
-
-      await handleMessage(msg, ticket, contact);
-    } catch (err) {
-      Sentry.captureException(err);
-      console.log(err);
-    }
+    handleMessage(msg, wbot);
   });
 
   wbot.on("message_ack", async (msg, ack) => {
-    await new Promise(r => setTimeout(r, 500));
-
-    try {
-      const messageToUpdate = await Message.findByPk(msg.id.id, {
-        include: [
-          "contact",
-          {
-            model: Message,
-            as: "quotedMsg",
-            include: ["contact"]
-          }
-        ]
-      });
-      if (!messageToUpdate) {
-        return;
-      }
-      await messageToUpdate.update({ ack });
-
-      io.to(messageToUpdate.ticketId.toString()).emit("appMessage", {
-        action: "update",
-        message: messageToUpdate
-      });
-    } catch (err) {
-      Sentry.captureException(err);
-      console.log(err);
-    }
+    handleMsgAck(msg, ack);
   });
 };
 
-export default wbotMessageListener;
+export { wbotMessageListener, handleMessage };
