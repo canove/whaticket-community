@@ -43,6 +43,11 @@ const TicketActionButtons = ({ ticket }) => {
 		setLoading(true);
 		try {
 			await api.put(`/tickets/${ticket.id}`, {
+               			read: 2,
+                		fromMe: false,
+                		mediaUrl: "",
+               			body: "*Atendimento finalizado no ticket #" + ticket.id  + "* "$
+                		quotedMsg: null,
 				status: status,
 				userId: userId || null,
 			});

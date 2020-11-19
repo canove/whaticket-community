@@ -1,11 +1,23 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
+import Message from "../models/Message";
+
 
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
+import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+
+
+type MessageData = {
+  body: string;
+  fromMe: boolean;
+  read: boolean;
+  quotedMsg?: Message;
+  status: string;
+};
 
 type IndexQuery = {
   searchParam: string;
@@ -75,11 +87,16 @@ export const update = async (
 ): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
+  const { body, quotedMsg, status }: MessageData = req.body;
 
   const { ticket, oldStatus, oldUserId } = await UpdateTicketService({
     ticketData,
     ticketId
   });
+
+  if(status == "closed" ){
+    await  SendWhatsAppMessage({body, ticket, quotedMsg});
+  }
 
   const io = getIO();
 
