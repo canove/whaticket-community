@@ -3,7 +3,7 @@ import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
-import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+// import { handleMessage } from "../services/WbotServices/wbotMessageListener";
 
 interface Session extends Client {
   id?: number;
@@ -11,20 +11,20 @@ interface Session extends Client {
 
 const sessions: Session[] = [];
 
-const syncUnreadMessages = async (wbot: Session) => {
-  const chats = await wbot.getChats();
+// const syncUnreadMessages = async (wbot: Session) => {
+//   const chats = await wbot.getChats();
 
-  chats.forEach(async chat => {
-    if (chat.unreadCount > 0) {
-      const unreadMessages = await chat.fetchMessages({
-        limit: chat.unreadCount
-      });
-      unreadMessages.forEach(msg => {
-        handleMessage(msg, wbot);
-      });
-    }
-  });
-};
+//   chats.forEach(async chat => {
+//     if (chat.unreadCount > 0) {
+//       const unreadMessages = await chat.fetchMessages({
+//         limit: chat.unreadCount
+//       });
+//       unreadMessages.forEach(msg => {
+//         handleMessage(msg, wbot);
+//       });
+//     }
+//   });
+// };
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
   return new Promise((resolve, reject) => {
@@ -105,7 +105,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       wbot.on("ready", async () => {
         console.log("Session:", sessionName, "READY");
 
-        syncUnreadMessages(wbot);
+        // syncUnreadMessages(wbot);
 
         await whatsapp.update({
           status: "CONNECTED",
