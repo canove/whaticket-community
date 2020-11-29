@@ -12,9 +12,10 @@ import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 
 import { i18n } from "../../translate/i18n";
-import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
+
 import ContactModal from "../ContactModal";
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
+import MarkdownWrapper from "../MarkdownWrapper";
 
 const drawerWidth = 320;
 
@@ -149,11 +150,9 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 								className={classes.contactExtraInfo}
 							>
 								<InputLabel>{info.name}</InputLabel>
-								<LinkifyWithTargetBlank>
-									<Typography noWrap style={{ paddingTop: 2 }}>
-										{info.value}
-									</Typography>
-								</LinkifyWithTargetBlank>
+								<Typography component="div" noWrap style={{ paddingTop: 2 }}>
+									<MarkdownWrapper>{info.value}</MarkdownWrapper>
+								</Typography>
 							</Paper>
 						))}
 					</Paper>

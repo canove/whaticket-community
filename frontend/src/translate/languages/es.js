@@ -292,6 +292,7 @@ const messages = {
 				placeholderOpen: "Escribe un mensaje",
 				placeholderClosed:
 					"Vuelva a abrir o acepte este ticket para enviar un mensaje.",
+				signMessage: "Firmar",
 			},
 			contactDrawer: {
 				header: "Detalles del contacto",
@@ -329,6 +330,8 @@ const messages = {
 				},
 			},
 			backendErrors: {
+				ERR_NO_OTHER_WHATSAPP:
+					"Debe haber al menos una conexión de WhatsApp predeterminada.",
 				ERR_NO_DEF_WAPP_FOUND:
 					"No se encontró WhatsApp predeterminado. Verifique la página de conexiones.",
 				ERR_WAPP_NOT_INITIALIZED:

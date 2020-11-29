@@ -18,6 +18,7 @@ import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
+import MarkdownWrapper from "../MarkdownWrapper";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -143,6 +144,7 @@ const TicketListItem = ({ ticket }) => {
 					></Avatar>
 				</ListItemAvatar>
 				<ListItemText
+					disableTypography
 					primary={
 						<span className={classes.contactNameWrapper}>
 							<Typography
@@ -185,7 +187,11 @@ const TicketListItem = ({ ticket }) => {
 								variant="body2"
 								color="textSecondary"
 							>
-								{ticket.lastMessage || <br />}
+								{ticket.lastMessage ? (
+									<MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
+								) : (
+									<br />
+								)}
 							</Typography>
 
 							<Badge

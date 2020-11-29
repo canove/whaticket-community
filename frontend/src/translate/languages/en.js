@@ -287,6 +287,7 @@ const messages = {
 			messagesInput: {
 				placeholderOpen: "Type a message",
 				placeholderClosed: "Reopen or accept this ticket to send a message.",
+				signMessage: "Sign",
 			},
 			contactDrawer: {
 				header: "Contact details",
@@ -323,6 +324,8 @@ const messages = {
 				},
 			},
 			backendErrors: {
+				ERR_NO_OTHER_WHATSAPP:
+					"There must be at lest one default WhatsApp connection.",
 				ERR_NO_DEF_WAPP_FOUND:
 					"No default WhatsApp found. Check connections page.",
 				ERR_WAPP_NOT_INITIALIZED:

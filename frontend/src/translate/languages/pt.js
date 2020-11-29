@@ -290,6 +290,7 @@ const messages = {
 				placeholderOpen: "Digite uma mensagem",
 				placeholderClosed:
 					"Reabra ou aceite esse ticket para enviar uma mensagem.",
+				signMessage: "Assinar",
 			},
 			contactDrawer: {
 				header: "Dados do contato",
@@ -302,8 +303,7 @@ const messages = {
 				delete: "Deletar",
 				transfer: "Transferir",
 				confirmationModal: {
-					title: "Deletar o ticket #",
-					titleFrom: "do contato ",
+					title: "Deletar o ticket do contato",
 					message:
 						"Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
 				},
@@ -327,6 +327,7 @@ const messages = {
 				},
 			},
 			backendErrors: {
+				ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
 				ERR_NO_DEF_WAPP_FOUND:
 					"Nenhum WhatsApp padrão encontrado. Verifique a página de conexões.",
 				ERR_WAPP_NOT_INITIALIZED:

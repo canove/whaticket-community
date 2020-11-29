@@ -21,7 +21,7 @@ import {
 	GetApp,
 } from "@material-ui/icons";
 
-import LinkifyWithTargetBlank from "../LinkifyWithTargetBlank";
+import MarkdownWrapper from "../MarkdownWrapper";
 import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
 import whatsBackground from "../../assets/wa-background.png";
@@ -556,7 +556,7 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 			const viewMessagesList = messagesList.map((message, index) => {
 				if (!message.fromMe) {
 					return (
-						<LinkifyWithTargetBlank key={message.id}>
+						<React.Fragment key={message.id}>
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageLeft}>
@@ -578,17 +578,17 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 								{message.mediaUrl && checkMessageMedia(message)}
 								<div className={classes.textContentItem}>
 									{message.quotedMsg && renderQuotedMessage(message)}
-									{message.body}
+									<MarkdownWrapper>{message.body}</MarkdownWrapper>
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
 									</span>
 								</div>
 							</div>
-						</LinkifyWithTargetBlank>
+						</React.Fragment>
 					);
 				} else {
 					return (
-						<LinkifyWithTargetBlank key={message.id}>
+						<React.Fragment key={message.id}>
 							{renderDailyTimestamps(message, index)}
 							{renderMessageDivider(message, index)}
 							<div className={classes.messageRight}>
@@ -616,14 +616,14 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 										/>
 									)}
 									{message.quotedMsg && renderQuotedMessage(message)}
-									{message.body}
+									<MarkdownWrapper>{message.body}</MarkdownWrapper>
 									<span className={classes.timestamp}>
 										{format(parseISO(message.createdAt), "HH:mm")}
 										{renderMessageAck(message)}
 									</span>
 								</div>
 							</div>
-						</LinkifyWithTargetBlank>
+						</React.Fragment>
 					);
 				}
 			});

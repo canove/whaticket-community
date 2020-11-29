@@ -20,6 +20,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import { FormControlLabel, Switch } from "@material-ui/core";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -175,6 +176,17 @@ const MessageInput = ({ ticketStatus }) => {
 		ReplyMessageContext
 	);
 
+	const [signMessage, setSignMessage] = useState(false);
+	const storedSignOption = localStorage.getItem("signOption");
+
+	useEffect(() => {
+		if (storedSignOption === "true") setSignMessage(true);
+	}, [storedSignOption]);
+
+	useEffect(() => {
+		localStorage.setItem("signOption", signMessage);
+	}, [signMessage]);
+
 	useEffect(() => {
 		inputRef.current.focus();
 	}, [replyingMessage]);
@@ -251,7 +263,9 @@ const MessageInput = ({ ticketStatus }) => {
 			read: 1,
 			fromMe: true,
 			mediaUrl: "",
-			body: `${username}: ${inputMessage.trim()}`,
+			body: signMessage
+				? `*${username}:*\n${inputMessage.trim()}`
+				: inputMessage.trim(),
 			quotedMsg: replyingMessage,
 		};
 		try {
@@ -433,6 +447,22 @@ const MessageInput = ({ ticketStatus }) => {
 							<AttachFileIcon className={classes.sendMessageIcons} />
 						</IconButton>
 					</label>
+					<FormControlLabel
+						style={{ marginRight: 7, color: "gray" }}
+						label={i18n.t("messagesInput.signMessage")}
+						labelPlacement="start"
+						control={
+							<Switch
+								size="small"
+								checked={signMessage}
+								onChange={() => {
+									setSignMessage(prevState => !prevState);
+								}}
+								name="showAllTickets"
+								color="primary"
+							/>
+						}
+					/>
 					<div className={classes.messageInputWrapper}>
 						<InputBase
 							inputRef={input => {
