@@ -177,11 +177,11 @@ const MessageInput = ({ ticketStatus }) => {
 	);
 
 	const [signMessage, setSignMessage] = useState(false);
-	const storedSignOption = localStorage.getItem("signOption");
 
 	useEffect(() => {
+		const storedSignOption = localStorage.getItem("signOption");
 		if (storedSignOption === "true") setSignMessage(true);
-	}, [storedSignOption]);
+	}, []);
 
 	useEffect(() => {
 		localStorage.setItem("signOption", signMessage);
