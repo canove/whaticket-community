@@ -163,6 +163,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 						loading={loading}
 						style={{ width: 300 }}
 						clearOnBlur
+						autoHighlight
 						freeSolo
 						clearOnEscape
 						getOptionLabel={renderOptionLabel}

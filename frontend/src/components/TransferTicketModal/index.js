@@ -111,6 +111,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 						options={options}
 						filterOptions={filterOptions}
 						freeSolo
+						autoHighlight
 						noOptionsText={i18n.t("transferTicketModal.noOptions")}
 						loading={loading}
 						renderInput={params => (
