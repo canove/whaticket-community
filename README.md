@@ -41,13 +41,10 @@ That said, theres not much to test without syncing an WhatsApp account, since ad
 
 Meanwhile, if you want to test it, remember to disconnect session and delete all tickets and contacts after your tests.
 
-https://whaticket.economicros.com.br/login
+Feel free to creat an account and test it:
+https://whaticket.economicros.com.br/signup
 
-email: demo@demo.com
-
-password: demo123
-
-It's online thanks to [@ramphy](https://github.com/ramphy), who provided a VPS to creation of these installation instructions.
+It's online thanks to [@ramphy](https://github.com/ramphy), who provided the VPS.
 
 ## Installation and Usage (Linux Ubuntu - Development)
 
@@ -423,6 +420,10 @@ chmod +x updateWhaticket
 ```
 
 ## Contributing
+
+This project helps you and you want to help keep it going? Buy me a coffe:
+
+<a href="https://www.buymeacoffee.com/canove" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 Any help and suggestions are welcome!
 
