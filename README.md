@@ -425,6 +425,17 @@ This project helps you and you want to help keep it going? Buy me a coffee:
 
 <a href="https://www.buymeacoffee.com/canove" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
+Para doações em BRL, você pode doar utilizando o Paypal:
+
+<form action="https://www.paypal.com/donate" method="post" target="_top">
+<input type="hidden" name="cmd" value="_donations" />
+<input type="hidden" name="business" value="VWW3BHW4AWHUY" />
+<input type="hidden" name="item_name" value="Desenvolvimento de Software" />
+<input type="hidden" name="currency_code" value="BRL" />
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+<img alt="" border="0" src="https://www.paypal.com/en_BR/i/scr/pixel.gif" width="1" height="1" />
+</form>
+
 Any help and suggestions are welcome!
 
 ## Disclaimer
