@@ -34,7 +34,6 @@
     "sequelize-cli": "^5.5.1",
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^2.3.0",
-    "socket.io-redis": "^5.4.0",
     "whatsapp-web.js": "1.11.1",
     "yup": "^0.29.3"
   },
