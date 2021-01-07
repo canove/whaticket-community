@@ -6,7 +6,6 @@ let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
   io = socketIo(httpServer);
-  io.origins([process.env.FRONTEND_URL || "*"]);
 
   io.on("connection", socket => {
     console.log("Client Connected");
