@@ -18,9 +18,9 @@ import {
 	FormControlLabel,
 } from "@material-ui/core";
 
-// import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	form: {
@@ -73,16 +73,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				const { data } = await api.get(`whatsapp/${whatsAppId}`);
 				setWhatsApp(data);
 			} catch (err) {
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
+				toastError(err);
 			}
 		};
 		fetchSession();
@@ -100,16 +91,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			}
 			toast.success(i18n.t("whatsappModal.success"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		handleClose();
 	};

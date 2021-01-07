@@ -31,6 +31,7 @@ import MainHeader from "../../components/MainHeader";
 import Title from "../../components/Title";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import MainContainer from "../../components/MainContainer";
+import toastError from "../../errors/toastError";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_CONTACTS") {
@@ -117,16 +118,7 @@ const Contacts = () => {
 					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 			fetchContacts();
@@ -176,16 +168,7 @@ const Contacts = () => {
 			});
 			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setLoading(false);
 	};
@@ -200,16 +183,7 @@ const Contacts = () => {
 			await api.delete(`/contacts/${contactId}`);
 			toast.success(i18n.t("contacts.toasts.deleted"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setDeletingContact(null);
 		setSearchParam("");
@@ -221,16 +195,7 @@ const Contacts = () => {
 			await api.post("/contacts/import");
 			history.go(0);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 

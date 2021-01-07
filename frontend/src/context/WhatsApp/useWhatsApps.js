@@ -1,9 +1,8 @@
 import { useState, useEffect, useReducer } from "react";
-import { toast } from "react-toastify";
 import openSocket from "socket.io-client";
+import toastError from "../../errors/toastError";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
@@ -67,16 +66,7 @@ const useWhatsApps = () => {
 				setLoading(false);
 			} catch (err) {
 				setLoading(false);
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
+				toastError(err);
 			}
 		};
 		fetchSession();

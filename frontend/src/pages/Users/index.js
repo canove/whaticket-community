@@ -29,6 +29,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { Avatar } from "@material-ui/core";
+import toastError from "../../errors/toastError";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_USERS") {
@@ -113,16 +114,7 @@ const Users = () => {
 					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 			fetchUsers();
@@ -171,16 +163,7 @@ const Users = () => {
 			await api.delete(`/users/${userId}`);
 			toast.success(i18n.t("users.toasts.deleted"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setDeletingUser(null);
 		setSearchParam("");
