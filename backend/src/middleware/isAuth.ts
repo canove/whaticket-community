@@ -30,7 +30,10 @@ const isAuth = (req: Request, res: Response, next: NextFunction): void => {
       profile
     };
   } catch (err) {
-    throw new AppError("Invalid token.", 403);
+    throw new AppError(
+      "Invalid token. We'll try to assign a new one on next request",
+      403
+    );
   }
 
   return next();

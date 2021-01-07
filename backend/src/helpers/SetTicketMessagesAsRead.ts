@@ -1,6 +1,7 @@
 import { getIO } from "../libs/socket";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
+import { logger } from "../utils/logger";
 import GetTicketWbot from "./GetTicketWbot";
 
 const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
@@ -18,9 +19,8 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
     const wbot = await GetTicketWbot(ticket);
     wbot.sendSeen(`${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`);
   } catch (err) {
-    console.log(
-      "Could not mark messages as read. Maybe whatsapp session disconnected?",
-      err
+    logger.warn(
+      `Could not mark messages as read. Maybe whatsapp session disconnected? Err: ${err}`
     );
   }
 

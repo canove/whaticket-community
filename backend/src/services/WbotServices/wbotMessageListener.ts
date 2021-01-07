@@ -20,6 +20,7 @@ import { getIO } from "../../libs/socket";
 import AppError from "../../errors/AppError";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import { logger } from "../../utils/logger";
 
 interface Session extends Client {
   id?: number;
@@ -176,7 +177,8 @@ const verifyMedia = async (
       "base64"
     );
   } catch (err) {
-    console.log(err);
+    Sentry.captureException(err);
+    logger.error(err);
   }
 
   const messageData = {
@@ -303,7 +305,7 @@ const handleMessage = async (
     await verifyMessage(msg, ticket, contact);
   } catch (err) {
     Sentry.captureException(err);
-    console.log(err);
+    logger.error(err);
   }
 };
 
@@ -334,13 +336,12 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
     });
   } catch (err) {
     Sentry.captureException(err);
-    console.log(err);
+    logger.log(err);
   }
 };
 
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
-    // console.log(msg);
     handleMessage(msg, wbot);
   });
 

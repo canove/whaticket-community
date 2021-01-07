@@ -1,6 +1,7 @@
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getWbot } from "../../libs/wbot";
 import Contact from "../../models/Contact";
+import { logger } from "../../utils/logger";
 
 const ImportContactsService = async (): Promise<void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp();
@@ -12,10 +13,7 @@ const ImportContactsService = async (): Promise<void> => {
   try {
     phoneContacts = await wbot.getContacts();
   } catch (err) {
-    console.log(
-      "Could not get whatsapp contacts from phone. Check connection page.",
-      err
-    );
+    logger.error(`Could not get whatsapp contacts from phone. Err: ${err}`);
   }
 
   if (phoneContacts) {

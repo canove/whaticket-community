@@ -3,6 +3,7 @@ import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
+import { logger } from "../utils/logger";
 // import { handleMessage } from "../services/WbotServices/wbotMessageListener";
 
 interface Session extends Client {
@@ -58,7 +59,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       wbot.initialize();
 
       wbot.on("qr", async qr => {
-        console.log("Session:", sessionName);
+        logger.info("Session:", sessionName);
         qrCode.generate(qr, { small: true });
         await whatsapp.update({ qrcode: qr, status: "qrcode", retries: 0 });
 
@@ -75,7 +76,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       });
 
       wbot.on("authenticated", async session => {
-        console.log("Session:", sessionName, "AUTHENTICATED");
+        logger.info("Session:", sessionName, "AUTHENTICATED");
         await whatsapp.update({
           session: JSON.stringify(session)
         });
@@ -103,7 +104,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       });
 
       wbot.on("ready", async () => {
-        console.log("Session:", sessionName, "READY");
+        logger.info("Session:", sessionName, "READY");
 
         // syncUnreadMessages(wbot);
 
@@ -129,7 +130,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         resolve(wbot);
       });
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     }
   });
 };
@@ -151,6 +152,6 @@ export const removeWbot = (whatsappId: number): void => {
       sessions.splice(sessionIndex, 1);
     }
   } catch (err) {
-    console.log(err);
+    logger.error(err);
   }
 };
