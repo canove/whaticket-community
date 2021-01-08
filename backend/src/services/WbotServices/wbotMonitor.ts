@@ -19,7 +19,7 @@ const wbotMonitor = async (
 
   try {
     wbot.on("change_state", async newState => {
-      logger.info("Monitor session:", sessionName, newState);
+      logger.info(`Monitor session: ${sessionName}, ${newState}`);
       try {
         await whatsapp.update({ status: newState });
       } catch (err) {
@@ -53,7 +53,7 @@ const wbotMonitor = async (
     });
 
     wbot.on("disconnected", async reason => {
-      logger.info("Disconnected session:", sessionName, reason);
+      logger.info(`Disconnected session: ${sessionName}, reason: ${reason}`);
       try {
         await whatsapp.update({ status: "OPENING", session: "" });
       } catch (err) {

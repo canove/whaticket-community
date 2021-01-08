@@ -15,6 +15,8 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
     }
   );
 
+  await ticket.update({ unreadMessages: 0 });
+
   try {
     const wbot = await GetTicketWbot(ticket);
     wbot.sendSeen(`${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`);
