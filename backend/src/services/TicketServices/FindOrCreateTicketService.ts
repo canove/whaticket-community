@@ -21,10 +21,12 @@ const FindOrCreateTicketService = async (
   });
 
   if (ticket) {
-    ticket.update({ unreadMessages });
+    await ticket.update({ unreadMessages });
+
+    return ticket;
   }
 
-  if (!ticket && groupContact) {
+  if (groupContact) {
     ticket = await Ticket.findOne({
       where: {
         contactId: groupContact.id
@@ -39,10 +41,10 @@ const FindOrCreateTicketService = async (
         userId: null,
         unreadMessages
       });
-    }
-  }
 
-  if (!ticket && !groupContact) {
+      return ticket;
+    }
+  } else {
     ticket = await Ticket.findOne({
       where: {
         updatedAt: {
@@ -60,20 +62,20 @@ const FindOrCreateTicketService = async (
         userId: null,
         unreadMessages
       });
+
+      return ticket;
     }
   }
 
-  if (!ticket) {
-    const { id } = await Ticket.create({
-      contactId: groupContact ? groupContact.id : contact.id,
-      status: "pending",
-      isGroup: !!groupContact,
-      unreadMessages,
-      whatsappId
-    });
+  const { id } = await Ticket.create({
+    contactId: groupContact ? groupContact.id : contact.id,
+    status: "pending",
+    isGroup: !!groupContact,
+    unreadMessages,
+    whatsappId
+  });
 
-    ticket = await ShowTicketService(id);
-  }
+  ticket = await ShowTicketService(id);
 
   return ticket;
 };
