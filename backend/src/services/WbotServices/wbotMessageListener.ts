@@ -197,8 +197,6 @@ const handleMessage = async (
           await verifyMessage(msg, ticket, contact);
           resolve();
         }
-
-        await verifyMessage(msg, ticket, contact);
       } catch (err) {
         Sentry.captureException(err);
         logger.error(`Error handling whatsapp message: Err: ${err}`);
