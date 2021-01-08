@@ -10,6 +10,8 @@ import {
   Unique,
   BelongsToMany
 } from "sequelize-typescript";
+import User from "./User";
+import UserQueue from "./UserQueue";
 
 import Whatsapp from "./Whatsapp";
 import WhatsappQueue from "./WhatsappQueue";
@@ -39,6 +41,9 @@ class Queue extends Model<Queue> {
 
   @BelongsToMany(() => Whatsapp, () => WhatsappQueue)
   whatsapps: Array<Whatsapp & { WhatsappQueue: WhatsappQueue }>;
+
+  @BelongsToMany(() => User, () => UserQueue)
+  users: Array<User & { UserQueue: UserQueue }>;
 }
 
 export default Queue;

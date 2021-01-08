@@ -7,6 +7,7 @@ interface Request {
   email: string;
   password: string;
   name: string;
+  queueIds?: number[];
   profile?: string;
 }
 
@@ -21,6 +22,7 @@ const CreateUserService = async ({
   email,
   password,
   name,
+  queueIds = [],
   profile = "admin"
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -47,18 +49,26 @@ const CreateUserService = async ({
     throw new AppError(err.message);
   }
 
-  const user = await User.create({
-    email,
-    password,
-    name,
-    profile
-  });
+  const user = await User.create(
+    {
+      email,
+      password,
+      name,
+      profile
+    },
+    { include: ["queues"] }
+  );
+
+  await user.$set("queues", queueIds);
+
+  await user.reload();
 
   const serializedUser = {
     id: user.id,
     name: user.name,
     email: user.email,
-    profile: user.profile
+    profile: user.profile,
+    queues: user.queues
   };
 
   return serializedUser;

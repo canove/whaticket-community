@@ -18,7 +18,7 @@ interface Response {
 const CreateWhatsAppService = async ({
   name,
   status = "OPENING",
-  queueIds,
+  queueIds = [],
   isDefault = false
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -64,13 +64,18 @@ const CreateWhatsAppService = async ({
     }
   }
 
-  const whatsapp = await Whatsapp.create({
-    name,
-    status,
-    isDefault
-  });
+  const whatsapp = await Whatsapp.create(
+    {
+      name,
+      status,
+      isDefault
+    },
+    { include: ["queues"] }
+  );
 
   await whatsapp.$set("queues", queueIds);
+
+  await whatsapp.reload();
 
   return { whatsapp, oldDefaultWhatsapp };
 };

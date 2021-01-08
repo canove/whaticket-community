@@ -8,6 +8,7 @@ import ContactCustomField from "../models/ContactCustomField";
 import Message from "../models/Message";
 import Queue from "../models/Queue";
 import WhatsappQueue from "../models/WhatsappQueue";
+import UserQueue from "../models/UserQueue";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -24,7 +25,8 @@ const models = [
   ContactCustomField,
   Setting,
   Queue,
-  WhatsappQueue
+  WhatsappQueue,
+  UserQueue
 ];
 
 sequelize.addModels(models);

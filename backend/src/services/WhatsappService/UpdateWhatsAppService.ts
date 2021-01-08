@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
+import ShowWhatsAppService from "./ShowWhatsAppService";
 
 interface WhatsappData {
   name?: string;
@@ -50,13 +51,8 @@ const UpdateWhatsAppService = async ({
     }
   }
 
-  const whatsapp = await Whatsapp.findOne({
-    where: { id: whatsappId }
-  });
+  const whatsapp = await ShowWhatsAppService(whatsappId);
 
-  if (!whatsapp) {
-    throw new AppError("ERR_NO_WAPP_FOUND", 404);
-  }
   await whatsapp.update({
     name,
     status,
@@ -65,6 +61,8 @@ const UpdateWhatsAppService = async ({
   });
 
   await whatsapp.$set("queues", queueIds);
+
+  await whatsapp.reload();
 
   return { whatsapp, oldDefaultWhatsapp };
 };

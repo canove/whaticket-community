@@ -14,6 +14,7 @@ import {
 
 import Contact from "./Contact";
 import Message from "./Message";
+import Queue from "./Queue";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
@@ -63,6 +64,13 @@ class Ticket extends Model<Ticket> {
 
   @BelongsTo(() => Whatsapp)
   whatsapp: Whatsapp;
+
+  @ForeignKey(() => Queue)
+  @Column
+  queueId: number;
+
+  @BelongsTo(() => Queue)
+  queue: Queue;
 
   @HasMany(() => Message)
   messages: Message[];
