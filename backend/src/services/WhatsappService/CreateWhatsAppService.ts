@@ -5,6 +5,7 @@ import Whatsapp from "../../models/Whatsapp";
 
 interface Request {
   name: string;
+  queueIds: number[];
   status?: string;
   isDefault?: boolean;
 }
@@ -17,6 +18,7 @@ interface Response {
 const CreateWhatsAppService = async ({
   name,
   status = "OPENING",
+  queueIds,
   isDefault = false
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -67,6 +69,8 @@ const CreateWhatsAppService = async ({
     status,
     isDefault
   });
+
+  await whatsapp.$set("queues", queueIds);
 
   return { whatsapp, oldDefaultWhatsapp };
 };

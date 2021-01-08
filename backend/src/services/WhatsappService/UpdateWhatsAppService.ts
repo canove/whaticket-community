@@ -9,6 +9,7 @@ interface WhatsappData {
   status?: string;
   session?: string;
   isDefault?: boolean;
+  queueIds?: number[];
 }
 
 interface Request {
@@ -30,7 +31,7 @@ const UpdateWhatsAppService = async ({
     isDefault: Yup.boolean()
   });
 
-  const { name, status, isDefault, session } = whatsappData;
+  const { name, status, isDefault, session, queueIds = [] } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
@@ -62,6 +63,8 @@ const UpdateWhatsAppService = async ({
     session,
     isDefault
   });
+
+  await whatsapp.$set("queues", queueIds);
 
   return { whatsapp, oldDefaultWhatsapp };
 };
