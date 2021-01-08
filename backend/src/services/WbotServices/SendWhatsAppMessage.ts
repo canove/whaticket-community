@@ -30,7 +30,8 @@ const SendWhatsAppMessage = async ({
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       body,
       {
-        quotedMessageId: quotedMsgSerializedId
+        quotedMessageId: quotedMsgSerializedId,
+        linkPreview: false
       }
     );
 
