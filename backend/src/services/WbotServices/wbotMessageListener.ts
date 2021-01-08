@@ -98,8 +98,8 @@ const verifyMediaMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  const newMessage = await CreateMessageService({ messageData });
   await ticket.update({ lastMessage: msg.body || media.filename });
+  const newMessage = await CreateMessageService({ messageData });
 
   return newMessage;
 };
@@ -122,8 +122,8 @@ const verifyMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  await CreateMessageService({ messageData });
   await ticket.update({ lastMessage: msg.body });
+  await CreateMessageService({ messageData });
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {

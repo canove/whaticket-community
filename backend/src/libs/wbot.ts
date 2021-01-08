@@ -111,7 +111,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       });
 
       wbot.on("ready", async () => {
-        logger.info("Session:", sessionName, "READY");
+        logger.info(`Session: ${sessionName} READY`);
 
         await whatsapp.update({
           status: "CONNECTED",
@@ -131,7 +131,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         }
 
         wbot.sendPresenceAvailable();
-        syncUnreadMessages(wbot);
+        await syncUnreadMessages(wbot);
 
         resolve(wbot);
       });
