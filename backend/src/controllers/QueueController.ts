@@ -11,9 +11,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { name, color } = req.body;
+  const { name, color, greetingMessage } = req.body;
 
-  const queue = await Queue.create({ name, color });
+  const queue = await Queue.create({ name, color, greetingMessage });
 
   return res.status(200).json(queue);
 };

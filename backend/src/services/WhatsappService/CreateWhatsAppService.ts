@@ -2,10 +2,16 @@ import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
+import AssociateWhatsappQueue from "../QueueService/AssociateWhatsappQueue";
 
+interface QueueData {
+  id: number;
+  optionNumber: number;
+}
 interface Request {
   name: string;
-  queueIds: number[];
+  queuesData: QueueData[];
+  greetingMessage?: string;
   status?: string;
   isDefault?: boolean;
 }
@@ -18,7 +24,8 @@ interface Response {
 const CreateWhatsAppService = async ({
   name,
   status = "OPENING",
-  queueIds = [],
+  queuesData = [],
+  greetingMessage,
   isDefault = false
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -68,12 +75,13 @@ const CreateWhatsAppService = async ({
     {
       name,
       status,
+      greetingMessage,
       isDefault
     },
     { include: ["queues"] }
   );
 
-  await whatsapp.$set("queues", queueIds);
+  await AssociateWhatsappQueue(whatsapp, queuesData);
 
   await whatsapp.reload();
 

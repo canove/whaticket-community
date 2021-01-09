@@ -47,6 +47,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   retries: number;
 
+  @Column(DataType.TEXT)
+  greetingMessage: string;
+
   @Default(false)
   @AllowNull
   @Column
@@ -63,6 +66,9 @@ class Whatsapp extends Model<Whatsapp> {
 
   @BelongsToMany(() => Queue, () => WhatsappQueue)
   queues: Array<Queue & { WhatsappQueue: WhatsappQueue }>;
+
+  @HasMany(() => WhatsappQueue)
+  whatsappQueues: WhatsappQueue[];
 }
 
 export default Whatsapp;

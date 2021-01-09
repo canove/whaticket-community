@@ -19,6 +19,9 @@ module.exports = {
         allowNull: false,
         unique: true
       },
+      greetingMessage: {
+        type: DataTypes.TEXT
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false

@@ -4,13 +4,19 @@ import { Op } from "sequelize";
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
 import ShowWhatsAppService from "./ShowWhatsAppService";
+import AssociateWhatsappQueue from "../QueueService/AssociateWhatsappQueue";
 
+interface QueueData {
+  id: number;
+  optionNumber: number;
+}
 interface WhatsappData {
   name?: string;
   status?: string;
   session?: string;
   isDefault?: boolean;
-  queueIds?: number[];
+  greetingMessage?: string;
+  queuesData?: QueueData[];
 }
 
 interface Request {
@@ -32,7 +38,14 @@ const UpdateWhatsAppService = async ({
     isDefault: Yup.boolean()
   });
 
-  const { name, status, isDefault, session, queueIds = [] } = whatsappData;
+  const {
+    name,
+    status,
+    isDefault,
+    session,
+    greetingMessage,
+    queuesData = []
+  } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
@@ -57,10 +70,11 @@ const UpdateWhatsAppService = async ({
     name,
     status,
     session,
+    greetingMessage,
     isDefault
   });
 
-  await whatsapp.$set("queues", queueIds);
+  await AssociateWhatsappQueue(whatsapp, queuesData);
 
   await whatsapp.reload();
 

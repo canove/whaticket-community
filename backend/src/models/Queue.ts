@@ -8,7 +8,8 @@ import {
   AutoIncrement,
   AllowNull,
   Unique,
-  BelongsToMany
+  BelongsToMany,
+  HasMany
 } from "sequelize-typescript";
 import User from "./User";
 import UserQueue from "./UserQueue";
@@ -32,6 +33,9 @@ class Queue extends Model<Queue> {
   @Unique
   @Column
   color: string;
+
+  @Column
+  greetingMessage: string;
 
   @CreatedAt
   createdAt: Date;

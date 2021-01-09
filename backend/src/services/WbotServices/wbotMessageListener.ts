@@ -19,6 +19,7 @@ import CreateMessageService from "../MessageServices/CreateMessageService";
 import { logger } from "../../utils/logger";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 
 interface Session extends Client {
   id?: number;
@@ -126,6 +127,54 @@ const verifyMessage = async (
   await CreateMessageService({ messageData });
 };
 
+const verifyQueue = async (
+  wbot: Session,
+  msg: WbotMessage,
+  ticket: Ticket,
+  contact: Contact
+) => {
+  const { whatsappQueues, greetingMessage } = await ShowWhatsAppService(
+    wbot.id!
+  );
+
+  if (whatsappQueues.length === 1) {
+    await ticket.$set("queue", whatsappQueues[0].queue);
+    // TODO sendTicketQueueUpdate to frontend
+
+    return;
+  }
+
+  const selectedOption = msg.body[0];
+
+  const validOption = whatsappQueues.find(
+    q => q.optionNumber === +selectedOption
+  );
+
+  if (validOption) {
+    await ticket.$set("queue", validOption.queue);
+
+    const body = `\u200e ${validOption.queue.greetingMessage}`;
+
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+
+    await verifyMessage(sentMessage, ticket, contact);
+
+    // TODO sendTicketQueueUpdate to frontend
+  } else {
+    let options = "";
+
+    whatsappQueues.forEach(whatsQueue => {
+      options += `*${whatsQueue.optionNumber}* - ${whatsQueue.queue.name}\n`;
+    });
+
+    const body = `\u200e ${greetingMessage}\n\n${options}`;
+
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+
+    await verifyMessage(sentMessage, ticket, contact);
+  }
+};
+
 const isValidMsg = (msg: WbotMessage): boolean => {
   if (msg.from === "status@broadcast") return false;
   if (
@@ -146,64 +195,64 @@ const handleMessage = async (
   msg: WbotMessage,
   wbot: Session
 ): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
-    (async () => {
-      if (!isValidMsg(msg)) {
-        return;
+  if (!isValidMsg(msg)) {
+    return;
+  }
+
+  try {
+    let msgContact: WbotContact;
+    let groupContact: Contact | undefined;
+
+    if (msg.fromMe) {
+      // messages sent automatically by wbot have a special character in front of it
+      // if so, this message was already been stored in database;
+      if (/\u200e/.test(msg.body[0])) return;
+
+      // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
+      // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
+
+      if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard") return;
+
+      msgContact = await wbot.getContactById(msg.to);
+    } else {
+      msgContact = await msg.getContact();
+    }
+
+    const chat = await msg.getChat();
+
+    if (chat.isGroup) {
+      let msgGroupContact;
+
+      if (msg.fromMe) {
+        msgGroupContact = await wbot.getContactById(msg.to);
+      } else {
+        msgGroupContact = await wbot.getContactById(msg.from);
       }
 
-      try {
-        let msgContact: WbotContact;
-        let groupContact: Contact | undefined;
+      groupContact = await verifyContact(msgGroupContact);
+    }
 
-        if (msg.fromMe) {
-          // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
-          // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
+    const contact = await verifyContact(msgContact);
+    const ticket = await FindOrCreateTicketService(
+      contact,
+      wbot.id!,
+      chat.unreadCount,
+      groupContact
+    );
 
-          if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard")
-            return;
+    if (msg.hasMedia) {
+      await verifyMediaMessage(msg, ticket, contact);
+    } else {
+      await verifyMessage(msg, ticket, contact);
+    }
 
-          msgContact = await wbot.getContactById(msg.to);
-        } else {
-          msgContact = await msg.getContact();
-        }
-
-        const chat = await msg.getChat();
-
-        if (chat.isGroup) {
-          let msgGroupContact;
-
-          if (msg.fromMe) {
-            msgGroupContact = await wbot.getContactById(msg.to);
-          } else {
-            msgGroupContact = await wbot.getContactById(msg.from);
-          }
-
-          groupContact = await verifyContact(msgGroupContact);
-        }
-
-        const contact = await verifyContact(msgContact);
-        const ticket = await FindOrCreateTicketService(
-          contact,
-          wbot.id!,
-          chat.unreadCount,
-          groupContact
-        );
-
-        if (msg.hasMedia) {
-          await verifyMediaMessage(msg, ticket, contact);
-          resolve();
-        } else {
-          await verifyMessage(msg, ticket, contact);
-          resolve();
-        }
-      } catch (err) {
-        Sentry.captureException(err);
-        logger.error(`Error handling whatsapp message: Err: ${err}`);
-        reject(err);
-      }
-    })();
-  });
+    if (!ticket.queue && !chat.isGroup && !msg.fromMe) {
+      await verifyQueue(wbot, msg, ticket, contact);
+    }
+  } catch (err) {
+    Sentry.captureException(err);
+    logger.error(`Error handling whatsapp message: Err: ${err}`);
+  }
 };
 
 const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
