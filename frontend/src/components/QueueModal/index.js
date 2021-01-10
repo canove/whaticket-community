@@ -13,10 +13,6 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Select from "@material-ui/core/Select";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
 
 import { i18n } from "../../translate/i18n";
 
@@ -120,7 +116,13 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
 	return (
 		<div className={classes.root}>
-			<Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
+			<Dialog
+				open={open}
+				onClose={handleClose}
+				maxWidth="sm"
+				fullWidth
+				scroll="paper"
+			>
 				<DialogTitle>
 					{queueId
 						? `${i18n.t("queueModal.title.edit")}`

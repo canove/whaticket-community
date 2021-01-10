@@ -22,15 +22,18 @@ import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import QueueSelector from "../QueueSelector";
 
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
 		flexWrap: "wrap",
 	},
-	textField: {
-		marginRight: theme.spacing(1),
-		flex: 1,
+	multFieldLine: {
+		display: "flex",
+		"& > *:not(:last-child)": {
+			marginRight: theme.spacing(1),
+		},
 	},
 
 	btnWrapper: {
@@ -71,6 +74,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const [user, setUser] = useState(initialState);
+	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -80,6 +84,8 @@ const UserModal = ({ open, onClose, userId }) => {
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
+				const userQueueIds = data.queues?.map(queue => queue.id);
+				setSelectedQueueIds(userQueueIds);
 			} catch (err) {
 				toastError(err);
 			}
@@ -94,11 +100,12 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
+		const userData = { ...values, queueIds: selectedQueueIds };
 		try {
 			if (userId) {
-				await api.put(`/users/${userId}`, values);
+				await api.put(`/users/${userId}`, userData);
 			} else {
-				await api.post("/users", values);
+				await api.post("/users", userData);
 			}
 			toast.success(i18n.t("userModal.success"));
 		} catch (err) {
@@ -109,7 +116,13 @@ const UserModal = ({ open, onClose, userId }) => {
 
 	return (
 		<div className={classes.root}>
-			<Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
+			<Dialog
+				open={open}
+				onClose={handleClose}
+				maxWidth="xs"
+				fullWidth
+				scroll="paper"
+			>
 				<DialogTitle id="form-dialog-title">
 					{userId
 						? `${i18n.t("userModal.title.edit")}`
@@ -129,27 +142,18 @@ const UserModal = ({ open, onClose, userId }) => {
 					{({ touched, errors, isSubmitting }) => (
 						<Form>
 							<DialogContent dividers>
-								<Field
-									as={TextField}
-									label={i18n.t("userModal.form.name")}
-									autoFocus
-									name="name"
-									error={touched.name && Boolean(errors.name)}
-									helperText={touched.name && errors.name}
-									variant="outlined"
-									margin="dense"
-									className={classes.textField}
-								/>
-								<Field
-									as={TextField}
-									label={i18n.t("userModal.form.email")}
-									name="email"
-									error={touched.email && Boolean(errors.email)}
-									helperText={touched.email && errors.email}
-									variant="outlined"
-									margin="dense"
-								/>
-								<div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label={i18n.t("userModal.form.name")}
+										autoFocus
+										name="name"
+										error={touched.name && Boolean(errors.name)}
+										helperText={touched.name && errors.name}
+										variant="outlined"
+										margin="dense"
+										fullWidth
+									/>
 									<Field
 										as={TextField}
 										label={i18n.t("userModal.form.password")}
@@ -159,6 +163,19 @@ const UserModal = ({ open, onClose, userId }) => {
 										helperText={touched.password && errors.password}
 										variant="outlined"
 										margin="dense"
+										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label={i18n.t("userModal.form.email")}
+										name="email"
+										error={touched.email && Boolean(errors.email)}
+										helperText={touched.email && errors.email}
+										variant="outlined"
+										margin="dense"
+										fullWidth
 									/>
 									<FormControl
 										variant="outlined"
@@ -181,6 +198,10 @@ const UserModal = ({ open, onClose, userId }) => {
 										</Field>
 									</FormControl>
 								</div>
+								<QueueSelector
+									selectedQueueIds={selectedQueueIds}
+									onChange={values => setSelectedQueueIds(values)}
+								/>
 							</DialogContent>
 							<DialogActions>
 								<Button
