@@ -193,7 +193,7 @@ const Users = () => {
 					}?`
 				}
 				open={confirmModalOpen}
-				setOpen={setConfirmModalOpen}
+				onClose={setConfirmModalOpen}
 				onConfirm={() => handleDeleteUser(deletingUser.id)}
 			>
 				{i18n.t("users.confirmationModal.deleteMessage")}

@@ -294,7 +294,7 @@ const Connections = () => {
 			<ConfirmationModal
 				title={confirmModalInfo.title}
 				open={confirmModalOpen}
-				setOpen={setConfirmModalOpen}
+				onClose={setConfirmModalOpen}
 				onConfirm={handleSubmitConfirmationModal}
 			>
 				{confirmModalInfo.message}

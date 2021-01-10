@@ -76,7 +76,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 					ticket.contact.name
 				}?`}
 				open={confirmationOpen}
-				setOpen={setConfirmationOpen}
+				onClose={setConfirmationOpen}
 				onConfirm={handleDeleteTicket}
 			>
 				{i18n.t("ticketOptionsMenu.confirmationModal.message")}

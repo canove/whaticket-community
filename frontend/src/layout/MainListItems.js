@@ -7,12 +7,13 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Divider from "@material-ui/core/Divider";
 import { Badge } from "@material-ui/core";
-import DashboardIcon from "@material-ui/icons/Dashboard";
+import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
-import SettingsIcon from "@material-ui/icons/Settings";
-import GroupIcon from "@material-ui/icons/Group";
-import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
+import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
+import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
+import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
+import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
@@ -69,7 +70,11 @@ const MainListItems = () => {
 
 	return (
 		<div>
-			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
+			<ListItemLink
+				to="/"
+				primary="Dashboard"
+				icon={<DashboardOutlinedIcon />}
+			/>
 			<ListItemLink
 				to="/connections"
 				primary={i18n.t("mainDrawer.listItems.connections")}
@@ -88,7 +93,7 @@ const MainListItems = () => {
 			<ListItemLink
 				to="/contacts"
 				primary={i18n.t("mainDrawer.listItems.contacts")}
-				icon={<ContactPhoneIcon />}
+				icon={<ContactPhoneOutlinedIcon />}
 			/>
 			{userProfile === "admin" && (
 				<>
@@ -99,12 +104,17 @@ const MainListItems = () => {
 					<ListItemLink
 						to="/users"
 						primary={i18n.t("mainDrawer.listItems.users")}
-						icon={<GroupIcon />}
+						icon={<PeopleAltOutlinedIcon />}
+					/>
+					<ListItemLink
+						to="/queues"
+						primary={i18n.t("mainDrawer.listItems.queues")}
+						icon={<AccountTreeOutlinedIcon />}
 					/>
 					<ListItemLink
 						to="/settings"
 						primary={i18n.t("mainDrawer.listItems.settings")}
-						icon={<SettingsIcon />}
+						icon={<SettingsOutlinedIcon />}
 					/>
 				</>
 			)}

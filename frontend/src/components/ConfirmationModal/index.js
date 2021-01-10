@@ -8,11 +8,11 @@ import Typography from "@material-ui/core/Typography";
 
 import { i18n } from "../../translate/i18n";
 
-const ConfirmationModal = ({ title, children, open, setOpen, onConfirm }) => {
+const ConfirmationModal = ({ title, children, open, onClose, onConfirm }) => {
 	return (
 		<Dialog
 			open={open}
-			onClose={() => setOpen(false)}
+			onClose={() => onClose(false)}
 			aria-labelledby="confirm-dialog"
 		>
 			<DialogTitle id="confirm-dialog">{title}</DialogTitle>
@@ -22,7 +22,7 @@ const ConfirmationModal = ({ title, children, open, setOpen, onConfirm }) => {
 			<DialogActions>
 				<Button
 					variant="contained"
-					onClick={() => setOpen(false)}
+					onClick={() => onClose(false)}
 					color="default"
 				>
 					{i18n.t("confirmationModal.buttons.cancel")}
@@ -30,7 +30,7 @@ const ConfirmationModal = ({ title, children, open, setOpen, onConfirm }) => {
 				<Button
 					variant="contained"
 					onClick={() => {
-						setOpen(false);
+						onClose(false);
 						onConfirm();
 					}}
 					color="secondary"

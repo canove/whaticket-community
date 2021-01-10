@@ -36,7 +36,7 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 			<ConfirmationModal
 				title={i18n.t("messageOptionsMenu.confirmationModal.title")}
 				open={confirmationOpen}
-				setOpen={setConfirmationOpen}
+				onClose={setConfirmationOpen}
 				onConfirm={handleDeleteMessage}
 			>
 				{i18n.t("messageOptionsMenu.confirmationModal.message")}

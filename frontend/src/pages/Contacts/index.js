@@ -229,7 +229,7 @@ const Contacts = () => {
 						: `${i18n.t("contacts.confirmationModal.importTitlte")}`
 				}
 				open={confirmOpen}
-				setOpen={setConfirmOpen}
+				onClose={setConfirmOpen}
 				onConfirm={e =>
 					deletingContact
 						? handleDeleteContact(deletingContact.id)
