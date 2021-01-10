@@ -175,11 +175,14 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		if (status) {
-			socket.emit("joinTickets", status);
-		} else {
-			socket.emit("joinNotification");
-		}
+
+		socket.on("connect", () => {
+			if (status) {
+				socket.emit("joinTickets", status);
+			} else {
+				socket.emit("joinNotification");
+			}
+		});
 
 		socket.on("ticket", data => {
 			if (data.action === "updateUnread") {

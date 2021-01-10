@@ -77,7 +77,7 @@ const NotificationsPopOver = () => {
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
-		socket.emit("joinNotification");
+		socket.on("connect", () => socket.emit("joinNotification"));
 
 		socket.on("ticket", data => {
 			if (data.action === "updateUnread" || data.action === "delete") {

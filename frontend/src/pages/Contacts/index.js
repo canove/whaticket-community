@@ -128,6 +128,7 @@ const Contacts = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.on("contact", data => {
 			if (data.action === "update" || data.action === "create") {
 				dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
