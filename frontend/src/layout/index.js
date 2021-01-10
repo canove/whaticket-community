@@ -19,11 +19,11 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 
 import MainListItems from "./MainListItems";
-import NotificationsPopOver from "../NotificationsPopOver";
-import UserModal from "../UserModal";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import BackdropLoading from "../BackdropLoading";
-import { i18n } from "../../translate/i18n";
+import NotificationsPopOver from "../components/NotificationsPopOver";
+import UserModal from "../components/UserModal";
+import { AuthContext } from "../context/Auth/AuthContext";
+import BackdropLoading from "../components/BackdropLoading";
+import { i18n } from "../translate/i18n";
 
 const drawerWidth = 240;
 

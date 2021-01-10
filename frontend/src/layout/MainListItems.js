@@ -6,18 +6,16 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Divider from "@material-ui/core/Divider";
+import { Badge } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import SettingsIcon from "@material-ui/icons/Settings";
 import GroupIcon from "@material-ui/icons/Group";
-
 import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
 
-import { i18n } from "../../translate/i18n";
-import { Badge } from "@material-ui/core";
-
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import { i18n } from "../translate/i18n";
+import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 
 function ListItemLink(props) {
 	const { icon, primary, to, className } = props;
