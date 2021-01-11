@@ -163,7 +163,7 @@ const verifyQueue = async (
       options += `*${index + 1}* - ${queue.name}\n`;
     });
 
-    const body = `\u200e ${greetingMessage}\n\n${options}`;
+    const body = `\u200e ${greetingMessage}\n${options}`;
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 

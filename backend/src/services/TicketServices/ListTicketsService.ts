@@ -4,6 +4,7 @@ import { startOfDay, endOfDay, parseISO } from "date-fns";
 import Ticket from "../../models/Ticket";
 import Contact from "../../models/Contact";
 import Message from "../../models/Message";
+import Queue from "../../models/Queue";
 
 interface Request {
   searchParam?: string;
@@ -40,6 +41,11 @@ const ListTicketsService = async ({
       model: Contact,
       as: "contact",
       attributes: ["id", "name", "number", "profilePicUrl"]
+    },
+    {
+      model: Queue,
+      as: "queue",
+      attributes: ["id", "name", "color"]
     }
   ];
 

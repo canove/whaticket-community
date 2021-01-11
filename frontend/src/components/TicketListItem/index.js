@@ -87,6 +87,15 @@ const useStyles = makeStyles(theme => ({
 		position: "absolute",
 		left: "50%",
 	},
+
+	ticketQueueColor: {
+		flex: "none",
+		width: "8px",
+		height: "100%",
+		position: "absolute",
+		top: "0%",
+		left: "0%",
+	},
 }));
 
 const TicketListItem = ({ ticket }) => {
@@ -138,6 +147,10 @@ const TicketListItem = ({ ticket }) => {
 					[classes.pendingTicket]: ticket.status === "pending",
 				})}
 			>
+				<span
+					style={{ backgroundColor: ticket.queue?.color }}
+					className={classes.ticketQueueColor}
+				></span>
 				<ListItemAvatar>
 					<Avatar
 						src={ticket.contact.profilePicUrl && ticket.contact.profilePicUrl}

@@ -86,7 +86,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = { ...values, queueIds: selectedQueueIds };
-		console.log("SELECTED", whatsappData);
+
 		try {
 			if (whatsAppId) {
 				await api.put(`/whatsapp/${whatsAppId}`, whatsappData);
