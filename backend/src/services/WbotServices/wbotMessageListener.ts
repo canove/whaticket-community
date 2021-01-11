@@ -20,6 +20,7 @@ import { logger } from "../../utils/logger";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
+import { debounce } from "../../helpers/Debounce";
 
 interface Session extends Client {
   id?: number;
@@ -165,9 +166,19 @@ const verifyQueue = async (
 
     const body = `\u200e ${greetingMessage}\n${options}`;
 
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+    const debouncedSentMessage = debounce(
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
+        verifyMessage(sentMessage, ticket, contact);
+      },
+      3000,
+      ticket.id
+    );
 
-    await verifyMessage(sentMessage, ticket, contact);
+    debouncedSentMessage();
   }
 };
 
