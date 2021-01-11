@@ -19,6 +19,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
+import { Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -147,10 +148,16 @@ const TicketListItem = ({ ticket }) => {
 					[classes.pendingTicket]: ticket.status === "pending",
 				})}
 			>
-				<span
-					style={{ backgroundColor: ticket.queue?.color }}
-					className={classes.ticketQueueColor}
-				></span>
+				<Tooltip
+					arrow
+					placement="right"
+					title={ticket.queue?.name || "Sem fila"}
+				>
+					<span
+						style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
+						className={classes.ticketQueueColor}
+					></span>
+				</Tooltip>
 				<ListItemAvatar>
 					<Avatar
 						src={ticket.contact.profilePicUrl && ticket.contact.profilePicUrl}
