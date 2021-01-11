@@ -145,12 +145,12 @@ const verifyQueue = async (
 
   const selectedOption = msg.body[0];
 
-  const validOption = queues[+selectedOption - 1];
+  const choosenQueue = queues[+selectedOption - 1];
 
-  if (validOption) {
-    await ticket.$set("queue", validOption);
+  if (choosenQueue) {
+    await ticket.$set("queue", choosenQueue);
 
-    const body = `\u200e ${validOption.greetingMessage}`;
+    const body = `\u200e ${choosenQueue.greetingMessage}`;
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 

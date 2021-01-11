@@ -4,7 +4,7 @@ import { Op } from "sequelize";
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
 import ShowWhatsAppService from "./ShowWhatsAppService";
-import AssociateWhatsappQueue from "../QueueService/AssociateWhatsappQueue";
+import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
 interface WhatsappData {
   name?: string;
