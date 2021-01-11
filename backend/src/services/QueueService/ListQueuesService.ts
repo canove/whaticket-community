@@ -1,7 +1,7 @@
 import Queue from "../../models/Queue";
 
 const ListQueuesService = async (): Promise<Queue[]> => {
-  const queues = await Queue.findAll();
+  const queues = await Queue.findAll({ order: [["name", "ASC"]] });
 
   return queues;
 };

@@ -133,12 +133,10 @@ const verifyQueue = async (
   ticket: Ticket,
   contact: Contact
 ) => {
-  const { whatsappQueues, greetingMessage } = await ShowWhatsAppService(
-    wbot.id!
-  );
+  const { queues, greetingMessage } = await ShowWhatsAppService(wbot.id!);
 
-  if (whatsappQueues.length === 1) {
-    await ticket.$set("queue", whatsappQueues[0].queue);
+  if (queues.length === 1) {
+    await ticket.$set("queue", queues[0]);
     // TODO sendTicketQueueUpdate to frontend
 
     return;
@@ -146,14 +144,12 @@ const verifyQueue = async (
 
   const selectedOption = msg.body[0];
 
-  const validOption = whatsappQueues.find(
-    q => q.optionNumber === +selectedOption
-  );
+  const validOption = queues[+selectedOption - 1];
 
   if (validOption) {
-    await ticket.$set("queue", validOption.queue);
+    await ticket.$set("queue", validOption);
 
-    const body = `\u200e ${validOption.queue.greetingMessage}`;
+    const body = `\u200e ${validOption.greetingMessage}`;
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
@@ -163,8 +159,8 @@ const verifyQueue = async (
   } else {
     let options = "";
 
-    whatsappQueues.forEach(whatsQueue => {
-      options += `*${whatsQueue.optionNumber}* - ${whatsQueue.queue.name}\n`;
+    queues.forEach((queue, index) => {
+      options += `*${index + 1}* - ${queue.name}\n`;
     });
 
     const body = `\u200e ${greetingMessage}\n\n${options}`;

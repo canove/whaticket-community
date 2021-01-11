@@ -75,7 +75,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				const { data } = await api.get(`whatsapp/${whatsAppId}`);
 				setWhatsApp(data);
 
-				const whatsQueueIds = data.whatsappQueues?.map(q => q.queue.id);
+				const whatsQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(whatsQueueIds);
 			} catch (err) {
 				toastError(err);
@@ -94,10 +94,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				await api.post("/whatsapp", whatsappData);
 			}
 			toast.success(i18n.t("whatsappModal.success"));
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
-		handleClose();
 	};
 
 	const handleClose = () => {

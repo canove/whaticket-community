@@ -4,13 +4,9 @@ import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
 import AssociateWhatsappQueue from "../QueueService/AssociateWhatsappQueue";
 
-interface QueueData {
-  id: number;
-  optionNumber: number;
-}
 interface Request {
   name: string;
-  queuesData: QueueData[];
+  queueIds?: number[];
   greetingMessage?: string;
   status?: string;
   isDefault?: boolean;
@@ -24,7 +20,7 @@ interface Response {
 const CreateWhatsAppService = async ({
   name,
   status = "OPENING",
-  queuesData = [],
+  queueIds = [],
   greetingMessage,
   isDefault = false
 }: Request): Promise<Response> => {
@@ -71,6 +67,10 @@ const CreateWhatsAppService = async ({
     }
   }
 
+  if (queueIds.length > 1 && !greetingMessage) {
+    throw new AppError("ERR_WAPP_GREETING_REQUIRED");
+  }
+
   const whatsapp = await Whatsapp.create(
     {
       name,
@@ -81,9 +81,7 @@ const CreateWhatsAppService = async ({
     { include: ["queues"] }
   );
 
-  await AssociateWhatsappQueue(whatsapp, queuesData);
-
-  await whatsapp.reload();
+  await AssociateWhatsappQueue(whatsapp, queueIds);
 
   return { whatsapp, oldDefaultWhatsapp };
 };

@@ -6,17 +6,13 @@ import Whatsapp from "../../models/Whatsapp";
 import ShowWhatsAppService from "./ShowWhatsAppService";
 import AssociateWhatsappQueue from "../QueueService/AssociateWhatsappQueue";
 
-interface QueueData {
-  id: number;
-  optionNumber: number;
-}
 interface WhatsappData {
   name?: string;
   status?: string;
   session?: string;
   isDefault?: boolean;
   greetingMessage?: string;
-  queuesData?: QueueData[];
+  queueIds?: number[];
 }
 
 interface Request {
@@ -34,7 +30,7 @@ const UpdateWhatsAppService = async ({
   whatsappId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
-    name: Yup.string().min(2),
+    name: Yup.string().min(2).required(),
     isDefault: Yup.boolean()
   });
 
@@ -44,13 +40,17 @@ const UpdateWhatsAppService = async ({
     isDefault,
     session,
     greetingMessage,
-    queuesData = []
+    queueIds = []
   } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
   } catch (err) {
     throw new AppError(err.message);
+  }
+
+  if (queueIds.length > 1 && !greetingMessage) {
+    throw new AppError("ERR_WAPP_GREETING_REQUIRED");
   }
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
@@ -74,9 +74,7 @@ const UpdateWhatsAppService = async ({
     isDefault
   });
 
-  await AssociateWhatsappQueue(whatsapp, queuesData);
-
-  await whatsapp.reload();
+  await AssociateWhatsappQueue(whatsapp, queueIds);
 
   return { whatsapp, oldDefaultWhatsapp };
 };
