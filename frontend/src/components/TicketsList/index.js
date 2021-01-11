@@ -100,8 +100,6 @@ const reducer = (state, action) => {
 	if (action.type === "UPDATE_TICKET") {
 		const ticket = action.payload;
 
-		console.log("TICKET", ticket);
-
 		const ticketIndex = state.findIndex(t => t.id === ticket.id);
 		if (ticketIndex !== -1) {
 			state[ticketIndex] = ticket;
