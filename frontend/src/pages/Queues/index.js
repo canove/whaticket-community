@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
+
+import openSocket from "socket.io-client";
 
 import {
 	Button,
@@ -41,10 +43,54 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_QUEUES") {
+		const queues = action.payload;
+		const newQueues = [];
+
+		queues.forEach(queue => {
+			const queueIndex = state.findIndex(q => q.id === queue.id);
+			if (queueIndex !== -1) {
+				state[queueIndex] = queue;
+			} else {
+				newQueues.push(queue);
+			}
+		});
+
+		return [...state, ...newQueues];
+	}
+
+	if (action.type === "UPDATE_QUEUES") {
+		const queue = action.payload;
+		const queueIndex = state.findIndex(u => u.id === queue.id);
+
+		if (queueIndex !== -1) {
+			state[queueIndex] = queue;
+			return [...state];
+		} else {
+			return [queue, ...state];
+		}
+	}
+
+	if (action.type === "DELETE_QUEUE") {
+		const queueId = action.payload;
+		console.log("QUEUEID", queueId);
+		const queueIndex = state.findIndex(q => q.id === queueId);
+		if (queueIndex !== -1) {
+			state.splice(queueIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
+
 const Queues = () => {
 	const classes = useStyles();
 
-	const [queues, setQueue] = useState([]);
+	const [queues, dispatch] = useReducer(reducer, []);
 	const [loading, setLoading] = useState(false);
 
 	const [queueModalOpen, setQueueModalOpen] = useState(false);
@@ -56,14 +102,32 @@ const Queues = () => {
 			setLoading(true);
 			try {
 				const { data } = await api.get("/queue");
+				dispatch({ type: "LOAD_QUEUES", payload: data });
 
-				setQueue(data);
 				setLoading(false);
 			} catch (err) {
 				toastError(err);
 				setLoading(false);
 			}
 		})();
+	}, []);
+
+	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
+		socket.on("queue", data => {
+			if (data.action === "update" || data.action === "create") {
+				dispatch({ type: "UPDATE_QUEUES", payload: data.queue });
+			}
+
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_QUEUE", payload: data.queueId });
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
 	}, []);
 
 	const handleOpenQueueModal = () => {
