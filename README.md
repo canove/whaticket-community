@@ -368,13 +368,15 @@ sudo service nginx restart
 
 Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. A easy way to this is using Certbot:
 
-Install certbor with snapd:
+Install certbot:
 
 ```bash
-sudo snap install --classic certbot
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt update
+sudo apt install python-certbot-nginx
 ```
 
-Enable SSL on nginx (Accept all information asked):
+Enable SSL on nginx (Fill / Accept all information asked):
 
 ```bash
 sudo certbot --nginx
@@ -428,12 +430,11 @@ This project helps you and you want to help keep it going? Buy me a coffee:
 Para doações em BRL, você pode doar utilizando o Paypal:
 
 <form action="https://www.paypal.com/donate" method="post" target="_top">
-<input type="hidden" name="cmd" value="_donations" />
 <input type="hidden" name="business" value="VWW3BHW4AWHUY" />
 <input type="hidden" name="item_name" value="Desenvolvimento de Software" />
 <input type="hidden" name="currency_code" value="BRL" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_BR/i/scr/pixel.gif" width="1" height="1" />
+<input type="image" src="https://www.paypalobjects.com/pt_BR/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Faça doações com o botão do PayPal" />
+<img alt="" border="0" src="https://www.paypal.com/pt_BR/i/scr/pixel.gif" width="1" height="1" />
 </form>
 
 Any help and suggestions are welcome!
