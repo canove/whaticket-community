@@ -24,10 +24,10 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-toastify": "^6.0.9",
-    "recharts": "^1.8.5",
-    "socket.io-client": "^2.3.1",
-    "use-sound": "^1.0.2",
-    "yup": "^0.29.3"
+    "recharts": "^2.0.2",
+    "socket.io-client": "^3.0.5",
+    "use-sound": "^2.0.1",
+    "yup": "^0.32.8"
   },
   "scripts": {
     "start": "react-scripts start",
