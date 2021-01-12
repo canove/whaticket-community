@@ -425,19 +425,15 @@ chmod +x updateWhaticket
 
 This project helps you and you want to help keep it going? Buy me a coffee:
 
-<a href="https://www.buymeacoffee.com/canove" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<a href="https://www.buymeacoffee.com/canove" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 61px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-Para doações em BRL, você pode doar utilizando o Paypal:
+Para doações em BRL, utilize o Paypal:
 
-<form action="https://www.paypal.com/donate" method="post" target="_top">
-<input type="hidden" name="business" value="VWW3BHW4AWHUY" />
-<input type="hidden" name="item_name" value="Desenvolvimento de Software" />
-<input type="hidden" name="currency_code" value="BRL" />
-<input type="image" src="https://www.paypalobjects.com/pt_BR/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Faça doações com o botão do PayPal" />
-<img alt="" border="0" src="https://www.paypal.com/pt_BR/i/scr/pixel.gif" width="1" height="1" />
-</form>
+<a href="https://www.paypal.com/donate?business=VWW3BHW4AWHUY&item_name=Desenvolvimento+de+Software&currency_code=BRL">
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" style="height: 70px !important;width: 174px"/>
+</a>
 
-Any help and suggestions are welcome!
+Any help and suggestions will be apreciated.
 
 ## Disclaimer
 
