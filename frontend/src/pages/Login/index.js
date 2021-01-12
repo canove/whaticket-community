@@ -61,6 +61,11 @@ const Login = () => {
 		setUser({ ...user, [e.target.name]: e.target.value });
 	};
 
+	const handlSubmit = e => {
+		e.preventDefault();
+		handleLogin(user);
+	};
+
 	return (
 		<Container component="main" maxWidth="xs">
 			<CssBaseline />
@@ -71,11 +76,7 @@ const Login = () => {
 				<Typography component="h1" variant="h5">
 					{i18n.t("login.title")}
 				</Typography>
-				<form
-					className={classes.form}
-					noValidate
-					onSubmit={e => handleLogin(e, user)}
-				>
+				<form className={classes.form} noValidate onSubmit={handlSubmit}>
 					<TextField
 						variant="outlined"
 						margin="normal"

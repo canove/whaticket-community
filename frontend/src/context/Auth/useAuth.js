@@ -63,9 +63,8 @@ const useAuth = () => {
 		setLoading(false);
 	}, []);
 
-	const handleLogin = async (e, user) => {
+	const handleLogin = async user => {
 		setLoading(true);
-		e.preventDefault();
 
 		try {
 			const { data } = await api.post("/auth/login", user);
@@ -78,11 +77,11 @@ const useAuth = () => {
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");
+			setLoading(false);
 		} catch (err) {
 			toastError(err);
+			setLoading(false);
 		}
-
-		setLoading(false);
 	};
 
 	const handleLogout = e => {
