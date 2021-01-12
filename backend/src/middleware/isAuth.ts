@@ -16,7 +16,7 @@ const isAuth = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    throw new AppError("Token was not provided.", 403);
+    throw new AppError("ERR_SESSION_EXPIRED", 401);
   }
 
   const [, token] = authHeader.split(" ");
