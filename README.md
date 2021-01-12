@@ -430,7 +430,7 @@ This project helps you and you want to help keep it going? Buy me a coffee:
 Para doações em BRL, utilize o Paypal:
 
 <a href="https://www.paypal.com/donate?business=VWW3BHW4AWHUY&item_name=Desenvolvimento+de+Software&currency_code=BRL">
-  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" style="height: 70px !important;width: 174px"/>
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" style="height: 70px !important;width: 174px !important;"/>
 </a>
 
 Any help and suggestions will be apreciated.
