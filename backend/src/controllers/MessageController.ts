@@ -42,7 +42,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const ticket = await ShowTicketService(ticketId);
 
-  await SetTicketMessagesAsRead(ticket);
+  SetTicketMessagesAsRead(ticket);
 
   if (medias) {
     await Promise.all(
