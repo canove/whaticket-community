@@ -30,7 +30,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     ticketId
   });
 
-  await SetTicketMessagesAsRead(ticket);
+  SetTicketMessagesAsRead(ticket);
 
   return res.json({ count, messages, ticket, hasMore });
 };
