@@ -7,10 +7,8 @@ import Paper from "@material-ui/core/Paper";
 
 import TicketListItem from "../TicketListItem";
 import TicketsListSkeleton from "../TicketsListSkeleton";
-import TicketsListQueueSelect from "../TicketsListQueueSelect";
 
 import useTickets from "../../hooks/useTickets";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { i18n } from "../../translate/i18n";
 import { ListSubheader } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -117,14 +115,14 @@ const reducer = (state, action) => {
 		return [...state];
 	}
 
-	if (action.type === "UPDATE_TICKET_MESSAGES_COUNT") {
-		const { ticket, searchParam } = action.payload;
+	if (action.type === "UPDATE_TICKET_UNREAD_MESSAGES") {
+		const ticket = action.payload;
 
 		const ticketIndex = state.findIndex(t => t.id === ticket.id);
 		if (ticketIndex !== -1) {
 			state[ticketIndex] = ticket;
 			state.unshift(state.splice(ticketIndex, 1)[0]);
-		} else if (!searchParam) {
+		} else {
 			state.unshift(ticket);
 		}
 
@@ -155,52 +153,39 @@ const reducer = (state, action) => {
 	}
 };
 
-const TicketsList = ({ status, searchParam, showAll }) => {
+const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
 	const { user } = useContext(AuthContext);
-	const [pendingSelectedQueueIds, setPendingSelectedQueueIds] = useLocalStorage(
-		"pendingSelectedQueues",
-		[]
-	);
-	const [openSelectedQueueIds, setOpenSelectedQueueIds] = useLocalStorage(
-		"openSelectedQueues",
-		[]
-	);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
-	}, [
-		status,
-		searchParam,
-		dispatch,
-		showAll,
-		openSelectedQueueIds,
-		pendingSelectedQueueIds,
-	]);
+	}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
 
 	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
 		searchParam,
 		status,
 		showAll,
-		queueIds:
-			status === "open"
-				? JSON.stringify(openSelectedQueueIds)
-				: JSON.stringify(pendingSelectedQueueIds),
+		queueIds: JSON.stringify(selectedQueueIds),
 	});
 
 	useEffect(() => {
+		if (!status && !searchParam) return;
 		dispatch({
 			type: "LOAD_TICKETS",
 			payload: tickets,
 		});
-	}, [tickets]);
+	}, [tickets, status, searchParam]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
+		const shouldUpdateTicket = ticket =>
+			(!ticket.userId || ticket.userId === user?.id || showAll) &&
+			selectedQueueIds.indexOf(ticket.queueId) > -1;
 
 		socket.on("connect", () => {
 			if (status) {
@@ -218,10 +203,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 				});
 			}
 
-			if (
-				(data.action === "updateStatus" || data.action === "create") &&
-				(!data.ticket.userId || data.ticket.userId === user?.id || showAll)
-			) {
+			if (data.action === "update" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
 					type: "UPDATE_TICKET",
 					payload: data.ticket,
@@ -234,16 +216,10 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		});
 
 		socket.on("appMessage", data => {
-			if (
-				data.action === "create" &&
-				(!data.ticket.userId || data.ticket.userId === user?.id || showAll)
-			) {
+			if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
-					type: "UPDATE_TICKET_MESSAGES_COUNT",
-					payload: {
-						ticket: data.ticket,
-						searchParam,
-					},
+					type: "UPDATE_TICKET_UNREAD_MESSAGES",
+					payload: data.ticket,
 				});
 			}
 		});
@@ -260,7 +236,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, showAll, user, searchParam]);
+	}, [status, showAll, user, selectedQueueIds]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
@@ -273,15 +249,6 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 
 		if (scrollHeight - (scrollTop + 100) < clientHeight) {
 			loadMore();
-		}
-	};
-
-	const handleSelectedQueues = values => {
-		if (status === "open") {
-			setOpenSelectedQueueIds(values);
-		}
-		if (status === "pending") {
-			setPendingSelectedQueueIds(values);
 		}
 	};
 
@@ -303,11 +270,6 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 									{ticketsList.length}
 								</span>
 							</div>
-							<TicketsListQueueSelect
-								selectedQueueIds={openSelectedQueueIds}
-								userQueues={user?.queues}
-								onChange={handleSelectedQueues}
-							/>
 						</ListSubheader>
 					)}
 					{status === "pending" && (
@@ -318,11 +280,6 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 									{ticketsList.length}
 								</span>
 							</div>
-							<TicketsListQueueSelect
-								selectedQueueIds={pendingSelectedQueueIds}
-								userQueues={user?.queues}
-								onChange={handleSelectedQueues}
-							/>
 						</ListSubheader>
 					)}
 					{ticketsList.length === 0 && !loading ? (

@@ -63,7 +63,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const io = getIO();
   io.to(ticket.status).emit("ticket", {
-    action: "create",
+    action: "update",
     ticket
   });
 
@@ -100,7 +100,7 @@ export const update = async (
   }
 
   io.to(ticket.status).to("notification").to(ticketId).emit("ticket", {
-    action: "updateStatus",
+    action: "update",
     ticket
   });
 

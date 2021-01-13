@@ -5,7 +5,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import { Checkbox, ListItemText } from "@material-ui/core";
 
-const TicketsListQueueSelect = ({
+const TicketsQueueSelect = ({
 	userQueues,
 	selectedQueueIds = [],
 	onChange,
@@ -15,7 +15,7 @@ const TicketsListQueueSelect = ({
 	};
 
 	return (
-		<div style={{ width: 120, marginTop: -5 }}>
+		<div style={{ width: 120, marginTop: -4 }}>
 			<FormControl fullWidth margin="dense">
 				<Select
 					multiple
@@ -56,4 +56,4 @@ const TicketsListQueueSelect = ({
 	);
 };
 
-export default TicketsListQueueSelect;
+export default TicketsQueueSelect;

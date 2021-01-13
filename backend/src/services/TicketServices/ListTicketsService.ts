@@ -34,12 +34,6 @@ const ListTicketsService = async ({
   userId,
   withUnreadMessages
 }: Request): Promise<Response> => {
-  // const user = await ShowUserService(userId);
-
-  // const userQueueIds = user.queues.map(queue => queue.id);
-
-  // console.log(userQueueIds);
-
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
     queueId: { [Op.or]: [queueIds, null] }
@@ -60,7 +54,7 @@ const ListTicketsService = async ({
   ];
 
   if (showAll === "true") {
-    whereCondition = {};
+    whereCondition = { queueId: { [Op.or]: [queueIds, null] } };
   }
 
   if (status) {
@@ -92,6 +86,7 @@ const ListTicketsService = async ({
     ];
 
     whereCondition = {
+      ...whereCondition,
       [Op.or]: [
         {
           "$contact.name$": where(
