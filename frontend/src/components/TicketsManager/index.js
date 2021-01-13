@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -18,6 +18,8 @@ import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
 
 import { i18n } from "../../translate/i18n";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import Can from "../Can";
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -88,6 +90,7 @@ const TicketsManager = () => {
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 	const [showAllTickets, setShowAllTickets] = useState(false);
+	const { user } = useContext(AuthContext);
 
 	const handleSearchContact = e => {
 		if (e.target.value === "") {
@@ -149,19 +152,26 @@ const TicketsManager = () => {
 					/>
 				</div>
 				<div className={classes.ticketsListActions}>
-					<FormControlLabel
-						label={i18n.t("tickets.buttons.showAll")}
-						labelPlacement="start"
-						control={
-							<Switch
-								size="small"
-								checked={showAllTickets}
-								onChange={() => setShowAllTickets(prevState => !prevState)}
-								name="showAllTickets"
-								color="primary"
+					<Can
+						role={user.profile}
+						perform="tickets-manager:showall"
+						yes={() => (
+							<FormControlLabel
+								label={i18n.t("tickets.buttons.showAll")}
+								labelPlacement="start"
+								control={
+									<Switch
+										size="small"
+										checked={showAllTickets}
+										onChange={() => setShowAllTickets(prevState => !prevState)}
+										name="showAllTickets"
+										color="primary"
+									/>
+								}
 							/>
-						}
+						)}
 					/>
+
 					<IconButton
 						aria-label="add ticket"
 						size="small"

@@ -4,7 +4,7 @@ const rules = {
 	},
 
 	admin: {
-		static: ["drawer-admin-items:view"],
+		static: ["drawer-admin-items:view", "tickets-manager:showall"],
 	},
 };
 
