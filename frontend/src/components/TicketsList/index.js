@@ -185,7 +185,7 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 
 		const shouldUpdateTicket = ticket =>
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&
-			selectedQueueIds.indexOf(ticket.queueId) > -1;
+			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
 		socket.on("connect", () => {
 			if (status) {
