@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
@@ -20,6 +20,7 @@ import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { Tooltip } from "@material-ui/core";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -102,10 +103,10 @@ const useStyles = makeStyles(theme => ({
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
 	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
 	const isMounted = useRef(true);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		return () => {
@@ -118,7 +119,7 @@ const TicketListItem = ({ ticket }) => {
 		try {
 			await api.put(`/tickets/${ticketId}`, {
 				status: "open",
-				userId: userId,
+				userId: user?.id,
 			});
 		} catch (err) {
 			setLoading(false);

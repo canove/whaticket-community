@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+// import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const useAuth = () => {
 	const history = useHistory();
 	const [isAuth, setIsAuth] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [user, setUser] = useState({});
 
 	api.interceptors.request.use(
 		config => {
@@ -44,9 +46,6 @@ const useAuth = () => {
 			}
 			if (error?.response?.status === 401) {
 				localStorage.removeItem("token");
-				localStorage.removeItem("username");
-				localStorage.removeItem("profile");
-				localStorage.removeItem("userId");
 				api.defaults.headers.Authorization = undefined;
 				setIsAuth(false);
 			}
@@ -56,11 +55,15 @@ const useAuth = () => {
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
-		if (token) {
-			api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
-			setIsAuth(true);
-		}
-		setLoading(false);
+		(async () => {
+			if (token) {
+				const { data } = await api.post("/auth/refresh_token");
+				api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
+				setIsAuth(true);
+				setUser(data.user);
+			}
+			setLoading(false);
+		})();
 	}, []);
 
 	const handleLogin = async user => {
@@ -69,11 +72,8 @@ const useAuth = () => {
 		try {
 			const { data } = await api.post("/auth/login", user);
 			localStorage.setItem("token", JSON.stringify(data.token));
-			localStorage.setItem("username", data.username);
-			localStorage.setItem("profile", data.profile);
-			localStorage.setItem("userId", data.userId);
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
-
+			setUser(data.user);
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");
@@ -84,20 +84,17 @@ const useAuth = () => {
 		}
 	};
 
-	const handleLogout = e => {
+	const handleLogout = () => {
 		setLoading(true);
-		e.preventDefault();
 		setIsAuth(false);
+		setUser({});
 		localStorage.removeItem("token");
-		localStorage.removeItem("username");
-		localStorage.removeItem("profile");
-		localStorage.removeItem("userId");
 		api.defaults.headers.Authorization = undefined;
 		setLoading(false);
 		history.push("/login");
 	};
 
-	return { isAuth, setIsAuth, loading, handleLogin, handleLogout };
+	return { isAuth, user, setUser, loading, handleLogin, handleLogout };
 };
 
 export default useAuth;

@@ -41,7 +41,7 @@ const QueueSelector = ({ selectedQueueIds, onChange }) => {
 
 	return (
 		<div style={{ marginTop: 6 }}>
-			<FormControl fullWidth variant="outlined">
+			<FormControl fullWidth margin="dense" variant="outlined">
 				<InputLabel>Filas</InputLabel>
 				<Select
 					multiple

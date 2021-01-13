@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
+import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
 
 interface Request {
@@ -63,13 +64,7 @@ const CreateUserService = async ({
 
   await user.reload();
 
-  const serializedUser = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    profile: user.profile,
-    queues: user.queues
-  };
+  const serializedUser = SerializeUser(user);
 
   return serializedUser;
 };

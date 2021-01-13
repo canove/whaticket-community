@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import clsx from "clsx";
 
 import {
@@ -24,6 +24,7 @@ import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const drawerWidth = 240;
 
@@ -107,30 +108,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const LoggedInLayout = ({ children }) => {
-	const drawerState = localStorage.getItem("drawerOpen");
-	const userId = +localStorage.getItem("userId");
 	const classes = useStyles();
-	const [open, setOpen] = useState(true);
 	const [userModalOpen, setUserModalOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const { handleLogout, loading } = useContext(AuthContext);
-
-	useEffect(() => {
-		if (drawerState === "0") {
-			setOpen(false);
-		}
-	}, [drawerState]);
-
-	const handleDrawerOpen = () => {
-		setOpen(true);
-		localStorage.setItem("drawerOpen", 1);
-	};
-
-	const handleDrawerClose = () => {
-		setOpen(false);
-		localStorage.setItem("drawerOpen", 0);
-	};
+	const [drawerOpen, setDrawerOpen] = useLocalStorage("drawerOpen", true);
+	const { user } = useContext(AuthContext);
 
 	const handleMenu = event => {
 		setAnchorEl(event.currentTarget);
@@ -156,12 +140,15 @@ const LoggedInLayout = ({ children }) => {
 			<Drawer
 				variant="permanent"
 				classes={{
-					paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+					paper: clsx(
+						classes.drawerPaper,
+						!drawerOpen && classes.drawerPaperClose
+					),
 				}}
-				open={open}
+				open={drawerOpen}
 			>
 				<div className={classes.toolbarIcon}>
-					<IconButton onClick={handleDrawerClose}>
+					<IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
 						<ChevronLeftIcon />
 					</IconButton>
 				</div>
@@ -174,11 +161,11 @@ const LoggedInLayout = ({ children }) => {
 			<UserModal
 				open={userModalOpen}
 				onClose={() => setUserModalOpen(false)}
-				userId={userId}
+				userId={user?.id}
 			/>
 			<AppBar
 				position="absolute"
-				className={clsx(classes.appBar, open && classes.appBarShift)}
+				className={clsx(classes.appBar, drawerOpen && classes.appBarShift)}
 				color={process.env.NODE_ENV === "development" ? "inherit" : "primary"}
 			>
 				<Toolbar variant="dense" className={classes.toolbar}>
@@ -186,10 +173,10 @@ const LoggedInLayout = ({ children }) => {
 						edge="start"
 						color="inherit"
 						aria-label="open drawer"
-						onClick={handleDrawerOpen}
+						onClick={() => setDrawerOpen(!drawerOpen)}
 						className={clsx(
 							classes.menuButton,
-							open && classes.menuButtonHidden
+							drawerOpen && classes.menuButtonHidden
 						)}
 					>
 						<MenuIcon />

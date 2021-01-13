@@ -301,7 +301,7 @@ const reducer = (state, action) => {
 	}
 };
 
-const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
+const MessagesList = ({ ticketId, isGroup }) => {
 	const classes = useStyles();
 
 	const [messagesList, dispatch] = useReducer(reducer, []);

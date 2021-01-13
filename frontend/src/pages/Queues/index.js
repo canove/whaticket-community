@@ -74,7 +74,6 @@ const reducer = (state, action) => {
 
 	if (action.type === "DELETE_QUEUE") {
 		const queueId = action.payload;
-		console.log("QUEUEID", queueId);
 		const queueIndex = state.findIndex(q => q.id === queueId);
 		if (queueIndex !== -1) {
 			state.splice(queueIndex, 1);

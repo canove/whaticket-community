@@ -17,6 +17,8 @@ import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
+import { AuthContext } from "../context/Auth/AuthContext";
+import Can from "../components/Can";
 
 function ListItemLink(props) {
 	const { icon, primary, to, className } = props;
@@ -40,8 +42,8 @@ function ListItemLink(props) {
 }
 
 const MainListItems = () => {
-	const userProfile = localStorage.getItem("profile");
 	const { whatsApps } = useContext(WhatsAppsContext);
+	const { user } = useContext(AuthContext);
 	const [connectionWarning, setConnectionWarning] = useState(false);
 
 	useEffect(() => {
@@ -95,29 +97,33 @@ const MainListItems = () => {
 				primary={i18n.t("mainDrawer.listItems.contacts")}
 				icon={<ContactPhoneOutlinedIcon />}
 			/>
-			{userProfile === "admin" && (
-				<>
-					<Divider />
-					<ListSubheader inset>
-						{i18n.t("mainDrawer.listItems.administration")}
-					</ListSubheader>
-					<ListItemLink
-						to="/users"
-						primary={i18n.t("mainDrawer.listItems.users")}
-						icon={<PeopleAltOutlinedIcon />}
-					/>
-					<ListItemLink
-						to="/queues"
-						primary={i18n.t("mainDrawer.listItems.queues")}
-						icon={<AccountTreeOutlinedIcon />}
-					/>
-					<ListItemLink
-						to="/settings"
-						primary={i18n.t("mainDrawer.listItems.settings")}
-						icon={<SettingsOutlinedIcon />}
-					/>
-				</>
-			)}
+			<Can
+				role={user.profile}
+				perform="drawer-admin-items:view"
+				yes={() => (
+					<>
+						<Divider />
+						<ListSubheader inset>
+							{i18n.t("mainDrawer.listItems.administration")}
+						</ListSubheader>
+						<ListItemLink
+							to="/users"
+							primary={i18n.t("mainDrawer.listItems.users")}
+							icon={<PeopleAltOutlinedIcon />}
+						/>
+						<ListItemLink
+							to="/queues"
+							primary={i18n.t("mainDrawer.listItems.queues")}
+							icon={<AccountTreeOutlinedIcon />}
+						/>
+						<ListItemLink
+							to="/settings"
+							primary={i18n.t("mainDrawer.listItems.settings")}
+							icon={<SettingsOutlinedIcon />}
+						/>
+					</>
+				)}
+			/>
 		</div>
 	);
 };

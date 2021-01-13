@@ -25,6 +25,8 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import RecordingTimer from "./RecordingTimer";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
@@ -164,7 +166,6 @@ const useStyles = makeStyles(theme => ({
 const MessageInput = ({ ticketStatus }) => {
 	const classes = useStyles();
 	const { ticketId } = useParams();
-	const username = localStorage.getItem("username");
 
 	const [medias, setMedias] = useState([]);
 	const [inputMessage, setInputMessage] = useState("");
@@ -175,17 +176,9 @@ const MessageInput = ({ ticketStatus }) => {
 	const { setReplyingMessage, replyingMessage } = useContext(
 		ReplyMessageContext
 	);
+	const { user } = useContext(AuthContext);
 
-	const [signMessage, setSignMessage] = useState(false);
-
-	useEffect(() => {
-		const storedSignOption = localStorage.getItem("signOption");
-		if (storedSignOption === "true") setSignMessage(true);
-	}, []);
-
-	useEffect(() => {
-		localStorage.setItem("signOption", signMessage);
-	}, [signMessage]);
+	const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
 
 	useEffect(() => {
 		inputRef.current.focus();
@@ -255,7 +248,7 @@ const MessageInput = ({ ticketStatus }) => {
 			fromMe: true,
 			mediaUrl: "",
 			body: signMessage
-				? `*${username}:*\n${inputMessage.trim()}`
+				? `*${user?.name}:*\n${inputMessage.trim()}`
 				: inputMessage.trim(),
 			quotedMsg: replyingMessage,
 		};
@@ -279,7 +272,7 @@ const MessageInput = ({ ticketStatus }) => {
 			setRecording(true);
 			setLoading(false);
 		} catch (err) {
-			console.log(err);
+			toastError(err);
 			setLoading(false);
 		}
 	};
@@ -314,7 +307,7 @@ const MessageInput = ({ ticketStatus }) => {
 			await Mp3Recorder.stop().getMp3();
 			setRecording(false);
 		} catch (err) {
-			console.log(err);
+			toastError(err);
 		}
 	};
 
@@ -428,8 +421,8 @@ const MessageInput = ({ ticketStatus }) => {
 							<Switch
 								size="small"
 								checked={signMessage}
-								onChange={() => {
-									setSignMessage(prevState => !prevState);
+								onChange={e => {
+									setSignMessage(e.target.checked);
 								}}
 								name="showAllTickets"
 								color="primary"

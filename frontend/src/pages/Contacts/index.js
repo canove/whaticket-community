@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
@@ -32,6 +32,7 @@ import Title from "../../components/Title";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import MainContainer from "../../components/MainContainer";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_CONTACTS") {
@@ -89,7 +90,8 @@ const useStyles = makeStyles(theme => ({
 const Contacts = () => {
 	const classes = useStyles();
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
+
+	const { user } = useContext(AuthContext);
 
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -164,7 +166,7 @@ const Contacts = () => {
 		try {
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
-				userId: userId,
+				userId: user?.id,
 				status: "open",
 			});
 			history.push(`/tickets/${ticket.id}`);

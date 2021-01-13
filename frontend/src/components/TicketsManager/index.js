@@ -175,13 +175,13 @@ const TicketsManager = () => {
 			</Paper>
 			<TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
 				<TicketsList status="open" showAll={showAllTickets} />
-				<TicketsList status="pending" showAll={true} />
+				<TicketsList status="pending" />
 			</TabPanel>
 			<TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
-				<TicketsList status="closed" showAll={true} />
+				<TicketsList status="closed" showAll={showAllTickets} />
 			</TabPanel>
 			<TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
-				<TicketsList searchParam={searchParam} showAll={true} />
+				<TicketsList searchParam={searchParam} showAll={showAllTickets} />
 			</TabPanel>
 		</Paper>
 	);

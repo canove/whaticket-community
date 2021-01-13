@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -10,6 +10,7 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 import { ListSubheader } from "@material-ui/core";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	ticketsListWrapper: {
@@ -149,10 +150,10 @@ const reducer = (state, action) => {
 };
 
 const TicketsList = ({ status, searchParam, showAll }) => {
-	const userId = +localStorage.getItem("userId");
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -194,7 +195,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 
 			if (
 				(data.action === "updateStatus" || data.action === "create") &&
-				(!data.ticket.userId || data.ticket.userId === userId || showAll)
+				(!data.ticket.userId || data.ticket.userId === user?.id || showAll)
 			) {
 				dispatch({
 					type: "UPDATE_TICKET",
@@ -210,7 +211,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		socket.on("appMessage", data => {
 			if (
 				data.action === "create" &&
-				(!data.ticket.userId || data.ticket.userId === userId || showAll)
+				(!data.ticket.userId || data.ticket.userId === user?.id || showAll)
 			) {
 				dispatch({
 					type: "UPDATE_TICKET_MESSAGES_COUNT",
@@ -234,7 +235,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, showAll, userId, searchParam]);
+	}, [status, showAll, user, searchParam]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
