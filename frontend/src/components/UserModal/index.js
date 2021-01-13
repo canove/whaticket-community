@@ -22,7 +22,7 @@ import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import QueueSelector from "../QueueSelector";
+import QueueSelect from "../QueueSelect";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -198,7 +198,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										</Field>
 									</FormControl>
 								</div>
-								<QueueSelector
+								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
 									onChange={values => setSelectedQueueIds(values)}
 								/>

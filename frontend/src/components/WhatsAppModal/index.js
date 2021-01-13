@@ -21,7 +21,7 @@ import {
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
-import QueueSelector from "../QueueSelector";
+import QueueSelect from "../QueueSelect";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -176,7 +176,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										margin="dense"
 									/>
 								</div>
-								<QueueSelector
+								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
 									onChange={values => setSelectedQueueIds(values)}
 								/>

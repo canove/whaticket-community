@@ -7,7 +7,10 @@ import Paper from "@material-ui/core/Paper";
 
 import TicketListItem from "../TicketListItem";
 import TicketsListSkeleton from "../TicketsListSkeleton";
+import TicketsListQueueSelect from "../TicketsListQueueSelect";
+
 import useTickets from "../../hooks/useTickets";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { i18n } from "../../translate/i18n";
 import { ListSubheader } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -35,6 +38,9 @@ const useStyles = makeStyles(theme => ({
 		zIndex: 2,
 		backgroundColor: "white",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "space-between",
 	},
 
 	ticketsCount: {
@@ -154,17 +160,36 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
 	const { user } = useContext(AuthContext);
+	const [pendingSelectedQueueIds, setPendingSelectedQueueIds] = useLocalStorage(
+		"pendingSelectedQueues",
+		[]
+	);
+	const [openSelectedQueueIds, setOpenSelectedQueueIds] = useLocalStorage(
+		"openSelectedQueues",
+		[]
+	);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
-	}, [status, searchParam, dispatch, showAll]);
+	}, [
+		status,
+		searchParam,
+		dispatch,
+		showAll,
+		openSelectedQueueIds,
+		pendingSelectedQueueIds,
+	]);
 
 	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
 		searchParam,
 		status,
 		showAll,
+		queueIds:
+			status === "open"
+				? JSON.stringify(openSelectedQueueIds)
+				: JSON.stringify(pendingSelectedQueueIds),
 	});
 
 	useEffect(() => {
@@ -251,6 +276,15 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		}
 	};
 
+	const handleSelectedQueues = values => {
+		if (status === "open") {
+			setOpenSelectedQueueIds(values);
+		}
+		if (status === "pending") {
+			setPendingSelectedQueueIds(values);
+		}
+	};
+
 	return (
 		<div className={classes.ticketsListWrapper}>
 			<Paper
@@ -263,14 +297,32 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 				<List style={{ paddingTop: 0 }}>
 					{status === "open" && (
 						<ListSubheader className={classes.ticketsListHeader}>
-							{i18n.t("ticketsList.assignedHeader")}
-							<span className={classes.ticketsCount}>{ticketsList.length}</span>
+							<div>
+								{i18n.t("ticketsList.assignedHeader")}
+								<span className={classes.ticketsCount}>
+									{ticketsList.length}
+								</span>
+							</div>
+							<TicketsListQueueSelect
+								selectedQueueIds={openSelectedQueueIds}
+								userQueues={user?.queues}
+								onChange={handleSelectedQueues}
+							/>
 						</ListSubheader>
 					)}
 					{status === "pending" && (
 						<ListSubheader className={classes.ticketsListHeader}>
-							{i18n.t("ticketsList.pendingHeader")}
-							<span className={classes.ticketsCount}>{ticketsList.length}</span>
+							<div>
+								{i18n.t("ticketsList.pendingHeader")}
+								<span className={classes.ticketsCount}>
+									{ticketsList.length}
+								</span>
+							</div>
+							<TicketsListQueueSelect
+								selectedQueueIds={pendingSelectedQueueIds}
+								userQueues={user?.queues}
+								onChange={handleSelectedQueues}
+							/>
 						</ListSubheader>
 					)}
 					{ticketsList.length === 0 && !loading ? (

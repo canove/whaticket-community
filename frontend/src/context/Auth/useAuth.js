@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-// import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const useAuth = () => {
 	const history = useHistory();
@@ -62,12 +61,11 @@ const useAuth = () => {
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
 					setIsAuth(true);
 					setUser(data.user);
-					setLoading(false);
 				} catch (err) {
 					toastError(err);
-					setLoading(false);
 				}
 			}
+			setLoading(false);
 		})();
 	}, []);
 

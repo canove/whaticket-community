@@ -9,6 +9,7 @@ const useTickets = ({
 	status,
 	date,
 	showAll,
+	queueIds,
 	withUnreadMessages,
 }) => {
 	const [loading, setLoading] = useState(true);
@@ -27,6 +28,7 @@ const useTickets = ({
 							status,
 							date,
 							showAll,
+							queueIds,
 							withUnreadMessages,
 						},
 					});
@@ -41,7 +43,15 @@ const useTickets = ({
 			fetchTickets();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, pageNumber, status, date, showAll, withUnreadMessages]);
+	}, [
+		searchParam,
+		pageNumber,
+		status,
+		date,
+		showAll,
+		queueIds,
+		withUnreadMessages,
+	]);
 
 	return { tickets, loading, hasMore };
 };

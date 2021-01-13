@@ -5,6 +5,7 @@ import Ticket from "../../models/Ticket";
 import Contact from "../../models/Contact";
 import Message from "../../models/Message";
 import Queue from "../../models/Queue";
+// import ShowUserService from "../UserServices/ShowUserService";
 
 interface Request {
   searchParam?: string;
@@ -14,6 +15,7 @@ interface Request {
   showAll?: string;
   userId: string;
   withUnreadMessages?: string;
+  queueIds: number[];
 }
 
 interface Response {
@@ -25,14 +27,22 @@ interface Response {
 const ListTicketsService = async ({
   searchParam = "",
   pageNumber = "1",
+  queueIds,
   status,
   date,
   showAll,
   userId,
   withUnreadMessages
 }: Request): Promise<Response> => {
+  // const user = await ShowUserService(userId);
+
+  // const userQueueIds = user.queues.map(queue => queue.id);
+
+  // console.log(userQueueIds);
+
   let whereCondition: Filterable["where"] = {
-    [Op.or]: [{ userId }, { status: "pending" }]
+    [Op.or]: [{ userId }, { status: "pending" }],
+    queueId: { [Op.or]: [queueIds, null] }
   };
   let includeCondition: Includeable[];
 
@@ -85,7 +95,7 @@ const ListTicketsService = async ({
       [Op.or]: [
         {
           "$contact.name$": where(
-            fn("LOWER", col("name")),
+            fn("LOWER", col("contact.name")),
             "LIKE",
             `%${sanitizedSearchParam}%`
           )

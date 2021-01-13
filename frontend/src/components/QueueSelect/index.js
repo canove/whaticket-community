@@ -5,7 +5,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Chip from "@material-ui/core/Chip";
-import { OutlinedInput } from "@material-ui/core";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 
@@ -19,9 +18,8 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QueueSelector = ({ selectedQueueIds, onChange }) => {
+const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	const classes = useStyles();
-	// const [selectedQueues, setSelectedQueues] = useState([]);
 	const [queues, setQueues] = useState([]);
 
 	useEffect(() => {
@@ -45,9 +43,9 @@ const QueueSelector = ({ selectedQueueIds, onChange }) => {
 				<InputLabel>Filas</InputLabel>
 				<Select
 					multiple
+					labelWidth={40}
 					value={selectedQueueIds}
 					onChange={handleChange}
-					input={<OutlinedInput label="Filas" id="select-multiple-chip" />}
 					MenuProps={{
 						anchorOrigin: {
 							vertical: "bottom",
@@ -61,12 +59,12 @@ const QueueSelector = ({ selectedQueueIds, onChange }) => {
 					}}
 					renderValue={selected => (
 						<div className={classes.chips}>
-							{selected.length > 0 &&
-								selected.map(value => {
-									const queue = queues.find(q => q.id === value);
+							{selected?.length > 0 &&
+								selected.map(id => {
+									const queue = queues.find(q => q.id === id);
 									return queue ? (
 										<Chip
-											key={value}
+											key={id}
 											style={{ backgroundColor: queue.color }}
 											variant="outlined"
 											label={queue.name}
@@ -88,4 +86,4 @@ const QueueSelector = ({ selectedQueueIds, onChange }) => {
 	);
 };
 
-export default QueueSelector;
+export default QueueSelect;
