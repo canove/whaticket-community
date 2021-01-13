@@ -150,7 +150,7 @@ const verifyQueue = async (
   if (choosenQueue) {
     await ticket.$set("queue", choosenQueue);
 
-    const body = `\u200e ${choosenQueue.greetingMessage}`;
+    const body = `\u200e${choosenQueue.greetingMessage}`;
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
@@ -164,7 +164,7 @@ const verifyQueue = async (
       options += `*${index + 1}* - ${queue.name}\n`;
     });
 
-    const body = `\u200e ${greetingMessage}\n${options}`;
+    const body = `\u200e${greetingMessage}\n${options}`;
 
     const debouncedSentMessage = debounce(
       async () => {
@@ -253,7 +253,7 @@ const handleMessage = async (
       await verifyMessage(msg, ticket, contact);
     }
 
-    if (!ticket.queue && !chat.isGroup && !msg.fromMe) {
+    if (!ticket.queue && !chat.isGroup && !msg.fromMe && !ticket.userId) {
       await verifyQueue(wbot, msg, ticket, contact);
     }
   } catch (err) {
