@@ -57,6 +57,8 @@ const NotificationsPopOver = () => {
 	const [play] = useSound(alertSound);
 	const soundAlertRef = useRef();
 
+	const historyRef = useRef(history);
+
 	useEffect(() => {
 		soundAlertRef.current = play;
 
@@ -128,16 +130,16 @@ const NotificationsPopOver = () => {
 
 				if (shouldNotNotificate) return;
 
-				handleNotifications(data, history);
+				handleNotifications(data);
 			}
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [history, user]);
+	}, [user]);
 
-	const handleNotifications = (data, history) => {
+	const handleNotifications = data => {
 		const { message, contact, ticket } = data;
 
 		const options = {
@@ -155,7 +157,7 @@ const NotificationsPopOver = () => {
 		notification.onclick = e => {
 			e.preventDefault();
 			window.focus();
-			history.push(`/tickets/${ticket.id}`);
+			historyRef.current.push(`/tickets/${ticket.id}`);
 		};
 
 		setDesktopNotifications(prevState => {

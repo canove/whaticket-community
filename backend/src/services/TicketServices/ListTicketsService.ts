@@ -5,7 +5,7 @@ import Ticket from "../../models/Ticket";
 import Contact from "../../models/Contact";
 import Message from "../../models/Message";
 import Queue from "../../models/Queue";
-// import ShowUserService from "../UserServices/ShowUserService";
+import ShowUserService from "../UserServices/ShowUserService";
 
 interface Request {
   searchParam?: string;
@@ -117,18 +117,14 @@ const ListTicketsService = async ({
   }
 
   if (withUnreadMessages === "true") {
-    includeCondition = [
-      ...includeCondition,
-      {
-        model: Message,
-        as: "messages",
-        attributes: [],
-        where: {
-          read: false,
-          fromMe: false
-        }
-      }
-    ];
+    const user = await ShowUserService(userId);
+    const userQueueIds = user.queues.map(queue => queue.id);
+
+    whereCondition = {
+      [Op.or]: [{ userId }, { status: "pending" }],
+      queueId: { [Op.or]: [userQueueIds, null] },
+      unreadMessages: { [Op.gt]: 0 }
+    };
   }
 
   const limit = 20;
