@@ -33,6 +33,7 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import MainContainer from "../../components/MainContainer";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { Can } from "../../components/Can";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_CONTACTS") {
@@ -318,15 +319,21 @@ const Contacts = () => {
 										>
 											<EditIcon />
 										</IconButton>
-										<IconButton
-											size="small"
-											onClick={e => {
-												setConfirmOpen(true);
-												setDeletingContact(contact);
-											}}
-										>
-											<DeleteOutlineIcon />
-										</IconButton>
+										<Can
+											role={user.profile}
+											perform="contacts-page:deleteContact"
+											yes={() => (
+												<IconButton
+													size="small"
+													onClick={e => {
+														setConfirmOpen(true);
+														setDeletingContact(contact);
+													}}
+												>
+													<DeleteOutlineIcon />
+												</IconButton>
+											)}
+										/>
 									</TableCell>
 								</TableRow>
 							))}

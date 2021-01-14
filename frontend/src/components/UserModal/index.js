@@ -23,6 +23,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
+import { Can } from "../Can";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -182,25 +183,40 @@ const UserModal = ({ open, onClose, userId }) => {
 										className={classes.formControl}
 										margin="dense"
 									>
-										<InputLabel id="profile-selection-input-label">
-											{i18n.t("userModal.form.profile")}
-										</InputLabel>
-										<Field
-											as={Select}
-											label={i18n.t("userModal.form.profile")}
-											name="profile"
-											labelId="profile-selection-label"
-											id="profile-selection"
-											required
-										>
-											<MenuItem value="admin">Admin</MenuItem>
-											<MenuItem value="user">User</MenuItem>
-										</Field>
+										<Can
+											role={user.profile}
+											perform="user-modal:editProfile"
+											yes={() => (
+												<>
+													<InputLabel id="profile-selection-input-label">
+														{i18n.t("userModal.form.profile")}
+													</InputLabel>
+
+													<Field
+														as={Select}
+														label={i18n.t("userModal.form.profile")}
+														name="profile"
+														labelId="profile-selection-label"
+														id="profile-selection"
+														required
+													>
+														<MenuItem value="admin">Admin</MenuItem>
+														<MenuItem value="user">User</MenuItem>
+													</Field>
+												</>
+											)}
+										/>
 									</FormControl>
 								</div>
-								<QueueSelect
-									selectedQueueIds={selectedQueueIds}
-									onChange={values => setSelectedQueueIds(values)}
+								<Can
+									role={user.profile}
+									perform="user-modal:editQueues"
+									yes={() => (
+										<QueueSelect
+											selectedQueueIds={selectedQueueIds}
+											onChange={values => setSelectedQueueIds(values)}
+										/>
+									)}
 								/>
 							</DialogContent>
 							<DialogActions>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
@@ -8,11 +8,14 @@ import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
 import toastError from "../../errors/toastError";
+import { Can } from "../Can";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
 	const isMounted = useRef(true);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		return () => {
@@ -62,9 +65,16 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				open={menuOpen}
 				onClose={handleClose}
 			>
-				<MenuItem onClick={handleOpenConfirmationModal}>
-					{i18n.t("ticketOptionsMenu.delete")}
-				</MenuItem>
+				<Can
+					role={user.profile}
+					perform="ticket-options:deleteTicket"
+					yes={() => (
+						<MenuItem onClick={handleOpenConfirmationModal}>
+							{i18n.t("ticketOptionsMenu.delete")}
+						</MenuItem>
+					)}
+				/>
+
 				<MenuItem onClick={handleOpenTransferModal}>
 					{i18n.t("ticketOptionsMenu.transfer")}
 				</MenuItem>

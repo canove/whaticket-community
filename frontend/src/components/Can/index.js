@@ -36,4 +36,4 @@ Can.defaultProps = {
 	no: () => null,
 };
 
-export default Can;
+export { Can };

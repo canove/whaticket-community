@@ -18,7 +18,7 @@ import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { AuthContext } from "../context/Auth/AuthContext";
-import Can from "../components/Can";
+import { Can } from "../components/Can";
 
 function ListItemLink(props) {
 	const { icon, primary, to, className } = props;
