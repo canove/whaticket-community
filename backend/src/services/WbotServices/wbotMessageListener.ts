@@ -255,7 +255,15 @@ const handleMessage = async (
       await verifyMessage(msg, ticket, contact);
     }
 
-    if (!ticket.queue && !chat.isGroup && !msg.fromMe && !ticket.userId) {
+    const whatsapp = await ShowWhatsAppService(wbot.id!);
+
+    if (
+      !ticket.queue &&
+      !chat.isGroup &&
+      !msg.fromMe &&
+      !ticket.userId &&
+      whatsapp.queues.length > 1
+    ) {
       await verifyQueue(wbot, msg, ticket, contact);
     }
   } catch (err) {
