@@ -30,7 +30,8 @@ const UpdateWhatsAppService = async ({
   whatsappId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
-    name: Yup.string().min(2).required(),
+    name: Yup.string().min(2),
+    status: Yup.string(),
     isDefault: Yup.boolean()
   });
 
