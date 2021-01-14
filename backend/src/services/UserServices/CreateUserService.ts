@@ -1,12 +1,14 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
+import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
 
 interface Request {
   email: string;
   password: string;
   name: string;
+  queueIds?: number[];
   profile?: string;
 }
 
@@ -21,6 +23,7 @@ const CreateUserService = async ({
   email,
   password,
   name,
+  queueIds = [],
   profile = "admin"
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -47,19 +50,21 @@ const CreateUserService = async ({
     throw new AppError(err.message);
   }
 
-  const user = await User.create({
-    email,
-    password,
-    name,
-    profile
-  });
+  const user = await User.create(
+    {
+      email,
+      password,
+      name,
+      profile
+    },
+    { include: ["queues"] }
+  );
 
-  const serializedUser = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    profile: user.profile
-  };
+  await user.$set("queues", queueIds);
+
+  await user.reload();
+
+  const serializedUser = SerializeUser(user);
 
   return serializedUser;
 };

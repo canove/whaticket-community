@@ -1,4 +1,6 @@
 import { verify } from "jsonwebtoken";
+
+import User from "../../models/User";
 import AppError from "../../errors/AppError";
 import ShowUserService from "../UserServices/ShowUserService";
 import authConfig from "../../config/auth";
@@ -13,6 +15,7 @@ interface RefreshTokenPayload {
 }
 
 interface Response {
+  user: User;
   newToken: string;
   refreshToken: string;
 }
@@ -37,5 +40,5 @@ export const RefreshTokenService = async (token: string): Promise<Response> => {
   const newToken = createAccessToken(user);
   const refreshToken = createRefreshToken(user);
 
-  return { newToken, refreshToken };
+  return { user, newToken, refreshToken };
 };

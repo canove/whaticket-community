@@ -1,9 +1,7 @@
-import AppError from "../../errors/AppError";
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
-import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
-import User from "../../models/User";
+import ShowTicketService from "./ShowTicketService";
 
 interface TicketData {
   status?: string;
@@ -27,25 +25,7 @@ const UpdateTicketService = async ({
 }: Request): Promise<Response> => {
   const { status, userId } = ticketData;
 
-  const ticket = await Ticket.findOne({
-    where: { id: ticketId },
-    include: [
-      {
-        model: Contact,
-        as: "contact",
-        attributes: ["id", "name", "number", "profilePicUrl"]
-      },
-      {
-        model: User,
-        as: "user",
-        attributes: ["id", "name"]
-      }
-    ]
-  });
-
-  if (!ticket) {
-    throw new AppError("ERR_NO_TICKET_FOUND", 404);
-  }
+  const ticket = await ShowTicketService(ticketId);
 
   await SetTicketMessagesAsRead(ticket);
 

@@ -86,10 +86,11 @@ const Ticket = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinChatBox", ticketId);
+
+		socket.on("connect", () => socket.emit("joinChatBox", ticketId));
 
 		socket.on("ticket", data => {
-			if (data.action === "updateStatus") {
+			if (data.action === "update") {
 				setTicket(data.ticket);
 			}
 

@@ -156,6 +156,22 @@ const messages = {
 				},
 				success: "Contacto guardado satisfactoriamente.",
 			},
+			queueModal: {
+				title: {
+					add: "Agregar cola",
+					edit: "Editar cola",
+				},
+				form: {
+					name: "Nombre",
+					color: "Color",
+					greetingMessage: "Mensaje de saludo",
+				},
+				buttons: {
+					okAdd: "Añadir",
+					okEdit: "Ahorrar",
+					cancel: "Cancelar",
+				},
+			},
 			userModal: {
 				title: {
 					add: "Agregar usuario",
@@ -230,6 +246,7 @@ const messages = {
 					connections: "Conexiones",
 					tickets: "Tickets",
 					contacts: "Contactos",
+					queues: "Linhas",
 					administration: "Administración",
 					users: "Usuarios",
 					settings: "Configuración",
@@ -243,6 +260,23 @@ const messages = {
 			},
 			notifications: {
 				noTickets: "Sin notificaciones.",
+			},
+			queues: {
+				title: "Linhas",
+				table: {
+					name: "Nombre",
+					color: "Color",
+					greeting: "Mensaje de saludo",
+					actions: "Comportamiento",
+				},
+				buttons: {
+					add: "Agregar cola",
+				},
+				confirmationModal: {
+					deleteTitle: "Eliminar",
+					deleteMessage:
+						"¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ninguna cola asignada.",
+				},
 			},
 			users: {
 				title: "Usuarios",

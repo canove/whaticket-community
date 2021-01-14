@@ -124,6 +124,7 @@ const Users = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.on("user", data => {
 			if (data.action === "update" || data.action === "create") {
 				dispatch({ type: "UPDATE_USERS", payload: data.user });
@@ -192,7 +193,7 @@ const Users = () => {
 					}?`
 				}
 				open={confirmModalOpen}
-				setOpen={setConfirmModalOpen}
+				onClose={setConfirmModalOpen}
 				onConfirm={() => handleDeleteUser(deletingUser.id)}
 			>
 				{i18n.t("users.confirmationModal.deleteMessage")}

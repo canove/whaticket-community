@@ -8,7 +8,7 @@ import { RefreshTokenService } from "../services/AuthServices/RefreshTokenServic
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { email, password } = req.body;
 
-  const { token, user, refreshToken } = await AuthUserService({
+  const { token, serializedUser, refreshToken } = await AuthUserService({
     email,
     password
   });
@@ -17,9 +17,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   return res.status(200).json({
     token,
-    username: user.name,
-    profile: user.profile,
-    userId: user.id
+    user: serializedUser
   });
 };
 
@@ -33,9 +31,9 @@ export const update = async (
     throw new AppError("ERR_SESSION_EXPIRED", 401);
   }
 
-  const { newToken, refreshToken } = await RefreshTokenService(token);
+  const { user, newToken, refreshToken } = await RefreshTokenService(token);
 
   SendRefreshToken(res, refreshToken);
 
-  return res.json({ token: newToken });
+  return res.json({ token: newToken, user });
 };

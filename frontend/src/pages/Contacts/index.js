@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
@@ -32,6 +32,8 @@ import Title from "../../components/Title";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import MainContainer from "../../components/MainContainer";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { Can } from "../../components/Can";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_CONTACTS") {
@@ -89,7 +91,8 @@ const useStyles = makeStyles(theme => ({
 const Contacts = () => {
 	const classes = useStyles();
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
+
+	const { user } = useContext(AuthContext);
 
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -128,6 +131,7 @@ const Contacts = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.on("contact", data => {
 			if (data.action === "update" || data.action === "create") {
 				dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
@@ -163,7 +167,7 @@ const Contacts = () => {
 		try {
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
-				userId: userId,
+				userId: user?.id,
 				status: "open",
 			});
 			history.push(`/tickets/${ticket.id}`);
@@ -228,7 +232,7 @@ const Contacts = () => {
 						: `${i18n.t("contacts.confirmationModal.importTitlte")}`
 				}
 				open={confirmOpen}
-				setOpen={setConfirmOpen}
+				onClose={setConfirmOpen}
 				onConfirm={e =>
 					deletingContact
 						? handleDeleteContact(deletingContact.id)
@@ -315,15 +319,21 @@ const Contacts = () => {
 										>
 											<EditIcon />
 										</IconButton>
-										<IconButton
-											size="small"
-											onClick={e => {
-												setConfirmOpen(true);
-												setDeletingContact(contact);
-											}}
-										>
-											<DeleteOutlineIcon />
-										</IconButton>
+										<Can
+											role={user.profile}
+											perform="contacts-page:deleteContact"
+											yes={() => (
+												<IconButton
+													size="small"
+													onClick={e => {
+														setConfirmOpen(true);
+														setDeletingContact(contact);
+													}}
+												>
+													<DeleteOutlineIcon />
+												</IconButton>
+											)}
+										/>
 									</TableCell>
 								</TableRow>
 							))}

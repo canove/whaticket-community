@@ -154,6 +154,22 @@ const messages = {
 				},
 				success: "Contato salvo com sucesso.",
 			},
+			queueModal: {
+				title: {
+					add: "Adicionar fila",
+					edit: "Editar fila",
+				},
+				form: {
+					name: "Nome",
+					color: "Cor",
+					greetingMessage: "Mensagem de saudação",
+				},
+				buttons: {
+					okAdd: "Adicionar",
+					okEdit: "Salvar",
+					cancel: "Cancelar",
+				},
+			},
 			userModal: {
 				title: {
 					add: "Adicionar usuário",
@@ -228,6 +244,7 @@ const messages = {
 					connections: "Conexões",
 					tickets: "Tickets",
 					contacts: "Contatos",
+					queues: "Filas",
 					administration: "Administração",
 					users: "Usuários",
 					settings: "Configurações",
@@ -241,6 +258,23 @@ const messages = {
 			},
 			notifications: {
 				noTickets: "Nenhuma notificação.",
+			},
+			queues: {
+				title: "Filas",
+				table: {
+					name: "Nome",
+					color: "Cor",
+					greeting: "Mensagem de saudação",
+					actions: "Ações",
+				},
+				buttons: {
+					add: "Adicionar fila",
+				},
+				confirmationModal: {
+					deleteTitle: "Excluir",
+					deleteMessage:
+						"Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+				},
 			},
 			users: {
 				title: "Usuários",

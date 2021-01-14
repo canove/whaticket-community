@@ -301,7 +301,7 @@ const reducer = (state, action) => {
 	}
 };
 
-const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
+const MessagesList = ({ ticketId, isGroup }) => {
 	const classes = useStyles();
 
 	const [messagesList, dispatch] = useReducer(reducer, []);
@@ -354,7 +354,8 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinChatBox", ticketId);
+
+		socket.on("connect", () => socket.emit("joinChatBox", ticketId));
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {

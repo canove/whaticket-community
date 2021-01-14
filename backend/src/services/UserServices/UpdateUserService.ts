@@ -1,13 +1,14 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
-import User from "../../models/User";
+import ShowUserService from "./ShowUserService";
 
 interface UserData {
   email?: string;
   password?: string;
   name?: string;
   profile?: string;
+  queueIds?: number[];
 }
 
 interface Request {
@@ -26,14 +27,7 @@ const UpdateUserService = async ({
   userData,
   userId
 }: Request): Promise<Response | undefined> => {
-  const user = await User.findOne({
-    where: { id: userId },
-    attributes: ["name", "id", "email", "profile"]
-  });
-
-  if (!user) {
-    throw new AppError("ERR_NO_USER_FOUND", 404);
-  }
+  const user = await ShowUserService(userId);
 
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
@@ -42,7 +36,7 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, name } = userData;
+  const { email, password, profile, name, queueIds = [] } = userData;
 
   try {
     await schema.validate({ email, password, profile, name });
@@ -57,11 +51,16 @@ const UpdateUserService = async ({
     name
   });
 
+  await user.$set("queues", queueIds);
+
+  await user.reload();
+
   const serializedUser = {
     id: user.id,
     name: user.name,
     email: user.email,
-    profile: user.profile
+    profile: user.profile,
+    queues: user.queues
   };
 
   return serializedUser;

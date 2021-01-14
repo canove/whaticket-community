@@ -10,9 +10,12 @@ import {
   Default,
   AllowNull,
   HasMany,
-  Unique
+  Unique,
+  BelongsToMany
 } from "sequelize-typescript";
+import Queue from "./Queue";
 import Ticket from "./Ticket";
+import WhatsappQueue from "./WhatsappQueue";
 
 @Table
 class Whatsapp extends Model<Whatsapp> {
@@ -44,6 +47,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   retries: number;
 
+  @Column(DataType.TEXT)
+  greetingMessage: string;
+
   @Default(false)
   @AllowNull
   @Column
@@ -57,6 +63,12 @@ class Whatsapp extends Model<Whatsapp> {
 
   @HasMany(() => Ticket)
   tickets: Ticket[];
+
+  @BelongsToMany(() => Queue, () => WhatsappQueue)
+  queues: Array<Queue & { WhatsappQueue: WhatsappQueue }>;
+
+  @HasMany(() => WhatsappQueue)
+  whatsappQueues: WhatsappQueue[];
 }
 
 export default Whatsapp;

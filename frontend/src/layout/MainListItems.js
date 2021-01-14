@@ -6,18 +6,19 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Divider from "@material-ui/core/Divider";
-import DashboardIcon from "@material-ui/icons/Dashboard";
+import { Badge } from "@material-ui/core";
+import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
-import SettingsIcon from "@material-ui/icons/Settings";
-import GroupIcon from "@material-ui/icons/Group";
+import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
+import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
+import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
+import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 
-import ContactPhoneIcon from "@material-ui/icons/ContactPhone";
-
-import { i18n } from "../../translate/i18n";
-import { Badge } from "@material-ui/core";
-
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import { i18n } from "../translate/i18n";
+import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
+import { AuthContext } from "../context/Auth/AuthContext";
+import { Can } from "../components/Can";
 
 function ListItemLink(props) {
 	const { icon, primary, to, className } = props;
@@ -41,8 +42,8 @@ function ListItemLink(props) {
 }
 
 const MainListItems = () => {
-	const userProfile = localStorage.getItem("profile");
 	const { whatsApps } = useContext(WhatsAppsContext);
+	const { user } = useContext(AuthContext);
 	const [connectionWarning, setConnectionWarning] = useState(false);
 
 	useEffect(() => {
@@ -71,7 +72,11 @@ const MainListItems = () => {
 
 	return (
 		<div>
-			<ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
+			<ListItemLink
+				to="/"
+				primary="Dashboard"
+				icon={<DashboardOutlinedIcon />}
+			/>
 			<ListItemLink
 				to="/connections"
 				primary={i18n.t("mainDrawer.listItems.connections")}
@@ -90,26 +95,35 @@ const MainListItems = () => {
 			<ListItemLink
 				to="/contacts"
 				primary={i18n.t("mainDrawer.listItems.contacts")}
-				icon={<ContactPhoneIcon />}
+				icon={<ContactPhoneOutlinedIcon />}
 			/>
-			{userProfile === "admin" && (
-				<>
-					<Divider />
-					<ListSubheader inset>
-						{i18n.t("mainDrawer.listItems.administration")}
-					</ListSubheader>
-					<ListItemLink
-						to="/users"
-						primary={i18n.t("mainDrawer.listItems.users")}
-						icon={<GroupIcon />}
-					/>
-					<ListItemLink
-						to="/settings"
-						primary={i18n.t("mainDrawer.listItems.settings")}
-						icon={<SettingsIcon />}
-					/>
-				</>
-			)}
+			<Can
+				role={user.profile}
+				perform="drawer-admin-items:view"
+				yes={() => (
+					<>
+						<Divider />
+						<ListSubheader inset>
+							{i18n.t("mainDrawer.listItems.administration")}
+						</ListSubheader>
+						<ListItemLink
+							to="/users"
+							primary={i18n.t("mainDrawer.listItems.users")}
+							icon={<PeopleAltOutlinedIcon />}
+						/>
+						<ListItemLink
+							to="/queues"
+							primary={i18n.t("mainDrawer.listItems.queues")}
+							icon={<AccountTreeOutlinedIcon />}
+						/>
+						<ListItemLink
+							to="/settings"
+							primary={i18n.t("mainDrawer.listItems.settings")}
+							icon={<SettingsOutlinedIcon />}
+						/>
+					</>
+				)}
+			/>
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
@@ -19,6 +19,8 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
+import { Tooltip } from "@material-ui/core";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -87,15 +89,24 @@ const useStyles = makeStyles(theme => ({
 		position: "absolute",
 		left: "50%",
 	},
+
+	ticketQueueColor: {
+		flex: "none",
+		width: "8px",
+		height: "100%",
+		position: "absolute",
+		top: "0%",
+		left: "0%",
+	},
 }));
 
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
 	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
 	const isMounted = useRef(true);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		return () => {
@@ -108,7 +119,7 @@ const TicketListItem = ({ ticket }) => {
 		try {
 			await api.put(`/tickets/${ticketId}`, {
 				status: "open",
-				userId: userId,
+				userId: user?.id,
 			});
 		} catch (err) {
 			setLoading(false);
@@ -138,6 +149,16 @@ const TicketListItem = ({ ticket }) => {
 					[classes.pendingTicket]: ticket.status === "pending",
 				})}
 			>
+				<Tooltip
+					arrow
+					placement="right"
+					title={ticket.queue?.name || "Sem fila"}
+				>
+					<span
+						style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
+						className={classes.ticketQueueColor}
+					></span>
+				</Tooltip>
 				<ListItemAvatar>
 					<Avatar
 						src={ticket.contact.profilePicUrl && ticket.contact.profilePicUrl}

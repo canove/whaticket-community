@@ -153,6 +153,22 @@ const messages = {
 				},
 				success: "Contact saved successfully.",
 			},
+			queueModal: {
+				title: {
+					add: "Add queue",
+					edit: "Edit queue",
+				},
+				form: {
+					name: "Name",
+					color: "Color",
+					greetingMessage: "Greeting Message",
+				},
+				buttons: {
+					okAdd: "Add",
+					okEdit: "Save",
+					cancel: "Cancel",
+				},
+			},
 			userModal: {
 				title: {
 					add: "Add user",
@@ -226,6 +242,7 @@ const messages = {
 					connections: "Connections",
 					tickets: "Tickets",
 					contacts: "Contacts",
+					queues: "Queues",
 					administration: "Administration",
 					users: "Users",
 					settings: "Settings",
@@ -239,6 +256,23 @@ const messages = {
 			},
 			notifications: {
 				noTickets: "No notifications.",
+			},
+			queues: {
+				title: "Queues",
+				table: {
+					name: "Name",
+					color: "Color",
+					greeting: "Greeting message",
+					actions: "Actions",
+				},
+				buttons: {
+					add: "Add queue",
+				},
+				confirmationModal: {
+					deleteTitle: "Delete",
+					deleteMessage:
+						"Are you sure? It cannot be reverted! Tickets in this queue will still exist, but will not have any queues assigned.",
+				},
 			},
 			users: {
 				title: "Users",

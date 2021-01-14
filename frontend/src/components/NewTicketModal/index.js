@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
@@ -18,6 +18,7 @@ import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const filter = createFilterOptions({
 	trim: true,
@@ -25,7 +26,6 @@ const filter = createFilterOptions({
 
 const NewTicketModal = ({ modalOpen, onClose }) => {
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
 
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -33,6 +33,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	const [selectedContact, setSelectedContact] = useState(null);
 	const [newContact, setNewContact] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -71,7 +72,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		try {
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
-				userId: userId,
+				userId: user.id,
 				status: "open",
 			});
 			history.push(`/tickets/${ticket.id}`);

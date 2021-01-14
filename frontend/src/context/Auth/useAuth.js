@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import openSocket from "socket.io-client";
 
 import { toast } from "react-toastify";
 
@@ -11,6 +12,7 @@ const useAuth = () => {
 	const history = useHistory();
 	const [isAuth, setIsAuth] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [user, setUser] = useState({});
 
 	api.interceptors.request.use(
 		config => {
@@ -44,9 +46,6 @@ const useAuth = () => {
 			}
 			if (error?.response?.status === 401) {
 				localStorage.removeItem("token");
-				localStorage.removeItem("username");
-				localStorage.removeItem("profile");
-				localStorage.removeItem("userId");
 				api.defaults.headers.Authorization = undefined;
 				setIsAuth(false);
 			}
@@ -56,49 +55,64 @@ const useAuth = () => {
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
-		if (token) {
-			api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
-			setIsAuth(true);
-		}
-		setLoading(false);
+		(async () => {
+			if (token) {
+				try {
+					const { data } = await api.post("/auth/refresh_token");
+					api.defaults.headers.Authorization = `Bearer ${data.token}`;
+					setIsAuth(true);
+					setUser(data.user);
+				} catch (err) {
+					toastError(err);
+				}
+			}
+			setLoading(false);
+		})();
 	}, []);
 
-	const handleLogin = async (e, user) => {
+	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
+		socket.on("user", data => {
+			if (data.action === "update" && data.user.id === user.id) {
+				setUser(data.user);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [user]);
+
+	const handleLogin = async user => {
 		setLoading(true);
-		e.preventDefault();
 
 		try {
 			const { data } = await api.post("/auth/login", user);
 			localStorage.setItem("token", JSON.stringify(data.token));
-			localStorage.setItem("username", data.username);
-			localStorage.setItem("profile", data.profile);
-			localStorage.setItem("userId", data.userId);
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
-
+			setUser(data.user);
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");
+			setLoading(false);
 		} catch (err) {
 			toastError(err);
+			setLoading(false);
 		}
-
-		setLoading(false);
 	};
 
-	const handleLogout = e => {
+	const handleLogout = () => {
 		setLoading(true);
-		e.preventDefault();
 		setIsAuth(false);
+		setUser({});
 		localStorage.removeItem("token");
-		localStorage.removeItem("username");
-		localStorage.removeItem("profile");
-		localStorage.removeItem("userId");
 		api.defaults.headers.Authorization = undefined;
 		setLoading(false);
 		history.push("/login");
 	};
 
-	return { isAuth, setIsAuth, loading, handleLogin, handleLogout };
+	return { isAuth, user, loading, handleLogin, handleLogout };
 };
 
 export default useAuth;
