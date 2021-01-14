@@ -368,13 +368,15 @@ sudo service nginx restart
 
 Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. A easy way to this is using Certbot:
 
-Install certbor with snapd:
+Install certbot:
 
 ```bash
-sudo snap install --classic certbot
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt update
+sudo apt install python-certbot-nginx
 ```
 
-Enable SSL on nginx (Accept all information asked):
+Enable SSL on nginx (Fill / Accept all information asked):
 
 ```bash
 sudo certbot --nginx
@@ -423,20 +425,13 @@ chmod +x updateWhaticket
 
 This project helps you and you want to help keep it going? Buy me a coffee:
 
-<a href="https://www.buymeacoffee.com/canove" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<a href="https://www.buymeacoffee.com/canove" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 61px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-Para doações em BRL, você pode doar utilizando o Paypal:
+Para doações em BRL, utilize o Paypal:
 
-<form action="https://www.paypal.com/donate" method="post" target="_top">
-<input type="hidden" name="cmd" value="_donations" />
-<input type="hidden" name="business" value="VWW3BHW4AWHUY" />
-<input type="hidden" name="item_name" value="Desenvolvimento de Software" />
-<input type="hidden" name="currency_code" value="BRL" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_BR/i/scr/pixel.gif" width="1" height="1" />
-</form>
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?business=VWW3BHW4AWHUY&item_name=Desenvolvimento+de+Software&currency_code=BRL)
 
-Any help and suggestions are welcome!
+Any help and suggestions will be apreciated.
 
 ## Disclaimer
 

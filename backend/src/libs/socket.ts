@@ -1,4 +1,4 @@
-import socketIo, { Server as SocketIO } from "socket.io";
+import { Server as SocketIO } from "socket.io";
 import { Server } from "http";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
@@ -6,11 +6,15 @@ import { logger } from "../utils/logger";
 let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
-  io = socketIo(httpServer);
+  io = new SocketIO(httpServer, {
+    cors: {
+      origin: process.env.FRONTEND_URL
+    }
+  });
 
   io.on("connection", socket => {
     logger.info("Client Connected");
-    socket.on("joinChatBox", ticketId => {
+    socket.on("joinChatBox", (ticketId: string) => {
       logger.info("A client joined a ticket channel");
       socket.join(ticketId);
     });
@@ -20,7 +24,7 @@ export const initIO = (httpServer: Server): SocketIO => {
       socket.join("notification");
     });
 
-    socket.on("joinTickets", status => {
+    socket.on("joinTickets", (status: string) => {
       logger.info(`A client joined to ${status} tickets channel.`);
       socket.join(status);
     });
@@ -31,6 +35,7 @@ export const initIO = (httpServer: Server): SocketIO => {
   });
   return io;
 };
+
 export const getIO = (): SocketIO => {
   if (!io) {
     throw new AppError("Socket IO not initialized");

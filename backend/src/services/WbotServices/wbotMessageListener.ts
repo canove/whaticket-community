@@ -239,11 +239,13 @@ const handleMessage = async (
       groupContact = await verifyContact(msgGroupContact);
     }
 
+    const unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
+
     const contact = await verifyContact(msgContact);
     const ticket = await FindOrCreateTicketService(
       contact,
       wbot.id!,
-      chat.unreadCount,
+      unreadMessages,
       groupContact
     );
 
