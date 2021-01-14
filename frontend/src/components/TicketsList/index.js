@@ -187,6 +187,9 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&
 			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
+		const notBelongsToUserQueues = ticket =>
+			selectedQueueIds.indexOf(ticket.queueId) === -1;
+
 		socket.on("connect", () => {
 			if (status) {
 				socket.emit("joinTickets", status);
@@ -208,6 +211,10 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 					type: "UPDATE_TICKET",
 					payload: data.ticket,
 				});
+			}
+
+			if (data.action === "update" && notBelongsToUserQueues(data.ticket)) {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
 			}
 
 			if (data.action === "delete") {

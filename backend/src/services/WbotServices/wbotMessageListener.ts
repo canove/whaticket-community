@@ -21,6 +21,7 @@ import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateConta
 import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import { debounce } from "../../helpers/Debounce";
+import UpdateTicketService from "../TicketServices/UpdateTicketService";
 
 interface Session extends Client {
   id?: number;
@@ -137,8 +138,11 @@ const verifyQueue = async (
   const { queues, greetingMessage } = await ShowWhatsAppService(wbot.id!);
 
   if (queues.length === 1) {
-    await ticket.$set("queue", queues[0]);
-    // TODO sendTicketQueueUpdate to frontend
+    // await ticket.$set("queue", queues[0].id);
+    await UpdateTicketService({
+      ticketData: { queueId: queues[0].id },
+      ticketId: ticket.id
+    });
 
     return;
   }
@@ -148,15 +152,16 @@ const verifyQueue = async (
   const choosenQueue = queues[+selectedOption - 1];
 
   if (choosenQueue) {
-    await ticket.$set("queue", choosenQueue);
+    await UpdateTicketService({
+      ticketData: { queueId: choosenQueue.id },
+      ticketId: ticket.id
+    });
 
     const body = `\u200e${choosenQueue.greetingMessage}`;
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
     await verifyMessage(sentMessage, ticket, contact);
-
-    // TODO sendTicketQueueUpdate to frontend
   } else {
     let options = "";
 
