@@ -40,7 +40,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     queueIds
   });
 
-  // StartWhatsAppSession(whatsapp);
+  StartWhatsAppSession(whatsapp);
 
   const io = getIO();
   io.emit("whatsapp", {
