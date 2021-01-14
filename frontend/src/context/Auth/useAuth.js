@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import openSocket from "socket.io-client";
 
 import { toast } from "react-toastify";
 
@@ -69,6 +70,20 @@ const useAuth = () => {
 		})();
 	}, []);
 
+	useEffect(() => {
+		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
+		socket.on("user", data => {
+			if (data.action === "update" && data.user.id === user.id) {
+				setUser(data.user);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [user]);
+
 	const handleLogin = async user => {
 		setLoading(true);
 
@@ -97,7 +112,7 @@ const useAuth = () => {
 		history.push("/login");
 	};
 
-	return { isAuth, user, setUser, loading, handleLogin, handleLogout };
+	return { isAuth, user, loading, handleLogin, handleLogout };
 };
 
 export default useAuth;
