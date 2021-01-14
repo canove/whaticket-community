@@ -21,7 +21,6 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import TicketsQueueSelect from "../TicketsQueueSelect";
 import { Button } from "@material-ui/core";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -88,12 +87,11 @@ const TicketsManager = () => {
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 	const [showAllTickets, setShowAllTickets] = useState(false);
-	const { user } = useContext(AuthContext);
 	const searchInputRef = useRef();
-	const [selectedQueueIds, setSelectedQueueIds] = useLocalStorage(
-		"selectedQueueIds",
-		[]
-	);
+	const { user } = useContext(AuthContext);
+
+	const userQueueIds = user.queues.map(q => q.id);
+	const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
 	useEffect(() => {
 		if (tab === "search") {
