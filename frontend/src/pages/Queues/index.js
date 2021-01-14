@@ -37,7 +37,6 @@ const useStyles = makeStyles(theme => ({
 	},
 	customTableCell: {
 		display: "flex",
-
 		alignItems: "center",
 		justifyContent: "center",
 	},

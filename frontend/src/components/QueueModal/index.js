@@ -19,7 +19,8 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import ColorPicker from "../ColorPicker";
-import { InputAdornment } from "@material-ui/core";
+import { IconButton, InputAdornment } from "@material-ui/core";
+import { Colorize } from "@material-ui/icons";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -71,6 +72,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		greetingMessage: "",
 	};
 
+	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
 
 	useEffect(() => {
@@ -116,13 +118,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
 	return (
 		<div className={classes.root}>
-			<Dialog
-				open={open}
-				onClose={handleClose}
-				maxWidth="sm"
-				fullWidth
-				scroll="paper"
-			>
+			<Dialog open={open} onClose={handleClose} scroll="paper">
 				<DialogTitle>
 					{queueId
 						? `${i18n.t("queueModal.title.edit")}`
@@ -156,6 +152,9 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								<Field
 									as={TextField}
 									label={i18n.t("queueModal.form.color")}
+									name="color"
+									id="color"
+									// disabled
 									InputProps={{
 										startAdornment: (
 											<InputAdornment position="start">
@@ -165,20 +164,26 @@ const QueueModal = ({ open, onClose, queueId }) => {
 												></div>
 											</InputAdornment>
 										),
+										endAdornment: (
+											<IconButton
+												size="small"
+												color="default"
+												onClick={() => setColorPickerModalOpen(true)}
+											>
+												<Colorize />
+											</IconButton>
+										),
 									}}
-									name="color"
-									error={touched.color && Boolean(errors.color)}
-									helperText={touched.color && errors.color}
 									variant="outlined"
 									margin="dense"
 								/>
 								<ColorPicker
-									label={"Pick Color"}
-									currentColor={queue.color}
+									open={colorPickerModalOpen}
+									handleClose={() => setColorPickerModalOpen(false)}
 									onChange={color => {
 										values.color = color;
-										setQueue(prevState => {
-											return { ...prevState, color };
+										setQueue(() => {
+											return { ...values, color };
 										});
 									}}
 								/>
