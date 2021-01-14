@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -23,6 +23,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
+import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 
 const useStyles = makeStyles(theme => ({
@@ -73,6 +74,8 @@ const UserModal = ({ open, onClose, userId }) => {
 		password: "",
 		profile: "user",
 	};
+
+	const { user: loggedInUser } = useContext(AuthContext);
 
 	const [user, setUser] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -184,7 +187,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 									>
 										<Can
-											role={user.profile}
+											role={loggedInUser.profile}
 											perform="user-modal:editProfile"
 											yes={() => (
 												<>
@@ -209,7 +212,7 @@ const UserModal = ({ open, onClose, userId }) => {
 									</FormControl>
 								</div>
 								<Can
-									role={user.profile}
+									role={loggedInUser.profile}
 									perform="user-modal:editQueues"
 									yes={() => (
 										<QueueSelect
