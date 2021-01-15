@@ -1,0 +1,1 @@
+sonar.exclusions=frontend/src/translate/languages/*,**/__tests__/**/*
