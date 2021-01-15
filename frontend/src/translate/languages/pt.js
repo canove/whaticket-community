@@ -191,6 +191,14 @@ const messages = {
 			chat: {
 				noTicketMessage: "Selecione um ticket para começar a conversar.",
 			},
+			ticketsManager: {
+				buttons: {
+					newTicket: "Novo",
+				},
+			},
+			ticketsQueueSelect: {
+				placeholder: "Filas",
+			},
 			tickets: {
 				toasts: {
 					deleted: "O ticket que você estava foi deletado.",
@@ -275,6 +283,9 @@ const messages = {
 					deleteMessage:
 						"Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
 				},
+			},
+			queueSelect: {
+				inputLabel: "Filas",
 			},
 			users: {
 				title: "Usuários",
@@ -391,6 +402,10 @@ const messages = {
 				ERR_CREATING_TICKET: "Erro ao criar tíquete no banco de dados.",
 				ERR_FETCH_WAPP_MSG:
 					"Erro ao buscar a mensagem no WhtasApp, talvez ela seja muito antiga.",
+				ERR_QUEUE_COLOR_ALREADY_EXISTS:
+					"Esta cor já está em uso, escolha outra.",
+				ERR_WAPP_GREETING_REQUIRED:
+					"A mensagem de saudação é obrigatório quando há mais de uma fila.",
 			},
 		},
 	},

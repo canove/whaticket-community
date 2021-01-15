@@ -193,6 +193,14 @@ const messages = {
 			chat: {
 				noTicketMessage: "Selecciona un ticket para empezar a chatear.",
 			},
+			ticketsManager: {
+				buttons: {
+					newTicket: "Nuevo",
+				},
+			},
+			ticketsQueueSelect: {
+				placeholder: "Linhas",
+			},
 			tickets: {
 				toasts: {
 					deleted: "El ticket en el que estabas ha sido borrado.",
@@ -277,6 +285,9 @@ const messages = {
 					deleteMessage:
 						"¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ninguna cola asignada.",
 				},
+			},
+			queueSelect: {
+				inputLabel: "Linhas",
 			},
 			users: {
 				title: "Usuarios",
@@ -395,6 +406,10 @@ const messages = {
 				ERR_CREATING_TICKET: "Error al crear el ticket en la base de datos.",
 				ERR_FETCH_WAPP_MSG:
 					"Error al obtener el mensaje en WhtasApp, tal vez sea demasiado antiguo.",
+				ERR_QUEUE_COLOR_ALREADY_EXISTS:
+					"Este color ya está en uso, elija otro.",
+				ERR_WAPP_GREETING_REQUIRED:
+					"El mensaje de saludo es obligatorio cuando hay más de una cola.",
 			},
 		},
 	},

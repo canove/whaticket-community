@@ -190,6 +190,14 @@ const messages = {
 			chat: {
 				noTicketMessage: "Select a ticket to start chatting.",
 			},
+			ticketsManager: {
+				buttons: {
+					newTicket: "New",
+				},
+			},
+			ticketsQueueSelect: {
+				placeholder: "Queues",
+			},
 			tickets: {
 				toasts: {
 					deleted: "The ticket you were on has been deleted.",
@@ -273,6 +281,9 @@ const messages = {
 					deleteMessage:
 						"Are you sure? It cannot be reverted! Tickets in this queue will still exist, but will not have any queues assigned.",
 				},
+			},
+			queueSelect: {
+				inputLabel: "Queues",
 			},
 			users: {
 				title: "Users",

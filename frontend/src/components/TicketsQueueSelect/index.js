@@ -4,6 +4,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import { Checkbox, ListItemText } from "@material-ui/core";
+import { i18n } from "../../translate/i18n";
 
 const TicketsQueueSelect = ({
 	userQueues,
@@ -34,7 +35,7 @@ const TicketsQueueSelect = ({
 						},
 						getContentAnchorEl: null,
 					}}
-					renderValue={() => "Filas"}
+					renderValue={() => i18n.t("ticketsQueueSelect.placeholder")}
 				>
 					{userQueues?.length > 0 &&
 						userQueues.map(queue => (

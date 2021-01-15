@@ -7,6 +7,7 @@ import Select from "@material-ui/core/Select";
 import Chip from "@material-ui/core/Chip";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles(theme => ({
 	chips: {
@@ -33,17 +34,17 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 		})();
 	}, []);
 
-	const handleChange = event => {
-		onChange(event.target.value);
+	const handleChange = e => {
+		onChange(e.target.value);
 	};
 
 	return (
 		<div style={{ marginTop: 6 }}>
 			<FormControl fullWidth margin="dense" variant="outlined">
-				<InputLabel>Filas</InputLabel>
+				<InputLabel>{i18n.t("queueSelect.inputLabel")}</InputLabel>
 				<Select
 					multiple
-					labelWidth={40}
+					labelWidth={60}
 					value={selectedQueueIds}
 					onChange={handleChange}
 					MenuProps={{

@@ -175,7 +175,7 @@ const TicketsManager = () => {
 							color="primary"
 							onClick={() => setNewTicketModalOpen(true)}
 						>
-							Novo
+							{i18n.t("ticketsManager.buttons.newTicket")}
 						</Button>
 						<Can
 							role={user.profile}
