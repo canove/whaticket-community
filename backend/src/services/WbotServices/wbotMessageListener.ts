@@ -138,7 +138,6 @@ const verifyQueue = async (
   const { queues, greetingMessage } = await ShowWhatsAppService(wbot.id!);
 
   if (queues.length === 1) {
-    // await ticket.$set("queue", queues[0].id);
     await UpdateTicketService({
       ticketData: { queueId: queues[0].id },
       ticketId: ticket.id
@@ -267,7 +266,7 @@ const handleMessage = async (
       !chat.isGroup &&
       !msg.fromMe &&
       !ticket.userId &&
-      whatsapp.queues.length > 1
+      whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
     }

@@ -389,6 +389,10 @@ const messages = {
 				ERR_CREATING_TICKET: "Error while creating ticket on database.",
 				ERR_FETCH_WAPP_MSG:
 					"Error fetching the message in WhtasApp, maybe it is too old.",
+				ERR_QUEUE_COLOR_ALREADY_EXISTS:
+					"This color is already in use, pick another one.",
+				ERR_WAPP_GREETING_REQUIRED:
+					"Greeting message is required if there is more than one queue.",
 			},
 		},
 	},
