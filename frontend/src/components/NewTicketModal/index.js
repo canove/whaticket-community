@@ -100,8 +100,8 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		handleSaveTicket(contact.id);
 	};
 
-	const createAddContactOption = (options, params) => {
-		const filtered = filter(options, params);
+	const createAddContactOption = (filterOptions, params) => {
+		const filtered = filter(filterOptions, params);
 
 		if (params.inputValue !== "" && !loading && searchParam.length >= 3) {
 			filtered.push({

@@ -32,13 +32,11 @@ const CreateWhatsAppService = async ({
         "Check-name",
         "This whatsapp name is already used.",
         async value => {
-          if (value) {
-            const whatsappFound = await Whatsapp.findOne({
-              where: { name: value }
-            });
-            return !whatsappFound;
-          }
-          return true;
+          if (!value) return false;
+          const nameExists = await Whatsapp.findOne({
+            where: { name: value }
+          });
+          return !nameExists;
         }
       ),
     isDefault: Yup.boolean().required()
@@ -52,9 +50,7 @@ const CreateWhatsAppService = async ({
 
   const whatsappFound = await Whatsapp.findOne();
 
-  if (!whatsappFound) {
-    isDefault = !whatsappFound;
-  }
+  isDefault = !whatsappFound;
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
 

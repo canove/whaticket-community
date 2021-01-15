@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route as RouterRoute, Redirect } from "react-router-dom";
 
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 
-const RouteWrapper = ({ component: Component, isPrivate = false, ...rest }) => {
+const Route = ({ component: Component, isPrivate = false, ...rest }) => {
 	const { isAuth, loading } = useContext(AuthContext);
 
 	if (!isAuth && isPrivate) {
@@ -28,9 +28,9 @@ const RouteWrapper = ({ component: Component, isPrivate = false, ...rest }) => {
 	return (
 		<>
 			{loading && <BackdropLoading />}
-			<Route {...rest} component={Component} />
+			<RouterRoute {...rest} component={Component} />
 		</>
 	);
 };
 
-export default RouteWrapper;
+export default Route;

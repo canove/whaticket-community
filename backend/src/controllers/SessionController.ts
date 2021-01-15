@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AppError from "../errors/AppError";
 
-import AuthUserService from "../services/UserServices/AuthUserSerice";
+import AuthUserService from "../services/UserServices/AuthUserService";
 import { SendRefreshToken } from "../helpers/SendRefreshToken";
 import { RefreshTokenService } from "../services/AuthServices/RefreshTokenService";
 

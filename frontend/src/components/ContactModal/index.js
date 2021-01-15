@@ -102,12 +102,8 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 		fetchContact();
 	}, [contactId, open, initialValues]);
 
-	const handleClose = contactId => {
-		if (contactId) {
-			onClose(contactId);
-		} else {
-			onClose();
-		}
+	const handleClose = () => {
+		onClose();
 		setContact(initialState);
 	};
 

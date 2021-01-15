@@ -161,7 +161,7 @@ const MarkdownWrapper = ({ children }) => {
 	}
 
 	const options = React.useMemo(() => {
-		const options = {
+		const markdownOptions = {
 			disableParsingRawHTML: true,
 			forceInline: true,
 			overrides: {
@@ -171,11 +171,11 @@ const MarkdownWrapper = ({ children }) => {
 
 		elements.forEach(element => {
 			if (!allowedElements.includes(element)) {
-				options.overrides[element] = ({ children }) => children;
+				markdownOptions.overrides[element] = el => el.children;
 			}
 		});
 
-		return options;
+		return markdownOptions;
 	}, []);
 
 	return <Markdown options={options}>{children}</Markdown>;

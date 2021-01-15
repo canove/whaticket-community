@@ -21,6 +21,7 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -114,25 +115,25 @@ const TicketListItem = ({ ticket }) => {
 		};
 	}, []);
 
-	const handleAcepptTicket = async ticketId => {
+	const handleAcepptTicket = async id => {
 		setLoading(true);
 		try {
-			await api.put(`/tickets/${ticketId}`, {
+			await api.put(`/tickets/${id}`, {
 				status: "open",
 				userId: user?.id,
 			});
 		} catch (err) {
 			setLoading(false);
-			alert(err);
+			toastError(err);
 		}
 		if (isMounted.current) {
 			setLoading(false);
 		}
-		history.push(`/tickets/${ticketId}`);
+		history.push(`/tickets/${id}`);
 	};
 
-	const handleSelectTicket = (e, ticket) => {
-		history.push(`/tickets/${ticket.id}`);
+	const handleSelectTicket = id => {
+		history.push(`/tickets/${id}`);
 	};
 
 	return (
@@ -142,7 +143,7 @@ const TicketListItem = ({ ticket }) => {
 				button
 				onClick={e => {
 					if (ticket.status === "pending") return;
-					handleSelectTicket(e, ticket);
+					handleSelectTicket(ticket.id);
 				}}
 				selected={ticketId && +ticketId === ticket.id}
 				className={clsx(classes.ticket, {
@@ -160,9 +161,7 @@ const TicketListItem = ({ ticket }) => {
 					></span>
 				</Tooltip>
 				<ListItemAvatar>
-					<Avatar
-						src={ticket.contact.profilePicUrl && ticket.contact.profilePicUrl}
-					></Avatar>
+					<Avatar src={ticket?.contact?.profilePicUrl} />
 				</ListItemAvatar>
 				<ListItemText
 					disableTypography
