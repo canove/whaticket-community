@@ -20,6 +20,7 @@ type IndexQuery = {
 interface TicketData {
   contactId: number;
   status: string;
+  queueId: number;
   userId: number;
 }
 

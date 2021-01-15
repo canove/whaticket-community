@@ -188,7 +188,7 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
 		const notBelongsToUserQueues = ticket =>
-			selectedQueueIds.indexOf(ticket.queueId) === -1;
+			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
 
 		socket.on("connect", () => {
 			if (status) {

@@ -67,6 +67,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 		try {
 			await api.put(`/tickets/${ticketid}`, {
 				userId: selectedUser.id,
+				queueId: null,
 				status: "open",
 			});
 			setLoading(false);
