@@ -36,18 +36,20 @@ const useAuth = () => {
 			const originalRequest = error.config;
 			if (error?.response?.status === 403 && !originalRequest._retry) {
 				originalRequest._retry = true;
-
-				const { data } = await api.post("/auth/refresh_token");
-				if (data) {
-					localStorage.setItem("token", JSON.stringify(data.token));
-					api.defaults.headers.Authorization = `Bearer ${data.token}`;
+				const authRefresh = localStorage.getItem('refreshToken')
+				if (authRefresh) {
+					const { data } = await api.post("/auth/refresh_token", {refreshToken:authRefresh});
+					if (data) {
+						localStorage.setItem("token", JSON.stringify(data.token));
+						api.defaults.headers.Authorization = `Bearer ${data.token}`;
+					}
+				} else {
+					handleRemoveLoginData()
 				}
 				return api(originalRequest);
 			}
 			if (error?.response?.status === 401) {
-				localStorage.removeItem("token");
-				api.defaults.headers.Authorization = undefined;
-				setIsAuth(false);
+				handleRemoveLoginData()
 			}
 			return Promise.reject(error);
 		}
@@ -58,7 +60,16 @@ const useAuth = () => {
 		(async () => {
 			if (token) {
 				try {
-					const { data } = await api.post("/auth/refresh_token");
+					const authRefresh = localStorage.getItem('refreshToken')
+					if (authRefresh) {
+						const { data } = await api.post("/auth/refresh_token", {refreshToken:authRefresh});
+						if (data) {
+							localStorage.setItem("token", JSON.stringify(data.token));
+							api.defaults.headers.Authorization = `Bearer ${data.token}`;
+						}
+					} else {
+						handleRemoveLoginData()
+					}
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
 					setIsAuth(true);
 					setUser(data.user);
@@ -84,12 +95,20 @@ const useAuth = () => {
 		};
 	}, [user]);
 
+	const handleRemoveLoginData = () => {
+		localStorage.removeItem("token");
+		localStorage.removeItem("refreshToken");
+		api.defaults.headers.Authorization = undefined;
+		setIsAuth(false);
+	}
+
 	const handleLogin = async userData => {
 		setLoading(true);
 
 		try {
 			const { data } = await api.post("/auth/login", userData);
 			localStorage.setItem("token", JSON.stringify(data.token));
+			localStorage.setItem("refreshToken", JSON.stringify(data.refreshToken))
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
 			setUser(data.user);
 			setIsAuth(true);
@@ -107,6 +126,7 @@ const useAuth = () => {
 		setIsAuth(false);
 		setUser({});
 		localStorage.removeItem("token");
+		localStorage.removeItem("refreshToken");
 		api.defaults.headers.Authorization = undefined;
 		setLoading(false);
 		history.push("/login");
