@@ -84,11 +84,11 @@ const useAuth = () => {
 		};
 	}, [user]);
 
-	const handleLogin = async user => {
+	const handleLogin = async userData => {
 		setLoading(true);
 
 		try {
-			const { data } = await api.post("/auth/login", user);
+			const { data } = await api.post("/auth/login", userData);
 			localStorage.setItem("token", JSON.stringify(data.token));
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
 			setUser(data.user);

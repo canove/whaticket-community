@@ -1,6 +1,6 @@
-import rules from "../../accessRules";
+import rules from "../../rules";
 
-const check = (rules, role, action, data) => {
+const check = (role, action, data) => {
 	const permissions = rules[role];
 	if (!permissions) {
 		// role is not present in the rules
@@ -29,7 +29,7 @@ const check = (rules, role, action, data) => {
 };
 
 const Can = ({ role, perform, data, yes, no }) =>
-	check(rules, role, perform, data) ? yes() : no();
+	check(role, perform, data) ? yes() : no();
 
 Can.defaultProps = {
 	yes: () => null,

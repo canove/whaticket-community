@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { GithubPicker } from "react-color";
 
 const ColorPicker = ({ onChange, currentColor, handleClose, open }) => {
-	const [color, setColor] = useState(currentColor);
+	const [selectedColor, setSelectedColor] = useState(currentColor);
 
 	const handleChange = color => {
-		setColor(color.hex);
+		setSelectedColor(color.hex);
 		handleClose();
 	};
 
@@ -20,7 +20,7 @@ const ColorPicker = ({ onChange, currentColor, handleClose, open }) => {
 			<GithubPicker
 				width={"100%"}
 				triangle="hide"
-				color={color}
+				color={selectedColor}
 				onChange={handleChange}
 				onChangeComplete={color => onChange(color.hex)}
 			/>
