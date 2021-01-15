@@ -50,15 +50,13 @@ const MainListItems = () => {
 		const delayDebounceFn = setTimeout(() => {
 			if (whatsApps.length > 0) {
 				const offlineWhats = whatsApps.filter(whats => {
-					if (
+					return (
 						whats.status === "qrcode" ||
 						whats.status === "PAIRING" ||
 						whats.status === "DISCONNECTED" ||
 						whats.status === "TIMEOUT" ||
 						whats.status === "OPENING"
-					)
-						return true;
-					else return false;
+					);
 				});
 				if (offlineWhats.length > 0) {
 					setConnectionWarning(true);

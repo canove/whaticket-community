@@ -178,7 +178,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								</div>
 								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
-									onChange={values => setSelectedQueueIds(values)}
+									onChange={selectedIds => setSelectedQueueIds(selectedIds)}
 								/>
 							</DialogContent>
 							<DialogActions>

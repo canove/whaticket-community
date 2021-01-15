@@ -8,8 +8,7 @@ import {
   AutoIncrement,
   AllowNull,
   Unique,
-  BelongsToMany,
-  HasMany
+  BelongsToMany
 } from "sequelize-typescript";
 import User from "./User";
 import UserQueue from "./UserQueue";
