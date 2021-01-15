@@ -31,9 +31,21 @@ export const update = async (
     throw new AppError("ERR_SESSION_EXPIRED", 401);
   }
 
-  const { user, newToken, refreshToken } = await RefreshTokenService(token);
+  const { user, newToken, refreshToken } = await RefreshTokenService(
+    res,
+    token
+  );
 
   SendRefreshToken(res, refreshToken);
 
   return res.json({ token: newToken, user });
+};
+
+export const remove = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  res.clearCookie("jrt");
+
+  return res.send();
 };

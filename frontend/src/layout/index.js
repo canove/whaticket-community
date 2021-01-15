@@ -131,6 +131,11 @@ const LoggedInLayout = ({ children }) => {
 		handleCloseMenu();
 	};
 
+	const handleClickLogout = () => {
+		handleCloseMenu();
+		handleLogout();
+	};
+
 	if (loading) {
 		return <BackdropLoading />;
 	}
@@ -190,7 +195,7 @@ const LoggedInLayout = ({ children }) => {
 					>
 						WhaTicket
 					</Typography>
-					<NotificationsPopOver />
+					{user.id && <NotificationsPopOver />}
 
 					<div>
 						<IconButton
@@ -220,7 +225,7 @@ const LoggedInLayout = ({ children }) => {
 							<MenuItem onClick={handleOpenUserModal}>
 								{i18n.t("mainDrawer.appBar.user.profile")}
 							</MenuItem>
-							<MenuItem onClick={handleLogout}>
+							<MenuItem onClick={handleClickLogout}>
 								{i18n.t("mainDrawer.appBar.user.logout")}
 							</MenuItem>
 						</Menu>

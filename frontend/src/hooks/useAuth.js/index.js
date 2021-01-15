@@ -102,14 +102,21 @@ const useAuth = () => {
 		}
 	};
 
-	const handleLogout = () => {
+	const handleLogout = async () => {
 		setLoading(true);
-		setIsAuth(false);
-		setUser({});
-		localStorage.removeItem("token");
-		api.defaults.headers.Authorization = undefined;
-		setLoading(false);
-		history.push("/login");
+
+		try {
+			await api.delete("/auth/logout");
+			setIsAuth(false);
+			setUser({});
+			localStorage.removeItem("token");
+			api.defaults.headers.Authorization = undefined;
+			setLoading(false);
+			history.push("/login");
+		} catch (err) {
+			toastError(err);
+			setLoading(false);
+		}
 	};
 
 	return { isAuth, user, loading, handleLogin, handleLogout };
