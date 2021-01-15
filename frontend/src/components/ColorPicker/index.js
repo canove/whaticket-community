@@ -8,6 +8,7 @@ const ColorPicker = ({ onChange, currentColor, handleClose, open }) => {
 
 	const handleChange = color => {
 		setColor(color.hex);
+		handleClose();
 	};
 
 	return (

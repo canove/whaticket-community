@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -74,6 +74,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
+	const greetingRef = useRef();
 
 	useEffect(() => {
 		(async () => {
@@ -154,7 +155,12 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									label={i18n.t("queueModal.form.color")}
 									name="color"
 									id="color"
-									// disabled
+									onFocus={() => {
+										setColorPickerModalOpen(true);
+										greetingRef.current.focus();
+									}}
+									error={touched.color && Boolean(errors.color)}
+									helperText={touched.color && errors.color}
 									InputProps={{
 										startAdornment: (
 											<InputAdornment position="start">
@@ -193,6 +199,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										label={i18n.t("queueModal.form.greetingMessage")}
 										type="greetingMessage"
 										multiline
+										inputRef={greetingRef}
 										rows={5}
 										fullWidth
 										name="greetingMessage"
