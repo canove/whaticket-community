@@ -109,7 +109,6 @@ const ListTicketsService = async ({
 
   if (date) {
     whereCondition = {
-      ...whereCondition,
       createdAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       }
@@ -127,7 +126,7 @@ const ListTicketsService = async ({
     };
   }
 
-  const limit = 20;
+  const limit = 40;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({

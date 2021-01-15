@@ -41,17 +41,11 @@ const Chart = () => {
 		setChartData(prevState => {
 			let aux = [...prevState];
 
-			aux.map(a => {
+			aux.forEach(a => {
 				tickets.forEach(ticket => {
-					if (
-						format(startOfHour(parseISO(ticket.createdAt)), "HH:mm") === a.time
-					) {
-						return a.amount++;
-					} else {
-						return a;
-					}
+					format(startOfHour(parseISO(ticket.createdAt)), "HH:mm") === a.time &&
+						a.amount++;
 				});
-				return a;
 			});
 
 			return aux;
