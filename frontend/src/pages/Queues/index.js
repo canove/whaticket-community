@@ -256,7 +256,7 @@ const Queues = () => {
 									</TableCell>
 								</TableRow>
 							))}
-							{loading && <TableRowSkeleton />}
+							{loading && <TableRowSkeleton columns={4} />}
 						</>
 					</TableBody>
 				</Table>
