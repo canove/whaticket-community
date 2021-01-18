@@ -14,11 +14,13 @@ type IndexQuery = {
   date: string;
   showAll: string;
   withUnreadMessages: string;
+  queueIds: string;
 };
 
 interface TicketData {
   contactId: number;
   status: string;
+  queueId: number;
   userId: number;
 }
 
@@ -29,10 +31,17 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     date,
     searchParam,
     showAll,
+    queueIds: queueIdsStringified,
     withUnreadMessages
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
+
+  let queueIds: number[] = [];
+
+  if (queueIdsStringified) {
+    queueIds = JSON.parse(queueIdsStringified);
+  }
 
   const { tickets, count, hasMore } = await ListTicketsService({
     searchParam,
@@ -41,6 +50,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     date,
     showAll,
     userId,
+    queueIds,
     withUnreadMessages
   });
 
@@ -54,7 +64,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const io = getIO();
   io.to(ticket.status).emit("ticket", {
-    action: "create",
+    action: "update",
     ticket
   });
 
@@ -76,23 +86,9 @@ export const update = async (
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
-  const { ticket, oldStatus, oldUserId } = await UpdateTicketService({
+  const { ticket } = await UpdateTicketService({
     ticketData,
     ticketId
-  });
-
-  const io = getIO();
-
-  if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
-    io.to(oldStatus).emit("ticket", {
-      action: "delete",
-      ticketId: ticket.id
-    });
-  }
-
-  io.to(ticket.status).to("notification").to(ticketId).emit("ticket", {
-    action: "updateStatus",
-    ticket
   });
 
   return res.status(200).json(ticket);

@@ -2,9 +2,12 @@ import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
+import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
 interface Request {
   name: string;
+  queueIds?: number[];
+  greetingMessage?: string;
   status?: string;
   isDefault?: boolean;
 }
@@ -17,6 +20,8 @@ interface Response {
 const CreateWhatsAppService = async ({
   name,
   status = "OPENING",
+  queueIds = [],
+  greetingMessage,
   isDefault = false
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -27,13 +32,11 @@ const CreateWhatsAppService = async ({
         "Check-name",
         "This whatsapp name is already used.",
         async value => {
-          if (value) {
-            const whatsappFound = await Whatsapp.findOne({
-              where: { name: value }
-            });
-            return !whatsappFound;
-          }
-          return true;
+          if (!value) return false;
+          const nameExists = await Whatsapp.findOne({
+            where: { name: value }
+          });
+          return !nameExists;
         }
       ),
     isDefault: Yup.boolean().required()
@@ -47,9 +50,7 @@ const CreateWhatsAppService = async ({
 
   const whatsappFound = await Whatsapp.findOne();
 
-  if (!whatsappFound) {
-    isDefault = !whatsappFound;
-  }
+  isDefault = !whatsappFound;
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
 
@@ -62,11 +63,21 @@ const CreateWhatsAppService = async ({
     }
   }
 
-  const whatsapp = await Whatsapp.create({
-    name,
-    status,
-    isDefault
-  });
+  if (queueIds.length > 1 && !greetingMessage) {
+    throw new AppError("ERR_WAPP_GREETING_REQUIRED");
+  }
+
+  const whatsapp = await Whatsapp.create(
+    {
+      name,
+      status,
+      greetingMessage,
+      isDefault
+    },
+    { include: ["queues"] }
+  );
+
+  await AssociateWhatsappQueue(whatsapp, queueIds);
 
   return { whatsapp, oldDefaultWhatsapp };
 };

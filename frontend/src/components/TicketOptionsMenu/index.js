@@ -1,6 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-
-import { toast } from "react-toastify";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
@@ -9,11 +7,15 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
+import toastError from "../../errors/toastError";
+import { Can } from "../Can";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
 	const isMounted = useRef(true);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		return () => {
@@ -25,16 +27,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		try {
 			await api.delete(`/tickets/${ticket.id}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 
@@ -72,12 +65,18 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				open={menuOpen}
 				onClose={handleClose}
 			>
-				<MenuItem onClick={handleOpenConfirmationModal}>
-					{i18n.t("ticketOptionsMenu.delete")}
-				</MenuItem>
 				<MenuItem onClick={handleOpenTransferModal}>
 					{i18n.t("ticketOptionsMenu.transfer")}
 				</MenuItem>
+				<Can
+					role={user.profile}
+					perform="ticket-options:deleteTicket"
+					yes={() => (
+						<MenuItem onClick={handleOpenConfirmationModal}>
+							{i18n.t("ticketOptionsMenu.delete")}
+						</MenuItem>
+					)}
+				/>
 			</Menu>
 			<ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${
@@ -86,7 +85,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 					ticket.contact.name
 				}?`}
 				open={confirmationOpen}
-				setOpen={setConfirmationOpen}
+				onClose={setConfirmationOpen}
 				onConfirm={handleDeleteTicket}
 			>
 				{i18n.t("ticketOptionsMenu.confirmationModal.message")}

@@ -1,6 +1,6 @@
 import faker from "faker";
 import AppError from "../../../errors/AppError";
-import AuthUserService from "../../../services/UserServices/AuthUserSerice";
+import AuthUserService from "../../../services/UserServices/AuthUserService";
 import CreateUserService from "../../../services/UserServices/CreateUserService";
 import { disconnect, truncate } from "../../utils/database";
 
@@ -18,15 +18,18 @@ describe("Auth", () => {
   });
 
   it("should be able to login with an existing user", async () => {
+    const password = faker.internet.password();
+    const email = faker.internet.email();
+
     await CreateUserService({
       name: faker.name.findName(),
-      email: "mail@test.com",
-      password: "hardpassword"
+      email,
+      password
     });
 
     const response = await AuthUserService({
-      email: "mail@test.com",
-      password: "hardpassword"
+      email,
+      password
     });
 
     expect(response).toHaveProperty("token");
@@ -49,7 +52,7 @@ describe("Auth", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email: "mail@test.com",
-      password: "hardpassword"
+      password: faker.internet.password()
     });
 
     try {

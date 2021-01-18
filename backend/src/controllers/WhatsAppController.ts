@@ -11,6 +11,8 @@ import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppSer
 
 interface WhatsappData {
   name: string;
+  queueIds: number[];
+  greetingMessage?: string;
   status?: string;
   isDefault?: boolean;
 }
@@ -22,12 +24,20 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { name, status, isDefault }: WhatsappData = req.body;
+  const {
+    name,
+    status,
+    isDefault,
+    greetingMessage,
+    queueIds
+  }: WhatsappData = req.body;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
     status,
-    isDefault
+    isDefault,
+    greetingMessage,
+    queueIds
   });
 
   StartWhatsAppSession(whatsapp);

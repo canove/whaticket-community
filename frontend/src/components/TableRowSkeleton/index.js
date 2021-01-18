@@ -12,32 +12,38 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const TableRowSkeleton = () => {
+const TableRowSkeleton = ({ avatar, columns }) => {
 	const classes = useStyles();
 	return (
 		<>
 			<TableRow>
-				<TableCell style={{ paddingRight: 0 }}>
-					<Skeleton animation="wave" variant="circle" width={40} height={40} />
-				</TableCell>
-				<TableCell>
-					<Skeleton animation="wave" height={20} width={80} />
-				</TableCell>
-				<TableCell align="center">
-					<div className={classes.customTableCell}>
-						<Skeleton align="center" animation="wave" height={20} width={80} />
-					</div>
-				</TableCell>
-				<TableCell align="center">
-					<div className={classes.customTableCell}>
-						<Skeleton align="center" animation="wave" height={20} width={80} />
-					</div>
-				</TableCell>
-				<TableCell align="center">
-					<div className={classes.customTableCell}>
-						<Skeleton align="center" animation="wave" height={20} width={80} />
-					</div>
-				</TableCell>
+				{avatar && (
+					<>
+						<TableCell style={{ paddingRight: 0 }}>
+							<Skeleton
+								animation="wave"
+								variant="circle"
+								width={40}
+								height={40}
+							/>
+						</TableCell>
+						<TableCell>
+							<Skeleton animation="wave" height={30} width={80} />
+						</TableCell>
+					</>
+				)}
+				{Array.from({ length: columns }, (_, index) => (
+					<TableCell align="center" key={index}>
+						<div className={classes.customTableCell}>
+							<Skeleton
+								align="center"
+								animation="wave"
+								height={30}
+								width={80}
+							/>
+						</div>
+					</TableCell>
+				))}
 			</TableRow>
 		</>
 	);

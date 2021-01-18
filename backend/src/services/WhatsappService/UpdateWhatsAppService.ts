@@ -3,12 +3,16 @@ import { Op } from "sequelize";
 
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
+import ShowWhatsAppService from "./ShowWhatsAppService";
+import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
 interface WhatsappData {
   name?: string;
   status?: string;
   session?: string;
   isDefault?: boolean;
+  greetingMessage?: string;
+  queueIds?: number[];
 }
 
 interface Request {
@@ -27,15 +31,27 @@ const UpdateWhatsAppService = async ({
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
+    status: Yup.string(),
     isDefault: Yup.boolean()
   });
 
-  const { name, status, isDefault, session } = whatsappData;
+  const {
+    name,
+    status,
+    isDefault,
+    session,
+    greetingMessage,
+    queueIds = []
+  } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
   } catch (err) {
     throw new AppError(err.message);
+  }
+
+  if (queueIds.length > 1 && !greetingMessage) {
+    throw new AppError("ERR_WAPP_GREETING_REQUIRED");
   }
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
@@ -49,19 +65,17 @@ const UpdateWhatsAppService = async ({
     }
   }
 
-  const whatsapp = await Whatsapp.findOne({
-    where: { id: whatsappId }
-  });
+  const whatsapp = await ShowWhatsAppService(whatsappId);
 
-  if (!whatsapp) {
-    throw new AppError("ERR_NO_WAPP_FOUND", 404);
-  }
   await whatsapp.update({
     name,
     status,
     session,
+    greetingMessage,
     isDefault
   });
+
+  await AssociateWhatsappQueue(whatsapp, queueIds);
 
   return { whatsapp, oldDefaultWhatsapp };
 };

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
 
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -18,6 +17,8 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
+import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const filter = createFilterOptions({
 	trim: true,
@@ -25,7 +26,6 @@ const filter = createFilterOptions({
 
 const NewTicketModal = ({ modalOpen, onClose }) => {
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
 
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -33,6 +33,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	const [selectedContact, setSelectedContact] = useState(null);
 	const [newContact, setNewContact] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -50,16 +51,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 
@@ -80,21 +72,12 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		try {
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
-				userId: userId,
+				userId: user.id,
 				status: "open",
 			});
 			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setLoading(false);
 		handleClose();
@@ -117,8 +100,8 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		handleSaveTicket(contact.id);
 	};
 
-	const createAddContactOption = (options, params) => {
-		const filtered = filter(options, params);
+	const createAddContactOption = (filterOptions, params) => {
+		const filtered = filter(filterOptions, params);
 
 		if (params.inputValue !== "" && !loading && searchParam.length >= 3) {
 			filtered.push({

@@ -3,6 +3,7 @@ import Whatsapp from "../../models/Whatsapp";
 import { wbotMessageListener } from "./wbotMessageListener";
 import { getIO } from "../../libs/socket";
 import wbotMonitor from "./wbotMonitor";
+import { logger } from "../../utils/logger";
 
 export const StartWhatsAppSession = async (
   whatsapp: Whatsapp
@@ -20,6 +21,6 @@ export const StartWhatsAppSession = async (
     wbotMessageListener(wbot);
     wbotMonitor(wbot, whatsapp);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
   }
 };

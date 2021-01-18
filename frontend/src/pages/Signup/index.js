@@ -21,6 +21,7 @@ import Container from "@material-ui/core/Container";
 import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
+import toastError from "../../errors/toastError";
 
 // const Copyright = () => {
 // 	return (
@@ -47,7 +48,7 @@ const useStyles = makeStyles(theme => ({
 		backgroundColor: theme.palette.secondary.main,
 	},
 	form: {
-		width: "100%", // Fix IE 11 issue.
+		width: "100%",
 		marginTop: theme.spacing(3),
 	},
 	submit: {
@@ -78,16 +79,7 @@ const SignUp = () => {
 			toast.success(i18n.t("signup.toasts.success"));
 			history.push("/login");
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
@@ -31,6 +31,9 @@ import MainHeader from "../../components/MainHeader";
 import Title from "../../components/Title";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import MainContainer from "../../components/MainContainer";
+import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { Can } from "../../components/Can";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_CONTACTS") {
@@ -88,7 +91,8 @@ const useStyles = makeStyles(theme => ({
 const Contacts = () => {
 	const classes = useStyles();
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
+
+	const { user } = useContext(AuthContext);
 
 	const [loading, setLoading] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -117,16 +121,7 @@ const Contacts = () => {
 					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 			fetchContacts();
@@ -136,6 +131,7 @@ const Contacts = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.on("contact", data => {
 			if (data.action === "update" || data.action === "create") {
 				dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
@@ -171,21 +167,12 @@ const Contacts = () => {
 		try {
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
-				userId: userId,
+				userId: user?.id,
 				status: "open",
 			});
 			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setLoading(false);
 	};
@@ -200,16 +187,7 @@ const Contacts = () => {
 			await api.delete(`/contacts/${contactId}`);
 			toast.success(i18n.t("contacts.toasts.deleted"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setDeletingContact(null);
 		setSearchParam("");
@@ -221,16 +199,7 @@ const Contacts = () => {
 			await api.post("/contacts/import");
 			history.go(0);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 
@@ -263,7 +232,7 @@ const Contacts = () => {
 						: `${i18n.t("contacts.confirmationModal.importTitlte")}`
 				}
 				open={confirmOpen}
-				setOpen={setConfirmOpen}
+				onClose={setConfirmOpen}
 				onConfirm={e =>
 					deletingContact
 						? handleDeleteContact(deletingContact.id)
@@ -350,19 +319,25 @@ const Contacts = () => {
 										>
 											<EditIcon />
 										</IconButton>
-										<IconButton
-											size="small"
-											onClick={e => {
-												setConfirmOpen(true);
-												setDeletingContact(contact);
-											}}
-										>
-											<DeleteOutlineIcon />
-										</IconButton>
+										<Can
+											role={user.profile}
+											perform="contacts-page:deleteContact"
+											yes={() => (
+												<IconButton
+													size="small"
+													onClick={e => {
+														setConfirmOpen(true);
+														setDeletingContact(contact);
+													}}
+												>
+													<DeleteOutlineIcon />
+												</IconButton>
+											)}
+										/>
 									</TableCell>
 								</TableRow>
 							))}
-							{loading && <TableRowSkeleton />}
+							{loading && <TableRowSkeleton avatar columns={3} />}
 						</>
 					</TableBody>
 				</Table>

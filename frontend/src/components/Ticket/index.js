@@ -14,8 +14,8 @@ import TicketInfo from "../TicketInfo";
 import TicketActionButtons from "../TicketActionButtons";
 import MessagesList from "../MessagesList";
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import toastError from "../../errors/toastError";
 
 const drawerWidth = 320;
 
@@ -76,19 +76,7 @@ const Ticket = () => {
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-						if (err.response.status === 404) {
-							history.push("/tickets");
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 			fetchTicket();
@@ -98,10 +86,11 @@ const Ticket = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinChatBox", ticketId);
+
+		socket.on("connect", () => socket.emit("joinChatBox", ticketId));
 
 		socket.on("ticket", data => {
-			if (data.action === "updateStatus") {
+			if (data.action === "update") {
 				setTicket(data.ticket);
 			}
 

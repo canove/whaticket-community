@@ -4,6 +4,8 @@ import { startOfDay, endOfDay, parseISO } from "date-fns";
 import Ticket from "../../models/Ticket";
 import Contact from "../../models/Contact";
 import Message from "../../models/Message";
+import Queue from "../../models/Queue";
+import ShowUserService from "../UserServices/ShowUserService";
 
 interface Request {
   searchParam?: string;
@@ -13,6 +15,7 @@ interface Request {
   showAll?: string;
   userId: string;
   withUnreadMessages?: string;
+  queueIds: number[];
 }
 
 interface Response {
@@ -24,6 +27,7 @@ interface Response {
 const ListTicketsService = async ({
   searchParam = "",
   pageNumber = "1",
+  queueIds,
   status,
   date,
   showAll,
@@ -31,7 +35,8 @@ const ListTicketsService = async ({
   withUnreadMessages
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
-    [Op.or]: [{ userId }, { status: "pending" }]
+    [Op.or]: [{ userId }, { status: "pending" }],
+    queueId: { [Op.or]: [queueIds, null] }
   };
   let includeCondition: Includeable[];
 
@@ -40,11 +45,16 @@ const ListTicketsService = async ({
       model: Contact,
       as: "contact",
       attributes: ["id", "name", "number", "profilePicUrl"]
+    },
+    {
+      model: Queue,
+      as: "queue",
+      attributes: ["id", "name", "color"]
     }
   ];
 
   if (showAll === "true") {
-    whereCondition = {};
+    whereCondition = { queueId: { [Op.or]: [queueIds, null] } };
   }
 
   if (status) {
@@ -76,10 +86,11 @@ const ListTicketsService = async ({
     ];
 
     whereCondition = {
+      ...whereCondition,
       [Op.or]: [
         {
           "$contact.name$": where(
-            fn("LOWER", col("name")),
+            fn("LOWER", col("contact.name")),
             "LIKE",
             `%${sanitizedSearchParam}%`
           )
@@ -98,7 +109,6 @@ const ListTicketsService = async ({
 
   if (date) {
     whereCondition = {
-      ...whereCondition,
       createdAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       }
@@ -106,21 +116,17 @@ const ListTicketsService = async ({
   }
 
   if (withUnreadMessages === "true") {
-    includeCondition = [
-      ...includeCondition,
-      {
-        model: Message,
-        as: "messages",
-        attributes: [],
-        where: {
-          read: false,
-          fromMe: false
-        }
-      }
-    ];
+    const user = await ShowUserService(userId);
+    const userQueueIds = user.queues.map(queue => queue.id);
+
+    whereCondition = {
+      [Op.or]: [{ userId }, { status: "pending" }],
+      queueId: { [Op.or]: [userQueueIds, null] },
+      unreadMessages: { [Op.gt]: 0 }
+    };
   }
 
-  const limit = 20;
+  const limit = 40;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({

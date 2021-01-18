@@ -20,6 +20,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -27,9 +28,7 @@ const useStyles = makeStyles(theme => ({
 		flexWrap: "wrap",
 	},
 	textField: {
-		// marginLeft: theme.spacing(1),
 		marginRight: theme.spacing(1),
-		// width: "25ch",
 		flex: 1,
 	},
 
@@ -40,7 +39,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	btnWrapper: {
-		// margin: theme.spacing(1),
 		position: "relative",
 	},
 
@@ -97,28 +95,15 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 					setContact(data);
 				}
 			} catch (err) {
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
+				toastError(err);
 			}
 		};
 
 		fetchContact();
 	}, [contactId, open, initialValues]);
 
-	const handleClose = contactId => {
-		if (contactId) {
-			onClose(contactId);
-		} else {
-			onClose();
-		}
+	const handleClose = () => {
+		onClose();
 		setContact(initialState);
 	};
 
@@ -136,16 +121,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 			}
 			toast.success(i18n.t("contactModal.success"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 

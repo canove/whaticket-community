@@ -4,19 +4,17 @@ import {
   CreatedAt,
   UpdatedAt,
   Model,
-  DataType,
   PrimaryKey,
   ForeignKey,
   BelongsTo,
   HasMany,
   AutoIncrement,
-  AfterFind,
-  BeforeUpdate,
   Default
 } from "sequelize-typescript";
 
 import Contact from "./Contact";
 import Message from "./Message";
+import Queue from "./Queue";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
@@ -30,7 +28,7 @@ class Ticket extends Model<Ticket> {
   @Column({ defaultValue: "pending" })
   status: string;
 
-  @Column(DataType.VIRTUAL)
+  @Column
   unreadMessages: number;
 
   @Column
@@ -67,28 +65,15 @@ class Ticket extends Model<Ticket> {
   @BelongsTo(() => Whatsapp)
   whatsapp: Whatsapp;
 
+  @ForeignKey(() => Queue)
+  @Column
+  queueId: number;
+
+  @BelongsTo(() => Queue)
+  queue: Queue;
+
   @HasMany(() => Message)
   messages: Message[];
-
-  @AfterFind
-  static async countTicketsUnreadMessages(tickets: Ticket[]): Promise<void> {
-    if (tickets && tickets.length > 0) {
-      await Promise.all(
-        tickets.map(async ticket => {
-          ticket.unreadMessages = await Message.count({
-            where: { ticketId: ticket.id, read: false }
-          });
-        })
-      );
-    }
-  }
-
-  @BeforeUpdate
-  static async countTicketUnreadMessags(ticket: Ticket): Promise<void> {
-    ticket.unreadMessages = await Message.count({
-      where: { ticketId: ticket.id, read: false }
-    });
-  }
 }
 
 export default Ticket;

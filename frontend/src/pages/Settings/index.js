@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n.js";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -43,16 +44,7 @@ const Settings = () => {
 				const { data } = await api.get("/settings");
 				setSettings(data);
 			} catch (err) {
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
+				toastError(err);
 			}
 		};
 		fetchSession();
@@ -60,9 +52,9 @@ const Settings = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.on("settings", data => {
 			if (data.action === "update") {
-				// dispatch({ type: "UPDATE_USERS", payload: data.user });
 				setSettings(prevState => {
 					const aux = [...prevState];
 					const settingIndex = aux.findIndex(s => s.key === data.setting.key);
@@ -87,16 +79,7 @@ const Settings = () => {
 			});
 			toast.success(i18n.t("settings.success"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 

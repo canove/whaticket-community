@@ -28,7 +28,7 @@ import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
-import { Avatar } from "@material-ui/core";
+import toastError from "../../errors/toastError";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_USERS") {
@@ -113,16 +113,7 @@ const Users = () => {
 					setHasMore(data.hasMore);
 					setLoading(false);
 				} catch (err) {
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 			fetchUsers();
@@ -132,6 +123,7 @@ const Users = () => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+
 		socket.on("user", data => {
 			if (data.action === "update" || data.action === "create") {
 				dispatch({ type: "UPDATE_USERS", payload: data.user });
@@ -171,16 +163,7 @@ const Users = () => {
 			await api.delete(`/users/${userId}`);
 			toast.success(i18n.t("users.toasts.deleted"));
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 		setDeletingUser(null);
 		setSearchParam("");
@@ -209,7 +192,7 @@ const Users = () => {
 					}?`
 				}
 				open={confirmModalOpen}
-				setOpen={setConfirmModalOpen}
+				onClose={setConfirmModalOpen}
 				onConfirm={() => handleDeleteUser(deletingUser.id)}
 			>
 				{i18n.t("users.confirmationModal.deleteMessage")}
@@ -253,8 +236,7 @@ const Users = () => {
 				<Table size="small">
 					<TableHead>
 						<TableRow>
-							<TableCell padding="checkbox" />
-							<TableCell>{i18n.t("users.table.name")}</TableCell>
+							<TableCell align="center">{i18n.t("users.table.name")}</TableCell>
 							<TableCell align="center">
 								{i18n.t("users.table.email")}
 							</TableCell>
@@ -270,10 +252,7 @@ const Users = () => {
 						<>
 							{users.map(user => (
 								<TableRow key={user.id}>
-									<TableCell style={{ paddingRight: 0 }}>
-										{<Avatar />}
-									</TableCell>
-									<TableCell>{user.name}</TableCell>
+									<TableCell align="center">{user.name}</TableCell>
 									<TableCell align="center">{user.email}</TableCell>
 									<TableCell align="center">{user.profile}</TableCell>
 									<TableCell align="center">
@@ -296,7 +275,7 @@ const Users = () => {
 									</TableCell>
 								</TableRow>
 							))}
-							{loading && <TableRowSkeleton />}
+							{loading && <TableRowSkeleton columns={4} />}
 						</>
 					</TableBody>
 				</Table>

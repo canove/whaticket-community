@@ -30,14 +30,14 @@ const SendWhatsAppMessage = async ({
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       body,
       {
-        quotedMessageId: quotedMsgSerializedId
+        quotedMessageId: quotedMsgSerializedId,
+        linkPreview: false
       }
     );
 
     await ticket.update({ lastMessage: body });
     return sentMessage;
   } catch (err) {
-    console.log(err);
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };

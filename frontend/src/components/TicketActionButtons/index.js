@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { IconButton } from "@material-ui/core";
@@ -10,6 +9,8 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import TicketOptionsMenu from "../TicketOptionsMenu";
 import ButtonWithSpinner from "../ButtonWithSpinner";
+import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -26,10 +27,10 @@ const useStyles = makeStyles(theme => ({
 const TicketActionButtons = ({ ticket }) => {
 	const classes = useStyles();
 	const history = useHistory();
-	const userId = +localStorage.getItem("userId");
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
+	const { user } = useContext(AuthContext);
 
 	const handleOpenTicketOptionsMenu = e => {
 		setAnchorEl(e.currentTarget);
@@ -55,16 +56,7 @@ const TicketActionButtons = ({ ticket }) => {
 			}
 		} catch (err) {
 			setLoading(false);
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 
@@ -75,7 +67,7 @@ const TicketActionButtons = ({ ticket }) => {
 					loading={loading}
 					startIcon={<Replay />}
 					size="small"
-					onClick={e => handleUpdateTicketStatus(e, "open", userId)}
+					onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
 				>
 					{i18n.t("messagesList.header.buttons.reopen")}
 				</ButtonWithSpinner>
@@ -95,7 +87,7 @@ const TicketActionButtons = ({ ticket }) => {
 						size="small"
 						variant="contained"
 						color="primary"
-						onClick={e => handleUpdateTicketStatus(e, "closed", userId)}
+						onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)}
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
@@ -116,7 +108,7 @@ const TicketActionButtons = ({ ticket }) => {
 					size="small"
 					variant="contained"
 					color="primary"
-					onClick={e => handleUpdateTicketStatus(e, "open", userId)}
+					onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
 				>
 					{i18n.t("messagesList.header.buttons.accept")}
 				</ButtonWithSpinner>

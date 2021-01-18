@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -7,9 +7,11 @@ import Paper from "@material-ui/core/Paper";
 
 import TicketListItem from "../TicketListItem";
 import TicketsListSkeleton from "../TicketsListSkeleton";
+
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 import { ListSubheader } from "@material-ui/core";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	ticketsListWrapper: {
@@ -34,6 +36,9 @@ const useStyles = makeStyles(theme => ({
 		zIndex: 2,
 		backgroundColor: "white",
 		borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "space-between",
 	},
 
 	ticketsCount: {
@@ -110,14 +115,14 @@ const reducer = (state, action) => {
 		return [...state];
 	}
 
-	if (action.type === "UPDATE_TICKET_MESSAGES_COUNT") {
-		const { ticket, searchParam } = action.payload;
+	if (action.type === "UPDATE_TICKET_UNREAD_MESSAGES") {
+		const ticket = action.payload;
 
 		const ticketIndex = state.findIndex(t => t.id === ticket.id);
 		if (ticketIndex !== -1) {
 			state[ticketIndex] = ticket;
 			state.unshift(state.splice(ticketIndex, 1)[0]);
-		} else if (!searchParam) {
+		} else {
 			state.unshift(ticket);
 		}
 
@@ -148,38 +153,50 @@ const reducer = (state, action) => {
 	}
 };
 
-const TicketsList = ({ status, searchParam, showAll }) => {
-	const userId = +localStorage.getItem("userId");
+const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
-	}, [status, searchParam, dispatch, showAll]);
+	}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
 
 	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
 		searchParam,
 		status,
 		showAll,
+		queueIds: JSON.stringify(selectedQueueIds),
 	});
 
 	useEffect(() => {
+		if (!status && !searchParam) return;
 		dispatch({
 			type: "LOAD_TICKETS",
 			payload: tickets,
 		});
-	}, [tickets]);
+	}, [tickets, status, searchParam]);
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		if (status) {
-			socket.emit("joinTickets", status);
-		} else {
-			socket.emit("joinNotification");
-		}
+
+		const shouldUpdateTicket = ticket =>
+			(!ticket.userId || ticket.userId === user?.id || showAll) &&
+			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+
+		const notBelongsToUserQueues = ticket =>
+			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+
+		socket.on("connect", () => {
+			if (status) {
+				socket.emit("joinTickets", status);
+			} else {
+				socket.emit("joinNotification");
+			}
+		});
 
 		socket.on("ticket", data => {
 			if (data.action === "updateUnread") {
@@ -189,14 +206,15 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 				});
 			}
 
-			if (
-				(data.action === "updateStatus" || data.action === "create") &&
-				(!data.ticket.userId || data.ticket.userId === userId || showAll)
-			) {
+			if (data.action === "update" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
 					type: "UPDATE_TICKET",
 					payload: data.ticket,
 				});
+			}
+
+			if (data.action === "update" && notBelongsToUserQueues(data.ticket)) {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
 			}
 
 			if (data.action === "delete") {
@@ -205,16 +223,10 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		});
 
 		socket.on("appMessage", data => {
-			if (
-				data.action === "create" &&
-				(!data.ticket.userId || data.ticket.userId === userId || showAll)
-			) {
+			if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
-					type: "UPDATE_TICKET_MESSAGES_COUNT",
-					payload: {
-						ticket: data.ticket,
-						searchParam,
-					},
+					type: "UPDATE_TICKET_UNREAD_MESSAGES",
+					payload: data.ticket,
 				});
 			}
 		});
@@ -231,7 +243,7 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, showAll, userId, searchParam]);
+	}, [status, showAll, user, selectedQueueIds]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
@@ -259,14 +271,22 @@ const TicketsList = ({ status, searchParam, showAll }) => {
 				<List style={{ paddingTop: 0 }}>
 					{status === "open" && (
 						<ListSubheader className={classes.ticketsListHeader}>
-							{i18n.t("ticketsList.assignedHeader")}
-							<span className={classes.ticketsCount}>{ticketsList.length}</span>
+							<div>
+								{i18n.t("ticketsList.assignedHeader")}
+								<span className={classes.ticketsCount}>
+									{ticketsList.length}
+								</span>
+							</div>
 						</ListSubheader>
 					)}
 					{status === "pending" && (
 						<ListSubheader className={classes.ticketsListHeader}>
-							{i18n.t("ticketsList.pendingHeader")}
-							<span className={classes.ticketsCount}>{ticketsList.length}</span>
+							<div>
+								{i18n.t("ticketsList.pendingHeader")}
+								<span className={classes.ticketsCount}>
+									{ticketsList.length}
+								</span>
+							</div>
 						</ListSubheader>
 					)}
 					{ticketsList.length === 0 && !loading ? (

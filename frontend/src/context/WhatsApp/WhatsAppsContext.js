@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
 
-import useWhatsApps from "./useWhatsApps";
+import useWhatsApps from "../../hooks/useWhatsApps";
 
 const WhatsAppsContext = createContext();
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -8,8 +8,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import IconButton from "@material-ui/core/IconButton";
-import AddIcon from "@material-ui/icons/Add";
+
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
@@ -18,6 +17,10 @@ import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
 
 import { i18n } from "../../translate/i18n";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { Can } from "../Can";
+import TicketsQueueSelect from "../TicketsQueueSelect";
+import { Button } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	ticketsWrapper: {
@@ -46,17 +49,12 @@ const useStyles = makeStyles(theme => ({
 		width: 120,
 	},
 
-	ticketsListActions: {
-		flex: "none",
-		marginLeft: "auto",
-	},
-
-	searchBox: {
-		position: "relative",
+	ticketOptionsBox: {
 		display: "flex",
+		justifyContent: "space-between",
 		alignItems: "center",
 		background: "#fafafa",
-		padding: "10px 13px",
+		padding: theme.spacing(1),
 	},
 
 	serachInputWrapper: {
@@ -65,6 +63,7 @@ const useStyles = makeStyles(theme => ({
 		display: "flex",
 		borderRadius: 40,
 		padding: 4,
+		marginRight: theme.spacing(1),
 	},
 
 	searchIcon: {
@@ -88,15 +87,34 @@ const TicketsManager = () => {
 	const [tab, setTab] = useState("open");
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 	const [showAllTickets, setShowAllTickets] = useState(false);
+	const searchInputRef = useRef();
+	const { user } = useContext(AuthContext);
 
-	const handleSearchContact = e => {
-		if (e.target.value === "") {
-			setSearchParam(e.target.value.toLowerCase());
+	const userQueueIds = user.queues.map(q => q.id);
+	const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
+
+	useEffect(() => {
+		if (tab === "search") {
+			searchInputRef.current.focus();
+		}
+	}, [tab]);
+
+	let searchTimeout;
+
+	const handleSearch = e => {
+		const searchedTerm = e.target.value.toLowerCase();
+
+		clearTimeout(searchTimeout);
+
+		if (searchedTerm === "") {
+			setSearchParam(searchedTerm);
 			setTab("open");
 			return;
 		}
-		setSearchParam(e.target.value.toLowerCase());
-		setTab("search");
+
+		searchTimeout = setTimeout(() => {
+			setSearchParam(searchedTerm);
+		}, 500);
 	};
 
 	const handleChangeTab = (e, newValue) => {
@@ -138,50 +156,78 @@ const TicketsManager = () => {
 					/>
 				</Tabs>
 			</Paper>
-			<Paper square elevation={0} className={classes.searchBox}>
-				<div className={classes.serachInputWrapper}>
-					<SearchIcon className={classes.searchIcon} />
-					<InputBase
-						className={classes.searchInput}
-						placeholder={i18n.t("tickets.search.placeholder")}
-						type="search"
-						onChange={handleSearchContact}
-					/>
-				</div>
-				<div className={classes.ticketsListActions}>
-					<FormControlLabel
-						label={i18n.t("tickets.buttons.showAll")}
-						labelPlacement="start"
-						control={
-							<Switch
-								size="small"
-								checked={showAllTickets}
-								onChange={() => setShowAllTickets(prevState => !prevState)}
-								name="showAllTickets"
-								color="primary"
-							/>
-						}
-					/>
-					<IconButton
-						aria-label="add ticket"
-						size="small"
-						color="primary"
-						onClick={e => setNewTicketModalOpen(true)}
-						style={{ marginLeft: 20 }}
-					>
-						<AddIcon />
-					</IconButton>
-				</div>
+			<Paper square elevation={0} className={classes.ticketOptionsBox}>
+				{tab === "search" ? (
+					<div className={classes.serachInputWrapper}>
+						<SearchIcon className={classes.searchIcon} />
+						<InputBase
+							className={classes.searchInput}
+							inputRef={searchInputRef}
+							placeholder={i18n.t("tickets.search.placeholder")}
+							type="search"
+							onChange={handleSearch}
+						/>
+					</div>
+				) : (
+					<>
+						<Button
+							variant="outlined"
+							color="primary"
+							onClick={() => setNewTicketModalOpen(true)}
+						>
+							{i18n.t("ticketsManager.buttons.newTicket")}
+						</Button>
+						<Can
+							role={user.profile}
+							perform="tickets-manager:showall"
+							yes={() => (
+								<FormControlLabel
+									label={i18n.t("tickets.buttons.showAll")}
+									labelPlacement="start"
+									control={
+										<Switch
+											size="small"
+											checked={showAllTickets}
+											onChange={() =>
+												setShowAllTickets(prevState => !prevState)
+											}
+											name="showAllTickets"
+											color="primary"
+										/>
+									}
+								/>
+							)}
+						/>
+					</>
+				)}
+				<TicketsQueueSelect
+					style={{ marginLeft: 6 }}
+					selectedQueueIds={selectedQueueIds}
+					userQueues={user?.queues}
+					onChange={values => setSelectedQueueIds(values)}
+				/>
 			</Paper>
 			<TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
-				<TicketsList status="open" showAll={showAllTickets} />
-				<TicketsList status="pending" showAll={true} />
+				<TicketsList
+					status="open"
+					showAll={showAllTickets}
+					selectedQueueIds={selectedQueueIds}
+				/>
+				<TicketsList status="pending" selectedQueueIds={selectedQueueIds} />
 			</TabPanel>
 			<TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
-				<TicketsList status="closed" showAll={true} />
+				<TicketsList
+					status="closed"
+					showAll={true}
+					selectedQueueIds={selectedQueueIds}
+				/>
 			</TabPanel>
 			<TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
-				<TicketsList searchParam={searchParam} showAll={true} />
+				<TicketsList
+					searchParam={searchParam}
+					showAll={true}
+					selectedQueueIds={selectedQueueIds}
+				/>
 			</TabPanel>
 		</Paper>
 	);

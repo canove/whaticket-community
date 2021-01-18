@@ -1,18 +1,18 @@
-import AppError from "../../errors/AppError";
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
-import Contact from "../../models/Contact";
+import { getIO } from "../../libs/socket";
 import Ticket from "../../models/Ticket";
-import User from "../../models/User";
+import ShowTicketService from "./ShowTicketService";
 
 interface TicketData {
   status?: string;
   userId?: number;
+  queueId?: number;
 }
 
 interface Request {
   ticketData: TicketData;
-  ticketId: string;
+  ticketId: string | number;
 }
 
 interface Response {
@@ -25,27 +25,9 @@ const UpdateTicketService = async ({
   ticketData,
   ticketId
 }: Request): Promise<Response> => {
-  const { status, userId } = ticketData;
+  const { status, userId, queueId } = ticketData;
 
-  const ticket = await Ticket.findOne({
-    where: { id: ticketId },
-    include: [
-      {
-        model: Contact,
-        as: "contact",
-        attributes: ["id", "name", "number", "profilePicUrl"]
-      },
-      {
-        model: User,
-        as: "user",
-        attributes: ["id", "name"]
-      }
-    ]
-  });
-
-  if (!ticket) {
-    throw new AppError("ERR_NO_TICKET_FOUND", 404);
-  }
+  const ticket = await ShowTicketService(ticketId);
 
   await SetTicketMessagesAsRead(ticket);
 
@@ -58,10 +40,28 @@ const UpdateTicketService = async ({
 
   await ticket.update({
     status,
+    queueId,
     userId
   });
 
   await ticket.reload();
+
+  const io = getIO();
+
+  if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
+    io.to(oldStatus).emit("ticket", {
+      action: "delete",
+      ticketId: ticket.id
+    });
+  }
+
+  io.to(ticket.status)
+    .to("notification")
+    .to(ticketId.toString())
+    .emit("ticket", {
+      action: "update",
+      ticket
+    });
 
   return { ticket, oldStatus, oldUserId };
 };

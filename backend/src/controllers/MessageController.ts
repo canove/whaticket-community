@@ -30,7 +30,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     ticketId
   });
 
-  await SetTicketMessagesAsRead(ticket);
+  SetTicketMessagesAsRead(ticket);
 
   return res.json({ count, messages, ticket, hasMore });
 };
@@ -42,6 +42,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const ticket = await ShowTicketService(ticketId);
 
+  SetTicketMessagesAsRead(ticket);
+
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {
@@ -51,8 +53,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   } else {
     await SendWhatsAppMessage({ body, ticket, quotedMsg });
   }
-
-  await SetTicketMessagesAsRead(ticket);
 
   return res.send();
 };

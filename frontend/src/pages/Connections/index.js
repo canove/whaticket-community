@@ -39,6 +39,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
 import { i18n } from "../../translate/i18n";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -114,16 +115,7 @@ const Connections = () => {
 		try {
 			await api.post(`/whatsappsession/${whatsAppId}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 
@@ -131,16 +123,7 @@ const Connections = () => {
 		try {
 			await api.put(`/whatsappsession/${whatsAppId}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 
@@ -195,16 +178,7 @@ const Connections = () => {
 			try {
 				await api.delete(`/whatsappsession/${confirmModalInfo.whatsAppId}`);
 			} catch (err) {
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
+				toastError(err);
 			}
 		}
 
@@ -213,16 +187,7 @@ const Connections = () => {
 				await api.delete(`/whatsapp/${confirmModalInfo.whatsAppId}`);
 				toast.success(i18n.t("connections.toasts.deleted"));
 			} catch (err) {
-				const errorMsg = err.response?.data?.error;
-				if (errorMsg) {
-					if (i18n.exists(`backendErrors.${errorMsg}`)) {
-						toast.error(i18n.t(`backendErrors.${errorMsg}`));
-					} else {
-						toast.error(err.response.data.error);
-					}
-				} else {
-					toast.error("Unknown error");
-				}
+				toastError(err);
 			}
 		}
 
@@ -329,7 +294,7 @@ const Connections = () => {
 			<ConfirmationModal
 				title={confirmModalInfo.title}
 				open={confirmModalOpen}
-				setOpen={setConfirmModalOpen}
+				onClose={setConfirmModalOpen}
 				onConfirm={handleSubmitConfirmationModal}
 			>
 				{confirmModalInfo.message}

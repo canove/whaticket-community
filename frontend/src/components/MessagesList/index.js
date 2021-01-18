@@ -26,9 +26,8 @@ import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
 import whatsBackground from "../../assets/wa-background.png";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
-import { toast } from "react-toastify";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	messagesListWrapper: {
@@ -302,7 +301,7 @@ const reducer = (state, action) => {
 	}
 };
 
-const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
+const MessagesList = ({ ticketId, isGroup }) => {
 	const classes = useStyles();
 
 	const [messagesList, dispatch] = useReducer(reducer, []);
@@ -343,16 +342,7 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 					}
 				} catch (err) {
 					setLoading(false);
-					const errorMsg = err.response?.data?.error;
-					if (errorMsg) {
-						if (i18n.exists(`backendErrors.${errorMsg}`)) {
-							toast.error(i18n.t(`backendErrors.${errorMsg}`));
-						} else {
-							toast.error(err.response.data.error);
-						}
-					} else {
-						toast.error("Unknown error");
-					}
+					toastError(err);
 				}
 			};
 			fetchMessages();
@@ -364,7 +354,8 @@ const MessagesList = ({ ticketId, isGroup, setReplyingMessage }) => {
 
 	useEffect(() => {
 		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-		socket.emit("joinChatBox", ticketId);
+
+		socket.on("connect", () => socket.emit("joinChatBox", ticketId));
 
 		socket.on("appMessage", data => {
 			if (data.action === "create") {

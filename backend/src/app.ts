@@ -10,6 +10,7 @@ import "./database";
 import uploadConfig from "./config/upload";
 import AppError from "./errors/AppError";
 import routes from "./routes";
+import { logger } from "./utils/logger";
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 
@@ -31,10 +32,11 @@ app.use(Sentry.Handlers.errorHandler());
 
 app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
   if (err instanceof AppError) {
+    logger.warn(err);
     return res.status(err.statusCode).json({ error: err.message });
   }
 
-  console.error(err);
+  logger.error(err);
   return res.status(500).json({ error: "Internal server error" });
 });
 

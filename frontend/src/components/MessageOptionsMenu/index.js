@@ -1,7 +1,5 @@
 import React, { useState, useContext } from "react";
 
-import { toast } from "react-toastify";
-
 import MenuItem from "@material-ui/core/MenuItem";
 
 import { i18n } from "../../translate/i18n";
@@ -9,6 +7,7 @@ import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import { Menu } from "@material-ui/core";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import toastError from "../../errors/toastError";
 
 const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 	const { setReplyingMessage } = useContext(ReplyMessageContext);
@@ -18,16 +17,7 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 		try {
 			await api.delete(`/messages/${message.id}`);
 		} catch (err) {
-			const errorMsg = err.response?.data?.error;
-			if (errorMsg) {
-				if (i18n.exists(`backendErrors.${errorMsg}`)) {
-					toast.error(i18n.t(`backendErrors.${errorMsg}`));
-				} else {
-					toast.error(err.response.data.error);
-				}
-			} else {
-				toast.error("Unknown error");
-			}
+			toastError(err);
 		}
 	};
 
@@ -46,7 +36,7 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 			<ConfirmationModal
 				title={i18n.t("messageOptionsMenu.confirmationModal.title")}
 				open={confirmationOpen}
-				setOpen={setConfirmationOpen}
+				onClose={setConfirmationOpen}
 				onConfirm={handleDeleteMessage}
 			>
 				{i18n.t("messageOptionsMenu.confirmationModal.message")}

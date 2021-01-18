@@ -1,8 +1,6 @@
 import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
-import { Op } from "sequelize";
-import { subHours } from "date-fns";
 import * as Sentry from "@sentry/node";
 
 import {
@@ -17,9 +15,13 @@ import Ticket from "../../models/Ticket";
 import Message from "../../models/Message";
 
 import { getIO } from "../../libs/socket";
-import AppError from "../../errors/AppError";
-import ShowTicketService from "../TicketServices/ShowTicketService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import { logger } from "../../utils/logger";
+import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
+import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
+import { debounce } from "../../helpers/Debounce";
+import UpdateTicketService from "../TicketServices/UpdateTicketService";
 
 interface Session extends Client {
   id?: number;
@@ -27,141 +29,48 @@ interface Session extends Client {
 
 const writeFileAsync = promisify(writeFile);
 
-const verifyContact = async (
-  msgContact: WbotContact,
-  profilePicUrl: string
-): Promise<Contact> => {
-  const io = getIO();
+const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
+  const profilePicUrl = await msgContact.getProfilePicUrl();
 
-  let contact = await Contact.findOne({
-    where: { number: msgContact.id.user }
-  });
+  const contactData = {
+    name: msgContact.name || msgContact.pushname || msgContact.id.user,
+    number: msgContact.id.user,
+    profilePicUrl,
+    isGroup: msgContact.isGroup
+  };
 
-  if (contact) {
-    await contact.update({ profilePicUrl });
-
-    io.emit("contact", {
-      action: "update",
-      contact
-    });
-  } else {
-    contact = await Contact.create({
-      name: msgContact.name || msgContact.pushname || msgContact.id.user,
-      number: msgContact.id.user,
-      profilePicUrl
-    });
-
-    io.emit("contact", {
-      action: "create",
-      contact
-    });
-  }
+  const contact = CreateOrUpdateContactService(contactData);
 
   return contact;
 };
 
-const verifyGroup = async (msgGroupContact: WbotContact) => {
-  const profilePicUrl = await msgGroupContact.getProfilePicUrl();
+const verifyQuotedMessage = async (
+  msg: WbotMessage
+): Promise<Message | null> => {
+  if (!msg.hasQuotedMsg) return null;
 
-  let groupContact = await Contact.findOne({
-    where: { number: msgGroupContact.id.user }
-  });
-  if (groupContact) {
-    await groupContact.update({ profilePicUrl });
-  } else {
-    groupContact = await Contact.create({
-      name: msgGroupContact.name,
-      number: msgGroupContact.id.user,
-      isGroup: msgGroupContact.isGroup,
-      profilePicUrl
-    });
-    const io = getIO();
-    io.emit("contact", {
-      action: "create",
-      contact: groupContact
-    });
-  }
+  const wbotQuotedMsg = await msg.getQuotedMessage();
 
-  return groupContact;
-};
-
-const verifyTicket = async (
-  contact: Contact,
-  whatsappId: number,
-  groupContact?: Contact
-): Promise<Ticket> => {
-  let ticket = await Ticket.findOne({
-    where: {
-      status: {
-        [Op.or]: ["open", "pending"]
-      },
-      contactId: groupContact ? groupContact.id : contact.id
-    },
-    include: ["contact"]
+  const quotedMsg = await Message.findOne({
+    where: { id: wbotQuotedMsg.id.id }
   });
 
-  if (!ticket && groupContact) {
-    ticket = await Ticket.findOne({
-      where: {
-        contactId: groupContact.id
-      },
-      order: [["createdAt", "DESC"]],
-      include: ["contact"]
-    });
+  if (!quotedMsg) return null;
 
-    if (ticket) {
-      await ticket.update({ status: "pending", userId: null });
-    }
-  }
-
-  if (!ticket) {
-    ticket = await Ticket.findOne({
-      where: {
-        updatedAt: {
-          [Op.between]: [+subHours(new Date(), 2), +new Date()]
-        },
-        contactId: groupContact ? groupContact.id : contact.id
-      },
-      order: [["updatedAt", "DESC"]],
-      include: ["contact"]
-    });
-
-    if (ticket) {
-      await ticket.update({ status: "pending", userId: null });
-    }
-  }
-
-  if (!ticket) {
-    const { id } = await Ticket.create({
-      contactId: groupContact ? groupContact.id : contact.id,
-      status: "pending",
-      isGroup: !!groupContact,
-      whatsappId
-    });
-
-    ticket = await ShowTicketService(id);
-  }
-
-  return ticket;
+  return quotedMsg;
 };
 
-const verifyMedia = async (
+const verifyMediaMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
 ): Promise<Message> => {
-  let quotedMsg: Message | null = null;
+  const quotedMsg = await verifyQuotedMessage(msg);
 
   const media = await msg.downloadMedia();
 
   if (!media) {
-    throw new AppError("ERR_WAPP_DOWNLOAD_MEDIA");
-  }
-
-  if (msg.hasQuotedMsg) {
-    const wbotQuotedMsg = await msg.getQuotedMessage();
-
-    quotedMsg = await Message.findByPk(wbotQuotedMsg.id.id);
+    throw new Error("ERR_WAPP_DOWNLOAD_MEDIA");
   }
 
   if (!media.filename) {
@@ -176,7 +85,8 @@ const verifyMedia = async (
       "base64"
     );
   } catch (err) {
-    console.log(err);
+    Sentry.captureException(err);
+    logger.error(err);
   }
 
   const messageData = {
@@ -191,9 +101,9 @@ const verifyMedia = async (
     quotedMsgId: quotedMsg?.id
   };
 
+  await ticket.update({ lastMessage: msg.body || media.filename });
   const newMessage = await CreateMessageService({ messageData });
 
-  await ticket.update({ lastMessage: msg.body || media.filename });
   return newMessage;
 };
 
@@ -202,43 +112,78 @@ const verifyMessage = async (
   ticket: Ticket,
   contact: Contact
 ) => {
-  let newMessage: Message | null;
-  let quotedMsg: Message | null = null;
+  const quotedMsg = await verifyQuotedMessage(msg);
 
-  if (msg.hasQuotedMsg) {
-    const wbotQuotedMsg = await msg.getQuotedMessage();
+  const messageData = {
+    id: msg.id.id,
+    ticketId: ticket.id,
+    contactId: msg.fromMe ? undefined : contact.id,
+    body: msg.body,
+    fromMe: msg.fromMe,
+    mediaType: msg.type,
+    read: msg.fromMe,
+    quotedMsgId: quotedMsg?.id
+  };
 
-    quotedMsg = await Message.findByPk(wbotQuotedMsg.id.id);
-  }
+  await ticket.update({ lastMessage: msg.body });
+  await CreateMessageService({ messageData });
+};
 
-  if (msg.hasMedia) {
-    newMessage = await verifyMedia(msg, ticket, contact);
-  } else {
-    const messageData = {
-      id: msg.id.id,
-      ticketId: ticket.id,
-      contactId: msg.fromMe ? undefined : contact.id,
-      body: msg.body,
-      fromMe: msg.fromMe,
-      mediaType: msg.type,
-      read: msg.fromMe,
-      quotedMsgId: quotedMsg?.id
-    };
+const verifyQueue = async (
+  wbot: Session,
+  msg: WbotMessage,
+  ticket: Ticket,
+  contact: Contact
+) => {
+  const { queues, greetingMessage } = await ShowWhatsAppService(wbot.id!);
 
-    newMessage = await CreateMessageService({ messageData });
-    await ticket.update({ lastMessage: msg.body });
-  }
-
-  const io = getIO();
-  io.to(ticket.id.toString())
-    .to(ticket.status)
-    .to("notification")
-    .emit("appMessage", {
-      action: "create",
-      message: newMessage,
-      ticket,
-      contact
+  if (queues.length === 1) {
+    await UpdateTicketService({
+      ticketData: { queueId: queues[0].id },
+      ticketId: ticket.id
     });
+
+    return;
+  }
+
+  const selectedOption = msg.body[0];
+
+  const choosenQueue = queues[+selectedOption - 1];
+
+  if (choosenQueue) {
+    await UpdateTicketService({
+      ticketData: { queueId: choosenQueue.id },
+      ticketId: ticket.id
+    });
+
+    const body = `\u200e${choosenQueue.greetingMessage}`;
+
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+
+    await verifyMessage(sentMessage, ticket, contact);
+  } else {
+    let options = "";
+
+    queues.forEach((queue, index) => {
+      options += `*${index + 1}* - ${queue.name}\n`;
+    });
+
+    const body = `\u200e${greetingMessage}\n${options}`;
+
+    const debouncedSentMessage = debounce(
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
+        verifyMessage(sentMessage, ticket, contact);
+      },
+      3000,
+      ticket.id
+    );
+
+    debouncedSentMessage();
+  }
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {
@@ -270,14 +215,16 @@ const handleMessage = async (
     let groupContact: Contact | undefined;
 
     if (msg.fromMe) {
-      msgContact = await wbot.getContactById(msg.to);
+      // messages sent automatically by wbot have a special character in front of it
+      // if so, this message was already been stored in database;
+      if (/\u200e/.test(msg.body[0])) return;
 
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
-      // the media itself comes on body of message, as base64
-      // if this is the case, return and let this media be handled by media_uploaded event
-      // it should be improoved to handle the base64 media here in future versions
+      // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
 
       if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard") return;
+
+      msgContact = await wbot.getContactById(msg.to);
     } else {
       msgContact = await msg.getContact();
     }
@@ -293,17 +240,39 @@ const handleMessage = async (
         msgGroupContact = await wbot.getContactById(msg.from);
       }
 
-      groupContact = await verifyGroup(msgGroupContact);
+      groupContact = await verifyContact(msgGroupContact);
     }
 
-    const profilePicUrl = await msgContact.getProfilePicUrl();
-    const contact = await verifyContact(msgContact, profilePicUrl);
-    const ticket = await verifyTicket(contact, wbot.id!, groupContact);
+    const unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
 
-    await verifyMessage(msg, ticket, contact);
+    const contact = await verifyContact(msgContact);
+    const ticket = await FindOrCreateTicketService(
+      contact,
+      wbot.id!,
+      unreadMessages,
+      groupContact
+    );
+
+    if (msg.hasMedia) {
+      await verifyMediaMessage(msg, ticket, contact);
+    } else {
+      await verifyMessage(msg, ticket, contact);
+    }
+
+    const whatsapp = await ShowWhatsAppService(wbot.id!);
+
+    if (
+      !ticket.queue &&
+      !chat.isGroup &&
+      !msg.fromMe &&
+      !ticket.userId &&
+      whatsapp.queues.length >= 1
+    ) {
+      await verifyQueue(wbot, msg, ticket, contact);
+    }
   } catch (err) {
     Sentry.captureException(err);
-    console.log(err);
+    logger.error(`Error handling whatsapp message: Err: ${err}`);
   }
 };
 
@@ -334,13 +303,12 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
     });
   } catch (err) {
     Sentry.captureException(err);
-    console.log(err);
+    logger.error(`Error handling message ack. Err: ${err}`);
   }
 };
 
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
-    // console.log(msg);
     handleMessage(msg, wbot);
   });
 
