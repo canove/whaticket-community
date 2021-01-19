@@ -178,6 +178,8 @@ const MarkdownWrapper = ({ children }) => {
 		return markdownOptions;
 	}, []);
 
+	if (!children) return null;
+
 	return <Markdown options={options}>{children}</Markdown>;
 };
 
