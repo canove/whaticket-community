@@ -171,12 +171,14 @@ const MarkdownWrapper = ({ children }) => {
 
 		elements.forEach(element => {
 			if (!allowedElements.includes(element)) {
-				markdownOptions.overrides[element] = el => el.children;
+				markdownOptions.overrides[element] = el => el.children || null;
 			}
 		});
 
 		return markdownOptions;
 	}, []);
+
+	if (!children) return null;
 
 	return <Markdown options={options}>{children}</Markdown>;
 };
