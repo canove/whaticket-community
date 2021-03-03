@@ -40,19 +40,6 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 - Send media (images/audio/documents) ✅
 - Receive media (images/audio/video/documents) ✅
 
-## Demo
-
-**Note**: It's not a good idea to sync your WhatsApp account is this demo enviroment, because all your received messages will be stored in database and will be accessible by everyone that access this URL and creates an account.
-
-That said, theres not much to test without syncing an WhatsApp account, since adding contacts or tickets simple throws an error if app is not synced with WhatsApp.
-
-Meanwhile, if you want to test it, remember to disconnect session and delete all tickets and contacts after your tests.
-
-Feel free to creat an account and test it:
-https://whaticket.economicros.com.br/signup
-
-It's online thanks to [@ramphy](https://github.com/ramphy), who provided the VPS.
-
 ## Installation and Usage (Linux Ubuntu - Development)
 
 Create Mysql Database using docker:

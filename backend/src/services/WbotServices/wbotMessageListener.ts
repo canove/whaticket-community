@@ -146,7 +146,7 @@ const verifyQueue = async (
     return;
   }
 
-  const selectedOption = msg.body[0];
+  const selectedOption = msg.body;
 
   const choosenQueue = queues[+selectedOption - 1];
 
