@@ -5,12 +5,13 @@ services:
     env_file:
         "./env-backend"
     ports:
-      - "8000:8080"
+      - "3001:8080"
     build:
       context: ./backend
       dockerfile: ./Dockerfile
-    # volumes:
-      # - ./backend:/usr/app/
+    entrypoint: ["/bin/bash", "./entrypoint.sh"]
+    volumes:
+      - ./data-public:/usr/app/public
 
     ## Use External mysql Instance  
     networks:
