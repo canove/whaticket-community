@@ -43,12 +43,13 @@ const FindOrCreateTicketService = async (
   if (!ticket && !groupContact) {
     ticket = await Ticket.findOne({
       where: {
-        updatedAt: {
-          [Op.between]: [+subHours(new Date(), 2), +new Date()]
-        },
+        // updatedAt: {
+        //   [Op.between]: [+subHours(new Date(), 2), +new Date()]
+        // },
         contactId: contact.id
       },
-      order: [["updatedAt", "DESC"]]
+      order: [["updatedAt", "DESC"]],
+      include: ["contact"]
     });
 
     if (ticket) {
