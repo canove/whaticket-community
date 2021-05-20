@@ -20,7 +20,7 @@ I'm a SysAdmin, and in my daily work, I do a lot of support through WhatsApp. Si
 
 ## How it works?
 
-On every new message received in an associated WhatsApp, a new Ticket is created. Then, this ticket can be reached in a _queue_ on _Tickets_ page, where you can assign ticket to your yourself by _aceppting_ it, respond ticket messagee and eventually _resolve_ it.
+On every new message received in an associated WhatsApp, a new Ticket is created. Then, this ticket can be reached in a _queue_ on _Tickets_ page, where you can assign ticket to your yourself by _aceppting_ it, respond ticket message and eventually _resolve_ it.
 
 Subsequent messages from same contact will be related to first **open/pending** ticket found.
 
