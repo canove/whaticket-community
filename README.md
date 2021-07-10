@@ -6,6 +6,8 @@
 
 # WhaTicket
 
+**NOTE**: The new version of whatsapp-web.js required Node 14. Upgrade your installations to keep using it.
+
 A _very simple_ Ticket System based on WhatsApp messages.
 
 Backend uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) to receive and send WhatsApp messages, create tickets from them and store all in a MySQL database.
@@ -147,7 +149,7 @@ sudo apt update && sudo apt upgrade
 Install node and confirm node command is available:
 
 ```bash
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
 node -v
 npm -v
