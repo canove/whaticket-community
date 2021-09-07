@@ -42,7 +42,8 @@ function ListItemLink(props) {
   );
 }
 
-const MainListItems = () => {
+const MainListItems = (props) => {
+  const { drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const [connectionWarning, setConnectionWarning] = useState(false);
@@ -70,7 +71,7 @@ const MainListItems = () => {
   }, [whatsApps]);
 
   return (
-    <div>
+    <div onClick={drawerClose}>
       <ListItemLink
         to="/"
         primary="Dashboard"
