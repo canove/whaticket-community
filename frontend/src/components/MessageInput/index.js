@@ -12,6 +12,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { green } from "@material-ui/core/colors";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import IconButton from "@material-ui/core/IconButton";
+import MoreVert from "@material-ui/icons/MoreVert";
 import MoodIcon from "@material-ui/icons/Mood";
 import SendIcon from "@material-ui/icons/Send";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -19,7 +20,13 @@ import ClearIcon from "@material-ui/icons/Clear";
 import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { FormControlLabel, Switch } from "@material-ui/core";
+import {
+  FormControlLabel,
+  Hidden,
+  Menu,
+  MenuItem,
+  Switch,
+} from "@material-ui/core";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
 import { i18n } from "../../translate/i18n";
@@ -39,6 +46,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
     borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+    [theme.breakpoints.down("sm")]: {
+      position: "fixed",
+      bottom: 0,
+      width: "100%",
+    },
   },
 
   newMessageBox: {
@@ -56,6 +68,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     borderRadius: 20,
     flex: 1,
+    position: "relative",
   },
 
   messageInput: {
@@ -200,6 +213,7 @@ const MessageInput = ({ ticketStatus }) => {
   const [quickAnswers, setQuickAnswer] = useState([]);
   const [typeBar, setTypeBar] = useState(false);
   const inputRef = useRef();
+  const [anchorEl, setAnchorEl] = useState(null);
   const { setReplyingMessage, replyingMessage } =
     useContext(ReplyMessageContext);
   const { user } = useContext(AuthContext);
@@ -363,6 +377,14 @@ const MessageInput = ({ ticketStatus }) => {
     }
   };
 
+  const handleOpenMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (event) => {
+    setAnchorEl(null);
+  };
+
   const renderReplyingMessage = (message) => {
     return (
       <div className={classes.replyginMsgWrapper}>
@@ -429,60 +451,126 @@ const MessageInput = ({ ticketStatus }) => {
       <Paper square elevation={0} className={classes.mainWrapper}>
         {replyingMessage && renderReplyingMessage(replyingMessage)}
         <div className={classes.newMessageBox}>
-          <IconButton
-            aria-label="emojiPicker"
-            component="span"
-            disabled={loading || recording || ticketStatus !== "open"}
-            onClick={(e) => setShowEmoji((prevState) => !prevState)}
-          >
-            <MoodIcon className={classes.sendMessageIcons} />
-          </IconButton>
-          {showEmoji ? (
-            <div className={classes.emojiBox}>
-              <ClickAwayListener onClickAway={(e) => setShowEmoji(false)}>
-                <Picker
-                  perLine={16}
-                  showPreview={false}
-                  showSkinTones={false}
-                  onSelect={handleAddEmoji}
-                />
-              </ClickAwayListener>
-            </div>
-          ) : null}
-
-          <input
-            multiple
-            type="file"
-            id="upload-button"
-            disabled={loading || recording || ticketStatus !== "open"}
-            className={classes.uploadInput}
-            onChange={handleChangeMedias}
-          />
-          <label htmlFor="upload-button">
+          <Hidden only={["sm", "xs"]}>
             <IconButton
-              aria-label="upload"
+              aria-label="emojiPicker"
               component="span"
               disabled={loading || recording || ticketStatus !== "open"}
+              onClick={(e) => setShowEmoji((prevState) => !prevState)}
             >
-              <AttachFileIcon className={classes.sendMessageIcons} />
+              <MoodIcon className={classes.sendMessageIcons} />
             </IconButton>
-          </label>
-          <FormControlLabel
-            style={{ marginRight: 7, color: "gray" }}
-            label={i18n.t("messagesInput.signMessage")}
-            labelPlacement="start"
-            control={
-              <Switch
-                size="small"
-                checked={signMessage}
-                onChange={(e) => {
-                  setSignMessage(e.target.checked);
-                }}
-                name="showAllTickets"
-                color="primary"
-              />
-            }
-          />
+            {showEmoji ? (
+              <div className={classes.emojiBox}>
+                <ClickAwayListener onClickAway={(e) => setShowEmoji(false)}>
+                  <Picker
+                    perLine={16}
+                    showPreview={false}
+                    showSkinTones={false}
+                    onSelect={handleAddEmoji}
+                  />
+                </ClickAwayListener>
+              </div>
+            ) : null}
+
+            <input
+              multiple
+              type="file"
+              id="upload-button"
+              disabled={loading || recording || ticketStatus !== "open"}
+              className={classes.uploadInput}
+              onChange={handleChangeMedias}
+            />
+            <label htmlFor="upload-button">
+              <IconButton
+                aria-label="upload"
+                component="span"
+                disabled={loading || recording || ticketStatus !== "open"}
+              >
+                <AttachFileIcon className={classes.sendMessageIcons} />
+              </IconButton>
+            </label>
+            <FormControlLabel
+              style={{ marginRight: 7, color: "gray" }}
+              label={i18n.t("messagesInput.signMessage")}
+              labelPlacement="start"
+              control={
+                <Switch
+                  size="small"
+                  checked={signMessage}
+                  onChange={(e) => {
+                    setSignMessage(e.target.checked);
+                  }}
+                  name="showAllTickets"
+                  color="primary"
+                />
+              }
+            />
+          </Hidden>
+          <Hidden only={["md", "lg", "xl"]}>
+            <IconButton
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleOpenMenuClick}
+            >
+              <MoreVert></MoreVert>
+            </IconButton>
+            <Menu
+              id="simple-menu"
+              keepMounted
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuItemClick}
+            >
+              <MenuItem onClick={handleMenuItemClick}>
+                <IconButton
+                  aria-label="emojiPicker"
+                  component="span"
+                  disabled={loading || recording || ticketStatus !== "open"}
+                  onClick={(e) => setShowEmoji((prevState) => !prevState)}
+                >
+                  <MoodIcon className={classes.sendMessageIcons} />
+                </IconButton>
+              </MenuItem>
+              <MenuItem onClick={handleMenuItemClick}>
+                <input
+                  multiple
+                  type="file"
+                  id="upload-button"
+                  disabled={loading || recording || ticketStatus !== "open"}
+                  className={classes.uploadInput}
+                  onChange={handleChangeMedias}
+                />
+                <label htmlFor="upload-button">
+                  <IconButton
+                    aria-label="upload"
+                    component="span"
+                    disabled={loading || recording || ticketStatus !== "open"}
+                  >
+                    <AttachFileIcon className={classes.sendMessageIcons} />
+                  </IconButton>
+                </label>
+              </MenuItem>
+              <MenuItem onClick={handleMenuItemClick}>
+                <FormControlLabel
+                  style={{ marginRight: 7, color: "gray" }}
+                  label={i18n.t("messagesInput.signMessage")}
+                  labelPlacement="start"
+                  control={
+                    <Switch
+                      size="small"
+                      checked={signMessage}
+                      onChange={(e) => {
+                        setSignMessage(e.target.checked);
+                      }}
+                      name="showAllTickets"
+                      color="primary"
+                    />
+                  }
+                />
+              </MenuItem>
+            </Menu>
+          </Hidden>
           <div className={classes.messageInputWrapper}>
             <InputBase
               inputRef={(input) => {
