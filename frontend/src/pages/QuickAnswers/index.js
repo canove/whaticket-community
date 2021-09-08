@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useReducer } from "react";
-import { toast } from "react-toastify";
 import openSocket from "socket.io-client";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import IconButton from "@material-ui/core/IconButton";
+import {
+  Button,
+  IconButton,
+  makeStyles,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  InputAdornment,
+  TextField,
+} from "@material-ui/core";
+import { Edit, DeleteOutline } from "@material-ui/icons";
 import SearchIcon from "@material-ui/icons/Search";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import EditIcon from "@material-ui/icons/Edit";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -26,45 +25,46 @@ import Title from "../../components/Title";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
-import UserModal from "../../components/UserModal";
+import QuickAnswersModal from "../../components/QuickAnswersModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 
 const reducer = (state, action) => {
-  if (action.type === "LOAD_USERS") {
-    const users = action.payload;
-    const newUsers = [];
+  if (action.type === "LOAD_QUICK_ANSWERS") {
+    const quickAnswers = action.payload;
+    const newQuickAnswers = [];
 
-    users.forEach((user) => {
-      const userIndex = state.findIndex((u) => u.id === user.id);
-      if (userIndex !== -1) {
-        state[userIndex] = user;
+    quickAnswers.forEach((quickAnswer) => {
+      const quickAnswerIndex = state.findIndex((q) => q.id === quickAnswer.id);
+      if (quickAnswerIndex !== -1) {
+        state[quickAnswerIndex] = quickAnswer;
       } else {
-        newUsers.push(user);
+        newQuickAnswers.push(quickAnswer);
       }
     });
 
-    return [...state, ...newUsers];
+    return [...state, ...newQuickAnswers];
   }
 
-  if (action.type === "UPDATE_USERS") {
-    const user = action.payload;
-    const userIndex = state.findIndex((u) => u.id === user.id);
+  if (action.type === "UPDATE_QUICK_ANSWERS") {
+    const quickAnswer = action.payload;
+    const quickAnswerIndex = state.findIndex((q) => q.id === quickAnswer.id);
 
-    if (userIndex !== -1) {
-      state[userIndex] = user;
+    if (quickAnswerIndex !== -1) {
+      state[quickAnswerIndex] = quickAnswer;
       return [...state];
     } else {
-      return [user, ...state];
+      return [quickAnswer, ...state];
     }
   }
 
-  if (action.type === "DELETE_USER") {
-    const userId = action.payload;
+  if (action.type === "DELETE_QUICK_ANSWERS") {
+    const quickAnswerId = action.payload;
 
-    const userIndex = state.findIndex((u) => u.id === userId);
-    if (userIndex !== -1) {
-      state.splice(userIndex, 1);
+    const quickAnswerIndex = state.findIndex((q) => q.id === quickAnswerId);
+    if (quickAnswerIndex !== -1) {
+      state.splice(quickAnswerIndex, 1);
     }
     return [...state];
   }
@@ -83,18 +83,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Users = () => {
+const QuickAnswers = () => {
   const classes = useStyles();
 
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [deletingUser, setDeletingUser] = useState(null);
-  const [userModalOpen, setUserModalOpen] = useState(false);
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
-  const [users, dispatch] = useReducer(reducer, []);
+  const [quickAnswers, dispatch] = useReducer(reducer, []);
+  const [selectedQuickAnswers, setSelectedQuickAnswers] = useState(null);
+  const [quickAnswersModalOpen, setQuickAnswersModalOpen] = useState(false);
+  const [deletingQuickAnswers, setDeletingQuickAnswers] = useState(null);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -104,19 +104,19 @@ const Users = () => {
   useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
-      const fetchUsers = async () => {
+      const fetchQuickAnswers = async () => {
         try {
-          const { data } = await api.get("/users/", {
+          const { data } = await api.get("/quickAnswers/", {
             params: { searchParam, pageNumber },
           });
-          dispatch({ type: "LOAD_USERS", payload: data.users });
+          dispatch({ type: "LOAD_QUICK_ANSWERS", payload: data.quickAnswers });
           setHasMore(data.hasMore);
           setLoading(false);
         } catch (err) {
           toastError(err);
         }
       };
-      fetchUsers();
+      fetchQuickAnswers();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, pageNumber]);
@@ -124,13 +124,16 @@ const Users = () => {
   useEffect(() => {
     const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
-    socket.on("user", (data) => {
+    socket.on("quickAnswer", (data) => {
       if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_USERS", payload: data.user });
+        dispatch({ type: "UPDATE_QUICK_ANSWERS", payload: data.quickAnswer });
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_USER", payload: +data.userId });
+        dispatch({
+          type: "DELETE_QUICK_ANSWERS",
+          payload: +data.quickAnswerId,
+        });
       }
     });
 
@@ -139,33 +142,33 @@ const Users = () => {
     };
   }, []);
 
-  const handleOpenUserModal = () => {
-    setSelectedUser(null);
-    setUserModalOpen(true);
-  };
-
-  const handleCloseUserModal = () => {
-    setSelectedUser(null);
-    setUserModalOpen(false);
-  };
-
   const handleSearch = (event) => {
     setSearchParam(event.target.value.toLowerCase());
   };
 
-  const handleEditUser = (user) => {
-    setSelectedUser(user);
-    setUserModalOpen(true);
+  const handleOpenQuickAnswersModal = () => {
+    setSelectedQuickAnswers(null);
+    setQuickAnswersModalOpen(true);
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleCloseQuickAnswersModal = () => {
+    setSelectedQuickAnswers(null);
+    setQuickAnswersModalOpen(false);
+  };
+
+  const handleEditQuickAnswers = (quickAnswer) => {
+    setSelectedQuickAnswers(quickAnswer);
+    setQuickAnswersModalOpen(true);
+  };
+
+  const handleDeleteQuickAnswers = async (quickAnswerId) => {
     try {
-      await api.delete(`/users/${userId}`);
-      toast.success(i18n.t("users.toasts.deleted"));
+      await api.delete(`/quickAnswers/${quickAnswerId}`);
+      toast.success(i18n.t("quickAnswers.toasts.deleted"));
     } catch (err) {
       toastError(err);
     }
-    setDeletingUser(null);
+    setDeletingQuickAnswers(null);
     setSearchParam("");
     setPageNumber(1);
   };
@@ -186,28 +189,28 @@ const Users = () => {
     <MainContainer>
       <ConfirmationModal
         title={
-          deletingUser &&
-          `${i18n.t("users.confirmationModal.deleteTitle")} ${
-            deletingUser.name
+          deletingQuickAnswers &&
+          `${i18n.t("quickAnswers.confirmationModal.deleteTitle")} ${
+            deletingQuickAnswers.shortcut
           }?`
         }
         open={confirmModalOpen}
         onClose={setConfirmModalOpen}
-        onConfirm={() => handleDeleteUser(deletingUser.id)}
+        onConfirm={() => handleDeleteQuickAnswers(deletingQuickAnswers.id)}
       >
-        {i18n.t("users.confirmationModal.deleteMessage")}
+        {i18n.t("quickAnswers.confirmationModal.deleteMessage")}
       </ConfirmationModal>
-      <UserModal
-        open={userModalOpen}
-        onClose={handleCloseUserModal}
+      <QuickAnswersModal
+        open={quickAnswersModalOpen}
+        onClose={handleCloseQuickAnswersModal}
         aria-labelledby="form-dialog-title"
-        userId={selectedUser && selectedUser.id}
-      />
+        quickAnswerId={selectedQuickAnswers && selectedQuickAnswers.id}
+      ></QuickAnswersModal>
       <MainHeader>
-        <Title>{i18n.t("users.title")}</Title>
+        <Title>{i18n.t("quickAnswers.title")}</Title>
         <MainHeaderButtonsWrapper>
           <TextField
-            placeholder={i18n.t("contacts.searchPlaceholder")}
+            placeholder={i18n.t("quickAnswers.searchPlaceholder")}
             type="search"
             value={searchParam}
             onChange={handleSearch}
@@ -222,9 +225,9 @@ const Users = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleOpenUserModal}
+            onClick={handleOpenQuickAnswersModal}
           >
-            {i18n.t("users.buttons.add")}
+            {i18n.t("quickAnswers.buttons.add")}
           </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -236,46 +239,44 @@ const Users = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
               <TableCell align="center">
-                {i18n.t("users.table.email")}
+                {i18n.t("quickAnswers.table.shortcut")}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("users.table.profile")}
+                {i18n.t("quickAnswers.table.message")}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("users.table.actions")}
+                {i18n.t("quickAnswers.table.actions")}
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell align="center">{user.name}</TableCell>
-                  <TableCell align="center">{user.email}</TableCell>
-                  <TableCell align="center">{user.profile}</TableCell>
+              {quickAnswers.map((quickAnswer) => (
+                <TableRow key={quickAnswer.id}>
+                  <TableCell align="center">{quickAnswer.shortcut}</TableCell>
+                  <TableCell align="center">{quickAnswer.message}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
-                      onClick={() => handleEditUser(user)}
+                      onClick={() => handleEditQuickAnswers(quickAnswer)}
                     >
-                      <EditIcon />
+                      <Edit />
                     </IconButton>
 
                     <IconButton
                       size="small"
                       onClick={(e) => {
                         setConfirmModalOpen(true);
-                        setDeletingUser(user);
+                        setDeletingQuickAnswers(quickAnswer);
                       }}
                     >
-                      <DeleteOutlineIcon />
+                      <DeleteOutline />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
-              {loading && <TableRowSkeleton columns={4} />}
+              {loading && <TableRowSkeleton columns={3} />}
             </>
           </TableBody>
         </Table>
@@ -284,4 +285,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default QuickAnswers;
