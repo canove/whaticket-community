@@ -79,8 +79,9 @@ FRONTEND_URL=https://localhost:3000
 PROXY_PORT=8080
 PORT=8080
 
-DB_HOST=                  #DB host IP, usually localhost
 DB_DIALECT=
+DB_HOST=                  #DB host IP, usually localhost
+DB_PORT=
 DB_USER=
 DB_PASS=
 DB_NAME=
