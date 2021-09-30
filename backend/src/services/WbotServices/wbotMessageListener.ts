@@ -209,7 +209,21 @@ const handleMessage = async (
   if (!isValidMsg(msg)) {
     return;
   }
-
+//IGNORAR MENSAGENS DE GRUPO
+		const Settingdb = await Settings.findOne({
+          where: { key: 'CheckMsgIsGroup' }
+        });
+		if(Settingdb.value=='enabled') {
+			if (
+			msg.from === "status@broadcast" ||
+			msg.type === "location" ||
+			//msg.type === "call_log" ||
+			msg.author != null  //IGNORAR MENSAGENS DE GRUPO
+			) {
+				return;
+			}
+		}
+	//IGNORAR MENSAGENS DE GRUPO
   try {
     let msgContact: WbotContact;
     let groupContact: Contact | undefined;
