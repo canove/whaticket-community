@@ -12,6 +12,7 @@ import {
 
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
+import Settings from "../../models/Setting";
 import Message from "../../models/Message";
 
 import { getIO } from "../../libs/socket";
