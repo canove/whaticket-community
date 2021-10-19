@@ -12,6 +12,7 @@ interface WhatsappData {
   session?: string;
   isDefault?: boolean;
   greetingMessage?: string;
+  farewellMessage?: string;
   queueIds?: number[];
 }
 
