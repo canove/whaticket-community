@@ -214,7 +214,7 @@ const handleMessage = async (
 		const Settingdb = await Settings.findOne({
           where: { key: 'CheckMsgIsGroup' }
         });
-		if(Settingdb.value=='enabled') {
+		if(Settingdb?.value=='enabled') {
 			if (
 			msg.from === "status@broadcast" ||
 			msg.type === "location" ||
