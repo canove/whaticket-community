@@ -97,6 +97,7 @@ const messages = {
         form: {
           name: "Nome",
           default: "Padrão",
+          farewellMessage: "Mensagem de despedida"
         },
         buttons: {
           okAdd: "Adicionar",

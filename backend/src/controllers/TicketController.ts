@@ -6,6 +6,8 @@ import DeleteTicketService from "../services/TicketServices/DeleteTicketService"
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
+import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 
 type IndexQuery = {
   searchParam: string;
@@ -90,6 +92,20 @@ export const update = async (
     ticketData,
     ticketId
   });
+
+  if (ticket.status === "closed") {
+    const whatsapp = await ShowWhatsAppService(ticket.whatsappId);
+
+    const { farewellMessage } = whatsapp;
+
+    if (farewellMessage) {
+       await SendWhatsAppMessage({
+        body: farewellMessage,
+        ticket
+      });
+    }
+  }
+
 
   return res.status(200).json(ticket);
 };

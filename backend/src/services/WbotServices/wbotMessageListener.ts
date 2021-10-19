@@ -113,7 +113,6 @@ const verifyMessage = async (
   contact: Contact
 ) => {
   const quotedMsg = await verifyQuotedMessage(msg);
-
   const messageData = {
     id: msg.id.id,
     ticketId: ticket.id,
@@ -126,6 +125,7 @@ const verifyMessage = async (
   };
 
   await ticket.update({ lastMessage: msg.body });
+
   await CreateMessageService({ messageData });
 };
 
@@ -231,6 +231,7 @@ const handleMessage = async (
 
     const chat = await msg.getChat();
 
+
     if (chat.isGroup) {
       let msgGroupContact;
 
@@ -242,34 +243,39 @@ const handleMessage = async (
 
       groupContact = await verifyContact(msgGroupContact);
     }
+    const whatsapp = await ShowWhatsAppService(wbot.id!);
 
     const unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
 
     const contact = await verifyContact(msgContact);
-    const ticket = await FindOrCreateTicketService(
-      contact,
-      wbot.id!,
-      unreadMessages,
-      groupContact
-    );
 
-    if (msg.hasMedia) {
-      await verifyMediaMessage(msg, ticket, contact);
-    } else {
-      await verifyMessage(msg, ticket, contact);
-    }
+    if(unreadMessages === 0 && whatsapp.farewellMessage === msg.body) return;
 
-    const whatsapp = await ShowWhatsAppService(wbot.id!);
+      const ticket = await FindOrCreateTicketService(
+        contact,
+        wbot.id!,
+        unreadMessages,
+        groupContact
+      );
 
-    if (
-      !ticket.queue &&
-      !chat.isGroup &&
-      !msg.fromMe &&
-      !ticket.userId &&
-      whatsapp.queues.length >= 1
-    ) {
-      await verifyQueue(wbot, msg, ticket, contact);
-    }
+      if (msg.hasMedia) {
+        await verifyMediaMessage(msg, ticket, contact);
+      } else {
+        await verifyMessage(msg, ticket, contact);
+      }
+
+      if (
+        !ticket.queue &&
+        !chat.isGroup &&
+        !msg.fromMe &&
+        !ticket.userId &&
+        whatsapp.queues.length >= 1
+      ) {
+        await verifyQueue(wbot, msg, ticket, contact);
+      }
+
+
+
   } catch (err) {
     Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);
