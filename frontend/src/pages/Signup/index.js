@@ -6,17 +6,23 @@ import { Link as RouterLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Formik, Form, Field } from "formik";
 
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
+import {
+	Avatar,
+	Button,
+	CssBaseline,
+	TextField,
+	Grid,
+	Box,
+	Typography,
+	Container,
+	InputAdornment,
+	IconButton,
+	Link
+  } from '@material-ui/core';
+  
+import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
+  
 import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
 
 import { i18n } from "../../translate/i18n";
 
@@ -70,7 +76,7 @@ const SignUp = () => {
 	const history = useHistory();
 
 	const initialState = { name: "", email: "", password: "" };
-
+	const [showPassword, setShowPassword] = useState(false);
 	const [user] = useState(initialState);
 
 	const handleSignUp = async values => {
@@ -88,7 +94,7 @@ const SignUp = () => {
 			<CssBaseline />
 			<div className={classes.paper}>
 				<Avatar className={classes.avatar}>
-					<LockOutlinedIcon />
+					<LockOutlined />
 				</Avatar>
 				<Typography component="h1" variant="h5">
 					{i18n.t("signup.title")}
@@ -142,12 +148,24 @@ const SignUp = () => {
 										variant="outlined"
 										fullWidth
 										name="password"
+										id="password"
+										autoComplete="current-password"
 										error={touched.password && Boolean(errors.password)}
 										helperText={touched.password && errors.password}
 										label={i18n.t("signup.form.password")}
-										type="password"
-										id="password"
-										autoComplete="current-password"
+										type={showPassword ? 'text' : 'password'}
+										InputProps={{
+										endAdornment: (
+											<InputAdornment position="end">
+											<IconButton
+												aria-label="toggle password visibility"
+												onClick={() => setShowPassword((e) => !e)}
+											>
+												{showPassword ? <VisibilityOff /> : <Visibility />}
+											</IconButton>
+											</InputAdornment>
+										)
+										}}
 									/>
 								</Grid>
 							</Grid>
