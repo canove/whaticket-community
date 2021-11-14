@@ -6,6 +6,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import Badge from "@material-ui/core/Badge";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
@@ -78,6 +79,16 @@ const useStyles = makeStyles((theme) => ({
     border: "none",
     borderRadius: 30,
   },
+
+  badge: {
+    right: "-10px",
+  },
+  show: {
+    display: "block",
+  },
+  hide: {
+    display: "none !important",
+  },
 }));
 
 const TicketsManager = () => {
@@ -85,13 +96,24 @@ const TicketsManager = () => {
 
   const [searchParam, setSearchParam] = useState("");
   const [tab, setTab] = useState("open");
+  const [tabOpen, setTabOpen] = useState("open");
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
   const [showAllTickets, setShowAllTickets] = useState(false);
   const searchInputRef = useRef();
   const { user } = useContext(AuthContext);
 
+  const [openCount, setOpenCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
+
+  useEffect(() => {
+    if (user.profile.toUpperCase() === "ADMIN") {
+      setShowAllTickets(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (tab === "search") {
@@ -119,6 +141,16 @@ const TicketsManager = () => {
 
   const handleChangeTab = (e, newValue) => {
     setTab(newValue);
+  };
+
+  const handleChangeTabOpen = (e, newValue) => {
+    setTabOpen(newValue);
+  };
+
+  const applyPanelStyle = (status) => {
+    if (tabOpen !== status) {
+      return { width: 0, height: 0 };
+    }
   };
 
   return (
@@ -208,12 +240,53 @@ const TicketsManager = () => {
         />
       </Paper>
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
-        <TicketsList
-          status="open"
-          showAll={showAllTickets}
-          selectedQueueIds={selectedQueueIds}
-        />
-        <TicketsList status="pending" selectedQueueIds={selectedQueueIds} />
+        <Tabs
+          value={tabOpen}
+          onChange={handleChangeTabOpen}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth"
+        >
+          <Tab
+            label={
+              <Badge
+                className={classes.badge}
+                badgeContent={openCount}
+                color="primary"
+              >
+                {i18n.t("ticketsList.assignedHeader")}
+              </Badge>
+            }
+            value={"open"}
+          />
+          <Tab
+            label={
+              <Badge
+                className={classes.badge}
+                badgeContent={pendingCount}
+                color="secondary"
+              >
+                {i18n.t("ticketsList.pendingHeader")}
+              </Badge>
+            }
+            value={"pending"}
+          />
+        </Tabs>
+        <Paper className={classes.ticketsWrapper}>
+          <TicketsList
+            status="open"
+            showAll={showAllTickets}
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => setOpenCount(val)}
+            style={applyPanelStyle("open")}
+          />
+          <TicketsList
+            status="pending"
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => setPendingCount(val)}
+            style={applyPanelStyle("pending")}
+          />
+        </Paper>
       </TabPanel>
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
         <TicketsList

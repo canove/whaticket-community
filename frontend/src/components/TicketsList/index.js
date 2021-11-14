@@ -10,7 +10,6 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
-import { ListSubheader } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
@@ -153,7 +152,9 @@ const reducer = (state, action) => {
 	}
 };
 
-const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
+	const TicketsList = (props) => {
+		const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
+			props;
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
@@ -245,6 +246,13 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 		};
 	}, [status, showAll, user, selectedQueueIds]);
 
+	useEffect(() => {
+    if (typeof updateCount === "function") {
+      updateCount(ticketsList.length);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketsList]);
+
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
 	};
@@ -260,7 +268,7 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 	};
 
 	return (
-		<div className={classes.ticketsListWrapper}>
+    <Paper className={classes.ticketsListWrapper} style={style}>
 			<Paper
 				square
 				name="closed"
@@ -269,26 +277,6 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 				onScroll={handleScroll}
 			>
 				<List style={{ paddingTop: 0 }}>
-					{status === "open" && (
-						<ListSubheader className={classes.ticketsListHeader}>
-							<div>
-								{i18n.t("ticketsList.assignedHeader")}
-								<span className={classes.ticketsCount}>
-									{ticketsList.length}
-								</span>
-							</div>
-						</ListSubheader>
-					)}
-					{status === "pending" && (
-						<ListSubheader className={classes.ticketsListHeader}>
-							<div>
-								{i18n.t("ticketsList.pendingHeader")}
-								<span className={classes.ticketsCount}>
-									{ticketsList.length}
-								</span>
-							</div>
-						</ListSubheader>
-					)}
 					{ticketsList.length === 0 && !loading ? (
 						<div className={classes.noTicketsDiv}>
 							<span className={classes.noTicketsTitle}>
@@ -308,7 +296,7 @@ const TicketsList = ({ status, searchParam, showAll, selectedQueueIds }) => {
 					{loading && <TicketsListSkeleton />}
 				</List>
 			</Paper>
-		</div>
+    </Paper>
 	);
 };
 
