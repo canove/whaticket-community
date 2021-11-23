@@ -1,17 +1,23 @@
 import React, { useState, useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  InputAdornment,
+  IconButton,
+  Link
+} from '@material-ui/core';
+
+import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
+
 import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
 
 import { i18n } from "../../translate/i18n";
 
@@ -54,6 +60,7 @@ const Login = () => {
   const classes = useStyles();
 
   const [user, setUser] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
 
   const { handleLogin } = useContext(AuthContext);
 
@@ -71,7 +78,7 @@ const Login = () => {
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          <LockOutlined />
         </Avatar>
         <Typography component="h1" variant="h5">
           {i18n.t("login.title")}
@@ -97,11 +104,23 @@ const Login = () => {
             fullWidth
             name="password"
             label={i18n.t("login.form.password")}
-            type="password"
             id="password"
             value={user.password}
             onChange={handleChangeInput}
             autoComplete="current-password"
+            type={showPassword ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowPassword((e) => !e)}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
           />
           <Button
             type="submit"
