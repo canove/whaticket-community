@@ -39,6 +39,17 @@ const messages = {
             title: "Tickets hoje: ",
           },
         },
+        messages: {
+          inAttendance: {
+            title: "Em Atendimento"
+          },
+          waiting: {
+            title: "Aguardando"
+          },
+          closed: {
+            title: "Finalizado"
+          }
+        }
       },
       connections: {
         title: "Conexões",

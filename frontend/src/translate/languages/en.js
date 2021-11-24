@@ -39,6 +39,17 @@ const messages = {
             title: "Tickets today: ",
           },
         },
+        messages: {
+          inAttendance: {
+            title: "In Service"
+          },
+          waiting: {
+            title: "Waiting"
+          },
+          closed: {
+            title: "Closed"
+          }
+        }
       },
       connections: {
         title: "Connections",
