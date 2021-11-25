@@ -11,7 +11,7 @@
     "@testing-library/user-event": "^12.1.7",
     "axios": "^0.21.1",
     "date-fns": "^2.16.1",
-    "emoji-mart": "^3.0.0",
+    "emoji-mart": "^3.0.1",
     "formik": "^2.2.0",
     "i18next": "^19.8.2",
     "i18next-browser-languagedetector": "^6.0.1",
