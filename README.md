@@ -378,6 +378,11 @@ Enable SSL on nginx (Fill / Accept all information asked):
 sudo certbot --nginx
 ```
 
+## Access Data
+
+User: admin@whaticket.com
+Password: admin
+
 ## Upgrading
 
 WhaTicket is a working in progress and we are adding new features frequently. To update your old installation and get all the new features, you can use a bash script like this:
