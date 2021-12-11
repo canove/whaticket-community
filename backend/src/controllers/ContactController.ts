@@ -8,6 +8,7 @@ import ShowContactService from "../services/ContactServices/ShowContactService";
 import UpdateContactService from "../services/ContactServices/UpdateContactService";
 import DeleteContactService from "../services/ContactServices/DeleteContactService";
 
+import CheckContactNumber from "../services/WbotServices/CheckNumber"
 import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
 import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 import AppError from "../errors/AppError";
@@ -57,11 +58,20 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   }
 
   await CheckIsValidContact(newContact.number);
+  const validNumber : any = await CheckContactNumber(newContact.number)
+  
+  const profilePicUrl = await GetProfilePicUrl(validNumber);
 
-  const profilePicUrl = await GetProfilePicUrl(newContact.number);
+  let name = newContact.name
+  let number = validNumber
+  let email = newContact.email
+  let extraInfo = newContact.extraInfo
 
   const contact = await CreateContactService({
-    ...newContact,
+    name,
+    number,
+    email,
+    extraInfo,
     profilePicUrl
   });
 
