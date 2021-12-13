@@ -249,7 +249,7 @@ const handleMessage = async (
 
     const contact = await verifyContact(msgContact);
 
-    if(unreadMessages === 0 && whatsapp.farewellMessage === msg.body) return;
+    if ( unreadMessages === 0 &&  whatsapp.farewellMessage && whatsapp.farewellMessage === msg.body) return;
 
       const ticket = await FindOrCreateTicketService(
         contact,
