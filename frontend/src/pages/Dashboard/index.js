@@ -46,15 +46,18 @@ const Dashboard = () => {
 	const classes = useStyles()
 
 	const { user } = useContext(AuthContext);
+	var userQueueIds = [];
 
-	const userQueueIds = user.queues.map(q => q.id);
+	if (user.queues && user.queues.length > 0) {
+		userQueueIds = user.queues.map(q => q.id);
+	}
 
 	const GetTickets = (status, showAll, withUnreadMessages) => {
 
-		const { tickets } = useTickets({ 
-			status: status, 
-			showAll: showAll, 
-			withUnreadMessages: withUnreadMessages, 
+		const { tickets } = useTickets({
+			status: status,
+			showAll: showAll,
+			withUnreadMessages: withUnreadMessages,
 			queueIds: JSON.stringify(userQueueIds)
 		});
 		return tickets.length;
