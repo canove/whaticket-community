@@ -37,6 +37,7 @@
     "sequelize-cli": "^5.5.1",
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^3.0.5",
+    "uuid": "^8.3.2",
     "whatsapp-web.js": "^1.15.3",
     "yup": "^0.32.8"
   },
@@ -53,6 +54,7 @@
     "@types/multer": "^1.4.4",
     "@types/node": "^14.11.8",
     "@types/supertest": "^2.0.10",
+    "@types/uuid": "^8.3.3",
     "@types/validator": "^13.1.0",
     "@types/yup": "^0.29.8",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
