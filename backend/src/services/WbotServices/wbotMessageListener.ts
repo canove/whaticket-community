@@ -22,6 +22,8 @@ import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketServi
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import { debounce } from "../../helpers/Debounce";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
+import CreateContactService from "../ContactServices/CreateContactService";
+import GetContactService from "../ContactServices/GetContactService";
 
 interface Session extends Client {
   id?: number;
@@ -196,6 +198,7 @@ const isValidMsg = (msg: WbotMessage): boolean => {
     msg.type === "image" ||
     msg.type === "document" ||
     msg.type === "vcard" ||
+    //msg.type === "multi_vcard" ||
     msg.type === "sticker"
   )
     return true;
@@ -222,7 +225,9 @@ const handleMessage = async (
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
 
-      if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard") return;
+      if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard" 
+        //&& msg.type !== "multi_vcard"
+      ) return;
 
       msgContact = await wbot.getContactById(msg.to);
     } else {
@@ -249,32 +254,93 @@ const handleMessage = async (
 
     const contact = await verifyContact(msgContact);
 
-    if ( unreadMessages === 0 &&  whatsapp.farewellMessage && whatsapp.farewellMessage === msg.body) return;
+    if (unreadMessages === 0 && whatsapp.farewellMessage && whatsapp.farewellMessage === msg.body) return;
 
-      const ticket = await FindOrCreateTicketService(
-        contact,
-        wbot.id!,
-        unreadMessages,
-        groupContact
-      );
+    const ticket = await FindOrCreateTicketService(
+      contact,
+      wbot.id!,
+      unreadMessages,
+      groupContact
+    );
 
-      if (msg.hasMedia) {
-        await verifyMediaMessage(msg, ticket, contact);
-      } else {
-        await verifyMessage(msg, ticket, contact);
+    if (msg.hasMedia) {
+      await verifyMediaMessage(msg, ticket, contact);
+    } else {
+      await verifyMessage(msg, ticket, contact);
+    }
+
+    if (
+      !ticket.queue &&
+      !chat.isGroup &&
+      !msg.fromMe &&
+      !ticket.userId &&
+      whatsapp.queues.length >= 1
+    ) {
+      await verifyQueue(wbot, msg, ticket, contact);
+    }
+
+    if (msg.type === "vcard") { try { const array = msg.body.split("\n"); const obj = []; let contact = ""; for (let index = 0; index < array.length; index++) { const v = array[index]; const values = v.split(":"); for (let ind = 0; ind < values.length; ind++) { if (values[ind].indexOf("+") !== -1) { obj.push({ number: values[ind] }); } if (values[ind].indexOf("FN") !== -1) { contact = values[ind + 1]; } } } for await (const ob of obj) { const cont = await CreateContactService({ name: contact, number: ob.number.replace(/\D/g, "") }); } } catch (error) { console.log(error); } }
+
+    /*if (msg.type === "multi_vcard") {
+      try {
+        const array = msg.vCards.toString().split("\n");
+        let name = "";
+        let number = "";
+        const obj = [];
+        const conts = [];
+        for (let index = 0; index < array.length; index++) {
+          const v = array[index];
+          const values = v.split(":");
+          for (let ind = 0; ind < values.length; ind++) {
+            if (values[ind].indexOf("+") !== -1) {
+              number = values[ind];
+            }
+            if (values[ind].indexOf("FN") !== -1) {
+              name = values[ind + 1];
+            }
+            if (name !== "" && number !== "") {
+              obj.push({
+                name,
+                number
+              });
+              name = "";
+              number = "";
+            }
+          }
+        }
+
+        // eslint-disable-next-line no-restricted-syntax
+        for await (const ob of obj) {
+          try {
+            const cont = await CreateContactService({
+              name: ob.name,
+              number: ob.number.replace(/\D/g, "")
+            });
+            conts.push({
+              id: cont.id,
+              name: cont.name,
+              number: cont.number
+            });
+          } catch (error) {
+            if (error.message === "ERR_DUPLICATED_CONTACT") {
+              const cont = await GetContactService({
+                name: ob.name,
+                number: ob.number.replace(/\D/g, ""),
+                email: ""
+              });
+              conts.push({
+                id: cont.id,
+                name: cont.name,
+                number: cont.number
+              });
+            }
+          }
+        }
+        msg.body = JSON.stringify(conts);
+      } catch (error) {
+        console.log(error);
       }
-
-      if (
-        !ticket.queue &&
-        !chat.isGroup &&
-        !msg.fromMe &&
-        !ticket.userId &&
-        whatsapp.queues.length >= 1
-      ) {
-        await verifyQueue(wbot, msg, ticket, contact);
-      }
-
-
+    }*/
 
   } catch (err) {
     Sentry.captureException(err);
