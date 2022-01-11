@@ -584,7 +584,7 @@ const MessageInput = ({ ticketStatus }) => {
                   : i18n.t("messagesInput.placeholderClosed")
               }
               multiline
-              rowsMax={5}
+              maxRows={5}
               value={inputMessage}
               onChange={handleChangeInput}
               disabled={recording || loading || ticketStatus !== "open"}

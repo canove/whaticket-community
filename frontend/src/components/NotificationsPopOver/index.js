@@ -190,7 +190,7 @@ const NotificationsPopOver = () => {
 		<>
 			<IconButton
 				onClick={handleClick}
-				buttonRef={anchorEl}
+				ref={anchorEl}
 				aria-label="Open Notifications"
 				color="inherit"
 			>
