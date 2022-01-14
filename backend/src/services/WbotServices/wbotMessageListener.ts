@@ -114,6 +114,10 @@ const verifyMessage = async (
   ticket: Ticket,
   contact: Contact
 ) => {
+
+  if (msg.type === 'location')
+    msg = prepareLocation(msg);
+
   const quotedMsg = await verifyQuotedMessage(msg);
   const messageData = {
     id: msg.id.id,
@@ -126,9 +130,23 @@ const verifyMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  await ticket.update({ lastMessage: msg.body });
+  await ticket.update({ lastMessage: msg.type === "location" ? msg.description ? "Localization - " + msg.description.split('\\n')[0] : "Localization" : msg.body });
 
   await CreateMessageService({ messageData });
+};
+
+const prepareLocation = (msg: WbotMessage): WbotMessage => {
+  console.log(msg)
+  let gmapsUrl = "https://maps.google.com/maps?q=" + msg.location.latitude + "%2C" + msg.location.longitude + "&z=17&hl=pt-BR";
+
+  msg.body = "data:image/png;base64," + msg.body + "|" + gmapsUrl;
+
+  msg.body += "|" + (msg.description != undefined ? msg.description : (msg.location.latitude + ", " + msg.location.longitude))
+
+  console.log(msg.body)
+  console.log(msg.description)
+
+  return msg;
 };
 
 const verifyQueue = async (
@@ -199,7 +217,8 @@ const isValidMsg = (msg: WbotMessage): boolean => {
     msg.type === "document" ||
     msg.type === "vcard" ||
     //msg.type === "multi_vcard" ||
-    msg.type === "sticker"
+    msg.type === "sticker" ||
+    msg.type === "location"
   )
     return true;
   return false;
@@ -225,7 +244,7 @@ const handleMessage = async (
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
 
-      if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard" 
+      if (!msg.hasMedia && msg.type !== "location" && msg.type !== "chat" && msg.type !== "vcard"
         //&& msg.type !== "multi_vcard"
       ) return;
 

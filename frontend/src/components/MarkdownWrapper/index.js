@@ -153,8 +153,11 @@ const MarkdownWrapper = ({ children }) => {
 	const boldRegex = /\*(.*?)\*/g;
 	const tildaRegex = /~(.*?)~/g;
 	
-	if(children.includes('BEGIN:VCARD'))
+	if(children && children.includes('BEGIN:VCARD'))
 		//children = "Diga olá ao seu novo contato clicando em *conversar*!";
+		children = null;
+	
+	if(children && children.includes('data:image/'))
 		children = null;
 	
 	if (children && boldRegex.test(children)) {
