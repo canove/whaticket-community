@@ -22,18 +22,19 @@ const LocationPreview = ({ image, link, description }) => {
 			<div style={{
 				minWidth: "250px",
 			}}>
-				<Grid container spacing={1}>
-					<Grid item xs={2}>
-						<img src={image} onClick={handleLocation} />
-					</Grid>
+				<div>
+					<div style={{ float: "left" }}>
+						<img src={image} onClick={handleLocation} style={{ width: "100px" }} />
+					</div>
 					{ description && (
-					<Grid item xs={9}>
-						<Typography style={{ marginTop: "12px", marginLeft: "15px" }} variant="subtitle1" color="primary" gutterBottom>
+					<div style={{ display: "flex", flexWrap: "wrap" }}>
+						<Typography style={{ marginTop: "12px", marginLeft: "15px", marginRight: "15px", float: "left" }} variant="subtitle1" color="primary" gutterBottom>
 							<div dangerouslySetInnerHTML={{ __html: description.replace('\\n', '<br />') }}></div>
 						</Typography>
-					</Grid>
+					</div>
 					)}
-					<Grid item xs={12}>
+					<div style={{ display: "block", content: "", clear: "both" }}></div>
+					<div>
 						<Divider />
 						<Button
 							fullWidth
@@ -41,8 +42,8 @@ const LocationPreview = ({ image, link, description }) => {
 							onClick={handleLocation}
 							disabled={!link}
 						>Visualizar</Button>
-					</Grid>
-				</Grid>
+					</div>
+				</div>
 			</div>
 		</>
 	);

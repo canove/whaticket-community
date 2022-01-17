@@ -3,7 +3,7 @@ import { promisify } from "util";
 import { writeFile } from "fs";
 import * as Sentry from "@sentry/node";
 
-import {
+import WAWebJS, {
   Contact as WbotContact,
   Message as WbotMessage,
   MessageAck,
@@ -130,21 +130,17 @@ const verifyMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  await ticket.update({ lastMessage: msg.type === "location" ? msg.description ? "Localization - " + msg.description.split('\\n')[0] : "Localization" : msg.body });
+  await ticket.update({ lastMessage: msg.type === "location" ? msg.location.description ? "Localization - " + msg.location.description.split('\\n')[0] : "Localization" : msg.body });
 
   await CreateMessageService({ messageData });
 };
 
 const prepareLocation = (msg: WbotMessage): WbotMessage => {
-  console.log(msg)
   let gmapsUrl = "https://maps.google.com/maps?q=" + msg.location.latitude + "%2C" + msg.location.longitude + "&z=17&hl=pt-BR";
 
   msg.body = "data:image/png;base64," + msg.body + "|" + gmapsUrl;
 
-  msg.body += "|" + (msg.description != undefined ? msg.description : (msg.location.latitude + ", " + msg.location.longitude))
-
-  console.log(msg.body)
-  console.log(msg.description)
+  msg.body += "|" + (msg.location.description ? msg.location.description : (msg.location.latitude + ", " + msg.location.longitude))
 
   return msg;
 };
