@@ -4,6 +4,8 @@ import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Ticket from "../../models/Ticket";
 
+import formatBody from "../../helpers/Mustache";
+
 interface Request {
   media: Express.Multer.File;
   ticket: Ticket;
@@ -23,7 +25,7 @@ const SendWhatsAppMedia = async ({
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       newMedia,
       {
-        caption: body,
+        caption: formatBody(body as string, ticket.contact),
         sendAudioAsVoice: true
       }
     );

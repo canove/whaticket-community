@@ -2,7 +2,6 @@ import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
 import * as Sentry from "@sentry/node";
-
 import {
   Contact as WbotContact,
   Message as WbotMessage,
@@ -24,6 +23,7 @@ import { debounce } from "../../helpers/Debounce";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
+import formatBody from "../../helpers/Mustache";
 
 interface Session extends Client {
   id?: number;
@@ -158,7 +158,7 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    const body = `\u200e${choosenQueue.greetingMessage}`;
+    const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
@@ -170,7 +170,7 @@ const verifyQueue = async (
       options += `*${index + 1}* - ${queue.name}\n`;
     });
 
-    const body = `\u200e${greetingMessage}\n${options}`;
+    const body = formatBody(`\u200e${greetingMessage}\n${options}`, contact);
 
     const debouncedSentMessage = debounce(
       async () => {
@@ -198,7 +198,7 @@ const isValidMsg = (msg: WbotMessage): boolean => {
     msg.type === "image" ||
     msg.type === "document" ||
     msg.type === "vcard" ||
-    //msg.type === "multi_vcard" ||
+    // msg.type === "multi_vcard" ||
     msg.type === "sticker"
   )
     return true;
@@ -225,9 +225,13 @@ const handleMessage = async (
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
 
-      if (!msg.hasMedia && msg.type !== "chat" && msg.type !== "vcard" 
-        //&& msg.type !== "multi_vcard"
-      ) return;
+      if (
+        !msg.hasMedia &&
+        msg.type !== "chat" &&
+        msg.type !== "vcard"
+        // && msg.type !== "multi_vcard"
+      )
+        return;
 
       msgContact = await wbot.getContactById(msg.to);
     } else {
@@ -235,7 +239,6 @@ const handleMessage = async (
     }
 
     const chat = await msg.getChat();
-
 
     if (chat.isGroup) {
       let msgGroupContact;
@@ -254,7 +257,12 @@ const handleMessage = async (
 
     const contact = await verifyContact(msgContact);
 
-    if (unreadMessages === 0 && whatsapp.farewellMessage && whatsapp.farewellMessage === msg.body) return;
+    if (
+      unreadMessages === 0 &&
+      whatsapp.farewellMessage &&
+      formatBody(whatsapp.farewellMessage, contact) === msg.body
+    )
+      return;
 
     const ticket = await FindOrCreateTicketService(
       contact,
@@ -279,9 +287,35 @@ const handleMessage = async (
       await verifyQueue(wbot, msg, ticket, contact);
     }
 
-    if (msg.type === "vcard") { try { const array = msg.body.split("\n"); const obj = []; let contact = ""; for (let index = 0; index < array.length; index++) { const v = array[index]; const values = v.split(":"); for (let ind = 0; ind < values.length; ind++) { if (values[ind].indexOf("+") !== -1) { obj.push({ number: values[ind] }); } if (values[ind].indexOf("FN") !== -1) { contact = values[ind + 1]; } } } for await (const ob of obj) { const cont = await CreateContactService({ name: contact, number: ob.number.replace(/\D/g, "") }); } } catch (error) { console.log(error); } }
+    if (msg.type === "vcard") {
+      try {
+        const array = msg.body.split("\n");
+        const obj = [];
+        let contact = "";
+        for (let index = 0; index < array.length; index++) {
+          const v = array[index];
+          const values = v.split(":");
+          for (let ind = 0; ind < values.length; ind++) {
+            if (values[ind].indexOf("+") !== -1) {
+              obj.push({ number: values[ind] });
+            }
+            if (values[ind].indexOf("FN") !== -1) {
+              contact = values[ind + 1];
+            }
+          }
+        }
+        for await (const ob of obj) {
+          const cont = await CreateContactService({
+            name: contact,
+            number: ob.number.replace(/\D/g, "")
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
-    /*if (msg.type === "multi_vcard") {
+    /* if (msg.type === "multi_vcard") {
       try {
         const array = msg.vCards.toString().split("\n");
         let name = "";
@@ -340,8 +374,7 @@ const handleMessage = async (
       } catch (error) {
         console.log(error);
       }
-    }*/
-
+    } */
   } catch (err) {
     Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);
