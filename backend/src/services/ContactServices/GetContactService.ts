@@ -1,5 +1,6 @@
 import AppError from "../../errors/AppError";
 import Contact from "../../models/Contact";
+import CreateContactService from "./CreateContactService";
 
 interface ExtraInfo {
     name: string;
@@ -20,10 +21,18 @@ const GetContactService = async ({ name, number }: Request): Promise<Contact> =>
     });
 
     if (!numberExists) {
-        throw new AppError("CONTACT_NOT_FIND");
+        const contact = await CreateContactService({
+            name,
+            number,
+        })
+
+        if (contact == null)
+            throw new AppError("CONTACT_NOT_FIND")
+        else
+            return contact
     }
 
-    return numberExists;
+    return numberExists
 };
 
 export default GetContactService;

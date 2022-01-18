@@ -23,6 +23,7 @@ import {
 
 import MarkdownWrapper from "../MarkdownWrapper";
 import VcardPreview from "../VcardPreview";
+import LocationPreview from "../LocationPreview";
 import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
 import whatsBackground from "../../assets/wa-background.png";
@@ -414,7 +415,19 @@ const MessagesList = ({ ticketId, isGroup }) => {
   };
 
   const checkMessageMedia = (message) => {
-	if (message.mediaType === "vcard") {
+	if(message.mediaType === "location" && message.body.split('|').length >= 2) {
+		let locationParts = message.body.split('|')
+		let imageLocation = locationParts[0]		
+		let linkLocation = locationParts[1]
+		
+		let descriptionLocation = null
+		
+		if(locationParts.length > 2)
+			descriptionLocation = message.body.split('|')[2]
+		
+		return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation} />
+	}
+	else if (message.mediaType === "vcard") {
 		//console.log("vcard")
 		//console.log(message)
 		let array = message.body.split("\n");
@@ -604,7 +617,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
                     {message.contact?.name}
                   </span>
                 )}
-                {(message.mediaUrl || message.mediaType === "vcard" 
+                {(message.mediaUrl || message.mediaType === "location" || message.mediaType === "vcard" 
                 //|| message.mediaType === "multi_vcard" 
                 ) && checkMessageMedia(message)}
                 <div className={classes.textContentItem}>
@@ -633,7 +646,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
                 >
                   <ExpandMore />
                 </IconButton>
-                {(message.mediaUrl || message.mediaType === "vcard" 
+                {(message.mediaUrl || message.mediaType === "location" || message.mediaType === "vcard" 
                 //|| message.mediaType === "multi_vcard" 
                 ) && checkMessageMedia(message)}
                 <div
