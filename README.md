@@ -123,7 +123,7 @@ npm start
 - Wait for QR CODE button to appear, click it and read qr code.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
-## Basic production deployment (Ubuntu 18.04 VPS)
+## Basic production deployment (Ubuntu 20.04 VPS)
 
 All instructions below assumes you are NOT running as root, since it will give an error in puppeteer. So let's start creating a new user and granting sudo privileges to it:
 
@@ -146,7 +146,7 @@ Update all system packages:
 sudo apt update && sudo apt upgrade
 ```
 
-Install node and confirm node command is available:
+Install node, and confirm node command is available:
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
@@ -231,7 +231,7 @@ sudo npm install -g pm2
 pm2 start dist/server.js --name whaticket-backend
 ```
 
-Make pm2 auto start afeter reboot:
+Make pm2 auto start after reboot:
 
 ```bash
 pm2 startup ubuntu -u `YOUR_USERNAME`
@@ -250,7 +250,7 @@ cd ../frontend
 npm install
 ```
 
-Edit .env file and fill it with your backend address, it should look like this:
+Create frontend .env file and fill it ONLY with your backend address, it should look like this:
 
 ```bash
 REACT_APP_BACKEND_URL = https://api.mydomain.com/
@@ -337,14 +337,14 @@ server {
 }
 ```
 
-Create a symbolic links to enalbe nginx sites:
+Create a symbolic links to enable nginx sites:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/whaticket-frontend /etc/nginx/sites-enabled
 sudo ln -s /etc/nginx/sites-available/whaticket-backend /etc/nginx/sites-enabled
 ```
 
-By default, nginx limit body size to 1MB, what isn't enough to some media uploads. Lets change it to 20MB adding a new line to config file:
+By default, nginx limit body size to 1MB, which isn't enough for some media uploads. Lets change it to 20MB, adding a new line to config file:
 
 ```bash
 sudo nano /etc/nginx/nginx.conf
@@ -362,17 +362,16 @@ sudo nginx -t
 sudo service nginx restart
 ```
 
-Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. A easy way to this is using Certbot:
+Now, enable SSL (https) on your sites to use all app features like notifications and sending audio messages. An easy way to this is using Certbot:
 
 Install certbot:
 
 ```bash
-sudo add-apt-repository ppa:certbot/certbot
+sudo snap install --classic certbot
 sudo apt update
-sudo apt install python-certbot-nginx
 ```
 
-Enable SSL on nginx (Fill / Accept all information asked):
+Enable SSL on nginx (Fill / Accept all information required):
 
 ```bash
 sudo certbot --nginx
