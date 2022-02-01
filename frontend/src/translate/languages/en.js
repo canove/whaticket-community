@@ -280,6 +280,7 @@ const messages = {
           tickets: "Tickets",
           contacts: "Contacts",
           quickAnswers: "Quick Answers",
+          chat: "Chat",
           queues: "Queues",
           administration: "Administration",
           users: "Users",
@@ -333,6 +334,39 @@ const messages = {
           deleteTitle: "Are you sure you want to delete this Quick Reply: ",
           deleteMessage: "This action cannot be undone.",
         },
+      },
+      chat: {
+        title: "Chat",
+        table: {
+          shortcut: "User",
+          message: "Message",
+          actions: "Actions"
+        },
+        buttons: {
+          add: "New Chat",
+        },
+        toasts: {
+          deleted: "Chat deleted successfully.",
+        },
+        searchPlaceholder: "Search...",
+        confirmationModal: {
+          deleteTitle: "Are you sure you want to delete this Chat: ",
+          deleteMessage: "This action cannot be undone.",
+        },
+      },
+      chatModal: {
+        title: {
+          add: "New Chat",
+        },
+        form: {
+          shortcut: "User",
+        },
+        buttons: {
+          okAdd: "Add",
+          okEdit: "Save",
+          cancel: "Cancel",
+        },
+        success: "Chat saved successfully.",
       },
       users: {
         title: "Users",
