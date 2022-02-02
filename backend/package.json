@@ -7,7 +7,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
-    "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
+    "dev:server": "ts-node-dev --inspect --trace-warnings --respawn --transpile-only --ignore node_modules src/server.ts",
     "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
     "test": "NODE_ENV=test jest",
     "posttest": "NODE_ENV=test sequelize db:migrate:undo:all"
@@ -35,11 +35,11 @@
     "qrcode-terminal": "^0.12.0",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.22.3",
-    "sequelize-cli": "^5.5.1",
+    "sequelize-cli": "^6.4.1",
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^3.0.5",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "^1.15.3",
+    "whatsapp-web.js": "^1.15.4",
     "yup": "^0.32.8"
   },
   "devDependencies": {
@@ -54,7 +54,7 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/multer": "^1.4.4",
     "@types/mustache": "^4.1.2",
-    "@types/node": "^14.11.8",
+    "@types/node": "^14.18.10",
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.3.3",
     "@types/validator": "^13.1.0",
