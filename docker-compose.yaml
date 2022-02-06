@@ -17,14 +17,12 @@ services:
       - JWT_SECRET=${JWT_SECRET:-3123123213123}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
       - CHROME_WS=ws://chrome:3000
-    ports:
-      - 8080:3000
     networks:
       - whaticket
 
   frontend:
     ports:
-      - 3000:80
+      - ${FRONTEND_PORT:-3000}:80
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
@@ -36,17 +34,15 @@ services:
   mysql:
     image: mariadb:latest
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
-    ports:
-        - 3306:3306
     volumes:
-        - ./.docker/data/:/var/lib/mysql
+      - ./.docker/data/:/var/lib/mysql
     environment:
-        - MYSQL_DATABASE=${MYSQL_DATABASE:-whaticket}
-        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
-        - TZ=${TZ:-America/Fortaleza}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-whaticket}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
+      - TZ=${TZ:-America/Fortaleza}
     restart: always
     networks:
-        - whaticket
+      - whaticket
 
   chrome:
     image: browserless/chrome:latest
