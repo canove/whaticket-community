@@ -46,7 +46,9 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const wbot: Session = new Client({
         session: sessionCfg,
         puppeteer: {
-          executablePath: process.env.CHROME_BIN || undefined
+          executablePath: process.env.CHROME_BIN || undefined,
+          // @ts-ignore
+          browserWSEndpoint: process.env.CHROME_WS || undefined
         }
       });
 
