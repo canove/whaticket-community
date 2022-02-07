@@ -40,6 +40,8 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE:-whaticket}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
       - TZ=${TZ:-America/Fortaleza}
+    ports:
+      - 3306:3306
     restart: always
     networks:
       - whaticket
@@ -47,6 +49,6 @@ services:
   chrome:
     image: browserless/chrome:latest
     environment:
-      - MAX_CONCURRENT_SESSIONS=10
+      - MAX_CONCURRENT_SESSIONS=${MAX_CONCURRENT_SESSIONS:-1}
     networks:
       - whaticket
