@@ -1,0 +1,49 @@
+version: '3'
+
+networks:
+  whaticket:
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASS=${MYSQL_ROOT_PASSWORD:-strongpassword}
+      - DB_NAME=${MYSQL_DATABASE:-whaticket}
+      - JWT_SECRET=${JWT_SECRET:-3123123213123}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:3000/api}
+      - FRONTEND_URL=${BACKEND_URL:-http://localhost:3000}
+      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
+    networks:
+      - whaticket
+
+  frontend:
+    ports:
+      - ${FRONTEND_PORT:-3000}:80
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    environment:
+      - URL_BACKEND=http://backend:3000/
+    networks:
+      - whaticket
+
+  mysql:
+    image: mariadb:latest
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
+    volumes:
+      - ./.docker/data/:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-whaticket}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
+      - TZ=${TZ:-America/Fortaleza}
+    ports:
+      - 3306:3306
+    restart: always
+    networks:
+      - whaticket
