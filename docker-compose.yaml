@@ -16,7 +16,9 @@ services:
       - DB_NAME=${MYSQL_DATABASE:-whaticket}
       - JWT_SECRET=${JWT_SECRET:-3123123213123}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
-      - CHROME_WS=ws://chrome:3000
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:3000/api}
+      - FRONTEND_URL=${BACKEND_URL:-http://localhost:3000}
+      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
     networks:
       - whaticket
 
@@ -43,12 +45,5 @@ services:
     ports:
       - 3306:3306
     restart: always
-    networks:
-      - whaticket
-
-  chrome:
-    image: browserless/chrome:latest
-    environment:
-      - MAX_CONCURRENT_SESSIONS=${MAX_CONCURRENT_SESSIONS:-1}
     networks:
       - whaticket
