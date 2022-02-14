@@ -14,9 +14,12 @@ _addSslConfig() {
     FILE_CONF=/etc/nginx/sites.d/${1}.conf
 
     if [ -f ${SSL_CERTIFICATE} ] && [ -f ${SSL_CERTIFICATE_KEY} ]; then
+        echo "saving ssl config in ${FILE_CONF}"
         echo 'include "include.d/ssl.conf";' >> ${FILE_CONF};
         echo "ssl_certificate ${SSL_CERTIFICATE};" >> ${FILE_CONF};
         echo "ssl_certificate_key ${SSL_CERTIFICATE_KEY};" >> ${FILE_CONF};
+    else
+        echo "ssl ${1} not found >> ${SSL_CERTIFICATE} -> ${SSL_CERTIFICATE_KEY}"
     fi;
 }
 
