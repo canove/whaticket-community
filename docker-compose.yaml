@@ -27,6 +27,7 @@ services:
   frontend:
     ports:
       - ${FRONTEND_PORT:-3000}:80
+      - 443:443
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
