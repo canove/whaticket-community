@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
-import openSocket from "socket.io-client";
+import openSocket from "../../services/socket-io";
 import useSound from "use-sound";
 
 import Popover from "@material-ui/core/Popover";
@@ -78,7 +78,7 @@ const NotificationsPopOver = () => {
 	}, [ticketIdUrl]);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket();
 
 		socket.on("connect", () => socket.emit("joinNotification"));
 

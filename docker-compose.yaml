@@ -16,9 +16,11 @@ services:
       - DB_NAME=${MYSQL_DATABASE:-whaticket}
       - JWT_SECRET=${JWT_SECRET:-3123123213123}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
-      - BACKEND_URL=${BACKEND_URL:-http://localhost:3000/api}
-      - FRONTEND_URL=${BACKEND_URL:-http://localhost:3000}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:8080}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
+    ports:
+      - ${BACKEND_PORT:-8080}:3000
     networks:
       - whaticket
 
@@ -29,7 +31,12 @@ services:
       context: ./frontend
       dockerfile: ./Dockerfile
     environment:
-      - URL_BACKEND=http://backend:3000/
+      - URL_BACKEND=backend:3000
+      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost:8080/}
+      - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
+      - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
+    volumes:
+      - ./ssl/:/etc/nginx/ssl/
     networks:
       - whaticket
 

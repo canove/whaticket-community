@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useState } from "react";
 
-import openSocket from "socket.io-client";
+import openSocket from "../../services/socket-io";
 
 import {
   Button,
@@ -111,7 +111,7 @@ const Queues = () => {
   }, []);
 
   useEffect(() => {
-    const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+    const socket = openSocket();
 
     socket.on("queue", (data) => {
       if (data.action === "update" || data.action === "create") {

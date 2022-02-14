@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getHoursCloseTicketsAuto } from "../../config";
 import toastError from "../../errors/toastError";
 
 import api from "../../services/api";
@@ -35,7 +36,7 @@ const useTickets = ({
                     })
                     setTickets(data.tickets)
 
-                    let horasFecharAutomaticamente = process.env.REACT_APP_HOURS_CLOSE_TICKETS_AUTO
+                    let horasFecharAutomaticamente = getHoursCloseTicketsAuto(); 
 
                     if (status === "open" && horasFecharAutomaticamente && horasFecharAutomaticamente !== "" &&
                         horasFecharAutomaticamente !== "0" && Number(horasFecharAutomaticamente) > 0) {
