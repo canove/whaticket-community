@@ -47,7 +47,7 @@ _Note_: change MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_USER and MYSQL_ROOT_PASSWOR
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
 
 # Or run using `docker-compose` as below
-# Before copy .env-example to .env first and set the variables in the file.
+# Before copy .env.example to .env first and set the variables in the file.
 docker-compose up -d mysql
 ```
 
@@ -177,7 +177,7 @@ _Note_: change MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_USER and MYSQL_ROOT_PASSWOR
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
 
 # Or run using `docker-compose` as below
-# Before copy .env-example to .env first and set the variables in the file.
+# Before copy .env.example to .env first and set the variables in the file.
 docker-compose up -d mysql
 ```
 
