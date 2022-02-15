@@ -28,13 +28,13 @@ services:
   frontend:
     ports:
       - ${FRONTEND_PORT:-3000}:80
-      - 443:443
+      - ${FRONTEND_SSL_PORT:-3001}:443
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
     environment:
       - URL_BACKEND=backend:3000
-      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost:8080/}
+      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
       - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
       - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
     volumes:
@@ -44,7 +44,7 @@ services:
       - whaticket
 
   mysql:
-    image: mariadb:latest
+    image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
     volumes:
       - ./.docker/data/:/var/lib/mysql
@@ -53,7 +53,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
       - TZ=${TZ:-America/Fortaleza}
     ports:
-      - 3306:3306
+      - ${MYSQL_PORT:-3306}:3306
     restart: always
     networks:
       - whaticket
