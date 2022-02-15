@@ -119,7 +119,9 @@ npm start
 - Wait for QR CODE button to appear, click it and read qr code.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
-## Basic production deployment (Ubuntu 20.04 VPS)
+## Basic production deployment
+
+### Using Ubuntu 20.04 VPS
 
 All instructions below assumes you are NOT running as root, since it will give an error in puppeteer. So let's start creating a new user and granting sudo privileges to it:
 
@@ -371,6 +373,40 @@ Enable SSL on nginx (Fill / Accept all information required):
 
 ```bash
 sudo certbot --nginx
+```
+
+### Using docker and docker-compose
+
+To run WhaTicket using docker you must perform the following steps:
+
+```bash
+cp .env.example .env
+```
+
+Now it will be necessary to configure the .env using its information, the variables are the same as those mentioned in the deployment using ubuntu, with the exception of mysql settings that were not in the .env.
+
+To deploy the ssl certificate, add it to the `ssl/certs` folder. Inside it there should be a `backend` and a `frontend` folder, and each of them should contain the files `fullchain.pem` and `privkey.pem`, as in the structure below:
+
+```bash
+.
+├── certs
+│   ├── backend
+│   │   ├── fullchain.pem
+│   │   └── privkey.pem
+│   └── frontend
+│       ├── fullchain.pem
+│       └── privkey.pem
+└── www
+```
+
+To generate the certificate files use `certbot` which can be installed using snap, I used the following command:
+
+```bash
+# FRONTEND
+certbot certonly --cert-name backend --webroot --webroot-path ./ssl/www/ -d api.mydomain.com
+
+# BACKEND
+certbot certonly --cert-name frontend --webroot --webroot-path ./ssl/www/ -d myapp.mydomain.com
 ```
 
 ## Access Data
