@@ -426,6 +426,12 @@ After defining the variables, run the following command:
 docker-compose up -d --build
 ```
 
+On the `first` run it will be necessary to seed the database tables using the following command:
+
+```bash
+docker-compose exec backend npx sequelize db:seed:all
+```
+
 #### SSL Certificate
 
 To deploy the ssl certificate, add it to the `ssl/certs` folder. Inside it there should be a `backend` and a `frontend` folder, and each of them should contain the files `fullchain.pem` and `privkey.pem`, as in the structure below:
