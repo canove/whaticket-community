@@ -16,25 +16,35 @@ services:
       - DB_NAME=${MYSQL_DATABASE:-whaticket}
       - JWT_SECRET=${JWT_SECRET:-3123123213123}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
-      - BACKEND_URL=${BACKEND_URL:-http://localhost:3000/api}
-      - FRONTEND_URL=${BACKEND_URL:-http://localhost:3000}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - PROXY_PORT=${PROXY_PORT:-8080}
       - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
+    ports:
+      - ${BACKEND_PORT:-8080}:3000
     networks:
       - whaticket
 
   frontend:
     ports:
       - ${FRONTEND_PORT:-3000}:80
+      - ${FRONTEND_SSL_PORT:-3001}:443
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
     environment:
-      - URL_BACKEND=http://backend:3000/
+      - URL_BACKEND=backend:3000
+      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
+      - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
+      - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
+    volumes:
+      - ./ssl/certs/:/etc/nginx/ssl/
+      - ./ssl/www/:/var/www/letsencrypt/
     networks:
       - whaticket
 
   mysql:
-    image: mariadb:latest
+    image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
     volumes:
       - ./.docker/data/:/var/lib/mysql
@@ -43,7 +53,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
       - TZ=${TZ:-America/Fortaleza}
     ports:
-      - 3306:3306
+      - ${MYSQL_PORT:-3306}:3306
     restart: always
     networks:
       - whaticket

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import openSocket from "socket.io-client";
+import openSocket from "../../services/socket-io";
 
 import { toast } from "react-toastify";
 
@@ -71,7 +71,7 @@ const useAuth = () => {
 	}, []);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket();
 
 		socket.on("user", data => {
 			if (data.action === "update" && data.user.id === user.id) {

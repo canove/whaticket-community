@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer, useContext } from "react";
-import openSocket from "socket.io-client";
+import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -182,7 +182,7 @@ const reducer = (state, action) => {
 	}, [tickets, status, searchParam]);
 
 	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+		const socket = openSocket();
 
 		const shouldUpdateTicket = ticket =>
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&

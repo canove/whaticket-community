@@ -45,6 +45,10 @@ _Note_: change MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_USER and MYSQL_ROOT_PASSWOR
 
 ```bash
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+
+# Or run using `docker-compose` as below
+# Before copy .env.example to .env first and set the variables in the file.
+docker-compose up -d mysql
 ```
 
 Install puppeteer dependencies:
@@ -119,7 +123,9 @@ npm start
 - Wait for QR CODE button to appear, click it and read qr code.
 - Done. Every message received by your synced WhatsApp number will appear in Tickets List.
 
-## Basic production deployment (Ubuntu 20.04 VPS)
+## Basic production deployment
+
+### Using Ubuntu 20.04 VPS
 
 All instructions below assumes you are NOT running as root, since it will give an error in puppeteer. So let's start creating a new user and granting sudo privileges to it:
 
@@ -169,6 +175,10 @@ _Note_: change MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_USER and MYSQL_ROOT_PASSWOR
 
 ```bash
 docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DATABASE=whaticket -e MYSQL_USER=whaticket -e MYSQL_PASSWORD=whaticket --restart always -p 3306:3306 -d mariadb:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+
+# Or run using `docker-compose` as below
+# Before copy .env.example to .env first and set the variables in the file.
+docker-compose up -d mysql
 ```
 
 Clone this repository:
@@ -371,6 +381,83 @@ Enable SSL on nginx (Fill / Accept all information required):
 
 ```bash
 sudo certbot --nginx
+```
+
+### Using docker and docker-compose
+
+To run WhaTicket using docker you must perform the following steps:
+
+```bash
+cp .env.example .env
+```
+
+Now it will be necessary to configure the .env using its information, the variables are the same as those mentioned in the deployment using ubuntu, with the exception of mysql settings that were not in the .env. 
+
+```bash
+# MYSQL
+MYSQL_ENGINE=                           # default: mariadb
+MYSQL_VERSION=                          # default: 10.6
+MYSQL_ROOT_PASSWORD=strongpassword      # change it please
+MYSQL_DATABASE=whaticket
+MYSQL_PORT=3306                         # default: 3306; Use this port to expose mysql server
+TZ=America/Fortaleza                    # default: America/Fortaleza; Timezone for mysql
+
+# BACKEND
+BACKEND_PORT=                           # default: 8080; but access by host not use this port
+BACKEND_SERVER_NAME=api.mydomain.com
+BACKEND_URL=https://api.mydomain.com
+PROXY_PORT=443
+JWT_SECRET=3123123213123                # change it please
+JWT_REFRESH_SECRET=75756756756          # change it please
+
+# FRONTEND
+FRONTEND_PORT=80                        # default: 3000; Use port 80 to expose in production
+FRONTEND_SSL_PORT=443                   # default: 3001; Use port 443 to expose in production
+FRONTEND_SERVER_NAME=myapp.mydomain.com
+FRONTEND_URL=https://myapp.mydomain.com
+
+# BROWSERLESS
+MAX_CONCURRENT_SESSIONS=                # default: 1; Use only if using browserless
+```
+
+After defining the variables, run the following command:
+
+```bash
+docker-compose up -d --build
+```
+
+On the `first` run it will be necessary to seed the database tables using the following command:
+
+```bash
+docker-compose exec backend npx sequelize db:seed:all
+```
+
+#### SSL Certificate
+
+To deploy the ssl certificate, add it to the `ssl/certs` folder. Inside it there should be a `backend` and a `frontend` folder, and each of them should contain the files `fullchain.pem` and `privkey.pem`, as in the structure below:
+
+```bash
+.
+├── certs
+│   ├── backend
+│   │   ├── fullchain.pem
+│   │   └── privkey.pem
+│   └── frontend
+│       ├── fullchain.pem
+│       └── privkey.pem
+└── www
+```
+
+To generate the certificate files use `certbot` which can be installed using snap, I used the following command:
+
+Note: The frontend container that runs nginx is already prepared to receive the request made by certboot to validate the certificate.
+
+```bash
+# FRONTEND
+certbot certonly --cert-name backend --webroot --webroot-path ./ssl/www/ -d api.mydomain.com
+
+# BACKEND
+certbot certonly --cert-name frontend --webroot --webroot-path ./ssl/www/ -d myapp.mydomain.com
 ```
 
 ## Access Data

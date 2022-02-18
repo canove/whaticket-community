@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer, useRef } from "react";
 
 import { isSameDay, parseISO, format } from "date-fns";
-import openSocket from "socket.io-client";
+import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
 import { green } from "@material-ui/core/colors";
@@ -358,7 +358,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
   }, [pageNumber, ticketId]);
 
   useEffect(() => {
-    const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+    const socket = openSocket();
 
     socket.on("connect", () => socket.emit("joinChatBox", ticketId));
 
