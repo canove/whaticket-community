@@ -23,8 +23,9 @@ import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import { debounce } from "../../helpers/Debounce";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
-import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
+import { queryDialogFlow } from "../DialogflowServices/QueryDialogflow";
+import { createDialogflowSession } from "../DialogflowServices/CreateSessionDialogflow";
 
 interface Session extends Client {
   id?: number;
@@ -163,6 +164,10 @@ const verifyQueue = async (
     return;
   }
 
+  if (!contact.useQueues) {
+    return;
+  }
+
   const selectedOption = msg.body;
 
   const choosenQueue = queues[+selectedOption - 1];
@@ -173,11 +178,11 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
-
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
-
-    await verifyMessage(sentMessage, ticket, contact);
+    if( choosenQueue.greetingMessage ) {
+      let body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
+      const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+      await verifyMessage(sentMessage, ticket, contact);
+    }
   } else {
     let options = "";
 
@@ -202,6 +207,35 @@ const verifyQueue = async (
     debouncedSentMessage();
   }
 };
+
+const sendDialogflowAwswer = async (
+  wbot: Session, 
+  ticket:Ticket, 
+  msg:WbotMessage, 
+  contact: Contact
+) => {
+  const session = await createDialogflowSession(ticket.queue.dialogflow);
+  if(session === undefined) {
+    return;
+  }
+
+  let dialogFlowReply = await queryDialogFlow(
+    session,
+    ticket.queue.dialogflow.projectName, 
+    msg.from, 
+    msg.body, 
+    ticket.queue.dialogflow.language
+  );
+  if(dialogFlowReply === null) {
+    return;
+  }
+
+  const body = dialogFlowReply.replace(/\\n/g, '\n');
+  const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+  await verifyMessage(sentMessage, ticket, contact);
+}
+
+
 
 const isValidMsg = (msg: WbotMessage): boolean => {
   if (msg.from === "status@broadcast") return false;
@@ -297,6 +331,15 @@ const handleMessage = async (
       whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
+    }
+
+    if(
+      !msg.fromMe &&
+      ticket.queue &&
+      ticket.queue.dialogflow &&
+      contact.useDialogflow
+    ) {
+      await sendDialogflowAwswer(wbot, ticket, msg, contact);
     }
 
     if (msg.type === "vcard") {
