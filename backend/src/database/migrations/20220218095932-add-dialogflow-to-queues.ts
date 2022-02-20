@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface: QueryInterface) => {
     return queryInterface.addColumn("Queues", "dialogflowId", {
       type: DataTypes.INTEGER,
-      references: { model: "Dialogflow", key: "id" },
+      references: { model: "Dialogflows", key: "id" },
       onUpdate: "CASCADE",
       onDelete: "SET NULL"
     });
