@@ -190,6 +190,7 @@ const messages = {
         form: {
           name: "Nome",
           color: "Cor",
+          dialogflow: "Dialogflow",
           greetingMessage: "Mensagem de saudação",
         },
         buttons: {
@@ -375,6 +376,7 @@ const messages = {
         header: {
           assignedTo: "Atribuído à:",
           buttons: {
+            dialogflow: "Dialogflow",
             return: "Retornar",
             resolve: "Resolver",
             reopen: "Reabrir",
