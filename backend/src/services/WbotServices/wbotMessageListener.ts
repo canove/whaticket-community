@@ -7,7 +7,8 @@ import {
   Contact as WbotContact,
   Message as WbotMessage,
   MessageAck,
-  Client
+  Client,
+  Chat
 } from "whatsapp-web.js";
 
 import Contact from "../../models/Contact";
@@ -212,12 +213,15 @@ const sendDialogflowAwswer = async (
   wbot: Session, 
   ticket:Ticket, 
   msg:WbotMessage, 
-  contact: Contact
+  contact: Contact,
+  chat:Chat
 ) => {
   const session = await createDialogflowSession(ticket.queue.dialogflow);
   if(session === undefined) {
     return;
   }
+
+  wbot.sendPresenceAvailable();
 
   let dialogFlowReply = await queryDialogFlow(
     session,
@@ -230,12 +234,19 @@ const sendDialogflowAwswer = async (
     return;
   }
 
+  chat.sendStateTyping();
+
+  await new Promise(f => setTimeout(f, 1000));
+
   const body = dialogFlowReply.replace(/\\n/g, '\n');
-  const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
-  await verifyMessage(sentMessage, ticket, contact);
+  const linesOfBody = body.split('\n');
+
+  for(let i=0;i<linesOfBody.length;i++) {
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, linesOfBody[i]);
+    await verifyMessage(sentMessage, ticket, contact);
+    await new Promise(f => setTimeout(f, 1000));
+  }
 }
-
-
 
 const isValidMsg = (msg: WbotMessage): boolean => {
   if (msg.from === "status@broadcast") return false;
@@ -339,7 +350,7 @@ const handleMessage = async (
       ticket.queue.dialogflow &&
       contact.useDialogflow
     ) {
-      await sendDialogflowAwswer(wbot, ticket, msg, contact);
+      await sendDialogflowAwswer(wbot, ticket, msg, contact, chat);
     }
 
     if (msg.type === "vcard") {
