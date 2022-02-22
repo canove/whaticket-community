@@ -241,8 +241,8 @@ const sendDialogflowAwswer = async (
   const body = dialogFlowReply.replace(/\\n/g, '\n');
   const linesOfBody = body.split('\n');
 
-  for(let i=0;i<linesOfBody.length;i++) {
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, linesOfBody[i]);
+  for(let line of linesOfBody) {
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, line);
     await verifyMessage(sentMessage, ticket, contact);
     await new Promise(f => setTimeout(f, 1000));
   }

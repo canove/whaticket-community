@@ -38,7 +38,7 @@ async function queryDialogFlow(
     sessionId:string, 
     query:string, 
     languageCode:string
-) : Promise<String | null> {
+) : Promise<string | null> {
     let intentResponse;
 
     try {

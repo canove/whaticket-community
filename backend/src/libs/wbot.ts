@@ -129,18 +129,6 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 
         resolve(wbot);
       });
-
-      // wbot.on('message', async msg => {
-      //   wbot.sendPresenceAvailable();
-
-      //   let textoResposta = await executeQueries("whaticket-ctas", msg.from, msg.body, 'pt-BR');
-      //   if(textoResposta === null || textoResposta === undefined) {
-      //     console.log('Não houve resposta do dialogflow.');
-      //     return;
-      //   }
-
-      //   msg.reply(textoResposta.replace(/\\n/g, '\n'));
-      // });
     } catch (err) {
       logger.error(err);
     }
