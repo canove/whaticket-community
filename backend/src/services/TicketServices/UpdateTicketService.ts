@@ -10,6 +10,7 @@ interface TicketData {
   status?: string;
   userId?: number;
   queueId?: number;
+  whatsappId?: number;
 }
 
 interface Request {
@@ -27,7 +28,7 @@ const UpdateTicketService = async ({
   ticketData,
   ticketId
 }: Request): Promise<Response> => {
-  const { status, userId, queueId } = ticketData;
+  const { status, userId, queueId, whatsappId } = ticketData;
 
   const ticket = await ShowTicketService(ticketId);
   await SetTicketMessagesAsRead(ticket);
@@ -46,6 +47,11 @@ const UpdateTicketService = async ({
   });
 
 
+  if(whatsappId) {
+    await ticket.update({
+      whatsappId
+    });
+  }
 
   await ticket.reload();
 
