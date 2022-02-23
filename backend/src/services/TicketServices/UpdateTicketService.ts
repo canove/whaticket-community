@@ -36,7 +36,7 @@ const UpdateTicketService = async ({
   const oldUserId = ticket.user?.id;
 
   if (oldStatus === "closed") {
-    await CheckContactOpenTickets(ticket.contact.id);
+    await CheckContactOpenTickets(ticket.contact.id, ticket.whatsappId);
   }
 
   await ticket.update({
