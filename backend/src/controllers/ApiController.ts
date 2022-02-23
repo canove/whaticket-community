@@ -24,7 +24,10 @@ interface ContactData {
   number: string;
 }
 
-const createContact = async (newContact: string) => {
+const createContact = async (
+  userId: number,
+  newContact: string
+) => {
   await CheckIsValidContact(newContact);
 
   const validNumber: any = await CheckContactNumber(newContact);
@@ -42,7 +45,7 @@ const createContact = async (newContact: string) => {
 
   const contact = await CreateOrUpdateContactService(contactData);
 
-  const defaultWhatsapp = await GetDefaultWhatsApp();
+  const defaultWhatsapp = await GetDefaultWhatsApp(userId);
 
   const createTicket = await FindOrCreateTicketService(
     contact,
@@ -76,7 +79,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError(err.message);
   }
 
-  const contactAndTicket = await createContact(newContact.number);
+  const userId:number = parseInt(req.user.id);
+  const contactAndTicket = await createContact(userId, newContact.number);
 
   if (medias) {
     await Promise.all(
