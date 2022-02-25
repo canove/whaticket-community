@@ -248,7 +248,7 @@ const UserModal = ({ open, onClose, userId }) => {
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"
-									yes={() => (
+									yes={() => (!loading &&
 										<FormControl variant="outlined" margin="dense" className={classes.maxWidth} fullWidth>
 											<InputLabel>{i18n.t("userModal.form.whatsapp")}</InputLabel>
 											<Field

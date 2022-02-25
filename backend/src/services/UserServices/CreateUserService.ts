@@ -68,9 +68,7 @@ const CreateUserService = async ({
 
   await user.reload();
 
-  const serializedUser = SerializeUser(user);
-
-  return serializedUser;
+  return SerializeUser(user);
 };
 
 export default CreateUserService;
