@@ -206,6 +206,7 @@ const messages = {
           email: "Email",
           password: "Password",
           profile: "Profile",
+          whatsapp: "Default Connection",
         },
         buttons: {
           okAdd: "Add",
@@ -340,6 +341,7 @@ const messages = {
           name: "Name",
           email: "Email",
           profile: "Profile",
+          whatsapp: "Default Connection",
           actions: "Actions",
         },
         buttons: {

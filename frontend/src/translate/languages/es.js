@@ -209,6 +209,7 @@ const messages = {
           email: "Correo Electrónico",
           password: "Contraseña",
           profile: "Perfil",
+          whatsapp: "Conexión estándar",
         },
         buttons: {
           okAdd: "Agregar",
@@ -345,6 +346,7 @@ const messages = {
           name: "Nombre",
           email: "Correo Electrónico",
           profile: "Perfil",
+          whatsapp: "Conexión estándar",
           actions: "Acciones",
         },
         buttons: {

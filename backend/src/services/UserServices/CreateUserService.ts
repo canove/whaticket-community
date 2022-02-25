@@ -10,6 +10,7 @@ interface Request {
   name: string;
   queueIds?: number[];
   profile?: string;
+  whatsappId?: number;
 }
 
 interface Response {
@@ -24,7 +25,8 @@ const CreateUserService = async ({
   password,
   name,
   queueIds = [],
-  profile = "admin"
+  profile = "admin",
+  whatsappId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().required().min(2),
@@ -56,9 +58,10 @@ const CreateUserService = async ({
       email,
       password,
       name,
-      profile
+      profile,
+      whatsappId: whatsappId ? whatsappId : null
     },
-    { include: ["queues"] }
+    { include: ["queues", "whatsapp"] }
   );
 
   await user.$set("queues", queueIds);
