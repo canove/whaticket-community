@@ -23,7 +23,7 @@ services:
     ports:
       - ${BACKEND_PORT:-8080}:3000
     volumes:
-      - ./public/:/usr/src/app/public/
+      - ./backend/public/:/usr/src/app/public/
     networks:
       - whaticket
 

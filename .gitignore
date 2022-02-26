@@ -1,4 +1,3 @@
 .docker/data/
 ssl/
-public/
 .env
