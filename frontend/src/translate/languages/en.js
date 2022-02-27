@@ -249,7 +249,9 @@ const messages = {
         title: "Transfer Ticket",
         fieldLabel: "Type to search for users",
         fieldQueueLabel: "Transfer to queue",
+        fieldConnectionLabel: "Transfer to connection",
         fieldQueuePlaceholder: "Please select a queue",
+        fieldConnectionPlaceholder: "Please select a connection",
         noOptions: "No user found with this name",
         buttons: {
           ok: "Transfer",

@@ -252,7 +252,9 @@ const messages = {
         title: "Transferir Ticket",
         fieldLabel: "Escriba para buscar usuarios",
         fieldQueueLabel: "Transferir a la cola",
+        fieldConnectionLabel: "Transferir to conexión",
         fieldQueuePlaceholder: "Seleccione una cola",
+        fieldConnectionPlaceholder: "Seleccione una conexión",
         noOptions: "No se encontraron usuarios con ese nombre",
         buttons: {
           ok: "Transferir",
