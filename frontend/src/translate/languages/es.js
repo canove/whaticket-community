@@ -400,6 +400,7 @@ const messages = {
       },
       ticketOptionsMenu: {
         delete: "Borrar",
+        useQueues: "Use Queues",
         transfer: "Transferir",
         confirmationModal: {
           title: "¿Borrar ticket #",

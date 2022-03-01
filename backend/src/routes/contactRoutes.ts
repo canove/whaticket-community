@@ -22,7 +22,7 @@ contactRoutes.post("/contact", isAuth, ContactController.getContact);
 
 contactRoutes.put("/contacts/:contactId", isAuth, ContactController.update);
 
-contactRoutes.put("/contacts/toggleUseQueue/:contactId", isAuth, ContactController.toggleUseQueue);
+contactRoutes.put("/contacts/toggleUseQueues/:contactId", isAuth, ContactController.toggleUseQueue);
 
 contactRoutes.put("/contacts/toggleUseDialogflow/:contactId", isAuth, ContactController.toggleUseDialogflow);
 
