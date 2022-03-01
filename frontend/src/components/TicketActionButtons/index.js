@@ -61,7 +61,7 @@ const TicketActionButtons = ({ ticket }) => {
 		}
 	};
 
-	const handleContactToggleUseDialogflow = async (e, status, userId) => {
+	const handleContactToggleUseDialogflow = async () => {
 		setLoading(true);
 		try {
 			const contact = await api.put(`/contacts/toggleUseDialogflow/${ticket.contact.id}`);
@@ -75,16 +75,18 @@ const TicketActionButtons = ({ ticket }) => {
 
 	return (
 		<div className={classes.actionButtons}>
-			<FormControlLabel
-				control={
-					<Switch
-						size="small"
-						checked={useDialogflow}
-						onChange={e => handleContactToggleUseDialogflow(e)}
-					/>
-				}
-				label={i18n.t("messagesList.header.buttons.dialogflow")}
-			/>
+			{ticket?.queue?.dialogflow && 
+				<FormControlLabel
+					control={
+						<Switch
+							size="small"
+							checked={useDialogflow}
+							onChange={e => handleContactToggleUseDialogflow(e)}
+						/>
+					}
+					label={i18n.t("messagesList.header.buttons.dialogflow")}
+				/>
+			}
 			{ticket.status === "closed" && (
 				<ButtonWithSpinner
 					loading={loading}
