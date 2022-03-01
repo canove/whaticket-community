@@ -83,7 +83,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 					<Switch
 						size="small"
 						checked={useQueues}
-						onChange={e => handleContactToggleUseQueues(e)}
+						onChange={() => handleContactToggleUseQueues()}
 					/>
 					{i18n.t("ticketOptionsMenu.useQueues")}
 				</MenuItem>}

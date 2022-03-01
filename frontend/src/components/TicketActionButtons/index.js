@@ -81,7 +81,7 @@ const TicketActionButtons = ({ ticket }) => {
 						<Switch
 							size="small"
 							checked={useDialogflow}
-							onChange={e => handleContactToggleUseDialogflow(e)}
+							onChange={() => handleContactToggleUseDialogflow()}
 						/>
 					}
 					label={i18n.t("messagesList.header.buttons.dialogflow")}
