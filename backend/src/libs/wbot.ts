@@ -130,7 +130,8 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         resolve(wbot);
       });
     } catch (err) {
-      logger.error(err);
+      logger.error('--ERRO--:');
+      logger.error(JSON.stringify(err));
     }
   });
 };
