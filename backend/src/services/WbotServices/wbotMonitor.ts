@@ -23,8 +23,9 @@ const wbotMonitor = async (
       try {
         await whatsapp.update({ status: newState });
       } catch (err) {
+        logger.error('--ERRO--:');
         Sentry.captureException(err);
-        logger.error(err);
+        logger.error(JSON.stringify(err));
       }
 
       io.emit("whatsappSession", {
@@ -69,8 +70,9 @@ const wbotMonitor = async (
       setTimeout(() => StartWhatsAppSession(whatsapp), 2000);
     });
   } catch (err) {
+    logger.error('--ERRO--:');
     Sentry.captureException(err);
-    logger.error(err);
+    logger.error(JSON.stringify(err));
   }
 };
 
