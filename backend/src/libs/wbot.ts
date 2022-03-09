@@ -48,12 +48,15 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const wbot: Session = new Client({
         session: sessionCfg,
         puppeteer: {
+          headless: false,
           executablePath: process.env.CHROME_BIN || undefined,
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
           args: args.split(' ')
         }
       });
+
+      logger.info("--PUPPETEER--:", sessionName);
 
       wbot.initialize();
 
