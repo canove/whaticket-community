@@ -27,7 +27,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, queueIds } = req.body;
+  const { email, password, name, profile, queueIds, whatsappId } = req.body;
 
   if (
     req.url === "/signup" &&
@@ -43,7 +43,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     password,
     name,
     profile,
-    queueIds
+    queueIds,
+    whatsappId
   });
 
   const io = getIO();

@@ -208,6 +208,7 @@ const messages = {
           email: "Email",
           password: "Senha",
           profile: "Perfil",
+          whatsapp: "Conexão Padrão",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -250,7 +251,9 @@ const messages = {
         title: "Transferir Ticket",
         fieldLabel: "Digite para buscar usuários",
         fieldQueueLabel: "Transferir para fila",
+        fieldConnectionLabel: "Transferir para conexão",
         fieldQueuePlaceholder: "Selecione uma fila",
+        fieldConnectionPlaceholder: "Selecione uma conexão",
         noOptions: "Nenhum usuário encontrado com esse nome",
         buttons: {
           ok: "Transferir",
@@ -263,6 +266,7 @@ const messages = {
         noTicketsTitle: "Nada aqui!",
         noTicketsMessage:
           "Nenhum ticket encontrado com esse status ou termo pesquisado",
+        connectionTitle: "Conexão que está sendo utilizada atualmente.",
         buttons: {
           accept: "Aceitar",
         },
@@ -344,6 +348,7 @@ const messages = {
           name: "Nome",
           email: "Email",
           profile: "Perfil",
+          whatsapp: "Conexão Padrão",
           actions: "Ações",
         },
         buttons: {

@@ -11,12 +11,15 @@ import {
   AutoIncrement,
   Default,
   HasMany,
-  BelongsToMany
+  BelongsToMany,
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
 import { hash, compare } from "bcryptjs";
 import Ticket from "./Ticket";
 import Queue from "./Queue";
 import UserQueue from "./UserQueue";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class User extends Model<User> {
@@ -44,6 +47,13 @@ class User extends Model<User> {
   @Default("admin")
   @Column
   profile: string;
+
+  @ForeignKey(() => Whatsapp)
+  @Column
+  whatsappId: number;
+
+  @BelongsTo(() => Whatsapp)
+  whatsapp: Whatsapp;
 
   @CreatedAt
   createdAt: Date;
