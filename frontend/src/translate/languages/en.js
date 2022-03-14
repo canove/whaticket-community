@@ -263,6 +263,7 @@ const messages = {
         assignedHeader: "Working on",
         noTicketsTitle: "Nothing here!",
         noTicketsMessage: "No tickets found with this status or search term.",
+        connectionTitle: "Connection that is currently being used.",
         buttons: {
           accept: "Accept",
         },
