@@ -2,11 +2,10 @@ name: Create and publish a Frontend Docker image
 
 on:
 
-  push:
-    branches:
-      - master
-
-  pull_request:
+ push:
+   branches: [master]
+   paths:
+     - "frontend/**"
 
 env:
   REGISTRY: ghcr.io
