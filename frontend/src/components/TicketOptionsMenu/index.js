@@ -113,6 +113,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				modalOpen={transferTicketModalOpen}
 				onClose={handleCloseTransferTicketModal}
 				ticketid={ticket.id}
+				ticketWhatsappId={ticket.whatsappId}
 			/>
 		</>
 	);
