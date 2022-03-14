@@ -3,10 +3,9 @@ name: Create and publish a Backend Docker image
 on:
 
   push:
-    branches:
-      - master
-
-  pull_request:
+    branches: [master]
+    paths:
+      - "backend/**"
 
 env:
   REGISTRY: ghcr.io
