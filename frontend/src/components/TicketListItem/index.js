@@ -102,9 +102,9 @@ const useStyles = makeStyles(theme => ({
 
 	userTag: {
 		position: "absolute",
-		marginRight: 5,
-		right: 5,
-		bottom: 5,
+		marginRight: 35,
+		right: 10,
+		bottom: 9,
 		background:"#2576D2",
 		color: "#ffffff",
 		border:"1px solid #CCC",
@@ -112,7 +112,7 @@ const useStyles = makeStyles(theme => ({
 		paddingLeft: 5,
 		paddingRight: 5,
 		borderRadius: 10,
-		fontSize: "1em"
+		fontSize: "0.9em"
 	},
 }));
 
@@ -211,7 +211,7 @@ const TicketListItem = ({ ticket }) => {
 									)}
 								</Typography>
 							)}
-							{ticket.whatsappId && (
+							{ticket?.whatsapp && (
 								<div className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{ticket.whatsapp.name}</div>
 							)}
 						</span>
