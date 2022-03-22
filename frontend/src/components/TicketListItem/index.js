@@ -112,7 +112,7 @@ const useStyles = makeStyles(theme => ({
 		paddingLeft: 5,
 		paddingRight: 5,
 		borderRadius: 10,
-		fontSize: "1em"
+		fontSize: "0.9em"
 	},
 }));
 
