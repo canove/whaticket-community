@@ -5,7 +5,7 @@ import Ticket from "../models/Ticket";
 
 const GetTicketWbot = async (ticket: Ticket): Promise<Session> => {
   if (!ticket.whatsappId) {
-    const defaultWhatsapp = await GetDefaultWhatsApp();
+    const defaultWhatsapp = await GetDefaultWhatsApp(ticket.user.id);
 
     await ticket.$set("whatsapp", defaultWhatsapp);
   }

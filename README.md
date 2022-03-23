@@ -3,6 +3,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=canove_whaticket&metric=alert_status)](https://sonarcloud.io/dashboard?id=canove_whaticket)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=canove_whaticket&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=canove_whaticket)
 [![Discord Chat](https://img.shields.io/discord/784109818247774249.svg?logo=discord)](https://discord.gg/Dp2tTZRYHg)
+[![Forum](https://img.shields.io/badge/forum-online-blue.svg?logo=discourse)](https://whaticket.online/)
 
 # WhaTicket
 
@@ -49,6 +50,10 @@ docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DAT
 # Or run using `docker-compose` as below
 # Before copy .env.example to .env first and set the variables in the file.
 docker-compose up -d mysql
+
+# To administer this mysql database easily using phpmyadmin. 
+# It will run by default on port 9000, but can be changed in .env using `PMA_PORT`
+docker-compose -f docker-compose.phpmyadmin.yaml up -d
 ```
 
 Install puppeteer dependencies:
@@ -179,6 +184,10 @@ docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DAT
 # Or run using `docker-compose` as below
 # Before copy .env.example to .env first and set the variables in the file.
 docker-compose up -d mysql
+
+# To administer this mysql database easily using phpmyadmin. 
+# It will run by default on port 9000, but can be changed in .env using `PMA_PORT`
+docker-compose -f docker-compose.phpmyadmin.yaml up -d
 ```
 
 Clone this repository:
