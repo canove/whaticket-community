@@ -5,6 +5,7 @@ import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
 import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+const fs = require('fs');
 
 interface Session extends Client {
   id?: number;
@@ -39,7 +40,15 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const sessionName = whatsapp.name;
       let sessionCfg;
 
-      if (whatsapp && whatsapp.session) {
+      const SESSION_FILE_PATH = './session.json';
+
+      if(fs.existsSync(SESSION_FILE_PATH)){
+        sessionCfg = require(SESSION_FILE_PATH);
+      }
+
+      const wbot: Session = new Client({puppeteer: {headless:false}});
+
+    /*  if (whatsapp && whatsapp.session) {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
@@ -64,7 +73,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         }
       });
 
-      logger.info("--PUPPETEER--:", sessionName);
+      logger.info("--PUPPETEER--:", sessionName);*/
 
       wbot.initialize();
 
