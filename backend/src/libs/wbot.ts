@@ -46,7 +46,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = require(SESSION_FILE_PATH);
       }
 
-      const wbot: Session = new Client({puppeteer: {headless:false}});
+      const wbot: Session = new Client({puppeteer: {headless:true}});
 
     /*  if (whatsapp && whatsapp.session) {
         sessionCfg = JSON.parse(whatsapp.session);
