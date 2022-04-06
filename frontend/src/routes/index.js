@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
+import Api from "../pages/Api/";
 import LoggedInLayout from "../layout";
 import Dashboard from "../pages/Dashboard/";
 import Tickets from "../pages/Tickets/";
@@ -47,6 +47,7 @@ const Routes = () => {
                 component={QuickAnswers}
                 isPrivate
               />
+              <Route exact path="/api" component={Api} isPrivate />
               <Route exact path="/Settings" component={Settings} isPrivate />
               <Route exact path="/Queues" component={Queues} isPrivate />
             </LoggedInLayout>
