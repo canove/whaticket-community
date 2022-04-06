@@ -289,6 +289,7 @@ const messages = {
           quickAnswers: "Respostas Rápidas",
           queues: "Filas",
           administration: "Administração",
+          api: "Documentação API",
           users: "Usuários",
           settings: "Configurações",
         },
