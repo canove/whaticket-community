@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-
+import CodeIcon from "@material-ui/icons/Code";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -120,6 +120,13 @@ const MainListItems = (props) => {
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
               icon={<AccountTreeOutlinedIcon />}
+            />
+           <ListItemLink
+              to="/api"
+              primary={i18n.t("mainDrawer.listItems.api")}
+              icon={
+                <CodeIcon />
+              }
             />
             <ListItemLink
               to="/settings"
