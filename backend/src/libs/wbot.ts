@@ -173,6 +173,6 @@ export const removeWbot = (whatsappId: number): void => {
       sessions.splice(sessionIndex, 1);
     }
   } catch (err) {
-    logger.error(err);
+    //logger.error(err);
   }
 };
