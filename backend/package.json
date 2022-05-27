@@ -39,7 +39,7 @@
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^3.0.5",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "^1.15.8",
+    "whatsapp-web.js": "^1.16.6",
     "yup": "^0.32.8"
   },
   "devDependencies": {
