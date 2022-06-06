@@ -200,6 +200,24 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+      dialogflowModal: {
+        title: {
+          add: "Agregar cola",
+          edit: "Editar cola",
+        },
+        form: {
+          name: "Nombre",
+          projectName: "Nombre del proyecto",
+          language: "Idioma",
+          jsonContent: "JsonContent",
+        },
+        buttons: {
+          okAdd: "Añadir",
+          okEdit: "Ahorrar",
+          cancel: "Cancelar",
+          test: "Testar Bot",
+        },
+      },
       userModal: {
         title: {
           add: "Agregar usuario",
@@ -285,6 +303,7 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
+
           connections: "Conexiones",
           tickets: "Tickets",
           contacts: "Contactos",
@@ -293,6 +312,7 @@ const messages = {
           administration: "Administración",
           users: "Usuarios",
           settings: "Configuración",
+          dialogflow: "Dialogflow",
         },
         appBar: {
           user: {
@@ -319,6 +339,24 @@ const messages = {
           deleteTitle: "Eliminar",
           deleteMessage:
             "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ninguna cola asignada.",
+        },
+      },
+      dialoflows: {
+        title: "Dialogflow",
+        table: {
+          name: "Nombre",
+          projectName: "Nombre del proyecto",
+          language: "Idioma",
+          lastUpdate: "Última Actualización",
+          actions: "Comportamiento",
+        },
+        buttons: {
+          add: "Agregar proyecto",
+        },
+        confirmationModal: {
+          deleteTitle: "Eliminar",
+          deleteMessage:
+            "¿Estás seguro? ¡Esta acción no se puede revertir!",
         },
       },
       queueSelect: {
@@ -468,6 +506,9 @@ const messages = {
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
+        ERR_NO_DIALOG_FOUND: "No se encontró Dialogflow con este ID.",
+        ERR_TEST_SESSION_DIALOG: "Error al crear la sesión de dialogflow",
+        ERR_TEST_REPLY_DIALOG: "Error al probar la configuración de DialogFlow",
       },
     },
   },
