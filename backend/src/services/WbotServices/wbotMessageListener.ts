@@ -238,11 +238,10 @@ const sendDialogflowAwswer = async (
 
   await new Promise(f => setTimeout(f, 1000));
 
-  const body = dialogFlowReply.replace(/\\n/g, '\n');
-  const linesOfBody = body.split('\n');
-
-  for(let line of linesOfBody) {
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, line);
+  //const body = dialogFlowReply.replace(/\\n/g, '\n');
+  //const linesOfBody = body.split('\n');
+  for(let message of dialogFlowReply) {
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, message.text.text[0]);
     await verifyMessage(sentMessage, ticket, contact);
     await new Promise(f => setTimeout(f, 1000));
   }
@@ -346,6 +345,7 @@ const handleMessage = async (
 
     if(
       !msg.fromMe &&
+      !chat.isGroup &&
       ticket.queue &&
       ticket.queue.dialogflow &&
       contact.useDialogflow
