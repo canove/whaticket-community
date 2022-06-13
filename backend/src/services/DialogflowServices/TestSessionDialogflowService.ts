@@ -62,7 +62,10 @@ const TestDialogflowSession = async ({
     "Ola", 
     language,
   );
-
+  session.close;
+  
+  fs.unlinkSync(keyFilename);
+  
   if (!dialogFlowReply) {
     throw new AppError("ERR_TEST_REPLY_DIALOG", 400);
   }
@@ -71,9 +74,7 @@ const TestDialogflowSession = async ({
   for(let message of dialogFlowReply) {
     messages.push(message.text.text[0]);
   }
-
   
-  fs.unlinkSync(keyFilename);
   return { messages };
 }
 

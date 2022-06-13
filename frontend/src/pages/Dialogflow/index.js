@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const reducer = (state, action) => {
-  if (action.type === "LOAD_QUEUES") {
+  if (action.type === "LOAD_DIALOGFLOWS") {
     const dialoflows = action.payload;
     const newDialogflows = [];
 
@@ -59,7 +59,7 @@ const reducer = (state, action) => {
     return [...state, ...newDialogflows];
   }
 
-  if (action.type === "UPDATE_QUEUES") {
+  if (action.type === "UPDATE_DIALOGFLOWS") {
     const dialogflow = action.payload;
     const dialogflowIndex = state.findIndex((u) => u.id === dialogflow.id);
 
@@ -71,7 +71,7 @@ const reducer = (state, action) => {
     }
   }
 
-  if (action.type === "DELETE_QUEUE") {
+  if (action.type === "DELETE_DIALOGFLOW") {
     const dialogflowId = action.payload;
     const dialogflowIndex = state.findIndex((q) => q.id === dialogflowId);
     if (dialogflowIndex !== -1) {
@@ -100,7 +100,7 @@ const Dialogflows = () => {
       setLoading(true);
       try {
         const { data } = await api.get("/dialogflow");
-        dispatch({ type: "LOAD_QUEUES", payload: data });
+        dispatch({ type: "LOAD_DIALOGFLOWS", payload: data });
 
         setLoading(false);
       } catch (err) {
@@ -115,11 +115,11 @@ const Dialogflows = () => {
 
     socket.on("dialogflow", (data) => {
       if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_QUEUES", payload: data.dialogflow });
+        dispatch({ type: "UPDATE_DIALOGFLOWS", payload: data.dialogflow });
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_QUEUE", payload: data.dialogflowId });
+        dispatch({ type: "DELETE_DIALOGFLOW", payload: data.dialogflowId });
       }
     });
 
