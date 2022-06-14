@@ -13,6 +13,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { 
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem
+} from "@material-ui/core"
+
 
 import { i18n } from "../../translate/i18n";
 
@@ -21,6 +28,7 @@ import toastError from "../../errors/toastError";
 import ColorPicker from "../ColorPicker";
 import { IconButton, InputAdornment } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
+import useDialogflows from "../../hooks/useDialogflows";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -45,8 +53,8 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: -12,
 	},
 	formControl: {
-		margin: theme.spacing(1),
-		minWidth: 120,
+		marginRight: theme.spacing(1),
+		minWidth: 200,
 	},
 	colorAdorment: {
 		width: 20,
@@ -61,6 +69,7 @@ const QueueSchema = Yup.object().shape({
 		.required("Required"),
 	color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
 	greetingMessage: Yup.string(),
+	dialogflowId: Yup.number(),
 });
 
 const QueueModal = ({ open, onClose, queueId }) => {
@@ -70,10 +79,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		name: "",
 		color: "",
 		greetingMessage: "",
+		dialogflowId: "",
 	};
 
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
+	const [dialogflows, setDialogflows] = useState([]);
+	const { findAll: findAllDialogflows } = useDialogflows();
+
 	const greetingRef = useRef();
 
 	useEffect(() => {
@@ -94,9 +107,19 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				name: "",
 				color: "",
 				greetingMessage: "",
+				dialogflowId: "",
 			});
 		};
 	}, [queueId, open]);
+
+	useEffect(() => {
+		const loadDialogflows = async () => {
+			const list = await findAllDialogflows();
+			setDialogflows(list);
+		}
+		loadDialogflows();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handleClose = () => {
 		onClose();
@@ -213,6 +236,28 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										margin="dense"
 									/>
 								</div>
+								<FormControl
+										variant="outlined"
+										className={classes.formControl}
+										margin="dense"
+									>
+									<InputLabel id="dialogflow-selection-input-label">
+										{i18n.t("queueModal.form.dialogflow")}
+									</InputLabel>
+									<Field
+										as={Select}
+										label={i18n.t("queueModal.form.dialogflow")}
+										name="dialogflowId"
+										labelId="dialogflow-selection-label"
+										id="dialogflow-selection"
+										required
+									>
+										<MenuItem value={''}>&nbsp;</MenuItem>
+										{dialogflows.map((dialogflow) => (
+											<MenuItem key={dialogflow.id} value={dialogflow.id}>{dialogflow.name}</MenuItem>
+										))}
+									</Field>
+								</FormControl>
 							</DialogContent>
 							<DialogActions>
 								<Button

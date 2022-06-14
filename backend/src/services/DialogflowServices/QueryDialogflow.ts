@@ -42,7 +42,7 @@ async function queryDialogFlow(
     let intentResponse;
 
     try {
-        console.log(`Dialoflow Question: '${query}'`);
+        //console.log(`Dialoflow Question: '${query}'`);
         intentResponse = await detectIntent(
             sessionClient,
             projectId,
@@ -54,10 +54,10 @@ async function queryDialogFlow(
         const responses = intentResponse?.queryResult?.fulfillmentMessages;
 
         if (responses?.length === 0) {
-            console.log('No defined answer in Dialogflow');
+            //console.log('No defined answer in Dialogflow');
             return null;
         } else {
-            console.log("Dialoflow answer:", responses);
+            //console.log("Dialoflow answer:", responses);
             return responses
         }
     } catch (error) {
