@@ -34,6 +34,7 @@ interface ContactData {
   name: string;
   number: string;
   email?: string;
+  useDialogflow: boolean;
   extraInfo?: ExtraInfo[];
 }
 
@@ -85,11 +86,14 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   let number = validNumber
   let email = newContact.email
   let extraInfo = newContact.extraInfo
+  let useDialogflow = newContact.useDialogflow
+  
 
   const contact = await CreateContactService({
     name,
     number,
     email,
+    useDialogflow,
     extraInfo,
     profilePicUrl
   });

@@ -158,6 +158,7 @@ const messages = {
           email: "Correo Electrónico",
           extraName: "Nombre del Campo",
           extraValue: "Valor",
+          dialogflow: "Dialogflow",
         },
         buttons: {
           addExtraInfo: "Agregar información",
