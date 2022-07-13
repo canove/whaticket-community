@@ -388,8 +388,7 @@ const messages = {
           read: "Lida",
           mediaURL: "URL da mídia",
           ticketId: "ID do ticket",
-          initialDate: "Data inicial",
-          finalDate: "Data final",
+          date: "Data",
         }
       },
       messagesList: {

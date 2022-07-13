@@ -61,7 +61,6 @@ const Reports = () => {
 
     const [loading, setLoading] = useState(false);
     const [users, dispatchUsers] = useReducer(reducer, []);
-    // const [tickets, setTickets] = useState([]);
 
     useEffect(() => {
         dispatchUsers({ type: "RESET"});
@@ -84,25 +83,6 @@ const Reports = () => {
         return () => clearTimeout(delayDebounceFn);
     }, []);
 
-    // useEffect(() => {
-    //     setLoading(true);
-    //     const delayDebounceFn = setTimeout(() => {
-    //         const fetchTickets = async() => {
-    //             try {
-    //                 const { data } = await api.get("/tickets", {})
-    //                 setTickets(data.tickets)
-    //                 setLoading(false)
-    //             } catch (err) {
-    //                 setLoading(false)
-    //                 toastError(err)
-    //             }
-    //         }
-
-    //         fetchTickets()
-    //     }, 500)
-    //     return () => clearTimeout(delayDebounceFn)
-    // }, [])
-
     const valueRefUser = useRef("");
     const valueRefInitialDate = useRef("");
     const valueRefFinalDate = useRef("");
@@ -115,42 +95,7 @@ const Reports = () => {
         setUserValue(valueRefUser.current.value);
         setInitialDateValue(valueRefInitialDate.current.value);
         setFinalDateValue(valueRefFinalDate.current.value);
-
-        console.log(userValue, initialDateValue, finalDateValue)
     }
-
-    // const reportsModel = () => {
-    //     let userIndex;
-
-    //     users.map(user => {
-    //         if (user.name === userValue) {
-    //             userIndex = user.id;
-    //         }
-    //     })
-
-    //     tickets.map(ticket => {
-    //         let ticketUserId = ticket.userId;
-    //         let ticketInitialDate = ticket.createdAt.slice(0, 10);
-    //         let ticketFinalDate = ticket.updatedAt.slice(0, 10);
-    //         console.log(ticketUserId, ticketInitialDate, ticketFinalDate)
-    //         console.log(userIndex, initialDateValue, finalDateValue)
-
-    //         if (ticketUserId === userIndex && ticketInitialDate === initialDateValue && ticketFinalDate === finalDateValue) {
-    //             console.log("DEU CERTO!");
-    //         }
-    //     });
-
-    //     console.log(tickets)
-
-    //     return (
-    //         <TableRow>
-    //             <TableCell align="center">{userValue}</TableCell>
-    //             <TableCell align="center">{initialDateValue}</TableCell>
-    //             <TableCell align="center">{finalDateValue}</TableCell>
-    //             <TableCell align="center">{i18n.t("reports.table.actions")}</TableCell>
-    //         </TableRow>
-    //     );
-    // }
 
     return (
         <MainContainer>
@@ -204,8 +149,7 @@ const Reports = () => {
                         <TableCell align="center">{i18n.t("reports.table.read")}</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.mediaURL")}</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.ticketId")}</TableCell>
-                        <TableCell align="center">{i18n.t("reports.table.initialDate")}</TableCell>
-                        <TableCell align="center">{i18n.t("reports.table.finalDate")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.date")}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -213,17 +157,8 @@ const Reports = () => {
                         <ReportsList 
                             initialDate={initialDateValue}
                             finalDate={finalDateValue}
+                            user={userValue}
                         />
-                    {/* {tickets.map(ticket => {
-                        return (<TableRow>
-                            <TableCell align="center">{ticket.userId}</TableCell>
-                            <TableCell align="center">{ticket.createdAt}</TableCell>
-                            <TableCell align="center">{ticket.updatedAt}</TableCell>
-                            <TableCell align="center">{i18n.t("reports.table.actions")}</TableCell>
-                        </TableRow>)
-                    })}
-                        
-                        { reportsModel() } */}
                         {loading}
                     </>
                 </TableBody>
