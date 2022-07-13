@@ -287,6 +287,7 @@ const messages = {
           administration: "Administração",
           users: "Usuários",
           settings: "Configurações",
+          reports: "Relatórios",
         },
         appBar: {
           user: {
@@ -370,6 +371,26 @@ const messages = {
             },
           },
         },
+      },
+      reports: {
+        title: "Relatórios",
+        buttons: {
+          filter: "Filtrar relatórios",
+        },
+        form: {
+          initialDate: "Data inicial",
+          finalDate: "Data final",
+          user: "Usuário",
+        },
+        table: {
+          messageId: "Id da mensagem",
+          messageBody: "Corpo da mensagem",
+          read: "Lida",
+          mediaURL: "URL da mídia",
+          ticketId: "ID do ticket",
+          initialDate: "Data inicial",
+          finalDate: "Data final",
+        }
       },
       messagesList: {
         header: {
