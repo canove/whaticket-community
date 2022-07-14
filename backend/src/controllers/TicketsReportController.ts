@@ -10,5 +10,5 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
     const ticketsReport = await ListTicketsReportService({ ticketId });
 
-    return res.status(200).json(ticketsReport)
+    return res.status(200).json(ticketsReport);
 }
