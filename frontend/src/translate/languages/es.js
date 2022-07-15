@@ -288,7 +288,8 @@ const messages = {
           administration: "Administración",
           users: "Usuarios",
           settings: "Configuración",
-          reports: "Informes",
+          reports: "Informe de Conversación",
+          reportsTicket: "Informe de entradas"
         },
         appBar: {
           user: {
@@ -391,6 +392,22 @@ const messages = {
           ticketId: "Ticket ID",
           initialDate: "Initial date",
           finalDate: "Final date",
+        }
+      },
+        reportsTicket: {
+          title: "Informe de entradas",
+          buttons: {
+          filter: "Filtrar informes",
+        },
+        form: {
+          ticket: "Ticket"
+        },
+        table: {
+          messageId: "Message ID",
+          messageBody: "Message Body",
+          read: "Read",
+          ticketId: "ID do ticket",
+
         }
       },
       messagesList: {

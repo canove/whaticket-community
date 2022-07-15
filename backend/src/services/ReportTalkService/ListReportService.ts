@@ -26,9 +26,9 @@ const ListReportService = async ({
 ' where ' +
 	' tck.userId = ' + user +
 ' and ' +
-	" msg.createdAt >= '"+ initialDate +" 00:00:01' "+
+	" msg.createdAt >= '"+ initialDate +" dd/MM/yy HH:mm' "+
 ' and ' +
-	" msg.createdAt <= '" + finalDate + " 23:59:59' ",
+	" msg.createdAt <= '" + finalDate + " dd/MM/yy HH:mm' ",
     {
     type:QueryTypes.SELECT
 }

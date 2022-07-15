@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
-
 import ListReportService from "../services/ReportTalkService/ListReportService";
 
 type IndexQuery = {

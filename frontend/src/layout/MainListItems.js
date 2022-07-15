@@ -132,6 +132,11 @@ const MainListItems = (props) => {
               primary={i18n.t("mainDrawer.listItems.reports")}
               icon={<AssessmentOutlinedIcon />}
             />
+            <ListItemLink
+              to="/reportsTicket"
+              primary={i18n.t("mainDrawer.listItems.reportsTicket")}
+              icon={<AssessmentOutlinedIcon />}
+            />
           </>
         )}
       />

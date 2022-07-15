@@ -19,7 +19,7 @@ import Title from "../../components/Title";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
-import ReportsList from "../../components/ReportsList";
+import { format, parseISO } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,7 +38,7 @@ const reducer = (state, action) => {
     if (action.type === "LOAD_USERS") {
         const users = action.payload;
         const newUsers = [];
-    
+
         users.forEach((user) => {
             const userIndex = state.findIndex((u) => u.id === user.id);
             if (userIndex !== -1) {
@@ -47,7 +47,7 @@ const reducer = (state, action) => {
                 newUsers.push(user);
             }
         });
-    
+
         return [...state, ...newUsers];
     }
 
@@ -56,14 +56,33 @@ const reducer = (state, action) => {
     }
 };
 
-const Reports = () => {
+    const Reports = () => {
     const classes = useStyles();
 
     const [loading, setLoading] = useState(false);
     const [users, dispatchUsers] = useReducer(reducer, []);
+    const [reports, setReports] = useState([]);
 
+    const [userValue, setUserValue] = useState("");
+    const [initialDateValue, setInitialDateValue] = useState("");
+    const [finalDateValue, setFinalDateValue] = useState("");
+
+    const valueRefUser = useRef("");
+    const valueRefInitialDate = useRef("");
+    const valueRefFinalDate = useRef("");
+
+    const catchUserId = () => {
+           return userValue;
+    }
+    const filterReports = () => {
+
+    const userId = catchUserId();
+
+        fetchReports(userId);
+    }
     useEffect(() => {
         dispatchUsers({ type: "RESET"});
+
     }, []);
 
     useEffect(() => {
@@ -81,33 +100,42 @@ const Reports = () => {
             fetchUsers();
         }, 500);
         return () => clearTimeout(delayDebounceFn);
+
     }, []);
 
-    const valueRefUser = useRef("");
-    const valueRefInitialDate = useRef("");
-    const valueRefFinalDate = useRef("");
-
-    const [userValue, setUserValue] = useState("");
-    const [initialDateValue, setInitialDateValue] = useState("");
-    const [finalDateValue, setFinalDateValue] = useState("");
-
-    const filterReports = () => {
-        setUserValue(valueRefUser.current.value);
-        setInitialDateValue(valueRefInitialDate.current.value);
-        setFinalDateValue(valueRefFinalDate.current.value);
-    }
-
+    const fetchReports = async (userId) => {
+      try {
+          setLoading(true);
+          const { data } = await api.get(`report-talk?initialDate=${initialDateValue}&finalDate=${finalDateValue}&user=${userId}`);
+            setReports(data);
+            setLoading(false);
+          }catch (err) {
+              toastError(err);
+        }
+    };
+    const handleSelectOption = (e, newValue) => {
+      setUserValue(newValue.id);
+	};
+    const renderOptionLabel = option => {
+        if (option.number) {
+          return `${option.name} - ${option.number}`;
+        } else {
+          return `${option.name}`;
+        }
+      };
     return (
         <MainContainer>
             <MainHeader>
                 <Title>{i18n.t("reports.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Autocomplete
+                        onChange={(e, newValue) => handleSelectOption(e, newValue)}
                         className={classes.root}
-                        options={users.map(user => (user.name))}
-                        renderInput={(params) => 
-                            <TextField 
-                                {...params} 
+                        options={users}
+                        getOptionLabel={renderOptionLabel}
+                        renderInput={(params) =>
+                            <TextField
+                                {...params}
                                 label={i18n.t("reports.form.user")}
                                 InputLabelProps={{ required: true}}
                                 inputRef={valueRefUser}
@@ -116,6 +144,9 @@ const Reports = () => {
                     />
                     <TextField
                         id="initialDate"
+                        onChange={(e) => {
+                          setInitialDateValue(e.target.value)
+                        }}
                         label={i18n.t("reports.form.initialDate")}
                         InputLabelProps={{ shrink: true, required: true}}
                         type="date"
@@ -123,6 +154,9 @@ const Reports = () => {
                     />
                     <TextField
                         id="finalDate"
+                          onChange={(e) => {
+                          setFinalDateValue(e.target.value)
+                        }}
                         label={i18n.t("reports.form.finalDate")}
                         InputLabelProps={{ shrink: true, required: true }}
                         type="date"
@@ -154,11 +188,18 @@ const Reports = () => {
                 </TableHead>
                 <TableBody>
                     <>
-                        <ReportsList 
-                            initialDate={initialDateValue}
-                            finalDate={finalDateValue}
-                            user={userValue}
-                        />
+                        {reports.map((reportTalk) => (
+                            <TableRow key={reportTalk.id}>
+                                <TableCell align="center">{reportTalk.id}</TableCell>
+                                <TableCell align="center">{reportTalk.body}</TableCell>
+                                <TableCell align="center">{reportTalk.read}</TableCell>
+                                <TableCell align="center">{reportTalk.mediaUrl}</TableCell>
+                                <TableCell align="center">{reportTalk.ticketId}</TableCell>
+                                <TableCell align="center">{format(parseISO(reportTalk.createdAt), "dd/MM/yy HH:mm")}</TableCell>
+                            </TableRow>
+                        ))
+                        }
+
                         {loading}
                     </>
                 </TableBody>
