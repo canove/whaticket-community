@@ -19,6 +19,7 @@ import Title from "../../components/Title";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,18 +64,22 @@ const ReportsTicket = () => {
   }, [])
 
   const fetchReports = async (ticketId) => {
-    try {
-      setLoading(true);
-      const { data } = await api.get(`tickets-report?ticketId=${ticketId}`);
-      setReports(data);
-      setLoading(false);
-    } catch (err) {
-      toastError(err);
+    if (!ticketId) {
+      toast.error("Select a ticket");
+    } else {
+      try {
+        setLoading(true);
+        const { data } = await api.get(`tickets-report?ticketId=${ticketId}`);
+        setReports(data);
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+      }
     }
   };
 
   const handleSelectOption = (e, newValue) => {
-      setTicketId(newValue);
+    setTicketId(newValue);
   };
 
   return (
