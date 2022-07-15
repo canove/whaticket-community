@@ -38,39 +38,43 @@ const ReportsTicket = () => {
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState([]);
   const [tickets, setTickets] = useState([]);
-
-  //console.log(tickets.map(ticket => (ticket.id)))
+  const [ticketId, setTicketId] = useState();
 
   const filterReports = () => {
-        fetchReports(tickets.map(ticket => (ticket.id)))
+    fetchReports(ticketId)
   }
-    useEffect(() => {
-     setLoading(true);
-     const delayDebounceFn = setTimeout(() => {
-         const fetchTickets = async() => {
-             try {
-                 const { data } = await api.get("/tickets")
-                 setTickets(data.tickets)
-                 setLoading(false)
-             } catch (err) {
-                 setLoading(false)
-                toastError(err)
-            }
-         }
-         fetchTickets()
-     }, 500)
-     return () => clearTimeout(delayDebounceFn)
- }, [])
 
-  const fetchReports = async () => {
+  useEffect(() => {
+    setLoading(true);
+    const delayDebounceFn = setTimeout(() => {
+      const fetchTickets = async () => {
+        try {
+          const { data } = await api.get("/tickets")
+          setTickets(data.tickets)
+          setLoading(false)
+        } catch (err) {
+          setLoading(false)
+          toastError(err)
+        }
+      }
+      fetchTickets()
+    }, 500)
+    return () => clearTimeout(delayDebounceFn)
+  }, [])
+
+  const fetchReports = async (ticketId) => {
     try {
       setLoading(true);
-      const { data } = await api.get();
+      const { data } = await api.get(`tickets-report?ticketId=${ticketId}`);
       setReports(data);
       setLoading(false);
     } catch (err) {
       toastError(err);
     }
+  };
+
+  const handleSelectOption = (e, newValue) => {
+      setTicketId(newValue);
   };
 
   return (
@@ -79,6 +83,7 @@ const ReportsTicket = () => {
         <Title>{i18n.t("Relatório do Ticket")}</Title>
         <MainHeaderButtonsWrapper>
           <Autocomplete
+            onChange={(e, newValue) => handleSelectOption(e, newValue)}
             className={classes.root}
             options={tickets.map(ticket => ((ticket.id).toString()))}
             renderInput={(params) => (
@@ -89,7 +94,11 @@ const ReportsTicket = () => {
               />
             )}
           />
-          <Button variant="contained" color="primary" onClick={filterReports}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={ filterReports }
+          >
             {i18n.t("reports.buttons.filter")}
           </Button>
         </MainHeaderButtonsWrapper>
