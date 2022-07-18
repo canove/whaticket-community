@@ -66,7 +66,7 @@ const ReportsTicket = () => {
   const downloadPdf = () => {
     const linkSource = `data:application/pdf;base64,${pdf}`;
     const downloadLink = document.createElement("a");
-    const fileName = `ticket-report.pdf`;
+    const fileName = `report.pdf`;
     downloadLink.href = linkSource;
     downloadLink.download = fileName;
     downloadLink.click();

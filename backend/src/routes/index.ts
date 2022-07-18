@@ -14,6 +14,7 @@ import apiRoutes from "./apiRoutes";
 import reportTalkRoutes from "./reportTalkRoutes";
 import ticketsReportRoutes from "./ticketsReportRoutes";
 import ticketsExportReportRoutes from "./ticketsExportReportRoutes";
+import ticketsExportReportTalkRoutes from "./ticketsExportReportTalkRoutes"
 
 const routes = Router();
 
@@ -31,5 +32,6 @@ routes.use("/api/messages", apiRoutes);
 routes.use(reportTalkRoutes);
 routes.use(ticketsReportRoutes);
 routes.use(ticketsExportReportRoutes);
+routes.use(ticketsExportReportTalkRoutes)
 
 export default routes;

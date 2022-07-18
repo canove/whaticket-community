@@ -7,23 +7,27 @@ var pdf = require("pdf-creator-node");
 var pdf2base64 = require('pdf-to-base64');
 
 type IndexQuery = {
-    ticketId: Number;
+    userId: Number;
+    initialDate: string;
+    finalDate: string;
 }
 
 export const index = async (req: Request, res: Response) => {
-    const { ticketId } = req.query as unknown as IndexQuery;
+    const { userId="", initialDate="", finalDate="" } = req.query as unknown as IndexQuery;
 
     const reports = await Message.sequelize?.query(`
         select 
-            msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read 
+	        msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
         from 
-            whaticket.Messages as msg 
+	        whaticket.Messages as msg
         inner join 
-            whaticket.Tickets as ticket 
-        on 
-            msg.ticketId = ticket.id 
+	        whaticket.Tickets as tickets on msg.ticketId = tickets.id
         where 
-            ticket.id = ${ticketId}
+	        tickets.userId = ${userId}
+        and 
+            msg.createdAt >= '${initialDate} dd/MM/yy HH:mm'
+        and 
+	        msg.createdAt <= '${finalDate} dd/MM/yy HH:mm'
     `,
     { type: QueryTypes.SELECT }
     );
@@ -37,15 +41,18 @@ export const index = async (req: Request, res: Response) => {
         </head>
         <body>
             <h1>Tickets Report</h1>
-            <h2>Ticket ID: ${ticketId}</h2>
+            <h2>User ID: ${userId}</h2>
+            <h2>Initial Date: ${initialDate}</h2>
+            <h2>Final Date: ${finalDate}</h2>
             <table style="border: 1px solid black; border-collapse: collapse;">
                 <thead>
                     <tr>
                         <td style="border: 1px solid black">ID</td>
                         <td style="border: 1px solid black">Body</td>
-                        <td style="border: 1px solid black">Media URL</td>
-                        <td style="border: 1px solid black">Created At</td>
                         <td style="border: 1px solid black">Read</td>
+                        <td style="border: 1px solid black">Media URL</td>
+                        <td style="border: 1px solid black">Ticket ID</td>
+                        <td style="border: 1px solid black">Created At</td>
                     <tr>
                 </thead>
                 <tbody>
@@ -53,9 +60,10 @@ export const index = async (req: Request, res: Response) => {
                     <tr>
                         <td style="border: 1px solid black">{{this.id}}</td>
                         <td style="border: 1px solid black">{{this.body}}</td>
-                        <td style="border: 1px solid black">{{this.mediaUrl}}</td>
-                        <td style="border: 1px solid black">{{this.createdAt}}</td>
                         <td style="border: 1px solid black">{{this.read}}</td>
+                        <td style="border: 1px solid black">{{this.mediaUrl}}</td>
+                        <td style="border: 1px solid black">{{this.ticketId}}</td>
+                        <td style="border: 1px solid black">{{this.createdAt}}</td>
                     <tr>
                     {{/each}}
                 </tbody>

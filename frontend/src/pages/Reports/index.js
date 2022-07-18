@@ -20,6 +20,7 @@ import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
 import { format, parseISO } from "date-fns";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -62,24 +63,41 @@ const reducer = (state, action) => {
     const [loading, setLoading] = useState(false);
     const [users, dispatchUsers] = useReducer(reducer, []);
     const [reports, setReports] = useState([]);
+    const [disableButton, setDisableButton] = useState(true);
+    const [userId, setUserId] = useState("");
+    const [initialDate, setInitialDate] = useState("");
+    const [finalDate, setFinalDate] = useState("");
+    const [pdf, setPdf] = useState();
 
-    const [userValue, setUserValue] = useState("");
-    const [initialDateValue, setInitialDateValue] = useState("");
-    const [finalDateValue, setFinalDateValue] = useState("");
-
-    const valueRefUser = useRef("");
-    const valueRefInitialDate = useRef("");
-    const valueRefFinalDate = useRef("");
-
-    const catchUserId = () => {
-           return userValue;
+    const filterReports = async () => {
+        setDisableButton(true);
+        await fetchReports();
+        await createPdf();
+        setDisableButton(false);
     }
-    const filterReports = () => {
 
-    const userId = catchUserId();
-
-        fetchReports(userId);
+    const downloadPdf = () => {
+        const linkSource = `data:application/pdf;base64,${pdf}`;
+        const downloadLink = document.createElement("a");
+        const fileName = `report.pdf`;
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
     }
+
+    const createPdf = async () => {
+        if (!initialDate || !finalDate || !userId) {
+            toast.error("Fill the form");
+        } else {
+            try {
+                const { data } = await api.get(`/tickets-export-report-talk?initialDate=${initialDate}&finalDate=${finalDate}&userId=${userId}`);
+                setPdf(data);
+            } catch (err) {
+                toastError(err)
+            }
+        }
+    }
+
     useEffect(() => {
         dispatchUsers({ type: "RESET"});
 
@@ -100,29 +118,39 @@ const reducer = (state, action) => {
             fetchUsers();
         }, 500);
         return () => clearTimeout(delayDebounceFn);
-
     }, []);
 
-    const fetchReports = async (userId) => {
-      try {
-          setLoading(true);
-          const { data } = await api.get(`report-talk?initialDate=${initialDateValue}&finalDate=${finalDateValue}&user=${userId}`);
-            setReports(data);
-            setLoading(false);
-          }catch (err) {
-              toastError(err);
+    const fetchReports = async () => {
+        if (initialDate && finalDate && userId) {
+            try {
+                setLoading(true);
+                const { data } = await api.get(`report-talk?initialDate=${initialDate}&finalDate=${finalDate}&user=${userId}`);
+                setReports(data);
+                setLoading(false);
+            } catch (err) {
+                toastError(err);
+            }
+        } else {
+            toast.error("Fill the form")
         }
     };
-    const handleSelectOption = (e, newValue) => {
-      setUserValue(newValue.id);
+
+    const handleSelectOption = (_, newValue) => {
+        if (newValue) {
+            setUserId(newValue.id);
+        } else {
+            setUserId("");
+        }
 	};
+
     const renderOptionLabel = option => {
         if (option.number) {
           return `${option.name} - ${option.number}`;
         } else {
           return `${option.name}`;
         }
-      };
+    };
+
     return (
         <MainContainer>
             <MainHeader>
@@ -138,29 +166,20 @@ const reducer = (state, action) => {
                                 {...params}
                                 label={i18n.t("reports.form.user")}
                                 InputLabelProps={{ required: true}}
-                                inputRef={valueRefUser}
                             />
                         }
                     />
                     <TextField
-                        id="initialDate"
-                        onChange={(e) => {
-                          setInitialDateValue(e.target.value)
-                        }}
+                        onChange={(e) => { setInitialDate(e.target.value) }}
                         label={i18n.t("reports.form.initialDate")}
-                        InputLabelProps={{ shrink: true, required: true}}
+                        InputLabelProps={{ shrink: true, required: true }}
                         type="date"
-                        inputRef={valueRefInitialDate}
                     />
                     <TextField
-                        id="finalDate"
-                          onChange={(e) => {
-                          setFinalDateValue(e.target.value)
-                        }}
+                        onChange={(e) => { setFinalDate(e.target.value) }}
                         label={i18n.t("reports.form.finalDate")}
                         InputLabelProps={{ shrink: true, required: true }}
                         type="date"
-                        inputRef={valueRefFinalDate}
                     />
                     <Button
                         variant="contained"
@@ -168,6 +187,14 @@ const reducer = (state, action) => {
                         onClick={ filterReports }
                     >
                         {i18n.t("reports.buttons.filter")}
+                    </Button>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={ downloadPdf }
+                        disabled={ disableButton }
+                    >
+                        {i18n.t("reports.buttons.exportPdf")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
