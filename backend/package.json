@@ -29,6 +29,8 @@
     "multer": "^1.4.2",
     "mustache": "^4.2.0",
     "mysql2": "^2.2.5",
+    "pdf-creator-node": "^2.3.4",
+    "pdf-to-base64": "^1.0.3",
     "pg": "^8.4.1",
     "pino": "^6.9.0",
     "pino-pretty": "^4.3.0",

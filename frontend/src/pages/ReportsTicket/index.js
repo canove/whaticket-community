@@ -40,9 +40,36 @@ const ReportsTicket = () => {
   const [reports, setReports] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [ticketId, setTicketId] = useState();
+  const [disableButton, setDisableButton] = useState(true);
+  const [pdf, setPdf] = useState();
 
-  const filterReports = () => {
-    fetchReports(ticketId)
+  const filterReports = async () => {
+    setDisableButton(true);
+    await fetchReports(ticketId);
+    await createPdf();
+    setDisableButton(false);
+  }
+
+  const createPdf = async () => {
+    if (!ticketId) {
+      toast.error("Select a ticket");
+    } else {
+      try {
+        const { data } = await api.get(`/tickets-export-report?ticketId=${ticketId}`);
+        setPdf(data);
+      } catch (err) {
+        toastError(err)
+      }
+    }
+  }
+
+  const downloadPdf = () => {
+    const linkSource = `data:application/pdf;base64,${pdf}`;
+    const downloadLink = document.createElement("a");
+    const fileName = `ticket-report.pdf`;
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
   }
 
   useEffect(() => {
@@ -85,7 +112,7 @@ const ReportsTicket = () => {
   return (
     <MainContainer>
       <MainHeader>
-        <Title>{i18n.t("Relatório do Ticket")}</Title>
+        <Title>{i18n.t("reportsTicket.title")}</Title>
         <MainHeaderButtonsWrapper>
           <Autocomplete
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
@@ -106,6 +133,14 @@ const ReportsTicket = () => {
           >
             {i18n.t("reports.buttons.filter")}
           </Button>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={ downloadPdf }
+            disabled={ disableButton }
+          >
+            {i18n.t("reports.buttons.exportPdf")}
+          </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">
@@ -113,25 +148,25 @@ const ReportsTicket = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">
-                {i18n.t("reportsTicket.table.messageId")}
+                {i18n.t("reports.table.messageId")}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("reportsTicket.table.messageBody")}
+                {i18n.t("reports.table.messageBody")}
               </TableCell>
-              <TableCell align="center">{i18n.t("reportsTicket.table.read")}</TableCell>
+              <TableCell align="center">{i18n.t("reports.table.read")}</TableCell>
               <TableCell align="center">
-                {i18n.t("reportsTicket.table.ticketId")}
+                {i18n.t("reports.table.ticketId")}
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <>
-              {reports.map((reportsTicket) => (
-                <TableRow key={reportsTicket.id}>
-                  <TableCell align="center">{reportsTicket.id}</TableCell>
-                  <TableCell align="center">{reportsTicket.body}</TableCell>
-                  <TableCell align="center">{reportsTicket.read}</TableCell>
-                  <TableCell align="center">{reportsTicket.ticketId}</TableCell>
+              {reports.map((report) => (
+                <TableRow key={report.id}>
+                  <TableCell align="center">{report.id}</TableCell>
+                  <TableCell align="center">{report.body}</TableCell>
+                  <TableCell align="center">{report.read}</TableCell>
+                  <TableCell align="center">{report.ticketId}</TableCell>
                 </TableRow>
               ))}
               {loading}

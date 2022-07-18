@@ -285,7 +285,8 @@ const messages = {
           users: "Users",
           settings: "Settings",
           reports: "Talk Reports",
-        },reportsTicket: "Ticket Report",
+          reportsTicket: "Ticket Report",
+        },
 
         appBar: {
           user: {
@@ -373,6 +374,7 @@ const messages = {
         title: "Reports",
         buttons: {
           filter: "Filter reports",
+          exportPdf: "Export PDF",
         },
         form: {
           initialDate: "Initial date",
@@ -389,21 +391,8 @@ const messages = {
           finalDate: "Final date",
         }
       },
-        reportsTicket: {
-          title: "Ticket Report",
-          buttons: {
-          filter: "Filter reports",
-        },
-        form: {
-          ticket: "Ticket"
-        },
-        table: {
-          messageId: "Message ID",
-          messageBody: "Message Body",
-          read: "Read",
-          ticketId: "Ticket ID",
-
-        }
+      reportsTicket: {
+        title: "Reports Ticket",
       },
       messagesList: {
         header: {

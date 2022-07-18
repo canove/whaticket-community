@@ -378,6 +378,7 @@ const messages = {
         title: "Informes",
         buttons: {
           filter: "Filtrar informes",
+          exportPdf: "Export PDF",
         },
         form: {
           initialDate: "Fecha inicial",
@@ -394,21 +395,8 @@ const messages = {
           finalDate: "Final date",
         }
       },
-        reportsTicket: {
-          title: "Informe de entradas",
-          buttons: {
-          filter: "Filtrar informes",
-        },
-        form: {
-          ticket: "Ticket"
-        },
-        table: {
-          messageId: "Message ID",
-          messageBody: "Message Body",
-          read: "Read",
-          ticketId: "ID do ticket",
-
-        }
+      reportsTicket: {
+        title: "Reports Ticket",
       },
       messagesList: {
         header: {

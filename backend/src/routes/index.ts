@@ -13,6 +13,7 @@ import quickAnswerRoutes from "./quickAnswerRoutes";
 import apiRoutes from "./apiRoutes";
 import reportTalkRoutes from "./reportTalkRoutes";
 import ticketsReportRoutes from "./ticketsReportRoutes";
+import ticketsExportReportRoutes from "./ticketsExportReportRoutes";
 
 const routes = Router();
 
@@ -29,5 +30,6 @@ routes.use(quickAnswerRoutes);
 routes.use("/api/messages", apiRoutes);
 routes.use(reportTalkRoutes);
 routes.use(ticketsReportRoutes);
+routes.use(ticketsExportReportRoutes);
 
 export default routes;

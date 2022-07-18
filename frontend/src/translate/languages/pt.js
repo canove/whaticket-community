@@ -288,7 +288,7 @@ const messages = {
           users: "Usuários",
           settings: "Configurações",
           reports: "Relatórios Conversa",
-          reportsTicket: "Relatório do Ticket"
+          reportsTicket: "Relatórios Ticket"
         },
         appBar: {
           user: {
@@ -374,9 +374,10 @@ const messages = {
         },
       },
       reports: {
-        title: "Relatórios de Conversa",
+        title: "Relatório de Conversa",
         buttons: {
           filter: "Filtrar relatórios",
+          exportPdf: "Exportar PDF",
         },
         form: {
           initialDate: "Data inicial",
@@ -394,19 +395,6 @@ const messages = {
       },
       reportsTicket: {
         title: "Relatório do Ticket",
-        buttons: {
-          filter: "Filtrar relatórios",
-        },
-        form: {
-          ticket: "Ticket"
-        },
-        table: {
-          messageId: "Id da mensagem",
-          messageBody: "Corpo da mensagem",
-          read: "Lida",
-          ticketId: "ID do ticket",
-
-        }
       },
       messagesList: {
         header: {
