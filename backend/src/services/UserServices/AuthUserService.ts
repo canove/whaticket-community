@@ -12,6 +12,7 @@ interface SerializedUser {
   name: string;
   email: string;
   profile: string;
+  lang: string;
   queues: Queue[];
 }
 
@@ -28,7 +29,7 @@ interface Response {
 
 const AuthUserService = async ({
   email,
-  password
+  password,
 }: Request): Promise<Response> => {
   const user = await User.findOne({
     where: { email },

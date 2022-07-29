@@ -93,6 +93,7 @@ const useAuth = () => {
 			localStorage.setItem("token", JSON.stringify(data.token));
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
 			setUser(data.user);
+			i18n.changeLanguage(data.user.lang);
 			setIsAuth(true);
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");

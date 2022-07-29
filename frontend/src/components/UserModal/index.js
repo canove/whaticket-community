@@ -83,22 +83,24 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
-
 	const [user, setUser] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [showPassword, setShowPassword] = useState(false);
 	const [language, setLanguage] = useState('');
 
-	const handleLanguageChange = (e) => {
+	const handleChange = (e) => {
 		setLanguage(e.target.value);
 	};
+
+	function handleChangeLanguage(language) {
+		i18n.changeLanguage(language);
+	}
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			if (!userId) return;
 			try {
 				const { data } = await api.get(`/users/${userId}`);
-				console.log(data);
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
@@ -152,6 +154,7 @@ const UserModal = ({ open, onClose, userId }) => {
 					validationSchema={UserSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
+							handleChangeLanguage(language);
 							handleSaveUser(values);
 							actions.setSubmitting(false);
 						}, 400);
@@ -249,7 +252,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										id="language-selection"
 										value={language}
 										label="Language"
-										onChange={handleLanguageChange}
+										onChange={handleChange}
 									>
 										<MenuItem value="pt">Português</MenuItem>
 										<MenuItem value="en">Inglês</MenuItem>
