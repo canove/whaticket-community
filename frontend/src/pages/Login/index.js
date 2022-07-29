@@ -19,9 +19,8 @@ import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import { i18n } from "../../translate/i18n";
-
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { useTranslation } from "react-i18next";
 
 // const Copyright = () => {
 // 	return (
@@ -58,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Login = () => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
 
   const [user, setUser] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);

@@ -24,10 +24,9 @@ import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
   
 import { makeStyles } from "@material-ui/core/styles";
 
-import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 // const Copyright = () => {
 // 	return (
@@ -74,6 +73,7 @@ const UserSchema = Yup.object().shape({
 const SignUp = () => {
 	const classes = useStyles();
 	const history = useHistory();
+	const { i18n } = useTranslation();
 
 	const initialState = { name: "", email: "", password: "" };
 	const [showPassword, setShowPassword] = useState(false);

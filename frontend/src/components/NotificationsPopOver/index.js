@@ -15,10 +15,10 @@ import Badge from "@material-ui/core/Badge";
 import ChatIcon from "@material-ui/icons/Chat";
 
 import TicketListItem from "../TicketListItem";
-import { i18n } from "../../translate/i18n";
 import useTickets from "../../hooks/useTickets";
 import alertSound from "../../assets/sound.mp3";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	tabContainer: {
@@ -42,6 +42,7 @@ const useStyles = makeStyles(theme => ({
 
 const NotificationsPopOver = () => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 
 	const history = useHistory();
 	const { user } = useContext(AuthContext);

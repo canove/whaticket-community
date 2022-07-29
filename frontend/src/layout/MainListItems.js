@@ -17,10 +17,10 @@ import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutlined";
 import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
 
-import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { AuthContext } from "../context/Auth/AuthContext";
 import { Can } from "../components/Can";
+import { useTranslation } from "react-i18next";
 
 function ListItemLink(props) {
   const { icon, primary, to, className } = props;
@@ -48,6 +48,7 @@ const MainListItems = (props) => {
   const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const [connectionWarning, setConnectionWarning] = useState(false);
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

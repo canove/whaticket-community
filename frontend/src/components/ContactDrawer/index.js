@@ -11,11 +11,10 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 
-import { i18n } from "../../translate/i18n";
-
 import ContactModal from "../ContactModal";
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
 import MarkdownWrapper from "../MarkdownWrapper";
+import { useTranslation } from "react-i18next";
 
 const drawerWidth = 320;
 
@@ -83,6 +82,7 @@ const useStyles = makeStyles(theme => ({
 
 const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 
 	const [modalOpen, setModalOpen] = useState(false);
 

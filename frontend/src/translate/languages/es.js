@@ -397,8 +397,7 @@ const messages = {
           read: "Read",
           mediaURL: "Media URL",
           ticketId: "Ticket ID",
-          initialDate: "Initial date",
-          finalDate: "Final date",
+          date: "Date",
         }
       },
       reportsTicket: {

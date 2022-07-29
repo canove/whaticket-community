@@ -17,10 +17,10 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
 import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -57,8 +57,9 @@ const reducer = (state, action) => {
     }
 };
 
-    const Reports = () => {
+const Reports = () => {
     const classes = useStyles();
+    const { i18n } = useTranslation();
 
     const [loading, setLoading] = useState(false);
     const [users, dispatchUsers] = useReducer(reducer, []);

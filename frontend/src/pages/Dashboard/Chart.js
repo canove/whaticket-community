@@ -11,13 +11,13 @@ import {
 } from "recharts";
 import { startOfHour, parseISO, format } from "date-fns";
 
-import { i18n } from "../../translate/i18n";
-
 import Title from "./Title";
 import useTickets from "../../hooks/useTickets";
+import { useTranslation } from "react-i18next";
 
 const Chart = () => {
 	const theme = useTheme();
+	const { i18n } = useTranslation();
 
 	const date = useRef(new Date().toISOString());
 	const { tickets } = useTickets({ date: date.current });

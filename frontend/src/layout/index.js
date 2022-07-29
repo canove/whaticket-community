@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect, Image } from "react";
+import { useTranslation } from 'react-i18next'
 import clsx from "clsx";
 
 import {
@@ -26,7 +27,6 @@ import BackdropLoading from "../components/BackdropLoading";
 
 import { IconFlagBR, IconFlagUS, IconFlagES } from 'material-ui-flags';
 
-import { i18n } from "../translate/i18n";
 import brainit from "../assets/brainit500.png";
 const drawerWidth = 240;
 

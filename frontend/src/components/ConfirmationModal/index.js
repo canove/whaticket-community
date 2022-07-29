@@ -5,10 +5,11 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
-
-import { i18n } from "../../translate/i18n";
+import { useTranslation } from "react-i18next";
 
 const ConfirmationModal = ({ title, children, open, onClose, onConfirm }) => {
+	const { i18n } = useTranslation();
+	
 	return (
 		<Dialog
 			open={open}

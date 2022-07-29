@@ -4,10 +4,11 @@ import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
 
 import { Dialog, DialogContent, Paper, Typography } from "@material-ui/core";
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
+import { useTranslation } from "react-i18next";
 
 const QrcodeModal = ({ open, onClose, whatsAppId }) => {
+	const { i18n } = useTranslation();
 	const [qrCode, setQrCode] = useState("");
 
 	useEffect(() => {

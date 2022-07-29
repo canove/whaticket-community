@@ -25,13 +25,12 @@ import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 
-import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -74,6 +73,7 @@ const UserSchema = Yup.object().shape({
 
 const UserModal = ({ open, onClose, userId }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 
 	const initialState = {
 		name: "",
@@ -119,7 +119,6 @@ const UserModal = ({ open, onClose, userId }) => {
 
 	const handleSaveUser = async values => {
 		const userData = { ...values, lang: language, queueIds: selectedQueueIds };
-		console.log(userData);
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);

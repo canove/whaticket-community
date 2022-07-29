@@ -4,11 +4,12 @@ import openSocket from "../../services/socket-io";
 
 import { toast } from "react-toastify";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const useAuth = () => {
+	const { i18n } = useTranslation();
 	const history = useHistory();
 	const [isAuth, setIsAuth] = useState(false);
 	const [loading, setLoading] = useState(true);
