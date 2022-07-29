@@ -63,6 +63,7 @@ const useAuth = () => {
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
 					setIsAuth(true);
 					setUser(data.user);
+					i18n.changeLanguage(data.user.lang);
 				} catch (err) {
 					toastError(err);
 				}
