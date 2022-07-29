@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, Image } from "react";
 import clsx from "clsx";
 
 import {
@@ -24,7 +24,7 @@ import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
-
+import brainit from "../assets/brainit500.png";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +38,8 @@ const useStyles = makeStyles((theme) => ({
 
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
+    backgroundColor: "#c5cae9",
+    color: "#ffffff"
   },
   toolbarIcon: {
     display: "flex",
@@ -71,6 +73,8 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   drawerPaper: {
+    backgroundColor: "#F5F5F5",
+    color: "#212121",
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
@@ -208,7 +212,7 @@ const LoggedInLayout = ({ children }) => {
               drawerOpen && classes.menuButtonHidden
             )}
           >
-            <MenuIcon />
+            <MenuIcon/>
           </IconButton>
           <Typography
             component="h1"
@@ -216,8 +220,7 @@ const LoggedInLayout = ({ children }) => {
             color="inherit"
             noWrap
             className={classes.title}
-          >
-            WhaTicket
+          ><img src = { brainit }/>
           </Typography>
           {user.id && <NotificationsPopOver />}
 
