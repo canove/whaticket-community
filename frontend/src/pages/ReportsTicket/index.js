@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
 const ReportsTicket = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
-  
+
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState([]);
   const [tickets, setTickets] = useState([]);
@@ -123,21 +123,21 @@ const ReportsTicket = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={i18n.t("Id Ticket")}
+                label={i18n.t("ID da Chamada")}
                 InputLabelProps={{ required: true }}
               />
             )}
           />
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             onClick={ filterReports }
           >
             {i18n.t("reports.buttons.filter")}
           </Button>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             onClick={ downloadPdf }
             disabled={ disableButton }
           >

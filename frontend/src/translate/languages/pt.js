@@ -36,7 +36,7 @@ const messages = {
       dashboard: {
         charts: {
           perDay: {
-            title: "Tickets hoje: ",
+            title: "Chamadas hoje: ",
           },
         },
         messages: {
@@ -130,7 +130,7 @@ const messages = {
           deleteTitle: "Deletar ",
           importTitlte: "Importar contatos",
           deleteMessage:
-            "Tem certeza que deseja deletar este contato? Todos os tickets relacionados serão perdidos.",
+            "Tem certeza que deseja deletar este contato? Todas as chamadas relacionados serão perdidos.",
           importMessage: "Deseja importas todos os contatos do telefone?",
         },
         buttons: {
@@ -223,7 +223,7 @@ const messages = {
         success: "Usuário salvo com sucesso.",
       },
       chat: {
-        noTicketMessage: "Selecione um ticket para começar a conversar.",
+        noTicketMessage: "Selecione uma chamada para começar a conversar.",
       },
       ticketsManager: {
         buttons: {
@@ -235,7 +235,7 @@ const messages = {
       },
       tickets: {
         toasts: {
-          deleted: "O ticket que você estava foi deletado.",
+          deleted: "A chamada que você estava foi deletado.",
         },
         notification: {
           message: "Mensagem de",
@@ -246,14 +246,14 @@ const messages = {
           search: { title: "Busca" },
         },
         search: {
-          placeholder: "Buscar tickets e mensagens",
+          placeholder: "Buscar chamadas e mensagens",
         },
         buttons: {
           showAll: "Todos",
         },
       },
       transferTicketModal: {
-        title: "Transferir Ticket",
+        title: "Transferir Chamada",
         fieldLabel: "Digite para buscar usuários",
         fieldQueueLabel: "Transferir para fila",
         fieldQueuePlaceholder: "Selecione uma fila",
@@ -268,13 +268,13 @@ const messages = {
         assignedHeader: "Atendendo",
         noTicketsTitle: "Nada aqui!",
         noTicketsMessage:
-          "Nenhum ticket encontrado com esse status ou termo pesquisado",
+          "Nenhuma chamada encontrada com esse status ou termo pesquisado",
         buttons: {
           accept: "Aceitar",
         },
       },
       newTicketModal: {
-        title: "Criar Ticket",
+        title: "Criar Chamada",
         fieldLabel: "Digite para pesquisar o contato",
         add: "Adicionar",
         buttons: {
@@ -286,7 +286,7 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexões",
-          tickets: "Tickets",
+          tickets: "Chamadas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
           queues: "Filas",
@@ -294,7 +294,7 @@ const messages = {
           users: "Usuários",
           settings: "Configurações",
           reports: "Relatórios Conversa",
-          reportsTicket: "Relatórios Ticket"
+          reportsTicket: "Relatórios Chamadas"
         },
         appBar: {
           user: {
@@ -320,7 +320,7 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Excluir",
           deleteMessage:
-            "Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+            "Você tem certeza? Essa ação não pode ser revertida! As chamadas dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
         },
       },
       queueSelect: {
@@ -395,7 +395,7 @@ const messages = {
           messageBody: "Corpo da mensagem",
           read: "Lida",
           mediaURL: "URL da mídia",
-          ticketId: "ID do ticket",
+          ticketId: "ID da chamada",
           date: "Data",
         }
       },
@@ -416,7 +416,7 @@ const messages = {
       messagesInput: {
         placeholderOpen: "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
         placeholderClosed:
-          "Reabra ou aceite esse ticket para enviar uma mensagem.",
+          "Reabra ou aceite essa chamada para enviar uma mensagem.",
         signMessage: "Assinar",
       },
       contactDrawer: {
@@ -430,9 +430,9 @@ const messages = {
         delete: "Deletar",
         transfer: "Transferir",
         confirmationModal: {
-          title: "Deletar o ticket do contato",
+          title: "Deletar a chamada do contato",
           message:
-            "Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
+            "Atenção! Todas as mensagens relacionadas a essa chamada serão perdidas.",
         },
         buttons: {
           delete: "Excluir",
