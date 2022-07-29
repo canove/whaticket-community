@@ -45,6 +45,9 @@ class User extends Model<User> {
   @Column
   profile: string;
 
+  @Column
+  lang: string;
+
   @CreatedAt
   createdAt: Date;
 

@@ -209,6 +209,12 @@ const messages = {
           email: "Correo Electrónico",
           password: "Contraseña",
           profile: "Perfil",
+          language: "Language",
+          languages: {
+            pt: "Portuguese",
+            en: "English",
+            es: "Spanish",
+          },
         },
         buttons: {
           okAdd: "Agregar",

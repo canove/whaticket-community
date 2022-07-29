@@ -208,6 +208,12 @@ const messages = {
           email: "Email",
           password: "Senha",
           profile: "Perfil",
+          language: "Linguagem",
+          languages: {
+            pt: "Português",
+            en: "Inglês",
+            es: "Espanhol",
+          },
         },
         buttons: {
           okAdd: "Adicionar",

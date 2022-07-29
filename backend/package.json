@@ -7,6 +7,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
+    "db:migrate": "npx sequelize db:migrate",
     "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
     "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
     "test": "NODE_ENV=test jest",

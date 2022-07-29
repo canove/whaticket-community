@@ -87,13 +87,18 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [user, setUser] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [showPassword, setShowPassword] = useState(false);
+	const [language, setLanguage] = useState('');
 
+	const handleLanguageChange = (e) => {
+		setLanguage(e.target.value);
+	};
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			if (!userId) return;
 			try {
 				const { data } = await api.get(`/users/${userId}`);
+				console.log(data);
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
@@ -113,7 +118,8 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, queueIds: selectedQueueIds };
+		const userData = { ...values, lang: language, queueIds: selectedQueueIds };
+		console.log(userData);
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -232,6 +238,25 @@ const UserModal = ({ open, onClose, userId }) => {
 										/>
 									</FormControl>
 								</div>
+								<FormControl
+									variant="outlined"
+									className={classes.formControl}
+									margin="dense"
+									fullWidth
+								>
+									<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
+									<Select
+										labelId="language-selection-label"
+										id="language-selection"
+										value={language}
+										label="Language"
+										onChange={handleLanguageChange}
+									>
+										<MenuItem value="pt">Português</MenuItem>
+										<MenuItem value="en">Inglês</MenuItem>
+										<MenuItem value="es">Espanhol</MenuItem>
+									</Select>
+								</FormControl>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"

@@ -4,7 +4,7 @@ import Queue from "../../models/Queue";
 
 const ShowUserService = async (id: string | number): Promise<User> => {
   const user = await User.findByPk(id, {
-    attributes: ["name", "id", "email", "profile", "tokenVersion"],
+    attributes: ["name", "id", "email", "profile", "tokenVersion", "lang"],
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] }
     ],

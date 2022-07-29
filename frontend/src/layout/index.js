@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useTranslation } from 'react-i18next' 
 import clsx from "clsx";
 
 import {
@@ -23,7 +24,8 @@ import NotificationsPopOver from "../components/NotificationsPopOver";
 import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
-import { i18n } from "../translate/i18n";
+
+import { IconFlagBR, IconFlagUS, IconFlagES } from 'material-ui-flags';
 
 const drawerWidth = 240;
 
@@ -118,6 +120,14 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
+
+  const { i18n } = useTranslation();
+
+  function handleChangeLanguage(language) {
+    i18n.changeLanguage(language);
+  }
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -142,6 +152,16 @@ const LoggedInLayout = ({ children }) => {
     setAnchorEl(null);
     setMenuOpen(false);
   };
+
+  const handleLanguageMenu = (event) => {
+    setLanguageAnchorEl(event.currentTarget);
+    setLanguageMenuOpen(true);
+  }
+
+  const handleCloseLanguageMenu = () => {
+    setLanguageAnchorEl(null);
+    setLanguageMenuOpen(false);
+  }
 
   const handleOpenUserModal = () => {
     setUserModalOpen(true);
@@ -252,6 +272,39 @@ const LoggedInLayout = ({ children }) => {
               <MenuItem onClick={handleClickLogout}>
                 {i18n.t("mainDrawer.appBar.user.logout")}
               </MenuItem>
+            </Menu>
+          </div>
+          <div>
+            <IconButton
+              onClick={handleLanguageMenu}
+            >
+              {i18n.language === 'pt' &&
+                <IconFlagBR />
+              }
+              {i18n.language === 'en' &&
+                <IconFlagUS />
+              }
+              {i18n.language === 'es' &&
+                <IconFlagES />
+              }
+            </IconButton>
+            <Menu
+              anchorEl={languageAnchorEl}
+              getContentAnchorEl={null}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={languageMenuOpen}
+              onClose={handleCloseLanguageMenu}
+            >
+              <MenuItem onClick={() => handleChangeLanguage('pt')}><IconButton><IconFlagBR /></IconButton></MenuItem>
+              <MenuItem onClick={() => handleChangeLanguage('en')}><IconButton><IconFlagUS /></IconButton></MenuItem>
+              <MenuItem onClick={() => handleChangeLanguage('es')}><IconButton><IconFlagES /></IconButton></MenuItem>
             </Menu>
           </div>
         </Toolbar>

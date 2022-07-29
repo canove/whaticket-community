@@ -1,4 +1,5 @@
 import React, { useContext } from "react"
+import { useTranslation } from 'react-i18next' 
 
 import Paper from "@material-ui/core/Paper"
 import Container from "@material-ui/core/Container"
@@ -9,8 +10,6 @@ import Typography from "@material-ui/core/Typography";
 import useTickets from "../../hooks/useTickets"
 
 import { AuthContext } from "../../context/Auth/AuthContext";
-
-import { i18n } from "../../translate/i18n";
 
 import Chart from "./Chart"
 
@@ -44,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 const Dashboard = () => {
 	const classes = useStyles()
+	const { i18n } = useTranslation();
 
 	const { user } = useContext(AuthContext);
 	var userQueueIds = [];
