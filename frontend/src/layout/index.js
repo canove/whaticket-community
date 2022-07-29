@@ -28,6 +28,9 @@ import BackdropLoading from "../components/BackdropLoading";
 import { IconFlagBR, IconFlagUS, IconFlagES } from 'material-ui-flags';
 
 import brainit from "../assets/brainit500.png";
+import api from "../services/api";
+import { toast } from "react-toastify";
+import toastError from "../errors/toastError";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -132,7 +135,22 @@ const LoggedInLayout = ({ children }) => {
 
   function handleChangeLanguage(language) {
     i18n.changeLanguage(language);
+    handleSaveUser(language);
   }
+
+  const handleSaveUser = async (language) => {
+    const userData = { lang: language };
+		try {
+			if (user.id) {
+				await api.put(`/users/${user.id}`, userData);
+			} else {
+				await api.post("/users", userData);
+			}
+			toast.success(i18n.t("userModal.success"));
+		} catch (err) {
+			toastError(err);
+		}
+	};
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -80,6 +80,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		email: "",
 		password: "",
 		profile: "user",
+		lang: "",
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
@@ -87,8 +88,10 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [showPassword, setShowPassword] = useState(false);
 	const [language, setLanguage] = useState('');
+	const [changingLang, setChangingLang] = useState(false);
 
 	const handleChange = (e) => {
+		setChangingLang(true);
 		setLanguage(e.target.value);
 	};
 
@@ -117,6 +120,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const handleClose = () => {
 		onClose();
 		setUser(initialState);
+		setChangingLang(false);
 	};
 
 	const handleSaveUser = async values => {
@@ -154,7 +158,9 @@ const UserModal = ({ open, onClose, userId }) => {
 					validationSchema={UserSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							handleChangeLanguage(language);
+							if (user.id === loggedInUser.id) {
+								handleChangeLanguage(language);
+							}
 							handleSaveUser(values);
 							actions.setSubmitting(false);
 						}, 400);
@@ -248,10 +254,11 @@ const UserModal = ({ open, onClose, userId }) => {
 								>
 									<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
 									<Select
+										label={i18n.t("userModal.form.language")}
+										name="lang"
 										labelId="language-selection-label"
 										id="language-selection"
-										value={language}
-										label="Language"
+										value={changingLang ? language : user.lang}
 										onChange={handleChange}
 									>
 										<MenuItem value="pt">Português</MenuItem>
