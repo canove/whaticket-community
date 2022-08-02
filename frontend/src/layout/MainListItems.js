@@ -16,6 +16,7 @@ import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
 import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutlined";
 import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
+import ImportExportOutlinedIcon from '@material-ui/icons/ImportExportOutlined';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { AuthContext } from "../context/Auth/AuthContext";
@@ -103,6 +104,11 @@ const MainListItems = (props) => {
         to="/quickAnswers"
         primary={i18n.t("mainDrawer.listItems.quickAnswers")}
         icon={<QuestionAnswerOutlinedIcon />}
+      />
+      <ListItemLink
+        to="/importation"
+        primary={i18n.t("mainDrawer.listItems.importation")}
+        icon={<ImportExportOutlinedIcon />}
       />
       <Can
         role={user.profile}

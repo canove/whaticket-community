@@ -286,6 +286,7 @@ const messages = {
           tickets: "Tickets",
           contacts: "Contacts",
           quickAnswers: "Quick Answers",
+          importation: "Import",
           queues: "Queues",
           administration: "Administration",
           users: "Users",
@@ -341,6 +342,23 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Are you sure you want to delete this Quick Reply: ",
           deleteMessage: "This action cannot be undone.",
+        },
+      },
+      importation: {
+        title: "Import",
+        form: {
+          status: "Status",
+          date: "Date",
+        },
+        buttons: {
+          import: "Import",
+        },
+        table: {
+          uploadDate: "Upload Date",
+          fileName: "File Name",
+          sentBy: "Sent By",
+          numberOfRecords: "Number of Records",
+          status: "Status",
         },
       },
       users: {

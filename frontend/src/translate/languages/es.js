@@ -290,6 +290,7 @@ const messages = {
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
+          importation: "Importar",
           queues: "Linhas",
           administration: "Administración",
           users: "Usuarios",
@@ -345,6 +346,23 @@ const messages = {
           deleteTitle:
             "¿Está seguro de que desea eliminar esta respuesta rápida?",
           deleteMessage: "Esta acción no se puede deshacer.",
+        },
+      },
+      importation: {
+        title: "Importar",
+        form: {
+          status: "Status",
+          date: "Date",
+        },
+        buttons: {
+          import: "Import",
+        },
+        table: {
+          uploadDate: "Upload Date",
+          fileName: "File Name",
+          sentBy: "Sent By",
+          numberOfRecords: "Number of Records",
+          status: "Status",
         },
       },
       users: {

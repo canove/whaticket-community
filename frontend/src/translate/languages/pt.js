@@ -289,6 +289,7 @@ const messages = {
           tickets: "Chamadas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
+          importation: "Importação",
           queues: "Filas",
           administration: "Administração",
           users: "Usuários",
@@ -344,6 +345,23 @@ const messages = {
           deleteTitle:
             "Você tem certeza que quer excluir esta Resposta Rápida: ",
           deleteMessage: "Esta ação não pode ser revertida.",
+        },
+      },
+      importation: {
+        title: "Importação",
+        form: {
+          status: "Status",
+          date: "Data",
+        },
+        buttons: {
+          import: "Importar Disparos",
+        },
+        table: {
+          uploadDate: "Data de Upload",
+          fileName: "Nome do Arquivo",
+          sentBy: "Enviado por",
+          numberOfRecords: "Quantidade de Registros",
+          status: "Status",
         },
       },
       users: {
