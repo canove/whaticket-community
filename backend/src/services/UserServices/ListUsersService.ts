@@ -1,6 +1,6 @@
 import { Sequelize, Op } from "sequelize";
-import Queue from "../../models/Queue";
-import User from "../../models/User";
+import Queue from "../../database/models/Queue";
+import User from "../../database/models/User";
 
 interface Request {
   searchParam?: string;

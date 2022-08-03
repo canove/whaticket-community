@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
+import Queue from "../../database/models/Queue";
 
 interface QueueData {
   name: string;

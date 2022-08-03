@@ -1,6 +1,6 @@
 import { sign } from "jsonwebtoken";
 import authConfig from "../config/auth";
-import User from "../models/User";
+import User from "../database/models/User";
 
 export const createAccessToken = (user: User): string => {
   const { secret, expiresIn } = authConfig;
