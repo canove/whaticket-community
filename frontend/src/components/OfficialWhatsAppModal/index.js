@@ -68,12 +68,17 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
 
 	const handleClose = () => {
 		onClose();
+		setIsConnectionTested(false);
 		setWhatsApp(initialState);
 	};
 
     const handleConnectionTest = () => {
         setIsConnectionTested(true);
     }
+
+	const handleChange = () => {
+		setIsConnectionTested(false);
+	}
 
 	return (
 		<div className={classes.root}>
@@ -135,6 +140,7 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
+										onChange={handleChange}
                                     />
                                 </div>
                                 <div className={classes.textQuickAnswerContainer}>
@@ -148,6 +154,7 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
+										onChange={handleChange}
                                     />
                                 </div>
                                 <div className={classes.textQuickAnswerContainer}>
@@ -161,6 +168,7 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
+										onChange={handleChange}
                                     />
                                 </div>
 								<div>
