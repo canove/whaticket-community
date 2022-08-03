@@ -1,4 +1,4 @@
-import Contact from "../../models/Contact";
+import Contact from "../../database/models/Contact";
 import AppError from "../../errors/AppError";
 
 const ShowContactService = async (id: string | number): Promise<Contact> => {

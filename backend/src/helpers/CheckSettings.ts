@@ -1,4 +1,4 @@
-import Setting from "../models/Setting";
+import Setting from "../database/models/Setting";
 import AppError from "../errors/AppError";
 
 const CheckSettings = async (key: string): Promise<string> => {

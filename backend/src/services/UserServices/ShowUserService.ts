@@ -1,6 +1,6 @@
-import User from "../../models/User";
+import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
+import Queue from "../../database/models/Queue";
 
 const ShowUserService = async (id: string | number): Promise<User> => {
   const user = await User.findByPk(id, {

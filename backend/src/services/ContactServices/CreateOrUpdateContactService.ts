@@ -1,5 +1,5 @@
 import { getIO } from "../../libs/socket";
-import Contact from "../../models/Contact";
+import Contact from "../../database/models/Contact";
 
 interface ExtraInfo {
   name: string;

@@ -1,10 +1,10 @@
 import { Op, fn, where, col, Filterable, Includeable } from "sequelize";
 import { startOfDay, endOfDay, parseISO } from "date-fns";
 
-import Ticket from "../../models/Ticket";
-import Contact from "../../models/Contact";
-import Message from "../../models/Message";
-import Queue from "../../models/Queue";
+import Ticket from "../../database/models/Ticket";
+import Contact from "../../database/models/Contact";
+import Message from "../../database/models/Message";
+import Queue from "../../database/models/Queue";
 import ShowUserService from "../UserServices/ShowUserService";
 
 interface Request {

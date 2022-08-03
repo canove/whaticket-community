@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import AppError from "../errors/AppError";
-import Ticket from "../models/Ticket";
+import Ticket from "../database/models/Ticket";
 
 const CheckContactOpenTickets = async (contactId: number): Promise<void> => {
   const ticket = await Ticket.findOne({

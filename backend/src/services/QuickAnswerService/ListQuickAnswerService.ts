@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import QuickAnswer from "../../models/QuickAnswer";
+import QuickAnswer from "../../database/models/QuickAnswer";
 
 interface Request {
   searchParam?: string;

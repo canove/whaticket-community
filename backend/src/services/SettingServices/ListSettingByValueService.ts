@@ -1,5 +1,5 @@
 import AppError from "../../errors/AppError";
-import Setting from "../../models/Setting";
+import Setting from "../../database/models/Setting";
 
 interface Response {
   key: string;

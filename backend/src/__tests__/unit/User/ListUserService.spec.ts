@@ -1,5 +1,5 @@
 import faker from "faker";
-import User from "../../../models/User";
+import User from "../../../database/models/User";
 import CreateUserService from "../../../services/UserServices/CreateUserService";
 import ListUsersService from "../../../services/UserServices/ListUsersService";
 import { disconnect, truncate } from "../../utils/database";

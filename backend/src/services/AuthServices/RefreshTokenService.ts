@@ -1,7 +1,7 @@
 import { verify } from "jsonwebtoken";
 import { Response as Res } from "express";
 
-import User from "../../models/User";
+import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
 import ShowUserService from "../UserServices/ShowUserService";
 import authConfig from "../../config/auth";
