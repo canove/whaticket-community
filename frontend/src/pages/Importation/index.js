@@ -83,6 +83,12 @@ const Importation = () => {
             <Button
                 variant="contained"
                 color="primary"
+            >
+                {i18n.t("importation.buttons.filter")}
+            </Button>
+            <Button
+                variant="contained"
+                color="primary"
                 onClick={handleOpenImportModal}
             >
                 {i18n.t("importation.buttons.import")}

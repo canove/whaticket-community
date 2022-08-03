@@ -379,6 +379,7 @@ const messages = {
         },
         buttons: {
           import: "Importar Disparos",
+          filter: "Filtrar",
         },
         table: {
           uploadDate: "Data de Upload",

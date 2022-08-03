@@ -381,6 +381,7 @@ const messages = {
         },
         buttons: {
           import: "Import",
+          filter: "Filter",
         },
         table: {
           uploadDate: "Upload Date",
