@@ -90,6 +90,11 @@ const MainListItems = (props) => {
         }
       />
       <ListItemLink
+        to="/officialConnections"
+        primary={i18n.t("mainDrawer.listItems.officialConnections")}
+        icon={<SyncAltIcon />}
+      />
+      <ListItemLink
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
         icon={<WhatsAppIcon />}

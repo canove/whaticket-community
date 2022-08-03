@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -16,10 +16,8 @@ import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import ImportModal from "../../components/ImportModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,13 +38,27 @@ const Importation = () => {
 
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const renderOptionLabel = (option) => {
     return option;
   };
 
+  const handleOpenImportModal = () => {
+    setImportModalOpen(true);
+  }
+
+  const handleCloseImportModal = () => {
+    setImportModalOpen(false);
+  }
+
   return (
     <MainContainer>
+      <ImportModal 
+        open={importModalOpen}
+        onClose={handleCloseImportModal}
+        aria-labelledby="form-dialog-title"
+      />
       <MainHeader>
         <Title>{i18n.t("importation.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -71,6 +83,7 @@ const Importation = () => {
             <Button
                 variant="contained"
                 color="primary"
+                onClick={handleOpenImportModal}
             >
                 {i18n.t("importation.buttons.import")}
             </Button>

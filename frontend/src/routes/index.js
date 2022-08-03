@@ -8,6 +8,7 @@ import Tickets from "../pages/Tickets/";
 import Signup from "../pages/Signup/";
 import Login from "../pages/Login/";
 import Connections from "../pages/Connections/";
+import OfficialConnections from "../pages/OfficialConnections/";
 import Settings from "../pages/Settings/";
 import Users from "../pages/Users";
 import Contacts from "../pages/Contacts/";
@@ -40,6 +41,12 @@ const Routes = () => {
                 exact
                 path="/connections"
                 component={Connections}
+                isPrivate
+              />
+              <Route
+                exact
+                path="/officialConnections"
+                component={OfficialConnections}
                 isPrivate
               />
               <Route exact path="/contacts" component={Contacts} isPrivate />

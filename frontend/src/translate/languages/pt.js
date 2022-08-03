@@ -100,6 +100,17 @@ const messages = {
           session: "Sessão",
         },
       },
+      officialConnections: {
+        title: "Conexões Oficiais",
+      },
+      officialWhatsappModal: {
+        title: "Adicionar WhatsApp Oficial",
+        buttons: {
+          cancel: "Cancelar",
+          testConnection: "Testar Conexão",
+          add: "Adicionar",
+        },
+      },
       whatsappModal: {
         title: {
           add: "Adicionar WhatsApp",
@@ -108,7 +119,7 @@ const messages = {
         form: {
           name: "Nome",
           default: "Padrão",
-          farewellMessage: "Mensagem de despedida"
+          farewellMessage: "Mensagem de despedida",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -142,6 +153,18 @@ const messages = {
           whatsapp: "WhatsApp",
           email: "Email",
           actions: "Ações",
+        },
+      },
+      importModal: {
+        title: "Importar",
+        buttons: {
+          uploadFile: "Importar Arquivo",
+          cancel: "Cancelar",
+          import: "Importar",
+        },
+        form: {
+          noFile: "Nenhum Arquivo Importado",
+          uploadedFile: "Arquivo Importado",
         },
       },
       contactModal: {
@@ -286,6 +309,7 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexões",
+          officialConnections: "Conexões Oficiais",
           tickets: "Chamadas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
