@@ -1,33 +1,59 @@
+import AWS from "aws-sdk";
+import fs from "fs";
+import path from "path";
 import File from "../../database/models/File";
 
 interface Request {
-    id: Number
-    name: string
-    ownerid: string
-    Status: Number
+  id: number;
+  name: string;
+  ownerid: string;
+  filePath: string;
+  Status: number;
 }
 
-interface Response {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface Response {}
 
 const CreateUploadFileService = async ({
-    id,
-    name,
-    ownerid,
-    Status = 0
+  name,
+  ownerid,
+  Status = 0,
+  filePath
 }: Request): Promise<Response> => {
+  const s3 = new AWS.S3({
+    apiVersion: "2006-03-01",
+    region: process.env.AWS_REGION
+  });
 
-  const file = await File.create(
-    {
-      id,
+  const fileContent = fs.readFileSync(filePath);
+  const now = new Date();
+
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET,
+    Key: `disparos/${now.getFullYear()}/${(now.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${now
+      .getDate()
+      .toString()
+      .padStart(2, "0")}/${path.basename(filePath)}`,
+    Body: fileContent
+  } as AWS.S3.PutObjectRequest;
+
+  try {
+    const data = await s3.upload(params).promise();
+    const url = data.Location;
+    const file = await File.create({
+      url,
       name,
       ownerid,
       Status
-    },
-  );
-
-  return 'Upload Completo';
+    });
+  
+    return file;
+  }catch(e){
+    return null;
+  }
+  
 };
 
 export default CreateUploadFileService;
