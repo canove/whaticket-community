@@ -2,12 +2,9 @@ import File from "../../database/models/File";
 
 interface Request {
     id: Number
-    url: string
     name: string
-    QtdeRegister: Number
-    Status: Number
-    initialDate: Date
     ownerid: string
+    Status: Number
 }
 
 interface Response {
@@ -16,27 +13,19 @@ interface Response {
 
 const CreateUploadFileService = async ({
     id,
-    url,
     name,
-    QtdeRegister,
-    Status,
-    initialDate,
     ownerid,
+    Status = 0
 }: Request): Promise<Response> => {
 
   const file = await File.create(
     {
       id,
-      url,
       name,
-      QtdeRegister,
-      Status,
-      initialDate,
       ownerid,
+      Status
     },
   );
-
-  await file.reload();
 
   return 'Upload Completo';
 };

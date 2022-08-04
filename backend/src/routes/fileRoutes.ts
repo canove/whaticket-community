@@ -8,7 +8,7 @@ const fileRoutes = Router();
 
 fileRoutes.get("/file/list", isAuth, FileController.store);
 
-fileRoutes.get("/file/upload", isAuth, UploadFileController.store);
+fileRoutes.post("/file/upload", isAuth, UploadFileController.store);
 
 
 
