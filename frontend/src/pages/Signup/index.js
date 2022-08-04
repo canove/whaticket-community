@@ -18,10 +18,10 @@ import {
 	InputAdornment,
 	IconButton,
 	Link
-  } from '@material-ui/core';
-  
+} from '@material-ui/core';
+
 import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
-  
+
 import { makeStyles } from "@material-ui/core/styles";
 
 import { i18n } from "../../translate/i18n";
@@ -155,16 +155,16 @@ const SignUp = () => {
 										label={i18n.t("signup.form.password")}
 										type={showPassword ? 'text' : 'password'}
 										InputProps={{
-										endAdornment: (
-											<InputAdornment position="end">
-											<IconButton
-												aria-label="toggle password visibility"
-												onClick={() => setShowPassword((e) => !e)}
-											>
-												{showPassword ? <VisibilityOff /> : <Visibility />}
-											</IconButton>
-											</InputAdornment>
-										)
+											endAdornment: (
+												<InputAdornment position="end">
+													<IconButton
+														aria-label="toggle password visibility"
+														onClick={() => setShowPassword((e) => !e)}
+													>
+														{showPassword ? <VisibilityOff /> : <Visibility />}
+													</IconButton>
+												</InputAdornment>
+											)
 										}}
 									/>
 								</Grid>
@@ -178,7 +178,7 @@ const SignUp = () => {
 							>
 								{i18n.t("signup.buttons.submit")}
 							</Button>
-							<Grid container justify="flex-end">
+							<Grid container justifyContent="flex-end">
 								<Grid item>
 									<Link
 										href="#"
