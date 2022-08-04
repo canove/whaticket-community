@@ -1,11 +1,11 @@
 import React, { createContext } from "react";
 
-import useWhatsApps from "../../hooks/useWhatsApps";
+import useOfficialWhatsApps from "../../hooks/useOfficialWhatsApps";
 
 const OfficialWhatsAppsContext = createContext();
 
 const OfficialWhatsAppsProvider = ({ children }) => {
-	const { loading, whatsApps } = useWhatsApps(true);
+	const { loading, whatsApps } = useOfficialWhatsApps(false);
 
 	return (
 		<OfficialWhatsAppsContext.Provider value={{ whatsApps, loading }}>
