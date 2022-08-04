@@ -2,10 +2,10 @@ import * as Yup from "yup";
 import * as Sentry from "@sentry/node";
 
 import AppError from "../../errors/AppError";
-import Contact from "../../models/Contact";
+import Contact from "../../database/models/Contact";
 import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
 import { logger } from "../../utils/logger";
-import Ticket from "../../models/Ticket";
+import Ticket from "../../database/models/Ticket";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 
