@@ -7,7 +7,6 @@ import api from "../../services/api";
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
 		const whatsApps = action.payload;
-
 		return [...whatsApps];
 	}
 
@@ -61,7 +60,8 @@ const useWhatsApps = () => {
 		setLoading(true);
 		const fetchSession = async () => {
 			try {
-				const { data } = await api.get("/whatsapp/");
+				const { data } = await api.get(`/whatsapp/`);
+				console.log(data);
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
 			} catch (err) {
