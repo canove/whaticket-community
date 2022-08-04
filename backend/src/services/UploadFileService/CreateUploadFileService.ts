@@ -4,11 +4,9 @@ import path from "path";
 import File from "../../database/models/File";
 
 interface Request {
-  id: number;
   name: string;
   ownerid: string;
   filePath: string;
-  Status: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -17,9 +15,8 @@ interface Response {}
 const CreateUploadFileService = async ({
   name,
   ownerid,
-  Status = 0,
   filePath
-}: Request): Promise<Response> => {
+}: Request): Promise<Response | null> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
     region: process.env.AWS_REGION
@@ -46,11 +43,10 @@ const CreateUploadFileService = async ({
       url,
       name,
       ownerid,
-      Status
+      status: 0
     });
-  
     return file;
-  }catch(e){
+  } catch(e) {
     return null;
   }
   
