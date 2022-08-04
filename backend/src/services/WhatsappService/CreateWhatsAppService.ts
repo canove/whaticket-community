@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
-import Whatsapp from "../../models/Whatsapp";
+import Whatsapp from "../../database/models/Whatsapp";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
 interface Request {

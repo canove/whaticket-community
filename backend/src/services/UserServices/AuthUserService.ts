@@ -1,11 +1,11 @@
-import User from "../../models/User";
+import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
 import {
   createAccessToken,
   createRefreshToken
 } from "../../helpers/CreateTokens";
 import { SerializeUser } from "../../helpers/SerializeUser";
-import Queue from "../../models/Queue";
+import Queue from "../../database/models/Queue";
 
 interface SerializedUser {
   id: number;

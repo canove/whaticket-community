@@ -8,6 +8,7 @@ import Tickets from "../pages/Tickets/";
 import Signup from "../pages/Signup/";
 import Login from "../pages/Login/";
 import Connections from "../pages/Connections/";
+import OfficialConnections from "../pages/OfficialConnections/";
 import Settings from "../pages/Settings/";
 import Users from "../pages/Users";
 import Contacts from "../pages/Contacts/";
@@ -15,6 +16,7 @@ import QuickAnswers from "../pages/QuickAnswers/";
 import Queues from "../pages/Queues/";
 import Reports from "../pages/Reports"
 import ReportsTicket from "../pages/ReportsTicket"
+import Importation from "../pages/Importation"
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import Route from "./Route";
@@ -41,6 +43,12 @@ const Routes = () => {
                 component={Connections}
                 isPrivate
               />
+              <Route
+                exact
+                path="/officialConnections"
+                component={OfficialConnections}
+                isPrivate
+              />
               <Route exact path="/contacts" component={Contacts} isPrivate />
               <Route exact path="/users" component={Users} isPrivate />
               <Route
@@ -49,6 +57,7 @@ const Routes = () => {
                 component={QuickAnswers}
                 isPrivate
               />
+              <Route exact path="/Importation" component={Importation} isPrivate />
               <Route exact path="/Settings" component={Settings} isPrivate />
               <Route exact path="/Queues" component={Queues} isPrivate />
               <Route exact path="/Reports" component={Reports} isPrivate />

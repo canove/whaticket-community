@@ -100,6 +100,17 @@ const messages = {
           session: "Sessão",
         },
       },
+      officialConnections: {
+        title: "Conexões Oficiais",
+      },
+      officialWhatsappModal: {
+        title: "Adicionar WhatsApp Oficial",
+        buttons: {
+          cancel: "Cancelar",
+          testConnection: "Testar Conexão",
+          add: "Adicionar",
+        },
+      },
       whatsappModal: {
         title: {
           add: "Adicionar WhatsApp",
@@ -108,7 +119,7 @@ const messages = {
         form: {
           name: "Nome",
           default: "Padrão",
-          farewellMessage: "Mensagem de despedida"
+          farewellMessage: "Mensagem de despedida",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -142,6 +153,18 @@ const messages = {
           whatsapp: "WhatsApp",
           email: "Email",
           actions: "Ações",
+        },
+      },
+      importModal: {
+        title: "Importar",
+        buttons: {
+          uploadFile: "Importar Arquivo",
+          cancel: "Cancelar",
+          import: "Importar",
+        },
+        form: {
+          noFile: "Nenhum Arquivo Importado",
+          uploadedFile: "Arquivo Importado",
         },
       },
       contactModal: {
@@ -286,9 +309,11 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexões",
+          officialConnections: "Conexões Oficiais",
           tickets: "Chamadas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
+          importation: "Importação",
           queues: "Filas",
           administration: "Administração",
           users: "Usuários",
@@ -344,6 +369,24 @@ const messages = {
           deleteTitle:
             "Você tem certeza que quer excluir esta Resposta Rápida: ",
           deleteMessage: "Esta ação não pode ser revertida.",
+        },
+      },
+      importation: {
+        title: "Importação",
+        form: {
+          status: "Status",
+          date: "Data",
+        },
+        buttons: {
+          import: "Importar Disparos",
+          filter: "Filtrar",
+        },
+        table: {
+          uploadDate: "Data de Upload",
+          fileName: "Nome do Arquivo",
+          sentBy: "Enviado por",
+          numberOfRecords: "Quantidade de Registros",
+          status: "Status",
         },
       },
       users: {

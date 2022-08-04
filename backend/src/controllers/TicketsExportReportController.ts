@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
-import Message from "../models/Message";
+import Message from "../database/models/Message";
 
 var fs = require("fs");
 var pdf = require("pdf-creator-node");
@@ -14,15 +14,15 @@ export const index = async (req: Request, res: Response) => {
     const { ticketId } = req.query as unknown as IndexQuery;
 
     const reports = await Message.sequelize?.query(`
-        select 
-            msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read 
-        from 
-            whaticket.Messages as msg 
-        inner join 
-            whaticket.Tickets as ticket 
-        on 
-            msg.ticketId = ticket.id 
-        where 
+        select
+            msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
+        from
+            whaticket.Messages as msg
+        inner join
+            whaticket.Tickets as ticket
+        on
+            msg.ticketId = ticket.id
+        where
             ticket.id = ${ticketId}
     `,
     { type: QueryTypes.SELECT }

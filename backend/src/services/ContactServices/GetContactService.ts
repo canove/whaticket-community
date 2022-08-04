@@ -1,5 +1,5 @@
 import AppError from "../../errors/AppError";
-import Contact from "../../models/Contact";
+import Contact from "../../database/models/Contact";
 import CreateContactService from "./CreateContactService";
 
 interface ExtraInfo {

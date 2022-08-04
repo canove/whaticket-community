@@ -3,8 +3,8 @@ import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import GetWbotMessage from "../../helpers/GetWbotMessage";
 import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
+import Message from "../../database/models/Message";
+import Ticket from "../../database/models/Ticket";
 
 import formatBody from "../../helpers/Mustache";
 

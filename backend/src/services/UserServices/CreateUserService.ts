@@ -2,7 +2,7 @@ import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
-import User from "../../models/User";
+import User from "../../database/models/User";
 
 interface Request {
   email: string;

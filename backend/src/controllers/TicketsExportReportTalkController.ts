@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
-import Message from "../models/Message";
+import Message from "../database/models/Message";
 
 var fs = require("fs");
 var pdf = require("pdf-creator-node");
@@ -16,17 +16,17 @@ export const index = async (req: Request, res: Response) => {
     const { userId="", initialDate="", finalDate="" } = req.query as unknown as IndexQuery;
 
     const reports = await Message.sequelize?.query(`
-        select 
+        select
 	        msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
-        from 
+        from
 	        whaticket.Messages as msg
-        inner join 
+        inner join
 	        whaticket.Tickets as tickets on msg.ticketId = tickets.id
-        where 
+        where
 	        tickets.userId = ${userId}
-        and 
+        and
             msg.createdAt >= '${initialDate} dd/MM/yy HH:mm'
-        and 
+        and
 	        msg.createdAt <= '${finalDate} dd/MM/yy HH:mm'
     `,
     { type: QueryTypes.SELECT }

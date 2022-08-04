@@ -101,6 +101,17 @@ const messages = {
           session: "Sesión",
         },
       },
+      officialConnections: {
+        title: "Official Connections",
+      },
+      officialWhatsappModal: {
+        title: "Add Official WhatsApp",
+        buttons: {
+          cancel: "Cancel",
+          testConnection: "Test Connection",
+          add: "Add",
+        },
+      },
       whatsappModal: {
         title: {
           add: "Agrega WhatsApp",
@@ -109,6 +120,7 @@ const messages = {
         form: {
           name: "Nombre",
           default: "Por Defecto",
+          farewellMessage: "Farewell Message",
         },
         buttons: {
           okAdd: "Agregar",
@@ -143,6 +155,18 @@ const messages = {
           whatsapp: "WhatsApp",
           email: "Correo Electrónico",
           actions: "Acciones",
+        },
+      },
+      importModal: {
+        title: "Import",
+        buttons: {
+          uploadFile: "Upload File",
+          cancel: "Cancel",
+          import: "Import",
+        },
+        form: {
+          noFile: "No File Uploaded",
+          uploadedFile: "Uploaded File",
         },
       },
       contactModal: {
@@ -287,9 +311,11 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexiones",
+          officialConnections: "Official Connections",
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
+          importation: "Importar",
           queues: "Linhas",
           administration: "Administración",
           users: "Usuarios",
@@ -345,6 +371,24 @@ const messages = {
           deleteTitle:
             "¿Está seguro de que desea eliminar esta respuesta rápida?",
           deleteMessage: "Esta acción no se puede deshacer.",
+        },
+      },
+      importation: {
+        title: "Importar",
+        form: {
+          status: "Status",
+          date: "Date",
+        },
+        buttons: {
+          import: "Import",
+          filter: "Filter",
+        },
+        table: {
+          uploadDate: "Upload Date",
+          fileName: "File Name",
+          sentBy: "Sent By",
+          numberOfRecords: "Number of Records",
+          status: "Status",
         },
       },
       users: {

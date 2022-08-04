@@ -10,9 +10,9 @@ import {
   Client
 } from "whatsapp-web.js";
 
-import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
-import Message from "../../models/Message";
+import Contact from "../../database/models/Contact";
+import Ticket from "../../database/models/Ticket";
+import Message from "../../database/models/Message";
 
 import { getIO } from "../../libs/socket";
 import CreateMessageService from "../MessageServices/CreateMessageService";

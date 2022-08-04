@@ -1,6 +1,6 @@
-import Whatsapp from "../../models/Whatsapp";
+import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
+import Queue from "../../database/models/Queue";
 
 const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
   const whatsapp = await Whatsapp.findByPk(id, {

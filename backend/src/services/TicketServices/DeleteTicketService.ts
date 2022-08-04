@@ -1,4 +1,4 @@
-import Ticket from "../../models/Ticket";
+import Ticket from "../../database/models/Ticket";
 import AppError from "../../errors/AppError";
 
 const DeleteTicketService = async (id: string): Promise<Ticket> => {
