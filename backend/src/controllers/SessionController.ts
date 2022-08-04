@@ -12,6 +12,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     email,
     password
   });
+  
 
   SendRefreshToken(res, refreshToken);
 
