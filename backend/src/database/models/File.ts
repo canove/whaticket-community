@@ -45,7 +45,7 @@ class File extends Model<File> {
 
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  ownerid: number;
 }
 
 export default File;

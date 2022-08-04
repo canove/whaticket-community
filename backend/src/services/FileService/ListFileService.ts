@@ -9,23 +9,53 @@ interface Request {
 interface Response {
 };
 const ListFileService = async ({
-    Status = 0,
-    initialDate = '',
+    Status ,
+    initialDate,
 }: Request): Promise<Response | undefined> => {
-   return await File.sequelize?.query(
-        ' select ' +
-            ' msg.url, msg.name, msg.QtdeRegister, msg.Status, msg.createdAt, msg.ownerid' +
-        ' from ' +
-            ' whaticket.Files as msg ' +
-        ' where ' +
-            " msg.status = " + Status +
-        ' and ' +
-            " msg.createdAt >= '"+ initialDate +" dd/MM/yy HH:mm' ",
+    if (!Status && !initialDate){
+    return await File.sequelize?.query(
+            ' select ' +
+                ' msg.id, msg.url, msg.name, msg.QtdeRegister, msg.Status, msg.createdAt, msg.ownerid' +
+            ' from ' +
+                ' whaticket.Files as msg ',
 
-    {
-    type:QueryTypes.SELECT
-}
-    );
-}
+            {type:QueryTypes.SELECT}
+    )};
 
+    if (!initialDate && Status){
+        return await File.sequelize?.query(
+            ' select ' +
+                ' msg.id, msg.url, msg.name, msg.QtdeRegister, msg.Status, msg.createdAt, msg.ownerid' +
+            ' from ' +
+                ' whaticket.Files as msg ' +
+            ' where ' +
+                " msg.status = " + Status,
+
+            {type:QueryTypes.SELECT}
+    )};
+
+    if (!Status && initialDate){
+        return await File.sequelize?.query(
+            ' select ' +
+                ' msg.id, msg.url, msg.name, msg.QtdeRegister, msg.Status, msg.createdAt, msg.ownerid' +
+            ' from ' +
+                ' whaticket.Files as msg ' +
+            ' where ' +
+                " msg.createdAt >= '"+ initialDate +"' ",
+
+            {type:QueryTypes.SELECT}
+    )};
+        return await File.sequelize?.query(
+            ' select ' +
+                ' msg.id, msg.url, msg.name, msg.QtdeRegister, msg.Status, msg.createdAt, msg.ownerid' +
+            ' from ' +
+                ' whaticket.Files as msg ' +
+            ' where ' +
+                " msg.status = " + Status +
+            ' and ' +
+                " msg.createdAt >= '"+ initialDate +"' ",
+
+            {type:QueryTypes.SELECT}
+        )
+}
 export default ListFileService;
