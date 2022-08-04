@@ -18,12 +18,14 @@ interface WhatsappData {
   status?: string;
   isDefault?: boolean;
   official?: boolean;
+  facebookToken?: string;
+  facebookPhoneNumberId?: string;
+  phoneNumber?: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { official } = req.query;
-  const whatsapps = await ListWhatsAppsService(official == '1');
-
+  const { official }: WhatsappData = req.body;
+  const whatsapps = await ListWhatsAppsService({ official });
 
   return res.status(200).json(whatsapps);
 };
@@ -35,7 +37,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isDefault,
     greetingMessage,
     farewellMessage,
-    queueIds
+    queueIds,
+    official,
+    facebookToken,
+    facebookPhoneNumberId,
+    phoneNumber
   }: WhatsappData = req.body;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
@@ -44,7 +50,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isDefault,
     greetingMessage,
     farewellMessage,
-    queueIds
+    queueIds,
+    official,
+    facebookToken,
+    facebookPhoneNumberId,
+    phoneNumber
   });
 
   StartWhatsAppSession(whatsapp);

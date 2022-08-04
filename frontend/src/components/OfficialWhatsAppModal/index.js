@@ -18,6 +18,9 @@ import {
 
 import QueueSelect from "../QueueSelect";
 import { useTranslation } from "react-i18next";
+import api from "../../services/api";
+import { toast } from "react-toastify";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -53,7 +56,7 @@ const SessionSchema = Yup.object().shape({
 		.required("Required"),
 });
 
-const OfficialWhatsAppModal = ({ open, onClose }) => {
+const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
@@ -61,6 +64,10 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
 		greetingMessage: "",
 		farewellMessage: "",
 		isDefault: false,
+		facebookToken: "",
+		facebookPhoneNumberId: "",
+		phoneNumber: "",
+		official: true,
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -76,9 +83,21 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
         setIsConnectionTested(true);
     }
 
-	const handleChange = () => {
-		setIsConnectionTested(false);
-	}
+	const handleSaveWhatsApp = async values => {
+		const whatsappData = { ...values, queueIds: selectedQueueIds };
+
+		try {
+			if (whatsAppId) {
+				await api.put(`/whatsapp/${whatsAppId}`, whatsappData);
+			} else {
+				await api.post("/whatsapp", whatsappData);
+			}
+			toast.success(i18n.t("whatsappModal.success"));
+			handleClose();
+		} catch (err) {
+			toastError(err);
+		}
+	};
 
 	return (
 		<div className={classes.root}>
@@ -97,6 +116,7 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
 					enableReinitialize={true}
 					validationSchema={SessionSchema}
 					onSubmit={(values, actions) => {
+						handleSaveWhatsApp(values);
 						setTimeout(() => {
 							actions.setSubmitting(false);
 						}, 400);
@@ -140,35 +160,32 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
-										onChange={handleChange}
                                     />
                                 </div>
                                 <div className={classes.textQuickAnswerContainer}>
                                     <Field
                                         as={TextField}
                                         label="Token de Autenticação do Facebook"
-                                        name="facebookAuthToken"
-                                        error={touched.facebookAuthToken && Boolean(errors.facebookAuthToken)}
-                                        helperText={touched.facebookAuthToken && errors.facebookAuthToken}
+                                        name="facebookToken"
+                                        error={touched.facebookToken && Boolean(errors.facebookToken)}
+                                        helperText={touched.facebookToken && errors.facebookToken}
                                         variant="outlined"
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
-										onChange={handleChange}
                                     />
                                 </div>
                                 <div className={classes.textQuickAnswerContainer}>
                                     <Field
                                         as={TextField}
                                         label="Id do Telefone do Facebook"
-                                        name="facebookPhoneId"
-                                        error={touched.facebookPhoneId && Boolean(errors.facebookPhoneId)}
-                                        helperText={touched.facebookPhoneId && errors.facebookPhoneId}
+                                        name="facebookPhoneNumberId"
+                                        error={touched.facebookPhoneNumberId && Boolean(errors.facebookPhoneNumberId)}
+                                        helperText={touched.facebookPhoneNumberId && errors.facebookPhoneNumberId}
                                         variant="outlined"
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
-										onChange={handleChange}
                                     />
                                 </div>
 								<div>
@@ -224,7 +241,7 @@ const OfficialWhatsAppModal = ({ open, onClose }) => {
 									{i18n.t("officialWhatsappModal.buttons.cancel")}
 								</Button>
                                 <Button
-                                    type="submit"
+                                    type="button"
 									color="primary"
 									disabled={isSubmitting}
 									variant="contained"
