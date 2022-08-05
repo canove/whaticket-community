@@ -42,6 +42,16 @@ class File extends Model<File> {
   @Column
   official: boolean;
 
+  @AllowNull(true)
+  @Column
+  approvedOrRefusedId: number;
+
+  @Column
+  approvedAt: Date;
+
+  @Column
+  refusedAt: Date;
+
   @UpdatedAt
   updatedAt: Date;
 
