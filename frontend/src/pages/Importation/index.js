@@ -141,6 +141,18 @@ const Importation = () => {
     return response;
   };
 
+  const getOfficial = (official) => {
+    if (official === null) {
+      return "Null"
+    }
+
+    if (official) {
+      return "Oficial";
+    } else {
+      return "Não Oficial";
+    }
+  }
+
   const handleSelectOption = (e, newValue) => {
     if (newValue === null) {
       setStatus("");
@@ -227,6 +239,9 @@ const Importation = () => {
               <TableCell align="center">
                 {i18n.t("importation.table.status")}
               </TableCell>
+              <TableCell align="center">
+                Oficial
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -244,6 +259,9 @@ const Importation = () => {
                     <TableCell align="center">{item.QtdeRegister}</TableCell>
                     <TableCell align="center">
                       {getStatusById(item.Status)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {getOfficial(item.official)}
                     </TableCell>
                   </TableRow>
                 );

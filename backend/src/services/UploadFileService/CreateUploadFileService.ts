@@ -6,6 +6,7 @@ import File from "../../database/models/File";
 interface Request {
   name: string;
   ownerid: string;
+  official: string;
   filePath: string;
 }
 
@@ -15,6 +16,7 @@ interface Response {}
 const CreateUploadFileService = async ({
   name,
   ownerid,
+  official,
   filePath
 }: Request): Promise<Response | null> => {
   const s3 = new AWS.S3({
@@ -43,6 +45,7 @@ const CreateUploadFileService = async ({
       url,
       name,
       ownerid,
+      official,
       status: 0
     });
     return file;

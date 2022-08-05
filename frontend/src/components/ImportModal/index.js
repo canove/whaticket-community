@@ -1,13 +1,15 @@
 import React, { useContext, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
+import { green, red } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import InfoIcon from '@material-ui/icons/Info';
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
@@ -34,16 +36,18 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 	},
 
-	fieldMarginTop: {
-		marginTop: 20,
-	},
-
 	multFieldLine: {
 		display: "flex",
 		"& > *:not(:last-child)": {
 			marginRight: theme.spacing(1),
 		},
 		marginBottom: 20,
+		marginTop: 20,
+		alignItems: "center",
+	},
+
+	buttonRed: {
+		color: red[300],
 	},
 
 	buttonProgress: {
@@ -80,7 +84,8 @@ const ImportModal = ({ open, onClose }) => {
 		const formData = new FormData();
 		formData.append("file", file, file.name);
 		formData.set("ownerid", user.id);
-		formData.set("name", file.name)
+		formData.set("name", file.name);
+		formData.set("official", selectedType);
 
 		await api.post("file/upload", formData);
 
@@ -135,10 +140,10 @@ const ImportModal = ({ open, onClose }) => {
                         	{file ? `${i18n.t('importModal.form.uploadedFile')}: ${file.name}` : i18n.t('importModal.form.noFile')}
 						</Typography>
 					</div>
-					<div className={classes.fieldMarginTop}>
+					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-						Modelo de disparo suportado:<br />
-						NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
+						Modelo de disparo suportado
+						{/* NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
 
 						- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
 							- TEMPLATE_WHATS<br />
@@ -146,8 +151,9 @@ const ImportModal = ({ open, onClose }) => {
 
 						- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
 							- TEXTO_MENSAGEM<br />
-							- PARAMETROS_TEMPLATE<br />
+							- PARAMETROS_TEMPLATE<br /> */}
 						</Typography>
+						<IconButton><InfoIcon className={classes.buttonRed} /></IconButton>
 					</div>
                 </DialogContent>
 				<DialogActions>

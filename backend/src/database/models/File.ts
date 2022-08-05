@@ -39,6 +39,9 @@ class File extends Model<File> {
   @CreatedAt
   CreatedAt: Date;
 
+  @Column
+  official: boolean;
+
   @UpdatedAt
   updatedAt: Date;
 

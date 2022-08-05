@@ -2,8 +2,8 @@ import { Op } from "sequelize";
 import File from "../../database/models/File";
 
 interface Request {
-  Status: number;
-  initialDate: string;
+  Status?: number;
+  initialDate?: string;
 }
 
 interface Response {};
