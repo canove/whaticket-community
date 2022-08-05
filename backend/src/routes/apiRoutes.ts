@@ -16,6 +16,12 @@ ApiRoutes.post(
   WhatsAppController.newMessage
 );
 
+ApiRoutes.get(
+  "/verifyImportedFiles",
+  isAuthApi,
+  ApiController.importDispatcherFileProcess
+);
+
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
 
 export default ApiRoutes;

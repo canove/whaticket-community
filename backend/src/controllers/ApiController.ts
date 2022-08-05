@@ -12,6 +12,8 @@ import CheckContactNumber from "../services/WbotServices/CheckNumber";
 import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import ListFileService from "../services/FileService/ListFileService";
+import { FileStatus } from "../enum/FileStatus";
 
 type MessageData = {
   body: string;
@@ -55,6 +57,11 @@ const createContact = async (newContact: string) => {
   SetTicketMessagesAsRead(ticket);
 
   return ticket;
+};
+
+export const importDispatcherFileProcess = async (req: Request, res: Response) => {
+  const files = await ListFileService({ Status: FileStatus.WaitingImport });
+  return res.status(200).json('request is processed');
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {

@@ -5,7 +5,7 @@ import CreateUploadFileService from "../services/UploadFileService/CreateUploadF
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const form = formidable({ multiples: false });
 
-  form.parse(req, async (err, fields, files) => {
+  return form.parse(req, async (err, fields, files) => {
     if (err)
       return res.status(500).json("occured an error");
     if (!files)
