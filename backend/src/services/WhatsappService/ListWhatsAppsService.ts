@@ -1,11 +1,22 @@
+import { Op } from "sequelize/types";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 
-const ListWhatsAppsService = async ( official = false ): Promise<Whatsapp[]> => {
+interface Request {
+  official?: boolean | string;
+}
+
+const ListWhatsAppsService = async ({
+  official = false
+}: Request): Promise<Whatsapp[]> => {
+  let whereCondition = 0;
+
+  if (official === "true") {
+    whereCondition = 1;
+  }
+
   const whatsapps = await Whatsapp.findAll({
-    where: {
-    official: official
-    },
+    where: { official: whereCondition },
     include: [
       {
         model: Queue,

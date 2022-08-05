@@ -65,6 +65,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 		greetingMessage: "",
 		farewellMessage: "",
 		isDefault: false,
+		official: false
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -165,7 +166,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										label={i18n.t("queueModal.form.greetingMessage")}
 										type="greetingMessage"
 										multiline
-										rows={5}
+										minRows={5}
 										fullWidth
 										name="greetingMessage"
 										error={
@@ -184,7 +185,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										label={i18n.t("whatsappModal.form.farewellMessage")}
 										type="farewellMessage"
 										multiline
-										rows={5}
+										minRows={5}
 										fullWidth
 										name="farewellMessage"
 										error={

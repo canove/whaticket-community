@@ -5,20 +5,20 @@ module.exports = {
     queryInterface.addColumn("Whatsapps", "facebookToken", {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true
+      unique: false
     });
 
     queryInterface.addColumn("Whatsapps", "facebookPhoneNumberId", {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true
+      unique: false
     });
 
     queryInterface.addColumn("Whatsapps", "official", {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
-      unique: true
+      unique: false
     });
 
     return queryInterface.addColumn("Whatsapps", "phoneNumber", {
