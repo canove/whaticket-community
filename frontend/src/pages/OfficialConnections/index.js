@@ -139,7 +139,7 @@ const OfficialConnections = () => {
 			}
 		};
 		fetchSession();
-	}, []);
+	}, [whatsAppModalOpen]);
 
 	const handleOpenWhatsAppModal = () => {
 		setWhatsAppModalOpen(true);
