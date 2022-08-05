@@ -1,16 +1,20 @@
-import React, { useState } from "react";
-
+import React, { useContext, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
+import { green, red } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import InfoIcon from '@material-ui/icons/Info';
 
 import { useTranslation } from "react-i18next";
+import api from "../../services/api";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -32,6 +36,20 @@ const useStyles = makeStyles(theme => ({
 		position: "relative",
 	},
 
+	multFieldLine: {
+		display: "flex",
+		"& > *:not(:last-child)": {
+			marginRight: theme.spacing(1),
+		},
+		marginBottom: 20,
+		marginTop: 20,
+		alignItems: "center",
+	},
+
+	buttonRed: {
+		color: red[300],
+	},
+
 	buttonProgress: {
 		color: green[500],
 		position: "absolute",
@@ -45,16 +63,39 @@ const useStyles = makeStyles(theme => ({
 const ImportModal = ({ open, onClose }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
+	const { user } = useContext(AuthContext);
 
-    const [files, setFiles] = useState([]);
+    const [file, setFile] = useState();
+	const [selectedType, setSelectedType] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	const handleClose = () => {
 		onClose();
+		setFile();
 	};
 
     const handleFile = (e) => {
-        setFiles(Array.from(e.target.files));
+		setFile(e.target.files[0])
     }
+
+	const handleSubmit = async () => {
+		setLoading(true);
+
+		const formData = new FormData();
+		formData.append("file", file, file.name);
+		formData.set("ownerid", user.id);
+		formData.set("name", file.name);
+		formData.set("official", selectedType);
+
+		await api.post("file/upload", formData);
+
+		setLoading(false);
+		handleClose();
+	}
+
+	const handleChange = (e) => {
+		setSelectedType(e.target.value);
+	}
 
 	return (
 		<div className={classes.root}>
@@ -68,26 +109,59 @@ const ImportModal = ({ open, onClose }) => {
 					{i18n.t('importModal.title')}
 				</DialogTitle>
                 <DialogContent dividers>
-                    <Button
-                        variant="contained"
-                        component="label"
-                    >
-                        {i18n.t('importModal.buttons.uploadFile')}
-                        <input
-                            type="file"
-                            onChange={handleFile}
-                            hidden
-                        />
-                    </Button>
-                    <Typography variant="subtitle1" gutterBottom>
-                        {files.length > 0 ? `${i18n.t('importModal.form.uploadedFile')}: ${files.map((file) => file.name)}` : i18n.t('importModal.form.noFile')}
-					</Typography>
+					<div className={classes.multFieldLine}>
+						<Typography variant="subtitle1" gutterBottom>
+                        	Tipo de Disparo: 
+						</Typography>
+						<Select
+							labelId="type-select-label"
+							id="type-select"
+							value={selectedType}
+							label="Type"
+							onChange={handleChange}
+						>
+							<MenuItem value={true}>Oficial</MenuItem>
+							<MenuItem value={false}>Não Oficial</MenuItem>
+						</Select>
+					</div>
+					<div className={classes.multFieldLine}>
+						<Button
+							variant="contained"
+							component="label"
+						>
+							{i18n.t('importModal.buttons.uploadFile')}
+							<input
+								type="file"
+								onChange={handleFile}
+								hidden
+							/>
+						</Button>
+						<Typography variant="subtitle1" gutterBottom>
+                        	{file ? `${i18n.t('importModal.form.uploadedFile')}: ${file.name}` : i18n.t('importModal.form.noFile')}
+						</Typography>
+					</div>
+					<div className={classes.multFieldLine}>
+						<Typography variant="subtitle1" gutterBottom>
+						Modelo de disparo suportado
+						{/* NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
+
+						- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
+							- TEMPLATE_WHATS<br />
+							- PARAMETROS_TEMPLATE<br /><br />
+
+						- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
+							- TEXTO_MENSAGEM<br />
+							- PARAMETROS_TEMPLATE<br /> */}
+						</Typography>
+						<IconButton><InfoIcon className={classes.buttonRed} /></IconButton>
+					</div>
                 </DialogContent>
 				<DialogActions>
 					<Button
 						onClick={handleClose}
 						color="secondary"
 						variant="outlined"
+						disabled={loading}
 					>
 						{i18n.t('importModal.buttons.cancel')}
 					</Button>
@@ -96,6 +170,8 @@ const ImportModal = ({ open, onClose }) => {
 						color="primary"
 						variant="contained"
 						className={classes.btnWrapper}
+						onClick={handleSubmit}
+						disabled={loading}
 					>
 						{i18n.t('importModal.buttons.import')}
 					</Button>

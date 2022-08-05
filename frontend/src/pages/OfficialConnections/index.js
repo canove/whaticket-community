@@ -62,33 +62,6 @@ const reducer = (state, action) => {
 		return [...whatsApps];
 	}
 
-	if (action.type === "UPDATE_WHATSAPPS") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex] = whatsApp;
-			return [...state];
-		} else {
-			return [whatsApp, ...state];
-		}
-	}
-
-	if (action.type === "UPDATE_SESSION") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex].status = whatsApp.status;
-			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
-			state[whatsAppIndex].qrcode = whatsApp.qrcode;
-			state[whatsAppIndex].retries = whatsApp.retries;
-			return [...state];
-		} else {
-			return [...state];
-		}
-	}
-
 	if (action.type === "DELETE_WHATSAPPS") {
 		const whatsAppId = action.payload;
 
@@ -111,6 +84,7 @@ const OfficialConnections = () => {
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+	const [loadWhats, setLoadWhats] = useState(true);
 
 	const [whatsApps, dispatch] = useReducer(reducer, []);
 	const [loading, setLoading] = useState(true);
@@ -128,7 +102,7 @@ const OfficialConnections = () => {
 
 	useEffect(() => {
 		setLoading(true);
-		const fetchSession = async () => {
+		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/?official=true`);
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
@@ -138,20 +112,24 @@ const OfficialConnections = () => {
 				toastError(err);
 			}
 		};
-		fetchSession();
-	}, [whatsAppModalOpen]);
+		fetchWhats();
+		setLoadWhats(false);
+	}, [loadWhats]);
 
 	const handleOpenWhatsAppModal = () => {
 		setWhatsAppModalOpen(true);
+		setLoadWhats(true);
 	};
 
 	const handleCloseWhatsAppModal = useCallback(() => {
 		setWhatsAppModalOpen(false);
+		setLoadWhats(true);
 	}, [setWhatsAppModalOpen]);
 
 	const handleEditWhatsApp = (whatsApp) => {
 		setSelectedWhatsApp(whatsApp);
 		setWhatsAppModalOpen(true);
+		setLoadWhats(true);
 	};
 
 	const handleOpenConfirmationModal = (action, whatsAppId) => {
@@ -164,6 +142,7 @@ const OfficialConnections = () => {
 			});
 		}
 		setConfirmModalOpen(true);
+		setLoadWhats(true);
 	};
 
 	const handleSubmitConfirmationModal = async () => {
@@ -177,6 +156,7 @@ const OfficialConnections = () => {
 		}
 
 		setConfirmModalInfo(confirmationModalInitialState);
+		setLoadWhats(true);
 	};
 
 	return (
