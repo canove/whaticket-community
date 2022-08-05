@@ -151,10 +151,9 @@ const Importation = () => {
 
   useEffect(() => {
     handleFilter();
-  }, []);
+  }, [importModalOpen]);
 
   const handleFilter = async () => {
-    console.log(date, status);
     setLoading(true);
     try {
       setLoading(true);
