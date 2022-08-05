@@ -47,7 +47,15 @@ class FileRegister extends Model<FileRegister> {
 
   @AllowNull(true)
   @Column
+  msgWhatsId: string;
+
+  @AllowNull(true)
+  @Column
   deliveredAt: Date;
+
+  @AllowNull(true)
+  @Column
+  sentAt: Date;
 
   @AllowNull(true)
   @Column

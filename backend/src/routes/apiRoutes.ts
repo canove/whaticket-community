@@ -11,6 +11,12 @@ const upload = multer(uploadConfig);
 const ApiRoutes = express.Router();
 
 ApiRoutes.post(
+  "/whatsapp/messageStatus",
+  isAuthApi,
+  WhatsAppController.messageStatus
+);
+
+ApiRoutes.post(
   "/whatsapp/newMessage",
   isAuthApi,
   WhatsAppController.newMessage
@@ -20,6 +26,12 @@ ApiRoutes.get(
   "/verifyImportedFiles",
   isAuthApi,
   ApiController.importDispatcherFileProcess
+);
+
+ApiRoutes.get(
+  "/dispatcherRegisterProcess",
+  isAuthApi,
+  ApiController.dispatcherRegisterProcess
 );
 
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
