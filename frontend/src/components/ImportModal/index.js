@@ -62,8 +62,8 @@ const ImportModal = ({ open, onClose }) => {
 		console.log(file);
 
 		const formData = new FormData();
-		formData.append("File", file, file.name);
-		formData.set("ownerid", 0);
+		formData.append("file", file, file.name);
+		formData.set("ownerid", 1);
 		formData.set("name", file.name)
 
 		api.post("file/upload", formData);

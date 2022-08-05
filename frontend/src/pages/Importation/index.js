@@ -21,7 +21,7 @@ import ImportModal from "../../components/ImportModal";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import { format, parseISO } from "date-fns";
+import { parseISO, format } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -142,22 +142,27 @@ const Importation = () => {
   };
 
   const handleSelectOption = (e, newValue) => {
-    setStatus(getStatusByName(newValue));
+    if (newValue === null) {
+      setStatus("");
+    } else {
+      setStatus(getStatusByName(newValue));
+    }
   };
 
+  useEffect(() => {
+    handleFilter();
+  }, []);
+
   const handleFilter = async () => {
+    console.log(date, status);
     setLoading(true);
-    if (!date && !status) {
-      toast.error("Fill the form");
-    } else {
-      try {
-        setLoading(true);
-        const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
-        setImports(data);
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-      }
+    try {
+      setLoading(true);
+      const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
+      setImports(data);
+      setLoading(false);
+    } catch (err) {
+      toastError(err);
     }
   };
 
@@ -231,7 +236,7 @@ const Importation = () => {
                 return (
                   <TableRow key={index}>
                     <TableCell align="center">
-                      {format(parseISO(item.createdAt), "dd/MM/yy HH:mm")}
+                      {format(parseISO(item.CreatedAt), "dd/MM/yyyy HH:mm")}
                     </TableCell>
                     <TableCell align="center">{item.name}</TableCell>
                     <TableCell align="center">
