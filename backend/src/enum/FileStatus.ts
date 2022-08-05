@@ -3,5 +3,8 @@ export enum FileStatus {
   WaitingImport,
   Processing,
   WaitingApprove,
-  Error
+  Error,
+  Recused,
+  Shooting,
+  Finished,
 };
