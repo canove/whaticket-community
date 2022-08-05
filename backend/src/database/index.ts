@@ -11,7 +11,7 @@ import WhatsappQueue from "./models/WhatsappQueue";
 import UserQueue from "./models/UserQueue";
 import QuickAnswer from "./models/QuickAnswer";
 import File from "./models/File";
-
+import FileRegister from "./models/FileRegister";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -30,7 +30,8 @@ const models = [
   WhatsappQueue,
   UserQueue,
   QuickAnswer,
-  File
+  File,
+  FileRegister
 ];
 
 sequelize.addModels(models);
