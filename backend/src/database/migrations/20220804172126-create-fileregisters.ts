@@ -2,6 +2,24 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   up: (queryInterface: QueryInterface) => {
+    queryInterface.addColumn("Files", "approvedOrRefusedId", {
+      type: DataTypes.INTEGER,
+      references: { model: "Users", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
+      allowNull: false
+    });
+
+    queryInterface.addColumn("Files", "approvedAt", {
+      type: DataTypes.DATE,
+      allowNull: true
+    });
+
+    queryInterface.addColumn("Files", "refusedAt", {
+      type: DataTypes.DATE,
+      allowNull: true
+    });
+
     return queryInterface.createTable("FileRegisters", {
       id: {
         type: DataTypes.INTEGER,
