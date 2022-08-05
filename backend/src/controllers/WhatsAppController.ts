@@ -23,8 +23,12 @@ interface WhatsappData {
   phoneNumber?: string;
 }
 
+type IndexQuery = {
+  official: boolean;
+};
+
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { official }: WhatsappData = req.body;
+  const { official } = req.query as unknown as IndexQuery;
   const whatsapps = await ListWhatsAppsService({ official });
 
   return res.status(200).json(whatsapps);
