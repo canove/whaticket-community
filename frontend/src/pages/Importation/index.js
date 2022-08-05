@@ -22,6 +22,8 @@ import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { parseISO, format } from "date-fns";
+import { IconButton } from "@material-ui/core";
+import { Done, Visibility } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -104,14 +106,20 @@ const Importation = () => {
   };
 
   const getStatusByName = (status) => {
-    if (status === "Novo") {
+    if (status === "Aguardando Importação") {
       return "0";
     } else if (status === "Processando") {
       return "1";
-    } else if (status === "Processado") {
-      return "3";
+    } else if (status === "Aguardando Aprovação") {
+      return "2";
     } else if (status === "Erro") {
+      return "3";
+    } else if (status === "Recusado") {
       return "4";
+    } else if (status === "Disparando") {
+      return "5";
+    } else if (status === "Finalizado") {
+      return "6";
     } else {
       return status;
     }
@@ -119,13 +127,19 @@ const Importation = () => {
 
   const getStatusById = (id) => {
     if (id === 0) {
-      return "Novo";
+      return "Aguardando Importação";
     } else if (id === 1) {
       return "Processando";
     } else if (id === 2) {
-      return "Processado";
+      return "Aguardando Aprovação";
     } else if (id === 3) {
       return "Erro";
+    } else if (id === 4) {
+      return "Recusado";
+    } else if (id === 5) {
+      return "Disparando";
+    } else if (id === 6) {
+      return "Finalizado";
     } else {
       return id;
     }
@@ -189,7 +203,7 @@ const Importation = () => {
         <MainHeaderButtonsWrapper>
           <Autocomplete
             className={classes.root}
-            options={["Novo", "Processando", "Processado", "Erro"]}
+            options={["Aguardando Importação", "Processando", "Aguardando Aprovação", "Erro", "Recusado", "Disparando", "Finalizado"]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
             renderInput={(params) => (
@@ -242,6 +256,9 @@ const Importation = () => {
               <TableCell align="center">
                 Oficial
               </TableCell>
+              <TableCell align="center">
+								Ações
+							</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -263,6 +280,21 @@ const Importation = () => {
                     <TableCell align="center">
                       {getOfficial(item.official)}
                     </TableCell>
+                    <TableCell align="center">
+                        {item.Status === 2 && (
+                          <>
+                            <IconButton
+                              size="small"
+                            >
+                              <Done />
+                            </IconButton><IconButton
+                              size="small"
+                            >
+                              <Visibility />
+                            </IconButton>
+                          </>
+                        )}
+										</TableCell>
                   </TableRow>
                 );
               })}
@@ -273,6 +305,6 @@ const Importation = () => {
       </Paper>
     </MainContainer>
   );
-};
+}
 
 export default Importation;

@@ -68,6 +68,7 @@ const ImportModal = ({ open, onClose }) => {
     const [file, setFile] = useState();
 	const [selectedType, setSelectedType] = useState(true);
 	const [loading, setLoading] = useState(false);
+	const [showInfo, setShowInfo] = useState(false);
 
 	const handleClose = () => {
 		onClose();
@@ -142,18 +143,22 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-						Modelo de disparo suportado
-						{/* NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
-
-						- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
-							- TEMPLATE_WHATS<br />
-							- PARAMETROS_TEMPLATE<br /><br />
-
-						- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
-							- TEXTO_MENSAGEM<br />
-							- PARAMETROS_TEMPLATE<br /> */}
+							Modelo de disparo suportado: 
 						</Typography>
-						<IconButton><InfoIcon className={classes.buttonRed} /></IconButton>
+						<Button onClick={() => setShowInfo(!showInfo)}>{showInfo ? "Esconder" : "Mostrar"}</Button>
+					</div>
+					<div>
+						{showInfo && (
+							<Typography variant="subtitle1" gutterBottom>
+								NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
+								- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
+								TEMPLATE_WHATS<br />
+								PARAMETROS_TEMPLATE<br /><br />
+								- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
+								TEXTO_MENSAGEM<br />
+								PARAMETROS_TEMPLATE<br />
+							</Typography>
+						)}
 					</div>
                 </DialogContent>
 				<DialogActions>
