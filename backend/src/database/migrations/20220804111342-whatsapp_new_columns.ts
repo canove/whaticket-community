@@ -17,8 +17,7 @@ module.exports = {
     queryInterface.addColumn("Whatsapps", "official", {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
-      unique: true
+      defaultValue: 0
     });
 
     return queryInterface.addColumn("Whatsapps", "phoneNumber", {
