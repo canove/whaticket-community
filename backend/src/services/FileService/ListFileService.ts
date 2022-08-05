@@ -1,25 +1,22 @@
 import { Op } from "sequelize";
 import File from "../../database/models/File";
 
-interface Request {
-  Status?: number;
-  initialDate?: string;
-}
 
 interface Response {};
 
 const ListFileService = async ({
   Status,
-  initialDate
-}: Request): Promise<Response | undefined> => {
-  let whereCondition = null;
+  initialDate,
+  limit = null
+}): Promise<File[] | undefined> => {
+  let where = null;
   if (Status !== undefined && !initialDate) {
-    whereCondition = {
+    where = {
       status: Status
     };
   }
-  if (!Status && initialDate !== undefined) {
-    whereCondition = {
+  if (!Status && initialDate !== null) {
+    where = {
       createdAt: {
         [Op.gte]: new Date(initialDate)
       }
@@ -28,7 +25,9 @@ const ListFileService = async ({
 
   // eslint-disable-next-line no-return-await
   return await File.findAll({
-    where: whereCondition
+    where: where,
+    limit
   });
 };
-export default ListFileService;
+
+export default ListFileService
