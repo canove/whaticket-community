@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useEffect, useReducer } from "react";
 
+import { CheckCircle, DeleteOutline, Edit } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 import {
@@ -17,14 +18,13 @@ import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ConfirmationModal from "../../components/ConfirmationModal";
+
+import OfficialWhatsAppModal from "../../components/OfficialWhatsAppModal";
 
 import { useTranslation } from 'react-i18next'
-import OfficialWhatsAppModal from "../../components/OfficialWhatsAppModal";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
-import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
-import { CheckCircle, DeleteOutline, Edit } from "@material-ui/icons";
-import ConfirmationModal from "../../components/ConfirmationModal";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
@@ -56,15 +56,64 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_WHATSAPPS") {
+		const whatsApps = action.payload;
+		return [...whatsApps];
+	}
+
+	if (action.type === "UPDATE_WHATSAPPS") {
+		const whatsApp = action.payload;
+		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
+
+		if (whatsAppIndex !== -1) {
+			state[whatsAppIndex] = whatsApp;
+			return [...state];
+		} else {
+			return [whatsApp, ...state];
+		}
+	}
+
+	if (action.type === "UPDATE_SESSION") {
+		const whatsApp = action.payload;
+		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
+
+		if (whatsAppIndex !== -1) {
+			state[whatsAppIndex].status = whatsApp.status;
+			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
+			state[whatsAppIndex].qrcode = whatsApp.qrcode;
+			state[whatsAppIndex].retries = whatsApp.retries;
+			return [...state];
+		} else {
+			return [...state];
+		}
+	}
+
+	if (action.type === "DELETE_WHATSAPPS") {
+		const whatsAppId = action.payload;
+
+		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
+		if (whatsAppIndex !== -1) {
+			state.splice(whatsAppIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
 
 const OfficialConnections = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
-	const { whatsApps, loading } = useContext(WhatsAppsContext);
 
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
+	const [whatsApps, dispatch] = useReducer(reducer, []);
+	const [loading, setLoading] = useState(true);
 
 	const confirmationModalInitialState = {
 		action: "",
@@ -76,6 +125,21 @@ const OfficialConnections = () => {
 	const [confirmModalInfo, setConfirmModalInfo] = useState(
 		confirmationModalInitialState
 	);
+
+	useEffect(() => {
+		setLoading(true);
+		const fetchSession = async () => {
+			try {
+				const { data } = await api.get(`/whatsapp/?official=true`);
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+				toastError(err);
+			}
+		};
+		fetchSession();
+	}, [whatsAppModalOpen]);
 
 	const handleOpenWhatsAppModal = () => {
 		setWhatsAppModalOpen(true);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 
@@ -72,6 +72,23 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
     const [isConnectionTested, setIsConnectionTested] = useState(false);
+
+	useEffect(() => {
+		const fetchSession = async () => {
+			if (!whatsAppId) return;
+
+			try {
+				const { data } = await api.get(`whatsapp/${whatsAppId}`);
+				setWhatsApp(data);
+
+				const whatsQueueIds = data.queues?.map(queue => queue.id);
+				setSelectedQueueIds(whatsQueueIds);
+			} catch (err) {
+				toastError(err);
+			}
+		};
+		fetchSession();
+	}, [whatsAppId]);
 
 	const handleClose = () => {
 		onClose();
@@ -160,6 +177,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
+										required
                                     />
                                 </div>
                                 <div className={classes.textQuickAnswerContainer}>
@@ -173,6 +191,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
+										required
                                     />
                                 </div>
                                 <div className={classes.textQuickAnswerContainer}>
@@ -186,6 +205,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
                                         margin="dense"
                                         className={classes.textField}
                                         fullWidth
+										required
                                     />
                                 </div>
 								<div>

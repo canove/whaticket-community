@@ -8,6 +8,7 @@ import { logger } from "../../utils/logger";
 import Ticket from "../../database/models/Ticket";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
+import Whatsapp from "../../database/models/Whatsapp";
 
 interface Request {
   id: string;
@@ -18,12 +19,24 @@ interface Request {
   from: string;
   body: string;
   contactName: string;
-  contactNumber: string;
+  identification: number;
 }
 
 interface Response {
   success: boolean;
 }
+
+const GetWhatsappByIdentification = async (
+  identification: number
+): Promise<Whatsapp> => {
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      facebookPhoneNumberId: identification
+    }
+  });
+
+  return whatsapp;
+};
 
 const NewMessageWhatsappService = async ({
   id,
@@ -34,7 +47,7 @@ const NewMessageWhatsappService = async ({
   from,
   body,
   contactName,
-  contactNumber
+  identification
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     id: Yup.string().required(),
@@ -45,7 +58,7 @@ const NewMessageWhatsappService = async ({
     type: Yup.string().required(),
     isGroup: Yup.boolean().required(),
     contactName: Yup.string().required(),
-    contactNumber: Yup.string().required()
+    identification: Yup.number().required()
   });
 
   try {
@@ -58,7 +71,7 @@ const NewMessageWhatsappService = async ({
       type,
       isGroup,
       contactName,
-      contactNumber
+      identification
     });
   } catch (err) {
     throw new AppError(err.message);
@@ -72,8 +85,8 @@ const NewMessageWhatsappService = async ({
     to,
     type,
     contactName,
-    contactNumber,
-    isGroup
+    isGroup,
+    identification
   );
   return { success: true };
 };
@@ -131,14 +144,21 @@ const handleMessage = async (
   to: string,
   type: string,
   contactName: string,
-  contactNumber: string,
-  isGroup: boolean
+  isGroup: boolean,
+  identification: number
 ): Promise<void> => {
   try {
     const unreadMessages = 1;
-    const contact = await verifyContact(contactName, contactNumber);
+    const contact = await verifyContact(contactName, from);
+    const whatsapp = await GetWhatsappByIdentification(identification);
+    // eslint-disable-next-line no-throw-literal
+    if (!whatsapp) throw "number identification not found";
 
-    const ticket = await FindOrCreateTicketService(contact, 3, unreadMessages);
+    const ticket = await FindOrCreateTicketService(
+      contact,
+      whatsapp.id,
+      unreadMessages
+    );
 
     if (type !== "text") {
       //await verifyMediaMessage(msg, ticket, contact);
