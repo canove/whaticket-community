@@ -45,7 +45,7 @@ const CreateUploadFileService = async ({
     name,
     ownerid,
     official,
-    whatsappId: 25,
+    whatsappId: 13,
     status: 0
   });
   return file;
