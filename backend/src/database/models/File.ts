@@ -9,7 +9,8 @@ import {
   AllowNull,
   Unique,
   BelongsTo,
-  ForeignKey
+  ForeignKey,
+  Default
 } from "sequelize-typescript";
 import User from "./User";
 
@@ -29,10 +30,11 @@ class File extends Model<File> {
   url: string;
 
   @Column
-  QtdeRegister: number
+  QtdeRegister: number;
 
+  @Default(0)
   @Column
-  Status: number
+  Status: number;
 
   @CreatedAt
   CreatedAt: Date;
