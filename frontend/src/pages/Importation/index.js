@@ -152,9 +152,7 @@ const Importation = () => {
     } else {
       try {
         setLoading(true);
-        const { data } = await api.get(
-          `file/list?Status=${status}&initialDate=${date}`
-        );
+        const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
         setImports(data);
         setLoading(false);
       } catch (err) {

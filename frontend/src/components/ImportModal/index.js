@@ -11,6 +11,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import api from "../../services/api";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -46,15 +48,27 @@ const ImportModal = ({ open, onClose }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
-    const [files, setFiles] = useState([]);
+    const [file, setFile] = useState();
 
 	const handleClose = () => {
 		onClose();
 	};
 
     const handleFile = (e) => {
-        setFiles(Array.from(e.target.files));
+		setFile(e.target.files[0])
     }
+
+	const handleSubmit = () => {
+		console.log(file);
+
+		const formData = new FormData();
+		formData.append("File", file, file.name);
+		formData.set("ownerid", 0);
+		formData.set("name", file.name)
+
+		api.post("file/upload", formData);
+	}
+
 
 	return (
 		<div className={classes.root}>
@@ -80,7 +94,7 @@ const ImportModal = ({ open, onClose }) => {
                         />
                     </Button>
                     <Typography variant="subtitle1" gutterBottom>
-                        {files.length > 0 ? `${i18n.t('importModal.form.uploadedFile')}: ${files.map((file) => file.name)}` : i18n.t('importModal.form.noFile')}
+                        {file ? `${i18n.t('importModal.form.uploadedFile')}: ${file.name}` : i18n.t('importModal.form.noFile')}
 					</Typography>
                 </DialogContent>
 				<DialogActions>
@@ -96,6 +110,7 @@ const ImportModal = ({ open, onClose }) => {
 						color="primary"
 						variant="contained"
 						className={classes.btnWrapper}
+						onClick={handleSubmit}
 					>
 						{i18n.t('importModal.buttons.import')}
 					</Button>
