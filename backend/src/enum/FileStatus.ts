@@ -2,6 +2,6 @@
 export enum FileStatus {
   WaitingImport,
   Processing,
-  Imported,
+  WaitingApprove,
   Error
 };

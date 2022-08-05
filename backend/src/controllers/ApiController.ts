@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as Yup from "yup";
+import path from "path";
 import AppError from "../errors/AppError";
 import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
@@ -14,6 +15,7 @@ import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ListFileService from "../services/FileService/ListFileService";
 import { FileStatus } from "../enum/FileStatus";
+import ImportFileService from "../services/UploadFileService/ImportFileService";
 
 type MessageData = {
   body: string;
@@ -60,7 +62,14 @@ const createContact = async (newContact: string) => {
 };
 
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
-  const files = await ListFileService({ Status: FileStatus.WaitingImport });
+  const files = await ListFileService({ Status: FileStatus.WaitingImport,initialDate:null, limit: 1 });
+  if (files) {
+    files.forEach(async (file) => {
+      await file.update({ Status: FileStatus.Processing });
+      await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
+    });
+  }
+
   return res.status(200).json('request is processed');
 };
 
