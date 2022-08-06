@@ -32,7 +32,7 @@ const StatusMessageWhatsappService = async ({
   }
   let register;
 
-  if ((msgWhatsId == null || msgWhatsId === undefined) && msgId) {
+  if (msgId) {
     register = await FileRegister.findOne({
       where: {
         id: msgId
