@@ -13,10 +13,6 @@ whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
 
 whatsappRoutes.put("/whatsapp/:whatsappId", isAuth, WhatsAppController.update);
 
-whatsappRoutes.delete(
-  "/whatsapp/:whatsappId",
-  isAuth,
-  WhatsAppController.remove
-);
+whatsappRoutes.delete("/whatsapp/:whatsappId", isAuth, WhatsAppController.remove);
 
 export default whatsappRoutes;
