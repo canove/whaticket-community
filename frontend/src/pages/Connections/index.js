@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useContext, useEffect } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 
@@ -96,7 +96,9 @@ const Connections = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
-	const { whatsApps, loading } = useContext(WhatsAppsContext);
+	const [whatsApps, setWhatsApps] = useState();
+	const [loading, setLoading] = useState(false);
+	const [loadWhats, setLoadWhats] = useState(true);
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [qrModalOpen, setQrModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
@@ -111,6 +113,22 @@ const Connections = () => {
 	const [confirmModalInfo, setConfirmModalInfo] = useState(
 		confirmationModalInitialState
 	);
+
+	useEffect(() => {
+		setLoading(true);
+		const fetchWhats = async () => {
+			try {
+				const { data } = await api.get(`/whatsapp/list/${false}`);
+				setWhatsApps(data);
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+				toastError(err);
+			}
+		};
+		fetchWhats();
+		setLoadWhats(false);
+	}, [loadWhats]);
 
 	const handleStartWhatsAppSession = async whatsAppId => {
 		try {
@@ -131,11 +149,13 @@ const Connections = () => {
 	const handleOpenWhatsAppModal = () => {
 		setSelectedWhatsApp(null);
 		setWhatsAppModalOpen(true);
+		setLoadWhats(true);
 	};
 
 	const handleCloseWhatsAppModal = useCallback(() => {
 		setWhatsAppModalOpen(false);
 		setSelectedWhatsApp(null);
+		setLoadWhats(true)
 	}, [setSelectedWhatsApp, setWhatsAppModalOpen]);
 
 	const handleOpenQrModal = whatsApp => {
@@ -151,6 +171,7 @@ const Connections = () => {
 	const handleEditWhatsApp = whatsApp => {
 		setSelectedWhatsApp(whatsApp);
 		setWhatsAppModalOpen(true);
+		setLoadWhats(true);
 	};
 
 	const handleOpenConfirmationModal = (action, whatsAppId) => {
@@ -193,6 +214,7 @@ const Connections = () => {
 		}
 
 		setConfirmModalInfo(confirmationModalInitialState);
+		setLoadWhats(true);
 	};
 
 	const renderActionButtons = whatsApp => {

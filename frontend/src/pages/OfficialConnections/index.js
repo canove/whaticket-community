@@ -56,27 +56,6 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const reducer = (state, action) => {
-	if (action.type === "LOAD_WHATSAPPS") {
-		const whatsApps = action.payload;
-		return [...whatsApps];
-	}
-
-	if (action.type === "DELETE_WHATSAPPS") {
-		const whatsAppId = action.payload;
-
-		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
-		if (whatsAppIndex !== -1) {
-			state.splice(whatsAppIndex, 1);
-		}
-		return [...state];
-	}
-
-	if (action.type === "RESET") {
-		return [];
-	}
-};
-
 const OfficialConnections = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -85,8 +64,8 @@ const OfficialConnections = () => {
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [loadWhats, setLoadWhats] = useState(true);
+	const [whatsApps, setWhatsApps] = useState();
 
-	const [whatsApps, dispatch] = useReducer(reducer, []);
 	const [loading, setLoading] = useState(true);
 
 	const confirmationModalInitialState = {
@@ -104,8 +83,8 @@ const OfficialConnections = () => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
-				const { data } = await api.get(`/whatsapp?official=true`);
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+				const { data } = await api.get(`/whatsapp/list/${true}`);
+				setWhatsApps(data);
 				setLoading(false);
 			} catch (err) {
 				setLoading(false);
