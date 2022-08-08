@@ -16,6 +16,7 @@ import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { InputLabel, MenuItem, Select } from "@material-ui/core";
 import toastError from "../../errors/toastError";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -65,6 +66,7 @@ const ImportModal = ({ open, onClose }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const { user } = useContext(AuthContext);
+	const { whatsApps } = useContext(WhatsAppsContext);
 
     const [file, setFile] = useState();
 	const [selectedType, setSelectedType] = useState(true);
@@ -89,6 +91,7 @@ const ImportModal = ({ open, onClose }) => {
 		formData.set("ownerid", user.id);
 		formData.set("name", file.name);
 		formData.set("official", selectedType);
+		formData.set("whatsappId", selectedConnection);
 
 		await api.post("file/upload", formData);
 
@@ -143,6 +146,13 @@ const ImportModal = ({ open, onClose }) => {
 							onChange={handleChangeConnection}
 						>
 							<MenuItem value={"placeholder"} disabled>Selecione uma Conexão</MenuItem>
+							{whatsApps && whatsApps.map((whats, index) => {
+								if (whats.official === selectedType) {
+									return (
+										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+									)
+								}
+							})}
 						</Select>
 					</div>
 					<div className={classes.multFieldLine}>
