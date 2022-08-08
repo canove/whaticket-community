@@ -73,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
 const RegisterFileModal = ({ open, onClose, fileId }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
+  const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [fileRegister, setFileRegister] = useState();
 
@@ -80,12 +81,33 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
     onClose();
   };
 
+  const handleApprove = async () => {
+    await updateFileStatus(4);
+    handleClose();
+  }
+
+  const handleRefuse = async () => {
+    await updateFileStatus(7);
+    handleClose();
+  }
+
+  const updateFileStatus = async (status) => {
+    setLoading(true);
+    try {
+      setLoading(true);
+      const { data } = await api.put(`/file/update/${fileId}/?status=${status}&userId=${user.id}`);
+      setLoading(false);
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
   useEffect(() => {
     const handleFilter = async () => {
       setLoading(true);
       try {
         setLoading(true);
-        const { data } = await api.get('/file/listRegister?fileId=' + fileId);
+        const { data } = await api.get(`/file/listRegister?fileId=${fileId}`);
         setFileRegister(data)
         setLoading(false);
       } catch (err) {
@@ -143,10 +165,20 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
             color="primary"
             variant="contained"
             className={classes.btnWrapper}
-            onClick={handleClose}
+            onClick={handleRefuse}
             disabled={loading}
           >
-            {i18n.t("Close")}
+            Recusar
+          </Button>
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            className={classes.btnWrapper}
+            onClick={handleApprove}
+            disabled={loading}
+          >
+            Aprovar
           </Button>
         </DialogActions>
       </Dialog>

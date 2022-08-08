@@ -126,12 +126,14 @@ const Importation = () => {
       return "2";
     } else if (status === "Erro") {
       return "3";
-    } else if (status === "Recusado") {
+    } else if (status === "Aprovado") {
       return "4";
     } else if (status === "Disparando") {
       return "5";
     } else if (status === "Finalizado") {
       return "6";
+    } else if (status === "Recusado") {
+      return "7";
     } else {
       return status;
     }
@@ -147,11 +149,13 @@ const Importation = () => {
     } else if (id === 3) {
       return "Erro";
     } else if (id === 4) {
-      return "Recusado";
+      return "Aprovado";
     } else if (id === 5) {
       return "Disparando";
     } else if (id === 6) {
       return "Finalizado";
+    } else if (id === 7) {
+      return "Recusado";
     } else {
       return id;
     }
@@ -189,7 +193,7 @@ const Importation = () => {
 
   useEffect(() => {
     handleFilter();
-  }, [importModalOpen]);
+  }, [importModalOpen, registerFileModalOpen]);
 
   const handleFilter = async () => {
     setLoading(true);
@@ -223,7 +227,7 @@ const Importation = () => {
         <MainHeaderButtonsWrapper>
           <Autocomplete
             className={classes.root}
-            options={["Aguardando Importação", "Processando", "Aguardando Aprovação", "Erro", "Recusado", "Disparando", "Finalizado"]}
+            options={["Aguardando Importação", "Processando", "Aguardando Aprovação", "Erro", "Aprovado", "Disparando", "Finalizado", "Recusado"]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
             renderInput={(params) => (
