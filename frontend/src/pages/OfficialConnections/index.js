@@ -117,12 +117,14 @@ const OfficialConnections = () => {
 	}, [loadWhats]);
 
 	const handleOpenWhatsAppModal = () => {
+		setSelectedWhatsApp(null);
 		setWhatsAppModalOpen(true);
 		setLoadWhats(true);
 	};
 
 	const handleCloseWhatsAppModal = useCallback(() => {
 		setWhatsAppModalOpen(false);
+		setSelectedWhatsApp(null);
 		setLoadWhats(true);
 	}, [setWhatsAppModalOpen]);
 
