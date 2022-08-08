@@ -6,6 +6,7 @@ import File from "../../database/models/File";
 interface Request {
   name: string;
   ownerid: string;
+  official: string;
   filePath: string;
 }
 
@@ -15,6 +16,7 @@ interface Response {}
 const CreateUploadFileService = async ({
   name,
   ownerid,
+  official,
   filePath
 }: Request): Promise<Response | null> => {
   const s3 = new AWS.S3({
@@ -36,20 +38,17 @@ const CreateUploadFileService = async ({
     Body: fileContent
   } as AWS.S3.PutObjectRequest;
 
-  try {
-    const data = await s3.upload(params).promise();
-    const url = data.Location;
-    const file = await File.create({
-      url,
-      name,
-      ownerid,
-      status: 0
-    });
-    return file;
-  } catch(e) {
-    return null;
-  }
-  
+  const data = await s3.upload(params).promise();
+  const url = data.Location;
+  const file = await File.create({
+    url,
+    name,
+    ownerid,
+    official,
+    whatsappId: 13,
+    status: 0
+  });
+  return file;
 };
 
 export default CreateUploadFileService;

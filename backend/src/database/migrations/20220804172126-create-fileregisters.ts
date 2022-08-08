@@ -7,7 +7,7 @@ module.exports = {
       references: { model: "Users", key: "id" },
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
-      allowNull: false
+      allowNull: true
     });
 
     queryInterface.addColumn("Files", "approvedAt", {
