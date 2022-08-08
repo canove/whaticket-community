@@ -11,6 +11,7 @@ import formatBody from "../../helpers/Mustache";
 import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import Contact from "../../database/models/Contact";
 
 interface Request {
   body: string;
@@ -46,9 +47,14 @@ const SendWhatsAppMessage = async ({
         ],
         limit: 1
       });
+
+      const contact = await Contact.findOne({ where: {
+        id: message[0].contactId
+      }});
+
       const messageSended = await FileRegister.findOne({
         where: {
-          msgWhatsId: message[0].id
+          phoneNumber: contact.number
         }
       });
       
