@@ -9,6 +9,7 @@ import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsServi
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 import NewMessageWhatsapp from "../services/WhatsappService/NewMessageWhatsappService";
+import StatusMessageWhatsappService from "../services/WhatsappService/StatusMessageWhatsappService";
 
 interface WhatsappData {
   name: string;
@@ -160,6 +161,18 @@ export const newMessage = async (
     contactName,
     identification
   });
+
+  return res.status(200).json(message);
+};
+
+export const messageStatus = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+
+  const { statusType, msgId, msgWhatsId } = req.body;
+
+  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId });
 
   return res.status(200).json(message);
 };
