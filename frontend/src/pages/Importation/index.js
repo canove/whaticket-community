@@ -24,6 +24,7 @@ import api from "../../services/api";
 import { parseISO, format } from "date-fns";
 import { IconButton } from "@material-ui/core";
 import { Done, Visibility } from "@material-ui/icons";
+import RegisterFileModal from "../../components/RegisterFileModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,6 +70,8 @@ const Importation = () => {
   const [status, setStatus] = useState("");
   const [imports, setImports] = useState([]);
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
+  const [selectedFileId, setSelectedFileId] = useState("");
 
   const [users, dispatchUsers] = useReducer(reducer, []);
 
@@ -103,6 +106,15 @@ const Importation = () => {
 
   const handleCloseImportModal = () => {
     setImportModalOpen(false);
+  };
+
+  const handleOpenRegisterFileModal = (fileId) => {
+    setSelectedFileId(fileId)
+    setRegisterFileModalOpen(true);
+  };
+
+  const handleCloseRegisterFileModal = () => {
+    setRegisterFileModalOpen(false);
   };
 
   const getStatusByName = (status) => {
@@ -197,7 +209,15 @@ const Importation = () => {
         open={importModalOpen}
         onClose={handleCloseImportModal}
         aria-labelledby="form-dialog-title"
-      />
+      >
+      </ImportModal>
+      <RegisterFileModal
+        open={registerFileModalOpen}
+        onClose={handleCloseRegisterFileModal}
+        aria-labelledby="form-dialog-title"
+        fileId={selectedFileId}
+      >
+      </RegisterFileModal>
       <MainHeader>
         <Title>{i18n.t("importation.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -287,8 +307,10 @@ const Importation = () => {
                               size="small"
                             >
                               <Done />
-                            </IconButton><IconButton
+                            </IconButton>
+                            <IconButton
                               size="small"
+                              onClick={() => handleOpenRegisterFileModal(item.id)}
                             >
                               <Visibility />
                             </IconButton>
