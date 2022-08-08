@@ -4,6 +4,7 @@ import FileRegister from "../../database/models/FileRegister";
 import { FileStatus } from "../../enum/FileStatus";
 import File from "../../database/models/File";
 import Message from "../../database/models/Message";
+import { getIO } from "../../libs/socket";
 
 interface Request {
   msgId: number;
@@ -68,6 +69,12 @@ const StatusMessageWhatsappService = async ({
         await msgRegister?.update({ ack:3, read: 1 });
         break;
     }
+
+    const io = getIO();
+    io.emit("whatsapp", {
+      action: "update",
+      msgRegister
+    });
 
     return { success: true }
    }
