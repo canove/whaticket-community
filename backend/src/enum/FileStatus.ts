@@ -4,7 +4,7 @@ export enum FileStatus {
   Processing,
   WaitingApprove,
   Error,
-  Recused,
-  Shooting,
-  Finished,
+  WaitingDispatcher,
+  Sending,
+  Finished
 };
