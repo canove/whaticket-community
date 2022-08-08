@@ -3,7 +3,7 @@ import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 
 interface Request {
-  official?: boolean | string;
+  official?: unknown;
 }
 
 const ListWhatsAppsService = async ({

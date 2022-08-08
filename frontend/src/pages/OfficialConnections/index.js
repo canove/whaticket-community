@@ -104,7 +104,7 @@ const OfficialConnections = () => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
-				const { data } = await api.get(`/whatsapp/?official=true`);
+				const { data } = await api.get(`/whatsapp?official=true`);
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
 			} catch (err) {
