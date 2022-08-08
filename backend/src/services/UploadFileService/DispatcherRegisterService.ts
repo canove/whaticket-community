@@ -32,7 +32,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
       });
 
       payload.push({
-        company: account?.facebookPhoneNumberId,
+        company: account?.facebookBusinessId,
         person: reg.documentNumber,
         activationMessage: {
           msgid: reg.id,

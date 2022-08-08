@@ -3,6 +3,7 @@ import AppError from "../../errors/AppError";
 import FileRegister from "../../database/models/FileRegister";
 import { FileStatus } from "../../enum/FileStatus";
 import File from "../../database/models/File";
+import Message from "../../database/models/Message";
 
 interface Request {
   msgId: number;
@@ -47,6 +48,31 @@ const StatusMessageWhatsappService = async ({
       }
     });
   }
+
+  if (!register && msgWhatsId) {
+    const msgRegister = await Message.findOne({
+      where: {
+        id: msgWhatsId
+      }
+    });
+
+   if (msgRegister) {
+    switch(statusType){
+      case "sent":
+        await msgRegister?.update({ ack: 1 });
+        break;
+      case "delivered":
+        await msgRegister?.update({ ack: 2 });
+        break;
+      case "read":
+        await msgRegister?.update({ ack:3, read: 1 });
+        break;
+    }
+
+    return { success: true }
+   }
+  }
+
 
   if (!register) {
     return { success: false };
