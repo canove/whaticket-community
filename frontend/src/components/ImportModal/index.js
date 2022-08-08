@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { InputLabel, MenuItem, Select } from "@material-ui/core";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -67,6 +68,7 @@ const ImportModal = ({ open, onClose }) => {
 
     const [file, setFile] = useState();
 	const [selectedType, setSelectedType] = useState(true);
+	const [selectedConnection, setSelectedConnection] = useState("placeholder");
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
 
@@ -98,6 +100,10 @@ const ImportModal = ({ open, onClose }) => {
 		setSelectedType(e.target.value);
 	}
 
+	const handleChangeConnection = (e) => {
+		setSelectedConnection(e.target.value);
+	}
+
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -123,6 +129,20 @@ const ImportModal = ({ open, onClose }) => {
 						>
 							<MenuItem value={true}>Oficial</MenuItem>
 							<MenuItem value={false}>Não Oficial</MenuItem>
+						</Select>
+					</div>
+					<div className={classes.multFieldLine}>
+						<Typography variant="subtitle1" gutterBottom>
+                        	Conexão: 
+						</Typography>
+						<Select
+							labelId="type-select-label"
+							id="type-select"
+							value={selectedConnection}
+							label="Type"
+							onChange={handleChangeConnection}
+						>
+							<MenuItem value={"placeholder"} disabled>Selecione uma Conexão</MenuItem>
 						</Select>
 					</div>
 					<div className={classes.multFieldLine}>
