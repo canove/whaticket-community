@@ -305,11 +305,6 @@ const Importation = () => {
                           <>
                             <IconButton
                               size="small"
-                            >
-                              <Done />
-                            </IconButton>
-                            <IconButton
-                              size="small"
                               onClick={() => handleOpenRegisterFileModal(item.id)}
                             >
                               <Visibility />
