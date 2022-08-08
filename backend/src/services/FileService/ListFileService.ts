@@ -26,6 +26,7 @@ const ListFileService = async ({
   // eslint-disable-next-line no-return-await
   return await File.findAll({
     where: where,
+    order: [['createdAt', 'DESC']],
     limit
   });
 };
