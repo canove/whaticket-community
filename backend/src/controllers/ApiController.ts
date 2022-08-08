@@ -16,6 +16,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ListFileService from "../services/FileService/ListFileService";
 import { FileStatus } from "../enum/FileStatus";
 import ImportFileService from "../services/UploadFileService/ImportFileService";
+import DispatcherRegisterService from "../services/UploadFileService/DispatcherRegisterService";
 
 type MessageData = {
   body: string;
@@ -68,6 +69,26 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
       await file.update({ Status: FileStatus.Processing });
       await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
     });
+  }
+
+  return res.status(200).json('request is processed');
+};
+
+export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
+  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher,initialDate:null, limit: 1 });
+  const sendingFiles = await ListFileService({ Status: FileStatus.Sending,initialDate:null, limit: 1 });
+
+  if (sendingFiles?.length > 0) {
+    sendingFiles.forEach(async (file) => {
+      await DispatcherRegisterService({ file: file });
+    });
+  } else {
+    if (files?.length > 0) {
+      files.forEach(async (file) => {
+        await file.update({ Status: FileStatus.Sending });
+        await DispatcherRegisterService({ file: file });
+      });
+    }
   }
 
   return res.status(200).json('request is processed');

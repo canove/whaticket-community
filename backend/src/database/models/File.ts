@@ -13,6 +13,7 @@ import {
   Default
 } from "sequelize-typescript";
 import User from "./User";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class File extends Model<File> {
@@ -61,6 +62,10 @@ class File extends Model<File> {
   @ForeignKey(() => User)
   @Column
   ownerid: number;
+
+  @ForeignKey(() => Whatsapp)
+  @Column
+  whatsappId: number;
 }
 
 export default File;

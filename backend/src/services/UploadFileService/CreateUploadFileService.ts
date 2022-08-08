@@ -7,6 +7,7 @@ interface Request {
   name: string;
   ownerid: string;
   official: string;
+  whatsappId: number;
   filePath: string;
 }
 
@@ -17,6 +18,7 @@ const CreateUploadFileService = async ({
   name,
   ownerid,
   official,
+  whatsappId,
   filePath
 }: Request): Promise<Response | null> => {
   const s3 = new AWS.S3({
@@ -38,21 +40,17 @@ const CreateUploadFileService = async ({
     Body: fileContent
   } as AWS.S3.PutObjectRequest;
 
-  try {
-    const data = await s3.upload(params).promise();
-    const url = data.Location;
-    const file = await File.create({
-      url,
-      name,
-      ownerid,
-      official,
-      status: 0
-    });
-    return file;
-  } catch(e) {
-    return null;
-  }
-  
+  const data = await s3.upload(params).promise();
+  const url = data.Location;
+  const file = await File.create({
+    url,
+    name,
+    ownerid,
+    official,
+    whatsappId,
+    status: 0
+  });
+  return file;
 };
 
 export default CreateUploadFileService;

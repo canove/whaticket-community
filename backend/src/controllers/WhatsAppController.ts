@@ -9,6 +9,8 @@ import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsServi
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 import NewMessageWhatsapp from "../services/WhatsappService/NewMessageWhatsappService";
+import StatusMessageWhatsappService from "../services/WhatsappService/StatusMessageWhatsappService";
+import ListOfficialWhatsAppsService from "../services/WhatsappService/ListOfficialWhatsAppsService";
 
 interface WhatsappData {
   name: string;
@@ -24,8 +26,7 @@ interface WhatsappData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { official }: WhatsappData = req.body;
-  const whatsapps = await ListWhatsAppsService({ official });
+  const whatsapps = await ListWhatsAppsService();
 
   return res.status(200).json(whatsapps);
 };
@@ -129,6 +130,14 @@ export const remove = async (
   return res.status(200).json({ message: "Whatsapp deleted." });
 };
 
+export const list = async (req: Request, res: Response): Promise<Response> => {
+  const { official } = req.params;
+
+  const whatsapp = await ListOfficialWhatsAppsService(official);
+
+  return res.status(200).json(whatsapp);
+};
+
 export const newMessage = async (
   req: Request,
   res: Response
@@ -156,6 +165,18 @@ export const newMessage = async (
     contactName,
     identification
   });
+
+  return res.status(200).json(message);
+};
+
+export const messageStatus = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+
+  const { statusType, msgId, msgWhatsId } = req.body;
+
+  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId });
 
   return res.status(200).json(message);
 };

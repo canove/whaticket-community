@@ -13,12 +13,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
     const filePath = files.file.filepath;
 
-    const { ownerid, name, official } = fields;
+    const { ownerid, name, official, whatsappId } = fields;
 
     const file = await CreateUploadFileService({
       name,
       ownerid,
       official,
+      whatsappId,
       filePath
     });
 

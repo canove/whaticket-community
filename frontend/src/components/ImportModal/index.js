@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -17,6 +17,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { InputLabel, MenuItem, Select } from "@material-ui/core";
 import toastError from "../../errors/toastError";
 import { useHistory } from "react-router-dom";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -66,9 +67,11 @@ const ImportModal = ({ open, onClose }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const { user } = useContext(AuthContext);
+	const { whatsApps } = useContext(WhatsAppsContext);
 
     const [file, setFile] = useState();
 	const [selectedType, setSelectedType] = useState(true);
+	const [selectedConnection, setSelectedConnection] = useState("placeholder");
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
 	const history = useHistory();
@@ -90,6 +93,7 @@ const ImportModal = ({ open, onClose }) => {
 		formData.set("ownerid", user.id);
 		formData.set("name", file.name);
 		formData.set("official", selectedType);
+		formData.set("whatsappId", selectedConnection);
 
 		await api.post("file/upload", formData);
 
@@ -99,6 +103,10 @@ const ImportModal = ({ open, onClose }) => {
 
 	const handleChange = (e) => {
 		setSelectedType(e.target.value);
+	}
+
+	const handleChangeConnection = (e) => {
+		setSelectedConnection(e.target.value);
 	}
 
 	return (
@@ -126,6 +134,27 @@ const ImportModal = ({ open, onClose }) => {
 						>
 							<MenuItem value={true}>Oficial</MenuItem>
 							<MenuItem value={false}>Não Oficial</MenuItem>
+						</Select>
+					</div>
+					<div className={classes.multFieldLine}>
+						<Typography variant="subtitle1" gutterBottom>
+                        	Conexão:
+						</Typography>
+						<Select
+							labelId="type-select-label"
+							id="type-select"
+							value={selectedConnection}
+							label="Type"
+							onChange={handleChangeConnection}
+						>
+							<MenuItem value={"placeholder"} disabled>Selecione uma Conexão</MenuItem>
+							{whatsApps && whatsApps.map((whats, index) => {
+								if (whats.official === selectedType) {
+									return (
+										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+									)
+								}
+							})}
 						</Select>
 					</div>
 					<div className={classes.multFieldLine}>
