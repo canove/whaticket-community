@@ -2,13 +2,14 @@ import { Op } from "sequelize";
 import File from "../../database/models/File";
 
 
-interface Response {};
+interface Response {
+};
 
 const ListFileService = async ({
   Status,
   initialDate,
   limit = null
-}): Promise<File[] | undefined> => {
+}): Promise< unknown > => {
   let where = null;
   if (Status !== undefined && !initialDate) {
     where = {
@@ -24,10 +25,14 @@ const ListFileService = async ({
   }
 
   // eslint-disable-next-line no-return-await
-  return await File.findAll({
+  //const { count, rows: tickets } = await Ticket.findAndCountAll(
+  const { count, rows:files } = await File.findAndCountAll({
     where: where,
     limit
   });
+
+  return {files, count}
+
 };
 
 export default ListFileService

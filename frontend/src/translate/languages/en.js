@@ -48,6 +48,18 @@ const messages = {
           },
           closed: {
             title: "Closed"
+          },
+          imported: {
+            title: "Imported"
+          },
+          sent: {
+            title: "Sent"
+          },
+          handedOut: {
+            title: "Hande Out"
+          },
+          read: {
+            title: "Read"
           }
         }
       },

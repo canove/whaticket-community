@@ -49,6 +49,18 @@ const messages = {
           },
           closed: {
             title: "Finalizado"
+          },
+          imported: {
+            title: "Importado"
+          },
+          sent: {
+            title: "Enviado"
+          },
+          handedOut: {
+            title: "Entregado"
+          },
+          read: {
+            title: "Leer"
           }
         }
       },

@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { InputLabel, MenuItem, Select } from "@material-ui/core";
+import toastError from "../../errors/toastError";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -69,6 +71,7 @@ const ImportModal = ({ open, onClose }) => {
 	const [selectedType, setSelectedType] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
+	const history = useHistory();
 
 	const handleClose = () => {
 		onClose();
@@ -112,7 +115,7 @@ const ImportModal = ({ open, onClose }) => {
                 <DialogContent dividers>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-                        	Tipo de Disparo: 
+                        	Tipo de Disparo:
 						</Typography>
 						<Select
 							labelId="type-select-label"
@@ -143,7 +146,7 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-							Modelo de disparo suportado: 
+							Modelo de disparo suportado:
 						</Typography>
 						<Button onClick={() => setShowInfo(!showInfo)}>{showInfo ? "Esconder" : "Mostrar"}</Button>
 					</div>

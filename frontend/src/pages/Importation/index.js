@@ -196,7 +196,7 @@ const Importation = () => {
     try {
       setLoading(true);
       const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
-      setImports(data);
+      setImports(data.files);
       setLoading(false);
     } catch (err) {
       toastError(err);
