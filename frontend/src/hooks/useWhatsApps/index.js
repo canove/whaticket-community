@@ -15,7 +15,6 @@ const reducer = (state, action) => {
 		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
 		if (whatsAppIndex !== -1 || whatsApp.official === true) {
 			state[whatsAppIndex] = whatsApp;
-			console.log(...state);
 			return [...state];
 		} else {
 			return [whatsApp, ...state];
