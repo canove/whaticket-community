@@ -58,7 +58,7 @@ const SendWhatsAppMessage = async ({
         }
       });
       
-      if(!messageSended)
+      if(!messageSended && !contact)
         throw new AppError("ERR_SENDING_WAPP_MSG");
 
       const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
@@ -66,7 +66,7 @@ const SendWhatsAppMessage = async ({
         "messaging_product": "whatsapp",
         "preview_url": false,
         "recipient_type": "individual",
-        "to": messageSended?.phoneNumber,
+        "to": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
         "type": "text",
         "text": {
           "body": formatBody(body, ticket.contact)
