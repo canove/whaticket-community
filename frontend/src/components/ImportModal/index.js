@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -8,14 +8,11 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import InfoIcon from '@material-ui/icons/Info';
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { InputLabel, MenuItem, Select } from "@material-ui/core";
-import toastError from "../../errors/toastError";
+import { MenuItem, Select } from "@material-ui/core";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(theme => ({
@@ -121,7 +118,7 @@ const ImportModal = ({ open, onClose }) => {
                 <DialogContent dividers>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-                        	Tipo de Disparo: 
+                        	{i18n.t('importModal.form.shotType')}
 						</Typography>
 						<Select
 							labelId="type-select-label"
@@ -130,13 +127,13 @@ const ImportModal = ({ open, onClose }) => {
 							label="Type"
 							onChange={handleChange}
 						>
-							<MenuItem value={true}>Oficial</MenuItem>
-							<MenuItem value={false}>Não Oficial</MenuItem>
+							<MenuItem value={true}>{i18n.t('importModal.form.official')}</MenuItem>
+							<MenuItem value={false}>{i18n.t('importModal.form.notOfficial')}</MenuItem>
 						</Select>
 					</div>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-                        	Conexão: 
+                        	{i18n.t('importModal.form.connection')}
 						</Typography>
 						<Select
 							labelId="type-select-label"
@@ -145,7 +142,7 @@ const ImportModal = ({ open, onClose }) => {
 							label="Type"
 							onChange={handleChangeConnection}
 						>
-							<MenuItem value={"placeholder"} disabled>Selecione uma Conexão</MenuItem>
+							<MenuItem value={"placeholder"} disabled>{i18n.t('importModal.form.selectAConnection')}</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
 								if (whats.official === selectedType) {
 									return (
@@ -173,9 +170,10 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-							Modelo de disparo suportado: 
+							{i18n.t('importModal.form.supportedTriggerModel')}
 						</Typography>
-						<Button onClick={() => setShowInfo(!showInfo)}>{showInfo ? "Esconder" : "Mostrar"}</Button>
+						<Button onClick={() => setShowInfo(!showInfo)}>{showInfo ? "Esconder" : "Mostrar"}
+						</Button>
 					</div>
 					<div>
 						{showInfo && (

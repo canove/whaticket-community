@@ -16,7 +16,7 @@ import ticketsReportRoutes from "./ticketsReportRoutes";
 import ticketsExportReportRoutes from "./ticketsExportReportRoutes";
 import ticketsExportReportTalkRoutes from "./ticketsExportReportTalkRoutes";
 import fileRoutes from "./fileRoutes";
-
+import registerRoutes from "./registersRoutes";
 const routes = Router();
 
 routes.use(userRoutes);
@@ -35,6 +35,6 @@ routes.use(ticketsReportRoutes);
 routes.use(ticketsExportReportRoutes);
 routes.use(ticketsExportReportTalkRoutes);
 routes.use(fileRoutes);
-
+routes.use(registerRoutes);
 
 export default routes;
