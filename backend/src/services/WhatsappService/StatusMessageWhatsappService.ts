@@ -101,7 +101,7 @@ const StatusMessageWhatsappService = async ({
       await register?.update({ readAt: new Date() });
       break;
     case "error":
-      await msgRegister?.update({ errorAt: new Date(), errorMessage: errorMessage });
+      await register?.update({ errorAt: new Date(), errorMessage: errorMessage });
       break;
   }
 
