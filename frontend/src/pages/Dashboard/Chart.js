@@ -81,8 +81,8 @@ const Chart = () => {
 							angle={270}
 							position="left"
 							style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-						>
-							Chamadas
+						>	{i18n.t("dashboard.charts.perDay.calls")}
+
 						</Label>
 					</YAxis>
 					<Bar dataKey="amount" fill={theme.palette.primary.main} />

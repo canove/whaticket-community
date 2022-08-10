@@ -37,6 +37,7 @@ const messages = {
         charts: {
           perDay: {
             title: "Chamadas hoje: ",
+            calls: "Chamadas"
           },
         },
         messages: {
@@ -48,6 +49,18 @@ const messages = {
           },
           closed: {
             title: "Finalizado"
+          },
+          imported: {
+            title: "Importado"
+          },
+          sent: {
+            title: "Enviado"
+          },
+          handedOut: {
+            title: "Entregue"
+          },
+          read: {
+            title: "Lidos"
           }
         }
       },
@@ -153,18 +166,6 @@ const messages = {
           whatsapp: "WhatsApp",
           email: "Email",
           actions: "Ações",
-        },
-      },
-      importModal: {
-        title: "Importar",
-        buttons: {
-          uploadFile: "Importar Arquivo",
-          cancel: "Cancelar",
-          import: "Importar",
-        },
-        form: {
-          noFile: "Nenhum Arquivo Importado",
-          uploadedFile: "Arquivo Importado",
         },
       },
       contactModal: {
@@ -387,6 +388,40 @@ const messages = {
           sentBy: "Enviado por",
           numberOfRecords: "Quantidade de Registros",
           status: "Status",
+          official: "Oficial",
+          actions: "Ações",
+        },
+        registryModal:{
+          title: "Registros",
+          id: "Id",
+          name: "Nome",
+          template: "Template",
+          message: "Mensagem",
+          phoneNumber: "Número de Telefone",
+          documentNumber: "Número de Documento",
+          cancel: "Cancelar",
+          refuse: "Recusar",
+          approve: "Aprovar",
+        },
+      },
+      importModal: {
+        title: "Importar",
+        buttons: {
+          uploadFile: "Importar Arquivo",
+          cancel: "Cancelar",
+          import: "Importar",
+        },
+        form: {
+          shotType: "Tipo de Disparo",
+          official: "Oficial",
+          notOfficial: "Não Oficial",
+          noFile: "Nenhum Arquivo Importado",
+          uploadedFile: "Arquivo Importado",
+          supportedTriggerModel: "Modelo de Disparo Suportado",
+          connection:"Conexão",
+          selectAConnection: "Selecione uma Conexão",
+          show: "Mostrar",
+          toHide: "Esconder"
         },
       },
       users: {

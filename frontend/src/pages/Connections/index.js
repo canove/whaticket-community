@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect, useReducer } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -39,7 +39,6 @@ import WhatsAppModal from "../../components/WhatsAppModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
 import { useTranslation } from 'react-i18next'
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({

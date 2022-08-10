@@ -37,6 +37,7 @@ const messages = {
         charts: {
           perDay: {
             title: "Tickets today: ",
+            calls: "Calls",
           },
         },
         messages: {
@@ -48,6 +49,18 @@ const messages = {
           },
           closed: {
             title: "Closed"
+          },
+          imported: {
+            title: "Imported"
+          },
+          sent: {
+            title: "Sent"
+          },
+          handedOut: {
+            title: "Hande Out"
+          },
+          read: {
+            title: "Read"
           }
         }
       },
@@ -152,18 +165,6 @@ const messages = {
           whatsapp: "WhatsApp",
           email: "Email",
           actions: "Actions",
-        },
-      },
-      importModal: {
-        title: "Import",
-        buttons: {
-          uploadFile: "Upload File",
-          cancel: "Cancel",
-          import: "Import",
-        },
-        form: {
-          noFile: "No File Uploaded",
-          uploadedFile: "Uploaded File",
         },
       },
       contactModal: {
@@ -385,6 +386,40 @@ const messages = {
           sentBy: "Sent By",
           numberOfRecords: "Number of Records",
           status: "Status",
+          official: "Official",
+          actions: "Actions",
+        },
+        registryModal:{
+          title: "Registry",
+          id: "Id",
+          name: "Name",
+          template: "Template",
+          message: "Message",
+          phoneNumber: "Phone Number",
+          documentNumber: "Document Number",
+          cancel: "Cancel",
+          refuse: "Refuse",
+          approve: "To Approve",
+        },
+      },
+      importModal: {
+        title: "Import",
+        buttons: {
+          uploadFile: "Upload File",
+          cancel: "Cancel",
+          import: "Import",
+        },
+        form: {
+          noFile: "No File Uploaded",
+          uploadedFile: "Uploaded File",
+          shotType: "Shot Type",
+          official: "Official",
+          notOfficial: "Not Official",
+          supportedTriggerModel: "Supported Trigger Model",
+          connection:"Connection",
+          selectAConnection: "Select A Connetion",
+          show: "Show",
+          toHide: "To Hide",
         },
       },
       users: {
