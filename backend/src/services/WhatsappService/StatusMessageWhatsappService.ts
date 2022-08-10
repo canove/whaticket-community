@@ -100,6 +100,9 @@ const StatusMessageWhatsappService = async ({
     case "read":
       await register?.update({ readAt: new Date() });
       break;
+    case "error":
+      await msgRegister?.update({ errorAt: new Date(), errorMessage: errorMessage });
+      break;
   }
 
   var registersCount = await FileRegister.count({
