@@ -38,6 +38,7 @@ const messages = {
         charts: {
           perDay: {
             title: "Tickets hoy: ",
+            calls: "Iiamadas"
           },
         },
         messages: {
@@ -167,18 +168,6 @@ const messages = {
           whatsapp: "WhatsApp",
           email: "Correo Electrónico",
           actions: "Acciones",
-        },
-      },
-      importModal: {
-        title: "Import",
-        buttons: {
-          uploadFile: "Upload File",
-          cancel: "Cancel",
-          import: "Import",
-        },
-        form: {
-          noFile: "No File Uploaded",
-          uploadedFile: "Uploaded File",
         },
       },
       contactModal: {
@@ -388,19 +377,53 @@ const messages = {
       importation: {
         title: "Importar",
         form: {
-          status: "Status",
-          date: "Date",
+          status: "Estado",
+          date: "Fecha",
         },
         buttons: {
-          import: "Import",
-          filter: "Filter",
+          import: "Fotos Importadas",
+          filter: "Filtrar",
         },
         table: {
-          uploadDate: "Upload Date",
-          fileName: "File Name",
-          sentBy: "Sent By",
-          numberOfRecords: "Number of Records",
-          status: "Status",
+          uploadDate: "Fecha de Carga",
+          fileName: "Nombre del Archivo",
+          sentBy: "Enviado Por",
+          numberOfRecords: "Número de Registros",
+          status: "Estado",
+          official: "Oficial",
+          actions: "Comportamiento",
+        },
+        registryModal:{
+          title: "Registros",
+          id: "Id",
+          name: "Nombre",
+          template: "Template",
+          message: "Mensaje",
+          phoneNumber: "Número de Teléfono",
+          documentNumber: "Número del Documento",
+          cancel: "Cancelar",
+          refuse: "Rechazar",
+          approve: "Aprobar",
+        },
+      },
+      importModal: {
+        title: "Importar",
+        buttons: {
+          uploadFile: "Importar Archivo",
+          cancel: "Cancelar",
+          import: "Importar",
+        },
+        form: {
+          shotType: "Tipo de Disparo",
+          official: "Oficial",
+          notOfficial: "No Oficial",
+          noFile: "Sin Archivos Importados",
+          uploadedFile: "Archivo Importado",
+          supportedTriggerModel: "Modelo de Disparo Compatible",
+          connection:"Conexión",
+          selectAConnection: "Seleccione una Conexión",
+          show: "Mostrar",
+          toHide: "Esconder"
         },
       },
       users: {

@@ -8,9 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 
 import useTickets from "../../hooks/useTickets";
-
 import { AuthContext } from "../../context/Auth/AuthContext";
-
 import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -44,12 +42,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Dashboard = () => {
-  const classes = useStyles();
-  const { i18n } = useTranslation();
-  const { user } = useContext(AuthContext);
-  var userQueueIds = [];
-  const [importCount, setImportCount] = useState(0)
-  const [loading, setLoading] = useState(false);
+  	const classes = useStyles();
+  	const { i18n } = useTranslation();
+  	const { user } = useContext(AuthContext);
+  	var userQueueIds = [];
+  	const [loading, setLoading] = useState(false);
+	const [registerCount, setRegisterCount] = useState(0)
+	const [sentCount, setSentCount] = useState(0)
+	const [deliveredCount, setDeliveredCount] = useState(0)
+	const [readCount, setReadCount] = useState(0)
+
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -64,22 +66,29 @@ const Dashboard = () => {
     });
     return count;
   };
-  useEffect(() => {
-	 const handleFilter = async () => {
-    setLoading(true);
-    try {
-      setLoading(true);
-      const { data } = await api.get(`file/list`);
-      setImportCount(data.count);
-      setLoading(false);
-    } catch (err) {
-      toastError(err);
-    }
-  };
-    handleFilter();
-  }, []);
-
-
+	useEffect(() => {
+		const handleFilter = async () => {
+			setLoading(true);
+		try {
+			setLoading(true);
+		let response = await api.get('/registers/list?type');
+				setRegisterCount(response.data.count);
+				setLoading(false);
+			response = await api.get('/registers/list?type=sent');
+				setSentCount(response.data.count);
+				setLoading(false);
+			response = await api.get('/registers/list?type=delivered');
+				setDeliveredCount(response.data.count);
+				setLoading(false);
+			response = await api.get('/registers/list?type=read');
+				setReadCount(response.data.count);
+				setLoading(false);
+		} catch (err) {
+			toastError(err);
+		}
+	};
+		handleFilter();
+	}, []);
 
   return (
     <div>
@@ -140,7 +149,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {importCount}
+                  {registerCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -155,7 +164,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {GetTickets("sent", "true", "false")}
+                 {sentCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -170,7 +179,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {GetTickets("handed out", "true", "false")}
+                  {deliveredCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -185,7 +194,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {GetTickets("read", "true", "false")}
+                  {readCount}
                 </Typography>
               </Grid>
             </Paper>

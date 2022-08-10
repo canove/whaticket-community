@@ -200,7 +200,7 @@ const Importation = () => {
     try {
       setLoading(true);
       const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
-      setImports(data.files);
+      setImports(data);
       setLoading(false);
     } catch (err) {
       toastError(err);
@@ -278,10 +278,10 @@ const Importation = () => {
                 {i18n.t("importation.table.status")}
               </TableCell>
               <TableCell align="center">
-                Oficial
+                {i18n.t("importation.table.official")}
               </TableCell>
               <TableCell align="center">
-								Ações
+								{i18n.t("importation.table.actions")}
 							</TableCell>
             </TableRow>
           </TableHead>

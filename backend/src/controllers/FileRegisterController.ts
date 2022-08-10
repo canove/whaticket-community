@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import ListFileRegistersService from "../services/UploadFileService/ListFileRegistersService";
+import ListFileRegistersService from "../services/FileRegisterService/ListFileRegistersService";
 
 type IndexQuery = {
   fileId: number;
