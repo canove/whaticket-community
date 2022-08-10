@@ -278,10 +278,10 @@ const Importation = () => {
                 {i18n.t("importation.table.status")}
               </TableCell>
               <TableCell align="center">
-                Oficial
+                {i18n.t("importation.table.official")}
               </TableCell>
               <TableCell align="center">
-								Ações
+								{i18n.t("importation.table.actions")}
 							</TableCell>
             </TableRow>
           </TableHead>
