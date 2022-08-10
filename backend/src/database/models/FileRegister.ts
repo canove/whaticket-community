@@ -51,6 +51,14 @@ class FileRegister extends Model<FileRegister> {
 
   @AllowNull(true)
   @Column
+  errorAt: Date;
+
+  @AllowNull(true)
+  @Column
+  errorMessage: string;
+
+  @AllowNull(true)
+  @Column
   deliveredAt: Date;
 
   @AllowNull(true)
