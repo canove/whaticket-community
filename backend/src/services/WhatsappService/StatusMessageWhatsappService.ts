@@ -10,6 +10,7 @@ interface Request {
   msgId: number;
   statusType: string;
   msgWhatsId?: string;
+  errorMessage?: string;
 }
 
 interface Response {
@@ -18,7 +19,8 @@ interface Response {
 const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
-  msgWhatsId
+  msgWhatsId,
+  errorMessage
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     statusType: Yup.string().required()
@@ -57,7 +59,7 @@ const StatusMessageWhatsappService = async ({
       }
     });
 
-   if (msgRegister) {
+   if(msgRegister) {
     switch(statusType){
       case "sent":
         await msgRegister?.update({ ack: 1 });
@@ -67,6 +69,9 @@ const StatusMessageWhatsappService = async ({
         break;
       case "read":
         await msgRegister?.update({ ack:3, read: 1 });
+        break;
+      case "error":
+        await msgRegister?.update({ errorAt: new Date(), errorMessage: errorMessage });
         break;
     }
 
