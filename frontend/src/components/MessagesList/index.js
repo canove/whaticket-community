@@ -373,6 +373,12 @@ const MessagesList = ({ ticketId, isGroup }) => {
       }
     });
 
+    socket.on("whatsapp-message", (data) => {
+      if (data.action === "update") {
+        dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+      }
+    });
+
     return () => {
       socket.disconnect();
     };

@@ -70,11 +70,11 @@ const StatusMessageWhatsappService = async ({
         break;
     }
 
-    /*const io = getIO();
-    io.emit("whatsapp", {
+    const io = getIO();
+    io.to(msgRegister.ticketId.toString()).emit("whatsapp-message", {
       action: "update",
-      msgRegister
-    });*/
+      message: msgRegister
+    });
 
     return { success: true }
    }
