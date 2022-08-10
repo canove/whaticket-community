@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
+import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -56,6 +57,33 @@ const reducer = (state, action) => {
     return [...state, ...newUsers];
   }
 
+  if (action.type === "LOAD_FILES") {
+    const files = action.payload;
+    const newFiles = [];
+
+    files.forEach((file) => {
+      const fileIndex = state.findIndex((f) => f.id === file.id);
+      if (fileIndex !== -1) {
+        state[fileIndex] = file;
+      } else {
+        newFiles.push(file);
+      }
+    });
+
+    return [...state, ...newFiles];
+  }
+
+  if (action.type === "UPDATE_FILES") {
+    const file = action.payload;
+    const fileIndex = state.findIndex((f) => f.id === file.id);
+
+    if (fileIndex !== -1) {
+      state[fileIndex] = file;
+      return [...state];
+    } else {
+      return [file, ...state];
+    }
+  }
   if (action.type === "RESET") {
     return [];
   }
@@ -68,15 +96,16 @@ const Importation = () => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("");
-  const [imports, setImports] = useState([]);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState("");
 
   const [users, dispatchUsers] = useReducer(reducer, []);
+  const [imports, dispatchImports] = useReducer(reducer, []);
 
   useEffect(() => {
     dispatchUsers({ type: "RESET" });
+    dispatchImports({ type: "RESET" });
   }, []);
 
   useEffect(() => {
@@ -200,12 +229,26 @@ const Importation = () => {
     try {
       setLoading(true);
       const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
-      setImports(data);
+      dispatchImports({ type: "LOAD_FILES", payload: data });
       setLoading(false);
     } catch (err) {
       toastError(err);
     }
   };
+
+  useEffect(() => {
+    const socket = openSocket();
+
+    socket.on("file", (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatchImports({ type: "UPDATE_FILES", payload: data.file });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <MainContainer>

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import formidable from "formidable";
+import { getIO } from "../libs/socket";
 import CreateUploadFileService from "../services/UploadFileService/CreateUploadFileService";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
@@ -21,6 +22,12 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       official,
       whatsappId,
       filePath
+    });
+
+    const io = getIO();
+    io.emit("file", {
+      action: "create",
+      file
     });
 
     return res.status(200).json(file);
