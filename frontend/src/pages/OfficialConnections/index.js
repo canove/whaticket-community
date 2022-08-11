@@ -239,6 +239,9 @@ const OfficialConnections = () => {
 					<TableHead>
 						<TableRow>
 							<TableCell align="center">
+								Qualidade
+							</TableCell>
+							<TableCell align="center">
 								{i18n.t("connections.table.name")}
 							</TableCell>
 							<TableCell align="center">
@@ -266,6 +269,7 @@ const OfficialConnections = () => {
 								{whatsApps?.length > 0 &&
 									whatsApps.map(whatsApp => (
 										<TableRow key={whatsApp.id}>
+											<TableCell align="center"></TableCell>
 											<TableCell align="center">{whatsApp.name}</TableCell>
 											<TableCell align="center">
 												Status
