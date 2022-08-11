@@ -113,12 +113,17 @@ const StatusMessageWhatsappService = async ({
   });
   
   if (registersCount == 0) {
+    const io = getIO();
     const file = await File.findOne({
         where: {
           id: register?.fileId
         }
     })
     await file.update({ Status: FileStatus.Finished });
+    io.emit("file", {
+      action: "update",
+      file
+    });
   }
 
   return { success: true };

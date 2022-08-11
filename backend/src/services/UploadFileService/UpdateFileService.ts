@@ -5,7 +5,7 @@ const UpdateFileService = async ({
     status,
     userId,
     fileId
-}): Promise<string | undefined> => {
+}): Promise<unknown> => {
   const file = await ShowFileService(fileId);
   const date = new Date();
 
@@ -13,17 +13,18 @@ const UpdateFileService = async ({
     await file.update({ Status: FileStatus.WaitingDispatcher });
     await file.update({ approvedAt: date });
     await file.update({ approvedOrRefusedId: userId });
-    return "Success";
+    return file;
   }
 
   if (status == '7') {
-    await file.update({ Status: FileStatus.Refused })
+    await file.update({ Status: FileStatus.Refused });
     await file.update({ refusedAt: date });
     await file.update({ approvedOrRefusedId: userId });
-    return "Success";
+    return file;
   }
 
-  return "Error";
+  await file.update({ Status: FileStatus.Error });
+  return file;
 }
 
 export default UpdateFileService;
