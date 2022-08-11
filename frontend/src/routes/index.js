@@ -20,6 +20,7 @@ import Importation from "../pages/Importation"
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import Route from "./Route";
+import Templates from "../pages/Templates";
 
 const Routes = () => {
   return (
@@ -49,6 +50,7 @@ const Routes = () => {
                 component={OfficialConnections}
                 isPrivate
               />
+              <Route exact path="/templates" component={Templates} isPrivate />
               <Route exact path="/contacts" component={Contacts} isPrivate />
               <Route exact path="/users" component={Users} isPrivate />
               <Route

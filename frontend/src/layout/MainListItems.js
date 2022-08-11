@@ -17,6 +17,7 @@ import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutlined";
 import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
 import ImportExportOutlinedIcon from '@material-ui/icons/ImportExportOutlined';
+import DvrIcon from "@material-ui/icons/Dvr";
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { AuthContext } from "../context/Auth/AuthContext";
@@ -93,6 +94,11 @@ const MainListItems = (props) => {
         to="/officialConnections"
         primary={i18n.t("mainDrawer.listItems.officialConnections")}
         icon={<SyncAltIcon />}
+      />
+      <ListItemLink
+        to="/templates"
+        primary={i18n.t("mainDrawer.listItems.template")}
+        icon={<DvrIcon />}
       />
       <ListItemLink
         to="/tickets"
