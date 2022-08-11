@@ -7,6 +7,7 @@ import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
@@ -183,39 +184,40 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
     <div className={classes.root}>
       <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
         <DialogTitle id="form-dialog-title">{i18n.t("importation.registryModal.title")}
-          <Divider />
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center">{i18n.t("importation.registryModal.id")}</TableCell>
-                  <TableCell align="center">{i18n.t("importation.registryModal.name")}</TableCell>
-                  <TableCell align="center">{i18n.t("importation.registryModal.template")}</TableCell>
-                  <TableCell align="center">{i18n.t("importation.registryModal.message")}</TableCell>
-                  <TableCell align="center">{i18n.t("importation.registryModal.phoneNumber")}</TableCell>
-                  <TableCell align="center">{i18n.t("importation.registryModal.documentNumber")}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-              <>
-                {fileRegister && fileRegister.map((item, index) => {
-                  return (
-                    <TableRow key={index}>
-                      <TableCell align="center">{item.id}</TableCell>
-                      <TableCell align="center">{item.name}</TableCell>
-                      <TableCell align="center">{item.template}</TableCell>
-                      <TableCell align="center">{item.message}</TableCell>
-                      <TableCell align="center">{item.phoneNumber}</TableCell>
-                      <TableCell align="center">{item.documentNumber}</TableCell>
-                    </TableRow>
-                  );
-                  })}
-                {loading}
-              </>
-            </TableBody>
-            </Table>
-          </TableContainer>
-        </DialogTitle>
+          <DialogContent dividers>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">{i18n.t("importation.registryModal.id")}</TableCell>
+                    <TableCell align="center">{i18n.t("importation.registryModal.name")}</TableCell>
+                    <TableCell align="center">{i18n.t("importation.registryModal.template")}</TableCell>
+                    <TableCell align="center">{i18n.t("importation.registryModal.message")}</TableCell>
+                    <TableCell align="center">{i18n.t("importation.registryModal.phoneNumber")}</TableCell>
+                    <TableCell align="center">{i18n.t("importation.registryModal.documentNumber")}</TableCell>
+                  </TableRow>
+                </TableHead>
+                  <TableBody>
+                    <>
+                      {fileRegister && fileRegister.map((item, index) => {
+                        return (
+                          <TableRow key={index}>
+                            <TableCell align="center">{item.id}</TableCell>
+                            <TableCell align="center">{item.name}</TableCell>
+                            <TableCell align="center">{item.template}</TableCell>
+                            <TableCell align="center">{item.message}</TableCell>
+                            <TableCell align="center">{item.phoneNumber}</TableCell>
+                            <TableCell align="center">{item.documentNumber}</TableCell>
+                          </TableRow>
+                        );
+                        })}
+                      {loading}
+                    </>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </DialogContent>
+          </DialogTitle>
         <DialogActions>
           {pageNumber > 1 && (
             <>

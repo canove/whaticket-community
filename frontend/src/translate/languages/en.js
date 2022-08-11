@@ -309,6 +309,7 @@ const messages = {
           dashboard: "Dashboard",
           connections: "Connections",
           officialConnections: "Official Connections",
+          template: "Templates",
           tickets: "Tickets",
           contacts: "Contacts",
           quickAnswers: "Quick Answers",
@@ -526,6 +527,30 @@ const messages = {
         confirmationModal: {
           title: "Delete message?",
           message: "This action cannot be reverted.",
+        },
+      },
+
+    templates: {
+        title: "Templates",
+        table:{
+          name: "Name",
+          preview: "Preview",
+          category: "Category",
+          classification: "Classification",
+          language: "Language",
+          status: "Status",
+        },
+        buttons:{
+          newTemplate: "New Template",
+          cancel: "Cancel",
+          add: "Add",
+        },
+        templateModal:{
+          title: "New Template",
+          name: "Name",
+          category: "Category",
+          body: "Body",
+          footer: "Footer",
         },
       },
       backendErrors: {

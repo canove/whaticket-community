@@ -311,6 +311,7 @@ const messages = {
           dashboard: "Dashboard",
           connections: "Conexões",
           officialConnections: "Conexões Oficiais",
+          template: "Templates",
           tickets: "Chamadas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
@@ -531,6 +532,30 @@ const messages = {
           message: "Esta ação não pode ser revertida.",
         },
       },
+      templates: {
+        title: "Templates",
+        table:{
+          name: "Nome",
+          preview: "Prévia",
+          category: "Categoria",
+          classification: "Classificação",
+          language: "Idioma",
+          status: "Status"
+        },
+        buttons:{
+          newTemplate: "Nova Template",
+          cancel: "Cancelar",
+          add: "Adicionar"
+        },
+        templateModal:{
+          title: "Nova Template",
+          name: "Nome",
+          category: "Categoria",
+          body: "Corpo",
+          footer: "Rodapé",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:

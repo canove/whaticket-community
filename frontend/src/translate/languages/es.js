@@ -313,6 +313,7 @@ const messages = {
           dashboard: "Dashboard",
           connections: "Conexiones",
           officialConnections: "Official Connections",
+          template: "Plantilla",
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
@@ -532,6 +533,29 @@ const messages = {
         confirmationModal: {
           title: "¿Borrar mensaje?",
           message: "Esta acción no puede ser revertida.",
+        },
+      },
+    templates: {
+        title: "Plantilla",
+        table:{
+          name: "Nombre",
+          preview: "Avance",
+          category: "Categoría",
+          classification: "Clasificación",
+          language: "Idioma",
+          status: "Estado",
+        },
+        buttons:{
+          newTemplate: "Nueva Plantilla",
+          cancel: "Cancelar",
+          add: "Agregar"
+        },
+        templateModal:{
+          title: "Nueva Plantilla",
+          name: "Nombre",
+          category: "Categoría",
+          body: "Cuerpo",
+          footer: "Zócalo",
         },
       },
       backendErrors: {
