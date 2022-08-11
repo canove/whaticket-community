@@ -63,6 +63,10 @@ class FileRegister extends Model<FileRegister> {
 
   @AllowNull(true)
   @Column
+  processedAt: Date;
+
+  @AllowNull(true)
+  @Column
   sentAt: Date;
 
   @AllowNull(true)

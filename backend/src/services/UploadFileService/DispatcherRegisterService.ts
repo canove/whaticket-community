@@ -8,7 +8,8 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     const registers = await FileRegister.findAll({
       where: {
         fileId: file.id,
-        sentAt: null
+        sentAt: null,
+        processedAt: null
       },
       limit: 50
     });
@@ -52,6 +53,10 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
       await axios.post(apiUrl, JSON.stringify(payload), { headers: {
         "x-api-key": process.env.WPP_OFFICIAL_API_KEY
       }});
+     
+      await FileRegister.update({ processedAt: new Date() }, { where: {
+        id: registers.map((x) => x.id)
+      }})
     }
 
   } catch (e) {
