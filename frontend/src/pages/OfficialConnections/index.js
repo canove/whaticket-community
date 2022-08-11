@@ -60,7 +60,6 @@ const useStyles = makeStyles(theme => ({
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
 		const whatsApps = action.payload;
-		console.log(whatsApps);
 		return [...whatsApps];
 	}
 

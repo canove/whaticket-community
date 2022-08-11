@@ -3,6 +3,15 @@ import { getWbot } from "../libs/wbot";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
+import TestWhatsAppConnectionService from "../services/WhatsappService/TestWhatsAppConnectionService";
+
+const index = async (req: Request, res: Response): Promise<Response> => {
+  const { facebookToken, facebookPhoneNumberId, facebookBusinessId } = req.query;
+
+  const response = await TestWhatsAppConnectionService({ facebookToken, facebookPhoneNumberId, facebookBusinessId });
+
+  return res.status(200).json(response);
+}
 
 const store = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
@@ -37,4 +46,4 @@ const remove = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json({ message: "Session disconnected." });
 };
 
-export default { store, remove, update };
+export default { index, store, remove, update };
