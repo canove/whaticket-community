@@ -87,7 +87,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
     setLoading(true);
     try {
       setLoading(true);
-      const { data } = await api.put(`/file/update/${fileId}/?status=${status}&userId=${user.id}`);
+      await api.put(`/file/update/${fileId}/?status=${status}&userId=${user.id}`);
       setLoading(false);
     } catch (err) {
       toastError(err);

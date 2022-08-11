@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useReducer } from "react";
+import openSocket from "../../services/socket-io";
 
 import { CheckCircle, DeleteOutline, Edit } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
@@ -56,6 +57,53 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_WHATSAPPS") {
+		const whatsApps = action.payload;
+		return [...whatsApps];
+	}
+
+	if (action.type === "UPDATE_WHATSAPPS") {
+		const whatsApp = action.payload;
+		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
+		if (whatsAppIndex !== -1 || whatsApp.official === true) {
+			state[whatsAppIndex] = whatsApp;
+			return [...state];
+		} else {
+			return [whatsApp, ...state];
+		}
+	}
+
+	if (action.type === "UPDATE_SESSION") {
+		const whatsApp = action.payload;
+		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
+
+		if (whatsAppIndex !== -1) {
+			state[whatsAppIndex].status = whatsApp.status;
+			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
+			state[whatsAppIndex].qrcode = whatsApp.qrcode;
+			state[whatsAppIndex].retries = whatsApp.retries;
+			return [...state];
+		} else {
+			return [...state];
+		}
+	}
+
+	if (action.type === "DELETE_WHATSAPPS") {
+		const whatsAppId = action.payload;
+
+		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
+		if (whatsAppIndex !== -1) {
+			state.splice(whatsAppIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
+
 const OfficialConnections = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -63,8 +111,7 @@ const OfficialConnections = () => {
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-	const [loadWhats, setLoadWhats] = useState(true);
-	const [whatsApps, setWhatsApps] = useState();
+	const [whatsApps, dispatch] = useReducer(reducer, []);
 
 	const [loading, setLoading] = useState(true);
 
@@ -84,7 +131,7 @@ const OfficialConnections = () => {
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/list/${true}`);
-				setWhatsApps(data);
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
 			} catch (err) {
 				setLoading(false);
@@ -92,25 +139,47 @@ const OfficialConnections = () => {
 			}
 		};
 		fetchWhats();
-		setLoadWhats(false);
-	}, [loadWhats]);
+	}, []);
+
+	useEffect(() => {
+		const socket = openSocket();
+
+		socket.on("whatsapp", data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
+			}
+		});
+
+		socket.on("whatsapp", data => {
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
+			}
+		});
+
+		socket.on("whatsappSession", data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_SESSION", payload: data.session });
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
 
 	const handleOpenWhatsAppModal = () => {
 		setSelectedWhatsApp(null);
 		setWhatsAppModalOpen(true);
-		setLoadWhats(true);
 	};
 
 	const handleCloseWhatsAppModal = useCallback(() => {
 		setWhatsAppModalOpen(false);
 		setSelectedWhatsApp(null);
-		setLoadWhats(true);
 	}, [setWhatsAppModalOpen]);
 
 	const handleEditWhatsApp = (whatsApp) => {
 		setSelectedWhatsApp(whatsApp);
 		setWhatsAppModalOpen(true);
-		setLoadWhats(true);
 	};
 
 	const handleOpenConfirmationModal = (action, whatsAppId) => {
@@ -123,7 +192,6 @@ const OfficialConnections = () => {
 			});
 		}
 		setConfirmModalOpen(true);
-		setLoadWhats(true);
 	};
 
 	const handleSubmitConfirmationModal = async () => {
@@ -137,7 +205,6 @@ const OfficialConnections = () => {
 		}
 
 		setConfirmModalInfo(confirmationModalInitialState);
-		setLoadWhats(true);
 	};
 
 	return (
@@ -172,6 +239,9 @@ const OfficialConnections = () => {
 					<TableHead>
 						<TableRow>
 							<TableCell align="center">
+								Qualidade
+							</TableCell>
+							<TableCell align="center">
 								{i18n.t("connections.table.name")}
 							</TableCell>
 							<TableCell align="center">
@@ -199,6 +269,7 @@ const OfficialConnections = () => {
 								{whatsApps?.length > 0 &&
 									whatsApps.map(whatsApp => (
 										<TableRow key={whatsApp.id}>
+											<TableCell align="center"></TableCell>
 											<TableCell align="center">{whatsApp.name}</TableCell>
 											<TableCell align="center">
 												Status

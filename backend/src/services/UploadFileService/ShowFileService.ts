@@ -3,7 +3,7 @@ import AppError from "../../errors/AppError";
 
 const ShowFileService = async (id: string | number): Promise<File> => {
   const file = await File.findByPk(id, {
-    attributes: ["name", "id", "approvedAt", "refusedAt", "approvedOrRefusedId"],
+    attributes: ["name", "id", "approvedAt", "refusedAt", "approvedOrRefusedId", "CreatedAt"],
   });
   if (!file) {
     throw new AppError("ERR_NO_FILE_FOUND", 404);

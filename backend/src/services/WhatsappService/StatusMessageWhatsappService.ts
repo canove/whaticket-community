@@ -3,11 +3,14 @@ import AppError from "../../errors/AppError";
 import FileRegister from "../../database/models/FileRegister";
 import { FileStatus } from "../../enum/FileStatus";
 import File from "../../database/models/File";
+import Message from "../../database/models/Message";
+import { getIO } from "../../libs/socket";
 
 interface Request {
   msgId: number;
   statusType: string;
   msgWhatsId?: string;
+  errorMessage?: string;
 }
 
 interface Response {
@@ -16,7 +19,8 @@ interface Response {
 const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
-  msgWhatsId
+  msgWhatsId,
+  errorMessage
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     statusType: Yup.string().required()
@@ -48,6 +52,40 @@ const StatusMessageWhatsappService = async ({
     });
   }
 
+  if (!register && msgWhatsId) {
+    const msgRegister = await Message.findOne({
+      where: {
+        id: msgWhatsId
+      }
+    });
+
+   if(msgRegister) {
+    switch(statusType){
+      case "sent":
+        await msgRegister?.update({ ack: 1 });
+        break;
+      case "delivered":
+        await msgRegister?.update({ ack: 2 });
+        break;
+      case "read":
+        await msgRegister?.update({ ack:3, read: 1 });
+        break;
+      case "error":
+        await msgRegister?.update({ errorAt: new Date(), errorMessage: errorMessage });
+        break;
+    }
+
+    const io = getIO();
+    io.to(msgRegister.ticketId.toString()).emit("whatsapp-message", {
+      action: "update",
+      message: msgRegister
+    });
+
+    return { success: true }
+   }
+  }
+
+
   if (!register) {
     return { success: false };
   }
@@ -62,6 +100,9 @@ const StatusMessageWhatsappService = async ({
     case "read":
       await register?.update({ readAt: new Date() });
       break;
+    case "error":
+      await register?.update({ sentAt: new Date(), errorAt: new Date(), errorMessage: errorMessage });
+      break;
   }
 
   var registersCount = await FileRegister.count({
@@ -72,12 +113,17 @@ const StatusMessageWhatsappService = async ({
   });
   
   if (registersCount == 0) {
+    const io = getIO();
     const file = await File.findOne({
         where: {
           id: register?.fileId
         }
     })
     await file.update({ Status: FileStatus.Finished });
+    io.emit("file", {
+      action: "update",
+      file
+    });
   }
 
   return { success: true };

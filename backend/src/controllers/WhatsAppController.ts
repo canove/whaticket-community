@@ -174,9 +174,9 @@ export const messageStatus = async (
   res: Response
 ): Promise<Response> => {
 
-  const { statusType, msgId, msgWhatsId } = req.body;
+  const { statusType, msgId, msgWhatsId, errorMessage } = req.body;
 
-  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId });
+  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId, errorMessage });
 
   return res.status(200).json(message);
 };

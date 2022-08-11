@@ -60,6 +60,9 @@ class Whatsapp extends Model<Whatsapp> {
   facebookToken: string;
 
   @Column
+  facebookBusinessId: string;
+
+  @Column
   facebookPhoneNumberId: string;
 
   @Column

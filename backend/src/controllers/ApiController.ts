@@ -17,6 +17,7 @@ import ListFileService from "../services/FileService/ListFileService";
 import { FileStatus } from "../enum/FileStatus";
 import ImportFileService from "../services/UploadFileService/ImportFileService";
 import DispatcherRegisterService from "../services/UploadFileService/DispatcherRegisterService";
+import { getIO } from "../libs/socket";
 
 type MessageData = {
   body: string;
@@ -63,11 +64,23 @@ const createContact = async (newContact: string) => {
 };
 
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
+  const io = getIO();
   const files = await ListFileService({ Status: FileStatus.WaitingImport,initialDate:null, limit: 1 });
   if (files) {
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
+
+      io.emit("file", {
+        action: "update",
+        file
+      });
+
       await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
+
+      io.emit("file", {
+        action: "update",
+        file
+      });
     });
   }
 
@@ -75,6 +88,7 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 };
 
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
+  const io = getIO();
   const files = await ListFileService({ Status: FileStatus.WaitingDispatcher,initialDate:null, limit: 1 });
   const sendingFiles = await ListFileService({ Status: FileStatus.Sending,initialDate:null, limit: 1 });
 
@@ -86,7 +100,19 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
     if (files?.length > 0) {
       files.forEach(async (file) => {
         await file.update({ Status: FileStatus.Sending });
+
+        io.emit("file", {
+          action: "update",
+          file
+        });
+  
         await DispatcherRegisterService({ file: file });
+
+        io.emit("file", {
+        action: "update",
+        file
+      });
+
       });
     }
   }
