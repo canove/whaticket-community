@@ -98,6 +98,7 @@ const Dashboard = () => {
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
+              disabled={loading}
             >
               <Typography component="h3" variant="h6" color="primary" paragraph>
                 {i18n.t("dashboard.messages.inAttendance.title")}

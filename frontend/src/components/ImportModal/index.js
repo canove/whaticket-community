@@ -148,7 +148,7 @@ const ImportModal = ({ open, onClose }) => {
 									return (
 										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
 									)
-								}
+								}return null
 							})}
 						</Select>
 					</div>

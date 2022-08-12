@@ -124,6 +124,10 @@ const messages = {
           testConnection: "Test Connection",
           add: "Add",
         },
+      titleModal:{
+        add:"Agregar Whatsapp Oficial",
+        edit: "Para Editar WhatsApp Official",
+        },
       },
       whatsappModal: {
         title: {
@@ -548,7 +552,8 @@ const messages = {
         buttons:{
           newTemplate: "Nueva Plantilla",
           cancel: "Cancelar",
-          add: "Agregar"
+          add: "Agregar",
+          connection: "Conexiones"
         },
         templateModal:{
           title: "Nueva Plantilla",
@@ -556,6 +561,9 @@ const messages = {
           category: "Categoría",
           body: "Cuerpo",
           footer: "Zócalo",
+          connection: "Conexiones",
+          transactional: "Transaccional",
+          marketing: "Marketing",
         },
       },
       backendErrors: {
