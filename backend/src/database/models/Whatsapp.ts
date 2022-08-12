@@ -68,6 +68,12 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   phoneNumber: string;
 
+  @Column
+  tierLimit: string;
+
+  @Column
+  quality: string;
+
   @Default(false)
   @AllowNull
   @Column

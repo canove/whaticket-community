@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
+import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -11,7 +12,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { Table, TableRow } from "@material-ui/core";
+
+import { Table, TableRow, Divider, Select } from "@material-ui/core";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
@@ -62,12 +64,54 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const reducer = (state, action) => {
+  if (action.type === "LOAD_REPORTS") {
+    const reports = action.payload;
+    const newReports = [];
+
+    reports.forEach((report) => {
+      const reportIndex = state.findIndex((r) => r.id === report.id);
+      if (reportIndex !== -1) {
+        state[reportIndex] = report;
+      } else {
+        newReports.push(report);
+      }
+    });
+
+    return [...state, ...newReports];
+  }
+
+  if (action.type === "UPDATE_REPORTS") {
+    const report = action.payload;
+    const reportIndex = state.findIndex((r) => r.id === report.id);
+
+    if (reportIndex !== -1) {
+      state[reportIndex] = report;
+      return [...state];
+    } else {
+      return [report, ...state];
+    }
+  }
+
+  if (action.type === "RESET") {
+    return [];
+  }
+};
+
 const RegisterFileModal = ({ open, onClose, fileId }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
+
   const [loading, setLoading] = useState(false);
-  const [fileRegister, setFileRegister] = useState();
+  const [fileRegister, dispatch] = useReducer(reducer, []);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+
+  useEffect(() => {
+    dispatch({ type: "RESET" });
+    setPageNumber(1);
+  }, [fileId]);
 
   const handleClose = () => {
     onClose();
@@ -99,15 +143,43 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
       setLoading(true);
       try {
         setLoading(true);
-        const { data } = await api.get(`/file/listRegister?fileId=${fileId}`);
-        setFileRegister(data)
+        const { data } = await api.get(`/file/listRegister`, {
+          params: { fileId, pageNumber },
+        });
+        console.log(data, pageNumber);
+        dispatch({ type: "LOAD_REPORTS", payload: data.reports });
+        setHasMore(data.hasMore);
         setLoading(false);
       } catch (err) {
         toastError(err);
       }
     };
     handleFilter();
-  }, [fileId]);
+  }, [fileId, pageNumber]);
+
+  useEffect(() => {
+    const socket = openSocket();
+
+    socket.on("reports", (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_REPORTS", payload: data.reports });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const loadNextPage = () => {
+    dispatch({ type: "RESET" });
+    setPageNumber(pageNumber + 1);
+  };
+
+  const loadPreviousPage = () => {
+    dispatch({ type: "RESET" });
+    setPageNumber(pageNumber - 1);
+  }
 
   return (
     <div className={classes.root}>
@@ -148,6 +220,24 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
             </DialogContent>
           </DialogTitle>
         <DialogActions>
+          {pageNumber > 1 && (
+            <>
+              <Button
+                onClick={loadPreviousPage}
+              >
+                Página Anterior
+              </Button>
+            </>
+          )}
+          { hasMore && (
+            <>
+              <Button
+                onClick={loadNextPage}
+              >
+                Próxima Página
+              </Button>
+            </>
+          )}
           <Button
             onClick={handleClose}
             color="secondary"
