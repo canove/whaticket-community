@@ -80,7 +80,6 @@ const NotificationsPopOver = () => {
 
 	useEffect(() => {
 		const socket = openSocket();
-
 		socket.on("connect", () => socket.emit("joinNotification"));
 
 		socket.on("ticket", data => {
@@ -138,6 +137,7 @@ const NotificationsPopOver = () => {
 		return () => {
 			socket.disconnect();
 		};
+// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
 
 	const handleNotifications = data => {

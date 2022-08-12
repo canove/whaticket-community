@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, Image } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useTranslation } from 'react-i18next'
 import clsx from "clsx";
 
@@ -259,7 +259,7 @@ const LoggedInLayout = ({ children }) => {
             color="inherit"
             noWrap
             className={classes.title}
-          ><img src = { brainit }/>
+          ><img src = { brainit } alt= "Logo-BrainIT"/>
           </Typography>
           {user.id && <NotificationsPopOver />}
 

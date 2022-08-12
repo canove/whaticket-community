@@ -163,7 +163,9 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				scroll="paper"
 			>
 				<DialogTitle>
-					{i18n.t('officialWhatsappModal.title')}
+				{whatsAppId
+						? i18n.t("officialWhatsappModal.titleModal.edit")
+						: i18n.t("officialWhatsappModal.titleModal.add")}
 				</DialogTitle>
 				<Formik
 					initialValues={whatsApp}

@@ -1,0 +1,12 @@
+import express from "express";
+import isAuth from "../middleware/isAuth";
+
+import * as TemplateController from "../controllers/TemplateController";
+
+const templateRoutes = express.Router();
+
+templateRoutes.get("/whatsappTemplate/list/:whatsAppId", isAuth, TemplateController.index);
+
+templateRoutes.post("/whatsappTemplate/create/", isAuth, TemplateController.store);
+
+export default templateRoutes;

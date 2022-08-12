@@ -112,7 +112,6 @@ const OfficialConnections = () => {
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [whatsApps, dispatch] = useReducer(reducer, []);
-
 	const [loading, setLoading] = useState(true);
 
 	const confirmationModalInitialState = {

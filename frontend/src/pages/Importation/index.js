@@ -19,12 +19,11 @@ import Title from "../../components/Title";
 
 import { useTranslation } from "react-i18next";
 import ImportModal from "../../components/ImportModal";
-import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { parseISO, format } from "date-fns";
 import { IconButton } from "@material-ui/core";
-import { Done, Visibility } from "@material-ui/icons";
+import { Visibility } from "@material-ui/icons";
 import RegisterFileModal from "../../components/RegisterFileModal";
 
 const useStyles = makeStyles((theme) => ({
@@ -196,6 +195,7 @@ const Importation = () => {
       if (user.id === userId) {
         response = user.name;
       }
+      return null
     });
     return response;
   };
@@ -222,6 +222,7 @@ const Importation = () => {
 
   useEffect(() => {
     handleFilter();
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [importModalOpen, registerFileModalOpen]);
 
   const handleFilter = async () => {
