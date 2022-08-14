@@ -11,6 +11,12 @@ const upload = multer(uploadConfig);
 const ApiRoutes = express.Router();
 
 ApiRoutes.post(
+  "/whatsapp/quality",
+  isAuthApi,
+  WhatsAppController.qualityNumber
+);
+
+ApiRoutes.post(
   "/whatsapp/messageStatus",
   isAuthApi,
   WhatsAppController.messageStatus

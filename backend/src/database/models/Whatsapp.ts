@@ -48,6 +48,12 @@ class Whatsapp extends Model<Whatsapp> {
   retries: number;
 
   @Column(DataType.TEXT)
+  quality: string;
+
+  @Column(DataType.TEXT)
+  tierLimit: string;
+
+  @Column(DataType.TEXT)
   greetingMessage: string;
 
   @Column(DataType.TEXT)
