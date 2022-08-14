@@ -3,12 +3,13 @@ import ListFileRegistersService from "../services/FileRegisterService/ListFileRe
 
 type IndexQuery = {
   fileId: number;
+  pageNumber: string;
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { fileId } = req.query as unknown as IndexQuery;
+  const { fileId, pageNumber } = req.query as unknown as IndexQuery;
 
-  const report = await ListFileRegistersService({ fileId });
+  const { reports, count, hasMore } = await ListFileRegistersService({ fileId, pageNumber });
 
-  return res.status(200).json(report);
+  return res.status(200).json({ reports, count, hasMore });
 }

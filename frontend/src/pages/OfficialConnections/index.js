@@ -112,7 +112,6 @@ const OfficialConnections = () => {
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [whatsApps, dispatch] = useReducer(reducer, []);
-
 	const [loading, setLoading] = useState(true);
 
 	const confirmationModalInitialState = {
@@ -239,13 +238,13 @@ const OfficialConnections = () => {
 					<TableHead>
 						<TableRow>
 							<TableCell align="center">
-								Qualidade
-							</TableCell>
-							<TableCell align="center">
 								{i18n.t("connections.table.name")}
 							</TableCell>
 							<TableCell align="center">
-								{i18n.t("connections.table.status")}
+								Qualidade
+							</TableCell>
+							<TableCell align="center">
+								Limite
 							</TableCell>
 							<TableCell align="center">
 								{i18n.t("connections.table.session")}
@@ -269,11 +268,9 @@ const OfficialConnections = () => {
 								{whatsApps?.length > 0 &&
 									whatsApps.map(whatsApp => (
 										<TableRow key={whatsApp.id}>
-											<TableCell align="center"></TableCell>
 											<TableCell align="center">{whatsApp.name}</TableCell>
-											<TableCell align="center">
-												Status
-											</TableCell>
+											<TableCell align="center">{whatsApp.quality}</TableCell>
+											<TableCell align="center">{whatsApp.tierLimit}</TableCell>
 											<TableCell align="center">
 												Sessão
 											</TableCell>

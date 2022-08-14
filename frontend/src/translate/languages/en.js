@@ -122,6 +122,10 @@ const messages = {
           testConnection: "Test Connection",
           add: "Add",
         },
+      titleModal:{
+        add:"Add WhatsApp Official",
+        edit: "Edit WhatsApp Official",
+        },
       },
       whatsappModal: {
         title: {
@@ -544,6 +548,7 @@ const messages = {
           newTemplate: "New Template",
           cancel: "Cancel",
           add: "Add",
+          connection: "Connections"
         },
         templateModal:{
           title: "New Template",
@@ -551,6 +556,9 @@ const messages = {
           category: "Category",
           body: "Body",
           footer: "Footer",
+          connection: "Connections",
+          transactional: "Transactional",
+          marketing: "Marketing",
         },
       },
       backendErrors: {

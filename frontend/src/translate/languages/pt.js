@@ -117,7 +117,10 @@ const messages = {
         title: "Conexões Oficiais",
       },
       officialWhatsappModal: {
-        title: "Adicionar WhatsApp Oficial",
+        title:{
+        add:"Adicionar WhatsApp Oficial",
+        edit: "Editar WhatsApp Oficial",
+        },
         buttons: {
           cancel: "Cancelar",
           testConnection: "Testar Conexão",
@@ -545,7 +548,8 @@ const messages = {
         buttons:{
           newTemplate: "Nova Template",
           cancel: "Cancelar",
-          add: "Adicionar"
+          add: "Adicionar",
+          connection: "Conexões",
         },
         templateModal:{
           title: "Nova Template",
@@ -553,6 +557,10 @@ const messages = {
           category: "Categoria",
           body: "Corpo",
           footer: "Rodapé",
+          connection: "Conexões",
+          transactional: "Transacional",
+          marketing: "Marketing"
+
         },
       },
 
