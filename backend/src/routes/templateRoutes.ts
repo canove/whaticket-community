@@ -9,4 +9,8 @@ templateRoutes.get("/whatsappTemplate/list/:whatsAppId", isAuth, TemplateControl
 
 templateRoutes.post("/whatsappTemplate/create/", isAuth, TemplateController.store);
 
+templateRoutes.post("/whatsappTemplate/edit/", isAuth, TemplateController.update);
+
+templateRoutes.delete("/whatsappTemplate/delete/:whatsAppId/:templateName", isAuth, TemplateController.remove);
+
 export default templateRoutes;

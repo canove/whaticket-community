@@ -34,6 +34,8 @@ const messages = {
         },
       },
       dashboard: {
+      title: "Dashboard",
+      file: "File",
         charts: {
           perDay: {
             title: "Tickets today: ",
@@ -61,6 +63,9 @@ const messages = {
           },
           read: {
             title: "Read"
+          },
+          mistake: {
+            title: "Mistake"
           }
         }
       },
@@ -543,6 +548,7 @@ const messages = {
           classification: "Classification",
           language: "Language",
           status: "Status",
+          action: "Actions",
         },
         buttons:{
           newTemplate: "New Template",
@@ -559,6 +565,8 @@ const messages = {
           connection: "Connections",
           transactional: "Transactional",
           marketing: "Marketing",
+          edit: "To Edit",
+          cancel: "Cancel",
         },
       },
       backendErrors: {
