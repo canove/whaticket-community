@@ -85,11 +85,11 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
             });
           });
 
-          let lastSend = account.lastSendDate;
+          const lastSend: Date = account.lastSendDate;
           const now = new Date();
 
         if (lastSend)
-          lastSend = lastSend.setMinutes(lastSend.getMinutes() + 2);        
+            lastSend.setMinutes(lastSend.getMinutes() + 2);
 
         if(!lastSend || now > lastSend){
           await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
