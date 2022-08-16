@@ -7,7 +7,7 @@ interface Request {
   name: string;
   ownerid: string;
   official: string;
-  whatsappId: number;
+  whatsappIds: string;
   filePath: string;
 }
 
@@ -18,7 +18,7 @@ const CreateUploadFileService = async ({
   name,
   ownerid,
   official,
-  whatsappId,
+  whatsappIds,
   filePath
 }: Request): Promise<Response | null> => {
   const s3 = new AWS.S3({
@@ -47,7 +47,7 @@ const CreateUploadFileService = async ({
     name,
     ownerid,
     official,
-    whatsappId,
+    whatsappIds,
     status: 0
   });
   return file;
