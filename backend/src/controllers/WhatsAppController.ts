@@ -12,6 +12,8 @@ import NewMessageWhatsapp from "../services/WhatsappService/NewMessageWhatsappSe
 import StatusMessageWhatsappService from "../services/WhatsappService/StatusMessageWhatsappService";
 import ListOfficialWhatsAppsService from "../services/WhatsappService/ListOfficialWhatsAppsService";
 import QualityNumberWhatsappService from "../services/WhatsappService/QualityNumberWhatsappService";
+import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
+import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
 
 interface WhatsappData {
   name: string;
@@ -193,6 +195,37 @@ export const qualityNumber = async (
     displayPhoneNumber,
     event,
     currentLimit
+  });
+
+  return res.status(200).json(message);
+};
+
+export const nofSessionStatus = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+
+  const { session, status } = req.body;
+
+  const message = await NOFWhatsappSessionStatusService({
+    session,
+    status
+  });
+
+  return res.status(200).json(message);
+};
+
+export const nofSessionQRUpdate = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+
+  const { result, session, qrcode } = req.body;
+
+  const message = await NOFWhatsappQRCodeService({
+    result,
+    session,
+    qrcode
   });
 
   return res.status(200).json(message);
