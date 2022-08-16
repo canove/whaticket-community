@@ -90,20 +90,11 @@ const Dashboard = () => {
         setLoading(true);
 
         let response = await api.get(`/registers/list?fileId=${fileId}`);
-        setRegisterCount(response.data.count);
-        console.log(response);
-
-        response = await api.get(`/registers/list?type=sent&fileId=${fileId}`);
-        setSentCount(response.data.count);
-
-        response = await api.get(`/registers/list?type=delivered&fileId=${fileId}`);
-        setDeliveredCount(response.data.count);
-
-        response = await api.get(`/registers/list?type=read&fileId=${fileId}`);
-        setReadCount(response.data.count);
-
-        response = await api.get(`/registers/list?type=error&fileId=${fileId}`);
-        setErrorCount(response.data.count);
+        setRegisterCount(response.data.register.count);
+        setSentCount(response.data.sent.count);
+        setDeliveredCount(response.data.delivered.count);
+        setReadCount(response.data.read.count);
+        setErrorCount(response.data.error.count);
 
         setLoading(false);
       } catch (err) {
