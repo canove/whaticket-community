@@ -91,7 +91,6 @@ const Dashboard = () => {
 
         let response = await api.get(`/registers/list?fileId=${fileId}`);
         setRegisterCount(response.data.count);
-        console.log(response);
 
         response = await api.get(`/registers/list?type=sent&fileId=${fileId}`);
         setSentCount(response.data.count);
