@@ -14,6 +14,8 @@ import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { MenuItem, Select } from "@material-ui/core";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import { toast } from "react-toastify";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -67,7 +69,7 @@ const ImportModal = ({ open, onClose }) => {
 
     const [file, setFile] = useState();
 	const [selectedType, setSelectedType] = useState(true);
-	const [selectedConnection, setSelectedConnection] = useState("placeholder");
+	const [selectedConnection, setSelectedConnection] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
 
@@ -82,18 +84,29 @@ const ImportModal = ({ open, onClose }) => {
 
 	const handleSubmit = async () => {
 		setLoading(true);
+		if (selectedConnection.length == 0 && !file) {
+			toast.error("Por favor, selecione uma ou mais conexões e um arquivo de disparo.");
+		} else if (selectedConnection.length == 0 ) {
+			toast.error("Por favor, selecione uma ou mais conexões.");
+		} else if (!file) {
+			toast.error("Por favor, selecione um arquivo de disparo.");
+		} else {
+			try {
+				const selectedConnectionToString = selectedConnection.join();
+				const formData = new FormData();
+				formData.append("file", file, file.name);
+				formData.set("ownerid", user.id);
+				formData.set("name", file.name);
+				formData.set("official", selectedType);
+				formData.set("whatsappIds", selectedConnectionToString);
 
-		const formData = new FormData();
-		formData.append("file", file, file.name);
-		formData.set("ownerid", user.id);
-		formData.set("name", file.name);
-		formData.set("official", selectedType);
-		formData.set("whatsappId", selectedConnection);
-
-		await api.post("file/upload", formData);
-
+				await api.post("file/upload", formData);
+			} catch (err) {
+				toastError(err);
+			}	
+			handleClose();
+		}
 		setLoading(false);
-		handleClose();
 	}
 
 	const handleChange = (e) => {
@@ -101,7 +114,25 @@ const ImportModal = ({ open, onClose }) => {
 	}
 
 	const handleChangeConnection = (e) => {
-		setSelectedConnection(e.target.value);
+		const {
+			target: { value },
+		} = e;
+
+		if (value.includes('Todos')) {
+			setSelectedConnection([]);
+
+			let allConnections = []
+
+			whatsApps.map((whats => {
+				if (whats.official === selectedType) {
+					allConnections.push(whats.id);
+				}
+			}));
+
+			setSelectedConnection(allConnections);
+		} else {
+			setSelectedConnection(typeof value === "string" ? value.split(",") : value);
+		}
 	}
 
 	return (
@@ -133,7 +164,7 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-                        	{i18n.t('importModal.form.connection')}
+                        	Conexões:
 						</Typography>
 						<Select
 							labelId="type-select-label"
@@ -141,14 +172,21 @@ const ImportModal = ({ open, onClose }) => {
 							value={selectedConnection}
 							label="Type"
 							onChange={handleChangeConnection}
+							multiple
 						>
-							<MenuItem value={"placeholder"} disabled>{i18n.t('importModal.form.selectAConnection')}</MenuItem>
+							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
 								if (whats.official === selectedType) {
-									return (
-										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
-									)
-								}return null
+									if (selectedType === false && whats.status === "CONNECTED") {
+										return (
+											<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+										)
+									} else if (selectedType === true) {
+										return (
+											<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+										)
+									}
+								} return null
 							})}
 						</Select>
 					</div>

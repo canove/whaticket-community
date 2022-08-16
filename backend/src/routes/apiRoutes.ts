@@ -9,6 +9,25 @@ import isAuthApi from "../middleware/isAuthApi";
 const upload = multer(uploadConfig);
 
 const ApiRoutes = express.Router();
+ApiRoutes.post(
+  "/whatsapp/nof/sessionstatus",
+  isAuthApi,
+  WhatsAppController.nofSessionStatus
+);
+ApiRoutes.post(
+  "/whatsapp/nof/updateqrcode",
+  isAuthApi,
+  WhatsAppController.nofSessionQRUpdate
+);
+
+
+
+
+ApiRoutes.post(
+  "/whatsapp/quality",
+  isAuthApi,
+  WhatsAppController.qualityNumber
+);
 
 ApiRoutes.post(
   "/whatsapp/messageStatus",
