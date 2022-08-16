@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Message as WbotMessage } from "whatsapp-web.js";
 import AppError from "../../errors/AppError";
-import GetTicketWbot from "../../helpers/GetTicketWbot";
 import GetWbotMessage from "../../helpers/GetWbotMessage";
 import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId";
 import Message from "../../database/models/Message";
@@ -21,19 +20,12 @@ interface Request {
 
 const SendWhatsAppMessage = async ({
   body,
-  ticket,
-  quotedMsg
-}: Request): Promise<WbotMessage> => {
-  let quotedMsgSerializedId: string | undefined;
-  if (quotedMsg) {
-    await GetWbotMessage(ticket, quotedMsg.id);
-    quotedMsgSerializedId = SerializeWbotMsgId(ticket, quotedMsg);
-  }
-
+  ticket
+}: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
       id: ticket.whatsappId
-  }});
+     }});
 
   const message = await Message.findAll({
     where: {
@@ -99,7 +91,7 @@ const SendWhatsAppMessage = async ({
       }else{
         throw new AppError("ERR_SENDING_WAPP_MSG");
       }
-    } catch(e) {
+    } catch (e) {
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   } else {
@@ -138,7 +130,7 @@ const SendWhatsAppMessage = async ({
       }else{
         throw new AppError("ERR_SENDING_WAPP_MSG");
       }
-    } catch(e) {
+    } catch (e) {
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   }
