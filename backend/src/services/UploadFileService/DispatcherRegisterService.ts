@@ -66,6 +66,10 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
           });
 
           registers.forEach(async reg => {
+            let phoneNumber = reg.phoneNumber;
+            if (phoneNumber.length > 12)
+              phoneNumber = `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`;
+
             registers.push(reg);
             payload.push({
               company: account?.facebookBusinessId,
@@ -76,7 +80,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
                 channel: "wpp_no",
                 template: "",
                 to: {
-                  identifier: `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`,
+                  identifier: phoneNumber,
                   name: reg.name
                 },
                 text: reg.message,

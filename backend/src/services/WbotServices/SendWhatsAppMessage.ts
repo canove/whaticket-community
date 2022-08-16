@@ -35,32 +35,32 @@ const SendWhatsAppMessage = async ({
       id: ticket.whatsappId
   }});
 
+  const message = await Message.findAll({
+    where: {
+      ticketId: ticket.id,
+      fromMe: false
+    },
+    order: [
+      ['createdAt', 'DESC'],
+    ],
+    limit: 1
+  });
+
+  const contact = await Contact.findOne({ where: {
+    id: message[0].contactId
+  }});
+
+  const messageSended = await FileRegister.findOne({
+    where: {
+      phoneNumber: contact.number
+    }
+  });
+  
+  if(!messageSended && !contact)
+    throw new AppError("ERR_SENDING_WAPP_MSG");
+
   if (connnection?.official) {
     try {
-      const message = await Message.findAll({
-        where: {
-          ticketId: ticket.id,
-          fromMe: false
-        },
-        order: [
-          ['createdAt', 'DESC'],
-        ],
-        limit: 1
-      });
-
-      const contact = await Contact.findOne({ where: {
-        id: message[0].contactId
-      }});
-
-      const messageSended = await FileRegister.findOne({
-        where: {
-          phoneNumber: contact.number
-        }
-      });
-      
-      if(!messageSended && !contact)
-        throw new AppError("ERR_SENDING_WAPP_MSG");
-
       const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
       const payload = {
         "messaging_product": "whatsapp",
@@ -103,20 +103,42 @@ const SendWhatsAppMessage = async ({
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   } else {
-    const wbot = await GetTicketWbot(ticket);
-
     try {
-      const sentMessage = await wbot.sendMessage(
-        `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
-        formatBody(body, ticket.contact),
-        {
-          quotedMessageId: quotedMsgSerializedId,
-          linkPreview: false
+      const apiUrl = `${process.env.WPPNOF_URL}/sendText`;
+      const payload = {
+        "session": connnection.name,
+        "number": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
+        "text": formatBody(body, ticket.contact)
+      };
+
+      var result = await axios.post(apiUrl, payload, {
+        headers: {
+          "sessionkey": `${connnection.WPPNOF_API_TOKEN}`
         }
-      );
-      await ticket.update({ lastMessage: body });
-      return sentMessage;
-    } catch (err) {
+      });
+
+      if(result.status == 200){
+          const msgWhatsId = result.data.id;
+          
+          const messageData = {
+            id: msgWhatsId,
+            ticketId: ticket.id,
+            contactId: undefined,
+            body: body,
+            fromMe: true,
+            read: true,
+            mediaUrl: null,
+            mediaType: null,
+            quotedMsgId: null
+          };
+        
+          await ticket.update({ lastMessage: body });
+          await CreateMessageService({ messageData });
+      
+      }else{
+        throw new AppError("ERR_SENDING_WAPP_MSG");
+      }
+    } catch(e) {
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   }
