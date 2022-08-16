@@ -84,7 +84,6 @@ const ImportModal = ({ open, onClose }) => {
 
 	const handleSubmit = async () => {
 		setLoading(true);
-		console.log();
 		if (selectedConnection.length == 0 && !file) {
 			toast.error("Por favor, selecione uma ou mais conexões e um arquivo de disparo.");
 		} else if (selectedConnection.length == 0 ) {
@@ -178,9 +177,15 @@ const ImportModal = ({ open, onClose }) => {
 							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
 								if (whats.official === selectedType) {
-									return (
-										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
-									)
+									if (selectedType === false && whats.status === "CONNECTED") {
+										return (
+											<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+										)
+									} else if (selectedType === true) {
+										return (
+											<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+										)
+									}
 								} return null
 							})}
 						</Select>
