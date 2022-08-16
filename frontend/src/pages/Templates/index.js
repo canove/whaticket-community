@@ -22,9 +22,13 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  IconButton,
 } from "@material-ui/core";
 import TemplateModal from "../../components/TemplateModal";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import { DeleteOutline } from "@material-ui/icons";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,6 +62,17 @@ const Templates = () => {
   const [connection, setConnection] = useState("");
   const { whatsApps } = useContext(WhatsAppsContext);
   const [templates, setTemplates] = useState([]);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const confirmationModalInitialState = {
+		action: "",
+		title: "",
+		message: "",
+    whatsAppId: "",
+    templateName: "",
+		open: false,
+	};
+  ;
+  const [confirmModalInfo, setConfirmModalInfo] = useState(confirmationModalInitialState);
 
   const handleTemplateModal = () => {
     setTemplateModalOpen(true);
@@ -83,23 +98,47 @@ const Templates = () => {
     if (connection) {
       fetchTemplates();
     }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection]);
 
-  const getComponent = (components) => {
-    let bodyText = "";
+  const getComponent = (components, type) => {
+    let text = "";
 
     components.every((component) => {
-      if (component.type === "BODY") {
-        bodyText = component.text;
+      if (component.type === type) {
+        text = component.text;
         return false
       }
       return true;
     });
 
-    return bodyText;
+    return text;
   }
+  	const handleOpenConfirmationModal = (action, whatsAppId, templateName) => {
+      if (action === "delete") {
+        setConfirmModalInfo({
+          action: action,
+          title: i18n.t("connections.confirmationModal.deleteTitle"),
+          message: i18n.t("connections.confirmationModal.deleteMessage"),
+          whatsAppId: whatsAppId,
+          templateName: templateName,
+        });
+      }
+
+		  setConfirmModalOpen(true);
+	  };
+
+  	const handleSubmitConfirmationModal = async () => {
+      if (confirmModalInfo.action === "delete") {
+        try {
+          await api.delete(`/whatsappTemplate/delete/${confirmModalInfo.whatsAppId}/${confirmModalInfo.templateName}`);
+          toast.success("Template Deletado com Sucesso!");
+        } catch (err) {
+          toastError(err);
+        }
+      }
+
+		setConfirmModalInfo(confirmationModalInitialState);
+	};
 
   return (
     <MainContainer>
@@ -108,6 +147,14 @@ const Templates = () => {
         onClose={handleCloseTemplateModal}
         aria-labelledby="form-dialog-title"
       ></TemplateModal>
+      	<ConfirmationModal
+          title={confirmModalInfo.title}
+          open={confirmModalOpen}
+          onClose={setConfirmModalOpen}
+          onConfirm={handleSubmitConfirmationModal}
+			>
+        {confirmModalInfo.message}
+      </ConfirmationModal>
       <MainHeader>
         <div className={classes.titleStyle}>
           <Title>{i18n.t("templates.title")}</Title>
@@ -164,6 +211,9 @@ const Templates = () => {
               <TableCell align="center">
                 {i18n.t("templates.table.status")}
               </TableCell>
+              <TableCell align="center">
+                {i18n.t("templates.table.action")}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -171,10 +221,18 @@ const Templates = () => {
               {templates.map((template, index) => (
                 <TableRow key={index}>
                   <TableCell align="center">{template.name}</TableCell>
-                  <TableCell align="center">{getComponent(template.components)}</TableCell>
+                  <TableCell align="center">{getComponent(template.components, "BODY")}</TableCell>
                   <TableCell align="center">{template.category}</TableCell>
                   <TableCell align="center">{template.language}</TableCell>
                   <TableCell align="center">{template.status}</TableCell>
+                  <TableCell align="center">
+                        <IconButton
+													size="small"
+                          onClick={e => { handleOpenConfirmationModal("delete", connection, template.name) }}
+												>
+													<DeleteOutline />
+												</IconButton>
+											</TableCell>
                 </TableRow>
               ))}
             </>

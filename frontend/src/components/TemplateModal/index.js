@@ -73,10 +73,6 @@ const TemplateModal = ({ open, onClose }) => {
   };
 
   const handleSubmit = async (values) => {
-    console.log(values);
-	  console.log(category);
-    console.log(connectionName);
-
     const templateData = { ...values, category: category, whatsAppsId: connectionName };
 		try {
       await api.post(`/whatsappTemplate/create/`, templateData);
@@ -214,14 +210,13 @@ const TemplateModal = ({ open, onClose }) => {
               </DialogContent>
               <DialogActions>
                 <Button
-                  onClick={handleClose}
-                  color="secondary"
-                  disabled={isSubmitting}
-                  variant="outlined"
+                  color="primary"
+                  variant="contained"
+                  className={classes.btnWrapper}
                 >
-                  {i18n.t("templates.buttons.cancel")}
+                  {"{{ }}"}
                 </Button>
-                <Button
+				        <Button
                   type="submit"
                   color="primary"
                   variant="contained"
@@ -229,6 +224,15 @@ const TemplateModal = ({ open, onClose }) => {
                 >
                   {i18n.t("templates.buttons.add")}
                 </Button>
+                <Button
+                  onClick={handleClose}
+                  color="secondary"
+                  disabled={isSubmitting}
+                  variant="outlined"
+                >
+                  {i18n.t("templates.buttons.cancel")}
+                </Button>
+
               </DialogActions>
             </Form>
           )}

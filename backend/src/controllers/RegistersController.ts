@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
-import RegistersService from "../services/RegistersService/RegistersService";
+import ListRegistersService from "../services/RegistersService/ListRegistersService";
 
 type IndexQuery = {
   type: string,
+  fileId: string,
 };
 
-export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { type } = req.query as unknown as IndexQuery;
+export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { type, fileId } = req.query as unknown as IndexQuery;
 
-  const report = await RegistersService({ type });
+  const report = await ListRegistersService({ type, fileId });
 
   return res.status(200).json(report);
 }

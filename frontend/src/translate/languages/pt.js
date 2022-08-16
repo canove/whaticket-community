@@ -34,6 +34,8 @@ const messages = {
         },
       },
       dashboard: {
+        title: "Dashboard",
+        file:" Arquivo",
         charts: {
           perDay: {
             title: "Chamadas hoje: ",
@@ -48,21 +50,24 @@ const messages = {
             title: "Aguardando"
           },
           closed: {
-            title: "Finalizado"
+            title: "Finalizados"
           },
           imported: {
-            title: "Importado"
+            title: "Importados"
           },
           sent: {
-            title: "Enviado"
+            title: "Enviados"
           },
           handedOut: {
-            title: "Entregue"
+            title: "Entregues"
           },
           read: {
             title: "Lidos"
-          }
-        }
+          },
+          mistake: {
+            title: "Erro"
+          },
+        },
       },
       connections: {
         title: "Conexões",
@@ -543,7 +548,8 @@ const messages = {
           category: "Categoria",
           classification: "Classificação",
           language: "Idioma",
-          status: "Status"
+          status: "Status",
+          action: "Ações",
         },
         buttons:{
           newTemplate: "Nova Template",
@@ -559,8 +565,9 @@ const messages = {
           footer: "Rodapé",
           connection: "Conexões",
           transactional: "Transacional",
-          marketing: "Marketing"
-
+          marketing: "Marketing",
+          edit: "Editar",
+          cancel: "Cancelar",
         },
       },
 
