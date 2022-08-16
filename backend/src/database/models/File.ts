@@ -31,6 +31,9 @@ class File extends Model<File> {
   url: string;
 
   @Column
+  whatsappIds: string;
+
+  @Column
   QtdeRegister: number;
 
   @Default(0)
