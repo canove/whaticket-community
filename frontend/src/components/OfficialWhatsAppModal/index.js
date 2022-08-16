@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, useFormikContext } from "formik";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -67,11 +67,29 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 		facebookToken: "",
 		facebookPhoneNumberId: "",
 		phoneNumber: "",
+		facebookBusinessId: "",
 		official: true,
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
     const [isConnectionTested, setIsConnectionTested] = useState(false);
+	const [submitType, setSubmitType] = useState("testConnection");
+
+	const [lastFormValues, setLastFormValues] = useState();
+	
+	const GetFormValues = () => {
+		const { values } = useFormikContext();
+
+		useEffect(() => {
+			if (!(values === lastFormValues)) {
+				setIsConnectionTested(false);
+			}
+
+			setLastFormValues(values);
+		}, [values]);
+
+		return null;
+	};
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -96,9 +114,28 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 		setWhatsApp(initialState);
 	};
 
-    const handleConnectionTest = () => {
-        setIsConnectionTested(true);
+    const handleConnectionTest = (e) => {
+		setSubmitType("testConnection");
     }
+
+	const handleSubmit = () => {
+		setSubmitType("submit");
+	}
+
+	const testConnection = async (values) => {
+		const facebookToken = values.facebookToken;
+		const facebookPhoneNumberId = values.facebookPhoneNumberId;
+		const facebookBusinessId = values.facebookBusinessId;
+
+		try {
+			const response = await api.get(`/whatsappsession/testConnection/`, {
+				params: { facebookToken, facebookPhoneNumberId, facebookBusinessId },
+			});
+			setIsConnectionTested(true);
+		} catch (err) {
+			toastError(err);
+		}
+	}
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = { ...values, queueIds: selectedQueueIds };
@@ -135,7 +172,14 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 					enableReinitialize={true}
 					validationSchema={SessionSchema}
 					onSubmit={(values, actions) => {
-						handleSaveWhatsApp(values);
+						if (submitType === "testConnection") {
+							testConnection(values);
+						}
+
+						if (submitType === "submit") {
+							handleSaveWhatsApp(values);
+						}
+
 						setTimeout(() => {
 							actions.setSubmitting(false);
 						}, 400);
@@ -210,6 +254,20 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										required
                                     />
                                 </div>
+								<div className={classes.textQuickAnswerContainer}>
+                                    <Field
+                                        as={TextField}
+                                        label="Facebook Business ID"
+                                        name="facebookBusinessId"
+                                        error={touched.facebookBusinessId && Boolean(errors.facebookBusinessId)}
+                                        helperText={touched.facebookBusinessId && errors.facebookBusinessId}
+                                        variant="outlined"
+                                        margin="dense"
+                                        className={classes.textField}
+                                        fullWidth
+										required
+                                    />
+                                </div>
 								<div>
 									<Field
 										as={TextField}
@@ -263,7 +321,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 									{i18n.t("officialWhatsappModal.buttons.cancel")}
 								</Button>
                                 <Button
-                                    type="button"
+                                    type="submit"
 									color="primary"
 									disabled={isSubmitting}
 									variant="contained"
@@ -278,10 +336,12 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 									disabled={!isConnectionTested}
 									variant="contained"
 									className={classes.btnWrapper}
+									onClick={handleSubmit}
 								>
 									{i18n.t("officialWhatsappModal.buttons.add")}
 								</Button>
 							</DialogActions>
+							<GetFormValues />
 						</Form>
 					)}
 				</Formik>
