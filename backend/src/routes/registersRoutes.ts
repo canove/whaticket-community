@@ -5,7 +5,6 @@ import * as RegistersController from "../controllers/RegistersController";
 
 const registersRoutes = Router();
 
-registersRoutes.get("/registers/list", isAuth, RegistersController.store);
-
+registersRoutes.get("/registers/list", isAuth, RegistersController.index);
 
 export default registersRoutes;
