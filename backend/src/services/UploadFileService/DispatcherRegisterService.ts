@@ -9,8 +9,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
     const accounts = await Whatsapp.findAll({
       where: {
-        id: whatsappIds,
-        status: "CONNECTED"
+        id: whatsappIds
       }
     });
 
@@ -18,7 +17,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     const apiUrl = `${process.env.WPP_OFFICIAL_URL}?x-api-key=${process.env.WPP_OFFICIAL_API_KEY}`;
     let registers;
 
-    await Promise.all(accounts.map(async (account) => {
+    await Promise.all(accounts.filter((x) => x.official || x.status == "CONNECTED").map(async (account) => {
       if (account.official) {
           registers = await FileRegister.findAll({
             where: {

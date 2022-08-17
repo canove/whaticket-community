@@ -97,9 +97,13 @@ const SendWhatsAppMessage = async ({
   } else {
     try {
       const apiUrl = `${process.env.WPPNOF_URL}/sendText`;
+      let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
+      if (phoneNumber.length > 12)
+        phoneNumber = `${phoneNumber.substring(4, 0)}${phoneNumber.substring(phoneNumber.length, 5)}`;
+
       const payload = {
         "session": connnection.name,
-        "number": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
+        "number": phoneNumber,
         "text": formatBody(body, ticket.contact)
       };
 
@@ -110,7 +114,7 @@ const SendWhatsAppMessage = async ({
       });
 
       if(result.status == 200){
-          const msgWhatsId = result.data.id;
+          const msgWhatsId = result.data.data.id;
           
           const messageData = {
             id: msgWhatsId,
