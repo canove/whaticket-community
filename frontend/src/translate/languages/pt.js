@@ -65,7 +65,7 @@ const messages = {
             title: "Lidos"
           },
           mistake: {
-            title: "Erro"
+            title: "Erros"
           },
         },
       },

@@ -65,7 +65,7 @@ const messages = {
             title: "Read"
           },
           mistake: {
-            title: "Mistake"
+            title: "Mistakes"
           }
         }
       },

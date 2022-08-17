@@ -66,7 +66,7 @@ const messages = {
             title: "Leer"
           },
           mistake: {
-            title: "Error"
+            title: "Errors"
           }
         }
       },
