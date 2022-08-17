@@ -122,7 +122,7 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const newContact: ContactData = req.body;
-  const { body, quotedMsg }: MessageData = req.body;
+  const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
 
   newContact.number = newContact.number.replace("-", "").replace(" ", "");
@@ -148,7 +148,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket: contactAndTicket, quotedMsg });
+    await SendWhatsAppMessage({ body, ticket: contactAndTicket });
   }
 
   return res.send();

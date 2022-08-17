@@ -9,6 +9,7 @@ import Ticket from "../../database/models/Ticket";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import Whatsapp from "../../database/models/Whatsapp";
+import FileRegister from "../../database/models/FileRegister";
 
 interface Request {
   id: string;
@@ -19,6 +20,7 @@ interface Request {
   from: string;
   body: string;
   contactName: string;
+  session: string;
   identification: number;
 }
 
@@ -38,6 +40,16 @@ const GetWhatsappByIdentification = async (
   return whatsapp;
 };
 
+const GetWhatsappBySession = async (session: string): Promise<Whatsapp> => {
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      name: session
+    }
+  });
+
+  return whatsapp;
+};
+
 const NewMessageWhatsappService = async ({
   id,
   fromMe,
@@ -47,7 +59,8 @@ const NewMessageWhatsappService = async ({
   from,
   body,
   contactName,
-  identification
+  identification,
+  session
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     id: Yup.string().required(),
@@ -56,9 +69,7 @@ const NewMessageWhatsappService = async ({
     from: Yup.string().required(),
     to: Yup.string().required(),
     type: Yup.string().required(),
-    isGroup: Yup.boolean().required(),
-    contactName: Yup.string().required(),
-    identification: Yup.number().required()
+    isGroup: Yup.boolean().required()
   });
 
   try {
@@ -69,9 +80,7 @@ const NewMessageWhatsappService = async ({
       from,
       to,
       type,
-      isGroup,
-      contactName,
-      identification
+      isGroup
     });
   } catch (err) {
     throw new AppError(err.message);
@@ -86,7 +95,8 @@ const NewMessageWhatsappService = async ({
     type,
     contactName,
     isGroup,
-    identification
+    identification,
+    session
   );
   return { success: true };
 };
@@ -124,6 +134,12 @@ const verifyContact = async (
   contactName: string,
   contactNumber: string
 ): Promise<Contact> => {
+  if (contactName == '') {
+    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber }, limit: 1});
+    if (contact.length > 0)
+      contactName = contact[0].name;
+  }
+
   const contactData = {
     name: contactName,
     number: contactNumber,
@@ -133,7 +149,7 @@ const verifyContact = async (
   const contact = CreateOrUpdateContactService(contactData);
 
   return contact;
-};
+}
 
 
 const handleMessage = async (
@@ -145,12 +161,19 @@ const handleMessage = async (
   type: string,
   contactName: string,
   isGroup: boolean,
-  identification: number
+  identification: number,
+  session: string
 ): Promise<void> => {
   try {
     const unreadMessages = 1;
     const contact = await verifyContact(contactName, from);
-    const whatsapp = await GetWhatsappByIdentification(identification);
+    let whatsapp: Whatsapp;
+    if (identification) {
+      whatsapp = await GetWhatsappByIdentification(identification);
+    }
+    if (session) {
+      whatsapp = await GetWhatsappBySession(session);
+    }
     // eslint-disable-next-line no-throw-literal
     if (!whatsapp) throw "number identification not found";
 
