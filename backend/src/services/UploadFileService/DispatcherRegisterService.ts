@@ -15,20 +15,23 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
     const payload = [];
     const apiUrl = `${process.env.WPP_OFFICIAL_URL}?x-api-key=${process.env.WPP_OFFICIAL_API_KEY}`;
-    let registers;
+    let processedRegister = [];
 
-    await Promise.all(accounts.filter((x) => x.official || x.status == "CONNECTED").map(async (account) => {
+    const filteredAccounts = accounts.filter((x) => x.official || x.status == "CONNECTED");
+
+
+    for (const account of filteredAccounts) {
       if (account.official) {
-          registers = await FileRegister.findAll({
-            where: {
-              fileId: file.id,
-              sentAt: null,
-              processedAt: null
-            },
-            limit: 50
-          });
+        const registers = await FileRegister.findAll({
+          where: {
+            fileId: file.id,
+            sentAt: null,
+            processedAt: null
+          },
+          limit: 50
+        });
 
-          registers.forEach(async reg => {
+        registers.forEach(async reg => {
             const params = reg.templateParams.split(",");
             const templateParams = [];
             params.forEach((param) => {
@@ -37,7 +40,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
                 text: param
               });
             });
-
+            processedRegister.push(reg);
             payload.push({
               company: account?.facebookBusinessId,
               person: reg.documentNumber,
@@ -53,32 +56,31 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
                 parameters: templateParams
               }
             });
-          });
-        } else {
-            const lastSend: Date = account.lastSendDate;
-            const now = new Date();
+            await reg.update({ processedAt: new Date() });
+        });
+      } else {
+          const lastSend: Date = account.lastSendDate;
+          const now = new Date();
 
-            if (lastSend)
-               lastSend.setMinutes(lastSend.getMinutes() + 2);
+          if (lastSend)
+             lastSend.setMinutes(lastSend.getMinutes() + 2);
 
-            if(!lastSend || now > lastSend){
-              await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
+          if(!lastSend || now > lastSend){
+            const registers = await FileRegister.findAll({
+              where: {
+                fileId: file.id,
+                sentAt: null,
+                processedAt: null
+              },
+              limit: 1
+            });
 
-              registers = await FileRegister.findAll({
-                where: {
-                  fileId: file.id,
-                  sentAt: null,
-                  processedAt: null
-                },
-                limit: 1
-              });
-  
-              registers.forEach(async reg => {
-                let phoneNumber = reg.phoneNumber;
-                if (phoneNumber.length > 12)
-                  phoneNumber = `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`;
-  
-                registers.push(reg);
+            for (const reg of registers){
+              let phoneNumber = reg.phoneNumber;
+              if (phoneNumber.length > 12)
+                phoneNumber = `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`;
+
+                processedRegister.push(reg);
                 payload.push({
                   company: account?.facebookBusinessId,
                   person: reg.documentNumber,
@@ -95,19 +97,21 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
                     parameters: []
                   }
                 });
-              });
+
+                await reg.update({ processedAt: new Date() });
+            }
+
+              if(registers.length > 0) {
+                await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
+              }
             }
         }
-      }))
+      }
     
-      if (payload.length > 0) {
-        await axios.post(apiUrl, JSON.stringify(payload), { headers: {
-          "x-api-key": process.env.WPP_OFFICIAL_API_KEY
-        }});
-      
-        await FileRegister.update({ processedAt: new Date() }, { where: {
-          id: registers.map((x) => x.id)
-        }})
+    if (payload.length > 0) {
+      await axios.post(apiUrl, JSON.stringify(payload), { headers: {
+        "x-api-key": process.env.WPP_OFFICIAL_API_KEY
+      }});
     }
 
   } catch (e) {
