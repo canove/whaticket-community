@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import QRCode from "qrcode.react";
 import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
 
@@ -52,7 +51,7 @@ const QrcodeModal = ({ open, onClose, whatsAppId }) => {
 						{i18n.t("qrCode.message")}
 					</Typography>
 					<img
-						src={`${qrCode}`}
+						src={`${qrCode}`} alt="QR Code"
 					/>
 				</Paper>
 			</DialogContent>

@@ -6,18 +6,18 @@ import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 
-import { 
-    Button, 
-    FormControl, 
-    InputLabel, 
-    makeStyles, 
-    MenuItem, 
-    Paper, 
-    Select, 
-    Table, 
-    TableBody, 
-    TableHead, 
-    TableRow 
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableHead,
+    TableRow
 } from "@material-ui/core";
 
 import toastError from "../../errors/toastError";
