@@ -15,6 +15,7 @@ const FindOrCreateTicketService = async (
       status: {
         [Op.or]: ["open", "pending"]
       },
+      whatsappId,
       contactId: groupContact ? groupContact.id : contact.id
     }
   });
@@ -26,7 +27,7 @@ const FindOrCreateTicketService = async (
   if (!ticket && groupContact) {
     ticket = await Ticket.findOne({
       where: {
-        contactId: groupContact.id
+        contactId: groupContact.id,
       },
       order: [["updatedAt", "DESC"]]
     });
@@ -46,6 +47,7 @@ const FindOrCreateTicketService = async (
         updatedAt: {
           [Op.between]: [+subHours(new Date(), 2), +new Date()]
         },
+        whatsappId,
         contactId: contact.id
       },
       order: [["updatedAt", "DESC"]]

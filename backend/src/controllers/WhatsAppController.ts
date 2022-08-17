@@ -154,7 +154,8 @@ export const newMessage = async (
     from,
     body,
     contactName,
-    identification
+    identification,
+    session
   } = req.body;
 
   const message = await NewMessageWhatsapp({
@@ -166,7 +167,8 @@ export const newMessage = async (
     from,
     body,
     contactName,
-    identification
+    identification,
+    session
   });
 
   return res.status(200).json(message);

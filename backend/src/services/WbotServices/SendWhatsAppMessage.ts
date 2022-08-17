@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Message as WbotMessage } from "whatsapp-web.js";
 import AppError from "../../errors/AppError";
-import GetTicketWbot from "../../helpers/GetTicketWbot";
 import GetWbotMessage from "../../helpers/GetWbotMessage";
 import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId";
 import Message from "../../database/models/Message";
@@ -21,46 +20,39 @@ interface Request {
 
 const SendWhatsAppMessage = async ({
   body,
-  ticket,
-  quotedMsg
-}: Request): Promise<WbotMessage> => {
-  let quotedMsgSerializedId: string | undefined;
-  if (quotedMsg) {
-    await GetWbotMessage(ticket, quotedMsg.id);
-    quotedMsgSerializedId = SerializeWbotMsgId(ticket, quotedMsg);
-  }
-
+  ticket
+}: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
       id: ticket.whatsappId
+     }});
+
+  const message = await Message.findAll({
+    where: {
+      ticketId: ticket.id,
+      fromMe: false
+    },
+    order: [
+      ['createdAt', 'DESC'],
+    ],
+    limit: 1
+  });
+
+  const contact = await Contact.findOne({ where: {
+    id: message[0].contactId
   }});
+
+  const messageSended = await FileRegister.findOne({
+    where: {
+      phoneNumber: contact.number
+    }
+  });
+  
+  if(!messageSended && !contact)
+    throw new AppError("ERR_SENDING_WAPP_MSG");
 
   if (connnection?.official) {
     try {
-      const message = await Message.findAll({
-        where: {
-          ticketId: ticket.id,
-          fromMe: false
-        },
-        order: [
-          ['createdAt', 'DESC'],
-        ],
-        limit: 1
-      });
-
-      const contact = await Contact.findOne({ where: {
-        id: message[0].contactId
-      }});
-
-      const messageSended = await FileRegister.findOne({
-        where: {
-          phoneNumber: contact.number
-        }
-      });
-      
-      if(!messageSended && !contact)
-        throw new AppError("ERR_SENDING_WAPP_MSG");
-
       const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
       const payload = {
         "messaging_product": "whatsapp",
@@ -99,24 +91,50 @@ const SendWhatsAppMessage = async ({
       }else{
         throw new AppError("ERR_SENDING_WAPP_MSG");
       }
-    } catch(e) {
+    } catch (e) {
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   } else {
-    const wbot = await GetTicketWbot(ticket);
-
     try {
-      const sentMessage = await wbot.sendMessage(
-        `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
-        formatBody(body, ticket.contact),
-        {
-          quotedMessageId: quotedMsgSerializedId,
-          linkPreview: false
+      const apiUrl = `${process.env.WPPNOF_URL}/sendText`;
+      let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
+      if (phoneNumber.length > 12)
+        phoneNumber = `${phoneNumber.substring(4, 0)}${phoneNumber.substring(phoneNumber.length, 5)}`;
+
+      const payload = {
+        "session": connnection.name,
+        "number": phoneNumber,
+        "text": formatBody(body, ticket.contact)
+      };
+
+      var result = await axios.post(apiUrl, payload, {
+        headers: {
+          "sessionkey": `${process.env.WPPNOF_API_TOKEN}`
         }
-      );
-      await ticket.update({ lastMessage: body });
-      return sentMessage;
-    } catch (err) {
+      });
+
+      if(result.status == 200){
+          const msgWhatsId = result.data.data.id;
+          
+          const messageData = {
+            id: msgWhatsId,
+            ticketId: ticket.id,
+            contactId: undefined,
+            body: body,
+            fromMe: true,
+            read: true,
+            mediaUrl: null,
+            mediaType: null,
+            quotedMsgId: null
+          };
+        
+          await ticket.update({ lastMessage: body });
+          await CreateMessageService({ messageData });
+      
+      }else{
+        throw new AppError("ERR_SENDING_WAPP_MSG");
+      }
+    } catch (e) {
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   }
