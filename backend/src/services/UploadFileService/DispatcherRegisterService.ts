@@ -55,59 +55,59 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
             });
           });
         } else {
-          registers = await FileRegister.findAll({
-            where: {
-              fileId: file.id,
-              sentAt: null,
-              processedAt: null
-            },
-            limit: 1
-          });
+            const lastSend: Date = account.lastSendDate;
+            const now = new Date();
 
-          registers.forEach(async reg => {
-            let phoneNumber = reg.phoneNumber;
-            if (phoneNumber.length > 12)
-              phoneNumber = `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`;
+            if (lastSend)
+               lastSend.setMinutes(lastSend.getMinutes() + 2);
 
-            registers.push(reg);
-            payload.push({
-              company: account?.facebookBusinessId,
-              person: reg.documentNumber,
-              activationMessage: {
-                session: account.name,
-                msgid: reg.id,
-                channel: "wpp_no",
-                template: "",
-                to: {
-                  identifier: phoneNumber,
-                  name: reg.name
+            if(!lastSend || now > lastSend){
+              await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
+
+              registers = await FileRegister.findAll({
+                where: {
+                  fileId: file.id,
+                  sentAt: null,
+                  processedAt: null
                 },
-                text: reg.message,
-                parameters: []
-              }
-            });
-          });
-
-          const lastSend: Date = account.lastSendDate;
-          const now = new Date();
-
-        if (lastSend)
-            lastSend.setMinutes(lastSend.getMinutes() + 2);
-
-        if(!lastSend || now > lastSend){
-          await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
+                limit: 1
+              });
+  
+              registers.forEach(async reg => {
+                let phoneNumber = reg.phoneNumber;
+                if (phoneNumber.length > 12)
+                  phoneNumber = `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`;
+  
+                registers.push(reg);
+                payload.push({
+                  company: account?.facebookBusinessId,
+                  person: reg.documentNumber,
+                  activationMessage: {
+                    session: account.name,
+                    msgid: reg.id,
+                    channel: "wpp_no",
+                    template: "",
+                    to: {
+                      identifier: phoneNumber,
+                      name: reg.name
+                    },
+                    text: reg.message,
+                    parameters: []
+                  }
+                });
+              });
+            }
         }
-      }
-    }))
-   
-    if (payload.length > 0) {
-      await axios.post(apiUrl, JSON.stringify(payload), { headers: {
-        "x-api-key": process.env.WPP_OFFICIAL_API_KEY
-      }});
+      }))
     
-      await FileRegister.update({ processedAt: new Date() }, { where: {
-        id: registers.map((x) => x.id)
-      }})
+      if (payload.length > 0) {
+        await axios.post(apiUrl, JSON.stringify(payload), { headers: {
+          "x-api-key": process.env.WPP_OFFICIAL_API_KEY
+        }});
+      
+        await FileRegister.update({ processedAt: new Date() }, { where: {
+          id: registers.map((x) => x.id)
+        }})
     }
 
   } catch (e) {
