@@ -23,7 +23,7 @@ const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
   try {
     const data = await s3.getObject(getParams).promise();
     let objectData = data.Body.toString('utf-8');
-    let registers = objectData.split('\n');
+    let registers = objectData.split('\r\n');
     let totalRegisters = 0;
     let registersToInsert = [];
 
