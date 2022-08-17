@@ -146,7 +146,6 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
         const { data } = await api.get(`/file/listRegister`, {
           params: { fileId, pageNumber },
         });
-        console.log(data, pageNumber);
         dispatch({ type: "LOAD_REPORTS", payload: data.reports });
         setHasMore(data.hasMore);
         setLoading(false);
