@@ -157,7 +157,7 @@ const MainListItems = (props) => {
             />
             <ListItemLink
               to="/registersReports"
-              primary="Relatórios Registros"
+              primary="Relatórios de Envios"
               icon={<AssessmentOutlinedIcon />}
             />
           </>
