@@ -5,6 +5,18 @@ import { FileStatus } from "../../enum/FileStatus";
 
 const DispatcherRegisterService = async ({ file }): Promise<void> => {
   try {
+    const containPending = await FileRegister.findAll({ 
+      where: {
+        fileId: file.id,
+        processedAt: null
+      }
+    });
+
+    if(containPending.length == 0){
+      await file.update({ Status: FileStatus.Finished });
+      return;
+    }
+
     const whatsappIds = file.whatsappIds.split(",");
 
     const accounts = await Whatsapp.findAll({
