@@ -6,20 +6,20 @@ import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 
-import { 
-    Button, 
-    FormControl, 
-    InputLabel, 
-    makeStyles, 
-    MenuItem, 
-    Paper, 
-    Select, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableFooter, 
-    TableHead, 
-    TableRow, 
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableRow,
     Typography
 } from "@material-ui/core";
 
@@ -157,10 +157,10 @@ const RegistersReports = () => {
     return (
         <MainContainer>
             <MainHeader>
-                <Title>Relatórios de Registros</Title>
+                <Title>{i18n.t("logReport.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <FormControl className={classes.root}>
-                        <InputLabel id="file-select-label">Arquivo</InputLabel>
+                        <InputLabel id="file-select-label">{i18n.t("logReport.select.file")}</InputLabel>
                         <Select
                             className={classes.select}
                             labelId="file-select-label"
@@ -169,7 +169,7 @@ const RegistersReports = () => {
                             onChange={handleFileSelectChange}
                             multiple
                         >
-                            <MenuItem value={"Todos"}>Todos</MenuItem>
+                            <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
                             {files && files.map((file, index) => {
                                 return (
                                     <MenuItem key={index} value={file.id}>
@@ -180,7 +180,7 @@ const RegistersReports = () => {
                         </Select>
                     </FormControl>
                     <FormControl className={classes.root}>
-                        <InputLabel id="status-select-label">Status</InputLabel>
+                        <InputLabel id="status-select-label">{i18n.t("logReport.select.status")}</InputLabel>
                         <Select
                             className={classes.select}
                             labelId="status-select-label"
@@ -189,11 +189,11 @@ const RegistersReports = () => {
                             onChange={handleStatusSelectChange}
                             multiple
                         >
-                            <MenuItem value={"Todos"}>Todos</MenuItem>
-                            <MenuItem value={"sent"}>Enviado</MenuItem>
-                            <MenuItem value={"delivered"}>Entregue</MenuItem>
-                            <MenuItem value={"read"}>Lido</MenuItem>
-                            <MenuItem value={"error"}>Erro</MenuItem>
+                            <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
+                            <MenuItem value={"sent"}>{i18n.t("logReport.select.sent")}</MenuItem>
+                            <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
+                            <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
+                            <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
                         </Select>
                     </FormControl>
                     <Button
@@ -202,7 +202,7 @@ const RegistersReports = () => {
                         onClick={createPdf}
                         disabled={creatingPdf}
                     >
-                        Criar PDF
+                        {i18n.t("logReport.buttons.createPdf")}
                     </Button>
                     <Button
                         variant="contained"
@@ -210,7 +210,7 @@ const RegistersReports = () => {
                         onClick={downloadPdf}
                         disabled={disableButton}
                     >
-                        Exportar PDF
+                        {i18n.t("logReport.buttons.exportPdf")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -221,11 +221,11 @@ const RegistersReports = () => {
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Nome</TableCell>
-                            <TableCell align="center">Enviado</TableCell>
-                            <TableCell align="center">Entregue</TableCell>
-                            <TableCell align="center">Lido</TableCell>
-                            <TableCell align="center">Erro</TableCell>
+                            <TableCell align="center">{i18n.t("logReport.grid.name")}</TableCell>
+                            <TableCell align="center">{i18n.t("logReport.grid.sent")}</TableCell>
+                            <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
+                            <TableCell align="center">{i18n.t("logReport.grid.read")}</TableCell>
+                            <TableCell align="center">{i18n.t("logReport.grid.errors")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -251,7 +251,7 @@ const RegistersReports = () => {
                             onClick={handlePreviousPage}
                             disabled={pageNumber === 1}
                         >
-                            Anterior
+                            {i18n.t("logReport.buttons.previous")}
                         </Button>
                         <Button
                             variant="contained"
@@ -259,10 +259,10 @@ const RegistersReports = () => {
                             onClick={handleNextPage}
                             disabled={pageNumber === Math.ceil(count / 20)}
                         >
-                            Próxima
+                            {i18n.t("logReport.buttons.next")}
                         </Button>
                         <Typography>
-                            Página: { pageNumber } / { Math.ceil(count / 20)}
+                            {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
                         </Typography>
                     </TableFooter>
                 </Table>

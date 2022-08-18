@@ -65,7 +65,7 @@ const messages = {
             title: "Read"
           },
           mistake: {
-            title: "Mistake"
+            title: "Mistakes"
           }
         }
       },
@@ -329,6 +329,7 @@ const messages = {
           settings: "Settings",
           reports: "Talk Reports",
           reportsTicket: "Ticket Report",
+          logReports: "Log Reports"
         },
 
         appBar: {
@@ -569,6 +570,34 @@ const messages = {
           cancel: "Cancel",
         },
       },
+
+      logReport:{
+        title: "Log Reports",
+        select:{
+          file: "Files",
+          status: "Status",
+          all: "All",
+          sent: "Sent",
+          delivered: "Delivered",
+          read: "Read",
+          errors: "Errors",
+        },
+        buttons:{
+          createPdf: "Create Pdf",
+          exportPdf:  "Export Pdf",
+          previous: "Previous",
+          next: "Next",
+          page: "Page: ",
+        },
+        grid:{
+          name: "Name",
+          sent: "Sent",
+          delivered: "Delivered",
+          read: "Read",
+          errors: "Errors"
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
