@@ -112,12 +112,10 @@ const MainListItems = (props) => {
         <li>
           <ListItem button open={openOff} onClick={handleClickOff}>
             <ListItemIcon>
-              <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
                 <WhatsAppIcon />
-              </Badge>
             </ListItemIcon>
             <ListItemText primary={i18n.t("WhatsApp")} />
-            {open ? <ExpandLess /> : <ExpandMore />}
+            {openOff ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
         </li>
         <Collapse component="li" in={openOff} timeout="auto" unmountOnExit>
@@ -127,6 +125,12 @@ const MainListItems = (props) => {
               primary={i18n.t("Conexões Oficiais")}
               sx={{ pl: 8 }}
               to="/officialConnections"
+            />
+            <ListItemLink
+              icon={<SettingsOutlinedIcon />}
+              primary="Configurações"
+              sx={{ pl: 8 }}
+              to="whatsConfig"
             />
           </List>
         </Collapse>

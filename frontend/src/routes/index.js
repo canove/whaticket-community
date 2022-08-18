@@ -18,6 +18,7 @@ import Reports from "../pages/Reports"
 import ReportsTicket from "../pages/ReportsTicket"
 import RegistersReports from "../pages/RegistersReports"
 import Importation from "../pages/Importation"
+import WhatsConfig from "../pages/WhatsConfig"
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import Route from "./Route";
@@ -51,6 +52,7 @@ const Routes = () => {
                 component={OfficialConnections}
                 isPrivate
               />
+              <Route exact path="/whatsConfig" component={WhatsConfig} isPrivate />
               <Route exact path="/templates" component={Templates} isPrivate />
               <Route exact path="/contacts" component={Contacts} isPrivate />
               <Route exact path="/users" component={Users} isPrivate />
