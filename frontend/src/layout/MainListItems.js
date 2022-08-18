@@ -9,23 +9,30 @@ import Divider from "@material-ui/core/Divider";
 import { Badge } from "@material-ui/core";
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
-import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
 import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
 import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
 import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutlined";
-import AssessmentOutlinedIcon from '@material-ui/icons/AssessmentOutlined';
-import ImportExportOutlinedIcon from '@material-ui/icons/ImportExportOutlined';
+import AssessmentOutlinedIcon from "@material-ui/icons/AssessmentOutlined";
+import ImportExportOutlinedIcon from "@material-ui/icons/ImportExportOutlined";
 import DvrIcon from "@material-ui/icons/Dvr";
+import PhoneCallbackIcon from "@material-ui/icons/PhoneCallback";
+import SyncAltIcon from "@material-ui/icons/SyncAlt";
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { AuthContext } from "../context/Auth/AuthContext";
 import { Can } from "../components/Can";
 import { useTranslation } from "react-i18next";
 
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import List from "@material-ui/core/List";
+import PropTypes from "prop-types";
+import Collapse from "@material-ui/core/Collapse";
+
 function ListItemLink(props) {
-  const { icon, primary, to, className } = props;
+  const { icon, to, primary, className, open, ...other } = props;
 
   const renderLink = React.useMemo(
     () =>
@@ -35,15 +42,26 @@ function ListItemLink(props) {
     [to]
   );
 
+  let icons = null;
+  if (open != null) {
+    icons = open ? <ExpandLess /> : <ExpandMore />;
+  }
+
   return (
     <li>
-      <ListItem button component={renderLink} className={className}>
+      <ListItem button component={renderLink} className={className} {...other}>
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
+        {icons}
       </ListItem>
     </li>
   );
 }
+
+ListItemLink.propTypes = {
+  open: PropTypes.bool,
+  to: PropTypes.string.isRequired,
+};
 
 const MainListItems = (props) => {
   const { drawerClose } = props;
@@ -51,6 +69,8 @@ const MainListItems = (props) => {
   const { user } = useContext(AuthContext);
   const [connectionWarning, setConnectionWarning] = useState(false);
   const { i18n } = useTranslation();
+  const [open, setOpen] = React.useState(false);
+  const [openOff, setOpenOff] = React.useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -74,6 +94,13 @@ const MainListItems = (props) => {
     return () => clearTimeout(delayDebounceFn);
   }, [whatsApps]);
 
+  const handleClickOff = () => {
+    setOpenOff((prevOpen) => !prevOpen);
+  };
+
+  const handleClick = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
   return (
     <div onClick={drawerClose}>
       <ListItemLink
@@ -81,20 +108,54 @@ const MainListItems = (props) => {
         primary="Dashboard"
         icon={<DashboardOutlinedIcon />}
       />
-      <ListItemLink
-        to="/connections"
-        primary={i18n.t("mainDrawer.listItems.connections")}
-        icon={
-          <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
-            <SyncAltIcon />
-          </Badge>
-        }
-      />
-      <ListItemLink
-        to="/officialConnections"
-        primary={i18n.t("mainDrawer.listItems.officialConnections")}
-        icon={<SyncAltIcon />}
-      />
+      <List>
+        <li>
+          <ListItem button open={openOff} onClick={handleClickOff}>
+            <ListItemIcon>
+              <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
+                <WhatsAppIcon />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText primary={i18n.t("WhatsApp")} />
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </ListItem>
+        </li>
+        <Collapse component="li" in={openOff} timeout="auto" unmountOnExit>
+          <List disablePadding>
+            <ListItemLink
+              icon={<SyncAltIcon />}
+              primary={i18n.t("Conexões Oficiais")}
+              sx={{ pl: 8 }}
+              to="/officialConnections"
+            />
+          </List>
+        </Collapse>
+      </List>
+
+      <List>
+        <li>
+          <ListItem button open={open} onClick={handleClick}>
+            <ListItemIcon>
+              <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
+                <WhatsAppIcon />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText primary={i18n.t("WhatsApp 2")} />
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </ListItem>
+        </li>
+        <Collapse component="li" in={open} timeout="auto" unmountOnExit>
+          <List disablePadding>
+            <ListItemLink
+              icon={<SyncAltIcon />}
+              primary={i18n.t("Conexões")}
+              sx={{ pl: 8 }}
+              to="connections"
+            />
+          </List>
+        </Collapse>
+      </List>
+
       <ListItemLink
         to="/templates"
         primary={i18n.t("mainDrawer.listItems.template")}
@@ -103,7 +164,7 @@ const MainListItems = (props) => {
       <ListItemLink
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
-        icon={<WhatsAppIcon />}
+        icon={<PhoneCallbackIcon />}
       />
 
       <ListItemLink
@@ -157,7 +218,7 @@ const MainListItems = (props) => {
             />
             <ListItemLink
               to="/registersReports"
-              primary="Relatórios de Envios"
+              primary={i18n.t("mainDrawer.listItems.logReports")}
               icon={<AssessmentOutlinedIcon />}
             />
           </>

@@ -332,7 +332,8 @@ const messages = {
           users: "Usuarios",
           settings: "Configuración",
           reports: "Informe de Conversación",
-          reportsTicket: "Informe de entradas"
+          reportsTicket: "Informe de entradas",
+          logReports: "Informes de Registro",
         },
         appBar: {
           user: {
@@ -544,36 +545,63 @@ const messages = {
           message: "Esta acción no puede ser revertida.",
         },
       },
-    templates: {
-        title: "Plantilla",
-        table:{
-          name: "Nombre",
-          preview: "Avance",
-          category: "Categoría",
-          classification: "Clasificación",
-          language: "Idioma",
-          status: "Estado",
-          action: "Comportamiento"
+      templates: {
+          title: "Plantilla",
+          table:{
+            name: "Nombre",
+            preview: "Avance",
+            category: "Categoría",
+            classification: "Clasificación",
+            language: "Idioma",
+            status: "Estado",
+            action: "Comportamiento"
+          },
+          buttons:{
+            newTemplate: "Nueva Plantilla",
+            cancel: "Cancelar",
+            add: "Agregar",
+            connection: "Conexiones"
+          },
+          templateModal:{
+            title: "Nueva Plantilla",
+            name: "Nombre",
+            category: "Categoría",
+            body: "Cuerpo",
+            footer: "Zócalo",
+            connection: "Conexiones",
+            transactional: "Transaccional",
+            marketing: "Marketing",
+            edit: "Para Editar",
+            cancel: "Cancelar",
+          },
         },
-        buttons:{
-          newTemplate: "Nueva Plantilla",
-          cancel: "Cancelar",
-          add: "Agregar",
-          connection: "Conexiones"
+        logReport:{
+          title: "Informes de Registro",
+          select:{
+            file: "Archivo",
+            status: "Estado",
+            all: "Todos",
+            sent: "Enviado",
+            delivered: "Repartido",
+            read: "Leer",
+            errors: "Errores",
+          },
+          buttons:{
+            createPdf: "Crea Pdf",
+            exportPdf:  "Exportar Pdf",
+            previous: "Anterior",
+            next: "Siguinte",
+            page: "Página: " ,
+          },
+          grid:{
+            name: "Nombre",
+            sent: "Enviado",
+            delivered: "Repartido",
+            read: "Leer",
+            errors: "Errores"
+          },
         },
-        templateModal:{
-          title: "Nueva Plantilla",
-          name: "Nombre",
-          category: "Categoría",
-          body: "Cuerpo",
-          footer: "Zócalo",
-          connection: "Conexiones",
-          transactional: "Transaccional",
-          marketing: "Marketing",
-          edit: "Para Editar",
-          cancel: "Cancelar",
-        },
-      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",

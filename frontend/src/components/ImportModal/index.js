@@ -84,9 +84,9 @@ const ImportModal = ({ open, onClose }) => {
 
 	const handleSubmit = async () => {
 		setLoading(true);
-		if (selectedConnection.length == 0 && !file) {
+		if (selectedConnection.length === 0 && !file) {
 			toast.error("Por favor, selecione uma ou mais conexões e um arquivo de disparo.");
-		} else if (selectedConnection.length == 0 ) {
+		} else if (selectedConnection.length === 0 ) {
 			toast.error("Por favor, selecione uma ou mais conexões.");
 		} else if (!file) {
 			toast.error("Por favor, selecione um arquivo de disparo.");
@@ -103,7 +103,7 @@ const ImportModal = ({ open, onClose }) => {
 				await api.post("file/upload", formData);
 			} catch (err) {
 				toastError(err);
-			}	
+			}
 			handleClose();
 		}
 		setLoading(false);
@@ -126,7 +126,7 @@ const ImportModal = ({ open, onClose }) => {
 			whatsApps.map((whats => {
 				if (whats.official === selectedType) {
 					allConnections.push(whats.id);
-				}
+				}return null
 			}));
 
 			setSelectedConnection(allConnections);
