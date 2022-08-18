@@ -19,6 +19,7 @@ import ImportExportOutlinedIcon from "@material-ui/icons/ImportExportOutlined";
 import DvrIcon from "@material-ui/icons/Dvr";
 import PhoneCallbackIcon from "@material-ui/icons/PhoneCallback";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
+import EqualizerIcon from "@material-ui/icons/Equalizer";
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { AuthContext } from "../context/Auth/AuthContext";
@@ -71,6 +72,7 @@ const MainListItems = (props) => {
   const { i18n } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [openOff, setOpenOff] = React.useState(false);
+  const [openRel, setOpenRel] = React.useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -101,6 +103,11 @@ const MainListItems = (props) => {
   const handleClick = () => {
     setOpen((prevOpen) => !prevOpen);
   };
+
+  const handleClickRel = () => {
+    setOpenRel((prevOpen) => !prevOpen);
+  };
+
   return (
     <div onClick={drawerClose}>
       <ListItemLink
@@ -122,13 +129,13 @@ const MainListItems = (props) => {
           <List disablePadding>
             <ListItemLink
               icon={<SyncAltIcon />}
-              primary={i18n.t("Conexões Oficiais")}
+              primary={i18n.t("mainDrawer.whatsApp.officialConnections")}
               sx={{ pl: 8 }}
               to="/officialConnections"
             />
             <ListItemLink
               icon={<SettingsOutlinedIcon />}
-              primary="Configurações"
+              primary={i18n.t("mainDrawer.whatsApp.settings")}
               sx={{ pl: 8 }}
               to="whatsConfig"
             />
@@ -152,14 +159,13 @@ const MainListItems = (props) => {
           <List disablePadding>
             <ListItemLink
               icon={<SyncAltIcon />}
-              primary={i18n.t("Conexões")}
+              primary={i18n.t("mainDrawer.whatsApp.connections")}
               sx={{ pl: 8 }}
               to="connections"
             />
           </List>
         </Collapse>
       </List>
-
       <ListItemLink
         to="/templates"
         primary={i18n.t("mainDrawer.listItems.template")}
@@ -210,9 +216,20 @@ const MainListItems = (props) => {
               primary={i18n.t("mainDrawer.listItems.settings")}
               icon={<SettingsOutlinedIcon />}
             />
+          <List>
+            <li>
+            <ListItem button open={openRel} onClick={handleClickRel}>
+            <ListItemIcon>
+                <EqualizerIcon/>
+            </ListItemIcon>
+            <ListItemText primary={i18n.t("mainDrawer.listItems.reports")} />
+              {openRel ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            </li>
+            <Collapse component="li" in={openRel} timeout="auto" unmountOnExit>
             <ListItemLink
               to="/reports"
-              primary={i18n.t("mainDrawer.listItems.reports")}
+              primary={i18n.t("mainDrawer.listItems.reportsTalk")}
               icon={<AssessmentOutlinedIcon />}
             />
             <ListItemLink
@@ -225,6 +242,9 @@ const MainListItems = (props) => {
               primary={i18n.t("mainDrawer.listItems.logReports")}
               icon={<AssessmentOutlinedIcon />}
             />
+          </Collapse>
+          </List>
+
           </>
         )}
       />

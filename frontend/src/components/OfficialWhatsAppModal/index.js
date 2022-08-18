@@ -164,8 +164,8 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			>
 				<DialogTitle>
 				{whatsAppId
-						? i18n.t("officialWhatsappModal.titleModal.edit")
-						: i18n.t("officialWhatsappModal.titleModal.add")}
+						? i18n.t("officialWhatsappModal.title.edit")
+						: i18n.t("officialWhatsappModal.title.add")}
 				</DialogTitle>
 				<Formik
 					initialValues={whatsApp}
@@ -215,7 +215,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
                                 <div className={classes.textQuickAnswerContainer}>
                                     <Field
                                         as={TextField}
-                                        label="Número de Telefone"
+                                        label={i18n.t("officialWhatsappModal.title.labelNumber")}
                                         name="phoneNumber"
                                         error={touched.phoneNumber && Boolean(errors.phoneNumber)}
                                         helperText={touched.phoneNumber && errors.phoneNumber}
@@ -229,7 +229,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
                                 <div className={classes.textQuickAnswerContainer}>
                                     <Field
                                         as={TextField}
-                                        label="Token de Autenticação do Facebook"
+                                        label={i18n.t("officialWhatsappModal.title.labelToken")}
                                         name="facebookToken"
                                         error={touched.facebookToken && Boolean(errors.facebookToken)}
                                         helperText={touched.facebookToken && errors.facebookToken}
@@ -243,7 +243,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
                                 <div className={classes.textQuickAnswerContainer}>
                                     <Field
                                         as={TextField}
-                                        label="Id do Telefone do Facebook"
+                                        label={i18n.t("officialWhatsappModal.title.labelId")}
                                         name="facebookPhoneNumberId"
                                         error={touched.facebookPhoneNumberId && Boolean(errors.facebookPhoneNumberId)}
                                         helperText={touched.facebookPhoneNumberId && errors.facebookPhoneNumberId}
@@ -257,7 +257,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								<div className={classes.textQuickAnswerContainer}>
                                     <Field
                                         as={TextField}
-                                        label="Facebook Business ID"
+                                        label={i18n.t("officialWhatsappModal.title.labelBusiness")}
                                         name="facebookBusinessId"
                                         error={touched.facebookBusinessId && Boolean(errors.facebookBusinessId)}
                                         helperText={touched.facebookBusinessId && errors.facebookBusinessId}
@@ -271,7 +271,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								<div>
 									<Field
 										as={TextField}
-										label={i18n.t("queueModal.form.greetingMessage")}
+										label={i18n.t("officialWhatsappModal.title.greetingMessage")}
 										type="greetingMessage"
 										multiline
 										minRows={3}
@@ -290,7 +290,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								<div>
 									<Field
 										as={TextField}
-										label={i18n.t("whatsappModal.form.farewellMessage")}
+										label={i18n.t("officialWhatsappModal.title.farewellMessage")}
 										type="farewellMessage"
 										multiline
 										minRows={3}
