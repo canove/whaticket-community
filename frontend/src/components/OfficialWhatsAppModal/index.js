@@ -76,7 +76,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const [submitType, setSubmitType] = useState("testConnection");
 
 	const [lastFormValues, setLastFormValues] = useState();
-	
+
 	const GetFormValues = () => {
 		const { values } = useFormikContext();
 
@@ -131,7 +131,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			const response = await api.get(`/whatsappsession/testConnection/`, {
 				params: { facebookToken, facebookPhoneNumberId, facebookBusinessId },
 			});
-			setIsConnectionTested(true);
+			setIsConnectionTested(response);
 		} catch (err) {
 			toastError(err);
 		}

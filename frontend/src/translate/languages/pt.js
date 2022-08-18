@@ -65,7 +65,7 @@ const messages = {
             title: "Lidos"
           },
           mistake: {
-            title: "Erro"
+            title: "Erros"
           },
         },
       },
@@ -329,7 +329,8 @@ const messages = {
           users: "Usuários",
           settings: "Configurações",
           reports: "Relatórios Conversa",
-          reportsTicket: "Relatórios Chamadas"
+          reportsTicket: "Relatórios Chamadas",
+          logReports: "Relatório Registro",
         },
         appBar: {
           user: {
@@ -467,7 +468,7 @@ const messages = {
         },
       },
       reports: {
-        title: "Relatório de Conversa",
+        title: "Relatório Conversa",
         buttons: {
           filter: "Filtrar relatórios",
           exportPdf: "Exportar PDF",
@@ -487,7 +488,7 @@ const messages = {
         }
       },
       reportsTicket: {
-        title: "Relatório do Ticket",
+        title: "Relatório Chamadas",
       },
       messagesList: {
         header: {
@@ -568,6 +569,33 @@ const messages = {
           marketing: "Marketing",
           edit: "Editar",
           cancel: "Cancelar",
+        },
+      },
+
+      logReport:{
+        title: "Relatórios de Registros",
+        select:{
+          file: "Arquivo",
+          status: "Status",
+          all: "Todos",
+          sent: "Enviados",
+          delivered: "Entregues",
+          read: "Lidos",
+          errors: "Erros",
+        },
+        buttons:{
+          createPdf: "Criar Pdf",
+          exportPdf:  "Exportar Pdf",
+          previous: "Anterior",
+          next: "Próxima",
+          page: "Página: ",
+        },
+        grid:{
+          name: "Nome",
+          sent: "Enviados",
+          delivered: "Entregues",
+          read: "Lidos",
+          errors: "Erros"
         },
       },
 
