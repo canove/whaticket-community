@@ -23,31 +23,34 @@ const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
   try {
     const data = await s3.getObject(getParams).promise();
     let objectData = data.Body.toString('utf-8');
-    let registers = objectData.split('\n');
+    let registers = objectData.split('\r\n');
     let totalRegisters = 0;
     let registersToInsert = [];
 
     registers.forEach(async (line) => {
       // eslint-disable-next-line @typescript-eslint/ban-types
-
-      if (line.trim().length > 1) {
-        let infos = line.split(";");
-
-        registersToInsert.push({
-          name: infos[0],
-          phoneNumber: infos[2],
-          fileId: file.id,
-          documentNumber: infos[1],
-          template: infos[3],
-          templateParams: infos[4],
-          message: infos[5]
-        });
-
-        if (registersToInsert.length >= 500) {
-          await FileRegister.bulkCreate(registersToInsert);
-          totalRegisters += registersToInsert.length;
-          registersToInsert = [];
+      try {
+        if (line.trim().length > 1) {
+          let infos = line.split(";");
+  
+          registersToInsert.push({
+            name: infos[0],
+            phoneNumber: infos[2],
+            fileId: file.id,
+            documentNumber: infos[1],
+            template: infos[3],
+            templateParams: infos[4],
+            message: infos[5]
+          });
+  
+          if (registersToInsert.length >= 500) {
+            await FileRegister.bulkCreate(registersToInsert);
+            totalRegisters += registersToInsert.length;
+            registersToInsert = [];
+          }
         }
+      } catch (err) {
+        console.log(err);
       }
     });
 
