@@ -76,13 +76,15 @@ const MainListItems = (props) => {
     const delayDebounceFn = setTimeout(() => {
       if (whatsApps.length > 0) {
         const offlineWhats = whatsApps.filter((whats) => {
-          return (
-            whats.status === "qrcode" ||
-            whats.status === "PAIRING" ||
-            whats.status === "DISCONNECTED" ||
-            whats.status === "TIMEOUT" ||
-            whats.status === "OPENING"
-          );
+          if (whats.official === false) {
+            return (
+              whats.status === "qrcode" ||
+              whats.status === "PAIRING" ||
+              whats.status === "DISCONNECTED" ||
+              whats.status === "TIMEOUT" ||
+              whats.status === "OPENING"
+            );
+          }
         });
         if (offlineWhats.length > 0) {
           setConnectionWarning(true);
@@ -126,12 +128,6 @@ const MainListItems = (props) => {
               sx={{ pl: 8 }}
               to="/officialConnections"
             />
-            <ListItemLink
-              icon={<SettingsOutlinedIcon />}
-              primary="Configurações"
-              sx={{ pl: 8 }}
-              to="whatsConfig"
-            />
           </List>
         </Collapse>
       </List>
@@ -155,6 +151,12 @@ const MainListItems = (props) => {
               primary={i18n.t("Conexões")}
               sx={{ pl: 8 }}
               to="connections"
+            />
+            <ListItemLink
+              icon={<SettingsOutlinedIcon />}
+              primary="Configurações"
+              sx={{ pl: 8 }}
+              to="whatsConfig"
             />
           </List>
         </Collapse>
