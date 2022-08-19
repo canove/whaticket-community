@@ -59,6 +59,10 @@ class FileRegister extends Model<FileRegister> {
 
   @AllowNull(true)
   @Column
+  whatsappId: number;
+
+  @AllowNull(true)
+  @Column
   deliveredAt: Date;
 
   @AllowNull(true)
