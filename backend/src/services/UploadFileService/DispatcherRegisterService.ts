@@ -68,7 +68,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
                 parameters: templateParams
               }
             });
-            await reg.update({ processedAt: new Date() });
+            await reg.update({ processedAt: new Date(), whatsappId: account.id });
         });
       } else {
           const lastSend: Date = account.lastSendDate;
@@ -110,7 +110,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
                   }
                 });
 
-                await reg.update({ processedAt: new Date() });
+                await reg.update({ processedAt: new Date(), whatsappId: account.id });
             }
 
               if(registers.length > 0) {
