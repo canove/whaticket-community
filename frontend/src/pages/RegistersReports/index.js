@@ -141,7 +141,8 @@ const RegistersReports = () => {
             setCreatingPdf(false);
             setDisableButton(false);
         } catch (err) {
-             toastError(err);
+            toastError(err);
+            setCreatingPdf(false);
         }
     }
 
