@@ -130,15 +130,6 @@ const Dashboard = () => {
       } catch (err) {
         toastError(err);
       }
-      try {
-        setLoading(true);
-
-        const { data } = await api.get('file/list?Status=4');
-        setFiles(files.concat(data));
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-      }
     };
     handleFiles();
 // eslint-disable-next-line react-hooks/exhaustive-deps

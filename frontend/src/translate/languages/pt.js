@@ -35,37 +35,37 @@ const messages = {
       },
       dashboard: {
         title: "Dashboard",
-        file:" Arquivo",
+        file: " Arquivo",
         charts: {
           perDay: {
             title: "Chamadas hoje: ",
-            calls: "Chamadas"
+            calls: "Chamadas",
           },
         },
         messages: {
           inAttendance: {
-            title: "Em Atendimento"
+            title: "Em Atendimento",
           },
           waiting: {
-            title: "Aguardando"
+            title: "Aguardando",
           },
           closed: {
-            title: "Finalizados"
+            title: "Finalizados",
           },
           imported: {
-            title: "Importados"
+            title: "Importados",
           },
           sent: {
-            title: "Enviados"
+            title: "Enviados",
           },
           handedOut: {
-            title: "Entregues"
+            title: "Entregues",
           },
           read: {
-            title: "Lidos"
+            title: "Lidos",
           },
           mistake: {
-            title: "Erros"
+            title: "Erros",
           },
         },
       },
@@ -116,15 +116,23 @@ const messages = {
           default: "Padrão",
           actions: "Ações",
           session: "Sessão",
+          quality: "Qualidade",
+          limit: "Limite",
         },
       },
       officialConnections: {
         title: "Conexões Oficiais",
       },
       officialWhatsappModal: {
-        title:{
-        add:"Adicionar WhatsApp Oficial",
-        edit: "Editar WhatsApp Oficial",
+        title: {
+          add: "Adicionar WhatsApp Oficial",
+          edit: "Editar WhatsApp Oficial",
+          labelNumber: "Número de Telefone",
+          labelToken: "Token de Autenticação do Facebook",
+          labelId: "Id do Telefone do Facebook",
+          labelBusiness: "Facebook Business Id",
+          greetingMessage: "Mensagem de saudação",
+          farewellMessage: "Mensagem de despedida",
         },
         buttons: {
           cancel: "Cancelar",
@@ -317,8 +325,6 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
-          connections: "Conexões",
-          officialConnections: "Conexões Oficiais",
           template: "Templates",
           tickets: "Chamadas",
           contacts: "Contatos",
@@ -328,9 +334,15 @@ const messages = {
           administration: "Administração",
           users: "Usuários",
           settings: "Configurações",
-          reports: "Relatórios Conversa",
+          reportsTalk: "Relatórios Conversa",
           reportsTicket: "Relatórios Chamadas",
           logReports: "Relatório Registro",
+          reports: "Relatórios",
+        },
+        whatsApp: {
+          connections: "Conexões",
+          officialConnections: "Conexões Oficiais",
+          settings: "Configurações",
         },
         appBar: {
           user: {
@@ -401,7 +413,7 @@ const messages = {
           official: "Oficial",
           actions: "Ações",
         },
-        registryModal:{
+        registryModal: {
           title: "Registros",
           id: "Id",
           name: "Nome",
@@ -428,10 +440,10 @@ const messages = {
           noFile: "Nenhum Arquivo Importado",
           uploadedFile: "Arquivo Importado",
           supportedTriggerModel: "Modelo de Disparo Suportado",
-          connection:"Conexão",
+          connection: "Conexão",
           selectAConnection: "Selecione uma Conexão",
           show: "Mostrar",
-          toHide: "Esconder"
+          toHide: "Esconder",
         },
       },
       users: {
@@ -485,7 +497,7 @@ const messages = {
           mediaURL: "URL da mídia",
           ticketId: "ID da chamada",
           date: "Data",
-        }
+        },
       },
       reportsTicket: {
         title: "Relatório Chamadas",
@@ -502,7 +514,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
+        placeholderOpen:
+          "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
         placeholderClosed:
           "Reabra ou aceite essa chamada para enviar uma mensagem.",
         signMessage: "Assinar",
@@ -543,7 +556,7 @@ const messages = {
       },
       templates: {
         title: "Templates",
-        table:{
+        table: {
           name: "Nome",
           preview: "Prévia",
           category: "Categoria",
@@ -552,13 +565,13 @@ const messages = {
           status: "Status",
           action: "Ações",
         },
-        buttons:{
+        buttons: {
           newTemplate: "Nova Template",
           cancel: "Cancelar",
           add: "Adicionar",
           connection: "Conexões",
         },
-        templateModal:{
+        templateModal: {
           title: "Nova Template",
           name: "Nome",
           category: "Categoria",
@@ -572,9 +585,9 @@ const messages = {
         },
       },
 
-      logReport:{
+      logReport: {
         title: "Relatórios de Registros",
-        select:{
+        select: {
           file: "Arquivo",
           status: "Status",
           all: "Todos",
@@ -583,20 +596,27 @@ const messages = {
           read: "Lidos",
           errors: "Erros",
         },
-        buttons:{
+        buttons: {
           createPdf: "Criar Pdf",
-          exportPdf:  "Exportar Pdf",
+          exportPdf: "Exportar Pdf",
           previous: "Anterior",
           next: "Próxima",
           page: "Página: ",
         },
-        grid:{
+        grid: {
           name: "Nome",
           sent: "Enviado",
           delivered: "Entregue",
           read: "Lido",
-          errors: "Erro"
+          errors: "Erro",
         },
+      },
+
+      settingsWhats:{
+        title: "Configurações",
+        triggerTime: "Tempo de Disparo entre as Instâncias",
+        connections: "Conexões",
+        all: "Todos",
       },
 
       backendErrors: {

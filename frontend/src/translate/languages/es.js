@@ -117,23 +117,31 @@ const messages = {
           default: "Por Defecto",
           actions: "Acciones",
           session: "Sesión",
+          quality: "Calidad",
+          limit: "Límite"
         },
       },
       officialConnections: {
-        title: "Official Connections",
+        title: "Conexiones Oficiales",
       },
       officialWhatsappModal: {
-        title: "Add Official WhatsApp",
-        buttons: {
-          cancel: "Cancel",
-          testConnection: "Test Connection",
-          add: "Add",
-        },
-      titleModal:{
+        title:{
         add:"Agregar Whatsapp Oficial",
-        edit: "Para Editar WhatsApp Official",
+        edit: "Para Editar WhatsApp Oficial",
+        labelNumber: "Número de teléfono",
+        labelToken: "Ficha de autenticación de Facebook",
+        labelId: "Identificación de teléfono de Facebook",
+        labelBusiness: "Identificación Comercial de Facebook",
+        greetingMessage: "Mensaje de Saludo",
+        farewellMessage: "Mensaje de Despedida",
+        },
+        buttons: {
+          cancel: "Cancelar",
+          testConnection: "Testar Conexion",
+          add: "Agregar",
         },
       },
+
       whatsappModal: {
         title: {
           add: "Agrega WhatsApp",
@@ -320,8 +328,6 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
-          connections: "Conexiones",
-          officialConnections: "Official Connections",
           template: "Plantilla",
           tickets: "Tickets",
           contacts: "Contactos",
@@ -331,10 +337,17 @@ const messages = {
           administration: "Administración",
           users: "Usuarios",
           settings: "Configuración",
-          reports: "Informe de Conversación",
+          reportsTalk: "Informe de Conversación",
           reportsTicket: "Informe de entradas",
           logReports: "Informes de Registro",
+          reports: "Informes",
         },
+        whatsApp: {
+          connections: "Conexiones",
+          officialConnections: "Conexiones Oficiales",
+          settings: "Configuración",
+        },
+
         appBar: {
           user: {
             profile: "Perfil",
@@ -601,6 +614,13 @@ const messages = {
             errors: "Errores"
           },
         },
+
+        settingsWhats:{
+          title: "Configuración",
+          triggerTime: "Tiempo de activación entre instancias",
+          connections: "conexiones",
+          all: "Todos",
+      },
 
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
