@@ -47,8 +47,6 @@ const RegistersReports = () => {
 
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(false);
-    const [creatingPdf, setCreatingPdf] = useState(false);
-    const [disableButton, setDisableButton] = useState(true);
     const [files, setFiles] = useState([]);
     const [fileIds, setFileIds] = useState([]);
     const [statuses, setStatuses] = useState([]);
@@ -56,6 +54,9 @@ const RegistersReports = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [count, setCount] = useState(0);
     const [pdf, setPdf] = useState("");
+    const [disablePdfButton, setDisablePdfButton] = useState(true);
+    const [csv, setCsv] = useState("");
+    const [disableCsvButton, setDisableCsvButton] = useState(true);
 
     useEffect(() => {
         setLoading(true);
@@ -72,7 +73,40 @@ const RegistersReports = () => {
 
     useEffect(() => {
         setPageNumber(1);
-        setDisableButton(true);
+        setDisablePdfButton(true);
+        setDisableCsvButton(true);
+    }, [fileIds, statuses])
+
+    useEffect(() => {
+        const createCsvFile = async () => {
+            try {
+                const { data } = await api.get(`/registers/exportCsv`, {
+                    params: { statuses, fileIds, pageNumber: "ALL" }
+                });
+                setCsv(data);
+                setDisableCsvButton(false);
+            } catch (err) {
+                toastError(err);
+                setDisableCsvButton(true);
+            }
+        }
+        createCsvFile();
+    }, [fileIds, statuses])
+
+    useEffect(() => {
+        const createPdfFile = async () => {
+            try {
+                const { data } = await api.get(`/registers/exportPdf`, {
+                    params: { statuses, fileIds, pageNumber: "ALL" }
+                });
+                setPdf(data);
+                setDisablePdfButton(false);
+            } catch (err) {
+                toastError(err);
+                setDisablePdfButton(true);
+            }
+        }
+        createPdfFile();
     }, [fileIds, statuses])
 
     useEffect(() => {
@@ -97,7 +131,7 @@ const RegistersReports = () => {
             target: { value },
         } = e;
 
-        if (value.includes("Todos")) {
+        if (value.includes("all")) {
             setFileIds([]);
         } else {
             setFileIds(typeof value === 'string' ? value.split(',') : value,);
@@ -109,7 +143,7 @@ const RegistersReports = () => {
             target: { value },
         } = e;
 
-        if (value.includes("Todos")) {
+        if (value.includes("all")) {
             setStatuses([]);
         } else {
             setStatuses(typeof value === 'string' ? value.split(',') : value,);
@@ -131,19 +165,17 @@ const RegistersReports = () => {
         return date;
     }
 
-    const createPdf = async () => {
-        setCreatingPdf(true);
-        try {
-            const { data } = await api.get(`/registers/exportPdf`, {
-                params: { statuses, fileIds, pageNumber: "ALL" }
-            });
-            setPdf(data);
-            setCreatingPdf(false);
-            setDisableButton(false);
-        } catch (err) {
-            toastError(err);
-            setCreatingPdf(false);
+    const getStatus = (register) => {
+        if (register.errorAt) {
+            return 'Erro';
+        } else if (register.readAt) {
+            return 'Lido';
+        } else if (register.deliveredAt) {
+            return 'Entregue';
+        } else if (register.sentAt) {
+            return 'Enviado';
         }
+        return '';
     }
 
     const downloadPdf = () => {
@@ -153,6 +185,16 @@ const RegistersReports = () => {
         downloadLink.href = linkSource;
         downloadLink.download = fileName;
         downloadLink.click();
+    }
+
+    const downloadCsv = async () => {
+        const encodedUri = encodeURI(csv);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "report.csv");
+        document.body.appendChild(link);
+
+        link.click();
     }
 
     return (
@@ -200,18 +242,18 @@ const RegistersReports = () => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={createPdf}
-                        disabled={creatingPdf}
+                        onClick={downloadPdf}
+                        disabled={disablePdfButton}
                     >
-                        {i18n.t("logReport.buttons.createPdf")}
+                        {i18n.t("logReport.buttons.exportPdf")}
                     </Button>
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={downloadPdf}
-                        disabled={disableButton}
+                        onClick={downloadCsv}
+                        disabled={disableCsvButton}
                     >
-                        {i18n.t("logReport.buttons.exportPdf")}
+                        Exportar CSV
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -223,6 +265,7 @@ const RegistersReports = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">{i18n.t("logReport.grid.name")}</TableCell>
+                            <TableCell align="center">Status</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.sent")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.read")}</TableCell>
@@ -235,6 +278,7 @@ const RegistersReports = () => {
                                 return (
                                     <TableRow key={index}>
                                         <TableCell align="center">{register.name}</TableCell>
+                                        <TableCell align="center">{getStatus(register)}</TableCell>
                                         <TableCell align="center">{formatDate(register.sentAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.deliveredAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.readAt)}</TableCell>

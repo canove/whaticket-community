@@ -605,10 +605,10 @@ const messages = {
         },
         grid: {
           name: "Nome",
-          sent: "Enviados",
-          delivered: "Entregues",
-          read: "Lidos",
-          errors: "Erros",
+          sent: "Enviado",
+          delivered: "Entregue",
+          read: "Lido",
+          errors: "Erro",
         },
       },
 

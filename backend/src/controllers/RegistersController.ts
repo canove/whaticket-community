@@ -4,7 +4,7 @@ import ListReportRegistersService from "../services/RegistersService/ListReportR
 
 var fs = require("fs");
 var pdf = require("pdf-creator-node");
-var pdf2base64 = require('pdf-to-base64');
+var pdf2base64 = require("pdf-to-base64");
 
 type IndexQuery = {
   type: string,
@@ -65,18 +65,30 @@ export const exportPdf = async (req: Request, res: Response) => {
   }
 
   const getRegistersData = () => {
-    let text = ''
+    let text = ""
 
     registers.forEach((register) => {
-      const name = register.getDataValue('name');
-      const sentAt = formatDate(register.getDataValue('sentAt'));
-      const deliveredAt = formatDate(register.getDataValue('deliveredAt'));
-      const readAt = formatDate(register.getDataValue('readAt'));
-      const errorAt = formatDate(register.getDataValue('errorAt'));
+      const name = register.getDataValue("name");
+      const sentAt = formatDate(register.getDataValue("sentAt"));
+      const deliveredAt = formatDate(register.getDataValue("deliveredAt"));
+      const readAt = formatDate(register.getDataValue("readAt"));
+      const errorAt = formatDate(register.getDataValue("errorAt"));
+
+      let status = "";
+      if (errorAt) {
+        status = "Erro";
+      } else if (register.readAt) {
+        status = "Lido";
+      } else if (register.deliveredAt) {
+        status = "Entregue";
+      } else if (register.sentAt) {
+        status = "Enviado";
+      }
 
       text += `
         <tr>
           <td style="border: 1px solid black">${name}</td>
+          <td style="border: 1px solid black">${status}</td>
           <td style="border: 1px solid black">${sentAt}</td>
           <td style="border: 1px solid black">${deliveredAt}</td>
           <td style="border: 1px solid black">${readAt}</td>
@@ -101,6 +113,7 @@ export const exportPdf = async (req: Request, res: Response) => {
                 <thead>
                     <tr>
                         <td style="border: 1px solid black">Nome</td>
+                        <td style="border: 1px solid black">Status</td>
                         <td style="border: 1px solid black">Enviado</td>
                         <td style="border: 1px solid black">Entregue</td>
                         <td style="border: 1px solid black">Lido</td>
@@ -114,15 +127,6 @@ export const exportPdf = async (req: Request, res: Response) => {
         </body>
         </html>
     `;
-
-//     <tr>
-//     <td style="border: 1px solid black">{{this.dataValues.name}}</td>
-//     <td style="border: 1px solid black">{{this.dataValues.sentAt}}</td>
-//     <td style="border: 1px solid black">{{this.dataValues.deliveredAt}}</td>
-//     <td style="border: 1px solid black">{{this.dataValues.readAt}}</td>
-//     <td style="border: 1px solid black">{{this.dataValues.errorAt}}</td>
-// <tr>
-// {{/each}}
 
   let options = {
     format: "A3",
@@ -151,9 +155,70 @@ export const exportPdf = async (req: Request, res: Response) => {
     return res.status(200).json(pdfBase);
   })
 
-  fs.unlink('./src/downloads/output.pdf', (err: Error) => {
+  fs.unlink("./src/downloads/output.pdf", (err: Error) => {
       if (err) {
           throw err;
       }
   });
+}
+
+export const exportCsv = async (req: Request, res: Response) => {
+  const { statuses, fileIds, pageNumber } = req.query as Query;
+
+  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber });
+
+  const checkZero = (data) => {
+    if(data.length == 1){
+      data = "0" + data;
+    }
+    return data;
+  }
+
+  const formatDate = (date) => {
+    if (date === null) {
+      return "";
+    } else {
+      let dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(date.getHours() + "")}:${checkZero(date.getMinutes() + "")}`;
+      return dateString;
+    }
+  }
+
+  let rows = [['Nome', 'Status', 'Enviado', 'Entregue', 'Lido', 'Erro']];
+
+  registers.forEach((register) => {
+    const name = register.name;
+    const sentAt = formatDate(register.sentAt);
+    const deliveredAt = formatDate(register.deliveredAt);
+    const readAt = formatDate(register.readAt);
+    const errorAt = formatDate(register.errorAt);
+
+    let status = "";
+    if (errorAt) {
+      status = "Erro";
+    } else if (register.readAt) {
+      status = "Lido";
+    } else if (register.deliveredAt) {
+      status = "Entregue";
+    } else if (register.sentAt) {
+      status = "Enviado";
+    }
+
+    let columns = [];
+
+    columns.push(name);
+    columns.push(status);
+    columns.push(sentAt);
+    columns.push(deliveredAt);
+    columns.push(readAt);
+    columns.push(errorAt);
+    rows.push(columns);
+  });
+
+  let csvContent = "data:text/csv;charset=utf-8,";
+  rows.forEach((rowArray) => {
+    let row = rowArray.join(";");
+    csvContent += row + "\r\n";
+  });
+
+  return res.status(200).json(csvContent);
 }
