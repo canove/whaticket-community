@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -72,6 +72,7 @@ const WhatsConfig = () => {
 
 			whatsApps.map((whats => {
 				allConnections.push(whats.id);
+                return null
 			}));
 
 			setSelectedConnection(allConnections);
