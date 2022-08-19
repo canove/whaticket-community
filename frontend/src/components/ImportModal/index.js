@@ -92,13 +92,17 @@ const ImportModal = ({ open, onClose }) => {
 			toast.error("Por favor, selecione um arquivo de disparo.");
 		} else {
 			try {
-				const selectedConnectionToString = selectedConnection.join();
 				const formData = new FormData();
 				formData.append("file", file, file.name);
 				formData.set("ownerid", user.id);
 				formData.set("name", file.name);
 				formData.set("official", selectedType);
-				formData.set("whatsappIds", selectedConnectionToString);
+				if (selectedConnection.includes('Todos')) {
+					formData.set("whatsappIds", null);
+				} else {
+					const selectedConnectionToString = selectedConnection.join();
+					formData.set("whatsappIds", selectedConnectionToString);
+				}
 
 				await api.post("file/upload", formData);
 			} catch (err) {
@@ -121,13 +125,13 @@ const ImportModal = ({ open, onClose }) => {
 		if (value.includes('Todos')) {
 			setSelectedConnection([]);
 
-			let allConnections = []
+			let allConnections = ["Todos"]
 
-			whatsApps.map((whats => {
-				if (whats.official === selectedType) {
-					allConnections.push(whats.id);
-				}return null
-			}));
+			// whatsApps.map((whats => {
+			// 	if (whats.official === selectedType) {
+			// 		allConnections.push(whats.id);
+			// 	}return null
+			// }));
 
 			setSelectedConnection(allConnections);
 		} else {
