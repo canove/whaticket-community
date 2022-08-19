@@ -10,10 +10,19 @@ type IndexQuery = {
     ticketId: Number;
 }
 
+type Report = {
+    id: string,
+    body: string,
+    mediaUrl: string | null,
+    ticketId: number,
+    createdAt: Date,
+    read: number | boolean
+}
+
 export const index = async (req: Request, res: Response) => {
     const { ticketId } = req.query as unknown as IndexQuery;
 
-    const reports = await Message.sequelize?.query(`
+    const reports: Array<Report> = await Message.sequelize?.query(`
         select
             msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
         from
@@ -27,6 +36,54 @@ export const index = async (req: Request, res: Response) => {
     `,
     { type: QueryTypes.SELECT }
     );
+
+    const checkZero = (data) => {
+        if(data.length == 1){
+            data = "0" + data;
+        }
+        return data;
+    }
+    
+    const formatDate = (date) => {
+        if (date === null) {
+            return "";
+        } else {
+            let dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(date.getHours() + "")}:${checkZero(date.getMinutes() + "")}`;
+            return dateString;
+        }
+    }
+
+    const isRead = (read) => {
+        if (read === 1) {
+            return "Sim";
+        } else if (read === 2) {
+            return "Não";
+        } else {
+            return read;
+        }
+    }
+    
+    const getReportData = () => {
+        let text = '';
+        reports.forEach((report: Report) => {
+            const id = report.id;
+            const body = report.body;
+            const mediaUrl = report.mediaUrl ? report.mediaUrl : '';
+            const createdAt = formatDate(report.createdAt);
+            const read = isRead(report.read);
+
+            text += `
+                <tr>
+                    <td style="border: 1px solid black">${id}</td>
+                    <td style="border: 1px solid black">${body}</td>
+                    <td style="border: 1px solid black">${mediaUrl}</td>
+                    <td style="border: 1px solid black">${createdAt}</td>
+                    <td style="border: 1px solid black">${read}</td>
+                </tr>
+            `
+        });
+        return text;
+    }
 
     var html = `
         <!DOCTYPE html>
@@ -49,15 +106,7 @@ export const index = async (req: Request, res: Response) => {
                     <tr>
                 </thead>
                 <tbody>
-                    {{#each reports}}
-                    <tr>
-                        <td style="border: 1px solid black">{{this.id}}</td>
-                        <td style="border: 1px solid black">{{this.body}}</td>
-                        <td style="border: 1px solid black">{{this.mediaUrl}}</td>
-                        <td style="border: 1px solid black">{{this.createdAt}}</td>
-                        <td style="border: 1px solid black">{{this.read}}</td>
-                    <tr>
-                    {{/each}}
+                    ${getReportData()}
                 </tbody>
             </table>
         </body>
