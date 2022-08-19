@@ -1,0 +1,12 @@
+* text=auto
+*.sh text eol=lf
+Dockerfile eol=lf
+docker-compose.yml eol=lf
+docker-compose.*.yml eol=lf
+*.jpg binary
+*.png binary 
+*.gif binary 
+*.woff binary 
+*.tff binary 
+*.eot binary 
+*.otf binary
