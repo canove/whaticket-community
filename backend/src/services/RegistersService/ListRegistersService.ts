@@ -29,7 +29,7 @@ const ListRegistersService = async ({
         break;
       case 'error':
         whereCondition = {
-          errorMessage: {[Op.ne]: null},
+          errorAt: {[Op.ne]: null},
           fileId: fileId
         }
         break;
