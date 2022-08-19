@@ -241,10 +241,10 @@ const OfficialConnections = () => {
 								{i18n.t("connections.table.name")}
 							</TableCell>
 							<TableCell align="center">
-								Qualidade
+								{i18n.t("connections.table.quality")}
 							</TableCell>
 							<TableCell align="center">
-								Limite
+								{i18n.t("connections.table.limit")}
 							</TableCell>
 							<TableCell align="center">
 								{i18n.t("connections.table.session")}

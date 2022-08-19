@@ -115,23 +115,31 @@ const messages = {
           default: "Default",
           actions: "Actions",
           session: "Session",
+          quality: "Quality",
+          limit: "Limit"
         },
       },
       officialConnections: {
         title: "Official Connections",
       },
       officialWhatsappModal: {
-        title: "Add Official WhatsApp",
+        title:{
+        add:"Add Official WhatsApp",
+        edit: "Edit WhatsApp Official",
+        labelNumber: "Phone Number",
+        labelToken: "Facebook Authentication Token",
+        labelId: "Facebook Phone Id",
+        labelBusiness: "Facebook Business Id",
+        greetingMessage: "Greeting Message",
+        farewellMessage: "Farewell Message",
+        },
         buttons: {
           cancel: "Cancel",
           testConnection: "Test Connection",
           add: "Add",
         },
-      titleModal:{
-        add:"Add WhatsApp Official",
-        edit: "Edit WhatsApp Official",
-        },
       },
+
       whatsappModal: {
         title: {
           add: "Add WhatsApp",
@@ -316,8 +324,6 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
-          connections: "Connections",
-          officialConnections: "Official Connections",
           template: "Templates",
           tickets: "Tickets",
           contacts: "Contacts",
@@ -327,9 +333,15 @@ const messages = {
           administration: "Administration",
           users: "Users",
           settings: "Settings",
-          reports: "Talk Reports",
+          reportsTalk: "Talk Reports",
           reportsTicket: "Ticket Report",
-          logReports: "Log Reports"
+          logReports: "Log Reports",
+          reports: "Reports",
+        },
+        whatsApp: {
+          connections: "Connections",
+          officialConnections: "Official Connections",
+          settings: "Settings",
         },
 
         appBar: {
@@ -596,6 +608,13 @@ const messages = {
           read: "Read",
           errors: "Errors"
         },
+      },
+
+      settingsWhats:{
+        title: "Settings",
+        triggerTime: "Trigger Time Between Instances",
+        connections: "Connections",
+        all: "All",
       },
 
       backendErrors: {

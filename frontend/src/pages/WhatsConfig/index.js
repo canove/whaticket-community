@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -72,6 +72,7 @@ const WhatsConfig = () => {
 
 			whatsApps.map((whats => {
 				allConnections.push(whats.id);
+                return null
 			}));
 
 			setSelectedConnection(allConnections);
@@ -83,14 +84,14 @@ const WhatsConfig = () => {
 	return (
 	    <MainContainer>
             <MainHeader>
-                <Title>Configurações</Title>
+                <Title>{i18n.t("settingsWhats.title")}</Title>
             </MainHeader>
             <Paper
                 className={classes.paper}
                 variant="outlined"
             >
                 <Typography id="input-slider" gutterBottom>
-                    Tempo de Disparo entre as Instâncias (1min - 60min)
+                    {i18n.t("settingsWhats.triggerTime")} (1min - 60min)
                 </Typography>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs>
@@ -126,7 +127,7 @@ const WhatsConfig = () => {
                 variant="outlined"
             >
                 <Typography variant="subtitle1" gutterBottom>
-                	Conexões:
+                	{i18n.t("settingsWhats.connections")}
 				</Typography>
 				<Select
 					labelId="type-select-label"
@@ -136,7 +137,7 @@ const WhatsConfig = () => {
 					onChange={handleChangeConnection}
 					multiple
 				>
-					<MenuItem value={"Todos"}>Todos</MenuItem>
+					<MenuItem value={"Todos"}>{i18n.t("settingsWhats.all")}</MenuItem>
 					{whatsApps && whatsApps.map((whats, index) => {
 						if (whats.official === false) {
 							if (whats.status === "CONNECTED") {

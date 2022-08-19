@@ -4,7 +4,6 @@ import { Link as RouterLink } from "react-router-dom";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
 import Divider from "@material-ui/core/Divider";
 import { Badge } from "@material-ui/core";
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
@@ -17,12 +16,12 @@ import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutline
 import AssessmentOutlinedIcon from "@material-ui/icons/AssessmentOutlined";
 import ImportExportOutlinedIcon from "@material-ui/icons/ImportExportOutlined";
 import DvrIcon from "@material-ui/icons/Dvr";
-import PhoneCallbackIcon from "@material-ui/icons/PhoneCallback";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
+import EqualizerIcon from "@material-ui/icons/Equalizer";
+import ChatIcon from "@material-ui/icons/Chat";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
-import { AuthContext } from "../context/Auth/AuthContext";
-import { Can } from "../components/Can";
 import { useTranslation } from "react-i18next";
 
 import ExpandLess from "@material-ui/icons/ExpandLess";
@@ -66,11 +65,12 @@ ListItemLink.propTypes = {
 const MainListItems = (props) => {
   const { drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
-  const { user } = useContext(AuthContext);
   const [connectionWarning, setConnectionWarning] = useState(false);
   const { i18n } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [openOff, setOpenOff] = React.useState(false);
+  const [openRel, setOpenRel] = React.useState(false);
+  const [openAdm, setOpenAdm] = React.useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -103,6 +103,15 @@ const MainListItems = (props) => {
   const handleClick = () => {
     setOpen((prevOpen) => !prevOpen);
   };
+
+  const handleClickRel = () => {
+    setOpenRel((prevOpen) => !prevOpen);
+  };
+
+  const handleClickAdm = () => {
+    setOpenAdm((prevOpen) => !prevOpen);
+  };
+
   return (
     <div onClick={drawerClose}>
       <ListItemLink
@@ -114,7 +123,7 @@ const MainListItems = (props) => {
         <li>
           <ListItem button open={openOff} onClick={handleClickOff}>
             <ListItemIcon>
-                <WhatsAppIcon />
+              <WhatsAppIcon />
             </ListItemIcon>
             <ListItemText primary={i18n.t("WhatsApp")} />
             {openOff ? <ExpandLess /> : <ExpandMore />}
@@ -124,7 +133,7 @@ const MainListItems = (props) => {
           <List disablePadding>
             <ListItemLink
               icon={<SyncAltIcon />}
-              primary={i18n.t("Conexões Oficiais")}
+              primary={i18n.t("mainDrawer.whatsApp.officialConnections")}
               sx={{ pl: 8 }}
               to="/officialConnections"
             />
@@ -148,20 +157,19 @@ const MainListItems = (props) => {
           <List disablePadding>
             <ListItemLink
               icon={<SyncAltIcon />}
-              primary={i18n.t("Conexões")}
+              primary={i18n.t("mainDrawer.whatsApp.connections")}
               sx={{ pl: 8 }}
               to="connections"
             />
             <ListItemLink
               icon={<SettingsOutlinedIcon />}
-              primary="Configurações"
+               primary={i18n.t("mainDrawer.whatsApp.settings")}
               sx={{ pl: 8 }}
               to="whatsConfig"
             />
           </List>
         </Collapse>
       </List>
-
       <ListItemLink
         to="/templates"
         primary={i18n.t("mainDrawer.listItems.template")}
@@ -170,7 +178,7 @@ const MainListItems = (props) => {
       <ListItemLink
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
-        icon={<PhoneCallbackIcon />}
+        icon={<ChatIcon />}
       />
 
       <ListItemLink
@@ -188,33 +196,49 @@ const MainListItems = (props) => {
         primary={i18n.t("mainDrawer.listItems.importation")}
         icon={<ImportExportOutlinedIcon />}
       />
-      <Can
-        role={user.profile}
-        perform="drawer-admin-items:view"
-        yes={() => (
-          <>
-            <Divider />
-            <ListSubheader inset>
-              {i18n.t("mainDrawer.listItems.administration")}
-            </ListSubheader>
-            <ListItemLink
-              to="/users"
-              primary={i18n.t("mainDrawer.listItems.users")}
-              icon={<PeopleAltOutlinedIcon />}
+      <Divider />
+      <List>
+        <li>
+          <ListItem button open={openAdm} onClick={handleClickAdm}>
+            <ListItemIcon>
+              <AccountCircleIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={i18n.t("mainDrawer.listItems.administration")}
             />
-            <ListItemLink
-              to="/queues"
-              primary={i18n.t("mainDrawer.listItems.queues")}
-              icon={<AccountTreeOutlinedIcon />}
-            />
-            <ListItemLink
-              to="/settings"
-              primary={i18n.t("mainDrawer.listItems.settings")}
-              icon={<SettingsOutlinedIcon />}
-            />
+            {openAdm ? <ExpandLess /> : <ExpandMore />}
+          </ListItem>
+        </li>
+        <Collapse component="li" in={openAdm} timeout="auto" unmountOnExit>
+          <ListItemLink
+            to="/users"
+            primary={i18n.t("mainDrawer.listItems.users")}
+            icon={<PeopleAltOutlinedIcon />}
+          />
+          <ListItemLink
+            to="/queues"
+            primary={i18n.t("mainDrawer.listItems.queues")}
+            icon={<AccountTreeOutlinedIcon />}
+          />
+          <ListItemLink
+            to="/settings"
+            primary={i18n.t("mainDrawer.listItems.settings")}
+            icon={<SettingsOutlinedIcon />}
+          />
+
+          <li>
+            <ListItem button open={openRel} onClick={handleClickRel}>
+              <ListItemIcon>
+                <EqualizerIcon />
+              </ListItemIcon>
+              <ListItemText primary={i18n.t("mainDrawer.listItems.reports")} />
+              {openRel ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+          </li>
+          <Collapse component="li" in={openRel} timeout="auto" unmountOnExit>
             <ListItemLink
               to="/reports"
-              primary={i18n.t("mainDrawer.listItems.reports")}
+              primary={i18n.t("mainDrawer.listItems.reportsTalk")}
               icon={<AssessmentOutlinedIcon />}
             />
             <ListItemLink
@@ -227,9 +251,9 @@ const MainListItems = (props) => {
               primary={i18n.t("mainDrawer.listItems.logReports")}
               icon={<AssessmentOutlinedIcon />}
             />
-          </>
-        )}
-      />
+          </Collapse>
+        </Collapse>
+      </List>
     </div>
   );
 };
