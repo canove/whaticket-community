@@ -138,6 +138,12 @@ const MainListItems = (props) => {
               to="/officialConnections"
             />
           </List>
+            <ListItemLink
+              icon={<SettingsOutlinedIcon />}
+               primary={i18n.t("mainDrawer.whatsApp.settings")}
+              sx={{ pl: 8 }}
+              to="whatsConfig"
+            />
         </Collapse>
       </List>
 
@@ -160,12 +166,6 @@ const MainListItems = (props) => {
               primary={i18n.t("mainDrawer.whatsApp.connections")}
               sx={{ pl: 8 }}
               to="connections"
-            />
-            <ListItemLink
-              icon={<SettingsOutlinedIcon />}
-               primary={i18n.t("mainDrawer.whatsApp.settings")}
-              sx={{ pl: 8 }}
-              to="whatsConfig"
             />
           </List>
         </Collapse>
