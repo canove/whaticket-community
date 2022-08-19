@@ -302,7 +302,7 @@ const RegistersReports = () => {
                             variant="contained"
                             color="primary"
                             onClick={handleNextPage}
-                            disabled={pageNumber === Math.ceil(count / 20)}
+                            disabled={!hasMore}
                         >
                             {i18n.t("logReport.buttons.next")}
                         </Button>
