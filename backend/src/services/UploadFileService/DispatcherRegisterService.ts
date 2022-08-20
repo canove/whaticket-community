@@ -141,8 +141,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     
     if (payload.length > 0) {
       await axios.post(apiUrl, JSON.stringify(payload), { headers: {
-        "x-api-key": process.env.WPP_OFFICIAL_API_KEY,
-        "api-key": process.env.WPPNOF_API_TOKEN
+        "x-api-key": process.env.WPP_OFFICIAL_API_KEY
       }});
     }
 
