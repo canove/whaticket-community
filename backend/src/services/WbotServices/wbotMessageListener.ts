@@ -26,7 +26,7 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import formatBody from "../../helpers/Mustache";
 import { queryDialogFlow } from "../DialogflowServices/QueryDialogflow";
-import { createDialogflowSession, createDialogflowSessionWithModel } from "../DialogflowServices/CreateSessionDialogflow";
+import { createDialogflowSessionWithModel } from "../DialogflowServices/CreateSessionDialogflow";
 
 interface Session extends Client {
   id?: number;

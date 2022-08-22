@@ -4,7 +4,6 @@ import dir from 'path';
 import fs from 'fs';
 import os from 'os';
 import { logger } from "../../utils/logger";
-import { id } from "date-fns/locale";
 
 const sessions : Map<number, SessionsClient> = new Map<number, SessionsClient>();
 

@@ -2,11 +2,6 @@ import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
 
-import { SessionsClient } from "@google-cloud/dialogflow";
-import dir from 'path';
-import fs from 'fs';
-import os from 'os';
-import { logger } from "../../utils/logger";
 import { queryDialogFlow } from "./QueryDialogflow";
 import { createDialogflowSession } from "./CreateSessionDialogflow";
 
