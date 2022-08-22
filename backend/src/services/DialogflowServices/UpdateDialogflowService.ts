@@ -1,18 +1,14 @@
 import * as Yup from "yup";
-import { Op } from "sequelize";
 
 import AppError from "../../errors/AppError";
 import Dialogflow from "../../models/Dialogflow";
 import ShowDialogflowService from "./ShowDialogflowService";
-
-
 
 interface DialogflowData {
   name?: string;
   projectName?: string;
   jsonContent?: string;
   language?: string;
-
 }
 
 interface Request {

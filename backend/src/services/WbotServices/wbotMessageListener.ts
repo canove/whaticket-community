@@ -238,13 +238,22 @@ const sendDialogflowAwswer = async (
 
   await new Promise(f => setTimeout(f, 1000));
 
-  //const body = dialogFlowReply.replace(/\\n/g, '\n');
-  //const linesOfBody = body.split('\n');
+  console.log(dialogFlowReply);
+
   for(let message of dialogFlowReply) {
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, message.text.text[0]);
+    await sendDelayedMessages(wbot, ticket, contact, message.text.text[0]);
+  }
+}
+
+async function sendDelayedMessages(wbot:Session, ticket:Ticket, contact:Contact, message:string) {
+  const body = message.replace(/\\n/g, '\n');
+  const linesOfBody = body.split('\n');
+
+  for(let message of linesOfBody) {
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, message);
     await verifyMessage(sentMessage, ticket, contact);
     await new Promise(f => setTimeout(f, 1000));
-  }
+  }  
 }
 
 const isValidMsg = (msg: WbotMessage): boolean => {

@@ -86,7 +86,6 @@ const DialogflowModal = ({ open, onClose, dialogflowId }) => {
 	};
 
 	const [dialogflow, setDialogflow] = useState(initialState);
-	const greetingRef = useRef();
 
 	useEffect(() => {
 		(async () => {
@@ -118,14 +117,11 @@ const DialogflowModal = ({ open, onClose, dialogflowId }) => {
 
 	const handleTestSession = async (event, values) => {
 		try {
-			//event.preventDefault();
-			console.log(values)
 			const  {projectName, jsonContent, language } = values
 			
 			await api.post(`/dialogflow/testSession`, {projectName, jsonContent, language });
-			
-			//await api.post(`/dialogflow/testSession`, {projectName, jsonContent, language });
-			toast.success("Dialogflow test successfully");
+
+			toast.success( i18n.t("dialogflowModal.messages.testSuccess") );
 		} catch (err) {
 			toastError(err);
 		}
@@ -136,10 +132,11 @@ const DialogflowModal = ({ open, onClose, dialogflowId }) => {
 			console.log(values)
 			if (dialogflowId) {
 				await api.put(`/dialogflow/${dialogflowId}`, values);
+				toast.success( i18n.t("dialogflowModal.messages.editSuccess") );
 			} else {
 				await api.post("/dialogflow", values);
+				toast.success( i18n.t("dialogflowModal.messages.addSuccess") );
 			}
-			toast.success("Dialogflow saved successfully");
 			handleClose();
 		} catch (err) {
 			toastError(err);

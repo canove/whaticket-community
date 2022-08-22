@@ -43,13 +43,13 @@ const TestDialogflowSession = async ({
     throw new AppError(err.message);
   }
   
-  const keyFilename = dir.join(os.tmpdir(), `TestSession_${projectName}.json`);
+  const configFilename = dir.join(os.tmpdir(), `TestSession_${projectName}.json`);
 
-  logger.info(`Test dialogflow session #${projectName} in '${keyFilename}'`)
+  logger.info(`Test dialogflow session #${projectName} in '${configFilename}'`)
 
-  fs.writeFileSync(keyFilename, jsonContent);
+  fs.writeFileSync(configFilename, jsonContent);
 
-  const session = new SessionsClient({ keyFilename });
+  const session = new SessionsClient({ configFilename });
   
   if (!session) {
     throw new AppError("ERR_TEST_SESSION_DIALOG", 400);
@@ -62,9 +62,10 @@ const TestDialogflowSession = async ({
     "Ola", 
     language,
   );
-  session.close;
   
-  fs.unlinkSync(keyFilename);
+  await session.close();
+  
+  fs.unlinkSync(configFilename);
   
   if (!dialogFlowReply) {
     throw new AppError("ERR_TEST_REPLY_DIALOG", 400);

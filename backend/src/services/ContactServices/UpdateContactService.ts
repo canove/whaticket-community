@@ -11,7 +11,7 @@ interface ContactData {
   email?: string;
   number?: string;
   name?: string;
-  useDialogflow?: Boolean;
+  useDialogflow?: boolean;
   extraInfo?: ExtraInfo[];
 }
 

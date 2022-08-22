@@ -17,7 +17,9 @@ import {
 	FormControl,
 	InputLabel,
 	Select,
-	MenuItem
+	MenuItem,
+	IconButton, 
+	InputAdornment
 } from "@material-ui/core"
 
 
@@ -26,7 +28,6 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import ColorPicker from "../ColorPicker";
-import { IconButton, InputAdornment } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
 import useDialogflows from "../../hooks/useDialogflows";
 

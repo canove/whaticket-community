@@ -218,6 +218,11 @@ const messages = {
           cancel: "Cancelar",
           test: "Testar Bot",
         },
+        messages: {
+          testSuccess: "Prueba Dialogflow con éxito",
+          addSuccess: "Dialogflow agregado con éxito",
+          editSuccess: "Dialogflow editado con éxito",
+        }
       },
       userModal: {
         title: {
