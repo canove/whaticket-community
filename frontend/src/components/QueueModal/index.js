@@ -94,6 +94,10 @@ const QueueModal = ({ open, onClose, queueId }) => {
 			if (!queueId) return;
 			try {
 				const { data } = await api.get(`/queue/${queueId}`);
+				if(data.dialogflowId === null) {
+					data.dialogflowId = "";
+				}
+
 				setQueue(prevState => {
 					return { ...prevState, ...data };
 				});
@@ -128,6 +132,10 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
 	const handleSaveQueue = async values => {
 		try {
+			if(values.dialogflowId === "") {
+				values.dialogflowId = null;
+			}
+
 			if (queueId) {
 				await api.put(`/queue/${queueId}`, values);
 			} else {
@@ -250,7 +258,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										name="dialogflowId"
 										labelId="dialogflow-selection-label"
 										id="dialogflow-selection"
-										required
 									>
 										<MenuItem value={''}>&nbsp;</MenuItem>
 										{dialogflows.map((dialogflow) => (
