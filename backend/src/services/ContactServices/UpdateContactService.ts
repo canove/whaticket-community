@@ -11,6 +11,7 @@ interface ContactData {
   email?: string;
   number?: string;
   name?: string;
+  useDialogflow?: Boolean;
   extraInfo?: ExtraInfo[];
 }
 
@@ -23,7 +24,7 @@ const UpdateContactService = async ({
   contactData,
   contactId
 }: Request): Promise<Contact> => {
-  const { email, name, number, extraInfo } = contactData;
+  const { email, name, number, extraInfo, useDialogflow } = contactData;
 
   const contact = await Contact.findOne({
     where: { id: contactId },
@@ -56,7 +57,8 @@ const UpdateContactService = async ({
   await contact.update({
     name,
     number,
-    email
+    email,
+    useDialogflow
   });
 
   await contact.reload({

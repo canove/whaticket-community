@@ -157,6 +157,7 @@ const messages = {
           email: "Email",
           extraName: "Nome do campo",
           extraValue: "Valor",
+          dialogflow: "Dialogflow",
         },
         buttons: {
           addExtraInfo: "Adicionar informação",
@@ -197,6 +198,24 @@ const messages = {
           okAdd: "Adicionar",
           okEdit: "Salvar",
           cancel: "Cancelar",
+        },
+      },
+      dialogflowModal: {
+        title: {
+          add: "Adicionar projeto",
+          edit: "Editar projeto",
+        },
+        form: {
+          name: "Nome",
+          projectName: "Nome do Projeto",
+          language: "Linguagem",
+          jsonContent: "JsonContent",
+        },
+        buttons: {
+          okAdd: "Adicionar",
+          okEdit: "Salvar",
+          cancel: "Cancelar",
+          test: "Testar Bot",
         },
       },
       userModal: {
@@ -283,7 +302,7 @@ const messages = {
       },
       mainDrawer: {
         listItems: {
-          dashboard: "Dashboard",
+          dashboard: "Dashboard",          
           connections: "Conexões",
           tickets: "Tickets",
           contacts: "Contatos",
@@ -292,6 +311,7 @@ const messages = {
           administration: "Administração",
           users: "Usuários",
           settings: "Configurações",
+          dialogflow: "Integrador Dialogflow",
         },
         appBar: {
           user: {
@@ -318,6 +338,24 @@ const messages = {
           deleteTitle: "Excluir",
           deleteMessage:
             "Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+        },
+      },
+      dialogflows: {
+        title: "Dialogflow",
+        table: {
+          name: "Nome",
+          projectName: "Nome do Projeto",
+          language: "Linguagem",
+          lastUpdate: "Ultima atualização",
+          actions: "Ações",
+        },
+        buttons: {
+          add: "Adicionar Projeto",
+        },
+        confirmationModal: {
+          deleteTitle: "Excluir",
+          deleteMessage:
+            "Você tem certeza? Essa ação não pode ser revertida! e será removida das filas e conexões vinculadas",
         },
       },
       queueSelect: {
@@ -465,6 +503,9 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+        ERR_NO_DIALOG_FOUND: "Nenhuma Dialogflow encontrado com este ID",
+        ERR_TEST_SESSION_DIALOG: "Erro ao criar sessão do DialogFlow",
+        ERR_TEST_REPLY_DIALOG: "Erro ao testar configuração do DialogFlow",
       },
     },
   },

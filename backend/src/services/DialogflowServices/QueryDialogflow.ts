@@ -38,12 +38,11 @@ async function queryDialogFlow(
     sessionId:string, 
     query:string, 
     languageCode:string
-) : Promise<string | null> {
+) : Promise<any | null> {
     let intentResponse;
 
     try {
-        console.log(`Dialoflow Question: '${query}'`);
-
+        //console.log(`Dialoflow Question: '${query}'`);
         intentResponse = await detectIntent(
             sessionClient,
             projectId,
@@ -52,14 +51,14 @@ async function queryDialogFlow(
             languageCode
         );
 
-        const fulfillmentText = intentResponse?.queryResult?.fulfillmentText;
+        const responses = intentResponse?.queryResult?.fulfillmentMessages;
 
-        if (isBlank(fulfillmentText)) {
-            console.log('No defined answer in Dialogflow');
+        if (responses?.length === 0) {
+            //console.log('No defined answer in Dialogflow');
             return null;
         } else {
-            console.log(`Dialoflow answer: '${fulfillmentText}'`);
-            return `${fulfillmentText}`
+            //console.log("Dialoflow answer:", responses);
+            return responses
         }
     } catch (error) {
         Sentry.captureException(error);

@@ -155,6 +155,7 @@ const messages = {
           email: "Email",
           extraName: "Field name",
           extraValue: "Value",
+          dialogflow: "Dialogflow",
         },
         buttons: {
           addExtraInfo: "Add information",
@@ -195,6 +196,24 @@ const messages = {
           okAdd: "Add",
           okEdit: "Save",
           cancel: "Cancel",
+        },
+      },
+      dialogflowModal: {
+        title: {
+          add: "Add Project",
+          edit: "Edit Project",
+        },
+        form: {
+          name: "Name",
+          projectName: "Project Name",
+          language: "Language",
+          jsonContent: "JsonContent"
+        },
+        buttons: {
+          okAdd: "Add",
+          okEdit: "Save",
+          cancel: "Cancel",
+          test: "Bot Test",
         },
       },
       userModal: {
@@ -289,6 +308,7 @@ const messages = {
           administration: "Administration",
           users: "Users",
           settings: "Settings",
+          dialogflow: "Dialogflow",
         },
         appBar: {
           user: {
@@ -315,6 +335,24 @@ const messages = {
           deleteTitle: "Delete",
           deleteMessage:
             "Are you sure? It cannot be reverted! Tickets in this queue will still exist, but will not have any queues assigned.",
+        },
+      },
+      dialogflows: {
+        title: "Dialogflow",
+        table: {
+          name: "Name",
+          projectName: "Project Name",
+          lamguage: "Language",
+          lastUpdate:"Last Update",
+          actions: "Actions",
+        },
+        buttons: {
+          add: "Add Project",
+        },
+        confirmationModal: {
+          deleteTitle: "Delete",
+          deleteMessage:
+            "Are you sure? It cannot be reverted!",
         },
       },
       queueSelect: {
@@ -461,6 +499,9 @@ const messages = {
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
+        ERR_NO_DIALOG_FOUND: "No Dialogflow found with this ID.",
+        ERR_TEST_SESSION_DIALOG: "Error creating DialogFlow session",
+        ERR_TEST_REPLY_DIALOG: "Error testing DialogFlow configuration",
       },
     },
   },
