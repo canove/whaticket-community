@@ -2,10 +2,6 @@ import * as Sentry from "@sentry/node";
 import { SessionsClient } from "@google-cloud/dialogflow";
 import { logger } from "../../utils/logger";
 
-function isBlank(str:string | undefined | null) {
-    return (!str || /^\s*$/.test(str));
-}
-
 async function detectIntent(
     sessionClient:SessionsClient,
     projectId:string,

@@ -26,7 +26,7 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import formatBody from "../../helpers/Mustache";
 import { queryDialogFlow } from "../DialogflowServices/QueryDialogflow";
-import { createDialogflowSession } from "../DialogflowServices/CreateSessionDialogflow";
+import { createDialogflowSession, createDialogflowSessionWithModel } from "../DialogflowServices/CreateSessionDialogflow";
 
 interface Session extends Client {
   id?: number;
@@ -216,7 +216,7 @@ const sendDialogflowAwswer = async (
   contact: Contact,
   chat:Chat
 ) => {
-  const session = await createDialogflowSession(ticket.queue.dialogflow);
+  const session = await createDialogflowSessionWithModel(ticket.queue.dialogflow);
   if(session === undefined) {
     return;
   }
@@ -237,8 +237,6 @@ const sendDialogflowAwswer = async (
   chat.sendStateTyping();
 
   await new Promise(f => setTimeout(f, 1000));
-
-  console.log(dialogFlowReply);
 
   for(let message of dialogFlowReply) {
     await sendDelayedMessages(wbot, ticket, contact, message.text.text[0]);
