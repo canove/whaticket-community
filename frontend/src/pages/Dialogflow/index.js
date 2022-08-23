@@ -1,7 +1,5 @@
-import React, { useEffect, useReducer, useState } from "react";
 import { format, parseISO } from "date-fns";
-
-import openSocket from "../../services/socket-io";
+import React, { useReducer, useState } from "react";
 
 import {
   Button,
@@ -12,21 +10,21 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
+  TableRow
 } from "@material-ui/core";
 
+import { DeleteOutline, Edit } from "@material-ui/icons";
+import { toast } from "react-toastify";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import DialogflowModal from "../../components/DialogflowModal";
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Title from "../../components/Title";
-import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import { DeleteOutline, Edit } from "@material-ui/icons";
-import DialogflowModal from "../../components/DialogflowModal";
-import { toast } from "react-toastify";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import { i18n } from "../../translate/i18n";
 import useLoadData from "../Queues/useLoadData.js";
 import useSocket from "../Queues/useSocket";
 
