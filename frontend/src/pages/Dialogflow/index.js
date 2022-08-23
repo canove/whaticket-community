@@ -27,6 +27,8 @@ import { DeleteOutline, Edit } from "@material-ui/icons";
 import DialogflowModal from "../../components/DialogflowModal";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import useLoadData from "../Queues/useLoadData.js";
+import useSocket from "../Queues/useSocket";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -95,38 +97,8 @@ const Dialogflows = () => {
   const [selectedDialogflow, setSelectedDialogflow] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const { data } = await api.get("/dialogflow");
-        dispatch({ type: "LOAD_DIALOGFLOWS", payload: data });
-
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    const socket = openSocket();
-
-    socket.on("dialogflow", (data) => {
-      if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_DIALOGFLOWS", payload: data.dialogflow });
-      }
-
-      if (data.action === "delete") {
-        dispatch({ type: "DELETE_DIALOGFLOW", payload: data.dialogflowId });
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  useLoadData(setLoading, dispatch, '/dialogflow', 'LOAD_DIALOGFLOWS');
+  useSocket(dispatch, 'dialogflow', 'UPDATE_DIALOGFLOWS', 'DELETE_DIALOGFLOW', 'dialogflow', 'dialogflowId');
 
   const handleOpenDialogflowModal = () => {
     setDialogflowModalOpen(true);

@@ -1,7 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
 
-import openSocket from "../../services/socket-io";
-
 import {
   Button,
   IconButton,
@@ -27,6 +25,8 @@ import { DeleteOutline, Edit } from "@material-ui/icons";
 import QueueModal from "../../components/QueueModal";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import useSocket from "./useSocket";
+import useLoadData from "./useLoadData";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -95,38 +95,8 @@ const Queues = () => {
   const [selectedQueue, setSelectedQueue] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const { data } = await api.get("/queue");
-        dispatch({ type: "LOAD_QUEUES", payload: data });
-
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    const socket = openSocket();
-
-    socket.on("queue", (data) => {
-      if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_QUEUES", payload: data.queue });
-      }
-
-      if (data.action === "delete") {
-        dispatch({ type: "DELETE_QUEUE", payload: data.queueId });
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  useLoadData(setLoading, dispatch, '/queue', 'LOAD_QUEUES');
+  useSocket(dispatch, 'queue', 'UPDATE_QUEUES', 'DELETE_QUEUE', 'queue', 'queueId');
 
   const handleOpenQueueModal = () => {
     setQueueModalOpen(true);
