@@ -124,6 +124,10 @@ const WhatsConfig = () => {
     const [deletedGreetingMessage, setDeletedGreetingMessage] = useState(null);
     const [saving, setSaving] = useState(false);
 
+    useEffect(() => {
+		dispatch({ type: "RESET" });
+	}, []);
+
     // Interval
     const handleIntervalSliderChange = (event, newValue) => {
         setIntervalValue(newValue);
@@ -257,7 +261,13 @@ const WhatsConfig = () => {
         if (config.length > 0) {
             setIntervalValue(config[0].triggerInterval);
             setGreetingMessages(config[0].greetingMessages);
-            setSelectedConnection(config[0].whatsappIds.split(','));
+            
+            if (config[0].whatsappIds === null) {
+                setSelectedConnection(['all']);
+            } else {
+                setSelectedConnection(config[0].whatsappIds.split(','));
+            }
+
             if (config[0].greetingMessages.length > 0) {
                 setUseGreetingMessage(true);
             } else {
