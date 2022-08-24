@@ -225,7 +225,6 @@ const WhatsConfig = () => {
 
     // Config
     const handleSaveConfig = async () => {
-        setSaving(true);
         const configBody = {
             triggerInterval: intervalValue,
             whatsappIds: selectedConnection.includes('all') ? null : selectedConnection.join(),
@@ -243,18 +242,17 @@ const WhatsConfig = () => {
         } catch (err) {
             toastError(err);
         }
-        setSaving(false);
+        setSaving(!saving);
     }
 
     const handleDeleteConfig = async () => {
-        setSaving(true);
         try {
             await api.delete(`/whatsconfig/${config[0].id}`);
             toast.success("Config Deletada com Sucesso!");
         } catch (err) {
             toastError(err);
         }
-        setSaving(false);
+        setSaving(!saving);
     }
 
     useEffect(() => {
@@ -268,7 +266,7 @@ const WhatsConfig = () => {
                 setSelectedConnection(config[0].whatsappIds.split(','));
             }
 
-            if (config[0].greetingMessages.length > 0) {
+            if (config[0].greetingMessages && config[0].greetingMessages.length > 0) {
                 setUseGreetingMessage(true);
             } else {
                 setUseGreetingMessage(false);
