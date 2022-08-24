@@ -352,7 +352,7 @@ const WhatsConfig = () => {
 					<MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
 					{whatsApps && whatsApps.map((whats, index) => {
 						if (whats.official === false) {
-							if (whats.status === "OPENING") {
+							if (whats.status === "CONNECTED") {
 								return (
 									<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
 								)
