@@ -18,6 +18,7 @@ import ticketsExportReportTalkRoutes from "./ticketsExportReportTalkRoutes";
 import fileRoutes from "./fileRoutes";
 import registerRoutes from "./registersRoutes";
 import templateRoutes from "./templateRoutes";
+import whatsConfigRoutes from "./whatsConfigRoutes";
 
 const routes = Router();
 
@@ -39,5 +40,6 @@ routes.use(ticketsExportReportTalkRoutes);
 routes.use(fileRoutes);
 routes.use(registerRoutes);
 routes.use(templateRoutes);
+routes.use(whatsConfigRoutes);
 
 export default routes;
