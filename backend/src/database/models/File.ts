@@ -65,10 +65,6 @@ class File extends Model<File> {
   @ForeignKey(() => User)
   @Column
   ownerid: number;
-
-  @ForeignKey(() => Whatsapp)
-  @Column
-  whatsappId: number;
 }
 
 export default File;
