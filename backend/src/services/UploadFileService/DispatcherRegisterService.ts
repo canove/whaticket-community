@@ -1,8 +1,11 @@
+import { Op } from "sequelize";
+
 import axios from "axios";
 import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import { FileStatus } from "../../enum/FileStatus";
 
+/* eslint-disable */
 const DispatcherRegisterService = async ({ file }): Promise<void> => {
   try {
     const containPending = await FileRegister.findAll({ 
@@ -17,22 +20,36 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
       return;
     }
 
-    const whatsappIds = file.whatsappIds.split(",");
+    let whatsappIds;
+    if (file.whatsappIds)
+      whatsappIds = file.whatsappIds.split(",");
 
-    const accounts = await Whatsapp.findAll({
-      where: {
-        id: whatsappIds
-      }
-    });
+    let accounts;
+
+    if(whatsappIds) {
+      accounts = await Whatsapp.findAll({
+        where: {
+          id: whatsappIds
+        }
+      });
+    }else{
+      accounts = await Whatsapp.findAll({
+        where: {
+          status: "CONNECTED",
+          [Op.or]: [
+            {
+              official: file.official
+            }
+          ]
+        }
+      });
+    }
 
     const payload = [];
     const apiUrl = `${process.env.WPP_OFFICIAL_URL}?x-api-key=${process.env.WPP_OFFICIAL_API_KEY}`;
     let processedRegister = [];
-
-    const filteredAccounts = accounts.filter((x) => x.official || x.status == "CONNECTED");
-
-
-    for (const account of filteredAccounts) {
+   
+    for (const account of accounts) {
       if (account.official) {
         const registers = await FileRegister.findAll({
           where: {
@@ -54,7 +71,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
             });
             processedRegister.push(reg);
             payload.push({
-              company: account?.facebookBusinessId,
+              company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
               person: reg.documentNumber,
               activationMessage: {
                 msgid: reg.id,
@@ -76,16 +93,18 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
           if (lastSend)
              lastSend.setMinutes(lastSend.getMinutes() + 2);
+          
+          const registers = await FileRegister.findAll({
+            where: {
+              fileId: file.id,
+              sentAt: null,
+              processedAt: null
+            },
+            limit: 1
+          });
 
-          if(!lastSend || now > lastSend){
-            const registers = await FileRegister.findAll({
-              where: {
-                fileId: file.id,
-                sentAt: null,
-                processedAt: null
-              },
-              limit: 1
-            });
+          if(!lastSend || now > lastSend && registers.length > 0){
+            
 
             for (const reg of registers){
               let phoneNumber = reg.phoneNumber;
@@ -94,7 +113,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
                 processedRegister.push(reg);
                 payload.push({
-                  company: account?.facebookBusinessId,
+                  company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
                   person: reg.documentNumber,
                   activationMessage: {
                     session: account.name,
@@ -118,7 +137,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
               }
             }
         }
-      }
+    }
     
     if (payload.length > 0) {
       await axios.post(apiUrl, JSON.stringify(payload), { headers: {

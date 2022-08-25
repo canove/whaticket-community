@@ -109,7 +109,8 @@ const SendWhatsAppMessage = async ({
 
       var result = await axios.post(apiUrl, payload, {
         headers: {
-          "sessionkey": `${process.env.WPPNOF_API_TOKEN}`
+          "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
         }
       });
 

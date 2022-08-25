@@ -2,13 +2,12 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   up: (queryInterface: QueryInterface) => {
-    return queryInterface.addColumn("Files", "whatsappIds", {
-      type: DataTypes.TEXT,
-      allowNull: true
+    return queryInterface.addColumn("WhatsappsConfigs", "active", {
+      type: DataTypes.BOOLEAN
     });
   },
 
   down: (queryInterface: QueryInterface) => {
-    return queryInterface.removeColumn("Files", "whatsappIds");
+    return queryInterface.removeColumn("WhatsappsConfigs", "active");
   }
 };
