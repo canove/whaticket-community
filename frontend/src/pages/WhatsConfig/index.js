@@ -248,6 +248,10 @@ const WhatsConfig = () => {
     const handleDeleteConfig = async () => {
         try {
             await api.delete(`/whatsconfig/${config[0].id}`);
+            setIntervalValue(1);
+            setGreetingMessages([]);
+            setSelectedConnection([]);
+            setUseGreetingMessage(false);
             toast.success("Config Deletada com Sucesso!");
         } catch (err) {
             toastError(err);
