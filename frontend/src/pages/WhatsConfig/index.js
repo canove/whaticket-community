@@ -123,6 +123,7 @@ const WhatsConfig = () => {
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [deletedGreetingMessage, setDeletedGreetingMessage] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -157,6 +158,11 @@ const WhatsConfig = () => {
 			setSelectedConnection(typeof value === "string" ? value.split(",") : value);
 		}
 	}
+
+    // Active
+    const handleActiveCheckboxChange = () => {
+        setIsActive(!isActive);
+    }
 
     // Greeting Message
     const handleCheckboxChange = () => {
@@ -229,7 +235,8 @@ const WhatsConfig = () => {
             triggerInterval: intervalValue,
             whatsappIds: selectedConnection.includes('all') ? null : selectedConnection.join(),
             useGreetingMessages: useGreetingMessage,
-            greetingMessages: greetingMessages
+            greetingMessages: greetingMessages,
+            active: isActive,
         }
         try {
             if (config.length > 0) {
@@ -245,22 +252,9 @@ const WhatsConfig = () => {
         setSaving(!saving);
     }
 
-    const handleDeleteConfig = async () => {
-        try {
-            await api.delete(`/whatsconfig/${config[0].id}`);
-            setIntervalValue(1);
-            setGreetingMessages([]);
-            setSelectedConnection([]);
-            setUseGreetingMessage(false);
-            toast.success("Config Deletada com Sucesso!");
-        } catch (err) {
-            toastError(err);
-        }
-        setSaving(!saving);
-    }
-
     useEffect(() => {
         if (config.length > 0) {
+            setIsActive(config[0].active);
             setIntervalValue(config[0].triggerInterval);
             setGreetingMessages(config[0].greetingMessages);
             
@@ -335,16 +329,24 @@ const WhatsConfig = () => {
                     >
                         Salvar
                     </Button>
-                    <Button
-                        color="primary"
-                        variant="contained"
-                        onClick={handleDeleteConfig}
-                        disabled={!config[0]}
-                    >
-                        Deletar
-                    </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
+            <Paper
+                className={classes.paper}
+                variant="outlined"
+            >
+                <Typography variant="subtitle1" gutterBottom>
+                	Ativar config? 
+				</Typography>
+                <Checkbox
+                    {...label}
+                    defaultChecked
+                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                    color="primary"
+                    onChange={handleActiveCheckboxChange}
+                    checked={isActive}
+                />
+            </Paper>
             <Paper
                 className={classes.paper}
                 variant="outlined"
@@ -360,6 +362,7 @@ const WhatsConfig = () => {
 					label="Type"
 					onChange={handleChangeConnection}
 					multiple
+                    disabled={!isActive}
 				>
 					<MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
 					{whatsApps && whatsApps.map((whats, index) => {
@@ -390,7 +393,7 @@ const WhatsConfig = () => {
                             min={0.5}
                             max={60}
                             valueLabelDisplay="auto"
-                            disabled={selectedConnection.length === 0}
+                            disabled={!isActive}
                         />
                     </Grid>
                     <Grid item>
@@ -406,7 +409,7 @@ const WhatsConfig = () => {
                             type: 'number',
                             'aria-labelledby': 'input-slider',
                             }}
-                            disabled={selectedConnection.length === 0}
+                            disabled={!isActive}
                         />
                     </Grid>
                 </Grid>
@@ -425,7 +428,7 @@ const WhatsConfig = () => {
                     color="primary"
                     onChange={handleCheckboxChange}
                     checked={useGreetingMessage}
-                    disabled={selectedConnection.length === 0}
+                    disabled={!isActive}
                 />
             </Paper>
             { useGreetingMessage === true && selectedConnection.length !== 0 && (
@@ -434,6 +437,7 @@ const WhatsConfig = () => {
                         variant="contained"
                         color="primary"
                         onClick={handleGreetingMessageOpenModal}
+                        disabled={!isActive}
                     >
                         Criar Mensagem
                     </Button>
@@ -456,11 +460,13 @@ const WhatsConfig = () => {
                                         <TableCell>
                                             <Button
                                                 onClick={(e) => {handleEditGreetingMessage(greetingMessage, index)}}
+                                                disabled={!isActive}
                                             >
                                                 Editar
                                             </Button>
                                             <Button
                                                 onClick={(e) => {handleOpenConfirmationModal(greetingMessage, index)}}
+                                                disabled={!isActive}
                                             >
                                                 Deletar
                                             </Button>

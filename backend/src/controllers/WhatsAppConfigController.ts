@@ -18,14 +18,16 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     triggerInterval,
     whatsappIds,
     useGreetingMessages,
-    greetingMessages
+    greetingMessages,
+    active
   } = req.body;
 
   const config = await CreateWhatsConfigService({
     triggerInterval,
     whatsappIds,
     useGreetingMessages,
-    greetingMessages
+    greetingMessages,
+    active
   });
 
   const io = getIO();

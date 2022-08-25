@@ -17,13 +17,15 @@ const UpdateConfigService = async ({
     id,
     triggerInterval,
     whatsappIds,
+    active,
     greetingMessages = []
   } = configData;
 
   await config.update({
     id,
     triggerInterval,
-    whatsappIds
+    whatsappIds,
+    active
   });
 
   greetingMessages.forEach(async greetingMessage => {
