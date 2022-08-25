@@ -622,6 +622,20 @@ const messages = {
           all: "Todos",
       },
 
+      historicTicket:{
+        button: "Histórico",
+      historicModal:{
+        title: "Histórico",
+        name: "Nombre",
+        message: "Mensaje",
+        status: "Estado",
+        createAt: "Fecha de Creación",
+        actions: "Comportamiento",
+        closed: "Cerca",
+        back: "Regresar"
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",

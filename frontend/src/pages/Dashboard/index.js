@@ -12,9 +12,10 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -51,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
   titleStyle: {
     marginLeft: 20,
     marginTop: 10,
+    width: 200
   },
 }));
 
@@ -68,6 +70,7 @@ const Dashboard = () => {
   const [errorCount, setErrorCount] = useState(0);
   const [fileId, setFileId] = useState("");
   const [files, setFiles] = useState([]);
+  const [date, setDate] = useState("");
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -83,13 +86,21 @@ const Dashboard = () => {
     return count;
   };
 
+  useEffect(() => {
+    setDate("");
+  }, [fileId]);
+
+  useEffect(() => {
+    setFileId("");
+  }, [date]);
+
 	useEffect(() => {
 		const handleFilter = async () => {
 			setLoading(true);
       try {
         setLoading(true);
 
-        let response = await api.get(`/registers/list?fileId=${fileId}`);
+        let response = await api.get(`/registers/list?fileId=${fileId}&date=${date}`);
         setRegisterCount(response.data.register.count);
         setSentCount(response.data.sent.count);
         setDeliveredCount(response.data.delivered.count);
@@ -102,11 +113,7 @@ const Dashboard = () => {
       }
 	  };
 		handleFilter();
-	}, [fileId]);
-
-  const handleChange = (e) => {
-    setFileId(e.target.value);
-  };
+	}, [fileId, date]);
 
   useEffect(() => {
     const handleFiles = async () => {
@@ -135,33 +142,47 @@ const Dashboard = () => {
 // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleSelectOption = (_, newValue) => {
+      if (newValue) {
+          setFileId(newValue.id);
+      } else {
+          setFileId("");
+      }
+  };
+
+  const renderOptionLabel = option => {
+      if (option.number) {
+        return `${option.name} - ${option.number}`;
+      } else {
+        return `${option.name}`;
+      }
+  };
+
   return (
     <div>
       <MainHeader>
+        <Title>{i18n.t("dashboard.title")}</Title>
         <div className={classes.titleStyle}>
-          <Title>{i18n.t("dashboard.title")}</Title>
-            <FormControl className={classes.multFieldLine}>
-              <InputLabel id="demo-dashboard">
-                {i18n.t("dashboard.file")}
-              </InputLabel>
-              <Select
-                className={classes.multFieldLine}
-                labelId="demo-dashboard-label"
-                id="demo-dashboard"
-                value={fileId}
-                onChange={handleChange}
-              >
-                <MenuItem value={""}>Todos</MenuItem>
-                {files && files.map((file, index) => {
-                  return (
-                    <MenuItem key={index} value={file.id}>
-                      {file.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
+          <Autocomplete
+              onChange={(e, newValue) => handleSelectOption(e, newValue)}
+              className={classes.root}
+              options={files}
+              getOptionLabel={renderOptionLabel}
+              renderInput={(params) =>
+                  <TextField
+                      {...params}
+                      label={"Arquivo"}
+                      InputLabelProps={{ required: true}}
+                  />
+              }
+          />
         </div>
+        <TextField className={classes.titleStyle}
+            onChange={(e) => { setDate(e.target.value) }}
+            label={"Data"}
+            InputLabelProps={{ shrink: true, required: true }}
+            type="date"
+        />
       </MainHeader>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>

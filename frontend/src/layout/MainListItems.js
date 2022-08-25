@@ -84,7 +84,7 @@ const MainListItems = (props) => {
               whats.status === "TIMEOUT" ||
               whats.status === "OPENING"
             );
-          }
+          }return null
         });
         if (offlineWhats.length > 0) {
           setConnectionWarning(true);
