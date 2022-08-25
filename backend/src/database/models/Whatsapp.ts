@@ -88,6 +88,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   lastSendDate: Date;
 
+  @Column
+  lastPingDate: Date;
+
   @HasMany(() => Ticket)
   tickets: Ticket[];
 

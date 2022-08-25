@@ -20,9 +20,6 @@ ApiRoutes.post(
   WhatsAppController.nofSessionQRUpdate
 );
 
-
-
-
 ApiRoutes.post(
   "/whatsapp/quality",
   isAuthApi,
@@ -51,6 +48,12 @@ ApiRoutes.get(
   "/dispatcherRegisterProcess",
   isAuthApi,
   ApiController.dispatcherRegisterProcess
+);
+
+ApiRoutes.get(
+  "/pingConnections",
+  isAuthApi,
+  ApiController.pingConnections
 );
 
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
