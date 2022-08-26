@@ -20,7 +20,7 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
           official: false
         },
         limit: 2,
-        order: [['lastPingDate', 'DESC']],
+        order: [['lastPingDate', 'ASC']],
       });
     }else{
       accounts = await Whatsapp.findAll({
@@ -33,7 +33,7 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
           ]
         },
         limit: 2,
-        order: [['lastPingDate', 'DESC']],
+        order: [['lastPingDate', 'ASC']],
       });
     }
 
@@ -41,7 +41,7 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
     let provider;
 
     if(accounts.length > 0){
-      provider = accounts[accounts.length -1]
+      provider = accounts[0]
       await provider.update({ lastPingDate: new Date() });
     }
 
