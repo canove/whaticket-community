@@ -261,7 +261,8 @@ const WhatsConfig = () => {
             if (config[0].whatsappIds === null) {
                 setSelectedConnection(['all']);
             } else {
-                setSelectedConnection(config[0].whatsappIds.split(','));
+                let array = config[0].whatsappIds.split(',');
+                setSelectedConnection(array);
             }
 
             if (config[0].greetingMessages && config[0].greetingMessages.length > 0) {
@@ -366,7 +367,6 @@ const WhatsConfig = () => {
                         label="Type"
                         onChange={handleChangeConnection}
                         multiple
-                        disabled={!isActive}
                     >
                         <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
                         {whatsApps && whatsApps.map((whats, index) => {
@@ -397,7 +397,6 @@ const WhatsConfig = () => {
                                 min={0.5}
                                 max={60}
                                 valueLabelDisplay="auto"
-                                disabled={!isActive}
                             />
                         </Grid>
                         <Grid item>
@@ -413,7 +412,6 @@ const WhatsConfig = () => {
                                 type: 'number',
                                 'aria-labelledby': 'input-slider',
                                 }}
-                                disabled={!isActive}
                             />
                         </Grid>
                     </Grid>
@@ -432,16 +430,14 @@ const WhatsConfig = () => {
                         color="primary"
                         onChange={handleCheckboxChange}
                         checked={useGreetingMessage}
-                        disabled={!isActive}
                     />
                 </Paper>
-                { useGreetingMessage === true && selectedConnection.length !== 0 && (
+                { useGreetingMessage === true && (
                     <>
                         <Button
                             variant="contained"
                             color="primary"
                             onClick={handleGreetingMessageOpenModal}
-                            disabled={!isActive}
                         >
                             Criar Mensagem
                         </Button>
@@ -464,13 +460,11 @@ const WhatsConfig = () => {
                                             <TableCell>
                                                 <Button
                                                     onClick={(e) => {handleEditGreetingMessage(greetingMessage, index)}}
-                                                    disabled={!isActive}
                                                 >
                                                     Editar
                                                 </Button>
                                                 <Button
                                                     onClick={(e) => {handleOpenConfirmationModal(greetingMessage, index)}}
-                                                    disabled={!isActive}
                                                 >
                                                     Deletar
                                                 </Button>
