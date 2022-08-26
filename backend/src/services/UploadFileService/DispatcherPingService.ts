@@ -3,13 +3,12 @@ import { Op } from "sequelize";
 import axios from "axios";
 import randomWords from "random-words";
 import Whatsapp from "../../database/models/Whatsapp";
-import { FileStatus } from "../../enum/FileStatus";
 
 /* eslint-disable */
 const DispatcherPingService = async ({ file }): Promise<void> => {
   try {
     let whatsappIds;
-    if (file.whatsappIds)
+    if (file.whatsappIds && file.whatsappIds != 'null')
       whatsappIds = file.whatsappIds.split(",");
 
     let accounts;
@@ -40,10 +39,10 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
 
     if(accounts.length > 0)
       provider = accounts[accounts.length -1]
-
+      await provider.update({ lastPingDate: new Date() });
     for (const account of accounts) {
       if (!account.official && provider.name != account.name) { 
-            const payload = {
+            const payload = [{
               company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
               person: account.name,
               activationMessage: {
@@ -58,7 +57,7 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
                 text: `${randomWords({ exactly: 5, join: ' ' })} -PING-`,
                 parameters: []
               }
-            };
+            }];
 
             await new Promise((resolve) => { setTimeout(() => resolve(true), 3000) })
             await axios.post(apiUrl, JSON.stringify(payload), { headers: {
@@ -68,7 +67,6 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
     }
   } catch (e) {
     console.log(e);
-    await file.update({ Status: FileStatus.Error });
   }
 };
 
