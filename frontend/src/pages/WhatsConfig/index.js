@@ -252,6 +252,9 @@ const WhatsConfig = () => {
         setSaving(!saving);
     }
 
+    const [disconnectedWhatsapps, setDisconnectedWhatsapps] = useState([]);
+    const [deletedWhatsapps, setDeletedWhatsapps] = useState([]);
+
     useEffect(() => {
         if (config.length > 0) {
             setIsActive(config[0].active);
@@ -263,6 +266,30 @@ const WhatsConfig = () => {
             } else {
                 let array = config[0].whatsappIds.split(',');
                 setSelectedConnection(array);
+
+                let connectedArray = [];
+                let disconnectArray = [];
+                let deletedArray = [];
+                array.forEach(whatsId => {
+                    let whatsExists = false;
+                    whatsApps.forEach(whats => {
+                        if (whats.id == whatsId) {
+                            whatsExists = true;
+                            if (whats.status === "CONNECTED") {
+                                connectedArray.push(whats.id);
+                            } else {
+                                disconnectArray.push(whats.name);
+                            }
+                        }
+                    })
+
+                    if (whatsExists == false) {
+                        deletedArray.push(whatsId);
+                    }
+                })
+                setSelectedConnection(connectedArray);
+                setDisconnectedWhatsapps(disconnectArray);
+                setDeletedWhatsapps(deletedArray);
             }
 
             if (config[0].greetingMessages && config[0].greetingMessages.length > 0) {
@@ -353,32 +380,73 @@ const WhatsConfig = () => {
                     />
                 </Paper>
                 <Paper
-                    className={classes.paper}
+                    className={classes.mainPaper}
                     variant="outlined"
                 >
-                    <Typography variant="subtitle1" gutterBottom>
-                        {i18n.t("settingsWhats.connections")}
-                    </Typography>
-                    <Select
-                        className={classes.selectWidth}
-                        labelId="type-select-label"
-                        id="type-select"
-                        value={selectedConnection}
-                        label="Type"
-                        onChange={handleChangeConnection}
-                        multiple
+                    <Paper
+                        className={classes.paper}
+                        variant="outlined"
                     >
-                        <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
-                        {whatsApps && whatsApps.map((whats, index) => {
-                            if (whats.official === false) {
-                                if (whats.status === "CONNECTED") {
-                                    return (
-                                        <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
-                                    )
-                                }
-                            } return null
-                        })}
-                    </Select>
+                        <Typography variant="subtitle1" gutterBottom>
+                            {i18n.t("settingsWhats.connections")}
+                        </Typography>
+                        <Select
+                            className={classes.selectWidth}
+                            labelId="type-select-label"
+                            id="type-select"
+                            value={selectedConnection}
+                            label="Type"
+                            onChange={handleChangeConnection}
+                            multiple
+                        >
+                            <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
+                            {whatsApps && whatsApps.map((whats, index) => {
+                                if (whats.official === false) {
+                                    if (whats.status === "CONNECTED") {
+                                        return (
+                                            <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+                                        )
+                                    }
+                                } return null
+                            })}
+                        </Select>
+                    </Paper>
+                    { disconnectedWhatsapps.length > 0 &&
+                        <Paper
+                            className={classes.paper}
+                            variant="outlined"
+                        >
+                            <Typography variant="subtitle1" gutterBottom>
+                                 Conexões Desconectadas: 
+                            </Typography>
+                            
+                            { disconnectedWhatsapps.length > 0 && disconnectedWhatsapps.map((disconnectWhats, index) => {
+                                return (
+                                    <Typography key={index} variant="subtitle1" gutterBottom>
+                                        { disconnectWhats };
+                                    </Typography>
+                                )
+                            })}
+                        </Paper>
+                    }
+                    { deletedWhatsapps.length > 0 &&
+                        <Paper
+                            className={classes.paper}
+                            variant="outlined"
+                        >
+                            <Typography variant="subtitle1" gutterBottom>
+                                Conexões Deletadas (id): 
+                            </Typography>
+                            
+                            { deletedWhatsapps.length > 0 && deletedWhatsapps.map((deletedWhats, index) => {
+                                return (
+                                    <Typography key={index} variant="subtitle1" gutterBottom>
+                                        { deletedWhats };
+                                    </Typography>
+                                )
+                            })}
+                        </Paper>
+                    }
                 </Paper>
                 <Paper
                     className={classes.paper}
