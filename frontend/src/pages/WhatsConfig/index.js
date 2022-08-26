@@ -332,154 +332,159 @@ const WhatsConfig = () => {
                 </MainHeaderButtonsWrapper>
             </MainHeader>
             <Paper
-                className={classes.paper}
+                className={classes.mainPaper}
                 variant="outlined"
             >
-                <Typography variant="subtitle1" gutterBottom>
-                	Ativar config? 
-				</Typography>
-                <Checkbox
-                    {...label}
-                    defaultChecked
-                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
-                    color="primary"
-                    onChange={handleActiveCheckboxChange}
-                    checked={isActive}
-                />
-            </Paper>
-            <Paper
-                className={classes.paper}
-                variant="outlined"
-            >
-                <Typography variant="subtitle1" gutterBottom>
-                	{i18n.t("settingsWhats.connections")}
-				</Typography>
-				<Select
-                    className={classes.selectWidth}
-					labelId="type-select-label"
-					id="type-select"
-					value={selectedConnection}
-					label="Type"
-					onChange={handleChangeConnection}
-					multiple
-                    disabled={!isActive}
-				>
-					<MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
-					{whatsApps && whatsApps.map((whats, index) => {
-						if (whats.official === false) {
-							if (whats.status === "CONNECTED") {
-								return (
-									<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
-								)
-							}
-						} return null
-					})}
-				</Select>
-            </Paper>
-            <Paper
-                className={classes.paper}
-                variant="outlined"
-            >
-                <Typography id="input-slider" gutterBottom>
-                    {i18n.t("settingsWhats.triggerTime")} (30seg - 1h)
-                </Typography>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs>
-                        <Slider
-                            value={typeof intervalValue === 'number' ? intervalValue : 0}
-                            onChange={handleIntervalSliderChange}
-                            aria-labelledby="input-slider"
-                            step={1}
-                            min={0.5}
-                            max={60}
-                            valueLabelDisplay="auto"
-                            disabled={!isActive}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <Input
-                            value={intervalValue}
-                            margin="dense"
-                            onChange={handleIntervalInputChange}
-                            onBlur={handleIntervalBlur}
-                            inputProps={{
-                            step: 1,
-                            min: 0.5,
-                            max: 60,
-                            type: 'number',
-                            'aria-labelledby': 'input-slider',
-                            }}
-                            disabled={!isActive}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper>
-            <Paper
-                className={classes.paper}
-                variant="outlined"
-            >
-                <Typography variant="subtitle1" gutterBottom>
-                	Usar mensagem de saudação? 
-				</Typography>
-                <Checkbox
-                    {...label}
-                    defaultChecked
-                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
-                    color="primary"
-                    onChange={handleCheckboxChange}
-                    checked={useGreetingMessage}
-                    disabled={!isActive}
-                />
-            </Paper>
-            { useGreetingMessage === true && selectedConnection.length !== 0 && (
-                <>
-                    <Button
-                        variant="contained"
+                <Paper
+                    className={classes.paper}
+                    variant="outlined"
+                >
+                    <Typography variant="subtitle1" gutterBottom>
+                        Ativar config? 
+                    </Typography>
+                    <Checkbox
+                        {...label}
+                        defaultChecked
+                        sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
                         color="primary"
-                        onClick={handleGreetingMessageOpenModal}
+                        onChange={handleActiveCheckboxChange}
+                        checked={isActive}
+                    />
+                </Paper>
+                <Paper
+                    className={classes.paper}
+                    variant="outlined"
+                >
+                    <Typography variant="subtitle1" gutterBottom>
+                        {i18n.t("settingsWhats.connections")}
+                    </Typography>
+                    <Select
+                        className={classes.selectWidth}
+                        labelId="type-select-label"
+                        id="type-select"
+                        value={selectedConnection}
+                        label="Type"
+                        onChange={handleChangeConnection}
+                        multiple
                         disabled={!isActive}
                     >
-                        Criar Mensagem
-                    </Button>
-                    <Paper
-                        className={classes.paper}
-                        variant="outlined"
-                    >
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Mensagem de Saudação</TableCell>
-                                    <TableCell>Ações</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                            { greetingMessages && greetingMessages.map((greetingMessage, index) => {
-                                return (
-                                    <TableRow key={index}>
-                                        <TableCell>{greetingMessage.greetingMessage}</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                onClick={(e) => {handleEditGreetingMessage(greetingMessage, index)}}
-                                                disabled={!isActive}
-                                            >
-                                                Editar
-                                            </Button>
-                                            <Button
-                                                onClick={(e) => {handleOpenConfirmationModal(greetingMessage, index)}}
-                                                disabled={!isActive}
-                                            >
-                                                Deletar
-                                            </Button>
-                                        </TableCell>
+                        <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
+                        {whatsApps && whatsApps.map((whats, index) => {
+                            if (whats.official === false) {
+                                if (whats.status === "CONNECTED") {
+                                    return (
+                                        <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+                                    )
+                                }
+                            } return null
+                        })}
+                    </Select>
+                </Paper>
+                <Paper
+                    className={classes.paper}
+                    variant="outlined"
+                >
+                    <Typography id="input-slider" gutterBottom>
+                        {i18n.t("settingsWhats.triggerTime")} (30seg - 1h)
+                    </Typography>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs>
+                            <Slider
+                                value={typeof intervalValue === 'number' ? intervalValue : 0}
+                                onChange={handleIntervalSliderChange}
+                                aria-labelledby="input-slider"
+                                step={1}
+                                min={0.5}
+                                max={60}
+                                valueLabelDisplay="auto"
+                                disabled={!isActive}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Input
+                                value={intervalValue}
+                                margin="dense"
+                                onChange={handleIntervalInputChange}
+                                onBlur={handleIntervalBlur}
+                                inputProps={{
+                                step: 1,
+                                min: 0.5,
+                                max: 60,
+                                type: 'number',
+                                'aria-labelledby': 'input-slider',
+                                }}
+                                disabled={!isActive}
+                            />
+                        </Grid>
+                    </Grid>
+                </Paper>
+                <Paper
+                    className={classes.paper}
+                    variant="outlined"
+                >
+                    <Typography variant="subtitle1" gutterBottom>
+                        Usar mensagem de saudação? 
+                    </Typography>
+                    <Checkbox
+                        {...label}
+                        defaultChecked
+                        sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                        color="primary"
+                        onChange={handleCheckboxChange}
+                        checked={useGreetingMessage}
+                        disabled={!isActive}
+                    />
+                </Paper>
+                { useGreetingMessage === true && selectedConnection.length !== 0 && (
+                    <>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleGreetingMessageOpenModal}
+                            disabled={!isActive}
+                        >
+                            Criar Mensagem
+                        </Button>
+                        <Paper
+                            className={classes.paper}
+                            variant="outlined"
+                        >
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Mensagem de Saudação</TableCell>
+                                        <TableCell>Ações</TableCell>
                                     </TableRow>
-                                )
-                            })}
-                            </TableBody>
-                        </Table>
-                    </Paper>
-                </>
-            )}
-    </MainContainer>
+                                </TableHead>
+                                <TableBody>
+                                { greetingMessages && greetingMessages.map((greetingMessage, index) => {
+                                    return (
+                                        <TableRow key={index}>
+                                            <TableCell>{greetingMessage.greetingMessage}</TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    onClick={(e) => {handleEditGreetingMessage(greetingMessage, index)}}
+                                                    disabled={!isActive}
+                                                >
+                                                    Editar
+                                                </Button>
+                                                <Button
+                                                    onClick={(e) => {handleOpenConfirmationModal(greetingMessage, index)}}
+                                                    disabled={!isActive}
+                                                >
+                                                    Deletar
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                                </TableBody>
+                            </Table>
+                        </Paper>
+                    </>
+                )}
+            </Paper>
+        </MainContainer>
 	);
 };
 
