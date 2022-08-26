@@ -10,7 +10,16 @@ const ListFileService = async ({
   limit = null
 }): Promise<File[] | undefined> => {
   let where = null;
-  if (Status !== undefined && !initialDate) {
+  if(Status === ''){
+    Status = undefined;
+  }
+    
+  if(initialDate === '') {
+    initialDate = null;
+  } 
+   
+
+  if (Status != null && Status != undefined && !initialDate) {
     where = {
       status: Status
     };
