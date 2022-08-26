@@ -18,6 +18,7 @@ import { FileStatus } from "../enum/FileStatus";
 import ImportFileService from "../services/UploadFileService/ImportFileService";
 import DispatcherRegisterService from "../services/UploadFileService/DispatcherRegisterService";
 import { getIO } from "../libs/socket";
+import DispatcherPingService from "../services/UploadFileService/DispatcherPingService";
 
 type MessageData = {
   body: string;
@@ -62,7 +63,7 @@ const createContact = async (newContact: string) => {
 
   return ticket;
 };
-
+/* eslint-disable */
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
   const io = getIO();
   const files = await ListFileService({ Status: FileStatus.WaitingImport,initialDate:null, limit: 1 });
@@ -87,6 +88,7 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
   return res.status(200).json('request is processed');
 };
 
+/* eslint-disable */
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
   const io = getIO();
   const files = await ListFileService({ Status: FileStatus.WaitingDispatcher,initialDate:null, limit: 1 });
@@ -117,6 +119,20 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
     }
   }
 
+  return res.status(200).json('request is processed');
+};
+
+/* eslint-disable */
+export const pingConnections = async (req: Request, res: Response) => {
+
+
+  const sendingFiles = await ListFileService({ Status: FileStatus.Sending,initialDate:null, limit: 1 });
+
+  if (sendingFiles?.length > 0) {
+    sendingFiles.forEach(async (file) => {
+      await DispatcherPingService({ file: file });
+    });
+  } 
   return res.status(200).json('request is processed');
 };
 

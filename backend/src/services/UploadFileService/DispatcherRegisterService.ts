@@ -21,7 +21,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     }
 
     let whatsappIds;
-    if (file.whatsappIds)
+    if (file.whatsappIds && file.whatsappIds != 'null')
       whatsappIds = file.whatsappIds.split(",");
 
     let accounts;
