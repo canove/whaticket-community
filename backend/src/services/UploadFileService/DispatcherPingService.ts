@@ -19,7 +19,7 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
           id: whatsappIds, 
           official: false
         },
-        limit:3,
+        limit: 2,
         order: [['lastPingDate', 'DESC']],
       });
     }else{
@@ -32,7 +32,7 @@ const DispatcherPingService = async ({ file }): Promise<void> => {
             }
           ]
         },
-        limit:3,
+        limit: 2,
         order: [['lastPingDate', 'DESC']],
       });
     }
