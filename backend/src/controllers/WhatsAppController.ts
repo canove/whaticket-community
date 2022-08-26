@@ -202,6 +202,15 @@ export const qualityNumber = async (
   return res.status(200).json(message);
 };
 
+export const health = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+
+  return res.status(200).json("api is active and running");
+};
+
+
 export const nofSessionStatus = async (
   req: Request,
   res: Response

@@ -1,8 +1,5 @@
 import axios from "axios";
-import { Message as WbotMessage } from "whatsapp-web.js";
 import AppError from "../../errors/AppError";
-import GetWbotMessage from "../../helpers/GetWbotMessage";
-import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId";
 import Message from "../../database/models/Message";
 import Ticket from "../../database/models/Ticket";
 
