@@ -10,12 +10,12 @@ const ListFileService = async ({
   limit = null
 }): Promise<File[] | undefined> => {
   let where = null;
-  if (Status !== '' && initialDate == '') {
+  if (Status !== undefined && !initialDate) {
     where = {
       status: Status
     };
   }
-  if (Status == '' && initialDate !== '') {
+  if (!Status && initialDate !== null) {
     where = {
       createdAt: {
         [Op.gte]: new Date(initialDate)
@@ -24,7 +24,7 @@ const ListFileService = async ({
   }
   // eslint-disable-next-line no-return-await
   return await File.findAll({
-    where,
+    where: where,
     order: [['createdAt', 'DESC']],
     limit
   });
