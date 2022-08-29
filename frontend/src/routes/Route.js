@@ -6,7 +6,7 @@ import BackdropLoading from "../components/BackdropLoading";
 
 const Route = ({ component: Component, isPrivate = false, ...rest }) => {
   const { isAuth, loading } = useContext(AuthContext);
-
+  console.log(Component);
   if (!isAuth && isPrivate) {
     return (
       <>

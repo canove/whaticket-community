@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import ListItem from "@material-ui/core/ListItem";
@@ -29,6 +29,8 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import List from "@material-ui/core/List";
 import PropTypes from "prop-types";
 import Collapse from "@material-ui/core/Collapse";
+import api from "../services/api";
+import toastError from "../errors/toastError";
 
 function ListItemLink(props) {
   const { icon, to, primary, className, open, ...other } = props;
@@ -62,6 +64,126 @@ ListItemLink.propTypes = {
   to: PropTypes.string.isRequired,
 };
 
+function getIcon(icon) {
+  if (icon === "DashboardOutlinedIcon") {
+    return <DashboardOutlinedIcon />;
+  } else if (icon === "WhatsAppIcon") {
+    return <WhatsAppIcon />;
+  } else if (icon === "SyncAltIcon") {
+    return <SyncAltIcon />;
+  } else if (icon === "SettingsOutlinedIcon") {
+    return <SettingsOutlinedIcon />;
+  } else if (icon === "DvrIcon") {
+    return <DvrIcon />;
+  } else if (icon === "ChatIcon") {
+    return <ChatIcon />;
+  } else if (icon === "ContactPhoneOutlinedIcon") {
+    return <ContactPhoneOutlinedIcon />;
+  } else if (icon === "QuestionAnswerOutlinedIcon") {
+    return <QuestionAnswerOutlinedIcon />;
+  } else if (icon === "ImportExportOutlinedIcon") {
+    return <ImportExportOutlinedIcon />;
+  } else if (icon === "AccountCircleIcon") {
+    return <AccountCircleIcon />;
+  } else if (icon === "PeopleAltOutlinedIcon") {
+    return <PeopleAltOutlinedIcon />;
+  } else if (icon === "AccountTreeOutlinedIcon") {
+    return <AccountTreeOutlinedIcon />;
+  } else if (icon === "EqualizerIcon") {
+    return <EqualizerIcon />;
+  } else if (icon === "AssessmentOutlinedIcon") {
+    return <AssessmentOutlinedIcon />
+  } else {
+    return null;
+  }
+}
+
+function ListParentItemLink(props) {
+  const { icon, primary, className, id } = props;
+
+  const [open, setOpen] = useState(false);
+  const [menus, setMenus] = useState([]);
+
+  const renderedIcon = getIcon(icon);
+
+  const handleClick = () => {
+    setOpen((prevOpen) => !prevOpen);
+  }
+
+  const fetchChildrenMenu = async () => {
+    try {
+      const { data } = await api.get(`/menus/children/${id}`);
+      setMenus(data);
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
+  useEffect(() => {
+    fetchChildrenMenu();
+  }, []);
+
+  return (
+    <List>
+      <li>
+        <ListItem button open={open} onClick={handleClick} className={className}>
+          {renderedIcon ? <ListItemIcon>{renderedIcon}</ListItemIcon> : null}
+          <ListItemText primary={primary} />
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItem>
+      </li>
+      <Collapse component="li" in={open} timeout="auto" unmountOnExit>
+        <List disablePadding>
+          { menus && menus.map((menu) => {
+            if (menu.isParent) {
+              return (
+                <ListParentItemLink
+                  key={menu.id}
+                  primary={menu.name}
+                  icon={menu.icon}
+                  id={menu.id}
+                />
+              )
+            } else {
+              return (
+                <ListItemLinkTest
+                  key={menu.id}
+                  to={`/${menu.name.replaceAll(' ', '')}`}
+                  primary={menu.name}
+                  icon={menu.icon}
+                />
+              )
+            }
+          })}
+        </List>
+      </Collapse>
+    </List>
+  )
+}
+
+function ListItemLinkTest(props) {
+  const { icon, to, primary, className, ...other } = props;
+
+  const renderLink = useMemo(
+    () =>
+      forwardRef((itemProps, ref) => (
+        <RouterLink to={to} ref={ref} {...itemProps} />
+      )),
+    [to]
+  );
+
+  const renderedIcon = getIcon(icon);
+
+  return (
+    <li>
+      <ListItem button component={renderLink} className={className} {...other}>
+        {renderedIcon ? <ListItemIcon>{renderedIcon}</ListItemIcon> : null}
+        <ListItemText primary={primary} />
+      </ListItem>
+    </li>
+  );
+}
+
 const MainListItems = (props) => {
   const { drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
@@ -71,6 +193,21 @@ const MainListItems = (props) => {
   const [openOff, setOpenOff] = React.useState(false);
   const [openRel, setOpenRel] = React.useState(false);
   const [openAdm, setOpenAdm] = React.useState(false);
+
+  const [menus, setMenus] = useState([]);
+
+  const fetchMenus = async () => {
+    try {
+      const { data } = await api.get('/menus/');
+      setMenus(data);
+    } catch (err) {
+      toastError(err);
+    } 
+  }
+
+  useEffect(() => {
+    fetchMenus();
+  }, []);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -114,7 +251,31 @@ const MainListItems = (props) => {
 
   return (
     <div onClick={drawerClose}>
-      <ListItemLink
+      { menus && menus.map((menu) => {
+        if (!menu.parentId) {
+          if (menu.isParent) {
+            return (
+              <ListParentItemLink
+                key={menu.id}
+                primary={menu.name}
+                icon={menu.icon}
+                id={menu.id}
+              />
+            )
+          } else {
+            return (
+              <ListItemLinkTest
+                key={menu.id}
+                to={`/${menu.name.replaceAll(' ', '')}`}
+                primary={menu.name}
+                icon={menu.icon}
+              />
+            )
+          }
+        }
+      })}
+
+      {/* <ListItemLink
         to="/"
         primary="Dashboard"
         icon={<DashboardOutlinedIcon />}
@@ -195,9 +356,9 @@ const MainListItems = (props) => {
         to="/importation"
         primary={i18n.t("mainDrawer.listItems.importation")}
         icon={<ImportExportOutlinedIcon />}
-      />
-      <Divider />
-      <List>
+      /> */}
+      {/* <Divider /> */}
+      {/* <List>
         <li>
           <ListItem button open={openAdm} onClick={handleClickAdm}>
             <ListItemIcon>
@@ -253,7 +414,7 @@ const MainListItems = (props) => {
             />
           </Collapse>
         </Collapse>
-      </List>
+      </List> */}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
@@ -23,8 +23,25 @@ import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import Route from "./Route";
 import Templates from "../pages/Templates";
+import api from "../services/api";
+import toastError from "../errors/toastError";
 
 const Routes = () => {
+  const [menus, setMenus] = useState([]);
+
+  const fetchMenus = async () => {
+    try {
+      const { data } = await api.get('/menus/');
+      setMenus(data);
+    } catch (err) {
+      toastError(err);
+    } 
+  }
+
+  useEffect(() => {
+    fetchMenus();
+  }, []);
+
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -33,7 +50,7 @@ const Routes = () => {
           <Route exact path="/signup" component={Signup} />
           <WhatsAppsProvider>
             <LoggedInLayout>
-              <Route exact path="/" component={Dashboard} isPrivate />
+              <Route exact path="/dashboard" component={Dashboard} isPrivate />
               <Route
                 exact
                 path="/tickets/:ticketId?"
