@@ -108,8 +108,15 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
             for (const reg of registers){
               let phoneNumber = reg.phoneNumber;
-              if (phoneNumber.length > 12)
-                phoneNumber = `${reg.phoneNumber.substring(4, 0)}${reg.phoneNumber.substring(reg.phoneNumber.length, 5)}`;
+              if (phoneNumber.length > 12) {
+                if (phoneNumber.length > 12){
+                  let firstNumber = phoneNumber.substring(6,5);
+                  if(firstNumber == "9" || firstNumber == "8") {
+                    phoneNumber = `${phoneNumber.substring(4, 0)}${phoneNumber.substring(phoneNumber.length, 5)}`;
+                  }
+                }
+          
+              }
 
                 processedRegister.push(reg);
                 payload.push({

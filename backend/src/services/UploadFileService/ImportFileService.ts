@@ -4,6 +4,7 @@ import path from "path";
 import FileRegister from "../../database/models/FileRegister";
 import { FileStatus } from "../../enum/FileStatus";
 
+/*eslint-disable*/
 const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
@@ -27,8 +28,7 @@ const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
     let totalRegisters = 0;
     let registersToInsert = [];
 
-    registers.forEach(async (line) => {
-      // eslint-disable-next-line @typescript-eslint/ban-types
+    for(const line of registers) {
       try {
         if (line.trim().length > 1) {
           let infos = line.split(";");
@@ -52,13 +52,13 @@ const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
       } catch (err) {
         console.log(err);
       }
-    });
+    }
 
     if (registersToInsert.length > 0) {
       totalRegisters += registersToInsert.length;
       await FileRegister.bulkCreate(registersToInsert);
-      await file.update({ QtdeRegister: totalRegisters, Status: FileStatus.WaitingApprove });
     }
+    await file.update({ QtdeRegister: totalRegisters, Status: FileStatus.WaitingApprove });
   } catch (e) {
     console.log(e);
     await file.update({ Status: FileStatus.Error });

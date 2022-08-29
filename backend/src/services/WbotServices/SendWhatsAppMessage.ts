@@ -14,7 +14,7 @@ interface Request {
   ticket: Ticket;
   quotedMsg?: Message;
 }
-
+/* eslint-disable */
 const SendWhatsAppMessage = async ({
   body,
   ticket
@@ -95,8 +95,13 @@ const SendWhatsAppMessage = async ({
     try {
       const apiUrl = `${process.env.WPPNOF_URL}/sendText`;
       let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
-      if (phoneNumber.length > 12)
-        phoneNumber = `${phoneNumber.substring(4, 0)}${phoneNumber.substring(phoneNumber.length, 5)}`;
+      
+      if (phoneNumber.length > 12){
+        let firstNumber = phoneNumber.substring(6,5);
+        if(firstNumber == "9" || firstNumber == "8") {
+          phoneNumber = `${phoneNumber.substring(4, 0)}${phoneNumber.substring(phoneNumber.length, 5)}`;
+        }
+      }
 
       const payload = {
         "session": connnection.name,
