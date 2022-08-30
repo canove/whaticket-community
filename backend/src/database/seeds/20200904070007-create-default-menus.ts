@@ -155,6 +155,14 @@ module.exports = {
           updatedAt: new Date()
         },
         {
+          name: "Menus",
+          icon: "ListAltIcon",
+          parentId: Administration[0][0].id,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
           name: "Queues",
           icon: "AccountTreeOutlinedIcon",
           parentId: Administration[0][0].id,
@@ -186,6 +194,7 @@ module.exports = {
       'SELECT id FROM whaticket.Menus WHERE name="Reports" and isParent=true;'
     );
 
+    // eslint-disable-next-line no-return-await
     return await queryInterface.bulkInsert(
       "Menus",
       [
