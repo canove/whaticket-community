@@ -29,6 +29,21 @@ import toastError from "../errors/toastError";
 const Routes = () => {
   const [menus, setMenus] = useState([]);
 
+  const [useDashboard, setUseDashboard] = useState(false);
+  const [useOfficialConnections, setUseOfficialConnections] = useState(false);
+  const [useConnections, setUseConnections] = useState(false);
+  const [useWhatsConfig, setUseWhatsConfig] = useState(false);
+  const [useTemplate, setUseTemplate] = useState(false);
+  const [useContacts, setUseContacts] = useState(false);
+  const [useUsers, setUseUsers] = useState(false);
+  const [useQuickAnswers, setUseQuickAnswers] = useState(false);
+  const [useImportation, setUseImportation] = useState(false);
+  const [useSettings, setUseSettings] = useState(false);
+  const [useQueues, setUseQueues] = useState(false);
+  const [useReports, setUseReports] = useState(false);
+  const [useReportsTicket, setUseReportsTicket] = useState(false);
+  const [useRegistersReports, setUseRegistersReports] = useState(false);
+
   const fetchMenus = async () => {
     try {
       const { data } = await api.get('/menus/');
@@ -42,6 +57,55 @@ const Routes = () => {
     fetchMenus();
   }, []);
 
+  useEffect(() => {
+    if (menus) {
+      menus.forEach(menu => {
+        if (menu.name === "Dashboard") {
+          setUseDashboard(true);
+        }
+        if (menu.name === "Official Connections") {
+          setUseOfficialConnections(true);
+        }
+        if (menu.name === "Connections") {
+          setUseConnections(true);
+        }
+        if (menu.name === "Whats Config") {
+          setUseWhatsConfig(true);
+        }
+        if (menu.name === "Templates") {
+          setUseTemplate(true);
+        }
+        if (menu.name === "Contacts") {
+          setUseContacts(true);
+        }
+        if (menu.name === "Users") {
+          setUseUsers(true);
+        }
+        if (menu.name === "Quick Answers") {
+          setUseQuickAnswers(true);
+        }
+        if (menu.name === "Importation") {
+          setUseImportation(true);
+        }
+        if (menu.name === "Settings") {
+          setUseSettings(true);
+        }
+        if (menu.name === "Queues") {
+          setUseQueues(true);
+        }
+        if (menu.name === "Reports") {
+          setUseReports(true);
+        }
+        if (menu.name === "Reports Ticket") {
+          setUseReportsTicket(true);
+        }
+        if (menu.name === "Registers Reports") {
+          setUseRegistersReports(true);
+        }
+      });
+    }
+  }, [menus])
+
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -50,41 +114,47 @@ const Routes = () => {
           <Route exact path="/signup" component={Signup} />
           <WhatsAppsProvider>
             <LoggedInLayout>
-              <Route exact path="/dashboard" component={Dashboard} isPrivate />
-              <Route
-                exact
-                path="/tickets/:ticketId?"
-                component={Tickets}
-                isPrivate
-              />
-              <Route
-                exact
-                path="/connections"
-                component={Connections}
-                isPrivate
-              />
+              {useDashboard && <Route exact path="/" component={Dashboard} isPrivate />}
+              {useOfficialConnections && 
               <Route
                 exact
                 path="/officialConnections"
                 component={OfficialConnections}
                 isPrivate
               />
-              <Route exact path="/whatsConfig" component={WhatsConfig} isPrivate />
-              <Route exact path="/templates" component={Templates} isPrivate />
-              <Route exact path="/contacts" component={Contacts} isPrivate />
-              <Route exact path="/users" component={Users} isPrivate />
+              }
+              {useConnections && 
+              <Route
+                exact
+                path="/connections"
+                component={Connections}
+                isPrivate
+              />
+              }
+              {useWhatsConfig && <Route exact path="/whatsConfig" component={WhatsConfig} isPrivate />}
+              <Route
+                exact
+                path="/tickets/:ticketId?"
+                component={Tickets}
+                isPrivate
+              />
+              {useTemplate && <Route exact path="/templates" component={Templates} isPrivate />}
+              {useContacts && <Route exact path="/contacts" component={Contacts} isPrivate />}
+              {useUsers && <Route exact path="/users" component={Users} isPrivate />}
+              {useQuickAnswers &&
               <Route
                 exact
                 path="/quickAnswers"
                 component={QuickAnswers}
                 isPrivate
               />
-              <Route exact path="/Importation" component={Importation} isPrivate />
-              <Route exact path="/Settings" component={Settings} isPrivate />
-              <Route exact path="/Queues" component={Queues} isPrivate />
-              <Route exact path="/Reports" component={Reports} isPrivate />
-              <Route exact path="/ReportsTicket" component={ReportsTicket} isPrivate />
-              <Route exact path="/RegistersReports" component={RegistersReports} isPrivate />
+              }
+              {useImportation && <Route exact path="/Importation" component={Importation} isPrivate />}
+              {useSettings && <Route exact path="/Settings" component={Settings} isPrivate />}
+              {useQueues && <Route exact path="/Queues" component={Queues} isPrivate />}
+              {useReports && <Route exact path="/Reports" component={Reports} isPrivate />}
+              {useReportsTicket && <Route exact path="/ReportsTicket" component={ReportsTicket} isPrivate />}
+              {useRegistersReports && <Route exact path="/RegistersReports" component={RegistersReports} isPrivate />}
             </LoggedInLayout>
           </WhatsAppsProvider>
         </Switch>

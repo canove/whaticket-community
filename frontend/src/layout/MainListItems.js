@@ -164,13 +164,7 @@ function ListParentItemLink(props) {
 function ListItemLinkTest(props) {
   const { icon, to, primary, className, ...other } = props;
 
-  const renderLink = useMemo(
-    () =>
-      forwardRef((itemProps, ref) => (
-        <RouterLink to={to} ref={ref} {...itemProps} />
-      )),
-    [to]
-  );
+  const renderLink = forwardRef((itemProps, ref) => (<RouterLink to={to} ref={ref} {...itemProps} />))
 
   const renderedIcon = getIcon(icon);
 
@@ -252,6 +246,16 @@ const MainListItems = (props) => {
   return (
     <div onClick={drawerClose}>
       { menus && menus.map((menu) => {
+        if (menu.name === "Dashboard") {
+          return (
+            <ListItemLinkTest
+              key={menu.id}
+              to={'/'}
+              primary={menu.name}
+              icon={menu.icon}
+            />
+          )
+        }
         if (!menu.parentId) {
           if (menu.isParent) {
             return (
