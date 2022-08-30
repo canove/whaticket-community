@@ -80,6 +80,8 @@ const CreateWhatsAppService = async ({
   if (!official && (facebookToken || facebookPhoneNumberId || phoneNumber)) {
     throw new AppError("ERRO!");
   }
+  const lastPingDate = new Date();
+  lastPingDate.setDate(lastPingDate.getDate() + 2);
 
   const whatsapp = await Whatsapp.create(
     {
@@ -91,7 +93,8 @@ const CreateWhatsAppService = async ({
       official,
       facebookToken,
       facebookPhoneNumberId,
-      phoneNumber
+      phoneNumber,
+      lastPingDate
     },
     { include: ["queues"] }
   );
