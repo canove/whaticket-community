@@ -619,6 +619,20 @@ const messages = {
         all: "Todos",
       },
 
+      historicTicket:{
+        button: "Histórico",
+      historicModal:{
+        title: "Histórico",
+        name: "Nome",
+        message: "Mensagem",
+        status: "Status",
+        createAt: "Data Criação",
+        actions: "Ações",
+        closed: "Fechar",
+        back: "Voltar"
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
