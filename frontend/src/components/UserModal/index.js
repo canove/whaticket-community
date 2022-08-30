@@ -246,6 +246,18 @@ const UserModal = ({ open, onClose, userId }) => {
 										/>
 									</FormControl>
 								</div>
+								<div>
+									<Field
+										as={TextField}
+										label={i18n.t("Id da empresa")}
+										name="id"
+										error={touched.id && Boolean(errors.id)}
+										helperText={touched.id && errors.id}
+										variant="outlined"
+										margin="dense"
+										fullWidth
+									/>
+								</div>
 								<FormControl
 									variant="outlined"
 									className={classes.formControl}

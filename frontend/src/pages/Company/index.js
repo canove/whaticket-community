@@ -25,46 +25,46 @@ import Title from "../../components/Title";
 
 import api from "../../services/api";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
-import UserModal from "../../components/UserModal";
+import CompanyRegistration from "../../components/CompanyRegistration";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 
 const reducer = (state, action) => {
-  if (action.type === "LOAD_USERS") {
-    const users = action.payload;
-    const newUsers = [];
+  if (action.type === "LOAD_COMPANIES") {
+    const companies = action.payload;
+    const newCompanies = [];
 
-    users.forEach((user) => {
-      const userIndex = state.findIndex((u) => u.id === user.id);
-      if (userIndex !== -1) {
-        state[userIndex] = user;
+    companies.forEach((company) => {
+      const companyIndex = state.findIndex((u) => u.id === company.id);
+      if (companyIndex !== -1) {
+        state[companyIndex] = company;
       } else {
-        newUsers.push(user);
+        newCompanies.push(company);
       }
     });
 
-    return [...state, ...newUsers];
+    return [...state, ...newCompanies];
   }
 
-  if (action.type === "UPDATE_USERS") {
-    const user = action.payload;
-    const userIndex = state.findIndex((u) => u.id === user.id);
+  if (action.type === "UPDATE_COMPANIES") {
+    const company = action.payload;
+    const companyIndex = state.findIndex((u) => u.id === company.id);
 
-    if (userIndex !== -1) {
-      state[userIndex] = user;
+    if (companyIndex !== -1) {
+      state[companyIndex] = company;
       return [...state];
     } else {
-      return [user, ...state];
+      return [company, ...state];
     }
   }
 
-  if (action.type === "DELETE_USER") {
-    const userId = action.payload;
+  if (action.type === "DELETE_COMPANY") {
+    const companyId = action.payload;
 
-    const userIndex = state.findIndex((u) => u.id === userId);
-    if (userIndex !== -1) {
-      state.splice(userIndex, 1);
+    const companyIndex = state.findIndex((u) => u.id === companyId);
+    if (companyIndex !== -1) {
+      state.splice(companyIndex, 1);
     }
     return [...state];
   }
@@ -83,19 +83,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Users = () => {
+const Company= () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [deletingUser, setDeletingUser] = useState(null);
-  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [deletingCompany, setDeletingcompany] = useState(null);
+  const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
-  const [users, dispatch] = useReducer(reducer, []);
+  const [companies, dispatch] = useReducer(reducer, []);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -105,19 +105,19 @@ const Users = () => {
   useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
-      const fetchUsers = async () => {
+      const fetchCompanies = async () => {
         try {
-          const { data } = await api.get("/users/", {
+          const { data } = await api.get("/company/", {
             params: { searchParam, pageNumber },
           });
-          dispatch({ type: "LOAD_USERS", payload: data.users });
+          dispatch({ type: "LOAD_COMPANIES", payload: data.companies });
           setHasMore(data.hasMore);
           setLoading(false);
         } catch (err) {
           toastError(err);
         }
       };
-      fetchUsers();
+      fetchCompanies();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, pageNumber]);
@@ -125,13 +125,13 @@ const Users = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("user", (data) => {
+    socket.on("company", (data) => {
       if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_USERS", payload: data.user });
+        dispatch({ type: "UPDATE_COMPANIES", payload: data.company });
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_USER", payload: +data.userId });
+        dispatch({ type: "DELETE_COMPANY", payload: + data.companyId });
       }
     });
 
@@ -140,33 +140,33 @@ const Users = () => {
     };
   }, []);
 
-  const handleOpenUserModal = () => {
-    setSelectedUser(null);
-    setUserModalOpen(true);
+  const handleOpenCompanyModal = () => {
+    setSelectedCompany(null);
+    setCompanyModalOpen(true);
   };
 
-  const handleCloseUserModal = () => {
-    setSelectedUser(null);
-    setUserModalOpen(false);
+  const handleCloseCompanyModal = () => {
+    setSelectedCompany(null);
+    setCompanyModalOpen(false);
   };
 
   const handleSearch = (event) => {
     setSearchParam(event.target.value.toLowerCase());
   };
 
-  const handleEditUser = (user) => {
-    setSelectedUser(user);
-    setUserModalOpen(true);
+  const handleEditCompany = (company) => {
+    setSelectedCompany(company);
+    setCompanyModalOpen(true);
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteCompany= async (companyId) => {
     try {
-      await api.delete(`/users/${userId}`);
-      toast.success(i18n.t("users.toasts.deleted"));
+      await api.delete(`/companies/${companyId}`);
+      toast.success(i18n.t("companies.toasts.deleted"));
     } catch (err) {
       toastError(err);
     }
-    setDeletingUser(null);
+    setDeletingcompany(null);
     setSearchParam("");
     setPageNumber(1);
   };
@@ -187,25 +187,25 @@ const Users = () => {
     <MainContainer>
       <ConfirmationModal
         title={
-          deletingUser &&
+          deletingCompany &&
           `${i18n.t("users.confirmationModal.deleteTitle")} ${
-            deletingUser.name
+            deletingCompany.name
           }?`
         }
         open={confirmModalOpen}
         onClose={setConfirmModalOpen}
-        onConfirm={() => handleDeleteUser(deletingUser.id)}
+        onConfirm={() => handleDeleteCompany(deletingCompany.id)}
       >
         {i18n.t("users.confirmationModal.deleteMessage")}
       </ConfirmationModal>
-      <UserModal
-        open={userModalOpen}
-        onClose={handleCloseUserModal}
+      <CompanyRegistration
+        open={companyModalOpen}
+        onClose={handleCloseCompanyModal}
         aria-labelledby="form-dialog-title"
-        userId={selectedUser && selectedUser.id}
+        companyId={selectedCompany && selectedCompany.id}
       />
       <MainHeader>
-        <Title>{i18n.t("users.title")}</Title>
+        <Title>{i18n.t("Empresa")}</Title>
         <MainHeaderButtonsWrapper>
           <TextField
             placeholder={i18n.t("contacts.searchPlaceholder")}
@@ -223,9 +223,9 @@ const Users = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleOpenUserModal}
+            onClick={handleOpenCompanyModal}
           >
-            {i18n.t("users.buttons.add")}
+            {i18n.t("Cadastrar Empresa")}
           </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -237,25 +237,30 @@ const Users = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
-              <TableCell align="center">{i18n.t("users.table.email")}</TableCell>
-              <TableCell align="center">{i18n.t("users.table.profile")}</TableCell>
-              <TableCell align="center">{i18n.t("Id da Empresa")}</TableCell>
-              <TableCell align="center">{i18n.t("users.table.actions")}</TableCell>
+              <TableCell align="center">{i18n.t("Id Empresa")}</TableCell>
+              <TableCell align="center">{i18n.t("Nome")}</TableCell>
+              <TableCell align="center">{i18n.t("Cnpj")}</TableCell>
+              <TableCell align="center">{i18n.t("Telefone")}</TableCell>
+              <TableCell align="center">{i18n.t("Email")}</TableCell>
+              <TableCell align="center">{i18n.t("Endereço")}</TableCell>
+              <TableCell align="center">{i18n.t("Ações")}</TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
             <>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell align="center">{user.name}</TableCell>
-                  <TableCell align="center">{user.email}</TableCell>
-                  <TableCell align="center">{user.profile}</TableCell>
-                  <TableCell align="center">{user.idCompany}</TableCell>
+              {companies.map((company) => (
+                <TableRow key={company.id}>
+                  <TableCell align="center">{company.id}</TableCell>
+                  <TableCell align="center">{company.name}</TableCell>
+                  <TableCell align="center">{company.cnpj}</TableCell>
+                  <TableCell align="center">{company.phone}</TableCell>
+                  <TableCell align="center">{company.email}</TableCell>
+                  <TableCell align="center">{company.address}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
-                      onClick={() => handleEditUser(user)}
+                      onClick={() => handleEditCompany(company)}
                     >
                       <EditIcon />
                     </IconButton>
@@ -264,7 +269,7 @@ const Users = () => {
                       size="small"
                       onClick={(e) => {
                         setConfirmModalOpen(true);
-                        setDeletingUser(user);
+                        setDeletingcompany(company);
                       }}
                     >
                       <DeleteOutlineIcon />
@@ -281,4 +286,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Company;

@@ -19,9 +19,9 @@ import {
 	IconButton,
 	Link
   } from '@material-ui/core';
-  
+
 import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
-  
+
 import { makeStyles } from "@material-ui/core/styles";
 
 import api from "../../services/api";
@@ -128,7 +128,6 @@ const SignUp = () => {
 										autoFocus
 									/>
 								</Grid>
-
 								<Grid item xs={12}>
 									<Field
 										as={TextField}

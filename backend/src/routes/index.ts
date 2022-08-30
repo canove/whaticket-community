@@ -19,6 +19,7 @@ import fileRoutes from "./fileRoutes";
 import registerRoutes from "./registersRoutes";
 import templateRoutes from "./templateRoutes";
 import whatsConfigRoutes from "./whatsConfigRoutes";
+import companyRoutes from "./companyRoutes";
 
 const routes = Router();
 
@@ -41,5 +42,6 @@ routes.use(fileRoutes);
 routes.use(registerRoutes);
 routes.use(templateRoutes);
 routes.use(whatsConfigRoutes);
+routes.use(companyRoutes);
 
 export default routes;
