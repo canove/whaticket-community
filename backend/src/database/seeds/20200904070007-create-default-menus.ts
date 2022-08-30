@@ -110,6 +110,14 @@ module.exports = {
           updatedAt: new Date()
         },
         {
+          name: "Company",
+          icon: "ApartmentIcon",
+          parentId: 12,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
           name: "Queues",
           icon: "AccountTreeOutlinedIcon",
           parentId: 12,

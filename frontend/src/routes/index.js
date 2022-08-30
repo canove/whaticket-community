@@ -44,6 +44,7 @@ const Routes = () => {
   const [useReports, setUseReports] = useState(false);
   const [useReportsTicket, setUseReportsTicket] = useState(false);
   const [useRegistersReports, setUseRegistersReports] = useState(false);
+  const [useCompany, setUseCompany] = useState(false);
 
   const fetchMenus = async () => {
     try {
@@ -103,6 +104,9 @@ const Routes = () => {
         if (menu.name === "Registers Reports") {
           setUseRegistersReports(true);
         }
+        if (menu.name === "Company") {
+          setUseCompany(true);
+        }
       });
     }
   }, [menus])
@@ -156,6 +160,7 @@ const Routes = () => {
               {useReports && <Route exact path="/Reports" component={Reports} isPrivate />}
               {useReportsTicket && <Route exact path="/ReportsTicket" component={ReportsTicket} isPrivate />}
               {useRegistersReports && <Route exact path="/RegistersReports" component={RegistersReports} isPrivate />}
+              {useCompany && <Route exact path="/Company" component={Company} isPrivate />}
             </LoggedInLayout>
           </WhatsAppsProvider>
         </Switch>

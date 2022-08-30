@@ -94,6 +94,8 @@ function getIcon(icon) {
     return <EqualizerIcon />;
   } else if (icon === "AssessmentOutlinedIcon") {
     return <AssessmentOutlinedIcon />
+  } else if (icon === "ApartmentIcon") {
+    return <ApartmentIcon />;
   } else {
     return null;
   }
