@@ -58,14 +58,17 @@ const useStyles = makeStyles((theme) => ({
 const Login = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
-
   const [user, setUser] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-
+  const [company, setCompany] = useState ("")
   const { handleLogin } = useContext(AuthContext);
 
   const handleChangeInput = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  const handleChange = (e) => {
+    setCompany(e.target.value);
   };
 
   const handlSubmit = (e) => {
@@ -84,6 +87,19 @@ const Login = () => {
           {i18n.t("login.title")}
         </Typography>
         <form className={classes.form} noValidate onSubmit={handlSubmit}>
+            <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="company"
+            label={i18n.t("Empresa")}
+            name="company"
+            value={company}
+            onChange={handleChange}
+            autoComplete="company"
+            autoFocus
+          />
           <TextField
             variant="outlined"
             margin="normal"

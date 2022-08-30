@@ -14,6 +14,7 @@ import File from "./models/File";
 import FileRegister from "./models/FileRegister";
 import WhatsappsConfig from "./models/WhatsappsConfig";
 import GreetingMessages from "./models/GreetingMessages";
+import Company from "./models/Company";
 import Menu from "./models/Menu";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -37,6 +38,7 @@ const models = [
   FileRegister,
   WhatsappsConfig,
   GreetingMessages,
+  Company,
   Menu
 ];
 

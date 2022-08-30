@@ -9,6 +9,7 @@ import UpdateTicketService from "../services/TicketServices/UpdateTicketService"
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import formatBody from "../helpers/Mustache";
+import HistoricService from "../services/TicketServices/HistoricService";
 
 type IndexQuery = {
   searchParam: string;
@@ -78,6 +79,14 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
 
   const contact = await ShowTicketService(ticketId);
+
+  return res.status(200).json(contact);
+};
+
+export const historic = async (req: Request, res: Response): Promise<Response> => {
+  const { contactId } = req.params;
+
+  const contact = await HistoricService(contactId);
 
   return res.status(200).json(contact);
 };

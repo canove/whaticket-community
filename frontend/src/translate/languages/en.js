@@ -617,6 +617,20 @@ const messages = {
         all: "All",
       },
 
+      historicTicket:{
+        button: "Historic",
+      historicModal:{
+        title: "Historic",
+        name: "Name",
+        message: "Message",
+        status: "Status",
+        createAt: "Create At",
+        actions: "Actions",
+        closed: "Close",
+        back: "Back",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",

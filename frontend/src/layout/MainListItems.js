@@ -20,6 +20,7 @@ import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import EqualizerIcon from "@material-ui/icons/Equalizer";
 import ChatIcon from "@material-ui/icons/Chat";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import ApartmentIcon from '@material-ui/icons/Apartment';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
@@ -215,7 +216,7 @@ const MainListItems = (props) => {
               whats.status === "TIMEOUT" ||
               whats.status === "OPENING"
             );
-          }
+          }return null
         });
         if (offlineWhats.length > 0) {
           setConnectionWarning(true);
@@ -379,6 +380,11 @@ const MainListItems = (props) => {
             to="/users"
             primary={i18n.t("mainDrawer.listItems.users")}
             icon={<PeopleAltOutlinedIcon />}
+          />
+          <ListItemLink
+            to="/company"
+            primary={i18n.t("Empresa")}
+            icon={<ApartmentIcon />}
           />
           <ListItemLink
             to="/queues"

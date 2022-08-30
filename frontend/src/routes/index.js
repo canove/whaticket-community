@@ -25,6 +25,7 @@ import Route from "./Route";
 import Templates from "../pages/Templates";
 import api from "../services/api";
 import toastError from "../errors/toastError";
+import Company from "../pages/Company";
 
 const Routes = () => {
   const [menus, setMenus] = useState([]);
