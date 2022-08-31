@@ -81,6 +81,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		password: "",
 		profile: "user",
 		lang: "",
+		companyId: ""
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
@@ -250,9 +251,9 @@ const UserModal = ({ open, onClose, userId }) => {
 									<Field
 										as={TextField}
 										label={i18n.t("Id da empresa")}
-										name="id"
-										error={touched.id && Boolean(errors.id)}
-										helperText={touched.id && errors.id}
+										name="companyId"
+										error={touched.companyId && Boolean(errors.companyId)}
+										helperText={touched.companyId && errors.companyId}
 										variant="outlined"
 										margin="dense"
 										fullWidth

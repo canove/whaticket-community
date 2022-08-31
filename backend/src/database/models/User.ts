@@ -47,6 +47,7 @@ class User extends Model<User> {
   @Column
   profile: string;
 
+  @Default("pt")
   @Column
   lang: string;
 

@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
+import { toast } from "react-toastify";
 
 // const Copyright = () => {
 // 	return (
@@ -96,7 +97,11 @@ const Login = () => {
 
   const handlSubmit = (e) => {
     e.preventDefault();
-    handleLogin(user);
+    if (selectedCompany) {
+      handleLogin(user);
+    } else {
+      toast.error("Selecione uma empresa.");
+    }
   }
 
   return (
