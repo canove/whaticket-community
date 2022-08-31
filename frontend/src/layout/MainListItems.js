@@ -21,6 +21,7 @@ import EqualizerIcon from "@material-ui/icons/Equalizer";
 import ChatIcon from "@material-ui/icons/Chat";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ApartmentIcon from '@material-ui/icons/Apartment';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
@@ -96,6 +97,8 @@ function getIcon(icon) {
     return <AssessmentOutlinedIcon />
   } else if (icon === "ApartmentIcon") {
     return <ApartmentIcon />;
+  } else if (icon === "ListAltIcon") {
+    return <ListAltIcon />
   } else {
     return null;
   }

@@ -9,7 +9,10 @@ import {
   AllowNull,
   Unique,
   Default,
+  BelongsToMany,
 } from "sequelize-typescript";
+import Menu from "./Menu";
+import MenuCompanies from "./MenuCompanies";
 
 @Table
 class Company extends Model<Company> {
@@ -37,6 +40,9 @@ class Company extends Model<Company> {
   @Default(false)
   @Column
   address: string;
+
+  @BelongsToMany(() => Menu, () => MenuCompanies)
+  menus: Menu[];
 
   @CreatedAt
   createdAt: Date;

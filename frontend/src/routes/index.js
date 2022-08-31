@@ -26,6 +26,7 @@ import Templates from "../pages/Templates";
 import api from "../services/api";
 import toastError from "../errors/toastError";
 import Company from "../pages/Company";
+import Menus from "../pages/Menus";
 
 const Routes = () => {
   const [menus, setMenus] = useState([]);
@@ -45,6 +46,7 @@ const Routes = () => {
   const [useReportsTicket, setUseReportsTicket] = useState(false);
   const [useRegistersReports, setUseRegistersReports] = useState(false);
   const [useCompany, setUseCompany] = useState(false);
+  const [useMenus, setUseMenus] = useState(false);
 
   const fetchMenus = async () => {
     try {
@@ -107,6 +109,9 @@ const Routes = () => {
         if (menu.name === "Company") {
           setUseCompany(true);
         }
+        if (menu.name === "Menus") {
+          setUseMenus(true);
+        }
       });
     }
   }, [menus])
@@ -161,6 +166,7 @@ const Routes = () => {
               {useReportsTicket && <Route exact path="/ReportsTicket" component={ReportsTicket} isPrivate />}
               {useRegistersReports && <Route exact path="/RegistersReports" component={RegistersReports} isPrivate />}
               {useCompany && <Route exact path="/Company" component={Company} isPrivate />}
+              {useMenus && <Route exact path="/Menus" component={Menus} isPrivate />}
             </LoggedInLayout>
           </WhatsAppsProvider>
         </Switch>

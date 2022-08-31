@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
-import CheckSettingsHelper from "../helpers/CheckSettings";
-import AppError from "../errors/AppError";
-
 import CreateCompanyService from "../services/CompanyService/CreateCompanyService";
 import ListCompanyService from "../services/CompanyService/ListCompanyService";
 import UpdateCompanyService from "../services/CompanyService/UpdateCompanyService";
@@ -28,7 +25,6 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { name, cnpj, phone, email, address } = req.body;
-
 
   const company = await CreateCompanyService({
     name,
@@ -59,8 +55,6 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
-
   const { companyId } = req.params;
   const companyData = req.body;
 
@@ -80,7 +74,6 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { companyId } = req.params;
-
 
   await DeleteCompanyService(companyId);
 

@@ -1,5 +1,6 @@
 import { Sequelize, Op } from "sequelize";
 import Company from "../../database/models/Company";
+import Menu from "../../database/models/Menu";
 
 interface Request {
   searchParam?: string;
@@ -35,7 +36,13 @@ const ListCompanyService = async ({
     where: whereCondition,
     attributes: ["id", "name", "cnpj", "phone", "email", "address"],
     order: [["createdAt", "DESC"]],
-
+    include: [
+      {
+        model: Menu,
+        as: "menus",
+        attributes: ["id", "name", "icon", "isParent", "parentId"]
+      }
+    ]
   });
 
   const hasMore = count > offset + companies.length;

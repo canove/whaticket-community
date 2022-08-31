@@ -5,8 +5,11 @@ import {
   PrimaryKey,
   AutoIncrement,
   CreatedAt,
-  UpdatedAt
+  UpdatedAt,
+  BelongsToMany
 } from "sequelize-typescript";
+import Company from "./Company";
+import MenuCompanies from "./MenuCompanies";
 
 @Table
 class Menu extends Model<Menu> {
@@ -26,6 +29,9 @@ class Menu extends Model<Menu> {
 
   @Column
   isParent: boolean;
+
+  @BelongsToMany(() => Company, () => MenuCompanies)
+  companies: Array<Company & { MenuCompanies: MenuCompanies }>;
 
   @CreatedAt
   createdAt: Date;
