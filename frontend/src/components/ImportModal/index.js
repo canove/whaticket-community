@@ -72,6 +72,7 @@ const ImportModal = ({ open, onClose }) => {
 	const [selectedConnection, setSelectedConnection] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
+	const [openSelect, setOpenSelect] = useState(false);
 
 	const handleClose = () => {
 		onClose();
@@ -134,10 +135,19 @@ const ImportModal = ({ open, onClose }) => {
 			// }));
 
 			setSelectedConnection(allConnections);
+			setOpenSelect(false);
 		} else {
 			setSelectedConnection(typeof value === "string" ? value.split(",") : value);
 		}
 	}
+
+	const handleOpenSelect = () => {
+		setOpenSelect(true)
+	};
+
+	const handleCloseSelect = () => {
+		setOpenSelect(false)
+	};
 
 	return (
 		<div className={classes.root}>
@@ -177,6 +187,9 @@ const ImportModal = ({ open, onClose }) => {
 							label="Type"
 							onChange={handleChangeConnection}
 							multiple
+							open={openSelect}
+							onOpen={handleOpenSelect}
+							onClose={handleCloseSelect}
 						>
 							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {

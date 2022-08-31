@@ -171,7 +171,7 @@ const messages = {
           importTitlte: "Importar contatos",
           deleteMessage:
             "Tem certeza que deseja deletar este contato? Todas as chamadas relacionados serão perdidos.",
-          importMessage: "Deseja importas todos os contatos do telefone?",
+          importMessage: "Deseja importar todos os contatos do telefone?",
         },
         buttons: {
           import: "Importar Contatos",
@@ -633,6 +633,36 @@ const messages = {
         },
       },
 
+      company:{
+        title: "Empresas",
+        search: "Pesquisar",
+      grid:{
+        companyId: "Id da Empresa",
+        name: "Nome",
+        cnpj: "CNPJ",
+        phone: "Telefone",
+        email: "Email",
+        address:  "Endereço",
+        actions: "Ações"
+      },
+      buttons: {
+        addCompany: "Cadastrar Empresa"
+      },
+      companyModal: {
+        titleAdd: "Adicionar Empresa",
+        titleEdit: "Editar Cadastro da Empresa",
+        name: "Nome da Empresa",
+        cnpj: "CNPJ",
+        phone: "Telefone",
+        email: "Email",
+        address: "Endereço"
+      },
+      success: "Empresa cadastrada com Sucesso!",
+      deleteCompany: "Todos os dados da empresa cadastrada serão perdidos, deseja realmente excluir, ",
+      toast: "Empresa excluida com sucesso!"
+
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
@@ -668,6 +698,8 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+        ERR_NO_COMPANY_FOUND: "Erro ao excluir a Empresa.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "Já existe uma empresa com esse CNPJ."
       },
     },
   },

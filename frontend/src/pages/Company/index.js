@@ -162,7 +162,7 @@ const Company= () => {
   const handleDeleteCompany= async (companyId) => {
     try {
       await api.delete(`/companies/${companyId}`);
-      toast.success(i18n.t("companies.toasts.deleted"));
+      toast.success(i18n.t("company.toast"));
     } catch (err) {
       toastError(err);
     }
@@ -188,7 +188,7 @@ const Company= () => {
       <ConfirmationModal
         title={
           deletingCompany &&
-          `${i18n.t("users.confirmationModal.deleteTitle")} ${
+          `${i18n.t("company.deleteCompany")} ${
             deletingCompany.name
           }?`
         }
@@ -196,7 +196,6 @@ const Company= () => {
         onClose={setConfirmModalOpen}
         onConfirm={() => handleDeleteCompany(deletingCompany.id)}
       >
-        {i18n.t("users.confirmationModal.deleteMessage")}
       </ConfirmationModal>
       <CompanyRegistration
         open={companyModalOpen}
@@ -205,7 +204,7 @@ const Company= () => {
         companyId={selectedCompany && selectedCompany.id}
       />
       <MainHeader>
-        <Title>{i18n.t("Empresa")}</Title>
+        <Title>{i18n.t("company.title")}</Title>
         <MainHeaderButtonsWrapper>
           <TextField
             placeholder={i18n.t("contacts.searchPlaceholder")}
@@ -225,7 +224,7 @@ const Company= () => {
             color="primary"
             onClick={handleOpenCompanyModal}
           >
-            {i18n.t("Cadastrar Empresa")}
+            {i18n.t("company.buttons.addCompany")}
           </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -237,13 +236,13 @@ const Company= () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{i18n.t("Id Empresa")}</TableCell>
-              <TableCell align="center">{i18n.t("Nome")}</TableCell>
-              <TableCell align="center">{i18n.t("Cnpj")}</TableCell>
-              <TableCell align="center">{i18n.t("Telefone")}</TableCell>
-              <TableCell align="center">{i18n.t("Email")}</TableCell>
-              <TableCell align="center">{i18n.t("Endereço")}</TableCell>
-              <TableCell align="center">{i18n.t("Ações")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.companyId")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.name")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.cnpj")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.phone")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.email")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.address")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.actions")}</TableCell>
 
             </TableRow>
           </TableHead>

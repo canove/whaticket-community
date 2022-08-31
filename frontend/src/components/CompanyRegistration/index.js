@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, } from "react";
+import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
@@ -15,7 +15,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
@@ -96,13 +95,12 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 	const handleSaveCompany = async values => {
 		const companyData = { ...values };
 		try {
-			let result ;
 			if (companyId) {
-				result = await api.put(`/companies/${companyId}`, companyData);
+				await api.put(`/companies/${companyId}`, companyData);
 			} else {
-				result = await api.post("/companies", companyData);
+				await api.post("/companies", companyData);
 			}
-			toast.success(i18n.t("userModal.success"));
+			toast.success(i18n.t("company.success"));
 		} catch (err) {
 
 			toastError(err);
@@ -122,8 +120,8 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 			>
 				<DialogTitle id="form-dialog-title">
 					{companyId
-						? `${i18n.t("Editar Cadastro")}`
-						: `${i18n.t("Cadastro de Empresa")}`}
+						? `${i18n.t("company.companyModal.titleEdit")}`
+						: `${i18n.t("company.companyModal.titleAdd")}`}
 				</DialogTitle>
 				<Formik
 					initialValues={company}
@@ -145,7 +143,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 											name="name"
 											variant="outlined"
 											margin="dense"
-											label={i18n.t("Nome da Empresa")}
+											label={i18n.t("company.companyModal.name")}
 											error={touched.name && Boolean(errors.name)}
 											helperText={touched.name && errors.name}
 											fullWidth
@@ -154,7 +152,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 									<div className={classes.multFieldLine}>
 										<Field
 											as={TextField}
-											label={i18n.t("CNPJ")}
+											label={i18n.t("company.companyModal.cnpj")}
 											name="cnpj"
 											error={touched.cnpj && Boolean(errors.cnpj)}
 											helperText={touched.cnpj && errors.cnpj}
@@ -166,7 +164,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 									<div className={classes.multFieldLine}>
 										<Field
 											as={TextField}
-											label={i18n.t("Telefone")}
+											label={i18n.t("company.companyModal.phone")}
 											name="phone"
 											error={touched.phone && Boolean(errors.phone)}
 											helperText={touched.phone && errors.phone}
@@ -178,7 +176,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 									<div className={classes.multFieldLine}>
 										<Field
 											as={TextField}
-											label={i18n.t("Email")}
+											label={i18n.t("company.companyModal.email")}
 											name="email"
 											error={touched.email && Boolean(errors.email)}
 											helperText={touched.email && errors.email}
@@ -190,7 +188,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 									<div className={classes.multFieldLine}>
 										<Field
 											as={TextField}
-											label={i18n.t("Endereço")}
+											label={i18n.t("company.companyModal.address")}
 											name="address"
 											error={touched.address && Boolean(errors.address)}
 											helperText={touched.address && errors.address}

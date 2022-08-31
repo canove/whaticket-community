@@ -289,28 +289,29 @@ const RegistersReports = () => {
                             {loading}
                         </>
                     </TableBody>
-                    <TableFooter>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handlePreviousPage}
-                            disabled={pageNumber === 1}
-                        >
-                            {i18n.t("logReport.buttons.previous")}
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleNextPage}
-                            disabled={!hasMore}
-                        >
-                            {i18n.t("logReport.buttons.next")}
-                        </Button>
-                        <Typography>
-                            {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
-                        </Typography>
-                    </TableFooter>
                 </Table>
+            </Paper>
+            <Paper className={classes.mainPaper}
+                variant="outlined">
+                <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handlePreviousPage}
+                        disabled={pageNumber === 1}
+                    >
+                        {i18n.t("logReport.buttons.previous")}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNextPage}
+                        disabled={!hasMore}
+                    >
+                        {i18n.t("logReport.buttons.next")}
+                    </Button>
+                    <Typography>
+                        {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
+                    </Typography>
             </Paper>
         </MainContainer>
     );

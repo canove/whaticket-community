@@ -636,6 +636,36 @@ const messages = {
         },
       },
 
+      company:{
+        title: "Compañías",
+        search: "Búsqueda",
+          grid:{
+          companyId: "ID de la Compañía",
+          name: "Nombres",
+          cnpj: "CNPJ",
+          phone: "Teléfono",
+          email: "Email",
+          address:  "Endereço",
+          actions: "Acción"
+          },
+          buttons: {
+            addCompany: "Registrar Compañía"
+          },
+          companyModal: {
+            titleAdd: "Añadir Compañía",
+            titleEdit: "Editar Registro de Compañía",
+            name: "Nombre da Compañía",
+            cnpj: "CNPJ",
+            phone: "Teléfono",
+            email: "Email",
+            address: "Endereço"
+          },
+          success: "Compañía registrada con éxito!",
+          deleteCompany: "Todos los datos de la compañía registrada se perderán, ¿realmente desea eliminarlos? ",
+          toast: "¡Compañía eliminada con éxito!"
+
+          },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
@@ -672,6 +702,8 @@ const messages = {
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
+        ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
       },
     },
   },
