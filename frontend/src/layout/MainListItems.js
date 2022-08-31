@@ -21,6 +21,7 @@ import EqualizerIcon from "@material-ui/icons/Equalizer";
 import ChatIcon from "@material-ui/icons/Chat";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ApartmentIcon from '@material-ui/icons/Apartment';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
@@ -96,13 +97,15 @@ function getIcon(icon) {
     return <AssessmentOutlinedIcon />
   } else if (icon === "ApartmentIcon") {
     return <ApartmentIcon />;
+  } else if (icon === "ListAltIcon") {
+    return <ListAltIcon />
   } else {
     return null;
   }
 }
 
 function ListParentItemLink(props) {
-  const { icon, primary, className, id } = props;
+  const { icon, primary, className, id, connected } = props;
 
   const [open, setOpen] = useState(false);
   const [menus, setMenus] = useState([]);
@@ -130,7 +133,7 @@ function ListParentItemLink(props) {
     <List>
       <li>
         <ListItem button open={open} onClick={handleClick} className={className}>
-          {renderedIcon ? <ListItemIcon>{renderedIcon}</ListItemIcon> : null}
+          {renderedIcon ? <ListItemIcon><Badge overlap="rectangular" badgeContent={connected ? "!" : 0} color="error">{renderedIcon}</Badge></ListItemIcon> : null}
           <ListItemText primary={primary} />
           {open ? <ExpandLess /> : <ExpandMore />}
         </ListItem>
@@ -184,13 +187,9 @@ function ListItemLinkTest(props) {
 const MainListItems = (props) => {
   const { drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
-  const [connectionWarning, setConnectionWarning] = useState(false);
+  
   const { i18n } = useTranslation();
-  const [open, setOpen] = React.useState(false);
-  const [openOff, setOpenOff] = React.useState(false);
-  const [openRel, setOpenRel] = React.useState(false);
-  const [openAdm, setOpenAdm] = React.useState(false);
-
+  const [connectionWarning, setConnectionWarning] = useState(false);
   const [menus, setMenus] = useState([]);
 
   const fetchMenus = async () => {
@@ -230,22 +229,6 @@ const MainListItems = (props) => {
     return () => clearTimeout(delayDebounceFn);
   }, [whatsApps]);
 
-  const handleClickOff = () => {
-    setOpenOff((prevOpen) => !prevOpen);
-  };
-
-  const handleClick = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
-
-  const handleClickRel = () => {
-    setOpenRel((prevOpen) => !prevOpen);
-  };
-
-  const handleClickAdm = () => {
-    setOpenAdm((prevOpen) => !prevOpen);
-  };
-
   return (
     <div onClick={drawerClose}>
       { menus && menus.map((menu) => {
@@ -256,6 +239,17 @@ const MainListItems = (props) => {
               to={'/'}
               primary={menu.name}
               icon={menu.icon}
+            />
+          )
+        }
+        if (menu.name === "WhatsApp 2") {
+          return (
+            <ListParentItemLink
+              key={menu.id}
+              primary={menu.name}
+              icon={menu.icon}
+              id={menu.id}
+              connected={connectionWarning}
             />
           )
         }
@@ -313,7 +307,7 @@ const MainListItems = (props) => {
         <li>
           <ListItem button open={open} onClick={handleClick}>
             <ListItemIcon>
-              <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
+              <Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error">
                 <WhatsAppIcon />
               </Badge>
             </ListItemIcon>

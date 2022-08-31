@@ -11,7 +11,7 @@ interface CompanyData {
   phone?: string;
   email?: string;
   address?: string;
-
+  menusIds?: string;
 }
 
 interface Request {
@@ -24,7 +24,7 @@ interface Response {
   id: number;
   cnpj: string;
   phone: string;
-  email:string;
+  email: string;
   address: string;
 }
 
@@ -36,11 +36,18 @@ const UpdateCompanyService = async ({
 
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
-    id: Yup.number(),
-
+    id: Yup.number()
   });
 
-  const { name, id, cnpj, phone, email, address = [] } = companyData;
+  const {
+    name,
+    id,
+    cnpj,
+    phone,
+    email,
+    address = [],
+    menusIds = []
+  } = companyData;
 
   try {
     await schema.validate({ name, id, cnpj, phone, email, address });
@@ -54,8 +61,10 @@ const UpdateCompanyService = async ({
     cnpj,
     phone,
     email,
-    address,
+    address
   });
+
+  await company.$set("menus", menusIds);
 
   await company.reload();
 
@@ -65,7 +74,7 @@ const UpdateCompanyService = async ({
     cnpj: company.cnpj,
     phone: company.phone,
     email: company.email,
-    address: company.address,
+    address: company.address
   };
 
   return serializedCompany;
