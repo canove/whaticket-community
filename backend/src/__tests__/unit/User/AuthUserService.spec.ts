@@ -24,12 +24,14 @@ describe("Auth", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email,
-      password
+      password,
+      companyId: null
     });
 
     const response = await AuthUserService({
       email,
-      password
+      password,
+      companyId: null
     });
 
     expect(response).toHaveProperty("token");
@@ -39,7 +41,8 @@ describe("Auth", () => {
     try {
       await AuthUserService({
         email: faker.internet.email(),
-        password: faker.internet.password()
+        password: faker.internet.password(),
+        companyId: null
       });
     } catch (err) {
       expect(err).toBeInstanceOf(AppError);
@@ -52,13 +55,15 @@ describe("Auth", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email: "mail@test.com",
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      companyId: null
     });
 
     try {
       await AuthUserService({
         email: "mail@test.com",
-        password: faker.internet.password()
+        password: faker.internet.password(),
+        companyId: null
       });
     } catch (err) {
       expect(err).toBeInstanceOf(AppError);
