@@ -36,7 +36,7 @@ const messages = {
       dashboard: {
         charts: {
           perDay: {
-            title: "Tickets hoje: ",
+            title: "Conversas hoje: ",
           },
         },
         messages: {
@@ -184,8 +184,8 @@ const messages = {
       },
       queueModal: {
         title: {
-          add: "Adicionar fila",
-          edit: "Editar fila",
+          add: "Adicionar Departamento",
+          edit: "Editar Departamento",
         },
         form: {
           name: "Nome",
@@ -226,7 +226,7 @@ const messages = {
         },
       },
       ticketsQueueSelect: {
-        placeholder: "Filas",
+        placeholder: "Departamentos",
       },
       tickets: {
         toasts: {
@@ -236,8 +236,8 @@ const messages = {
           message: "Mensagem de",
         },
         tabs: {
-          open: { title: "Inbox" },
-          closed: { title: "Resolvidos" },
+          open: { title: "Mensagens" },
+          closed: { title: "Resolvidas" },
           search: { title: "Busca" },
         },
         search: {
@@ -250,9 +250,9 @@ const messages = {
       transferTicketModal: {
         title: "Transferir Ticket",
         fieldLabel: "Digite para buscar usuários",
-        fieldQueueLabel: "Transferir para fila",
+        fieldQueueLabel: "Transferir para Departamento",
         fieldConnectionLabel: "Transferir para conexão",
-        fieldQueuePlaceholder: "Selecione uma fila",
+        fieldQueuePlaceholder: "Selecione uma Departamento",
         fieldConnectionPlaceholder: "Selecione uma conexão",
         noOptions: "Nenhum usuário encontrado com esse nome",
         buttons: {
@@ -284,10 +284,10 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexões",
-          tickets: "Tickets",
+          tickets: "Conversas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
-          queues: "Filas",
+          queues: "Departamentos",
           administration: "Administração",
           users: "Usuários",
           settings: "Configurações",
@@ -303,7 +303,7 @@ const messages = {
         noTickets: "Nenhuma notificação.",
       },
       queues: {
-        title: "Filas",
+        title: "Departamentos",
         table: {
           name: "Nome",
           color: "Cor",
@@ -311,16 +311,16 @@ const messages = {
           actions: "Ações",
         },
         buttons: {
-          add: "Adicionar fila",
+          add: "Adicionar Departamento",
         },
         confirmationModal: {
           deleteTitle: "Excluir",
           deleteMessage:
-            "Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+            "Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa Departamento continuarão existindo, mas não terão mais nenhuma Departamento atribuída.",
         },
       },
       queueSelect: {
-        inputLabel: "Filas",
+        inputLabel: "Departamentos",
       },
       quickAnswers: {
         title: "Respostas Rápidas",
@@ -360,7 +360,7 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Excluir",
           deleteMessage:
-            "Todos os dados do usuário serão perdidos. Os tickets abertos deste usuário serão movidos para a fila.",
+            "Todos os dados do usuário serão perdidos. Os tickets abertos deste usuário serão movidos para a Departamento.",
         },
       },
       settings: {
@@ -461,7 +461,7 @@ const messages = {
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
-          "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+          "A mensagem de saudação é obrigatório quando há mais de uma Departamento.",
       },
     },
   },
