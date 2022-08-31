@@ -15,4 +15,6 @@ companyRoutes.get("/companies/:companyId", isAuth, CompanyController.show);
 
 companyRoutes.delete("/companies/:companyId", isAuth, CompanyController.remove);
 
+companyRoutes.get("/company/noAuth", CompanyController.indexNoAuth);
+
 export default companyRoutes;

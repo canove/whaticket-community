@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import {
@@ -21,6 +21,9 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
 
 // const Copyright = () => {
 // 	return (
@@ -60,21 +63,41 @@ const Login = () => {
   const { i18n } = useTranslation();
   const [user, setUser] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [company, setCompany] = useState ("")
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState (null);
   const { handleLogin } = useContext(AuthContext);
 
   const handleChangeInput = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleChange = (e) => {
-    setCompany(e.target.value);
-  };
+  const fetchCompanies = async () => {
+    try {
+        const { data } = await api.get('/company/noAuth');
+        setCompanies(data);
+    } catch (err) {
+        toastError(err);
+    }
+  }
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const handleSelectCompanyChange = (e, company) => {
+      if (company) {
+          setSelectedCompany(company);
+          setUser({ ...user, companyId: company.id });
+      } else {
+          setSelectedCompany(null);
+          setUser({ ...user, companyId: null })
+      }
+  }
 
   const handlSubmit = (e) => {
     e.preventDefault();
     handleLogin(user);
-  };
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -87,18 +110,19 @@ const Login = () => {
           {i18n.t("login.title")}
         </Typography>
         <form className={classes.form} noValidate onSubmit={handlSubmit}>
-            <TextField
+          <Autocomplete
+            onChange={(e, newValue) => { handleSelectCompanyChange(e, newValue) }}
+            disablePortal
+            autoFocus
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            id="company"
             label={i18n.t("Empresa")}
-            name="company"
-            value={company}
-            onChange={handleChange}
-            autoComplete="company"
-            autoFocus
+            id="combo-box-companies"
+            options={companies}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => <TextField {...params} label="Compania" variant="outlined" />}
           />
           <TextField
             variant="outlined"
