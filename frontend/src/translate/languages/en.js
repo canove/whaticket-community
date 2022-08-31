@@ -631,6 +631,37 @@ const messages = {
         },
       },
 
+      company:{
+        title: "Companies",
+        search: "Search",
+          grid:{
+          companyId: "Company Id",
+          name: "Name",
+          cnpj: "CNPJ",
+          phone: "Phone",
+          email: "Email",
+          address:  "Address",
+          actions: "Actions"
+          },
+          buttons: {
+            addCompany: "Register Company"
+          },
+          companyModal: {
+            titleAdd: "Add Company",
+            titleEdit: "Edit Company Registration",
+            name: "Company Name",
+            cnpj: "CNPJ",
+            phone: "Phone",
+            email: "Email",
+            address: "Address"
+          },
+          success: "Company registered successfully!",
+          deleteCompany: "All registered company data will be lost, do you really want to delete, ",
+          toast: "Company successfully deleted!"
+
+          },
+
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
@@ -667,6 +698,8 @@ const messages = {
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
+        ERR_NO_COMPANY_FOUND: "Error deleting the Company.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "There is already a company with this CNPJ.",
       },
     },
   },

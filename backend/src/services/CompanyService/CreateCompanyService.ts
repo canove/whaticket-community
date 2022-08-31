@@ -3,8 +3,8 @@ import Company from "../../database/models/Company";
 
 interface Request {
   name: string;
-  cnpj?: number;
-  phone?: number;
+  cnpj?: string;
+  phone?: string;
   email?: string;
   address?: string;
 }
@@ -16,17 +16,15 @@ const CreateCompanyService = async ({
   email,
   address
 }: Request): Promise<Company> => {
+  cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
   const nameExists = await Company.findOne({
-    where: {  name,
-              cnpj,
-              phone,
-              email,
-              address
+    where: {
+            cnpj,
     }
   });
 
   if (nameExists) {
-    throw new AppError("ERR__SHORTCUT_DUPLICATED");
+    throw new AppError("ERR__SHORTCUT_DUPLICATED_COMPANY");
   }
 
   const company = await Company.create(

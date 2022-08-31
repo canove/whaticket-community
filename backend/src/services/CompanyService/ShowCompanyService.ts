@@ -7,7 +7,7 @@ const ShowCompanyService = async (id: string | number): Promise<Company> => {
 
   });
   if (!company) {
-    throw new AppError("ERR_NO_USER_FOUND", 404);
+    throw new AppError("ERR_NO_COMPANY_FOUND", 404);
   }
 
   return company;

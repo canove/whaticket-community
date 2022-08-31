@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import * as Yup from "yup";
 import { useHistory } from "react-router-dom";
@@ -27,6 +27,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 // const Copyright = () => {
 // 	return (
@@ -78,16 +79,45 @@ const SignUp = () => {
 	const initialState = { name: "", email: "", password: "" };
 	const [showPassword, setShowPassword] = useState(false);
 	const [user] = useState(initialState);
+	const [companies, setCompanies] = useState([]);
+  	const [selectedCompany, setSelectedCompany] = useState (null);
+
+	const fetchCompanies = async () => {
+		try {
+			const { data } = await api.get('/company/noAuth');
+			setCompanies(data);
+		} catch (err) {
+			toastError(err);
+		}
+	  }
+
+	  useEffect(() => {
+		fetchCompanies();
+	  }, []);
 
 	const handleSignUp = async values => {
+		if (!selectedCompany) {
+			toast.error("Selecione uma empresa.");
+			return;
+		}
+
+		const body = {...values, companyId: selectedCompany.id}
 		try {
-			await api.post("/auth/signup", values);
+			await api.post("/auth/signup", body);
 			toast.success(i18n.t("signup.toasts.success"));
 			history.push("/login");
 		} catch (err) {
 			toastError(err);
 		}
 	};
+
+	const handleSelectCompanyChange = (e, company) => {
+		if (company) {
+			setSelectedCompany(company);
+		} else {
+			setSelectedCompany(null);
+		}
+	}
 
 	return (
 		<Container component="main" maxWidth="xs">
@@ -114,6 +144,22 @@ const SignUp = () => {
 					{({ touched, errors, isSubmitting }) => (
 						<Form className={classes.form}>
 							<Grid container spacing={2}>
+								<Grid item xs={12}>
+									<Autocomplete
+										onChange={(e, newValue) => { handleSelectCompanyChange(e, newValue) }}
+										disablePortal
+										autoFocus
+										variant="outlined"
+										margin="normal"
+										required
+										fullWidth
+										label={i18n.t("Empresa")}
+										id="combo-box-companies"
+										options={companies}
+										getOptionLabel={(option) => option.name}
+										renderInput={(params) => <TextField {...params} label="Compania" variant="outlined" />}
+									/>
+								</Grid>
 								<Grid item xs={12}>
 									<Field
 										as={TextField}

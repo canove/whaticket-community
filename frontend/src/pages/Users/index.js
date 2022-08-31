@@ -251,7 +251,7 @@ const Users = () => {
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
-                  <TableCell align="center">{user.idCompany}</TableCell>
+                  <TableCell align="center">{user.companyId}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

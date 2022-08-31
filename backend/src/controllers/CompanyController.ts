@@ -6,6 +6,7 @@ import ListCompanyService from "../services/CompanyService/ListCompanyService";
 import UpdateCompanyService from "../services/CompanyService/UpdateCompanyService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import DeleteCompanyService from "../services/CompanyService/DeleteCompanyService";
+import ListCompanyNoAuthService from "../services/CompanyService/ListCompanyNoAuthService";
 
 type IndexQuery = {
   searchParam: string;
@@ -21,6 +22,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.json({ companies, count, hasMore });
+};
+
+export const indexNoAuth = async (req: Request, res: Response): Promise<Response> => {
+  const companies = await ListCompanyNoAuthService();
+
+  return res.json(companies);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
