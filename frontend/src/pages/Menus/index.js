@@ -240,7 +240,7 @@ const Menus = () => {
                         options={companies}
                         getOptionLabel={(option) => option.name}
                         style={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="Companies" variant="outlined" />}
+                        renderInput={(params) => <TextField {...params} label="Compania" variant="outlined" />}
                     />
                 </Paper>
                 <Paper
