@@ -248,7 +248,7 @@ const Menus = () => {
                     variant="outlined"
                 >
                     <FormControl fullWidth margin="dense" variant="outlined">
-                        <InputLabel>{i18n.t("queueSelect.inputLabel")}</InputLabel>
+                        <InputLabel>Menus</InputLabel>
                         <Select
                             disabled={!selectedCompany}
                             multiple
