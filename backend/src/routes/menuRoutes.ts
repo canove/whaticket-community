@@ -9,7 +9,7 @@ menuRoutes.get("/menus/", isAuth, MenuController.index);
 
 menuRoutes.get("/menus/:menuId", isAuth, MenuController.show);
 
-menuRoutes.get("/menus/children/:menuId", isAuth, MenuController.showChildren);
+menuRoutes.get("/menus/company/:companyId", isAuth, MenuController.showCompany);
 
 menuRoutes.post("/menus/", isAuth, MenuController.store);
 

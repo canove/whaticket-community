@@ -259,26 +259,27 @@ const UserModal = ({ open, onClose, userId }) => {
 										fullWidth
 									/>
 								</div>
-								<FormControl
-									variant="outlined"
-									className={classes.formControl}
-									margin="dense"
-									fullWidth
-								>
-									<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
-									<Select
-										label={i18n.t("userModal.form.language")}
-										name="lang"
-										labelId="language-selection-label"
-										id="language-selection"
-										value={changingLang ? language : user.lang}
-										onChange={handleChange}
+								<div>
+									<FormControl
+										variant="outlined"
+										margin="dense"
+										fullWidth
 									>
-										<MenuItem value="pt">Português</MenuItem>
-										<MenuItem value="en">Inglês</MenuItem>
-										<MenuItem value="es">Espanhol</MenuItem>
-									</Select>
-								</FormControl>
+										<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
+										<Select
+											label={i18n.t("userModal.form.language")}
+											name="lang"
+											labelId="language-selection-label"
+											id="language-selection"
+											value={changingLang ? language : user.lang}
+											onChange={handleChange}
+										>
+											<MenuItem value="pt">Português</MenuItem>
+											<MenuItem value="en">Inglês</MenuItem>
+											<MenuItem value="es">Espanhol</MenuItem>
+										</Select>
+									</FormControl>
+								</div>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"
