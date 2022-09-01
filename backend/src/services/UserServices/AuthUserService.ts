@@ -6,6 +6,8 @@ import {
 } from "../../helpers/CreateTokens";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import Queue from "../../database/models/Queue";
+import Company from "../../database/models/Company";
+import { Op, Sequelize } from "sequelize";
 
 interface SerializedUser {
   id: number;
@@ -19,7 +21,7 @@ interface SerializedUser {
 interface Request {
   email: string;
   password: string;
-  companyId: number | string;
+  company: string;
 }
 
 interface Response {
@@ -31,10 +33,31 @@ interface Response {
 const AuthUserService = async ({
   email,
   password,
-  companyId,
+  company
 }: Request): Promise<Response> => {
+  const whereCondition = {
+    [Op.or]: [
+      {
+        "$Company.name$": Sequelize.where(
+          Sequelize.fn("LOWER", Sequelize.col("Company.name")),
+          "LIKE",
+          `%${company.toLowerCase()}%`
+        )
+      },
+      { id: { [Op.like]: `%${company.toLowerCase()}%` } }
+    ]
+  };
+
+  const companyDb = await Company.findOne({
+    where: whereCondition
+  });
+
+if (!companyDb) {
+    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+  }
+
   const user = await User.findOne({
-    where: { email, companyId },
+    where: { email, companyId: companyDb.id },
     include: ["queues"]
   });
 

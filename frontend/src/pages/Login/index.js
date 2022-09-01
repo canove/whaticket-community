@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 const Login = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
-  const [user, setUser] = useState({ email: "", password: "" });
+  const [user, setUser] = useState({ email: "", password: "", company: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState (null);
@@ -72,36 +72,11 @@ const Login = () => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const fetchCompanies = async () => {
-    try {
-        const { data } = await api.get('/company/noAuth');
-        setCompanies(data);
-    } catch (err) {
-        toastError(err);
-    }
-  }
 
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  const handleSelectCompanyChange = (e, company) => {
-      if (company) {
-          setSelectedCompany(company);
-          setUser({ ...user, companyId: company.id });
-      } else {
-          setSelectedCompany(null);
-          setUser({ ...user, companyId: null })
-      }
-  }
 
   const handlSubmit = (e) => {
     e.preventDefault();
-    if (selectedCompany) {
       handleLogin(user);
-    } else {
-      toast.error("Selecione uma empresa.");
-    }
   }
 
   return (
@@ -115,19 +90,18 @@ const Login = () => {
           {i18n.t("login.title")}
         </Typography>
         <form className={classes.form} noValidate onSubmit={handlSubmit}>
-          <Autocomplete
-            onChange={(e, newValue) => { handleSelectCompanyChange(e, newValue) }}
-            disablePortal
-            autoFocus
+          <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
+            id="company"
             label={i18n.t("Empresa")}
-            id="combo-box-companies"
-            options={companies}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => <TextField {...params} label="Compania" variant="outlined" />}
+            name="company"
+            value={user.company}
+            onChange={handleChangeInput}
+            autoComplete="company"
+            autoFocus
           />
           <TextField
             variant="outlined"
@@ -176,18 +150,6 @@ const Login = () => {
           >
             {i18n.t("login.buttons.submit")}
           </Button>
-          <Grid container>
-            <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                component={RouterLink}
-                to="/signup"
-              >
-                {i18n.t("login.buttons.register")}
-              </Link>
-            </Grid>
-          </Grid>
         </form>
       </div>
       <Box mt={8}>{/* <Copyright /> */}</Box>
