@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
-
 import {
     Button,
     FormControl,
@@ -17,16 +15,13 @@ import {
     Table,
     TableBody,
     TableCell,
-    TableFooter,
     TableHead,
     TableRow,
     Typography
 } from "@material-ui/core";
-
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { format, parseISO } from "date-fns";
-
 
 const useStyles = makeStyles((theme) => ({
     root: {

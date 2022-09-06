@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
-import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { toast } from "react-toastify";
-
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
-
 import {
 	Dialog,
 	DialogContent,
@@ -14,13 +10,7 @@ import {
 	DialogActions,
 	CircularProgress,
 	TextField,
-	Switch,
-	FormControlLabel,
 } from "@material-ui/core";
-
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-import QueueSelect from "../QueueSelect";
 import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({

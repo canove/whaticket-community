@@ -31,7 +31,7 @@ describe("Auth", () => {
     const response = await AuthUserService({
       email,
       password,
-      companyId: null
+      company: null
     });
 
     expect(response).toHaveProperty("token");
@@ -42,7 +42,7 @@ describe("Auth", () => {
       await AuthUserService({
         email: faker.internet.email(),
         password: faker.internet.password(),
-        companyId: null
+        company: null
       });
     } catch (err) {
       expect(err).toBeInstanceOf(AppError);
@@ -63,7 +63,7 @@ describe("Auth", () => {
       await AuthUserService({
         email: "mail@test.com",
         password: faker.internet.password(),
-        companyId: null
+        company: null
       });
     } catch (err) {
       expect(err).toBeInstanceOf(AppError);

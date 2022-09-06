@@ -7,6 +7,7 @@ interface Request {
   phone?: string;
   email?: string;
   address?: string;
+  alias: string;
 }
 
 const CreateCompanyService = async ({
@@ -14,15 +15,16 @@ const CreateCompanyService = async ({
   cnpj,
   phone,
   email,
-  address
+  address,
+  alias,
 }: Request): Promise<Company> => {
   cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
+
   const nameExists = await Company.findOne({
     where: {
             cnpj,
     }
   });
-
   if (nameExists) {
     throw new AppError("ERR__SHORTCUT_DUPLICATED_COMPANY");
   }
@@ -34,6 +36,7 @@ const CreateCompanyService = async ({
       phone,
       email,
       address,
+      alias,
     },
   );
     return company.reload();

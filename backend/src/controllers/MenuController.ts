@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import ListMenusService from "../services/MenuServices/ListMenusService";
 import ShowMenuService from "../services/MenuServices/ShowMenuService";
-import ShowChildrenMenuService from "../services/MenuServices/ShowChildrenMenuService";
 import ShowCompanyMenuService from "../services/MenuServices/ShowCompanyMenuService";
 import CreateMenuService from "../services/MenuServices/CreateMenuService";
 import UpdateMenuService from "../services/MenuServices/UpdateMenuService";

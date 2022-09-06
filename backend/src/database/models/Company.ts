@@ -10,9 +10,11 @@ import {
   Unique,
   Default,
   BelongsToMany,
+  HasMany,
 } from "sequelize-typescript";
 import Menu from "./Menu";
 import MenuCompanies from "./MenuCompanies";
+import User from "./User";
 
 @Table
 class Company extends Model<Company> {
@@ -20,6 +22,9 @@ class Company extends Model<Company> {
   @AutoIncrement
   @Column
   id: number;
+
+  @Column
+  alias: string;
 
   @Column
   name: string;
@@ -49,6 +54,9 @@ class Company extends Model<Company> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @HasMany(() => User)
+  users: User[];
 
 }
 
