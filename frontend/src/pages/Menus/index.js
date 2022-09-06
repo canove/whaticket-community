@@ -1,45 +1,25 @@
-import React, { useState, useContext, useCallback, useEffect, useReducer } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import openSocket from "../../services/socket-io";
-
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import { 
-    Button, 
-    Checkbox, 
-    Chip, 
-    FormControl, 
-    Grid, 
-    Input, 
-    InputLabel, 
-    ListItemIcon, 
-    ListSubheader, 
-    MenuItem, 
-    Select, 
-    Slider, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableRow, 
-    TextField, 
-    Typography
+import {
+    Button,
+    Chip,
+    FormControl,
+    InputLabel,
+    ListItemIcon,
+    MenuItem,
+    Select,
+    TextField,
 } from "@material-ui/core";
-
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import Title from "../../components/Title";
-import GreetingMessageModal from "../../components/GreetingMessageModal";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
-import ConfirmationModal from "../../components/ConfirmationModal";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
-import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import { grey } from '@material-ui/core/colors';
-
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
@@ -99,7 +79,7 @@ function getStyles(id, menuId, theme) {
 
 function getIconStyles(id, menuId) {
     return {
-        color: 
+        color:
             menuId.indexOf(id) === -1
                 ? grey[500]
                 : grey[900],
@@ -213,7 +193,7 @@ const Menus = () => {
 	return (
 	    <MainContainer>
             <MainHeader>
-                <Title>Menus</Title>
+                <Title>{i18n.t("Menus")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
                         color="primary"
@@ -291,7 +271,7 @@ const Menus = () => {
                                             {menu.name}
                                         </MenuItem>
                                     )
-                                }
+                                }return null
                             })}
                         </Select>
 			        </FormControl>

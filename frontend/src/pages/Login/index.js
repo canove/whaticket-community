@@ -1,30 +1,19 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Link as RouterLink } from "react-router-dom";
-
+import React, { useState, useContext} from "react";
 import {
   Avatar,
   Button,
   CssBaseline,
   TextField,
-  Grid,
   Box,
   Typography,
   Container,
   InputAdornment,
   IconButton,
-  Link
 } from '@material-ui/core';
-
 import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
-
 import { makeStyles } from "@material-ui/core/styles";
-
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import toastError from "../../errors/toastError";
-import api from "../../services/api";
-import { toast } from "react-toastify";
 
 // const Copyright = () => {
 // 	return (
@@ -64,15 +53,11 @@ const Login = () => {
   const { i18n } = useTranslation();
   const [user, setUser] = useState({ email: "", password: "", company: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState (null);
   const { handleLogin } = useContext(AuthContext);
 
   const handleChangeInput = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
-
-
 
   const handlSubmit = (e) => {
     e.preventDefault();

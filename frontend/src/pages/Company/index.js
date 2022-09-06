@@ -237,6 +237,7 @@ const Company= () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("company.grid.companyId")}</TableCell>
+              <TableCell align="center">{i18n.t("Alias")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.name")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.cnpj")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.phone")}</TableCell>
@@ -251,6 +252,7 @@ const Company= () => {
               {companies.map((company) => (
                 <TableRow key={company.id}>
                   <TableCell align="center">{company.id}</TableCell>
+                  <TableCell align="center">{company.alias}</TableCell>
                   <TableCell align="center">{company.name}</TableCell>
                   <TableCell align="center">{company.cnpj}</TableCell>
                   <TableCell align="center">{company.phone}</TableCell>

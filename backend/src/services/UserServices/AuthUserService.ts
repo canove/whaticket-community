@@ -35,18 +35,16 @@ const AuthUserService = async ({
   password,
   company
 }: Request): Promise<Response> => {
-  const whereCondition = {
-    [Op.or]: [
+  const whereCondition =
+
       {
         "$Company.name$": Sequelize.where(
-          Sequelize.fn("LOWER", Sequelize.col("Company.name")),
+          Sequelize.fn("LOWER", Sequelize.col("Company.alias")),
           "LIKE",
           `%${company.toLowerCase()}%`
         )
-      },
-      { id: { [Op.like]: `%${company.toLowerCase()}%` } }
-    ]
-  };
+      };
+
 
   const companyDb = await Company.findOne({
     where: whereCondition

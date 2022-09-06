@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import ListItem from "@material-ui/core/ListItem";
@@ -29,7 +29,6 @@ import { useTranslation } from "react-i18next";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import List from "@material-ui/core/List";
-import PropTypes from "prop-types";
 import Collapse from "@material-ui/core/Collapse";
 import api from "../services/api";
 import toastError from "../errors/toastError";
@@ -122,7 +121,7 @@ const MainListItems = (props) => {
   const { drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
-  
+
   const { i18n } = useTranslation();
   const [menus, setMenus] = useState([]);
   const [connectionWarning, setConnectionWarning] = useState(false);
@@ -156,6 +155,7 @@ const MainListItems = (props) => {
 
   useEffect(() => {
     fetchMenus();
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -242,19 +242,19 @@ const MainListItems = (props) => {
 
   return (
     <div onClick={drawerClose}>
-      { useDashboard && 
+      { useDashboard &&
         <ListItemLink
           to="/"
           primary="Dashboard"
           icon="DashboardOutlinedIcon"
         />
       }
-      { (useOfficialConnections) && 
-        <ListParentItemLink 
+      { (useOfficialConnections) &&
+        <ListParentItemLink
           primary="WhatsApp"
           icon="WhatsAppIcon"
         >
-          { useOfficialConnections && 
+          { useOfficialConnections &&
             <ListItemLink
               to="/OfficialConnections"
               primary={i18n.t("mainDrawer.whatsApp.officialConnections")}
@@ -264,19 +264,19 @@ const MainListItems = (props) => {
         </ListParentItemLink>
       }
       { (useConnections || useWhatsConfig) &&
-        <ListParentItemLink 
+        <ListParentItemLink
           primary="WhatsApp 2"
           icon="WhatsAppIcon"
           connectionWarning={connectionWarning}
         >
-          { useConnections && 
+          { useConnections &&
             <ListItemLink
               to="/Connections"
               primary={i18n.t("mainDrawer.whatsApp.connections")}
               icon="SyncAltIcon"
             />
           }
-          { useWhatsConfig && 
+          { useWhatsConfig &&
             <ListItemLink
               to="/WhatsConfig"
               primary={i18n.t("mainDrawer.whatsApp.settings")}
@@ -285,35 +285,35 @@ const MainListItems = (props) => {
           }
         </ListParentItemLink>
       }
-      { useTemplate && 
+      { useTemplate &&
         <ListItemLink
           to="/Templates"
           primary={i18n.t("mainDrawer.listItems.template")}
           icon="DvrIcon"
         />
       }
-      { useTickets && 
+      { useTickets &&
         <ListItemLink
           to="/Tickets"
           primary={i18n.t("mainDrawer.listItems.tickets")}
           icon="ChatIcon"
         />
       }
-      { useContacts && 
+      { useContacts &&
         <ListItemLink
           to="/Contacts"
           primary={i18n.t("mainDrawer.listItems.contacts")}
           icon="ContactPhoneOutlinedIcon"
         />
       }
-      { useQuickAnswers && 
+      { useQuickAnswers &&
         <ListItemLink
           to="/QuickAnswers"
           primary={i18n.t("mainDrawer.listItems.quickAnswers")}
           icon="QuestionAnswerOutlinedIcon"
         />
       }
-      { useImportation && 
+      { useImportation &&
         <ListItemLink
           to="/Importation"
           primary={i18n.t("mainDrawer.listItems.importation")}
@@ -323,39 +323,39 @@ const MainListItems = (props) => {
       { (useUsers || useCompany || useQueues || useSettings || useReports || useReportsTicket || useRegistersReports) &&
         <>
           <Divider />
-          <ListParentItemLink 
+          <ListParentItemLink
             primary={i18n.t("mainDrawer.listItems.administration")}
             icon="AccountCircleIcon"
           >
-            { useUsers && 
+            { useUsers &&
               <ListItemLink
                 to="/Users"
                 primary={i18n.t("mainDrawer.listItems.users")}
                 icon="PeopleAltOutlinedIcon"
               />
             }
-            { useCompany && 
+            { useCompany &&
               <ListItemLink
                 to="/Company"
                 primary={i18n.t("Empresa")}
                 icon="ApartmentIcon"
               />
             }
-            { useQueues && 
+            { useQueues &&
               <ListItemLink
                 to="/Queues"
                 primary={i18n.t("mainDrawer.listItems.queues")}
                 icon="AccountTreeOutlinedIcon"
               />
             }
-            { useMenus && 
+            { useMenus &&
               <ListItemLink
                 to="/Menus"
                 primary="Menus"
                 icon="ListAltIcon"
               />
             }
-            { useSettings && 
+            { useSettings &&
               <ListItemLink
                 to="/Settings"
                 primary={i18n.t("mainDrawer.listItems.settings")}
@@ -363,7 +363,7 @@ const MainListItems = (props) => {
               />
             }
             { (useReports || useReportsTicket || useRegistersReports) &&
-              <ListParentItemLink 
+              <ListParentItemLink
                 primary={i18n.t("mainDrawer.listItems.reports")}
                 icon="EqualizerIcon"
               >
@@ -374,14 +374,14 @@ const MainListItems = (props) => {
                     icon="AssessmentOutlinedIcon"
                   />
                 }
-                { useReportsTicket && 
+                { useReportsTicket &&
                   <ListItemLink
                     to="/ReportsTicket"
                     primary={i18n.t("mainDrawer.listItems.reportsTicket")}
                     icon="AssessmentOutlinedIcon"
                   />
                 }
-                { useRegistersReports && 
+                { useRegistersReports &&
                   <ListItemLink
                     to="/RegistersReports"
                     primary={i18n.t("mainDrawer.listItems.logReports")}

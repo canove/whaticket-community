@@ -48,18 +48,19 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const UserSchema = Yup.object().shape({
-	name: Yup.string().required("Required"),
-	cnpj: Yup.number().typeError().required("Required"),
-	phone: Yup.number().typeError().required("Required"),
-	email: Yup.string().email("Invalid email").required("Required"),
-	address: Yup.string().required("Required")
+
+	name: Yup.string().required("Campo Obrigatório!"),
+	cnpj: Yup.number().typeError().required("Campo Obrigatório!"),
+	phone: Yup.number().typeError().required("Campo Obrigatório!"),
+	email: Yup.string().email("Invalid email").required("Campo Obrigatório!"),
+	address: Yup.string().required("Campo Obrigatório!"),
+	//alias: Yup.string().nullable().required("Campo Obrigatório!"),
 
 });
 
 const CompanyRegistration = ({ open, onClose, companyId }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
-
 	const initialState = {
 		id: "",
 		name: "",
@@ -67,9 +68,11 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 		phone:"",
 		email: "",
 		address: "",
+		alias: "",
 	};
 
 	const [company, setCompany] = useState(initialState);
+	const [textAlias, setAlias] = useState("");
 
 	useEffect(() => {
 		const fetchCompany = async () => {
@@ -87,13 +90,17 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 		fetchCompany();
 	}, [companyId, open]);
 
+	useEffect(() => {
+		setAlias(company.alias)
+	},[company]);
+
 	const handleClose = () => {
 		onClose();
 		setCompany(initialState);
 	};
 
 	const handleSaveCompany = async values => {
-		const companyData = { ...values };
+		const companyData = { ...values, alias:textAlias };
 		try {
 			if (companyId) {
 				await api.put(`/companies/${companyId}`, companyData);
@@ -104,9 +111,14 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 		} catch (err) {
 
 			toastError(err);
-
 		}
+
 		handleClose();
+	};
+
+	const handleChangeAlias = (e) => {
+		setAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ''));
+		e.preventDefault();
 	};
 
 	return (
@@ -137,6 +149,20 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 					{({ touched, errors, isSubmitting }) => (
 						<Form>
 							<DialogContent dividers>
+									<div className={classes.multFieldLine}>
+										<Field
+											as={TextField}
+											value={textAlias}
+											onChange={handleChangeAlias}
+											name="alias"
+											variant="outlined"
+											margin="dense"
+											label={i18n.t("Alias")}
+											error={touched.alias && Boolean(errors.alias)}
+											helperText={touched.alias && errors.alias}
+											fullWidth
+										/>
+									</div>
 									<div className={classes.multFieldLine}>
 										<Field
 											as={TextField}

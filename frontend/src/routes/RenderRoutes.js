@@ -1,12 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-
 import Route from "./Route";
-
-import LoggedInLayout from "../layout";
 import Dashboard from "../pages/Dashboard/";
 import Tickets from "../pages/Tickets/";
-import Signup from "../pages/Signup/";
-import Login from "../pages/Login/";
 import Connections from "../pages/Connections/";
 import OfficialConnections from "../pages/OfficialConnections/";
 import Settings from "../pages/Settings/";
@@ -39,11 +34,12 @@ const RenderRoutes = () => {
             setMenus(data);
         } catch (err) {
             toastError(err);
-        } 
+        }
     }
 
     useEffect(() => {
         fetchMenus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuth]);
 
     const getComponent = (name) => {
@@ -113,7 +109,7 @@ const RenderRoutes = () => {
                             isPrivate
                         />
                     )
-                } 
+                }
                 if (menu.name === "Tickets") {
                     return (
                         <Route

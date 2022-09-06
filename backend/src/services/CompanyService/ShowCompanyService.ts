@@ -3,7 +3,7 @@ import Company from "../../database/models/Company";
 
 const ShowCompanyService = async (id: string | number): Promise<Company> => {
   const company = await Company.findByPk(id, {
-    attributes: ["name", "id", "email", "cnpj", "phone", "email", "address"],
+    attributes: ["id", "alias", "name", "cnpj", "phone", "email", "address"],
 
   });
   if (!company) {

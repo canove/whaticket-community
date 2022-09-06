@@ -4,20 +4,20 @@ import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import { 
-    Button, 
-    Checkbox, 
-    Grid, 
-    Input, 
-    MenuItem, 
-    Select, 
-    Slider, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableRow, 
-    Typography 
+import {
+    Button,
+    Checkbox,
+    Grid,
+    Input,
+    MenuItem,
+    Select,
+    Slider,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Typography
 } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
@@ -68,7 +68,7 @@ const reducer = (state, action) => {
     if (action.type === "LOAD_CONFIG") {
       const configs = action.payload;
       const newConfigs = [];
-  
+
       configs.forEach((config) => {
         const configIndex = state.findIndex((c) => c.id === config.id);
         if (configIndex !== -1) {
@@ -77,14 +77,14 @@ const reducer = (state, action) => {
           newConfigs.push(config);
         }
       });
-  
+
       return [...state, ...newConfigs];
     }
-  
+
     if (action.type === "UPDATE_CONFIG") {
       const config = action.payload;
       const configIndex = state.findIndex((c) => c.id === config.id);
-  
+
       if (configIndex !== -1) {
         state[configIndex] = config;
         return [...state];
@@ -92,17 +92,17 @@ const reducer = (state, action) => {
         return [config, ...state];
       }
     }
-  
+
     if (action.type === "DELETE_CONFIG") {
       const configId = action.payload;
-  
+
       const configIndex = state.findIndex((c) => c.id === configId);
       if (configIndex !== -1) {
         state.splice(configIndex, 1);
       }
       return [...state];
     }
-  
+
     if (action.type === "RESET") {
       return [];
     }
@@ -260,7 +260,7 @@ const WhatsConfig = () => {
             setIsActive(config[0].active);
             setIntervalValue(config[0].triggerInterval);
             setGreetingMessages(config[0].greetingMessages);
-            
+
             if (config[0].whatsappIds === null) {
                 setSelectedConnection(['all']);
             } else {
@@ -273,7 +273,7 @@ const WhatsConfig = () => {
                 array.forEach(whatsId => {
                     let whatsExists = false;
                     whatsApps.forEach(whats => {
-                        if (whats.id == whatsId) {
+                        if (whats.id === whatsId) {
                             whatsExists = true;
                             if (whats.status === "CONNECTED") {
                                 connectedArray.push(whats.id);
@@ -283,7 +283,7 @@ const WhatsConfig = () => {
                         }
                     })
 
-                    if (whatsExists == false) {
+                    if (whatsExists === false) {
                         deletedArray.push(whatsId);
                     }
                 })
@@ -298,6 +298,7 @@ const WhatsConfig = () => {
                 setUseGreetingMessage(false);
             }
         }
+// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [config]);
 
     useEffect(() => {
@@ -314,17 +315,17 @@ const WhatsConfig = () => {
 
     useEffect(() => {
         const socket = openSocket();
-    
+
         socket.on("config", (data) => {
           if (data.action === "update" || data.action === "create") {
             dispatch({ type: "UPDATE_CONFIG", payload: data.config });
           }
-    
+
           if (data.action === "delete") {
             dispatch({ type: "DELETE_CONFIG", payload: +data.configId });
           }
         });
-    
+
         return () => {
           socket.disconnect();
         };
@@ -368,7 +369,7 @@ const WhatsConfig = () => {
                     variant="outlined"
                 >
                     <Typography variant="subtitle1" gutterBottom>
-                        Ativar config? 
+                        Ativar config?
                     </Typography>
                     <Checkbox
                         {...label}
@@ -417,9 +418,9 @@ const WhatsConfig = () => {
                             variant="outlined"
                         >
                             <Typography variant="subtitle1" gutterBottom>
-                                 Conexões Desconectadas: 
+                                 Conexões Desconectadas:
                             </Typography>
-                            
+
                             { disconnectedWhatsapps.length > 0 && disconnectedWhatsapps.map((disconnectWhats, index) => {
                                 return (
                                     <Typography key={index} variant="subtitle1" gutterBottom>
@@ -435,9 +436,9 @@ const WhatsConfig = () => {
                             variant="outlined"
                         >
                             <Typography variant="subtitle1" gutterBottom>
-                                Conexões Deletadas (id): 
+                                Conexões Deletadas (id):
                             </Typography>
-                            
+
                             { deletedWhatsapps.length > 0 && deletedWhatsapps.map((deletedWhats, index) => {
                                 return (
                                     <Typography key={index} variant="subtitle1" gutterBottom>
@@ -489,7 +490,7 @@ const WhatsConfig = () => {
                     variant="outlined"
                 >
                     <Typography variant="subtitle1" gutterBottom>
-                        Usar mensagem de saudação? 
+                        Usar mensagem de saudação?
                     </Typography>
                     <Checkbox
                         {...label}

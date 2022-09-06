@@ -12,7 +12,8 @@ import {
   Default,
   HasMany,
   BelongsToMany,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
 import { hash, compare } from "bcryptjs";
 import Ticket from "./Ticket";
@@ -66,6 +67,9 @@ class User extends Model<User> {
   @ForeignKey(() => Company)
   @Column
   companyId: number
+
+  @BelongsTo(() => Company)
+  company: Company;
 
   @BeforeUpdate
   @BeforeCreate

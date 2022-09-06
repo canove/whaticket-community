@@ -12,13 +12,11 @@ interface CompanyData {
   email?: string;
   address?: string;
   menusIds?: string;
-}
-
-interface Request {
+  alias?: string;
+}interface Request {
   companyData: CompanyData;
   companyId: string | number;
 }
-
 interface Response {
   name: string;
   id: number;
@@ -26,6 +24,7 @@ interface Response {
   phone: string;
   email: string;
   address: string;
+  alias: string;
 }
 
 const UpdateCompanyService = async ({
@@ -42,6 +41,7 @@ const UpdateCompanyService = async ({
   const {
     name,
     id,
+    alias,
     cnpj,
     phone,
     email,
@@ -50,7 +50,7 @@ const UpdateCompanyService = async ({
   } = companyData;
 
   try {
-    await schema.validate({ name, id, cnpj, phone, email, address });
+    await schema.validate({ name, id, alias, cnpj, phone, email, address });
   } catch (err) {
     throw new AppError(err.message);
   }
@@ -58,6 +58,7 @@ const UpdateCompanyService = async ({
   await company.update({
     name,
     id,
+    alias,
     cnpj,
     phone,
     email,
@@ -71,6 +72,7 @@ const UpdateCompanyService = async ({
   const serializedCompany = {
     name: company.name,
     id: company.id,
+    alias: company.alias,
     cnpj: company.cnpj,
     phone: company.phone,
     email: company.email,

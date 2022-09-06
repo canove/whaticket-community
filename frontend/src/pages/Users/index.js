@@ -131,7 +131,7 @@ const Users = () => {
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_USER", payload: +data.userId });
+        dispatch({ type: "DELETE_USER", payload: + data.userId });
       }
     });
 
@@ -182,6 +182,7 @@ const Users = () => {
       loadMore();
     }
   };
+
 
   return (
     <MainContainer>
@@ -240,7 +241,7 @@ const Users = () => {
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.email")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.profile")}</TableCell>
-              <TableCell align="center">{i18n.t("Id da Empresa")}</TableCell>
+              <TableCell align="center">{i18n.t("Nome da Empresa")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.actions")}</TableCell>
             </TableRow>
           </TableHead>
@@ -251,7 +252,7 @@ const Users = () => {
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
-                  <TableCell align="center">{user.companyId}</TableCell>
+                  <TableCell align="center">{user["company.name"]}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
