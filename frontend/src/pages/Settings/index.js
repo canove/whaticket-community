@@ -128,7 +128,7 @@ const Settings = () => {
 				<Paper className={classes.paper}>
 					<TextField
 						id="api-token-setting"
-						readonly
+						readOnly
 						label="Token Api"
 						margin="dense"
 						variant="outlined"

@@ -21,7 +21,8 @@ describe("User", () => {
     const newUser = await CreateUserService({
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      companyId: null
     });
 
     const updatedUser = await UpdateUserService({
@@ -52,7 +53,8 @@ describe("User", () => {
     const newUser = await CreateUserService({
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      companyId: null
     });
 
     const userId = newUser.id;

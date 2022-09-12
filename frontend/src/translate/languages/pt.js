@@ -171,7 +171,7 @@ const messages = {
           importTitlte: "Importar contatos",
           deleteMessage:
             "Tem certeza que deseja deletar este contato? Todas as chamadas relacionados serão perdidos.",
-          importMessage: "Deseja importas todos os contatos do telefone?",
+          importMessage: "Deseja importar todos os contatos do telefone?",
         },
         buttons: {
           import: "Importar Contatos",
@@ -582,6 +582,9 @@ const messages = {
           marketing: "Marketing",
           edit: "Editar",
           cancel: "Cancelar",
+          success: "Template criada com sucesso!",
+          connectionFailed: "Favor selecione uma conexão!",
+          delete: "Template excluida com sucesso!",
         },
       },
 
@@ -619,6 +622,90 @@ const messages = {
         all: "Todos",
       },
 
+      historicTicket:{
+        button: "Histórico",
+      historicModal:{
+        title: "Histórico",
+        name: "Nome",
+        message: "Mensagem",
+        status: "Status",
+        createAt: "Data Criação",
+        actions: "Ações",
+        closed: "Fechar",
+        back: "Voltar"
+        },
+      },
+
+      company:{
+        title: "Empresas",
+        search: "Pesquisar",
+      grid:{
+        companyId: "Id da Empresa",
+        name: "Nome",
+        cnpj: "CNPJ",
+        phone: "Telefone",
+        email: "Email",
+        address:  "Endereço",
+        actions: "Ações"
+      },
+      buttons: {
+        addCompany: "Cadastrar Empresa"
+      },
+      companyModal: {
+        titleAdd: "Adicionar Empresa",
+        titleEdit: "Editar Cadastro da Empresa",
+        name: "Nome da Empresa",
+        cnpj: "CNPJ",
+        phone: "Telefone",
+        email: "Email",
+        address: "Endereço"
+      },
+      success: "Empresa cadastrada com Sucesso!",
+      deleteCompany: "Todos os dados da empresa cadastrada serão perdidos, deseja realmente excluir, ",
+      toast: "Empresa excluida com sucesso!"
+      },
+
+      menu:{
+            title: "Menus",
+            success: "Menu salvo com sucesso!",
+          buttons:{
+            save: "Salvar",
+            menus: "Menus",
+            company: "Empresas"
+          },
+        },
+      templatesData:{
+        title: "Templates Data",
+        buttons: {
+          connection: "Conexões",
+          search: "Pesquisar",
+          newTemplate: "Nova Template"
+        },
+        grid: {
+          name: "Nome",
+          status: "Status",
+          text: "Texto",
+          footer: "Rodapé",
+          createdAt: "Data da Criação",
+          updateAt: "Editado em",
+          actions: "Acões",
+        },
+        templateModal: {
+          add: "Adicionar Template",
+          edit: "Editar Template",
+          name: "Nome",
+          bodyText: "Corpo do Texto",
+          footer: "Rodapé",
+          buttonAdd: "Adicionar",
+          buttonEdit: "Editar",
+        },
+        modalConfirm: {
+          delete: "Deseja realmente excluir, todos os dados da Template serão perdidos!",
+          successDelete: "Template Deletada com Sucesso!",
+          successAdd: "Template Adicionada com sucesso!",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
@@ -654,6 +741,8 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+        ERR_NO_COMPANY_FOUND: "Erro ao excluir a Empresa.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "Já existe uma empresa com esse CNPJ.",
       },
     },
   },

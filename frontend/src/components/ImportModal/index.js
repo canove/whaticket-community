@@ -12,7 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { MenuItem, Select } from "@material-ui/core";
+import { MenuItem, Paper, Select } from "@material-ui/core";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
@@ -72,6 +72,7 @@ const ImportModal = ({ open, onClose }) => {
 	const [selectedConnection, setSelectedConnection] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
+	const [openSelect, setOpenSelect] = useState(false);
 
 	const handleClose = () => {
 		onClose();
@@ -134,10 +135,19 @@ const ImportModal = ({ open, onClose }) => {
 			// }));
 
 			setSelectedConnection(allConnections);
+			setOpenSelect(false);
 		} else {
 			setSelectedConnection(typeof value === "string" ? value.split(",") : value);
 		}
 	}
+
+	const handleOpenSelect = () => {
+		setOpenSelect(true)
+	};
+
+	const handleCloseSelect = () => {
+		setOpenSelect(false)
+	};
 
 	return (
 		<div className={classes.root}>
@@ -177,6 +187,9 @@ const ImportModal = ({ open, onClose }) => {
 							label="Type"
 							onChange={handleChangeConnection}
 							multiple
+							open={openSelect}
+							onOpen={handleOpenSelect}
+							onClose={handleCloseSelect}
 						>
 							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
@@ -219,15 +232,19 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					<div>
 						{showInfo && (
-							<Typography variant="subtitle1" gutterBottom>
-								NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
-								- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
-								TEMPLATE_WHATS<br />
-								PARAMETROS_TEMPLATE<br /><br />
-								- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
-								TEXTO_MENSAGEM<br />
-								PARAMETROS_TEMPLATE<br />
-							</Typography>
+							<Paper
+								variant="outlined"
+							>
+								<Typography variant="subtitle1" gutterBottom>
+									NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
+									- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
+									TEMPLATE_WHATS<br />
+									PARAMETROS_TEMPLATE<br /><br />
+									- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
+									TEXTO_MENSAGEM<br />
+									PARAMETROS_TEMPLATE<br />
+								</Typography>
+							</Paper>
 						)}
 					</div>
                 </DialogContent>

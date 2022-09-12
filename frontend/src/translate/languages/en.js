@@ -580,6 +580,9 @@ const messages = {
           marketing: "Marketing",
           edit: "To Edit",
           cancel: "Cancel",
+          success: "Template created successfully!",
+          connectionFailed: "Please select a connection!",
+          delete: "Template successfully deleted!",
         },
       },
 
@@ -615,6 +618,90 @@ const messages = {
         triggerTime: "Trigger Time Between Instances",
         connections: "Connections",
         all: "All",
+      },
+
+      historicTicket:{
+        button: "Historic",
+      historicModal:{
+        title: "Historic",
+        name: "Name",
+        message: "Message",
+        status: "Status",
+        createAt: "Create At",
+        actions: "Actions",
+        closed: "Close",
+        back: "Back",
+        },
+      },
+
+      company:{
+        title: "Companies",
+        search: "Search",
+          grid:{
+          companyId: "Company Id",
+          name: "Name",
+          cnpj: "CNPJ",
+          phone: "Phone",
+          email: "Email",
+          address:  "Address",
+          actions: "Actions"
+          },
+          buttons: {
+            addCompany: "Register Company"
+          },
+          companyModal: {
+            titleAdd: "Add Company",
+            titleEdit: "Edit Company Registration",
+            name: "Company Name",
+            cnpj: "CNPJ",
+            phone: "Phone",
+            email: "Email",
+            address: "Address"
+          },
+          success: "Company registered successfully!",
+          deleteCompany: "All registered company data will be lost, do you really want to delete, ",
+          toast: "Company successfully deleted!"
+          },
+
+        menu:{
+            title: "Menus",
+            success: "Menu saved successfully!",
+          buttons:{
+            save: "Save",
+            menus: "Menus",
+            company: "Companies"
+          },
+        },
+      templatesData:{
+        title: "Data Templates",
+        buttons: {
+          connection: "Connections",
+          search: "Search",
+          newTemplate: "Template New"
+        },
+        grid: {
+          name: "Name",
+          status: "Status",
+          text: "Body Text",
+          footer: "Footer",
+          createdAt: "Created At",
+          updateAt: "Update At",
+          actions: "Actions",
+        },
+        templateModal: {
+          add: "Add Template",
+          edit: "Edit Template",
+          name: "Name",
+          bodyText: "Body Text",
+          footer: "Footer",
+          buttonAdd: "Add",
+          buttonEdit: "Edit",
+        },
+        modalConfirm: {
+          delete: "Really want to delete, all Template data will be lost!",
+          successDelete: "Template Deleted Successfully!",
+          successAdd: "Template Added Successfully!",
+        },
       },
 
       backendErrors: {
@@ -653,6 +740,8 @@ const messages = {
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
+        ERR_NO_COMPANY_FOUND: "Error deleting the Company.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "There is already a company with this CNPJ.",
       },
     },
   },

@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
+import { Button, IconButton } from "@material-ui/core";
 import { MoreVert, Replay } from "@material-ui/icons";
 
 import api from "../../services/api";
@@ -11,6 +11,7 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import HistoricModal from "../HistoricModal";
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -32,6 +33,7 @@ const TicketActionButtons = ({ ticket }) => {
 	const [loading, setLoading] = useState(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
+	const [historicModalOpen, setHistoricModalOpen] = useState(false);
 
 	const handleOpenTicketOptionsMenu = e => {
 		setAnchorEl(e.currentTarget);
@@ -61,8 +63,22 @@ const TicketActionButtons = ({ ticket }) => {
 		}
 	};
 
+	const handleOpenHistoricModal = () => {
+		setHistoricModalOpen(true);
+	}
+
+	const handleCloseHistoricModal = () => {
+		setHistoricModalOpen(false);
+	}
+
 	return (
 		<div className={classes.actionButtons}>
+			<HistoricModal
+				open={historicModalOpen}
+				onClose={handleCloseHistoricModal}
+				ticket={ticket}
+				aria-labelledby="form-dialog-title"
+			/>
 			{ticket.status === "closed" && (
 				<ButtonWithSpinner
 					loading={loading}
@@ -83,6 +99,15 @@ const TicketActionButtons = ({ ticket }) => {
 					>
 						{i18n.t("messagesList.header.buttons.return")}
 					</ButtonWithSpinner>
+
+					<Button
+						size="small"
+						variant="contained"
+						color="primary"
+						onClick= {handleOpenHistoricModal}
+					>
+						{i18n.t("historicTicket.button")}
+					</Button>
 					<ButtonWithSpinner
 						loading={loading}
 						size="small"

@@ -31,6 +31,7 @@ import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import { useTranslation } from "react-i18next";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -81,6 +82,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		password: "",
 		profile: "user",
 		lang: "",
+		companyId: ""
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
@@ -89,6 +91,8 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [language, setLanguage] = useState('');
 	const [changingLang, setChangingLang] = useState(false);
+	const [companies, setCompanies] = useState([]);
+  	const [selectedCompany, setSelectedCompany] = useState("");
 
 	const handleChange = (e) => {
 		setChangingLang(true);
@@ -124,7 +128,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, lang: language, queueIds: selectedQueueIds };
+		const userData = { ...values, lang: language, queueIds: selectedQueueIds, company: selectedCompany.id};
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -137,6 +141,28 @@ const UserModal = ({ open, onClose, userId }) => {
 		}
 		handleClose();
 	};
+
+	const fetchCompanies = async () => {
+		try {
+			const { data } = await api.get('/company');
+			setCompanies(data.companies);
+		} catch (err) {
+			toastError(err);
+		}
+    };
+
+	useEffect(() => {
+        fetchCompanies();
+    }, []);
+
+	const handleSelectCompanyChange = (e, company) => {
+        if (company) {
+            setSelectedCompany(company);
+        } else {
+            setSelectedCompany(null);
+
+        }
+    };
 
 	return (
 		<div className={classes.root}>
@@ -179,6 +205,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
+										autoComplete="off"
 										fullWidth
 									/>
 									<Field
@@ -186,6 +213,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										name="password"
 										variant="outlined"
 										margin="dense"
+										autoComplete="off"
 										label={i18n.t("userModal.form.password")}
 										error={touched.password && Boolean(errors.password)}
 										helperText={touched.password && errors.password}
@@ -210,6 +238,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										as={TextField}
 										label={i18n.t("userModal.form.email")}
 										name="email"
+										autoComplete="off"
 										error={touched.email && Boolean(errors.email)}
 										helperText={touched.email && errors.email}
 										variant="outlined"
@@ -246,26 +275,38 @@ const UserModal = ({ open, onClose, userId }) => {
 										/>
 									</FormControl>
 								</div>
-								<FormControl
-									variant="outlined"
-									className={classes.formControl}
-									margin="dense"
-									fullWidth
-								>
-									<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
-									<Select
-										label={i18n.t("userModal.form.language")}
-										name="lang"
-										labelId="language-selection-label"
-										id="language-selection"
-										value={changingLang ? language : user.lang}
-										onChange={handleChange}
+								<div>
+									 <Autocomplete
+										onChange={(e, newValue) => { handleSelectCompanyChange(e, newValue) }}
+										disablePortal
+										id="combo-box-companies"
+										options={companies}
+										getOptionLabel={(option) => option.name}
+										fullWidth
+										renderInput={(params) => <TextField {...params} label="Empresas" variant="outlined" />}
+									/>
+								</div>
+								<div>
+									<FormControl
+										variant="outlined"
+										margin="dense"
+										fullWidth
 									>
-										<MenuItem value="pt">Português</MenuItem>
-										<MenuItem value="en">Inglês</MenuItem>
-										<MenuItem value="es">Espanhol</MenuItem>
-									</Select>
-								</FormControl>
+										<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
+										<Select
+											label={i18n.t("userModal.form.language")}
+											name="lang"
+											labelId="language-selection-label"
+											id="language-selection"
+											value={changingLang ? language : user.lang}
+											onChange={handleChange}
+										>
+											<MenuItem value="pt">Português</MenuItem>
+											<MenuItem value="en">Inglês</MenuItem>
+											<MenuItem value="es">Espanhol</MenuItem>
+										</Select>
+									</FormControl>
+								</div>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"

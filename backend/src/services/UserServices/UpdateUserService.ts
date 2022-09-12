@@ -10,6 +10,7 @@ interface UserData {
   profile?: string;
   lang?: string;
   queueIds?: number[];
+  companyId?: string;
 }
 
 interface Request {

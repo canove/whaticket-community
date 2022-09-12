@@ -14,6 +14,10 @@ import File from "./models/File";
 import FileRegister from "./models/FileRegister";
 import WhatsappsConfig from "./models/WhatsappsConfig";
 import GreetingMessages from "./models/GreetingMessages";
+import Company from "./models/Company";
+import Menu from "./models/Menu";
+import MenuCompanies from "./models/MenuCompanies";
+import Templates from "./models/TemplatesData";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -35,7 +39,11 @@ const models = [
   File,
   FileRegister,
   WhatsappsConfig,
-  GreetingMessages
+  GreetingMessages,
+  Company,
+  Menu,
+  MenuCompanies,
+  Templates,
 ];
 
 sequelize.addModels(models);

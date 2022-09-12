@@ -1,4 +1,5 @@
 import { Sequelize, Op } from "sequelize";
+import Company from "../../database/models/Company";
 import Queue from "../../database/models/Queue";
 import User from "../../database/models/User";
 
@@ -39,8 +40,10 @@ const ListUsersService = async ({
     offset,
     order: [["createdAt", "DESC"]],
     include: [
-      { model: Queue, as: "queues", attributes: ["id", "name", "color"] }
-    ]
+      { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
+      { model: Company, as:"company", attributes: ["name"], required:true }
+  ],
+raw:true
   });
 
   const hasMore = count > offset + users.length;

@@ -586,6 +586,9 @@ const messages = {
             marketing: "Marketing",
             edit: "Para Editar",
             cancel: "Cancelar",
+            success: "¡Plantilla creada con éxito!",
+            connectionFailed: "¡Seleccione una conexión!",
+            delete: "¡Plantilla eliminada con éxito!",
           },
         },
         logReport:{
@@ -620,6 +623,90 @@ const messages = {
           triggerTime: "Tiempo de activación entre instancias",
           connections: "conexiones",
           all: "Todos",
+      },
+
+      historicTicket:{
+        button: "Histórico",
+      historicModal:{
+        title: "Histórico",
+        name: "Nombre",
+        message: "Mensaje",
+        status: "Estado",
+        createAt: "Fecha de Creación",
+        actions: "Comportamiento",
+        closed: "Cerca",
+        back: "Regresar"
+        },
+      },
+
+      company:{
+        title: "Compañías",
+        search: "Búsqueda",
+          grid:{
+          companyId: "ID de la Compañía",
+          name: "Nombres",
+          cnpj: "CNPJ",
+          phone: "Teléfono",
+          email: "Email",
+          address:  "Endereço",
+          actions: "Acción"
+          },
+          buttons: {
+            addCompany: "Registrar Compañía"
+          },
+          companyModal: {
+            titleAdd: "Añadir Compañía",
+            titleEdit: "Editar Registro de Compañía",
+            name: "Nombre da Compañía",
+            cnpj: "CNPJ",
+            phone: "Teléfono",
+            email: "Email",
+            address: "Endereço"
+          },
+          success: "Compañía registrada con éxito!",
+          deleteCompany: "Todos los datos de la compañía registrada se perderán, ¿realmente desea eliminarlos? ",
+          toast: "¡Compañía eliminada con éxito!"
+          },
+
+          menu:{
+            title: "Menú",
+            success: "¡Menú guardado con éxito!!",
+          buttons:{
+            save: "Guardar",
+            menus: "Menú",
+            company: "Compañías"
+          },
+        },
+      templatesData:{
+        title: "Plantillas",
+        buttons: {
+          connection: "Conexión",
+          search: "Búsqueda",
+          newTemplate: "Nueva Plantilla"
+        },
+        grid: {
+          name: "Nombre",
+          status: "Status",
+          text: "Texto",
+          footer: "Zócalo",
+          createdAt: "Fecha de Creación",
+          updateAt: "Editado en",
+          actions: "Comportamiento",
+        },
+        templateModal: {
+          add: "Agregar Plantilla",
+          edit: "Editar Plantilla",
+          name: "Nombre",
+          bodyText: "cuerpo do Texto",
+          footer: "Zócalo",
+          buttonAdd: "Agregar",
+          buttonEdit: "Editar",
+        },
+        modalConfirm: {
+          delete: "¡Realmente quiero eliminar, todos los datos de la plantilla se perderán!",
+          successDelete: "¡Plantilla eliminada con éxito!",
+          successAdd: "¡Plantilla agregada con éxito!",
+        },
       },
 
       backendErrors: {
@@ -658,6 +745,8 @@ const messages = {
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
+        ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
       },
     },
   },
