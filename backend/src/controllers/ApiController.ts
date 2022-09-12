@@ -124,15 +124,7 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
 
 /* eslint-disable */
 export const pingConnections = async (req: Request, res: Response) => {
-
-
-  const sendingFiles = await ListFileService({ Status: FileStatus.Sending,initialDate:null, limit: 1 });
-
-  if (sendingFiles?.length > 0) {
-    sendingFiles.forEach(async (file) => {
-      await DispatcherPingService({ file: file });
-    });
-  } 
+  await DispatcherPingService();
   return res.status(200).json('request is processed');
 };
 
