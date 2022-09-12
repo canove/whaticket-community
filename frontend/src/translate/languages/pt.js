@@ -582,6 +582,9 @@ const messages = {
           marketing: "Marketing",
           edit: "Editar",
           cancel: "Cancelar",
+          success: "Template criada com sucesso!",
+          connectionFailed: "Favor selecione uma conexão!",
+          delete: "Template excluida com sucesso!",
         },
       },
 
@@ -660,7 +663,47 @@ const messages = {
       success: "Empresa cadastrada com Sucesso!",
       deleteCompany: "Todos os dados da empresa cadastrada serão perdidos, deseja realmente excluir, ",
       toast: "Empresa excluida com sucesso!"
+      },
 
+      menu:{
+            title: "Menus",
+            success: "Menu salvo com sucesso!",
+          buttons:{
+            save: "Salvar",
+            menus: "Menus",
+            company: "Empresas"
+          },
+        },
+      templatesData:{
+        title: "Templates Data",
+        buttons: {
+          connection: "Conexões",
+          search: "Pesquisar",
+          newTemplate: "Nova Template"
+        },
+        grid: {
+          name: "Nome",
+          status: "Status",
+          text: "Texto",
+          footer: "Rodapé",
+          createdAt: "Data da Criação",
+          updateAt: "Editado em",
+          actions: "Acões",
+        },
+        templateModal: {
+          add: "Adicionar Template",
+          edit: "Editar Template",
+          name: "Nome",
+          bodyText: "Corpo do Texto",
+          footer: "Rodapé",
+          buttonAdd: "Adicionar",
+          buttonEdit: "Editar",
+        },
+        modalConfirm: {
+          delete: "Deseja realmente excluir, todos os dados da Template serão perdidos!",
+          successDelete: "Template Deletada com Sucesso!",
+          successAdd: "Template Adicionada com sucesso!",
+        },
       },
 
       backendErrors: {

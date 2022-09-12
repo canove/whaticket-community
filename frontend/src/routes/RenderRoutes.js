@@ -17,11 +17,12 @@ import WhatsConfig from "../pages/WhatsConfig"
 import Templates from "../pages/Templates";
 import Company from "../pages/Company";
 import Menus from "../pages/Menus";
+import TemplatesData from "../pages/TemplatesData";
 
 import { AuthContext } from "../context/Auth/AuthContext";
-
 import toastError from "../errors/toastError";
 import api from "../services/api";
+
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
@@ -51,6 +52,9 @@ const RenderRoutes = () => {
         }
         if (name === "Connections") {
             return Connections
+        }
+        if (name === "Template Data") {
+            return TemplatesData
         }
         if (name === "Whats Config") {
             return WhatsConfig

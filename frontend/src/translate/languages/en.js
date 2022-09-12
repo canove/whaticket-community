@@ -580,6 +580,9 @@ const messages = {
           marketing: "Marketing",
           edit: "To Edit",
           cancel: "Cancel",
+          success: "Template created successfully!",
+          connectionFailed: "Please select a connection!",
+          delete: "Template successfully deleted!",
         },
       },
 
@@ -658,9 +661,48 @@ const messages = {
           success: "Company registered successfully!",
           deleteCompany: "All registered company data will be lost, do you really want to delete, ",
           toast: "Company successfully deleted!"
-
           },
 
+        menu:{
+            title: "Menus",
+            success: "Menu saved successfully!",
+          buttons:{
+            save: "Save",
+            menus: "Menus",
+            company: "Companies"
+          },
+        },
+      templatesData:{
+        title: "Data Templates",
+        buttons: {
+          connection: "Connections",
+          search: "Search",
+          newTemplate: "Template New"
+        },
+        grid: {
+          name: "Name",
+          status: "Status",
+          text: "Body Text",
+          footer: "Footer",
+          createdAt: "Created At",
+          updateAt: "Update At",
+          actions: "Actions",
+        },
+        templateModal: {
+          add: "Add Template",
+          edit: "Edit Template",
+          name: "Name",
+          bodyText: "Body Text",
+          footer: "Footer",
+          buttonAdd: "Add",
+          buttonEdit: "Edit",
+        },
+        modalConfirm: {
+          delete: "Really want to delete, all Template data will be lost!",
+          successDelete: "Template Deleted Successfully!",
+          successAdd: "Template Added Successfully!",
+        },
+      },
 
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:

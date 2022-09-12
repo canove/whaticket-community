@@ -128,9 +128,10 @@ const MainListItems = (props) => {
 
   const [useDashboard, setUseDashboard] = useState(false);
   const [useOfficialConnections, setUseOfficialConnections] = useState(false);
+  const [useOfficialConnectionsTemp, setUseOfficialConnectionsTemp] = useState(false);
   const [useConnections, setUseConnections] = useState(false);
+  const [useConnectionsTemp, setUseConnectionsTemp] = useState(false);
   const [useWhatsConfig, setUseWhatsConfig] = useState(false);
-  const [useTemplate, setUseTemplate] = useState(false);
   const [useTickets, setUseTickets] = useState(false);
   const [useContacts, setUseContacts] = useState(false);
   const [useUsers, setUseUsers] = useState(false);
@@ -191,17 +192,20 @@ const MainListItems = (props) => {
         if (menu.name === "Official Connections") {
             setUseOfficialConnections(true);
         }
+        if (menu.name === "Templates") {
+            setUseOfficialConnectionsTemp(true);
+        }
         if (menu.name === "Connections") {
             setUseConnections(true);
+        }
+        if (menu.name === "Template Data") {
+            setUseConnectionsTemp(true);
         }
         if (menu.name === "Whats Config") {
             setUseWhatsConfig(true);
         }
         if (menu.name === "Tickets") {
-          setUseTickets(true);
-        }
-        if (menu.name === "Templates") {
-            setUseTemplate(true);
+            setUseTickets(true);
         }
         if (menu.name === "Contacts") {
             setUseContacts(true);
@@ -249,7 +253,7 @@ const MainListItems = (props) => {
           icon="DashboardOutlinedIcon"
         />
       }
-      { (useOfficialConnections) &&
+      { (useOfficialConnections || useOfficialConnectionsTemp) &&
         <ListParentItemLink
           primary="WhatsApp"
           icon="WhatsAppIcon"
@@ -261,9 +265,16 @@ const MainListItems = (props) => {
               icon="SyncAltIcon"
             />
           }
+          { useOfficialConnectionsTemp &&
+            <ListItemLink
+              to="/Templates"
+              primary={i18n.t("mainDrawer.listItems.template")}
+              icon="DvrIcon"
+            />
+          }
         </ListParentItemLink>
       }
-      { (useConnections || useWhatsConfig) &&
+      { (useConnections || useConnectionsTemp || useWhatsConfig) &&
         <ListParentItemLink
           primary="WhatsApp 2"
           icon="WhatsAppIcon"
@@ -276,6 +287,13 @@ const MainListItems = (props) => {
               icon="SyncAltIcon"
             />
           }
+          { useConnectionsTemp &&
+            <ListItemLink
+              to="/TemplateData"
+              primary={i18n.t("Templates Data")}
+              icon="DvrIcon"
+            />
+          }
           { useWhatsConfig &&
             <ListItemLink
               to="/WhatsConfig"
@@ -284,13 +302,6 @@ const MainListItems = (props) => {
             />
           }
         </ListParentItemLink>
-      }
-      { useTemplate &&
-        <ListItemLink
-          to="/Templates"
-          primary={i18n.t("mainDrawer.listItems.template")}
-          icon="DvrIcon"
-        />
       }
       { useTickets &&
         <ListItemLink

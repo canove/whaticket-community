@@ -128,7 +128,6 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-debugger
 		const userData = { ...values, lang: language, queueIds: selectedQueueIds, company: selectedCompany.id};
 		try {
 			if (userId) {

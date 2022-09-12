@@ -126,6 +126,14 @@ module.exports = {
           isParent: false,
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          name: "Template Data",
+          icon: "DvrIcon",
+          parentId: whatsApp2[0][0].id,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ],
       {}
