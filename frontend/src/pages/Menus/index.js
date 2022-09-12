@@ -36,6 +36,7 @@ import ChatIcon from "@material-ui/icons/Chat";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -177,23 +178,21 @@ const Menus = () => {
 
     const saveChanges = async () => {
         setSaving(true);
-
         const companyBody = {...selectedCompany, menusIds: selectedMenusIds}
-
         try {
             await api.put(`/companies/${selectedCompany.id}`, companyBody);
             setSaving(false);
+            toast.success(i18n.t("menu.success"));
         } catch (err) {
             toastError(err);
             setSaving(false);
         }
-
     }
 
 	return (
 	    <MainContainer>
             <MainHeader>
-                <Title>{i18n.t("Menus")}</Title>
+                <Title>{i18n.t("menu.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
                         color="primary"
@@ -201,7 +200,7 @@ const Menus = () => {
                         disabled={!selectedCompany || saving}
                         onClick={saveChanges}
                     >
-                        Salvar
+                        {i18n.t("menu.buttons.save")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -220,7 +219,7 @@ const Menus = () => {
                         options={companies}
                         getOptionLabel={(option) => option.name}
                         style={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="Compania" variant="outlined" />}
+                        renderInput={(params) => <TextField {...params} label={i18n.t("menu.buttons.company")} variant="outlined" />}
                     />
                 </Paper>
                 <Paper
@@ -228,7 +227,7 @@ const Menus = () => {
                     variant="outlined"
                 >
                     <FormControl fullWidth margin="dense" variant="outlined">
-                        <InputLabel>Menus</InputLabel>
+                        <InputLabel> {i18n.t("menu.buttons.menus")}</InputLabel>
                         <Select
                             disabled={!selectedCompany}
                             multiple

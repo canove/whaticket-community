@@ -586,6 +586,9 @@ const messages = {
             marketing: "Marketing",
             edit: "Para Editar",
             cancel: "Cancelar",
+            success: "¡Plantilla creada con éxito!",
+            connectionFailed: "¡Seleccione una conexión!",
+            delete: "¡Plantilla eliminada con éxito!",
           },
         },
         logReport:{
@@ -663,8 +666,48 @@ const messages = {
           success: "Compañía registrada con éxito!",
           deleteCompany: "Todos los datos de la compañía registrada se perderán, ¿realmente desea eliminarlos? ",
           toast: "¡Compañía eliminada con éxito!"
-
           },
+
+          menu:{
+            title: "Menú",
+            success: "¡Menú guardado con éxito!!",
+          buttons:{
+            save: "Guardar",
+            menus: "Menú",
+            company: "Compañías"
+          },
+        },
+      templatesData:{
+        title: "Plantillas",
+        buttons: {
+          connection: "Conexión",
+          search: "Búsqueda",
+          newTemplate: "Nueva Plantilla"
+        },
+        grid: {
+          name: "Nombre",
+          status: "Status",
+          text: "Texto",
+          footer: "Zócalo",
+          createdAt: "Fecha de Creación",
+          updateAt: "Editado en",
+          actions: "Comportamiento",
+        },
+        templateModal: {
+          add: "Agregar Plantilla",
+          edit: "Editar Plantilla",
+          name: "Nombre",
+          bodyText: "cuerpo do Texto",
+          footer: "Zócalo",
+          buttonAdd: "Agregar",
+          buttonEdit: "Editar",
+        },
+        modalConfirm: {
+          delete: "¡Realmente quiero eliminar, todos los datos de la plantilla se perderán!",
+          successDelete: "¡Plantilla eliminada con éxito!",
+          successAdd: "¡Plantilla agregada con éxito!",
+        },
+      },
 
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:

@@ -17,6 +17,7 @@ import GreetingMessages from "./models/GreetingMessages";
 import Company from "./models/Company";
 import Menu from "./models/Menu";
 import MenuCompanies from "./models/MenuCompanies";
+import Templates from "./models/TemplatesData";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -41,7 +42,8 @@ const models = [
   GreetingMessages,
   Company,
   Menu,
-  MenuCompanies
+  MenuCompanies,
+  Templates,
 ];
 
 sequelize.addModels(models);
