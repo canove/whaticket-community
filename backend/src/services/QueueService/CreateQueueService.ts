@@ -5,6 +5,7 @@ import Queue from "../../database/models/Queue";
 interface QueueData {
   name: string;
   color: string;
+  companyId: string | number;
   greetingMessage?: string;
 }
 

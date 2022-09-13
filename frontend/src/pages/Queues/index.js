@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import openSocket from "../../services/socket-io";
 
@@ -27,6 +27,7 @@ import QueueModal from "../../components/QueueModal";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -88,6 +89,7 @@ const reducer = (state, action) => {
 const Queues = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
+  const { user } = useContext(AuthContext);
 
   const [queues, dispatch] = useReducer(reducer, []);
   const [loading, setLoading] = useState(false);
@@ -100,7 +102,9 @@ const Queues = () => {
     (async () => {
       setLoading(true);
       try {
-        const { data } = await api.get("/queue");
+        const { data } = await api.get("/queue", {
+          params: { companyId: user.companyId }
+        });
         dispatch({ type: "LOAD_QUEUES", payload: data });
 
         setLoading(false);
@@ -109,7 +113,7 @@ const Queues = () => {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [user.companyId]);
 
   useEffect(() => {
     const socket = openSocket();
