@@ -5,6 +5,7 @@ interface Request {
   status?: number;
   text?: string;
   footer?: string;
+  companyId: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,6 +15,7 @@ const CreateTemplateDataService = async ({
   status,
   text,
   footer,
+  companyId,
   createdAt,
   updatedAt
 }: Request): Promise<Templates> => {
@@ -22,6 +24,7 @@ const templates = await Templates.create({
   status,
   text,
   footer,
+  companyId,
   createdAt,
   updatedAt
 });
