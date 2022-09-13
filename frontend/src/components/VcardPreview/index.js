@@ -28,7 +28,8 @@ const VcardPreview = ({ contact, numbers }) => {
                     let contactObj = {
                         name: contact,
                         number: numbers.replace(/\D/g, ""),
-                        email: ""
+                        email: "",
+                        companyId: user.companyId
                     }
                     const { data } = await api.post("/contact", contactObj);
                     setContact(data)
@@ -41,7 +42,7 @@ const VcardPreview = ({ contact, numbers }) => {
             fetchContacts();
         }, 500);
         return () => clearTimeout(delayDebounceFn);
-    }, [contact, numbers]);
+    }, [contact, numbers, user.companyId]);
 
     const handleNewChat = async() => {
         try {
@@ -49,6 +50,7 @@ const VcardPreview = ({ contact, numbers }) => {
                 contactId: selectedContact.id,
                 userId: user.id,
                 status: "open",
+                companyId: user.companyId
             });
             history.push(`/tickets/${ticket.id}`);
         } catch (err) {

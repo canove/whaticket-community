@@ -3,15 +3,11 @@ import { QueryInterface } from "sequelize";
 module.exports = {
   up: (queryInterface: QueryInterface) => {
     return queryInterface.bulkInsert(
-      "Users",
+      "Companies",
       [
         {
-          name: "Administrador",
-          email: "admin@whaticket.com",
-          passwordHash: "$2a$08$WaEmpmFDD/XkDqorkpQ42eUZozOqRCPkPcTkmHHMyuTGUOkI8dHsq",
-          profile: "admin",
-          companyId: 1,
-          tokenVersion: 0,
+          name: "Brain It Solutions",
+          alias: "BrainIt",
           createdAt: new Date(),
           updatedAt: new Date()
         }
@@ -21,6 +17,6 @@ module.exports = {
   },
 
   down: (queryInterface: QueryInterface) => {
-    return queryInterface.bulkDelete("Users", {});
+    return queryInterface.bulkDelete("Companies", {});
   }
 };

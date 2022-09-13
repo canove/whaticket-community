@@ -23,25 +23,22 @@ import { AuthContext } from "../context/Auth/AuthContext";
 import toastError from "../errors/toastError";
 import api from "../services/api";
 
-
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
 
     const [menus, setMenus] = useState([]);
 
-    const fetchMenus = async () => {
-        try {
-            const { data } = await api.get(`/menus/company/${user.companyId}`);
-            setMenus(data);
-        } catch (err) {
-            toastError(err);
-        }
-    }
-
     useEffect(() => {
+        const fetchMenus = async () => {
+            try {
+                const { data } = await api.get(`/menus/company/${user.companyId}`);
+                setMenus(data);
+            } catch (err) {
+                toastError(err);
+            }
+        }
         fetchMenus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuth]);
+    }, [isAuth, user.companyId]);
 
     const getComponent = (name) => {
         if (name === "Dashboard") {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useReducer } from "react";
+import React, { useState, useCallback, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
 
 import { CheckCircle, DeleteOutline, Edit } from "@material-ui/icons";
@@ -29,6 +29,7 @@ import { format, parseISO } from "date-fns";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -125,11 +126,15 @@ const OfficialConnections = () => {
 		confirmationModalInitialState
 	);
 
+	const { user } = useContext(AuthContext);
+
 	useEffect(() => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
-				const { data } = await api.get(`/whatsapp/list/${true}`);
+				const { data } = await api.get(`/whatsapp/list/`, {
+					params: { official: true, companyId: user.companyId }
+				});
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
 			} catch (err) {
@@ -138,7 +143,7 @@ const OfficialConnections = () => {
 			}
 		};
 		fetchWhats();
-	}, []);
+	}, [user.companyId]);
 
 	useEffect(() => {
 		const socket = openSocket();
