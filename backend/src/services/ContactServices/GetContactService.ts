@@ -5,25 +5,28 @@ import CreateContactService from "./CreateContactService";
 interface ExtraInfo {
     name: string;
     value: string;
+    companyId: string | number;
 }
 
 interface Request {
     name: string;
     number: string;
+    companyId: string | number;
     email?: string;
     profilePicUrl?: string;
     extraInfo?: ExtraInfo[];
 }
 
-const GetContactService = async ({ name, number }: Request): Promise<Contact> => {
+const GetContactService = async ({ name, number, companyId }: Request): Promise<Contact> => {
     const numberExists = await Contact.findOne({
-        where: { number }
+        where: { number, companyId }
     });
 
     if (!numberExists) {
         const contact = await CreateContactService({
             name,
             number,
+            companyId
         })
 
         if (contact == null)
