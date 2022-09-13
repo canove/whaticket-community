@@ -6,8 +6,10 @@ import {
   PrimaryKey,
   AutoIncrement,
   Model,
-  HasMany
+  HasMany,
+  ForeignKey
 } from "sequelize-typescript";
+import Company from "./Company";
 import GreetingMessages from "./GreetingMessages";
 
 @Table
@@ -31,6 +33,10 @@ class WhatsappsConfig extends Model<WhatsappsConfig> {
 
   @HasMany(() => GreetingMessages)
   greetingMessages: GreetingMessages[];
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @Column
   active: boolean;

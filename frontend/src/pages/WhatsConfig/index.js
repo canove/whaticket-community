@@ -31,6 +31,7 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -112,6 +113,7 @@ const WhatsConfig = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
     const { whatsApps } = useContext(WhatsAppsContext);
+    const { user } = useContext(AuthContext);
 
     const [intervalValue, setIntervalValue] = useState(1);
     const [selectedConnection, setSelectedConnection] = useState([]);
@@ -231,19 +233,20 @@ const WhatsConfig = () => {
 
     // Config
     const handleSaveConfig = async () => {
-        const configBody = {
+        const configData = {
             triggerInterval: intervalValue,
             whatsappIds: selectedConnection.includes('all') ? null : selectedConnection.join(),
             useGreetingMessages: useGreetingMessage,
             greetingMessages: greetingMessages,
             active: isActive,
+            companyId: user.companyId
         }
         try {
             if (config.length > 0) {
-                await api.put(`/whatsconfig/${config[0].id}`, configBody);
+                await api.put(`/whatsconfig/${config[0].id}`, configData);
                 toast.success("Config Alterada com Sucesso!");
             } else {
-                await api.post(`/whatsconfig/`, configBody);
+                await api.post(`/whatsconfig/`, configData);
                 toast.success("Config Salva com Sucesso!");
             }
         } catch (err) {
@@ -270,6 +273,7 @@ const WhatsConfig = () => {
                 let connectedArray = [];
                 let disconnectArray = [];
                 let deletedArray = [];
+
                 array.forEach(whatsId => {
                     let whatsExists = false;
                     whatsApps.forEach(whats => {
@@ -298,20 +302,21 @@ const WhatsConfig = () => {
                 setUseGreetingMessage(false);
             }
         }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [config]);
+    }, [config, whatsApps]);
 
     useEffect(() => {
         const fetchConfig = async () => {
             try {
-                const { data } = await api.get('/whatsconfig/');
+                const { data } = await api.get('/whatsconfig/', {
+                    params: { companyId: user.companyId }
+                });
                 dispatch({ type: "LOAD_CONFIG", payload: data });
             } catch (err) {
                 toastError(err);
             }
         }
         fetchConfig();
-    }, [saving]);
+    }, [saving, user.companyId]);
 
     useEffect(() => {
         const socket = openSocket();
@@ -373,7 +378,6 @@ const WhatsConfig = () => {
                     </Typography>
                     <Checkbox
                         {...label}
-                        defaultChecked
                         sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
                         color="primary"
                         onChange={handleActiveCheckboxChange}
@@ -436,16 +440,8 @@ const WhatsConfig = () => {
                             variant="outlined"
                         >
                             <Typography variant="subtitle1" gutterBottom>
-                                Conexões Deletadas (id):
+                                Algumas Conexões Foram Deletadas...
                             </Typography>
-
-                            { deletedWhatsapps.length > 0 && deletedWhatsapps.map((deletedWhats, index) => {
-                                return (
-                                    <Typography key={index} variant="subtitle1" gutterBottom>
-                                        { deletedWhats };
-                                    </Typography>
-                                )
-                            })}
                         </Paper>
                     }
                 </Paper>
@@ -494,7 +490,6 @@ const WhatsConfig = () => {
                     </Typography>
                     <Checkbox
                         {...label}
-                        defaultChecked
                         sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
                         color="primary"
                         onChange={handleCheckboxChange}
