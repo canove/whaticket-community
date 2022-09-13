@@ -3,7 +3,7 @@ import { getWbot } from "../../libs/wbot";
 import Contact from "../../database/models/Contact";
 import { logger } from "../../utils/logger";
 
-const ImportContactsService = async ({ companyId }): Promise<void> => {
+const ImportContactsService = async (companyId): Promise<void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp();
 
   const wbot = getWbot(defaultWhatsapp.id);

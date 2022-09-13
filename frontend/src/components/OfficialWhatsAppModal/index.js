@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field, useFormikContext } from "formik";
 
@@ -21,7 +21,6 @@ import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -76,7 +75,6 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
     const [isConnectionTested, setIsConnectionTested] = useState(false);
 	const [submitType, setSubmitType] = useState("testConnection");
 	const [lastFormValues, setLastFormValues] = useState();
-	const { user } = useContext(AuthContext);
 
 	const GetFormValues = () => {
 		const { values } = useFormikContext();
@@ -139,7 +137,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	}
 
 	const handleSaveWhatsApp = async values => {
-		const whatsappData = { ...values, queueIds: selectedQueueIds, companyId: user.companyId };
+		const whatsappData = { ...values, queueIds: selectedQueueIds };
 
 		try {
 			if (whatsAppId) {

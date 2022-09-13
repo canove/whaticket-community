@@ -81,9 +81,7 @@ const ReportsTicket = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchTickets = async () => {
         try {
-          const { data } = await api.get("/tickets", {
-            params: { companyId: user.companyId }
-          })
+          const { data } = await api.get("/tickets")
           setTickets(data.tickets)
           setLoading(false)
         } catch (err) {
@@ -94,7 +92,7 @@ const ReportsTicket = () => {
       fetchTickets()
     }, 500)
     return () => clearTimeout(delayDebounceFn)
-  }, [user.companyId])
+  }, [])
 
   const fetchReports = async (ticketId) => {
     if (!ticketId) {

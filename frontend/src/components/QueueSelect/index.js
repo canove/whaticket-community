@@ -29,15 +29,13 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	useEffect(() => {
 		(async () => {
 			try {
-				const { data } = await api.get("/queue", {
-					params: { companyId: user.companyId }
-				});
+				const { data } = await api.get("/queue");
 				setQueues(data);
 			} catch (err) {
 				toastError(err);
 			}
 		})();
-	}, [user.companyId]);
+	}, []);
 
 	const handleChange = e => {
 		onChange(e.target.value);

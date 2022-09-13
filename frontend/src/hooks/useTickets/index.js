@@ -33,8 +33,7 @@ const useTickets = ({
                             date,
                             showAll,
                             queueIds,
-                            withUnreadMessages,
-                            companyId: user.companyId
+                            withUnreadMessages
                         },
                     })
                     setTickets(data.tickets)
@@ -82,8 +81,7 @@ const useTickets = ({
         date,
         showAll,
         queueIds,
-        withUnreadMessages,
-        user.companyId
+        withUnreadMessages
     ])
 
     return { tickets, loading, hasMore, count };

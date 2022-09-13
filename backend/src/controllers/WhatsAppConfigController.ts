@@ -8,10 +8,6 @@ import DeleteMessageService from "../services/WhatsConfigService/DeleteMessageSe
 import ListWhatsConfigService from "../services/WhatsConfigService/ListWhatsConfigService";
 import UpdateConfigService from "../services/WhatsConfigService/UpdateConfigService";
 
-type IndexQuery = {
-  companyId: string | number;
-}
-
 interface ConfigData {
   companyId: string | number;
   triggerInterval?: number;
@@ -22,7 +18,7 @@ interface ConfigData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { companyId } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const config = await ListWhatsConfigService(companyId);
 
@@ -36,8 +32,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     useGreetingMessages,
     greetingMessages,
     active,
-    companyId
   } = req.body as ConfigData;
+
+  const companyId = req.user.companyId;
 
   const config = await CreateWhatsConfigService({
     triggerInterval,

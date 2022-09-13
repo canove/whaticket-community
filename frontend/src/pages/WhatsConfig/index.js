@@ -31,7 +31,6 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -113,7 +112,6 @@ const WhatsConfig = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
     const { whatsApps } = useContext(WhatsAppsContext);
-    const { user } = useContext(AuthContext);
 
     const [intervalValue, setIntervalValue] = useState(1);
     const [selectedConnection, setSelectedConnection] = useState([]);
@@ -239,7 +237,6 @@ const WhatsConfig = () => {
             useGreetingMessages: useGreetingMessage,
             greetingMessages: greetingMessages,
             active: isActive,
-            companyId: user.companyId
         }
         try {
             if (config.length > 0) {
@@ -307,16 +304,14 @@ const WhatsConfig = () => {
     useEffect(() => {
         const fetchConfig = async () => {
             try {
-                const { data } = await api.get('/whatsconfig/', {
-                    params: { companyId: user.companyId }
-                });
+                const { data } = await api.get('/whatsconfig/');
                 dispatch({ type: "LOAD_CONFIG", payload: data });
             } catch (err) {
                 toastError(err);
             }
         }
         fetchConfig();
-    }, [saving, user.companyId]);
+    }, [saving]);
 
     useEffect(() => {
         const socket = openSocket();

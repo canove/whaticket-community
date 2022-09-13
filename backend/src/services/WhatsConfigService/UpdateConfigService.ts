@@ -9,7 +9,7 @@ interface Request {
 
 const UpdateConfigService = async ({
   configData,
-  configId
+  configId,
 }: Request): Promise<WhatsappsConfig | undefined> => {
   const config = await ShowConfigService(configId);
 

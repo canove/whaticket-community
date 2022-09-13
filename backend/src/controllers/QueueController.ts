@@ -11,7 +11,7 @@ type IndexQuery = {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { companyId } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const queues = await ListQueuesService(companyId);
 
@@ -19,7 +19,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { name, color, greetingMessage, companyId } = req.body;
+  const { name, color, greetingMessage } = req.body;
+  const companyId = req.user.companyId;
 
   const queue = await CreateQueueService({ name, color, greetingMessage, companyId });
 

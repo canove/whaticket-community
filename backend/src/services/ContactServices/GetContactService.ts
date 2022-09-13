@@ -5,13 +5,13 @@ import CreateContactService from "./CreateContactService";
 interface ExtraInfo {
     name: string;
     value: string;
-    companyId: string | number;
+    companyId: number;
 }
 
 interface Request {
     name: string;
     number: string;
-    companyId: string | number;
+    companyId: number;
     email?: string;
     profilePicUrl?: string;
     extraInfo?: ExtraInfo[];

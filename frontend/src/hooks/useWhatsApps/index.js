@@ -60,12 +60,9 @@ const useWhatsApps = () => {
 	useEffect(() => {
 		setLoading(true);
 		const fetchSession = async () => {
-			const companyId = user.companyId;
 			if (companyId) {
 				try {
-					const { data } = await api.get(`/whatsapp/`, { 
-						params: { companyId }
-					});
+					const { data } = await api.get(`/whatsapp/`);
 					dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 					setLoading(false);
 				} catch (err) {
@@ -75,7 +72,7 @@ const useWhatsApps = () => {
 			}
 		};
 		fetchSession();
-	}, [user.companyId]);
+	}, []);
 
 	useEffect(() => {
 		const socket = openSocket();

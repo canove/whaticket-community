@@ -106,12 +106,11 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	};
 
 	const handleSaveQueue = async values => {
-		const queueData = { ...values, companyId: user.companyId }
 		try {
 			if (queueId) {
-				await api.put(`/queue/${queueId}`, queueData);
+				await api.put(`/queue/${queueId}`, values);
 			} else {
-				await api.post("/queue", queueData);
+				await api.post("/queue", values);
 			}
 			toast.success("Queue saved successfully");
 			handleClose();

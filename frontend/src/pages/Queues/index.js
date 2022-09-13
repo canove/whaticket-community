@@ -102,9 +102,7 @@ const Queues = () => {
     (async () => {
       setLoading(true);
       try {
-        const { data } = await api.get("/queue", {
-          params: { companyId: user.companyId }
-        });
+        const { data } = await api.get("/queue");
         dispatch({ type: "LOAD_QUEUES", payload: data });
 
         setLoading(false);
@@ -113,7 +111,7 @@ const Queues = () => {
         setLoading(false);
       }
     })();
-  }, [user.companyId]);
+  }, []);
 
   useEffect(() => {
     const socket = openSocket();

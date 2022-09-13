@@ -17,13 +17,11 @@ import GetContactService from "../services/ContactServices/GetContactService";
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
-  companyId: string | number;
 };
 
 type IndexGetContactQuery = {
   name: string;
   number: string;
-  companyId: string | number;
 };
 
 interface ExtraInfo {
@@ -34,13 +32,13 @@ interface ExtraInfo {
 interface ContactData {
   name: string;
   number: string;
-  companyId: string | number;
   email?: string;
   extraInfo?: ExtraInfo[];
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber, companyId } = req.query as IndexQuery;
+  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const { contacts, count, hasMore } = await ListContactsService({
     searchParam,
@@ -52,7 +50,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const getContact = async (req: Request, res: Response): Promise<Response> => {
-  const { name, number, companyId } = req.body as IndexGetContactQuery;
+  const { name, number } = req.body as IndexGetContactQuery;
+  const companyId = req.user.companyId;
 
   const contact = await GetContactService({
     name,
@@ -87,7 +86,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   let name = newContact.name
   let number = validNumber
-  let companyId = newContact.companyId
+  let companyId = req.user.companyId
   let email = newContact.email
   let extraInfo = newContact.extraInfo
 

@@ -171,7 +171,7 @@ const Connections = () => {
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/list/`, {
-					params: { official: false, companyId: user.companyId }
+					params: { official: false }
 				});
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
@@ -181,7 +181,7 @@ const Connections = () => {
 			}
 		};
 		fetchWhats();
-	}, [user.companyId]);
+	}, []);
 
 	useEffect(() => {
 		const socket = openSocket();

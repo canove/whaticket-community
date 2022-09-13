@@ -10,7 +10,7 @@ interface TokenPayload {
   profile: string;
   iat: number;
   exp: number;
-  companyId: string | number;
+  companyId: number;
 }
 
 const isAuth = (req: Request, res: Response, next: NextFunction): void => {

@@ -15,10 +15,6 @@ import QualityNumberWhatsappService from "../services/WhatsappService/QualityNum
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
 
-type IndexQuery = {
-  companyId: string | number;
-}
-
 type ListQuery = {
   companyId: string | number;
   official: string | boolean;
@@ -39,7 +35,7 @@ interface WhatsappData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { companyId } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const whatsapps = await ListWhatsAppsService(companyId);
 
@@ -58,8 +54,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     facebookToken,
     facebookPhoneNumberId,
     phoneNumber,
-    companyId
   }: WhatsappData = req.body;
+
+  const companyId = req.user.companyId;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -148,7 +145,8 @@ export const remove = async (
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { companyId, official } = req.query as ListQuery;
+  const { official } = req.query as ListQuery;
+  const companyId = req.user.companyId;
 
   const whatsapp = await ListOfficialWhatsAppsService({ companyId, official });
 

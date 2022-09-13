@@ -114,10 +114,9 @@ const Contacts = () => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
       const fetchContacts = async () => {
-        const companyId = user.companyId;
         try {
           const { data } = await api.get("/contacts/", {
-            params: { searchParam, pageNumber, companyId },
+            params: { searchParam, pageNumber },
           });
           dispatch({ type: "LOAD_CONTACTS", payload: data.contacts });
           setHasMore(data.hasMore);
@@ -129,7 +128,7 @@ const Contacts = () => {
       fetchContacts();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [searchParam, pageNumber, user.companyId]);
+  }, [searchParam, pageNumber]);
 
   useEffect(() => {
     const socket = openSocket();
@@ -171,7 +170,6 @@ const Contacts = () => {
         contactId: contactId,
         userId: user?.id,
         status: "open",
-        companyId: user.companyId
       });
       history.push(`/tickets/${ticket.id}`);
     } catch (err) {
@@ -199,7 +197,7 @@ const Contacts = () => {
 
   const handleImportContact = async () => {
     try {
-      await api.post("/contacts/import", { companyId: user.companyId });
+      await api.post("/contacts/import");
       history.go(0);
     } catch (err) {
       toastError(err);

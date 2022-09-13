@@ -19,7 +19,6 @@ type IndexQuery = {
   showAll: string;
   withUnreadMessages: string;
   queueIds: string;
-  companyId: string | number;
 };
 
 interface TicketData {
@@ -27,7 +26,6 @@ interface TicketData {
   status: string;
   queueId: number;
   userId: number;
-  companyId: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -39,10 +37,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     showAll,
     queueIds: queueIdsStringified,
     withUnreadMessages,
-    companyId
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
+  const companyId = req.user.companyId;
 
   let queueIds: number[] = [];
 
@@ -66,7 +64,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId, status, userId, companyId }: TicketData = req.body;
+  const { contactId, status, userId }: TicketData = req.body;
+  const companyId = req.user.companyId;
 
   const ticket = await CreateTicketService({ contactId, status, userId, companyId });
 
@@ -88,7 +87,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const historic = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId } = req.params;
+  const contactId = req.user.companyId;
 
   const contact = await HistoricService(contactId);
 

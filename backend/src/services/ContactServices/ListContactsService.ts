@@ -4,7 +4,7 @@ import Contact from "../../database/models/Contact";
 interface Request {
   searchParam?: string;
   pageNumber?: string;
-  companyId?: string | number;
+  companyId: number;
 }
 
 interface Response {
