@@ -139,7 +139,7 @@ const verifyContact = async (
   companyId: number
 ): Promise<Contact> => {
   if (contactName == '') {
-    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber }, limit: 1, companyId });
+    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber, companyId }, limit: 1 });
     if (contact.length > 0)
       contactName = contact[0].name;
   }

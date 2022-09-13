@@ -100,6 +100,7 @@ export const update = async (
 ): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
+  const companyId = req.user.companyId;
 
   const { ticket } = await UpdateTicketService({
     ticketData,
@@ -114,7 +115,8 @@ export const update = async (
     if (farewellMessage) {
       await SendWhatsAppMessage({
         body: formatBody(farewellMessage, ticket.contact),
-        ticket
+        ticket,
+        companyId
       });
     }
   }

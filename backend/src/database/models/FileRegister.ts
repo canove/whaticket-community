@@ -11,6 +11,7 @@ import {
   BelongsTo,
   ForeignKey
 } from "sequelize-typescript";
+import Company from "./Company";
 import File from "./File";
 
 @Table
@@ -85,6 +86,10 @@ class FileRegister extends Model<FileRegister> {
 
   @BelongsTo(() => File)
   file: File;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @ForeignKey(() => File)
   @Column

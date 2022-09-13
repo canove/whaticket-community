@@ -77,7 +77,7 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
         file
       });
 
-      await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
+      await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file, companyId });
 
       io.emit("file", {
         action: "update",
@@ -134,6 +134,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const newContact: ContactData = req.body;
   const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
+  const companyId = req.user.companyId;
 
   newContact.number = newContact.number.replace("-", "").replace(" ", "");
 
@@ -158,7 +159,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket: contactAndTicket });
+    await SendWhatsAppMessage({ body, ticket: contactAndTicket, companyId });
   }
 
   return res.send();

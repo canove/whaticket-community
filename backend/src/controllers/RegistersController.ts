@@ -168,8 +168,9 @@ export const exportPdf = async (req: Request, res: Response) => {
 
 export const exportCsv = async (req: Request, res: Response) => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
+  const companyId = req.user.companyId;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber });
+  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
 
   const checkZero = (data) => {
     if(data.length == 1){
