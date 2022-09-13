@@ -85,7 +85,6 @@ const StatusMessageWhatsappService = async ({
    }
   }
 
-
   if (!register) {
     return { success: false };
   }

@@ -5,6 +5,7 @@ import CreateUploadFileService from "../services/UploadFileService/CreateUploadF
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const form = formidable({ multiples: false });
+  const companyId = req.user.companyId;
 
   return form.parse(req, async (err, fields, files) => {
     if (err)
@@ -21,7 +22,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       ownerid,
       official,
       whatsappIds,
-      filePath
+      filePath,
+      companyId
     });
 
     const io = getIO();

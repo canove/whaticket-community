@@ -8,8 +8,9 @@ type IndexQuery = {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { fileId, pageNumber } = req.query as unknown as IndexQuery;
+  const companyId = req.user.companyId;
 
-  const { reports, count, hasMore } = await ListFileRegistersService({ fileId, pageNumber });
+  const { reports, count, hasMore } = await ListFileRegistersService({ fileId, companyId, pageNumber });
 
   return res.status(200).json({ reports, count, hasMore });
 }

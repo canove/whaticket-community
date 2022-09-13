@@ -1,15 +1,14 @@
 import { Op } from "sequelize";
 import File from "../../database/models/File";
 
-
-interface Response {};
-
 const ListFileService = async ({
   Status,
   initialDate,
-  limit = null
+  limit = null,
+  companyId
 }): Promise<File[] | undefined> => {
   let where = null;
+
   if(Status === ''){
     Status = undefined;
   }
@@ -21,14 +20,17 @@ const ListFileService = async ({
 
   if (Status != null && Status != undefined && !initialDate) {
     where = {
-      status: Status
+      status: Status,
+      companyId
     };
   }
+
   if (!Status && initialDate !== null) {
     where = {
       createdAt: {
         [Op.gte]: new Date(initialDate)
-      }
+      },
+      companyId
     };
   }
   // eslint-disable-next-line no-return-await

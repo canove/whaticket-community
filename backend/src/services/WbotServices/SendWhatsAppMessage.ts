@@ -13,11 +13,13 @@ interface Request {
   body: string;
   ticket: Ticket;
   quotedMsg?: Message;
+  companyId: number;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
   body,
-  ticket
+  ticket,
+  companyId
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -41,7 +43,8 @@ const SendWhatsAppMessage = async ({
 
   const messageSended = await FileRegister.findOne({
     where: {
-      phoneNumber: contact.number
+      phoneNumber: contact.number,
+      companyId: companyId
     }
   });
   
