@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import * as Yup from "yup";
 import { Formik, FieldArray, Form, Field } from "formik";
@@ -20,6 +20,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -64,6 +65,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const isMounted = useRef(true);
+	const { user } = useContext(AuthContext);
 
 	const initialState = {
 		name: "",
@@ -108,12 +110,13 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	};
 
 	const handleSaveContact = async values => {
+		const contactData = { ...values, companyId: user.companyId };
 		try {
 			if (contactId) {
-				await api.put(`/contacts/${contactId}`, values);
+				await api.put(`/contacts/${contactId}`, contactData);
 				handleClose();
 			} else {
-				const { data } = await api.post("/contacts", values);
+				const { data } = await api.post("/contacts", contactData);
 				if (onSave) {
 					onSave(data);
 				}
