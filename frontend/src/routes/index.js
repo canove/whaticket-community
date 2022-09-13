@@ -4,7 +4,6 @@ import { ToastContainer } from "react-toastify";
 
 import Route from "./Route";
 import RenderRoutes from "./RenderRoutes";
-
 import LoggedInLayout from "../layout";
 import Signup from "../pages/Signup/";
 import Login from "../pages/Login/";
@@ -19,12 +18,11 @@ const Routes = () => {
         <Switch>
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={Signup} />
-            <WhatsAppsProvider>
-              <LoggedInLayout>
-                <RenderRoutes />
-              </LoggedInLayout>
-            </WhatsAppsProvider>
-
+          <WhatsAppsProvider>
+            <LoggedInLayout>
+              <RenderRoutes />
+            </LoggedInLayout>
+          </WhatsAppsProvider>
         </Switch>
         <ToastContainer autoClose={3000} />
       </AuthProvider>
