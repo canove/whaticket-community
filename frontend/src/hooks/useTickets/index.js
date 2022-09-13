@@ -1,9 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { getHoursCloseTicketsAuto } from "../../config";
 import toastError from "../../errors/toastError";
 
 import api from "../../services/api";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useTickets = ({
     searchParam,
@@ -18,7 +17,6 @@ const useTickets = ({
     const [hasMore, setHasMore] = useState(false);
     const [tickets, setTickets] = useState([]);
     const [count, setCount] = useState(0);
-    const { user } = useContext(AuthContext);
 
     useEffect(() => {
         setLoading(true);

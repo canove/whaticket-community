@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useReducer, useContext } from "react";
+import React, { useState, useCallback, useEffect, useReducer } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -40,7 +40,6 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
 import { useTranslation } from 'react-i18next'
 import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -160,7 +159,6 @@ const Connections = () => {
 	const [confirmModalInfo, setConfirmModalInfo] = useState(
 		confirmationModalInitialState
 	);
-	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });

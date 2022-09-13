@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useReducer, useContext } from "react";
+import React, { useState, useCallback, useEffect, useReducer } from "react";
 import openSocket from "../../services/socket-io";
 
 import { CheckCircle, DeleteOutline, Edit } from "@material-ui/icons";
@@ -29,7 +29,6 @@ import { format, parseISO } from "date-fns";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -125,8 +124,6 @@ const OfficialConnections = () => {
 	const [confirmModalInfo, setConfirmModalInfo] = useState(
 		confirmationModalInitialState
 	);
-
-	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		setLoading(true);

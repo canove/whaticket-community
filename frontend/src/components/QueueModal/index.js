@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -20,7 +20,6 @@ import ColorPicker from "../ColorPicker";
 import { IconButton, InputAdornment } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
 import { useTranslation } from "react-i18next";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -66,7 +65,6 @@ const QueueSchema = Yup.object().shape({
 const QueueModal = ({ open, onClose, queueId }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
-	const { user } = useContext(AuthContext);
 
 	const initialState = {
 		name: "",
