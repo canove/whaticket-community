@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -20,6 +20,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
 const ReportsTicket = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
+  const { user } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState([]);
@@ -79,7 +81,9 @@ const ReportsTicket = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchTickets = async () => {
         try {
-          const { data } = await api.get("/tickets")
+          const { data } = await api.get("/tickets", {
+            params: { companyId: user.companyId }
+          })
           setTickets(data.tickets)
           setLoading(false)
         } catch (err) {
@@ -90,7 +94,7 @@ const ReportsTicket = () => {
       fetchTickets()
     }, 500)
     return () => clearTimeout(delayDebounceFn)
-  }, [])
+  }, [user.companyId])
 
   const fetchReports = async (ticketId) => {
     if (!ticketId) {

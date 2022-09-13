@@ -12,6 +12,7 @@ import {
   Default
 } from "sequelize-typescript";
 
+import Company from "./Company";
 import Contact from "./Contact";
 import Message from "./Message";
 import Queue from "./Queue";
@@ -71,6 +72,10 @@ class Ticket extends Model<Ticket> {
 
   @BelongsTo(() => Queue)
   queue: Queue;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @HasMany(() => Message)
   messages: Message[];

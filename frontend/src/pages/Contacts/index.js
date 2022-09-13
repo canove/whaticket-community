@@ -171,6 +171,7 @@ const Contacts = () => {
         contactId: contactId,
         userId: user?.id,
         status: "open",
+        companyId: user.companyId
       });
       history.push(`/tickets/${ticket.id}`);
     } catch (err) {

@@ -50,6 +50,7 @@ const VcardPreview = ({ contact, numbers }) => {
                 contactId: selectedContact.id,
                 userId: user.id,
                 status: "open",
+                companyId: user.companyId
             });
             history.push(`/tickets/${ticket.id}`);
         } catch (err) {
