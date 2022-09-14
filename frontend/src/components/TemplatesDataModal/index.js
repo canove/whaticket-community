@@ -44,16 +44,18 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
   const classes = useStyles();
   const initialState = {
     name: "",
+    text:"",
     footer: "",
   };
   const [template, setTemplate] = useState(initialState);
-  const [text , setText] = useState("");
-
+  const [text, setText] = useState("");
+  const [params, setParams] = useState(0);
 
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
         const { data } = await api.get(`/TemplatesData/show/${templatesId}`);
+        setText(data.text);
         setTemplate((prevState) => {
           return { ...prevState, ...data };
         });
@@ -86,13 +88,28 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     handleClose();
   };
 
-  const handleArray = (e) => {
-    setText(prevText => prevText + "{{ }}")
+  const handleArray = () => {
+    switch (params) {
+      case 0:
+        setParams(prevTimes => prevTimes + 1);
+        setText(prevText => prevText + "{{0}}");
+        break;
+      case 1:
+        setParams(prevTimes => prevTimes + 1);
+        setText(prevText => prevText + "{{1}}");
+        break;
+      case 2:
+        setParams(prevTimes => prevTimes + 1);
+        setText(prevText => prevText + "{{2}}");
+        break;
+      default:
+        toast.error(i18n.t("templates.templateModal.toastErr"));
+    }
   };
 
   const handleChange = (e) => {
-    setText(e.target.value)
-  };
+    setText(e.target.value);
+  }
 
   return (
     <div className={classes.root}>
@@ -140,7 +157,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                     as={TextField}
                     label={i18n.t("templatesData.templateModal.bodyText")}
                     type="text"
-                    onChange={(e) => {handleChange(e)}}
+                    onChange={(e) => { handleChange(e) }}
                     value={text}
                     multiline
                     minRows={5}
@@ -175,6 +192,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
+                  disabled={isSubmitting}
                   onClick={handleArray}
                 >
                   {"{{ }}"}

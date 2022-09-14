@@ -583,6 +583,7 @@ const messages = {
           success: "Template created successfully!",
           connectionFailed: "Please select a connection!",
           delete: "Template successfully deleted!",
+          toastErr: "Parameter limit exceeded!"
         },
       },
 
