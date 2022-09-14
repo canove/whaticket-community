@@ -40,7 +40,7 @@ const CreateUserService = async ({
         async value => {
           if (!value) return false;
           const emailExists = await User.findOne({
-            where: { email: value }
+            where: { email: value, companyId }
           });
           return !emailExists;
         }
