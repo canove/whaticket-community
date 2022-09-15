@@ -8,6 +8,7 @@ interface Request {
   useGreetingMessages?: boolean;
   greetingMessages?: GreetingMessages[];
   active?: boolean;
+  companyId: string | number;
 }
 
 const CreateWhatsConfigService = async ({
@@ -15,13 +16,15 @@ const CreateWhatsConfigService = async ({
   whatsappIds,
   useGreetingMessages,
   greetingMessages,
-  active
+  active,
+  companyId
 }: Request): Promise<WhatsappsConfig> => {
   try {
     const config = await WhatsappsConfig.create({
       triggerInterval,
       whatsappIds,
-      active
+      active,
+      companyId
     });
 
     const configId = config.id;

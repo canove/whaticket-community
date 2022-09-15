@@ -4,20 +4,20 @@ import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import { 
-    Button, 
-    Checkbox, 
-    Grid, 
-    Input, 
-    MenuItem, 
-    Select, 
-    Slider, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableRow, 
-    Typography 
+import {
+    Button,
+    Checkbox,
+    Grid,
+    Input,
+    MenuItem,
+    Select,
+    Slider,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Typography
 } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
@@ -68,7 +68,7 @@ const reducer = (state, action) => {
     if (action.type === "LOAD_CONFIG") {
       const configs = action.payload;
       const newConfigs = [];
-  
+
       configs.forEach((config) => {
         const configIndex = state.findIndex((c) => c.id === config.id);
         if (configIndex !== -1) {
@@ -77,14 +77,14 @@ const reducer = (state, action) => {
           newConfigs.push(config);
         }
       });
-  
+
       return [...state, ...newConfigs];
     }
-  
+
     if (action.type === "UPDATE_CONFIG") {
       const config = action.payload;
       const configIndex = state.findIndex((c) => c.id === config.id);
-  
+
       if (configIndex !== -1) {
         state[configIndex] = config;
         return [...state];
@@ -92,17 +92,17 @@ const reducer = (state, action) => {
         return [config, ...state];
       }
     }
-  
+
     if (action.type === "DELETE_CONFIG") {
       const configId = action.payload;
-  
+
       const configIndex = state.findIndex((c) => c.id === configId);
       if (configIndex !== -1) {
         state.splice(configIndex, 1);
       }
       return [...state];
     }
-  
+
     if (action.type === "RESET") {
       return [];
     }
@@ -231,7 +231,7 @@ const WhatsConfig = () => {
 
     // Config
     const handleSaveConfig = async () => {
-        const configBody = {
+        const configData = {
             triggerInterval: intervalValue,
             whatsappIds: selectedConnection.includes('all') ? null : selectedConnection.join(),
             useGreetingMessages: useGreetingMessage,
@@ -240,10 +240,10 @@ const WhatsConfig = () => {
         }
         try {
             if (config.length > 0) {
-                await api.put(`/whatsconfig/${config[0].id}`, configBody);
+                await api.put(`/whatsconfig/${config[0].id}`, configData);
                 toast.success("Config Alterada com Sucesso!");
             } else {
-                await api.post(`/whatsconfig/`, configBody);
+                await api.post(`/whatsconfig/`, configData);
                 toast.success("Config Salva com Sucesso!");
             }
         } catch (err) {
@@ -252,16 +252,45 @@ const WhatsConfig = () => {
         setSaving(!saving);
     }
 
+    const [disconnectedWhatsapps, setDisconnectedWhatsapps] = useState([]);
+    const [deletedWhatsapps, setDeletedWhatsapps] = useState([]);
+
     useEffect(() => {
         if (config.length > 0) {
             setIsActive(config[0].active);
             setIntervalValue(config[0].triggerInterval);
             setGreetingMessages(config[0].greetingMessages);
-            
+
             if (config[0].whatsappIds === null) {
                 setSelectedConnection(['all']);
             } else {
-                setSelectedConnection(config[0].whatsappIds.split(','));
+                let array = config[0].whatsappIds.split(',');
+                setSelectedConnection(array);
+
+                let connectedArray = [];
+                let disconnectArray = [];
+                let deletedArray = [];
+
+                array.forEach(whatsId => {
+                    let whatsExists = false;
+                    whatsApps.forEach(whats => {
+                        if (whats.id === whatsId) {
+                            whatsExists = true;
+                            if (whats.status === "CONNECTED") {
+                                connectedArray.push(whats.id);
+                            } else {
+                                disconnectArray.push(whats.name);
+                            }
+                        }
+                    })
+
+                    if (whatsExists === false) {
+                        deletedArray.push(whatsId);
+                    }
+                })
+                setSelectedConnection(connectedArray);
+                setDisconnectedWhatsapps(disconnectArray);
+                setDeletedWhatsapps(deletedArray);
             }
 
             if (config[0].greetingMessages && config[0].greetingMessages.length > 0) {
@@ -270,7 +299,7 @@ const WhatsConfig = () => {
                 setUseGreetingMessage(false);
             }
         }
-    }, [config]);
+    }, [config, whatsApps]);
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -286,17 +315,17 @@ const WhatsConfig = () => {
 
     useEffect(() => {
         const socket = openSocket();
-    
+
         socket.on("config", (data) => {
           if (data.action === "update" || data.action === "create") {
             dispatch({ type: "UPDATE_CONFIG", payload: data.config });
           }
-    
+
           if (data.action === "delete") {
             dispatch({ type: "DELETE_CONFIG", payload: +data.configId });
           }
         });
-    
+
         return () => {
           socket.disconnect();
         };
@@ -340,11 +369,10 @@ const WhatsConfig = () => {
                     variant="outlined"
                 >
                     <Typography variant="subtitle1" gutterBottom>
-                        Ativar config? 
+                        Ativar config?
                     </Typography>
                     <Checkbox
                         {...label}
-                        defaultChecked
                         sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
                         color="primary"
                         onChange={handleActiveCheckboxChange}
@@ -352,33 +380,65 @@ const WhatsConfig = () => {
                     />
                 </Paper>
                 <Paper
-                    className={classes.paper}
+                    className={classes.mainPaper}
                     variant="outlined"
                 >
-                    <Typography variant="subtitle1" gutterBottom>
-                        {i18n.t("settingsWhats.connections")}
-                    </Typography>
-                    <Select
-                        className={classes.selectWidth}
-                        labelId="type-select-label"
-                        id="type-select"
-                        value={selectedConnection}
-                        label="Type"
-                        onChange={handleChangeConnection}
-                        multiple
-                        disabled={!isActive}
+                    <Paper
+                        className={classes.paper}
+                        variant="outlined"
                     >
-                        <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
-                        {whatsApps && whatsApps.map((whats, index) => {
-                            if (whats.official === false) {
-                                if (whats.status === "CONNECTED") {
-                                    return (
-                                        <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
-                                    )
-                                }
-                            } return null
-                        })}
-                    </Select>
+                        <Typography variant="subtitle1" gutterBottom>
+                            {i18n.t("settingsWhats.connections")}
+                        </Typography>
+                        <Select
+                            className={classes.selectWidth}
+                            labelId="type-select-label"
+                            id="type-select"
+                            value={selectedConnection}
+                            label="Type"
+                            onChange={handleChangeConnection}
+                            multiple
+                        >
+                            <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
+                            {whatsApps && whatsApps.map((whats, index) => {
+                                if (whats.official === false) {
+                                    if (whats.status === "CONNECTED") {
+                                        return (
+                                            <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+                                        )
+                                    }
+                                } return null
+                            })}
+                        </Select>
+                    </Paper>
+                    { disconnectedWhatsapps.length > 0 &&
+                        <Paper
+                            className={classes.paper}
+                            variant="outlined"
+                        >
+                            <Typography variant="subtitle1" gutterBottom>
+                                 Conexões Desconectadas:
+                            </Typography>
+
+                            { disconnectedWhatsapps.length > 0 && disconnectedWhatsapps.map((disconnectWhats, index) => {
+                                return (
+                                    <Typography key={index} variant="subtitle1" gutterBottom>
+                                        { disconnectWhats };
+                                    </Typography>
+                                )
+                            })}
+                        </Paper>
+                    }
+                    { deletedWhatsapps.length > 0 &&
+                        <Paper
+                            className={classes.paper}
+                            variant="outlined"
+                        >
+                            <Typography variant="subtitle1" gutterBottom>
+                                Algumas Conexões Foram Deletadas...
+                            </Typography>
+                        </Paper>
+                    }
                 </Paper>
                 <Paper
                     className={classes.paper}
@@ -397,7 +457,6 @@ const WhatsConfig = () => {
                                 min={0.5}
                                 max={60}
                                 valueLabelDisplay="auto"
-                                disabled={!isActive}
                             />
                         </Grid>
                         <Grid item>
@@ -413,7 +472,6 @@ const WhatsConfig = () => {
                                 type: 'number',
                                 'aria-labelledby': 'input-slider',
                                 }}
-                                disabled={!isActive}
                             />
                         </Grid>
                     </Grid>
@@ -423,25 +481,22 @@ const WhatsConfig = () => {
                     variant="outlined"
                 >
                     <Typography variant="subtitle1" gutterBottom>
-                        Usar mensagem de saudação? 
+                        Usar mensagem de saudação?
                     </Typography>
                     <Checkbox
                         {...label}
-                        defaultChecked
                         sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
                         color="primary"
                         onChange={handleCheckboxChange}
                         checked={useGreetingMessage}
-                        disabled={!isActive}
                     />
                 </Paper>
-                { useGreetingMessage === true && selectedConnection.length !== 0 && (
+                { useGreetingMessage === true && (
                     <>
                         <Button
                             variant="contained"
                             color="primary"
                             onClick={handleGreetingMessageOpenModal}
-                            disabled={!isActive}
                         >
                             Criar Mensagem
                         </Button>
@@ -464,13 +519,11 @@ const WhatsConfig = () => {
                                             <TableCell>
                                                 <Button
                                                     onClick={(e) => {handleEditGreetingMessage(greetingMessage, index)}}
-                                                    disabled={!isActive}
                                                 >
                                                     Editar
                                                 </Button>
                                                 <Button
                                                     onClick={(e) => {handleOpenConfirmationModal(greetingMessage, index)}}
-                                                    disabled={!isActive}
                                                 >
                                                     Deletar
                                                 </Button>

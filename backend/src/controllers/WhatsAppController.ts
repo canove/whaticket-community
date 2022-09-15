@@ -15,6 +15,11 @@ import QualityNumberWhatsappService from "../services/WhatsappService/QualityNum
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
 
+type ListQuery = {
+  companyId: string | number;
+  official: string | boolean;
+}
+
 interface WhatsappData {
   name: string;
   queueIds: number[];
@@ -26,10 +31,13 @@ interface WhatsappData {
   facebookToken?: string;
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
+  companyId?: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const whatsapps = await ListWhatsAppsService();
+  const companyId = req.user.companyId;
+
+  const whatsapps = await ListWhatsAppsService(companyId);
 
   return res.status(200).json(whatsapps);
 };
@@ -45,8 +53,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
-    phoneNumber
+    phoneNumber,
   }: WhatsappData = req.body;
+
+  const companyId = req.user.companyId;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -58,7 +68,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
-    phoneNumber
+    phoneNumber,
+    companyId
   });
 
   StartWhatsAppSession(whatsapp);
@@ -134,9 +145,10 @@ export const remove = async (
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official } = req.params;
+  const { official } = req.query as ListQuery;
+  const companyId = req.user.companyId;
 
-  const whatsapp = await ListOfficialWhatsAppsService(official);
+  const whatsapp = await ListOfficialWhatsAppsService({ companyId, official });
 
   return res.status(200).json(whatsapp);
 };
@@ -157,6 +169,7 @@ export const newMessage = async (
     identification,
     session
   } = req.body;
+  const companyId = req.user.companyId;
 
   const message = await NewMessageWhatsapp({
     id,
@@ -168,7 +181,8 @@ export const newMessage = async (
     body,
     contactName,
     identification,
-    session
+    session,
+    companyId
   });
 
   return res.status(200).json(message);

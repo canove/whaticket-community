@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
-
 import {
     Button,
     FormControl,
@@ -17,16 +15,13 @@ import {
     Table,
     TableBody,
     TableCell,
-    TableFooter,
     TableHead,
     TableRow,
     Typography
 } from "@material-ui/core";
-
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { format, parseISO } from "date-fns";
-
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -289,28 +284,29 @@ const RegistersReports = () => {
                             {loading}
                         </>
                     </TableBody>
-                    <TableFooter>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handlePreviousPage}
-                            disabled={pageNumber === 1}
-                        >
-                            {i18n.t("logReport.buttons.previous")}
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleNextPage}
-                            disabled={!hasMore}
-                        >
-                            {i18n.t("logReport.buttons.next")}
-                        </Button>
-                        <Typography>
-                            {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
-                        </Typography>
-                    </TableFooter>
                 </Table>
+            </Paper>
+            <Paper className={classes.mainPaper}
+                variant="outlined">
+                <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handlePreviousPage}
+                        disabled={pageNumber === 1}
+                    >
+                        {i18n.t("logReport.buttons.previous")}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNextPage}
+                        disabled={!hasMore}
+                    >
+                        {i18n.t("logReport.buttons.next")}
+                    </Button>
+                    <Typography>
+                        {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
+                    </Typography>
             </Paper>
         </MainContainer>
     );

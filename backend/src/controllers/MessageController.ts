@@ -39,6 +39,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
+  const companyId = req.user.companyId;
 
   const ticket = await ShowTicketService(ticketId);
 
@@ -51,7 +52,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket });
+    await SendWhatsAppMessage({ body, ticket, companyId });
   }
 
   return res.send();

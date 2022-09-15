@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
@@ -19,6 +22,7 @@
     "markdown-to-jsx": "^7.1.0",
     "material-ui-flags": "^1.2.4",
     "mic-recorder-to-mp3": "^2.2.2",
+    "mui-rte": "^2.0.1",
     "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
     "react-color": "^2.19.3",

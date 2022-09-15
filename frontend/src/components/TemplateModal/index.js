@@ -50,18 +50,18 @@ const TemplateModal = ({ open, onClose }) => {
   const classes = useStyles();
   const initialState = {
     templateName: "",
-    bodyText: "",
     footerText: "",
   };
   const [template, setTemplate] = useState(initialState);
   const [connectionName, setConnectionName] = useState([]);
   const { whatsApps } = useContext(WhatsAppsContext);
   const [category, setCategory] = useState("");
+  const [bodyText, setBodyText] = useState("");
 
   const handleClose = () => {
     onClose();
     setTemplate(initialState);
-	  setCategory("");
+    setCategory("");
     setConnectionName([]);
   };
 
@@ -73,19 +73,36 @@ const TemplateModal = ({ open, onClose }) => {
   };
 
   const handleSubmit = async (values) => {
-    const templateData = { ...values, category: category, whatsAppsId: connectionName };
-		try {
-      await api.post(`/whatsappTemplate/create/`, templateData);
-			toast.success(i18n.t("userModal.success"));
-		} catch (err) {
-			toastError(err);
-		}
-		handleClose();
+    if (connectionName.length === 0) {
+      toast.error(i18n.t("templates.templateModal.connectionFailed"));
+    } else {
+      const templateData = {
+        ...values,
+        category,
+        whatsAppsId: connectionName,
+        bodyText,
+      };
+      try {
+        await api.post(`/whatsappTemplate/create/`, templateData);
+        toast.success(i18n.t("templates.templateModal.success"));
+      } catch (err) {
+        toastError(err);
+      }
+      handleClose();
+    }
   };
 
   const handleCategoryChange = (e) => {
-	  setCategory(e.target.value);
-  }
+    setCategory(e.target.value);
+  };
+
+  const handleArray = (e) => {
+    setBodyText((prevText) => prevText + "{{ }}");
+  };
+
+  const handleChangeBodyText = (e) => {
+    setBodyText(e.target.value);
+  };
 
   return (
     <div className={classes.root}>
@@ -137,10 +154,14 @@ const TemplateModal = ({ open, onClose }) => {
                         onChange={handleCategoryChange}
                         fullWidth
                       >
-                        <MenuItem value={"transicional"}>{i18n.t("templates.templateModal.transactional")}</MenuItem>
-                        <MenuItem value={"marketing"}>{i18n.t("templates.templateModal.marketing")}</MenuItem>
-                    </Select>
-                  </div>
+                        <MenuItem value={"transicional"}>
+                          {i18n.t("templates.templateModal.transactional")}
+                        </MenuItem>
+                        <MenuItem value={"marketing"}>
+                          {i18n.t("templates.templateModal.marketing")}
+                        </MenuItem>
+                      </Select>
+                    </div>
                     <FormControl className={classes.multFieldLine}>
                       <InputLabel id="multiple-official-connections-label">
                         {i18n.t("templates.templateModal.connection")}
@@ -161,7 +182,7 @@ const TemplateModal = ({ open, onClose }) => {
                                 </MenuItem>
                               );
                             }
-								return null
+                            return null;
                           })}
                       </Select>
                     </FormControl>
@@ -172,17 +193,17 @@ const TemplateModal = ({ open, onClose }) => {
                     as={TextField}
                     label={i18n.t("templates.templateModal.body")}
                     type="bodyText"
+                    onChange={(e) => {
+                      handleChangeBodyText(e);
+                    }}
+                    value={bodyText}
                     multiline
                     minRows={5}
                     fullWidth
                     maxLength="1024"
                     name="bodyText"
-                    error={
-                      touched.bodyText && Boolean(errors.bodyText)
-                    }
-                    helperText={
-                      touched.bodyText && errors.bodyText
-                    }
+                    error={touched.bodyText && Boolean(errors.bodyText)}
+                    helperText={touched.bodyText && errors.bodyText}
                     variant="outlined"
                     margin="dense"
                   />
@@ -197,12 +218,8 @@ const TemplateModal = ({ open, onClose }) => {
                     fullWidth
                     maxLength="60"
                     name="footerText"
-                    error={
-                      touched.footerText && Boolean(errors.footerText)
-                    }
-                    helperText={
-                      touched.footerText && errors.footerText
-                    }
+                    error={touched.footerText && Boolean(errors.footerText)}
+                    helperText={touched.footerText && errors.footerText}
                     variant="outlined"
                     margin="dense"
                   />
@@ -213,13 +230,15 @@ const TemplateModal = ({ open, onClose }) => {
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
+                  onClick={handleArray}
                 >
                   {"{{ }}"}
                 </Button>
-				        <Button
+                <Button
                   type="submit"
                   color="primary"
                   variant="contained"
+                  disabled={isSubmitting}
                   className={classes.btnWrapper}
                 >
                   {i18n.t("templates.buttons.add")}
@@ -232,7 +251,6 @@ const TemplateModal = ({ open, onClose }) => {
                 >
                   {i18n.t("templates.buttons.cancel")}
                 </Button>
-
               </DialogActions>
             </Form>
           )}

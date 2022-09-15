@@ -11,7 +11,9 @@ const CreateTemplateService = async ({
 }) => {
     whatsAppsId.forEach(async (whatsAppId) => {
         const whatsApp = await ShowWhatsAppService(whatsAppId);
-
+        if (!whatsApp){
+            throw new AppError(`ERR_NO_WHATSAPP_WITH_ID_${whatsAppId}`, 404);
+        }
         const facebookBusinessId = whatsApp.facebookBusinessId;
         const facebookToken = whatsApp.facebookToken;
 

@@ -319,7 +319,8 @@ const handleMessage = async (
         for await (const ob of obj) {
           const cont = await CreateContactService({
             name: contact,
-            number: ob.number.replace(/\D/g, "")
+            number: ob.number.replace(/\D/g, ""),
+            companyId: ob.companyId
           });
         }
       } catch (error) {

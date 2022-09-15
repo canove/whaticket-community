@@ -10,8 +10,6 @@ type IndexQuery = {
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { user, initialDate, finalDate } = req.query as unknown as IndexQuery;
 
-    console.log(req.query)
-
   const report = await ListReportService({
     user,
     initialDate,

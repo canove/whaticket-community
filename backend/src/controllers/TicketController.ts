@@ -9,6 +9,7 @@ import UpdateTicketService from "../services/TicketServices/UpdateTicketService"
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import formatBody from "../helpers/Mustache";
+import HistoricService from "../services/TicketServices/HistoricService";
 
 type IndexQuery = {
   searchParam: string;
@@ -35,17 +36,18 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     searchParam,
     showAll,
     queueIds: queueIdsStringified,
-    withUnreadMessages
+    withUnreadMessages,
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
+  const companyId = req.user.companyId;
 
   let queueIds: number[] = [];
 
   if (queueIdsStringified) {
     queueIds = JSON.parse(queueIdsStringified);
   }
-
+  
   const { tickets, count, hasMore } = await ListTicketsService({
     searchParam,
     pageNumber,
@@ -54,7 +56,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     showAll,
     userId,
     queueIds,
-    withUnreadMessages
+    withUnreadMessages,
+    companyId
   });
 
   return res.status(200).json({ tickets, count, hasMore });
@@ -62,8 +65,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { contactId, status, userId }: TicketData = req.body;
+  const companyId = req.user.companyId;
 
-  const ticket = await CreateTicketService({ contactId, status, userId });
+  const ticket = await CreateTicketService({ contactId, status, userId, companyId });
 
   const io = getIO();
   io.to(ticket.status).emit("ticket", {
@@ -82,12 +86,21 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(contact);
 };
 
+export const historic = async (req: Request, res: Response): Promise<Response> => {
+  const contactId = req.user.companyId;
+
+  const contact = await HistoricService(contactId);
+
+  return res.status(200).json(contact);
+};
+
 export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
+  const companyId = req.user.companyId;
 
   const { ticket } = await UpdateTicketService({
     ticketData,
@@ -102,7 +115,8 @@ export const update = async (
     if (farewellMessage) {
       await SendWhatsAppMessage({
         body: formatBody(farewellMessage, ticket.contact),
-        ticket
+        ticket,
+        companyId
       });
     }
   }

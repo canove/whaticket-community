@@ -9,5 +9,5 @@ const server = app.listen(process.env.PORT, () => {
 });
 
 initIO(server);
-//StartAllWhatsAppsSessions();
+//StartAllWhatsAppsSessions(); #NÃO ESTÁ FUNCIONANDO (FALTA COMPANYID)
 gracefulShutdown(server);

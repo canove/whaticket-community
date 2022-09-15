@@ -1,9 +1,15 @@
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 
-const ListWhatsAppsService = async (
-  official: string | boolean
-): Promise<Whatsapp[]> => {
+interface Request {
+  companyId: string | number;
+  official: string | boolean;
+}
+
+const ListWhatsAppsService = async ({
+  companyId,
+  official
+}: Request): Promise<Whatsapp[]> => {
   let isOfficial = "";
 
   if (official === "true") {
@@ -13,7 +19,7 @@ const ListWhatsAppsService = async (
   }
 
   const whatsapps = await Whatsapp.findAll({
-    where: { official: isOfficial },
+    where: { official: isOfficial, companyId },
     include: [
       {
         model: Queue,

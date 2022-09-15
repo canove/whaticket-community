@@ -15,6 +15,7 @@ interface Request {
   facebookToken?: string;
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
+  companyId?: string | number;
 }
 
 interface Response {
@@ -32,7 +33,8 @@ const CreateWhatsAppService = async ({
   official,
   facebookToken,
   facebookPhoneNumberId,
-  phoneNumber
+  phoneNumber,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -94,7 +96,8 @@ const CreateWhatsAppService = async ({
       facebookToken,
       facebookPhoneNumberId,
       phoneNumber,
-      lastPingDate
+      lastPingDate,
+      companyId
     },
     { include: ["queues"] }
   );

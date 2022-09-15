@@ -129,7 +129,9 @@ const OfficialConnections = () => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
-				const { data } = await api.get(`/whatsapp/list/${true}`);
+				const { data } = await api.get(`/whatsapp/list/`, {
+					params: { official: true }
+				});
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
 			} catch (err) {

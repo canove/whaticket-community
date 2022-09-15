@@ -21,6 +21,7 @@ type Report = {
 
 export const index = async (req: Request, res: Response) => {
     const { ticketId } = req.query as unknown as IndexQuery;
+    const companyId = req.user.companyId;
 
     const reports: Array<Report> = await Message.sequelize?.query(`
         select
@@ -33,6 +34,8 @@ export const index = async (req: Request, res: Response) => {
             msg.ticketId = ticket.id
         where
             ticket.id = ${ticketId}
+        and
+            ticket.companyId = ${companyId}
     `,
     { type: QueryTypes.SELECT }
     );

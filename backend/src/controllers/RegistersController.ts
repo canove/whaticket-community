@@ -7,8 +7,9 @@ var pdf = require("pdf-creator-node");
 var pdf2base64 = require("pdf-to-base64");
 
 type IndexQuery = {
-  type: string,
-  fileId: string,
+  type?: string,
+  fileId?: number | string,
+  date?: string
 };
 
 type Query = {
@@ -18,35 +19,38 @@ type Query = {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { type, fileId } = req.query as unknown as IndexQuery;
+  const { fileId, date } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
-  const report = await ListRegistersService({ type:"", fileId });
+  const report = await ListRegistersService({ type:"", fileId, date, companyId });
 
-  const register = await ListRegistersService ({ type:"register", fileId })
+  const register = await ListRegistersService ({ type:"register", fileId, date, companyId });
 
-  const sent = await ListRegistersService ({ type:"sent", fileId })
+  const sent = await ListRegistersService ({ type:"sent", fileId, date, companyId });
 
-  const delivered = await ListRegistersService ({ type:"delivered", fileId })
+  const delivered = await ListRegistersService ({ type:"delivered", fileId, date, companyId });
 
-  const read = await ListRegistersService ({ type:"read", fileId })
+  const read = await ListRegistersService ({ type:"read", fileId, date, companyId });
 
-  const error = await ListRegistersService ({ type:"error", fileId })
+  const error = await ListRegistersService ({ type:"error", fileId, date, companyId });
 
   return res.status(200).json({report, register, sent, delivered, read, error});
 }
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
+  const companyId = req.user.companyId;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber });
+  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
 
   return res.json({ registers, count, hasMore });
 }
 
 export const exportPdf = async (req: Request, res: Response) => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
+  const companyId = req.user.companyId;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber });
+  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
 
   const checkZero = (data) => {
     if(data.length == 1){
@@ -164,8 +168,9 @@ export const exportPdf = async (req: Request, res: Response) => {
 
 export const exportCsv = async (req: Request, res: Response) => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
+  const companyId = req.user.companyId;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber });
+  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
 
   const checkZero = (data) => {
     if(data.length == 1){

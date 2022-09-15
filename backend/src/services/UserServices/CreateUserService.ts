@@ -10,6 +10,8 @@ interface Request {
   name: string;
   queueIds?: number[];
   profile?: string;
+  companyId: number | string
+
 }
 
 interface Response {
@@ -24,7 +26,8 @@ const CreateUserService = async ({
   password,
   name,
   queueIds = [],
-  profile = "admin"
+  profile = "admin",
+  companyId,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().required().min(2),
@@ -37,12 +40,12 @@ const CreateUserService = async ({
         async value => {
           if (!value) return false;
           const emailExists = await User.findOne({
-            where: { email: value }
+            where: { email: value, companyId }
           });
           return !emailExists;
         }
       ),
-    password: Yup.string().required().min(5)
+    password: Yup.string().required().min(5),
   });
 
   try {
@@ -56,7 +59,8 @@ const CreateUserService = async ({
       email,
       password,
       name,
-      profile
+      profile,
+      companyId
     },
     { include: ["queues"] }
   );
