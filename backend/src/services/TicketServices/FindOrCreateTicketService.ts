@@ -7,6 +7,7 @@ import ShowTicketService from "./ShowTicketService";
 const FindOrCreateTicketService = async (
   contact: Contact,
   whatsappId: number,
+  companyId: number,
   unreadMessages: number,
   groupContact?: Contact
 ): Promise<Ticket> => {
@@ -16,7 +17,8 @@ const FindOrCreateTicketService = async (
         [Op.or]: ["open", "pending"]
       },
       whatsappId,
-      contactId: groupContact ? groupContact.id : contact.id
+      contactId: groupContact ? groupContact.id : contact.id,
+      companyId
     }
   });
 
@@ -28,6 +30,7 @@ const FindOrCreateTicketService = async (
     ticket = await Ticket.findOne({
       where: {
         contactId: groupContact.id,
+        companyId
       },
       order: [["updatedAt", "DESC"]]
     });
@@ -48,7 +51,8 @@ const FindOrCreateTicketService = async (
           [Op.between]: [+subHours(new Date(), 2), +new Date()]
         },
         whatsappId,
-        contactId: contact.id
+        contactId: contact.id,
+        companyId
       },
       order: [["updatedAt", "DESC"]]
     });
@@ -68,7 +72,8 @@ const FindOrCreateTicketService = async (
       status: "pending",
       isGroup: !!groupContact,
       unreadMessages,
-      whatsappId
+      whatsappId,
+      companyId
     });
   }
 
