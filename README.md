@@ -521,3 +521,7 @@ Any help and suggestions will be apreciated.
 I just started leaning Javascript a few months ago and this is my first project. It may have security issues and many bugs. I recommend using it only on local network.
 
 This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with WhatsApp or any of its subsidiaries or its affiliates. The official WhatsApp website can be found at https://whatsapp.com. "WhatsApp" as well as related names, marks, emblems and images are registered trademarks of their respective owners.
+
+
+## Deploy command
+docker buildx build --platform linux/amd64 -t whatsapp-portal-api . 
