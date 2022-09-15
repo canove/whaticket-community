@@ -82,7 +82,6 @@ const UserModal = ({ open, onClose, userId }) => {
 		password: "",
 		profile: "user",
 		lang: "",
-		companyId: ""
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
@@ -92,7 +91,6 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [language, setLanguage] = useState('');
 	const [changingLang, setChangingLang] = useState(false);
 	const [companies, setCompanies] = useState([]);
-  	const [selectedCompany, setSelectedCompany] = useState("");
 
 	const handleChange = (e) => {
 		setChangingLang(true);
@@ -128,7 +126,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, lang: language, queueIds: selectedQueueIds, company: selectedCompany.id};
+		const userData = { ...values, lang: language, queueIds: selectedQueueIds};
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -141,28 +139,6 @@ const UserModal = ({ open, onClose, userId }) => {
 		}
 		handleClose();
 	};
-
-	const fetchCompanies = async () => {
-		try {
-			const { data } = await api.get('/company');
-			setCompanies(data.companies);
-		} catch (err) {
-			toastError(err);
-		}
-    };
-
-	useEffect(() => {
-        fetchCompanies();
-    }, []);
-
-	const handleSelectCompanyChange = (e, company) => {
-        if (company) {
-            setSelectedCompany(company);
-        } else {
-            setSelectedCompany(null);
-
-        }
-    };
 
 	return (
 		<div className={classes.root}>
@@ -274,17 +250,6 @@ const UserModal = ({ open, onClose, userId }) => {
 											)}
 										/>
 									</FormControl>
-								</div>
-								<div>
-									 <Autocomplete
-										onChange={(e, newValue) => { handleSelectCompanyChange(e, newValue) }}
-										disablePortal
-										id="combo-box-companies"
-										options={companies}
-										getOptionLabel={(option) => option.name}
-										fullWidth
-										renderInput={(params) => <TextField {...params} label="Empresas" variant="outlined" />}
-									/>
 								</div>
 								<div>
 									<FormControl

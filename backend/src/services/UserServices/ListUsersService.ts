@@ -44,10 +44,10 @@ const ListUsersService = async ({
     order: [["createdAt", "DESC"]],
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
-      { model: Company, as:"company", attributes: ["name"], required:true }
-  ],
-raw:true
-  });
+      { model: Company, as:"company", attributes: ["name"], required: true }
+    ],
+    raw: true
+    });
 
   const hasMore = count > offset + users.length;
 
