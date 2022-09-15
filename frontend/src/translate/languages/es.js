@@ -589,6 +589,7 @@ const messages = {
             success: "¡Plantilla creada con éxito!",
             connectionFailed: "¡Seleccione una conexión!",
             delete: "¡Plantilla eliminada con éxito!",
+            toastErr: "¡Límite de parámetro excedido!"
           },
         },
         logReport:{

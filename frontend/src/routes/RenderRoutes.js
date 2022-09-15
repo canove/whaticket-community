@@ -25,7 +25,6 @@ import api from "../services/api";
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
-
     const [menus, setMenus] = useState([]);
 
     useEffect(() => {
@@ -38,7 +37,8 @@ const RenderRoutes = () => {
             }
         }
         fetchMenus();
-    }, [isAuth, user.companyId]);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuth]);
 
     const getComponent = (name) => {
         if (name === "Dashboard") {
@@ -99,39 +99,47 @@ const RenderRoutes = () => {
 
     return (
         <>
-            {menus && menus.map(menu => {
-                if (menu.name === "Dashboard") {
+            {!isAuth &&
+                <Route
+                    path={`/`}
+                    isPrivate
+                />
+            }
+            {isAuth &&
+                menus && menus.map(menu => {
+                    if (menu.name === "Dashboard") {
+                        return (
+                            <Route
+                                key={menu.id}
+                                exact
+                                path={`/`}
+                                component={getComponent(menu.name)}
+                                isPrivate
+                            />
+                        )
+                    }
+                    if (menu.name === "Tickets") {
+                        return (
+                            <Route
+                                key={menu.id}
+                                exact
+                                path={`/tickets/:ticketId?`}
+                                component={getComponent(menu.name)}
+                                isPrivate
+                            />
+                        )
+                    }
                     return (
                         <Route
                             key={menu.id}
                             exact
-                            path={`/`}
+                            path={`/${menu.name.replaceAll(" ", "")}`}
                             component={getComponent(menu.name)}
                             isPrivate
                         />
                     )
-                }
-                if (menu.name === "Tickets") {
-                    return (
-                        <Route
-                            key={menu.id}
-                            exact
-                            path={`/tickets/:ticketId?`}
-                            component={getComponent(menu.name)}
-                            isPrivate
-                        />
-                    )
-                }
-                return (
-                    <Route
-                        key={menu.id}
-                        exact
-                        path={`/${menu.name.replaceAll(" ", "")}`}
-                        component={getComponent(menu.name)}
-                        isPrivate
-                    />
-                )
-            })}
+                })
+            }
         </>
     )
 };

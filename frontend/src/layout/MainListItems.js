@@ -147,7 +147,7 @@ const MainListItems = (props) => {
 
   const fetchMenus = async () => {
     try {
-      const { data } = await api.get(`/menus/company/${user.companyId}`);
+      const { data } = await api.get(`/menus/company`);
       setMenus(data);
     } catch (err) {
       toastError(err);

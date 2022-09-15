@@ -34,14 +34,6 @@ module.exports = {
           updatedAt: new Date()
         },
         {
-          name: "Templates",
-          icon: "DvrIcon",
-          parentId: null,
-          isParent: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
           name: "Tickets",
           icon: "ChatIcon",
           parentId: null,
@@ -99,7 +91,15 @@ module.exports = {
           isParent: false,
           createdAt: new Date(),
           updatedAt: new Date()
-        }
+        },
+        {
+          name: "Templates",
+          icon: "DvrIcon",
+          parentId: whatsApp[0][0].id,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
       ],
       {}
     );
