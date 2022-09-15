@@ -57,6 +57,7 @@ const TemplateModal = ({ open, onClose }) => {
   const { whatsApps } = useContext(WhatsAppsContext);
   const [category, setCategory] = useState("");
   const [bodyText, setBodyText] = useState("");
+  const [params, setParams] = useState(0);
 
   const handleClose = () => {
     onClose();
@@ -96,13 +97,28 @@ const TemplateModal = ({ open, onClose }) => {
     setCategory(e.target.value);
   };
 
-  const handleArray = (e) => {
-    setBodyText((prevText) => prevText + "{{ }}");
+  const handleArray = () => {
+    switch (params) {
+      case 0:
+        setParams(prevTimes => prevTimes + 1);
+        setBodyText(prevText => prevText + "{{0}}");
+        break;
+      case 1:
+        setParams(prevTimes => prevTimes + 1);
+        setBodyText(prevText => prevText + "{{1}}");
+        break;
+      case 2:
+        setParams(prevTimes => prevTimes + 1);
+        setBodyText(prevText => prevText + "{{2}}");
+        break;
+      default:
+        toast.error(i18n.t("templates.templateModal.toastErr"));
+    }
   };
 
   const handleChangeBodyText = (e) => {
     setBodyText(e.target.value);
-  };
+  }
 
   return (
     <div className={classes.root}>
