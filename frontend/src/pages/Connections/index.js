@@ -159,19 +159,24 @@ const Connections = () => {
 	const [confirmModalInfo, setConfirmModalInfo] = useState(
 		confirmationModalInitialState
 	);
+	const [pageNumber, setPageNumber] = useState(1);
+	const [count, setCount] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
-	  }, []);
+	}, []);
 
 	useEffect(() => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/list/`, {
-					params: { official: false }
+					params: { official: false, pageNumber }
 				});
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
+				setCount(data.count);
+				setHasMore(data.hasMore);
 				setLoading(false);
 			} catch (err) {
 				setLoading(false);
@@ -179,7 +184,7 @@ const Connections = () => {
 			}
 		};
 		fetchWhats();
-	}, []);
+	}, [pageNumber]);
 
 	useEffect(() => {
 		const socket = openSocket();
@@ -489,6 +494,29 @@ const Connections = () => {
 						)}
 					</TableBody>
 				</Table>
+				<div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1} 
+					>
+						Página Anterior
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 10) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						Próxima Página
+					</Button>
+				</div>
 			</Paper>
 		</MainContainer>
 	);

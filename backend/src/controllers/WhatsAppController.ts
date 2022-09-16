@@ -16,7 +16,7 @@ import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRC
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
 
 type ListQuery = {
-  companyId: string | number;
+  pageNumber: string | number;
   official: string | boolean;
 }
 
@@ -145,12 +145,20 @@ export const remove = async (
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official } = req.query as ListQuery;
+  const { official, pageNumber } = req.query as ListQuery;
   const companyId = req.user.companyId;
 
-  const whatsapp = await ListOfficialWhatsAppsService({ companyId, official });
+  const {
+    whatsapps,
+    count,
+    hasMore
+  } = await ListOfficialWhatsAppsService({ companyId, official, pageNumber });
 
-  return res.status(200).json(whatsapp);
+  return res.status(200).json({
+    whatsapps,
+    count,
+    hasMore
+  });
 };
 
 export const newMessage = async (

@@ -13,6 +13,7 @@ import {
 	TableHead,
 	Paper,
 	IconButton,
+	Typography,
 } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
@@ -125,14 +126,24 @@ const OfficialConnections = () => {
 		confirmationModalInitialState
 	);
 
+	const [pageNumber, setPageNumber] = useState(1);
+	const [count, setCount] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
+
+	useEffect(() => {
+		dispatch({ type: "RESET" });
+	}, []);
+
 	useEffect(() => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/list/`, {
-					params: { official: true }
+					params: { official: true, pageNumber }
 				});
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
+				setCount(data.count);
+				setHasMore(data.hasMore);
 				setLoading(false);
 			} catch (err) {
 				setLoading(false);
@@ -309,6 +320,29 @@ const OfficialConnections = () => {
 						)}
 					</TableBody>
 				</Table>
+				<div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1} 
+					>
+						Página Anterior
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 10) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						Próxima Página
+					</Button>
+				</div>
 			</Paper>
 		</MainContainer>
 	);
