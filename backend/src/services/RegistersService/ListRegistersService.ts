@@ -36,34 +36,29 @@ const ListRegistersService = async ({
         whereCondition = {
           sentAt: {[Op.ne]: null},
           fileId,
-          companyId
         }
         break;
       case 'delivered':
         whereCondition = {
           deliveredAt: {[Op.ne]: null},
           fileId,
-          companyId
         }
         break;
       case 'read':
         whereCondition = {
           readAt: {[Op.ne]: null},
           fileId,
-          companyId
         }
         break;
       case 'error':
         whereCondition = {
           errorAt: {[Op.ne]: null},
           fileId,
-          companyId
         }
         break;
       default:
         whereCondition = {
           fileId,
-          companyId
         }
         break;
     }
@@ -85,7 +80,6 @@ const ListRegistersService = async ({
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
           },
-          companyId
         }
         break;
       case 'read':
@@ -95,7 +89,6 @@ const ListRegistersService = async ({
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
           },
-          companyId
         }
         break;
       case 'error':
@@ -105,7 +98,6 @@ const ListRegistersService = async ({
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
           },
-          companyId
         }
         break;
       default:
@@ -114,29 +106,28 @@ const ListRegistersService = async ({
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
           },
-          companyId
         }
         break;
     }
   } else {
     switch(type) {
       case 'sent':
-        whereCondition = { sentAt: { [Op.ne]: null }, companyId}
+        whereCondition = { sentAt: { [Op.ne]: null } }
         break;
       case 'delivered':
-        whereCondition = {deliveredAt: { [Op.ne]: null }, companyId}
+        whereCondition = { deliveredAt: { [Op.ne]: null } }
         break;
       case 'read':
-        whereCondition = { readAt: { [Op.ne]: null }, companyId}
+        whereCondition = { readAt: { [Op.ne]: null } }
         break;
       case 'error':
-        whereCondition = { errorAt: { [Op.ne]: null }, companyId}
+        whereCondition = { errorAt: { [Op.ne]: null } }
         break;
     }
   }
 
   const { count } = await FileRegister.findAndCountAll({
-    where: whereCondition
+    where: { ...whereCondition, companyId }
   });
 
   return { count }

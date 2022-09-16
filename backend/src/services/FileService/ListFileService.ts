@@ -20,8 +20,7 @@ const ListFileService = async ({
 
   if (Status != null && Status != undefined && !initialDate) {
     where = {
-      status: Status,
-      companyId
+      status: Status
     };
   }
 
@@ -29,13 +28,12 @@ const ListFileService = async ({
     where = {
       createdAt: {
         [Op.gte]: new Date(initialDate)
-      },
-      companyId
+      }
     };
   }
   // eslint-disable-next-line no-return-await
   return await File.findAll({
-    where: where,
+    where: { ...where, companyId },
     order: [['createdAt', 'DESC']],
     limit
   });
