@@ -183,7 +183,6 @@ const Users = () => {
     }
   };
 
-
   return (
     <MainContainer>
       <ConfirmationModal

@@ -4,13 +4,15 @@ import {Op} from "sequelize"
 interface Request {
   type?: string,
   fileId?: number | string,
-  date?: string
+  date?: string,
+  companyId: number
 }
 
 const ListRegistersService = async ({
   type,
   fileId,
   date,
+  companyId
 }: Request) => {
   let whereCondition = null;
 
@@ -33,30 +35,30 @@ const ListRegistersService = async ({
       case 'sent':
         whereCondition = {
           sentAt: {[Op.ne]: null},
-          fileId: fileId
+          fileId,
         }
         break;
       case 'delivered':
         whereCondition = {
           deliveredAt: {[Op.ne]: null},
-          fileId: fileId
+          fileId,
         }
         break;
       case 'read':
         whereCondition = {
           readAt: {[Op.ne]: null},
-          fileId: fileId
+          fileId,
         }
         break;
       case 'error':
         whereCondition = {
           errorAt: {[Op.ne]: null},
-          fileId: fileId
+          fileId,
         }
         break;
       default:
         whereCondition = {
-          fileId: fileId
+          fileId,
         }
         break;
     }
@@ -68,7 +70,7 @@ const ListRegistersService = async ({
           createdAt: {
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
-          }
+          },
         }
         break;
       case 'delivered':
@@ -77,7 +79,7 @@ const ListRegistersService = async ({
           createdAt: {
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
-          }
+          },
         }
         break;
       case 'read':
@@ -86,7 +88,7 @@ const ListRegistersService = async ({
           createdAt: {
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
-          }
+          },
         }
         break;
       case 'error':
@@ -95,7 +97,7 @@ const ListRegistersService = async ({
           createdAt: {
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
-          }
+          },
         }
         break;
       default:
@@ -103,29 +105,29 @@ const ListRegistersService = async ({
           createdAt: {
             [Op.gte]: getDate("MORNING"),
             [Op.lte]: getDate("NIGHT"),
-          }
+          },
         }
         break;
     }
   } else {
     switch(type) {
       case 'sent':
-        whereCondition = {sentAt: {[Op.ne]: null}}
+        whereCondition = { sentAt: { [Op.ne]: null } }
         break;
       case 'delivered':
-        whereCondition = {deliveredAt: {[Op.ne]: null}}
+        whereCondition = { deliveredAt: { [Op.ne]: null } }
         break;
       case 'read':
-        whereCondition = {readAt: {[Op.ne]: null}}
+        whereCondition = { readAt: { [Op.ne]: null } }
         break;
       case 'error':
-        whereCondition = {errorAt: {[Op.ne]: null}}
+        whereCondition = { errorAt: { [Op.ne]: null } }
         break;
     }
   }
 
   const { count } = await FileRegister.findAndCountAll({
-    where: whereCondition
+    where: { ...whereCondition, companyId }
   });
 
   return { count }

@@ -2,7 +2,8 @@ import { QueryTypes } from "sequelize";
 import Message from "../../database/models/Message";
 
 interface Request {
-    ticketId: Number;
+    ticketId: number;
+    companyId: number;
 }
 
 interface Response {
@@ -10,7 +11,8 @@ interface Response {
 }
 
 const ListTicketsReportService = async ({
-    ticketId = 0,
+    ticketId,
+    companyId
 }: Request): Promise<Response | undefined> => {
     return await Message.sequelize?.query(`
         select
@@ -23,6 +25,8 @@ const ListTicketsReportService = async ({
             msg.ticketId = ticket.id
         where
             ticket.id = ${ticketId}
+        and
+            ticket.companyId = ${companyId} 
     `,
     { type: QueryTypes.SELECT }
     );

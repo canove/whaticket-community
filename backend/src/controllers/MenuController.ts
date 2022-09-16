@@ -24,9 +24,7 @@ export const showCompany = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { companyId } = req.params;
-
-  const menus = await ShowCompanyMenuService(companyId);
+  const menus = await ShowCompanyMenuService(req.user.companyId);
 
   return res.status(200).json(menus);
 };

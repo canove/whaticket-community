@@ -1,15 +1,14 @@
 import { Op } from "sequelize";
 import File from "../../database/models/File";
 
-
-interface Response {};
-
 const ListFileService = async ({
   Status,
   initialDate,
-  limit = null
+  limit = null,
+  companyId
 }): Promise<File[] | undefined> => {
   let where = null;
+
   if(Status === ''){
     Status = undefined;
   }
@@ -24,6 +23,7 @@ const ListFileService = async ({
       status: Status
     };
   }
+
   if (!Status && initialDate !== null) {
     where = {
       createdAt: {
@@ -33,7 +33,7 @@ const ListFileService = async ({
   }
   // eslint-disable-next-line no-return-await
   return await File.findAll({
-    where: where,
+    where: { ...where, companyId },
     order: [['createdAt', 'DESC']],
     limit
   });

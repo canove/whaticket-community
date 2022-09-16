@@ -17,10 +17,12 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
-    pageNumber
+    pageNumber,
+    companyId
   });
 
   return res.json({ users, count, hasMore });
@@ -28,6 +30,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { email, password, name, profile, queueIds, companyId } = req.body;
+  const userCompanyId = req.user.companyId;
 
   if (
     req.url === "/signup" &&
@@ -38,13 +41,32 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
+  if (userCompanyId === 1) {
+    const user = await CreateUserService({
+      email,
+      password,
+      name,
+      profile,
+      queueIds,
+      companyId: companyId ? companyId : userCompanyId
+    });
+
+    const io = getIO();
+    io.emit("user", {
+      action: "create",
+      user
+    });
+
+    return res.status(200).json(user);
+  }
+
   const user = await CreateUserService({
     email,
     password,
     name,
     profile,
     queueIds,
-    companyId
+    companyId: userCompanyId
   });
 
   const io = getIO();
@@ -74,8 +96,9 @@ export const update = async (
 
   const { userId } = req.params;
   const userData = req.body;
+  const userCompanyId = req.user.companyId;
 
-  const user = await UpdateUserService({ userData, userId });
+  const user = await UpdateUserService({ userData, userId, userCompanyId });
 
   const io = getIO();
   io.emit("user", {

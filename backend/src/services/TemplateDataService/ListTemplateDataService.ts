@@ -7,17 +7,19 @@ interface Request {
   searchParam?: string;
   pageNumber?: string | number;
   templatesId?: string | number;
+  companyId: number;
 }
 
 interface Response {
-    count: number;
-    hasMore: boolean;
-    templates: Templates[];
+  count: number;
+  hasMore: boolean;
+  templates: Templates[];
 }
 
 const ListTemplateDataService = async ({
   searchParam = "",
-  pageNumber = "1"
+  pageNumber = "1",
+  companyId
 }: Request): Promise<Response> => {
   const whereCondition = {
     [Op.or]: [
@@ -29,8 +31,10 @@ const ListTemplateDataService = async ({
         )
       },
       { name: { [Op.like]: `%${searchParam.toLowerCase().trim()}%` } }
-    ]
+    ],
+    companyId
   };
+  
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 

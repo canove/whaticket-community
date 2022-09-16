@@ -15,6 +15,7 @@ interface Request {
   facebookToken?: string;
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
+  companyId?: string | number;
 }
 
 interface Response {
@@ -32,7 +33,8 @@ const CreateWhatsAppService = async ({
   official,
   facebookToken,
   facebookPhoneNumberId,
-  phoneNumber
+  phoneNumber,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -80,6 +82,8 @@ const CreateWhatsAppService = async ({
   if (!official && (facebookToken || facebookPhoneNumberId || phoneNumber)) {
     throw new AppError("ERRO!");
   }
+  const lastPingDate = new Date();
+  lastPingDate.setDate(lastPingDate.getDate() + 2);
 
   const whatsapp = await Whatsapp.create(
     {
@@ -91,7 +95,9 @@ const CreateWhatsAppService = async ({
       official,
       facebookToken,
       facebookPhoneNumberId,
-      phoneNumber
+      phoneNumber,
+      lastPingDate,
+      companyId
     },
     { include: ["queues"] }
   );

@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../database/models/User";
+import Company from "../../database/models/Company";
 
 interface Request {
   email: string;
@@ -40,7 +41,7 @@ const CreateUserService = async ({
         async value => {
           if (!value) return false;
           const emailExists = await User.findOne({
-            where: { email: value }
+            where: { email: value, companyId }
           });
           return !emailExists;
         }

@@ -5,12 +5,14 @@ interface Request {
   statuses?: Array<any>;
   fileIds?: Array<any>;
   pageNumber?: string | number;
+  companyId: number;
 }
 
 const ListReportRegistersService = async ({
   statuses,
   fileIds,
-  pageNumber = "1"
+  pageNumber = "1",
+  companyId
 }: Request) => {
   let whereCondition = null;
 
@@ -19,6 +21,7 @@ const ListReportRegistersService = async ({
       fileId: {
         [Op.or]: fileIds,
       },
+      companyId
     };
   }
 
@@ -47,7 +50,8 @@ const ListReportRegistersService = async ({
   if (statuses) {
     whereCondition = {
       ...whereCondition,
-      [Op.or]: getStatuses()
+      [Op.or]: getStatuses(),
+      companyId
     }
   }
 

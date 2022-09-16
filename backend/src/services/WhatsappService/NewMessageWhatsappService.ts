@@ -22,6 +22,7 @@ interface Request {
   contactName: string;
   session: string;
   identification: number;
+  companyId: number;
 }
 
 interface Response {
@@ -60,7 +61,8 @@ const NewMessageWhatsappService = async ({
   body,
   contactName,
   identification,
-  session
+  session,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     id: Yup.string().required(),
@@ -96,7 +98,8 @@ const NewMessageWhatsappService = async ({
     contactName,
     isGroup,
     identification,
-    session
+    session,
+    companyId
   );
   return { success: true };
 };
@@ -132,10 +135,11 @@ const verifyMessage = async (
 
 const verifyContact = async (
   contactName: string,
-  contactNumber: string
+  contactNumber: string,
+  companyId: number
 ): Promise<Contact> => {
   if (contactName == '') {
-    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber }, limit: 1});
+    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber, companyId }, limit: 1 });
     if (contact.length > 0)
       contactName = contact[0].name;
   }
@@ -162,11 +166,12 @@ const handleMessage = async (
   contactName: string,
   isGroup: boolean,
   identification: number,
-  session: string
+  session: string,
+  companyId: number
 ): Promise<void> => {
   try {
     const unreadMessages = 1;
-    const contact = await verifyContact(contactName, from);
+    const contact = await verifyContact(contactName, from, companyId);
     let whatsapp: Whatsapp;
     if (identification) {
       whatsapp = await GetWhatsappByIdentification(identification);
@@ -180,6 +185,7 @@ const handleMessage = async (
     const ticket = await FindOrCreateTicketService(
       contact,
       whatsapp.id,
+      whatsapp.companyId,
       unreadMessages
     );
 

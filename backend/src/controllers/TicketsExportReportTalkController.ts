@@ -23,6 +23,7 @@ type Report = {
 
 export const index = async (req: Request, res: Response) => {
     const { userId="", initialDate="", finalDate="" } = req.query as unknown as IndexQuery;
+    const companyId = req.user.companyId;
 
     const reports:Array<Report> = await Message.sequelize?.query(`
         select
@@ -37,6 +38,8 @@ export const index = async (req: Request, res: Response) => {
             msg.createdAt >= '${initialDate} dd/MM/yy HH:mm'
         and
 	        msg.createdAt <= '${finalDate} dd/MM/yy HH:mm'
+        and
+            tickets.companyId = ${companyId}
     `,
     { type: QueryTypes.SELECT }
     );

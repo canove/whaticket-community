@@ -12,6 +12,7 @@ import {
   ForeignKey,
   Default
 } from "sequelize-typescript";
+import Company from "./Company";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
@@ -58,6 +59,10 @@ class File extends Model<File> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @BelongsTo(() => User)
   user: User;

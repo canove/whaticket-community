@@ -74,7 +74,6 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
     const [isConnectionTested, setIsConnectionTested] = useState(false);
 	const [submitType, setSubmitType] = useState("testConnection");
-
 	const [lastFormValues, setLastFormValues] = useState();
 
 	const GetFormValues = () => {
