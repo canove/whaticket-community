@@ -13,6 +13,12 @@ const rules = {
 			"contacts-page:deleteContact",
 		],
 	},
+
+	admin1: {
+		static: [
+			"user-modal:editCompany",
+		]
+	}
 };
 
 export default rules;

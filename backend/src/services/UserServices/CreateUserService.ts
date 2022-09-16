@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../database/models/User";
+import Company from "../../database/models/Company";
 
 interface Request {
   email: string;

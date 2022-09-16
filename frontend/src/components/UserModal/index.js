@@ -91,6 +91,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [language, setLanguage] = useState('');
 	const [changingLang, setChangingLang] = useState(false);
 	const [companies, setCompanies] = useState([]);
+	const [selectedCompany, setSelectedCompany] = useState();
 
 	const handleChange = (e) => {
 		setChangingLang(true);
@@ -119,14 +120,32 @@ const UserModal = ({ open, onClose, userId }) => {
 		fetchUser();
 	}, [userId, open]);
 
+	useEffect(() => {
+		if (loggedInUser.companyId === 1) {
+			const fetchCompanies = async () => {
+				try {
+					const { data } = await api.get(`/company/`);
+					setCompanies(data.companies);
+				} catch (err) {
+					toastError(err);
+				}
+			}
+			fetchCompanies();
+		}
+	}, [])
+
 	const handleClose = () => {
 		onClose();
 		setUser(initialState);
 		setChangingLang(false);
 	};
 
+	const handleCompanyChange = (e) => {
+		setSelectedCompany(e.target.value);
+	}
+
 	const handleSaveUser = async values => {
-		const userData = { ...values, lang: language, queueIds: selectedQueueIds};
+		const userData = { ...values, lang: language, queueIds: selectedQueueIds, companyId: selectedCompany};
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -272,6 +291,35 @@ const UserModal = ({ open, onClose, userId }) => {
 										</Select>
 									</FormControl>
 								</div>
+								<Can
+									role={`${loggedInUser.profile}${loggedInUser.companyId}`}
+									perform="user-modal:editCompany"
+									yes={() => (
+										<div>
+											<FormControl
+												variant="outlined"
+												margin="dense"
+												fullWidth
+											>
+												<InputLabel id="company-selection-label">Empresa</InputLabel>
+												<Select
+													label="Empresa"
+													name="company"
+													labelId="company-selection-label"
+													id="company-selection"
+													value={selectedCompany}
+													onChange={(e) => {handleCompanyChange(e)}}
+												>
+													{ companies && companies.map(company => {
+														return (
+															<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
+														)
+													}) }
+												</Select>
+											</FormControl>
+										</div>
+									)}
+								/>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"
