@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -73,6 +73,8 @@ const ImportModal = ({ open, onClose }) => {
 	const [loading, setLoading] = useState(false);
 	const [showInfo, setShowInfo] = useState(false);
 	const [openSelect, setOpenSelect] = useState(false);
+	const [menus, setMenus] = useState();
+	const [useType, setUseType] = useState(false);
 
 	const handleClose = () => {
 		onClose();
@@ -149,6 +151,49 @@ const ImportModal = ({ open, onClose }) => {
 		setOpenSelect(false)
 	};
 
+	useEffect(() => {
+		const fetchMenus = async () => {
+			try {
+				const { data } = await api.get('menus/company');
+				setMenus(data);
+			} catch(err) {
+				toastError(err);
+			}
+		}
+		fetchMenus();
+	}, [])
+
+	useEffect(() => {
+		if (menus) {
+			let offWhats = false;
+			let noOffWhats = false;
+
+			menus.forEach(menu => {
+				if (menu.name === "Official Connections") {
+					offWhats = true;
+				}
+
+				if (menu.name === "Connections") {
+					noOffWhats = true;
+				}
+			})
+
+			if (offWhats && noOffWhats) {
+				setUseType(true);
+			}
+
+			if (offWhats && !noOffWhats) {
+				setUseType(false);
+				setSelectedType(true);
+			}
+
+			if (!offWhats && noOffWhats) {
+				setUseType(false);
+				setSelectedType(false);
+			}
+		}
+	}, [menus])
+
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -161,9 +206,10 @@ const ImportModal = ({ open, onClose }) => {
 					{i18n.t('importModal.title')}
 				</DialogTitle>
                 <DialogContent dividers>
+					{ useType && 
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-                        	{i18n.t('importModal.form.shotType')}
+							{i18n.t('importModal.form.shotType')}:
 						</Typography>
 						<Select
 							labelId="type-select-label"
@@ -171,16 +217,20 @@ const ImportModal = ({ open, onClose }) => {
 							value={selectedType}
 							label="Type"
 							onChange={handleChange}
+							style={{width: "50%"}}
+							variant="outlined"
 						>
 							<MenuItem value={true}>{i18n.t('importModal.form.official')}</MenuItem>
 							<MenuItem value={false}>{i18n.t('importModal.form.notOfficial')}</MenuItem>
 						</Select>
 					</div>
+					}	
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
                         	Conexões:
 						</Typography>
 						<Select
+							variant="outlined"
 							labelId="type-select-label"
 							id="type-select"
 							value={selectedConnection}
@@ -190,6 +240,7 @@ const ImportModal = ({ open, onClose }) => {
 							open={openSelect}
 							onOpen={handleOpenSelect}
 							onClose={handleCloseSelect}
+							style={{width: "50%"}}
 						>
 							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
