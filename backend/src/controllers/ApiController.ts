@@ -54,6 +54,7 @@ const createContact = async (newContact: string) => {
   const createTicket = await FindOrCreateTicketService(
     contact,
     defaultWhatsapp.id,
+    defaultWhatsapp.companyId,
     1
   );
 

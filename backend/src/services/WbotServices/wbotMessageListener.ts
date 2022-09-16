@@ -279,6 +279,7 @@ const handleMessage = async (
     const ticket = await FindOrCreateTicketService(
       contact,
       wbot.id!,
+      whatsapp.companyId,
       unreadMessages,
       groupContact
     );
