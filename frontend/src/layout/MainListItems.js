@@ -331,7 +331,7 @@ const MainListItems = (props) => {
           icon="ImportExportOutlinedIcon"
         />
       }
-      { (useUsers || useCompany || useQueues || useSettings || useReports || useReportsTicket || useRegistersReports) &&
+      { (useUsers || useCompany || useQueues || useSettings || useMenus || useReports || useReportsTicket || useRegistersReports) &&
         <>
           <Divider />
           <ListParentItemLink
