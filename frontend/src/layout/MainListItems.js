@@ -82,18 +82,40 @@ function ListParentItemLink(props) {
     setOpen((prevOpen) => !prevOpen);
   }
 
+  // <Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error"></Badge>
+  
   return (
     <List>
       <li>
         <ListItem button open={open} onClick={handleClick} className={className}>
-          {renderedIcon ? <ListItemIcon><Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error">{renderedIcon}</Badge></ListItemIcon> : null}
+          {renderedIcon ? <ListItemIcon>{renderedIcon}</ListItemIcon> : null}
           <ListItemText primary={primary} />
           {open ? <ExpandLess /> : <ExpandMore />}
         </ListItem>
       </li>
       <Collapse component="li" in={open} timeout="auto" unmountOnExit>
         <List disablePadding>
-          { children ? children : null }
+          { children && children.map(child => {
+            if (child.isParent) {
+              return (
+                <ListParentItemLink
+                  key={child.id}
+                  icon={child.icon}
+                  primary={child.name}
+                  children={child.children}
+                />
+              )
+            } else {
+              return (
+                <ListItemLink
+                  key={child.id}
+                  to={`/${(child.name).replaceAll(" ", "")}`}
+                  primary={child.name}
+                  icon={child.icon}
+                />
+              )
+            }
+          }) }
         </List>
       </Collapse>
     </List>
@@ -123,40 +145,71 @@ const MainListItems = (props) => {
   const { user } = useContext(AuthContext);
 
   const { i18n } = useTranslation();
-  const [menus, setMenus] = useState([]);
   const [connectionWarning, setConnectionWarning] = useState(false);
 
-  const [useDashboard, setUseDashboard] = useState(false);
-  const [useOfficialConnections, setUseOfficialConnections] = useState(false);
-  const [useOfficialConnectionsTemp, setUseOfficialConnectionsTemp] = useState(false);
-  const [useConnections, setUseConnections] = useState(false);
-  const [useConnectionsTemp, setUseConnectionsTemp] = useState(false);
-  const [useWhatsConfig, setUseWhatsConfig] = useState(false);
-  const [useTickets, setUseTickets] = useState(false);
-  const [useContacts, setUseContacts] = useState(false);
-  const [useUsers, setUseUsers] = useState(false);
-  const [useQuickAnswers, setUseQuickAnswers] = useState(false);
-  const [useImportation, setUseImportation] = useState(false);
-  const [useSettings, setUseSettings] = useState(false);
-  const [useQueues, setUseQueues] = useState(false);
-  const [useReports, setUseReports] = useState(false);
-  const [useReportsTicket, setUseReportsTicket] = useState(false);
-  const [useRegistersReports, setUseRegistersReports] = useState(false);
-  const [useCompany, setUseCompany] = useState(false);
-  const [useMenus, setUseMenus] = useState(false);
-
-  const fetchMenus = async () => {
-    try {
-      const { data } = await api.get(`/menus/company`);
-      setMenus(data);
-    } catch (err) {
-      toastError(err);
-    }
-  }
+  const [menus, setMenus] = useState([]);
 
   useEffect(() => {
+    const getParentMenu = async (menuId) => {
+      try {
+        const { data } = await api.get(`/menus/${menuId}`);
+        return data;
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+    const fetchMenus = async () => {
+      try {
+        const { data } = await api.get(`/menus/company`);
+        
+        const menus = [];
+        const allMenus = [];
+        const parentMenusIds = [];
+
+        for (const menu of data) {
+          if (menu.parentId) {
+            if (parentMenusIds.indexOf(menu.parentId) === -1) {
+              parentMenusIds.push(menu.parentId);
+
+              const parentMenu = await getParentMenu(menu.parentId);
+              allMenus.push(parentMenu);
+              allMenus.push(menu);
+            } else {
+              allMenus.push(menu);
+            }
+          } else {
+            allMenus.push(menu);
+          }
+        }
+
+        for (const menu of allMenus) {
+          if (menu.parentId || menu.isParent) {
+            if (menu.isParent) {
+              const childrenMenus = [];
+              for (const children of allMenus) {
+                if (children.parentId === menu.id) {
+                  childrenMenus.push(children);
+                }
+              }
+              menu.children = [...childrenMenus];
+              if (!menu.parentId) {
+                menus.push(menu);
+              }
+            }
+          } else {
+            menus.push(menu);
+          }
+        }
+
+        setMenus(menus);
+      } catch (err) {
+        console.log(err);
+        toastError(err);
+      }
+    }
+
     fetchMenus();
-// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -183,227 +236,40 @@ const MainListItems = (props) => {
     return () => clearTimeout(delayDebounceFn);
   }, [whatsApps]);
 
-  useEffect(() => {
-    if (menus) {
-      menus.forEach(menu => {
-        if (menu.name === "Dashboard") {
-            setUseDashboard(true);
-        }
-        if (menu.name === "Official Connections") {
-            setUseOfficialConnections(true);
-        }
-        if (menu.name === "Templates") {
-            setUseOfficialConnectionsTemp(true);
-        }
-        if (menu.name === "Connections") {
-            setUseConnections(true);
-        }
-        if (menu.name === "Template Data") {
-            setUseConnectionsTemp(true);
-        }
-        if (menu.name === "Whats Config") {
-            setUseWhatsConfig(true);
-        }
-        if (menu.name === "Tickets") {
-            setUseTickets(true);
-        }
-        if (menu.name === "Contacts") {
-            setUseContacts(true);
-        }
-        if (menu.name === "Users") {
-            setUseUsers(true);
-        }
-        if (menu.name === "Quick Answers") {
-            setUseQuickAnswers(true);
-        }
-        if (menu.name === "Importation") {
-            setUseImportation(true);
-        }
-        if (menu.name === "Settings") {
-            setUseSettings(true);
-        }
-        if (menu.name === "Queues") {
-            setUseQueues(true);
-        }
-        if (menu.name === "Reports") {
-            setUseReports(true);
-        }
-        if (menu.name === "Reports Ticket") {
-            setUseReportsTicket(true);
-        }
-        if (menu.name === "Registers Reports") {
-            setUseRegistersReports(true);
-        }
-        if (menu.name === "Company") {
-            setUseCompany(true);
-        }
-        if (menu.name === "Menus") {
-            setUseMenus(true);
-        }
-      });
-    }
-  }, [menus])
-
   return (
     <div onClick={drawerClose}>
-      { useDashboard &&
-        <ListItemLink
-          to="/"
-          primary="Dashboard"
-          icon="DashboardOutlinedIcon"
-        />
-      }
-      { (useOfficialConnections || useOfficialConnectionsTemp) &&
-        <ListParentItemLink
-          primary="WhatsApp"
-          icon="WhatsAppIcon"
-        >
-          { useOfficialConnections &&
+      { menus && menus.map(menu => {
+        if (menu.name === "Dashboard") {
+          return (
             <ListItemLink
-              to="/OfficialConnections"
-              primary={i18n.t("mainDrawer.whatsApp.officialConnections")}
-              icon="SyncAltIcon"
+              key={menu.id}
+              to={`/`}
+              primary={menu.name}
+              icon={menu.icon}
             />
-          }
-          { useOfficialConnectionsTemp &&
+          )
+        }
+
+        if (menu.isParent) {
+          return (
+            <ListParentItemLink
+              key={menu.id}
+              icon={menu.icon}
+              primary={menu.name}
+              children={menu.children}
+            />
+          )
+        } else {
+          return (
             <ListItemLink
-              to="/Templates"
-              primary={i18n.t("mainDrawer.listItems.template")}
-              icon="DvrIcon"
+              key={menu.id}
+              to={`/${(menu.name).replaceAll(" ", "")}`}
+              primary={menu.name}
+              icon={menu.icon}
             />
-          }
-        </ListParentItemLink>
-      }
-      { (useConnections || useConnectionsTemp || useWhatsConfig) &&
-        <ListParentItemLink
-          primary="WhatsApp 2"
-          icon="WhatsAppIcon"
-          connectionWarning={connectionWarning}
-        >
-          { useConnections &&
-            <ListItemLink
-              to="/Connections"
-              primary={i18n.t("mainDrawer.whatsApp.connections")}
-              icon="SyncAltIcon"
-            />
-          }
-          { useConnectionsTemp &&
-            <ListItemLink
-              to="/TemplateData"
-              primary={i18n.t("Templates Data")}
-              icon="DvrIcon"
-            />
-          }
-          { useWhatsConfig &&
-            <ListItemLink
-              to="/WhatsConfig"
-              primary={i18n.t("mainDrawer.whatsApp.settings")}
-              icon="SettingsOutlinedIcon"
-            />
-          }
-        </ListParentItemLink>
-      }
-      { useTickets &&
-        <ListItemLink
-          to="/Tickets"
-          primary={i18n.t("mainDrawer.listItems.tickets")}
-          icon="ChatIcon"
-        />
-      }
-      { useContacts &&
-        <ListItemLink
-          to="/Contacts"
-          primary={i18n.t("mainDrawer.listItems.contacts")}
-          icon="ContactPhoneOutlinedIcon"
-        />
-      }
-      { useQuickAnswers &&
-        <ListItemLink
-          to="/QuickAnswers"
-          primary={i18n.t("mainDrawer.listItems.quickAnswers")}
-          icon="QuestionAnswerOutlinedIcon"
-        />
-      }
-      { useImportation &&
-        <ListItemLink
-          to="/Importation"
-          primary={i18n.t("mainDrawer.listItems.importation")}
-          icon="ImportExportOutlinedIcon"
-        />
-      }
-      { (useUsers || useCompany || useQueues || useSettings || useMenus || useReports || useReportsTicket || useRegistersReports) &&
-        <>
-          <Divider />
-          <ListParentItemLink
-            primary={i18n.t("mainDrawer.listItems.administration")}
-            icon="AccountCircleIcon"
-          >
-            { useUsers &&
-              <ListItemLink
-                to="/Users"
-                primary={i18n.t("mainDrawer.listItems.users")}
-                icon="PeopleAltOutlinedIcon"
-              />
-            }
-            { useCompany &&
-              <ListItemLink
-                to="/Company"
-                primary={i18n.t("Empresa")}
-                icon="ApartmentIcon"
-              />
-            }
-            { useQueues &&
-              <ListItemLink
-                to="/Queues"
-                primary={i18n.t("mainDrawer.listItems.queues")}
-                icon="AccountTreeOutlinedIcon"
-              />
-            }
-            { useMenus &&
-              <ListItemLink
-                to="/Menus"
-                primary="Menus"
-                icon="ListAltIcon"
-              />
-            }
-            { useSettings &&
-              <ListItemLink
-                to="/Settings"
-                primary={i18n.t("mainDrawer.listItems.settings")}
-                icon="SettingsOutlinedIcon"
-              />
-            }
-            { (useReports || useReportsTicket || useRegistersReports) &&
-              <ListParentItemLink
-                primary={i18n.t("mainDrawer.listItems.reports")}
-                icon="EqualizerIcon"
-              >
-                { useReports &&
-                  <ListItemLink
-                    to="/Reports"
-                    primary={i18n.t("mainDrawer.listItems.reportsTalk")}
-                    icon="AssessmentOutlinedIcon"
-                  />
-                }
-                { useReportsTicket &&
-                  <ListItemLink
-                    to="/ReportsTicket"
-                    primary={i18n.t("mainDrawer.listItems.reportsTicket")}
-                    icon="AssessmentOutlinedIcon"
-                  />
-                }
-                { useRegistersReports &&
-                  <ListItemLink
-                    to="/RegistersReports"
-                    primary={i18n.t("mainDrawer.listItems.logReports")}
-                    icon="AssessmentOutlinedIcon"
-                  />
-                }
-              </ListParentItemLink>
-            }
-          </ListParentItemLink>
-        </>
-      }
+          )
+        }
+      })}
     </div>
   );
 };
