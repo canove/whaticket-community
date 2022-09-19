@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useMemo } from "react";
 import { useTranslation } from 'react-i18next'
 import clsx from "clsx";
 
@@ -131,6 +131,8 @@ const LoggedInLayout = ({ children }) => {
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
 
+  const mainListItems = useMemo(() => <MainListItems />, [user])
+
   const { i18n } = useTranslation();
 
   function handleChangeLanguage(language) {
@@ -226,7 +228,7 @@ const LoggedInLayout = ({ children }) => {
         </div>
         <Divider />
         <List>
-          <MainListItems drawerClose={drawerClose} />
+          { mainListItems }
         </List>
         <Divider />
       </Drawer>
