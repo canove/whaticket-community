@@ -30,13 +30,15 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     if(whatsappIds) {
       accounts = await Whatsapp.findAll({
         where: {
-          id: whatsappIds
+          id: whatsappIds,
+          companyId: file.companyId
         }
       });
     }else{
       accounts = await Whatsapp.findAll({
         where: {
           status: "CONNECTED",
+          companyId: file.companyId,
           [Op.or]: [
             {
               official: file.official
