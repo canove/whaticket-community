@@ -228,28 +228,30 @@ const ImportModal = ({ open, onClose }) => {
 				</DialogTitle>
                 <DialogContent dividers>
 					{ useType && 
-					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
 							{i18n.t('importModal.form.shotType')}:
 						</Typography>
+					}
+					{ useType && 
+					<div className={classes.multFieldLine}>
 						<Select
 							labelId="type-select-label"
 							id="type-select"
 							value={selectedType}
 							label="Type"
 							onChange={handleChange}
-							style={{width: "50%"}}
+							style={{width: "100%"}}
 							variant="outlined"
 						>
 							<MenuItem value={true}>{i18n.t('importModal.form.official')}</MenuItem>
 							<MenuItem value={false}>{i18n.t('importModal.form.notOfficial')}</MenuItem>
 						</Select>
 					</div>
-					}	
+					}
+					<Typography variant="subtitle1" gutterBottom>
+                        Conexões:
+					</Typography>
 					<div className={classes.multFieldLine}>
-						<Typography variant="subtitle1" gutterBottom>
-                        	Conexões:
-						</Typography>
 						<Select
 							variant="outlined"
 							labelId="type-select-label"
@@ -261,7 +263,7 @@ const ImportModal = ({ open, onClose }) => {
 							open={openSelect}
 							onOpen={handleOpenSelect}
 							onClose={handleCloseSelect}
-							style={{width: "50%"}}
+							style={{width: "100%"}}
 						>
 							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
@@ -280,10 +282,12 @@ const ImportModal = ({ open, onClose }) => {
 						</Select>
 					</div>
 					{ selectedType === false &&
-					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
-                        	Template:
+							Template:
 						</Typography>
+					}
+					{ selectedType === false &&
+					<div className={classes.multFieldLine}>
 						<Select
 							variant="outlined"
 							labelId="type-select-label"
@@ -291,7 +295,7 @@ const ImportModal = ({ open, onClose }) => {
 							value={selectedTemplate}
 							label="Type"
 							onChange={(e) => { handleChangeTemplate(e) }}
-							style={{width: "50%"}}
+							style={{width: "100%"}}
 						>
 							<MenuItem value={"Nenhum"}>Nenhum</MenuItem>
 							{templates.length > 0 && templates.map((template, index) => {
