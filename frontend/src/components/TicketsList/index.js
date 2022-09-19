@@ -263,6 +263,7 @@ const reducer = (state, action) => {
 		const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
 		if (scrollHeight - (scrollTop + 100) < clientHeight) {
+			e.currentTarget.scrollTop = scrollTop - 100;
 			loadMore();
 		}
 	};
