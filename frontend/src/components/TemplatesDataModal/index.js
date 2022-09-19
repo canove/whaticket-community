@@ -120,7 +120,6 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     if (paramsQuantity >= 3) {
       toast.error(i18n.t("templates.templateModal.toastErr"));
     } else {
-      setParamsQuantity(prevQuantity => prevQuantity + 1);
       setText(prevText => prevText + "{{" + param + "}}")
     }
 
