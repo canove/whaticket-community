@@ -338,10 +338,14 @@ const messages = {
           reportsTicket: "Relatórios Chamadas",
           logReports: "Relatório Registro",
           reports: "Relatórios",
+          whatsOff: "WhatsApp",
+          whatsNoOff: "WhatsApp 2",
+          company: "Empresas",
+          menus: "Menus",
         },
         whatsApp: {
           connections: "Conexões",
-          officialConnections: "Conexões Oficiais",
+          officialConnections: "Conexões",
           settings: "Configurações",
         },
         appBar: {

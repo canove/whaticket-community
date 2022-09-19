@@ -73,7 +73,7 @@ function getIcon(icon) {
 }
 
 function ListParentItemLink(props) {
-  const { icon, primary, className, connectionWarning, children } = props;
+  const { icon, primary, className, connectionWarning, children, translation } = props;
 
   const [open, setOpen] = useState(false);
   const renderedIcon = getIcon(icon);
@@ -101,8 +101,9 @@ function ListParentItemLink(props) {
                 <ListParentItemLink
                   key={child.id}
                   icon={child.icon}
-                  primary={child.name}
+                  primary={translation(child.name)}
                   children={child.children}
+                  translation={translation}
                 />
               )
             } else {
@@ -110,7 +111,7 @@ function ListParentItemLink(props) {
                 <ListItemLink
                   key={child.id}
                   to={`/${(child.name).replaceAll(" ", "")}`}
-                  primary={child.name}
+                  primary={translation(child.name)}
                   icon={child.icon}
                 />
               )
@@ -143,10 +144,9 @@ const MainListItems = (props) => {
   const { drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
-
   const { i18n } = useTranslation();
-  const [connectionWarning, setConnectionWarning] = useState(false);
 
+  const [connectionWarning, setConnectionWarning] = useState(false);
   const [menus, setMenus] = useState([]);
 
   useEffect(() => {
@@ -210,7 +210,7 @@ const MainListItems = (props) => {
     }
 
     fetchMenus();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -236,6 +236,98 @@ const MainListItems = (props) => {
     return () => clearTimeout(delayDebounceFn);
   }, [whatsApps]);
 
+  function getTranslation(name) {
+    if (name === "Dashboard") {
+      return i18n.t("mainDrawer.listItems.dashboard");
+    }
+  
+    if (name === "WhatsApp") {
+      return i18n.t("mainDrawer.listItems.whatsOff");
+    }
+  
+    if (name === "Official Connections") {
+      return i18n.t("mainDrawer.whatsApp.officialConnections");
+    }
+
+    if (name === "Templates") {
+      return i18n.t("mainDrawer.listItems.template");
+    }
+  
+    if (name === "WhatsApp 2") {
+      return i18n.t("mainDrawer.listItems.whatsNoOff");
+    }
+
+    if (name === "Connections") {
+      return i18n.t("mainDrawer.whatsApp.connections");
+    }
+
+    if (name === "Whats Config") {
+      return i18n.t("mainDrawer.whatsApp.settings");
+    }
+
+    if (name === "Template Data") {
+      return i18n.t("mainDrawer.listItems.template");
+    }
+
+    if (name === "Tickets") {
+      return i18n.t("mainDrawer.listItems.tickets");
+    }
+
+    if (name === "Contacts") {
+      return i18n.t("mainDrawer.listItems.contacts");
+    }
+  
+    if (name === "Quick Answers") {
+      return i18n.t("mainDrawer.listItems.quickAnswers");
+    }
+
+    if (name === "Importation") {
+      return i18n.t("mainDrawer.listItems.importation");
+    }
+
+    if (name === "Administration") {
+      return i18n.t("mainDrawer.listItems.administration");
+    }
+
+    if (name === "Users") {
+      return i18n.t("mainDrawer.listItems.users");
+    }
+
+    if (name === "Company") {
+      return i18n.t("mainDrawer.listItems.company");
+    }
+
+    if (name === "Menus") {
+      return i18n.t("mainDrawer.listItems.menus");
+    }
+
+    if (name === "Queues") {
+      return i18n.t("mainDrawer.listItems.queues");
+    }
+
+    if (name === "Settings") {
+      return i18n.t("mainDrawer.listItems.settings");
+    }
+
+    if (name === "Reports") {
+      return i18n.t("mainDrawer.listItems.reports");
+    }
+
+    if (name === "Reports Talk") {
+      return i18n.t("mainDrawer.listItems.reportsTalk");
+    }
+
+    if (name === "Reports Ticket") {
+      return i18n.t("mainDrawer.listItems.reportsTicket");
+    }
+
+    if (name === "Registers Reports") {
+      return i18n.t("mainDrawer.listItems.logReports");
+    }
+    
+    return name;
+  }
+
   return (
     <div onClick={drawerClose}>
       { menus && menus.map(menu => {
@@ -244,7 +336,7 @@ const MainListItems = (props) => {
             <ListItemLink
               key={menu.id}
               to={`/`}
-              primary={menu.name}
+              primary={getTranslation(menu.name)}
               icon={menu.icon}
             />
           )
@@ -255,8 +347,9 @@ const MainListItems = (props) => {
             <ListParentItemLink
               key={menu.id}
               icon={menu.icon}
-              primary={menu.name}
+              primary={getTranslation(menu.name)}
               children={menu.children}
+              translation={getTranslation}
             />
           )
         } else {
@@ -264,7 +357,7 @@ const MainListItems = (props) => {
             <ListItemLink
               key={menu.id}
               to={`/${(menu.name).replaceAll(" ", "")}`}
-              primary={menu.name}
+              primary={getTranslation(menu.name)}
               icon={menu.icon}
             />
           )
