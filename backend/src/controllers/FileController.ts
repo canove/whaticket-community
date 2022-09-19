@@ -10,7 +10,7 @@ type IndexQuery = {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { Status, initialDate } = req.query as unknown as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const report = await ListFileService({
     Status,

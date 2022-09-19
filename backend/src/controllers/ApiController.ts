@@ -67,7 +67,9 @@ const createContact = async (newContact: string) => {
 /* eslint-disable */
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1 });
+  const { companyId } = req.user;
+
+  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1, companyId });
   if (files) {
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
@@ -92,8 +94,10 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 /* eslint-disable */
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1 });
-  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1 });
+  const { companyId } = req.user;
+  
+  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1, companyId });
+  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1, companyId });
 
   if (sendingFiles?.length > 0) {
     sendingFiles.forEach(async (file) => {
