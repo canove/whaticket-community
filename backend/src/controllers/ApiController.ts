@@ -67,8 +67,7 @@ const createContact = async (newContact: string) => {
 /* eslint-disable */
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const companyId = req.user.companyId;
-  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1, companyId });
+  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1 });
   if (files) {
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
@@ -78,7 +77,7 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
         file
       });
 
-      await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file, companyId });
+      await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
 
       io.emit("file", {
         action: "update",
@@ -93,13 +92,12 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 /* eslint-disable */
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const companyId = req.user.companyId;
-  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1, companyId });
-  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1, companyId });
+  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1 });
+  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1 });
 
   if (sendingFiles?.length > 0) {
     sendingFiles.forEach(async (file) => {
-      await DispatcherRegisterService({ file, companyId });
+      await DispatcherRegisterService({ file });
     });
   } else {
     if (files?.length > 0) {
@@ -111,7 +109,7 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
           file
         });
   
-        await DispatcherRegisterService({ file, companyId });
+        await DispatcherRegisterService({ file });
 
         io.emit("file", {
         action: "update",
@@ -156,7 +154,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {
-        await SendWhatsAppMedia({ body, media, ticket: contactAndTicket });
+        await SendWhatsAppMedia({ media, ticket: contactAndTicket, companyId, body });
       })
     );
   } else {

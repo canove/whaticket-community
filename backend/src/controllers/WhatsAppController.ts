@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 import { removeWbot } from "../libs/wbot";
@@ -14,6 +15,7 @@ import ListOfficialWhatsAppsService from "../services/WhatsappService/ListOffici
 import QualityNumberWhatsappService from "../services/WhatsappService/QualityNumberWhatsappService";
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
+import axios from "axios";
 
 type ListQuery = {
   pageNumber: string | number;
@@ -56,7 +58,24 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     phoneNumber,
   }: WhatsappData = req.body;
 
+  //FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   const companyId = req.user.companyId;
+
+  const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
+   
+  const payload = {
+    "companyId": companyId
+  };
+  try {
+    await axios.post(apiUrl, payload, {
+      headers: {
+        "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+        "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+      }
+    });
+  }catch(err) {
+    return res.status(500).json(err['response'].data['message']);
+  }
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -133,7 +152,6 @@ export const remove = async (
   const { whatsappId } = req.params;
 
   await DeleteWhatsAppService(whatsappId);
-  removeWbot(+whatsappId);
 
   const io = getIO();
   io.emit("whatsapp", {
@@ -175,9 +193,9 @@ export const newMessage = async (
     body,
     contactName,
     identification,
+    file,
     session
   } = req.body;
-  const companyId = req.user.companyId;
 
   const message = await NewMessageWhatsapp({
     id,
@@ -189,8 +207,8 @@ export const newMessage = async (
     body,
     contactName,
     identification,
-    session,
-    companyId
+    file,
+    session
   });
 
   return res.status(200).json(message);

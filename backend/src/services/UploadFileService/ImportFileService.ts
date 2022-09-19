@@ -5,7 +5,7 @@ import FileRegister from "../../database/models/FileRegister";
 import { FileStatus } from "../../enum/FileStatus";
 
 /*eslint-disable*/
-const ImportFileService = async ({ key, createdAt, file, companyId }): Promise<void> => {
+const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
     region: process.env.AWS_REGION
@@ -41,7 +41,7 @@ const ImportFileService = async ({ key, createdAt, file, companyId }): Promise<v
             template: infos[3],
             templateParams: infos[4],
             message: infos[5],
-            companyId: companyId
+            companyId: file.companyId
           });
   
           if (registersToInsert.length >= 500) {

@@ -35,14 +35,7 @@ class Message extends Model<Message> {
   body: string;
 
   @Column(DataType.STRING)
-  get mediaUrl(): string | null {
-    if (this.getDataValue("mediaUrl")) {
-      return `${process.env.BACKEND_URL}:${
-        process.env.PROXY_PORT
-      }/public/${this.getDataValue("mediaUrl")}`;
-    }
-    return null;
-  }
+  mediaUrl: string;
 
   @Column
   mediaType: string;

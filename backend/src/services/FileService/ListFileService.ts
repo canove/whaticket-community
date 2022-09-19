@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { Op } from "sequelize";
 import File from "../../database/models/File";
 
@@ -5,7 +6,7 @@ const ListFileService = async ({
   Status,
   initialDate,
   limit = null,
-  companyId
+  companyId = null
 }): Promise<File[] | undefined> => {
   let where = null;
 
@@ -31,9 +32,12 @@ const ListFileService = async ({
       }
     };
   }
+  if(companyId) {
+    where = {...where, companyId }
+  }
   // eslint-disable-next-line no-return-await
   return await File.findAll({
-    where: { ...where, companyId },
+    where,
     order: [['createdAt', 'DESC']],
     limit
   });

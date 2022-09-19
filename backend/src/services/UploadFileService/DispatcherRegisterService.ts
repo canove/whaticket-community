@@ -6,12 +6,12 @@ import Whatsapp from "../../database/models/Whatsapp";
 import { FileStatus } from "../../enum/FileStatus";
 
 /* eslint-disable */
-const DispatcherRegisterService = async ({ file, companyId }): Promise<void> => {
+const DispatcherRegisterService = async ({ file }): Promise<void> => {
   try {
     const containPending = await FileRegister.findAll({ 
       where: {
         fileId: file.id,
-        companyId,
+        companyId: file.companyId,
         processedAt: null
       }
     });
@@ -55,7 +55,7 @@ const DispatcherRegisterService = async ({ file, companyId }): Promise<void> => 
         const registers = await FileRegister.findAll({
           where: {
             fileId: file.id,
-            companyId,
+            companyId: file.companyId,
             sentAt: null,
             processedAt: null
           },
@@ -100,7 +100,7 @@ const DispatcherRegisterService = async ({ file, companyId }): Promise<void> => 
             where: {
               fileId: file.id,
               sentAt: null,
-              companyId,
+              companyId: file.companyId,
               processedAt: null
             },
             limit: 1

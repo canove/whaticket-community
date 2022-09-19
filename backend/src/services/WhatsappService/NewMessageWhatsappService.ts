@@ -1,5 +1,7 @@
 import * as Yup from "yup";
 import * as Sentry from "@sentry/node";
+import { promisify } from "util";
+import { writeFile } from "fs";
 
 import AppError from "../../errors/AppError";
 import Contact from "../../database/models/Contact";
@@ -10,7 +12,8 @@ import CreateMessageService from "../MessageServices/CreateMessageService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
-
+import Company from "../../database/models/Company";
+/*eslint-disable*/
 interface Request {
   id: string;
   fromMe: boolean;
@@ -21,8 +24,8 @@ interface Request {
   body: string;
   contactName: string;
   session: string;
+  file: string;
   identification: number;
-  companyId: number;
 }
 
 interface Response {
@@ -61,8 +64,8 @@ const NewMessageWhatsappService = async ({
   body,
   contactName,
   identification,
-  session,
-  companyId
+  file,
+  session
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     id: Yup.string().required(),
@@ -98,8 +101,8 @@ const NewMessageWhatsappService = async ({
     contactName,
     isGroup,
     identification,
-    session,
-    companyId
+    file,
+    session
   );
   return { success: true };
 };
@@ -155,7 +158,6 @@ const verifyContact = async (
   return contact;
 }
 
-
 const handleMessage = async (
   id: string,
   fromMe: boolean,
@@ -166,12 +168,12 @@ const handleMessage = async (
   contactName: string,
   isGroup: boolean,
   identification: number,
-  session: string,
-  companyId: number
+  file: string = null,
+  session: string
 ): Promise<void> => {
   try {
     const unreadMessages = 1;
-    const contact = await verifyContact(contactName, from, companyId);
+   
     let whatsapp: Whatsapp;
     if (identification) {
       whatsapp = await GetWhatsappByIdentification(identification);
@@ -179,9 +181,11 @@ const handleMessage = async (
     if (session) {
       whatsapp = await GetWhatsappBySession(session);
     }
+    
     // eslint-disable-next-line no-throw-literal
     if (!whatsapp) throw "number identification not found";
 
+    const contact = await verifyContact(contactName, from, whatsapp.companyId);
     const ticket = await FindOrCreateTicketService(
       contact,
       whatsapp.id,
@@ -190,7 +194,16 @@ const handleMessage = async (
     );
 
     if (type !== "text") {
-      //await verifyMediaMessage(msg, ticket, contact);
+      await verifyMediaMessage({
+        id,
+        fromMe,
+        body,
+        from,
+        to,
+        type,
+        file,
+        isGroup
+      }, ticket, contact);
     } else {
       await verifyMessage(
         {
@@ -212,4 +225,38 @@ const handleMessage = async (
   }
 };
 
+const writeFileAsync = promisify(writeFile);
+
+const verifyMediaMessage = async (
+  msg: {
+    id: string;
+    fromMe: boolean;
+    body: string;
+    from: string;
+    to: string;
+    type: string;
+    file: string;
+    isGroup: boolean;
+  },
+  ticket: Ticket,
+  contact: Contact
+): Promise<void> => {
+  
+  const company = await Company.findByPk(ticket.companyId);
+  //const mediaUrl = await upoloadToS3(msg.body, msg.file, msg.type, company.name);
+
+  const messageData = {
+    id: msg.id,
+    ticketId: ticket.id,
+    contactId: msg.fromMe ? undefined : contact.id,
+    body: "",
+    fromMe: msg.fromMe,
+    read: msg.fromMe,
+    mediaUrl: msg.body,
+    mediaType: msg.type
+  };
+
+  await ticket.update({ lastMessage: msg.file });
+  await CreateMessageService({ messageData });
+};
 export default NewMessageWhatsappService;

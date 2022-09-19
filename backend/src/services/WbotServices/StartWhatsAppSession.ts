@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { initWbot } from "../../libs/wbot";
 import Whatsapp from "../../database/models/Whatsapp";
 import axios from "axios";
@@ -21,6 +22,7 @@ export const StartWhatsAppSession = async (
     const apiUrl = `${process.env.WPP_NOF_URL}/start`;
     const payload = {
       session: whatsapp.name,
+      companyId: whatsapp.companyId,
       wh_status: process.env.WPP_NOF_WEBHOOK_URL,
       wh_message: process.env.WPP_NOF_WEBHOOK_URL,
       wh_qrcode: process.env.WPP_NOF_WEBHOOK_URL,
