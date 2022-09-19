@@ -30,7 +30,7 @@ const ListWhatsAppsService = async ({
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: whatsapps } = await Whatsapp.findAndCountAll({
-    where: { official: isOfficial, companyId },
+    where: { official: isOfficial, companyId, deleted: false },
     limit,
     offset,
     include: [

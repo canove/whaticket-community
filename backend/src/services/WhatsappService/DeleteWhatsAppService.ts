@@ -27,7 +27,11 @@ const DeleteWhatsAppService = async (id: string): Promise<void> => {
     logger.error(err);
   }
 
-  await whatsapp.destroy();  
+  await whatsapp.update({
+    deleted: true,
+  });
+
+  // await whatsapp.destroy();  
 };
 
 export default DeleteWhatsAppService;
