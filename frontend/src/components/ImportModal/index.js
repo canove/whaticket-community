@@ -185,10 +185,6 @@ const ImportModal = ({ open, onClose }) => {
 	}, [])
 
 	useEffect(() => {
-		console.log(templates);
-	},[])
-
-	useEffect(() => {
 		if (menus) {
 			let offWhats = false;
 			let noOffWhats = false;
@@ -283,6 +279,7 @@ const ImportModal = ({ open, onClose }) => {
 							})}
 						</Select>
 					</div>
+					{ selectedType === false &&
 					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
                         	Template:
@@ -304,6 +301,7 @@ const ImportModal = ({ open, onClose }) => {
 							})}
 						</Select>
 					</div>
+					}
 					<div className={classes.multFieldLine}>
 						<Button
 							variant="contained"
