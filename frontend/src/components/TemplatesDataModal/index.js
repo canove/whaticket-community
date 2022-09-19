@@ -147,7 +147,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     const testParams = () => {
       let result = 0;
       result += text.split("{{name}}").length - 1
-      result += text.split("{{document}}").length - 1
+      result += text.split("{{documentNumber}}").length - 1
       result += text.split("{{phoneNumber}}").length - 1
 
       if (paramsQuantity > 3) {
@@ -174,7 +174,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                   style={{width: "100%"}}
                 >
                   <MenuItem value={'name'}>Nome</MenuItem>
-                  <MenuItem value={'document'}>Documento</MenuItem>
+                  <MenuItem value={'documentNumber'}>Documento</MenuItem>
                   <MenuItem value={'phoneNumber'}>Número de Telefone</MenuItem>
                 </Select>
               </FormControl>
