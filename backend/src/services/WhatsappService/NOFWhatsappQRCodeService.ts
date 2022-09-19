@@ -34,7 +34,8 @@ const NOFWhatsappQRCodeService = async ({
   }
   const whatsapp = await Whatsapp.findOne({
     where: {
-      name: session
+      name: session,
+      deleted: false
     }
   });
 

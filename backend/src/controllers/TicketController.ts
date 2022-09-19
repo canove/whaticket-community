@@ -87,7 +87,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const historic = async (req: Request, res: Response): Promise<Response> => {
-  const contactId = req.user.companyId;
+  const { contactId } = req.params;
 
   const contact = await HistoricService(contactId);
 
@@ -100,7 +100,7 @@ export const update = async (
 ): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const { ticket } = await UpdateTicketService({
     ticketData,
