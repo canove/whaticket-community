@@ -12,7 +12,8 @@ const ListWhatsAppsService = async (
         as: "queues",
         attributes: ["id", "name", "color", "greetingMessage"]
       }
-    ]
+    ],
+    order: ["status", "DESC"]
   });
 
   return whatsapps;
