@@ -1,5 +1,5 @@
 import { Message as WbotMessage } from "whatsapp-web.js";
-import Ticket from "../models/Ticket";
+import Ticket from "../database/models/Ticket";
 import GetTicketWbot from "./GetTicketWbot";
 import AppError from "../errors/AppError";
 

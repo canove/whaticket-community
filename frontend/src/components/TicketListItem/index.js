@@ -14,14 +14,13 @@ import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
 
-import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -103,6 +102,7 @@ const useStyles = makeStyles(theme => ({
 
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 	const history = useHistory();
 	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
@@ -177,6 +177,7 @@ const TicketListItem = ({ ticket }) => {
 							</Typography>
 							{ticket.status === "closed" && (
 								<Badge
+									overlap="rectangular"
 									className={classes.closedBadge}
 									badgeContent={"closed"}
 									color="primary"
@@ -215,6 +216,7 @@ const TicketListItem = ({ ticket }) => {
 							</Typography>
 
 							<Badge
+								overlap="rectangular"
 								className={classes.newMessagesCount}
 								badgeContent={ticket.unreadMessages}
 								classes={{

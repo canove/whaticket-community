@@ -15,10 +15,10 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
-import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,6 +65,7 @@ const QuickAnswersModal = ({
   onSave,
 }) => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
   const isMounted = useRef(true);
 
   const initialState = {

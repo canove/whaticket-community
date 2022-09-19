@@ -24,11 +24,11 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -85,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Users = () => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
@@ -130,7 +131,7 @@ const Users = () => {
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_USER", payload: +data.userId });
+        dispatch({ type: "DELETE_USER", payload: + data.userId });
       }
     });
 
@@ -237,15 +238,10 @@ const Users = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
-              <TableCell align="center">
-                {i18n.t("users.table.email")}
-              </TableCell>
-              <TableCell align="center">
-                {i18n.t("users.table.profile")}
-              </TableCell>
-              <TableCell align="center">
-                {i18n.t("users.table.actions")}
-              </TableCell>
+              <TableCell align="center">{i18n.t("users.table.email")}</TableCell>
+              <TableCell align="center">{i18n.t("users.table.profile")}</TableCell>
+              <TableCell align="center">{i18n.t("Nome da Empresa")}</TableCell>
+              <TableCell align="center">{i18n.t("users.table.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -255,6 +251,7 @@ const Users = () => {
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
+                  <TableCell align="center">{user["company.name"]}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

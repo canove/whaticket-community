@@ -34,22 +34,40 @@ const messages = {
         },
       },
       dashboard: {
+        title: "Dashboard",
+        file: " Arquivo",
         charts: {
           perDay: {
-            title: "Tickets hoje: ",
+            title: "Chamadas hoje: ",
+            calls: "Chamadas",
           },
         },
         messages: {
           inAttendance: {
-            title: "Em Atendimento"
+            title: "Em Atendimento",
           },
           waiting: {
-            title: "Aguardando"
+            title: "Aguardando",
           },
           closed: {
-            title: "Finalizado"
-          }
-        }
+            title: "Finalizados",
+          },
+          imported: {
+            title: "Importados",
+          },
+          sent: {
+            title: "Enviados",
+          },
+          handedOut: {
+            title: "Entregues",
+          },
+          read: {
+            title: "Lidos",
+          },
+          mistake: {
+            title: "Erros",
+          },
+        },
       },
       connections: {
         title: "Conexões",
@@ -98,6 +116,28 @@ const messages = {
           default: "Padrão",
           actions: "Ações",
           session: "Sessão",
+          quality: "Qualidade",
+          limit: "Limite",
+        },
+      },
+      officialConnections: {
+        title: "Conexões Oficiais",
+      },
+      officialWhatsappModal: {
+        title: {
+          add: "Adicionar WhatsApp Oficial",
+          edit: "Editar WhatsApp Oficial",
+          labelNumber: "Número de Telefone",
+          labelToken: "Token de Autenticação do Facebook",
+          labelId: "Id do Telefone do Facebook",
+          labelBusiness: "Facebook Business Id",
+          greetingMessage: "Mensagem de saudação",
+          farewellMessage: "Mensagem de despedida",
+        },
+        buttons: {
+          cancel: "Cancelar",
+          testConnection: "Testar Conexão",
+          add: "Adicionar",
         },
       },
       whatsappModal: {
@@ -108,7 +148,7 @@ const messages = {
         form: {
           name: "Nome",
           default: "Padrão",
-          farewellMessage: "Mensagem de despedida"
+          farewellMessage: "Mensagem de despedida",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -130,8 +170,8 @@ const messages = {
           deleteTitle: "Deletar ",
           importTitlte: "Importar contatos",
           deleteMessage:
-            "Tem certeza que deseja deletar este contato? Todos os tickets relacionados serão perdidos.",
-          importMessage: "Deseja importas todos os contatos do telefone?",
+            "Tem certeza que deseja deletar este contato? Todas as chamadas relacionados serão perdidos.",
+          importMessage: "Deseja importar todos os contatos do telefone?",
         },
         buttons: {
           import: "Importar Contatos",
@@ -208,6 +248,12 @@ const messages = {
           email: "Email",
           password: "Senha",
           profile: "Perfil",
+          language: "Linguagem",
+          languages: {
+            pt: "Português",
+            en: "Inglês",
+            es: "Espanhol",
+          },
         },
         buttons: {
           okAdd: "Adicionar",
@@ -217,7 +263,7 @@ const messages = {
         success: "Usuário salvo com sucesso.",
       },
       chat: {
-        noTicketMessage: "Selecione um ticket para começar a conversar.",
+        noTicketMessage: "Selecione uma chamada para começar a conversar.",
       },
       ticketsManager: {
         buttons: {
@@ -229,7 +275,7 @@ const messages = {
       },
       tickets: {
         toasts: {
-          deleted: "O ticket que você estava foi deletado.",
+          deleted: "A chamada que você estava foi deletado.",
         },
         notification: {
           message: "Mensagem de",
@@ -240,14 +286,14 @@ const messages = {
           search: { title: "Busca" },
         },
         search: {
-          placeholder: "Buscar tickets e mensagens",
+          placeholder: "Buscar chamadas e mensagens",
         },
         buttons: {
           showAll: "Todos",
         },
       },
       transferTicketModal: {
-        title: "Transferir Ticket",
+        title: "Transferir Chamada",
         fieldLabel: "Digite para buscar usuários",
         fieldQueueLabel: "Transferir para fila",
         fieldQueuePlaceholder: "Selecione uma fila",
@@ -262,13 +308,13 @@ const messages = {
         assignedHeader: "Atendendo",
         noTicketsTitle: "Nada aqui!",
         noTicketsMessage:
-          "Nenhum ticket encontrado com esse status ou termo pesquisado",
+          "Nenhuma chamada encontrada com esse status ou termo pesquisado",
         buttons: {
           accept: "Aceitar",
         },
       },
       newTicketModal: {
-        title: "Criar Ticket",
+        title: "Criar Chamada",
         fieldLabel: "Digite para pesquisar o contato",
         add: "Adicionar",
         buttons: {
@@ -279,15 +325,28 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
-          connections: "Conexões",
-          tickets: "Tickets",
+          template: "Templates",
+          tickets: "Chamadas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
+          importation: "Importação",
           queues: "Filas",
           administration: "Administração",
           users: "Usuários",
           settings: "Configurações",
+          reportsTalk: "Relatórios Conversa",
+          reportsTicket: "Relatórios Chamadas",
+          logReports: "Relatório Registro",
           reports: "Relatórios",
+          whatsOff: "WhatsApp",
+          whatsNoOff: "WhatsApp 2",
+          company: "Empresas",
+          menus: "Menus",
+        },
+        whatsApp: {
+          connections: "Conexões",
+          officialConnections: "Conexões",
+          settings: "Configurações",
         },
         appBar: {
           user: {
@@ -313,7 +372,7 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Excluir",
           deleteMessage:
-            "Você tem certeza? Essa ação não pode ser revertida! Os tickets dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+            "Você tem certeza? Essa ação não pode ser revertida! As chamadas dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
         },
       },
       queueSelect: {
@@ -337,6 +396,58 @@ const messages = {
           deleteTitle:
             "Você tem certeza que quer excluir esta Resposta Rápida: ",
           deleteMessage: "Esta ação não pode ser revertida.",
+        },
+      },
+      importation: {
+        title: "Importação",
+        form: {
+          status: "Status",
+          date: "Data",
+        },
+        buttons: {
+          import: "Importar Disparos",
+          filter: "Filtrar",
+        },
+        table: {
+          uploadDate: "Data de Upload",
+          fileName: "Nome do Arquivo",
+          sentBy: "Enviado por",
+          numberOfRecords: "Quantidade de Registros",
+          status: "Status",
+          official: "Oficial",
+          actions: "Ações",
+        },
+        registryModal: {
+          title: "Registros",
+          id: "Id",
+          name: "Nome",
+          template: "Template",
+          message: "Mensagem",
+          phoneNumber: "Número de Telefone",
+          documentNumber: "Número de Documento",
+          cancel: "Cancelar",
+          refuse: "Recusar",
+          approve: "Aprovar",
+        },
+      },
+      importModal: {
+        title: "Importar",
+        buttons: {
+          uploadFile: "Importar Arquivo",
+          cancel: "Cancelar",
+          import: "Importar",
+        },
+        form: {
+          shotType: "Tipo de Disparo",
+          official: "Oficial",
+          notOfficial: "Não Oficial",
+          noFile: "Nenhum Arquivo Importado",
+          uploadedFile: "Arquivo Importado",
+          supportedTriggerModel: "Modelo de Disparo Suportado",
+          connection: "Conexão",
+          selectAConnection: "Selecione uma Conexão",
+          show: "Mostrar",
+          toHide: "Esconder",
         },
       },
       users: {
@@ -373,9 +484,10 @@ const messages = {
         },
       },
       reports: {
-        title: "Relatórios",
+        title: "Relatório Conversa",
         buttons: {
           filter: "Filtrar relatórios",
+          exportPdf: "Exportar PDF",
         },
         form: {
           initialDate: "Data inicial",
@@ -387,9 +499,12 @@ const messages = {
           messageBody: "Corpo da mensagem",
           read: "Lida",
           mediaURL: "URL da mídia",
-          ticketId: "ID do ticket",
+          ticketId: "ID da chamada",
           date: "Data",
-        }
+        },
+      },
+      reportsTicket: {
+        title: "Relatório Chamadas",
       },
       messagesList: {
         header: {
@@ -403,9 +518,10 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
+        placeholderOpen:
+          "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
         placeholderClosed:
-          "Reabra ou aceite esse ticket para enviar uma mensagem.",
+          "Reabra ou aceite essa chamada para enviar uma mensagem.",
         signMessage: "Assinar",
       },
       contactDrawer: {
@@ -419,9 +535,9 @@ const messages = {
         delete: "Deletar",
         transfer: "Transferir",
         confirmationModal: {
-          title: "Deletar o ticket do contato",
+          title: "Deletar a chamada do contato",
           message:
-            "Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
+            "Atenção! Todas as mensagens relacionadas a essa chamada serão perdidas.",
         },
         buttons: {
           delete: "Excluir",
@@ -442,6 +558,159 @@ const messages = {
           message: "Esta ação não pode ser revertida.",
         },
       },
+      templates: {
+        title: "Templates",
+        table: {
+          name: "Nome",
+          preview: "Prévia",
+          category: "Categoria",
+          classification: "Classificação",
+          language: "Idioma",
+          status: "Status",
+          action: "Ações",
+        },
+        buttons: {
+          newTemplate: "Nova Template",
+          cancel: "Cancelar",
+          add: "Adicionar",
+          connection: "Conexões",
+        },
+        templateModal: {
+          title: "Nova Template",
+          name: "Nome",
+          category: "Categoria",
+          body: "Corpo",
+          footer: "Rodapé",
+          connection: "Conexões",
+          transactional: "Transacional",
+          marketing: "Marketing",
+          edit: "Editar",
+          cancel: "Cancelar",
+          success: "Template criada com sucesso!",
+          connectionFailed: "Favor selecione uma conexão!",
+          delete: "Template excluida com sucesso!",
+          toastErr: "Limite de parâmetros exedido!"
+        },
+      },
+
+      logReport: {
+        title: "Relatórios de Registros",
+        select: {
+          file: "Arquivo",
+          status: "Status",
+          all: "Todos",
+          sent: "Enviados",
+          delivered: "Entregues",
+          read: "Lidos",
+          errors: "Erros",
+        },
+        buttons: {
+          createPdf: "Criar Pdf",
+          exportPdf: "Exportar Pdf",
+          previous: "Anterior",
+          next: "Próxima",
+          page: "Página: ",
+        },
+        grid: {
+          name: "Nome",
+          sent: "Enviado",
+          delivered: "Entregue",
+          read: "Lido",
+          errors: "Erro",
+        },
+      },
+
+      settingsWhats:{
+        title: "Configurações",
+        triggerTime: "Tempo de Disparo entre as Instâncias",
+        connections: "Conexões",
+        all: "Todos",
+      },
+
+      historicTicket:{
+        button: "Histórico",
+      historicModal:{
+        title: "Histórico",
+        name: "Nome",
+        message: "Mensagem",
+        status: "Status",
+        createAt: "Data Criação",
+        actions: "Ações",
+        closed: "Fechar",
+        back: "Voltar"
+        },
+      },
+
+      company:{
+        title: "Empresas",
+        search: "Pesquisar",
+      grid:{
+        companyId: "Id da Empresa",
+        name: "Nome",
+        cnpj: "CNPJ",
+        phone: "Telefone",
+        email: "Email",
+        address:  "Endereço",
+        actions: "Ações"
+      },
+      buttons: {
+        addCompany: "Cadastrar Empresa"
+      },
+      companyModal: {
+        titleAdd: "Adicionar Empresa",
+        titleEdit: "Editar Cadastro da Empresa",
+        name: "Nome da Empresa",
+        cnpj: "CNPJ",
+        phone: "Telefone",
+        email: "Email",
+        address: "Endereço"
+      },
+      success: "Empresa cadastrada com Sucesso!",
+      deleteCompany: "Todos os dados da empresa cadastrada serão perdidos, deseja realmente excluir, ",
+      toast: "Empresa excluida com sucesso!"
+      },
+
+      menu:{
+            title: "Menus",
+            success: "Menu salvo com sucesso!",
+          buttons:{
+            save: "Salvar",
+            menus: "Menus",
+            company: "Empresas"
+          },
+        },
+      templatesData:{
+        title: "Templates Data",
+        buttons: {
+          connection: "Conexões",
+          search: "Pesquisar",
+          newTemplate: "Nova Template"
+        },
+        grid: {
+          name: "Nome",
+          status: "Status",
+          text: "Texto",
+          footer: "Rodapé",
+          createdAt: "Data da Criação",
+          updateAt: "Editado em",
+          actions: "Acões",
+        },
+        templateModal: {
+          add: "Adicionar Template",
+          edit: "Editar Template",
+          name: "Nome",
+          bodyText: "Corpo do Texto",
+          footer: "Rodapé",
+          buttonAdd: "Adicionar",
+          buttonEdit: "Editar",
+        },
+        modalConfirm: {
+          delete: "Deseja realmente excluir, todos os dados da Template serão perdidos!",
+          successDelete: "Template Deletada com Sucesso!",
+          successAdd: "Template Adicionada com sucesso!",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
@@ -477,6 +746,8 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+        ERR_NO_COMPANY_FOUND: "Erro ao excluir a Empresa.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "Já existe uma empresa com esse CNPJ.",
       },
     },
   },

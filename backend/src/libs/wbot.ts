@@ -1,7 +1,7 @@
 import qrCode from "qrcode-terminal";
 import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
-import Whatsapp from "../models/Whatsapp";
+import Whatsapp from "../database/models/Whatsapp";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
 import { handleMessage } from "../services/WbotServices/wbotMessageListener";
@@ -47,33 +47,6 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       }
 
       const wbot: Session = new Client({puppeteer: {headless:true}});
-
-    /*  if (whatsapp && whatsapp.session) {
-        sessionCfg = JSON.parse(whatsapp.session);
-      }
-
-      const args:String = process.env.CHROME_ARGS || "";
-
-      const wbot: Session = new Client({
-        session: sessionCfg,
-        puppeteer: {
-          executablePath: process.env.CHROME_BIN || undefined,
-          // @ts-ignore
-          browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-gpu'
-          ]
-        }
-      });
-
-      logger.info("--PUPPETEER--:", sessionName);*/
 
       wbot.initialize();
 

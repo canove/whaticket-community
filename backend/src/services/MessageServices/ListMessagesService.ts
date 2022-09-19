@@ -1,6 +1,6 @@
 import AppError from "../../errors/AppError";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
+import Message from "../../database/models/Message";
+import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Request {

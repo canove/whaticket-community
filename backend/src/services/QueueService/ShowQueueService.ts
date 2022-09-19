@@ -1,5 +1,5 @@
 import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
+import Queue from "../../database/models/Queue";
 
 const ShowQueueService = async (queueId: number | string): Promise<Queue> => {
   const queue = await Queue.findByPk(queueId);

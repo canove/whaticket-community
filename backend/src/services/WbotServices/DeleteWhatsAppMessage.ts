@@ -1,7 +1,7 @@
 import AppError from "../../errors/AppError";
 import GetWbotMessage from "../../helpers/GetWbotMessage";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
+import Message from "../../database/models/Message";
+import Ticket from "../../database/models/Ticket";
 
 const DeleteWhatsAppMessage = async (messageId: string): Promise<Message> => {
   const message = await Message.findByPk(messageId, {

@@ -1,4 +1,4 @@
-import QuickAnswer from "../../models/QuickAnswer";
+import QuickAnswer from "../../database/models/QuickAnswer";
 import AppError from "../../errors/AppError";
 
 interface QuickAnswerData {

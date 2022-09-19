@@ -1,6 +1,6 @@
 import { getIO } from "../libs/socket";
-import Message from "../models/Message";
-import Ticket from "../models/Ticket";
+import Message from "../database/models/Message";
+import Ticket from "../database/models/Ticket";
 import { logger } from "../utils/logger";
 import GetTicketWbot from "./GetTicketWbot";
 

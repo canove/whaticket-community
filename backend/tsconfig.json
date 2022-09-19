@@ -4,11 +4,14 @@
     "module": "commonjs",
     "outDir": "./dist",
     "strict": true,
+    "skipDefaultLibCheck": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true
   }
 }

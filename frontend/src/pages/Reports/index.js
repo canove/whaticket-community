@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -17,9 +17,10 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
-import ReportsList from "../../components/ReportsList";
+import { format, parseISO } from "date-fns";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,7 +39,7 @@ const reducer = (state, action) => {
     if (action.type === "LOAD_USERS") {
         const users = action.payload;
         const newUsers = [];
-    
+
         users.forEach((user) => {
             const userIndex = state.findIndex((u) => u.id === user.id);
             if (userIndex !== -1) {
@@ -47,7 +48,7 @@ const reducer = (state, action) => {
                 newUsers.push(user);
             }
         });
-    
+
         return [...state, ...newUsers];
     }
 
@@ -58,12 +59,49 @@ const reducer = (state, action) => {
 
 const Reports = () => {
     const classes = useStyles();
+    const { i18n } = useTranslation();
 
     const [loading, setLoading] = useState(false);
     const [users, dispatchUsers] = useReducer(reducer, []);
+    const [reports, setReports] = useState([]);
+    const [disableButton, setDisableButton] = useState(true);
+    const [userId, setUserId] = useState("");
+    const [initialDate, setInitialDate] = useState("");
+    const [finalDate, setFinalDate] = useState("");
+    const [pdf, setPdf] = useState();
+
+    const filterReports = async () => {
+        setDisableButton(true);
+        await fetchReports();
+        await createPdf();
+        setDisableButton(false);
+    }
+
+    const downloadPdf = () => {
+        const linkSource = `data:application/pdf;base64,${pdf}`;
+        const downloadLink = document.createElement("a");
+        const fileName = `report.pdf`;
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
+    }
+
+    const createPdf = async () => {
+        if (!initialDate || !finalDate || !userId) {
+            toast.error("Fill the form");
+        } else {
+            try {
+                const { data } = await api.get(`/tickets-export-report-talk?initialDate=${initialDate}&finalDate=${finalDate}&userId=${userId}`);
+                setPdf(data);
+            } catch (err) {
+                toastError(err)
+            }
+        }
+    }
 
     useEffect(() => {
         dispatchUsers({ type: "RESET"});
+
     }, []);
 
     useEffect(() => {
@@ -83,19 +121,36 @@ const Reports = () => {
         return () => clearTimeout(delayDebounceFn);
     }, []);
 
-    const valueRefUser = useRef("");
-    const valueRefInitialDate = useRef("");
-    const valueRefFinalDate = useRef("");
+    const fetchReports = async () => {
+        if (initialDate && finalDate && userId) {
+            try {
+                setLoading(true);
+                const { data } = await api.get(`report-talk?initialDate=${initialDate}&finalDate=${finalDate}&user=${userId}`);
+                setReports(data);
+                setLoading(false);
+            } catch (err) {
+                toastError(err);
+            }
+        } else {
+            toast.error("Fill the form")
+        }
+    };
 
-    const [userValue, setUserValue] = useState("");
-    const [initialDateValue, setInitialDateValue] = useState("");
-    const [finalDateValue, setFinalDateValue] = useState("");
+    const handleSelectOption = (_, newValue) => {
+        if (newValue) {
+            setUserId(newValue.id);
+        } else {
+            setUserId("");
+        }
+	};
 
-    const filterReports = () => {
-        setUserValue(valueRefUser.current.value);
-        setInitialDateValue(valueRefInitialDate.current.value);
-        setFinalDateValue(valueRefFinalDate.current.value);
-    }
+    const renderOptionLabel = option => {
+        if (option.number) {
+          return `${option.name} - ${option.number}`;
+        } else {
+          return `${option.name}`;
+        }
+    };
 
     return (
         <MainContainer>
@@ -103,30 +158,29 @@ const Reports = () => {
                 <Title>{i18n.t("reports.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Autocomplete
+                        onChange={(e, newValue) => handleSelectOption(e, newValue)}
                         className={classes.root}
-                        options={users.map(user => (user.name))}
-                        renderInput={(params) => 
-                            <TextField 
-                                {...params} 
+                        options={users}
+                        getOptionLabel={renderOptionLabel}
+                        renderInput={(params) =>
+                            <TextField
+                                {...params}
                                 label={i18n.t("reports.form.user")}
                                 InputLabelProps={{ required: true}}
-                                inputRef={valueRefUser}
                             />
                         }
                     />
                     <TextField
-                        id="initialDate"
+                        onChange={(e) => { setInitialDate(e.target.value) }}
                         label={i18n.t("reports.form.initialDate")}
-                        InputLabelProps={{ shrink: true, required: true}}
+                        InputLabelProps={{ shrink: true, required: true }}
                         type="date"
-                        inputRef={valueRefInitialDate}
                     />
                     <TextField
-                        id="finalDate"
+                        onChange={(e) => { setFinalDate(e.target.value) }}
                         label={i18n.t("reports.form.finalDate")}
                         InputLabelProps={{ shrink: true, required: true }}
                         type="date"
-                        inputRef={valueRefFinalDate}
                     />
                     <Button
                         variant="contained"
@@ -134,6 +188,14 @@ const Reports = () => {
                         onClick={ filterReports }
                     >
                         {i18n.t("reports.buttons.filter")}
+                    </Button>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={ downloadPdf }
+                        disabled={ disableButton }
+                    >
+                        {i18n.t("reports.buttons.exportPdf")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -154,11 +216,18 @@ const Reports = () => {
                 </TableHead>
                 <TableBody>
                     <>
-                        <ReportsList 
-                            initialDate={initialDateValue}
-                            finalDate={finalDateValue}
-                            user={userValue}
-                        />
+                        {reports.map((reportTalk) => (
+                            <TableRow key={reportTalk.id}>
+                                <TableCell align="center">{reportTalk.id}</TableCell>
+                                <TableCell align="center">{reportTalk.body}</TableCell>
+                                <TableCell align="center">{reportTalk.read}</TableCell>
+                                <TableCell align="center">{reportTalk.mediaUrl}</TableCell>
+                                <TableCell align="center">{reportTalk.ticketId}</TableCell>
+                                <TableCell align="center">{format(parseISO(reportTalk.createdAt), "dd/MM/yy HH:mm")}</TableCell>
+                            </TableRow>
+                        ))
+                        }
+
                         {loading}
                     </>
                 </TableBody>

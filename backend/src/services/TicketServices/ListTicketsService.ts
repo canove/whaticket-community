@@ -1,10 +1,10 @@
 import { Op, fn, where, col, Filterable, Includeable } from "sequelize";
 import { startOfDay, endOfDay, parseISO } from "date-fns";
 
-import Ticket from "../../models/Ticket";
-import Contact from "../../models/Contact";
-import Message from "../../models/Message";
-import Queue from "../../models/Queue";
+import Ticket from "../../database/models/Ticket";
+import Contact from "../../database/models/Contact";
+import Message from "../../database/models/Message";
+import Queue from "../../database/models/Queue";
 import ShowUserService from "../UserServices/ShowUserService";
 
 interface Request {
@@ -16,6 +16,7 @@ interface Request {
   userId: string;
   withUnreadMessages?: string;
   queueIds: number[];
+  companyId: string | number;
 }
 
 interface Response {
@@ -32,11 +33,13 @@ const ListTicketsService = async ({
   date,
   showAll,
   userId,
-  withUnreadMessages
+  withUnreadMessages,
+  companyId
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
-    queueId: { [Op.or]: [queueIds, null] }
+    queueId: { [Op.or]: [queueIds, null] },
+    companyId
   };
   let includeCondition: Includeable[];
 
@@ -54,7 +57,7 @@ const ListTicketsService = async ({
   ];
 
   if (showAll === "true") {
-    whereCondition = { queueId: { [Op.or]: [queueIds, null] } };
+    whereCondition = { queueId: { [Op.or]: [queueIds, null] }, companyId };
   }
 
   if (status) {
@@ -111,7 +114,8 @@ const ListTicketsService = async ({
     whereCondition = {
       createdAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
-      }
+      },
+      companyId
     };
   }
 
@@ -122,7 +126,8 @@ const ListTicketsService = async ({
     whereCondition = {
       [Op.or]: [{ userId }, { status: "pending" }],
       queueId: { [Op.or]: [userQueueIds, null] },
-      unreadMessages: { [Op.gt]: 0 }
+      unreadMessages: { [Op.gt]: 0 },
+      companyId
     };
   }
 

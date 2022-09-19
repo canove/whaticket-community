@@ -7,7 +7,7 @@ import Select from "@material-ui/core/Select";
 import Chip from "@material-ui/core/Chip";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	chips: {
@@ -21,6 +21,7 @@ const useStyles = makeStyles(theme => ({
 
 const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 	const [queues, setQueues] = useState([]);
 
 	useEffect(() => {

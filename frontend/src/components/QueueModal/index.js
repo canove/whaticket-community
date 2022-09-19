@@ -14,13 +14,12 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import ColorPicker from "../ColorPicker";
 import { IconButton, InputAdornment } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -65,6 +64,7 @@ const QueueSchema = Yup.object().shape({
 
 const QueueModal = ({ open, onClose, queueId }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 
 	const initialState = {
 		name: "",

@@ -9,8 +9,8 @@ import TicketListItem from "../TicketListItem";
 import TicketsListSkeleton from "../TicketsListSkeleton";
 
 import useTickets from "../../hooks/useTickets";
-import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	ticketsListWrapper: {
@@ -156,6 +156,7 @@ const reducer = (state, action) => {
 		const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
 			props;
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
 	const { user } = useContext(AuthContext);

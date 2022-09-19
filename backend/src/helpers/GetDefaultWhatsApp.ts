@@ -1,5 +1,5 @@
 import AppError from "../errors/AppError";
-import Whatsapp from "../models/Whatsapp";
+import Whatsapp from "../database/models/Whatsapp";
 
 const GetDefaultWhatsApp = async (): Promise<Whatsapp> => {
   const defaultWhatsapp = await Whatsapp.findOne({

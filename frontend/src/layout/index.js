@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useMemo } from "react";
+import { useTranslation } from 'react-i18next'
 import clsx from "clsx";
 
 import {
@@ -23,8 +24,13 @@ import NotificationsPopOver from "../components/NotificationsPopOver";
 import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
-import { i18n } from "../translate/i18n";
 
+import { IconFlagBR, IconFlagUS, IconFlagES } from 'material-ui-flags';
+
+import brainit from "../assets/brainit500.png";
+import api from "../services/api";
+import { toast } from "react-toastify";
+import toastError from "../errors/toastError";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +44,8 @@ const useStyles = makeStyles((theme) => ({
 
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
+    backgroundColor: "#F5F5F5",
+    color: "#363636"
   },
   toolbarIcon: {
     display: "flex",
@@ -71,6 +79,8 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   drawerPaper: {
+    backgroundColor: "#F5F5F5",
+    color: "#363636",
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
@@ -118,6 +128,31 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
+
+  const mainListItems = useMemo(() => <MainListItems />, [user])
+
+  const { i18n } = useTranslation();
+
+  function handleChangeLanguage(language) {
+    i18n.changeLanguage(language);
+    handleSaveUser(language);
+  }
+
+  const handleSaveUser = async (language) => {
+    const userData = { lang: language };
+		try {
+			if (user.id) {
+				await api.put(`/users/${user.id}`, userData);
+			} else {
+				await api.post("/users", userData);
+			}
+			toast.success(i18n.t("userModal.success"));
+		} catch (err) {
+			toastError(err);
+		}
+	};
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -142,6 +177,16 @@ const LoggedInLayout = ({ children }) => {
     setAnchorEl(null);
     setMenuOpen(false);
   };
+
+  const handleLanguageMenu = (event) => {
+    setLanguageAnchorEl(event.currentTarget);
+    setLanguageMenuOpen(true);
+  }
+
+  const handleCloseLanguageMenu = () => {
+    setLanguageAnchorEl(null);
+    setLanguageMenuOpen(false);
+  }
 
   const handleOpenUserModal = () => {
     setUserModalOpen(true);
@@ -183,7 +228,7 @@ const LoggedInLayout = ({ children }) => {
         </div>
         <Divider />
         <List>
-          <MainListItems drawerClose={drawerClose} />
+          { mainListItems }
         </List>
         <Divider />
       </Drawer>
@@ -208,7 +253,7 @@ const LoggedInLayout = ({ children }) => {
               drawerOpen && classes.menuButtonHidden
             )}
           >
-            <MenuIcon />
+            <MenuIcon/>
           </IconButton>
           <Typography
             component="h1"
@@ -216,8 +261,7 @@ const LoggedInLayout = ({ children }) => {
             color="inherit"
             noWrap
             className={classes.title}
-          >
-            WhaTicket
+          ><img src = { brainit } alt= "Logo-BrainIT"/>
           </Typography>
           {user.id && <NotificationsPopOver />}
 
@@ -252,6 +296,39 @@ const LoggedInLayout = ({ children }) => {
               <MenuItem onClick={handleClickLogout}>
                 {i18n.t("mainDrawer.appBar.user.logout")}
               </MenuItem>
+            </Menu>
+          </div>
+          <div>
+            <IconButton
+              onClick={handleLanguageMenu}
+            >
+              {i18n.language === 'pt' &&
+                <IconFlagBR />
+              }
+              {i18n.language === 'en' &&
+                <IconFlagUS />
+              }
+              {i18n.language === 'es' &&
+                <IconFlagES />
+              }
+            </IconButton>
+            <Menu
+              anchorEl={languageAnchorEl}
+              getContentAnchorEl={null}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={languageMenuOpen}
+              onClose={handleCloseLanguageMenu}
+            >
+              <MenuItem onClick={() => handleChangeLanguage('pt')}><IconButton><IconFlagBR /></IconButton></MenuItem>
+              <MenuItem onClick={() => handleChangeLanguage('en')}><IconButton><IconFlagUS /></IconButton></MenuItem>
+              <MenuItem onClick={() => handleChangeLanguage('es')}><IconButton><IconFlagES /></IconButton></MenuItem>
             </Menu>
           </div>
         </Toolbar>

@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useEffect, useReducer } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
+import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -37,8 +38,7 @@ import api from "../../services/api";
 import WhatsAppModal from "../../components/WhatsAppModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
-import { i18n } from "../../translate/i18n";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import { useTranslation } from 'react-i18next'
 import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
@@ -92,10 +92,59 @@ const CustomToolTip = ({ title, content, children }) => {
 	);
 };
 
+const reducer = (state, action) => {
+	if (action.type === "LOAD_WHATSAPPS") {
+		const whatsApps = action.payload;
+		return [...whatsApps];
+	}
+
+	if (action.type === "UPDATE_WHATSAPPS") {
+		const whatsApp = action.payload;
+		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
+		if (whatsAppIndex !== -1 || whatsApp.official === true) {
+			state[whatsAppIndex] = whatsApp;
+			return [...state];
+		} else {
+			return [whatsApp, ...state];
+		}
+	}
+
+	if (action.type === "UPDATE_SESSION") {
+		const whatsApp = action.payload;
+		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
+
+		if (whatsAppIndex !== -1) {
+			state[whatsAppIndex].status = whatsApp.status;
+			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
+			state[whatsAppIndex].qrcode = whatsApp.qrcode;
+			state[whatsAppIndex].retries = whatsApp.retries;
+			return [...state];
+		} else {
+			return [...state];
+		}
+	}
+
+	if (action.type === "DELETE_WHATSAPPS") {
+		const whatsAppId = action.payload;
+
+		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
+		if (whatsAppIndex !== -1) {
+			state.splice(whatsAppIndex, 1);
+		}
+		return [...state];
+	}
+
+	if (action.type === "RESET") {
+		return [];
+	}
+};
+
 const Connections = () => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 
-	const { whatsApps, loading } = useContext(WhatsAppsContext);
+	const [whatsApps, dispatch] = useReducer(reducer, []);
+	const [loading, setLoading] = useState(false);
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [qrModalOpen, setQrModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
@@ -110,6 +159,58 @@ const Connections = () => {
 	const [confirmModalInfo, setConfirmModalInfo] = useState(
 		confirmationModalInitialState
 	);
+	const [pageNumber, setPageNumber] = useState(1);
+	const [count, setCount] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
+
+	useEffect(() => {
+		dispatch({ type: "RESET" });
+	}, []);
+
+	useEffect(() => {
+		setLoading(true);
+		const fetchWhats = async () => {
+			try {
+				const { data } = await api.get(`/whatsapp/list/`, {
+					params: { official: false, pageNumber }
+				});
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
+				setCount(data.count);
+				setHasMore(data.hasMore);
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+				toastError(err);
+			}
+		};
+		fetchWhats();
+	}, [pageNumber]);
+
+	useEffect(() => {
+		const socket = openSocket();
+
+		socket.on("whatsapp", data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
+			}
+		});
+
+		socket.on("whatsapp", data => {
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
+			}
+		});
+
+		socket.on("whatsappSession", data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_SESSION", payload: data.session });
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
 
 	const handleStartWhatsAppSession = async whatsAppId => {
 		try {
@@ -393,6 +494,29 @@ const Connections = () => {
 						)}
 					</TableBody>
 				</Table>
+				<div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1} 
+					>
+						Página Anterior
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 10) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						Próxima Página
+					</Button>
+				</div>
 			</Paper>
 		</MainContainer>
 	);

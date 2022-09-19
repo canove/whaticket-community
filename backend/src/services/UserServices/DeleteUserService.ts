@@ -1,6 +1,6 @@
-import User from "../../models/User";
+import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
-import Ticket from "../../models/Ticket";
+import Ticket from "../../database/models/Ticket";
 import UpdateDeletedUserOpenTicketsStatus from "../../helpers/UpdateDeletedUserOpenTicketsStatus";
 
 const DeleteUserService = async (id: string | number): Promise<void> => {

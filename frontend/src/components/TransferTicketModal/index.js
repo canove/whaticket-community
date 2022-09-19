@@ -18,11 +18,11 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   maxWidth: {
@@ -45,6 +45,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 	const [selectedQueue, setSelectedQueue] = useState('');
 	const classes = useStyles();
 	const { findAll: findAllQueues } = useQueues();
+	const { i18n } = useTranslation();
 
 	useEffect(() => {
 		const loadQueues = async () => {

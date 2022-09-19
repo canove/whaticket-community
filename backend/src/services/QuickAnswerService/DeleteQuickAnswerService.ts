@@ -1,4 +1,4 @@
-import QuickAnswer from "../../models/QuickAnswer";
+import QuickAnswer from "../../database/models/QuickAnswer";
 import AppError from "../../errors/AppError";
 
 const DeleteQuickAnswerService = async (id: string): Promise<void> => {

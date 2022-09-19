@@ -11,13 +11,13 @@ import {
 } from "recharts";
 import { startOfHour, parseISO, format } from "date-fns";
 
-import { i18n } from "../../translate/i18n";
-
 import Title from "./Title";
 import useTickets from "../../hooks/useTickets";
+import { useTranslation } from "react-i18next";
 
 const Chart = () => {
 	const theme = useTheme();
+	const { i18n } = useTranslation();
 
 	const date = useRef(new Date().toISOString());
 	const { tickets } = useTickets({ date: date.current });
@@ -81,8 +81,8 @@ const Chart = () => {
 							angle={270}
 							position="left"
 							style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-						>
-							Tickets
+						>	{i18n.t("dashboard.charts.perDay.calls")}
+
 						</Label>
 					</YAxis>
 					<Bar dataKey="amount" fill={theme.palette.primary.main} />

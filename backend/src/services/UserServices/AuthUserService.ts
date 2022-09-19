@@ -1,23 +1,27 @@
-import User from "../../models/User";
+import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
 import {
   createAccessToken,
   createRefreshToken
 } from "../../helpers/CreateTokens";
 import { SerializeUser } from "../../helpers/SerializeUser";
-import Queue from "../../models/Queue";
+import Queue from "../../database/models/Queue";
+import Company from "../../database/models/Company";
+import { Op, Sequelize } from "sequelize";
 
 interface SerializedUser {
   id: number;
   name: string;
   email: string;
   profile: string;
+  lang: string;
   queues: Queue[];
 }
 
 interface Request {
   email: string;
   password: string;
+  company: string;
 }
 
 interface Response {
@@ -28,10 +32,27 @@ interface Response {
 
 const AuthUserService = async ({
   email,
-  password
+  password,
+  company
 }: Request): Promise<Response> => {
+  const whereCondition = {
+    "$Company.name$": Sequelize.where(
+      Sequelize.fn("LOWER", Sequelize.col("Company.alias")),
+      "LIKE",
+      `%${company.toLowerCase()}%`
+    )
+  };
+
+  const companyDb = await Company.findOne({
+    where: whereCondition
+  });
+
+  if (!companyDb) {
+    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+  }
+
   const user = await User.findOne({
-    where: { email },
+    where: { email, companyId: companyDb.id },
     include: ["queues"]
   });
 

@@ -34,9 +34,12 @@ const messages = {
         },
       },
       dashboard: {
+      title: "Dashboard",
+      file: "File",
         charts: {
           perDay: {
             title: "Tickets today: ",
+            calls: "Calls",
           },
         },
         messages: {
@@ -48,6 +51,21 @@ const messages = {
           },
           closed: {
             title: "Closed"
+          },
+          imported: {
+            title: "Imported"
+          },
+          sent: {
+            title: "Sent"
+          },
+          handedOut: {
+            title: "Hande Out"
+          },
+          read: {
+            title: "Read"
+          },
+          mistake: {
+            title: "Mistakes"
           }
         }
       },
@@ -97,8 +115,31 @@ const messages = {
           default: "Default",
           actions: "Actions",
           session: "Session",
+          quality: "Quality",
+          limit: "Limit"
         },
       },
+      officialConnections: {
+        title: "Official Connections",
+      },
+      officialWhatsappModal: {
+        title:{
+        add:"Add Official WhatsApp",
+        edit: "Edit WhatsApp Official",
+        labelNumber: "Phone Number",
+        labelToken: "Facebook Authentication Token",
+        labelId: "Facebook Phone Id",
+        labelBusiness: "Facebook Business Id",
+        greetingMessage: "Greeting Message",
+        farewellMessage: "Farewell Message",
+        },
+        buttons: {
+          cancel: "Cancel",
+          testConnection: "Test Connection",
+          add: "Add",
+        },
+      },
+
       whatsappModal: {
         title: {
           add: "Add WhatsApp",
@@ -107,6 +148,7 @@ const messages = {
         form: {
           name: "Name",
           default: "Default",
+          farewellMessage: "Farewell Message",
         },
         buttons: {
           okAdd: "Add",
@@ -206,6 +248,12 @@ const messages = {
           email: "Email",
           password: "Password",
           profile: "Profile",
+          language: "Language",
+          languages: {
+            pt: "Portuguese",
+            en: "English",
+            es: "Spanish",
+          },
         },
         buttons: {
           okAdd: "Add",
@@ -276,16 +324,30 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
-          connections: "Connections",
+          template: "Templates",
           tickets: "Tickets",
           contacts: "Contacts",
           quickAnswers: "Quick Answers",
+          importation: "Import",
           queues: "Queues",
           administration: "Administration",
           users: "Users",
           settings: "Settings",
+          reportsTalk: "Talk Reports",
+          reportsTicket: "Ticket Report",
+          logReports: "Log Reports",
           reports: "Reports",
+          whatsOff: "WhatsApp",
+          whatsNoOff: "WhatsApp 2",
+          company: "Companies",
+          menus: "Menus",
         },
+        whatsApp: {
+          connections: "Connections",
+          officialConnections: "Connections",
+          settings: "Settings",
+        },
+
         appBar: {
           user: {
             profile: "Profile",
@@ -335,6 +397,58 @@ const messages = {
           deleteMessage: "This action cannot be undone.",
         },
       },
+      importation: {
+        title: "Import",
+        form: {
+          status: "Status",
+          date: "Date",
+        },
+        buttons: {
+          import: "Import",
+          filter: "Filter",
+        },
+        table: {
+          uploadDate: "Upload Date",
+          fileName: "File Name",
+          sentBy: "Sent By",
+          numberOfRecords: "Number of Records",
+          status: "Status",
+          official: "Official",
+          actions: "Actions",
+        },
+        registryModal:{
+          title: "Registry",
+          id: "Id",
+          name: "Name",
+          template: "Template",
+          message: "Message",
+          phoneNumber: "Phone Number",
+          documentNumber: "Document Number",
+          cancel: "Cancel",
+          refuse: "Refuse",
+          approve: "To Approve",
+        },
+      },
+      importModal: {
+        title: "Import",
+        buttons: {
+          uploadFile: "Upload File",
+          cancel: "Cancel",
+          import: "Import",
+        },
+        form: {
+          noFile: "No File Uploaded",
+          uploadedFile: "Uploaded File",
+          shotType: "Shot Type",
+          official: "Official",
+          notOfficial: "Not Official",
+          supportedTriggerModel: "Supported Trigger Model",
+          connection:"Connection",
+          selectAConnection: "Select A Connetion",
+          show: "Show",
+          toHide: "To Hide",
+        },
+      },
       users: {
         title: "Users",
         table: {
@@ -372,6 +486,7 @@ const messages = {
         title: "Reports",
         buttons: {
           filter: "Filter reports",
+          exportPdf: "Export PDF",
         },
         form: {
           initialDate: "Initial date",
@@ -384,9 +499,11 @@ const messages = {
           read: "Read",
           mediaURL: "Media URL",
           ticketId: "Ticket ID",
-          initialDate: "Initial date",
-          finalDate: "Final date",
+          date: "Date",
         }
+      },
+      reportsTicket: {
+        title: "Reports Ticket",
       },
       messagesList: {
         header: {
@@ -438,6 +555,160 @@ const messages = {
           message: "This action cannot be reverted.",
         },
       },
+
+    templates: {
+        title: "Templates",
+        table:{
+          name: "Name",
+          preview: "Preview",
+          category: "Category",
+          classification: "Classification",
+          language: "Language",
+          status: "Status",
+          action: "Actions",
+        },
+        buttons:{
+          newTemplate: "New Template",
+          cancel: "Cancel",
+          add: "Add",
+          connection: "Connections"
+        },
+        templateModal:{
+          title: "New Template",
+          name: "Name",
+          category: "Category",
+          body: "Body",
+          footer: "Footer",
+          connection: "Connections",
+          transactional: "Transactional",
+          marketing: "Marketing",
+          edit: "To Edit",
+          cancel: "Cancel",
+          success: "Template created successfully!",
+          connectionFailed: "Please select a connection!",
+          delete: "Template successfully deleted!",
+          toastErr: "Parameter limit exceeded!"
+        },
+      },
+
+      logReport:{
+        title: "Log Reports",
+        select:{
+          file: "Files",
+          status: "Status",
+          all: "All",
+          sent: "Sent",
+          delivered: "Delivered",
+          read: "Read",
+          errors: "Errors",
+        },
+        buttons:{
+          createPdf: "Create Pdf",
+          exportPdf:  "Export Pdf",
+          previous: "Previous",
+          next: "Next",
+          page: "Page: ",
+        },
+        grid:{
+          name: "Name",
+          sent: "Sent",
+          delivered: "Delivered",
+          read: "Read",
+          errors: "Errors"
+        },
+      },
+
+      settingsWhats:{
+        title: "Settings",
+        triggerTime: "Trigger Time Between Instances",
+        connections: "Connections",
+        all: "All",
+      },
+
+      historicTicket:{
+        button: "Historic",
+      historicModal:{
+        title: "Historic",
+        name: "Name",
+        message: "Message",
+        status: "Status",
+        createAt: "Create At",
+        actions: "Actions",
+        closed: "Close",
+        back: "Back",
+        },
+      },
+
+      company:{
+        title: "Companies",
+        search: "Search",
+          grid:{
+          companyId: "Company Id",
+          name: "Name",
+          cnpj: "CNPJ",
+          phone: "Phone",
+          email: "Email",
+          address:  "Address",
+          actions: "Actions"
+          },
+          buttons: {
+            addCompany: "Register Company"
+          },
+          companyModal: {
+            titleAdd: "Add Company",
+            titleEdit: "Edit Company Registration",
+            name: "Company Name",
+            cnpj: "CNPJ",
+            phone: "Phone",
+            email: "Email",
+            address: "Address"
+          },
+          success: "Company registered successfully!",
+          deleteCompany: "All registered company data will be lost, do you really want to delete, ",
+          toast: "Company successfully deleted!"
+          },
+
+        menu:{
+            title: "Menus",
+            success: "Menu saved successfully!",
+          buttons:{
+            save: "Save",
+            menus: "Menus",
+            company: "Companies"
+          },
+        },
+      templatesData:{
+        title: "Data Templates",
+        buttons: {
+          connection: "Connections",
+          search: "Search",
+          newTemplate: "Template New"
+        },
+        grid: {
+          name: "Name",
+          status: "Status",
+          text: "Body Text",
+          footer: "Footer",
+          createdAt: "Created At",
+          updateAt: "Update At",
+          actions: "Actions",
+        },
+        templateModal: {
+          add: "Add Template",
+          edit: "Edit Template",
+          name: "Name",
+          bodyText: "Body Text",
+          footer: "Footer",
+          buttonAdd: "Add",
+          buttonEdit: "Edit",
+        },
+        modalConfirm: {
+          delete: "Really want to delete, all Template data will be lost!",
+          successDelete: "Template Deleted Successfully!",
+          successAdd: "Template Added Successfully!",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
@@ -474,6 +745,8 @@ const messages = {
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
+        ERR_NO_COMPANY_FOUND: "Error deleting the Company.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "There is already a company with this CNPJ.",
       },
     },
   },

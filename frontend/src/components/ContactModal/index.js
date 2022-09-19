@@ -17,10 +17,9 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -63,6 +62,7 @@ const ContactSchema = Yup.object().shape({
 
 const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 	const isMounted = useRef(true);
 
 	const initialState = {

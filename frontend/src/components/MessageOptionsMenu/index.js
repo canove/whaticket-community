@@ -2,14 +2,15 @@ import React, { useState, useContext } from "react";
 
 import MenuItem from "@material-ui/core/MenuItem";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import { Menu } from "@material-ui/core";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
+  const { i18n } = useTranslation();
   const { setReplyingMessage } = useContext(ReplyMessageContext);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
