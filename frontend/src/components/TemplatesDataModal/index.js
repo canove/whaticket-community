@@ -10,12 +10,18 @@ import {
   Button,
   DialogActions,
   TextField,
+  FormControl,
+  Select,
+  InputLabel,
+  MenuItem,
+  Input,
+  Typography,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -37,6 +43,24 @@ const useStyles = makeStyles(() => ({
     marginTop: -12,
     marginLeft: -12,
   },
+
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+
+  multFieldLine: {
+		display: "flex",
+		"& > *:not(:last-child)": {
+			marginRight: theme.spacing(1),
+		},
+		alignItems: "center",
+	},
 }));
 
 const TemplatesDataModal = ({ open, onClose, templatesId }) => {
@@ -49,9 +73,13 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
   };
   const [template, setTemplate] = useState(initialState);
   const [text, setText] = useState("");
-  const [params, setParams] = useState(0);
+  const [paramsQuantity, setParamsQuantity] = useState(0);
+  const [param, setParam] = useState("");
+  const [openParamModal, setOpenParamModal] = useState(false);
 
   useEffect(() => {
+    setText("");
+    setParamsQuantity(0);
     const fetchTemplates = async () => {
       try {
         const { data } = await api.get(`/TemplatesData/show/${templatesId}`);
@@ -88,31 +116,80 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     handleClose();
   };
 
-  const handleArray = () => {
-    switch (params) {
-      case 0:
-        setParams(prevTimes => prevTimes + 1);
-        setText(prevText => prevText + "{{0}}");
-        break;
-      case 1:
-        setParams(prevTimes => prevTimes + 1);
-        setText(prevText => prevText + "{{1}}");
-        break;
-      case 2:
-        setParams(prevTimes => prevTimes + 1);
-        setText(prevText => prevText + "{{2}}");
-        break;
-      default:
-        toast.error(i18n.t("templates.templateModal.toastErr"));
+  const handleParams = () => {
+    if (paramsQuantity >= 3) {
+      toast.error(i18n.t("templates.templateModal.toastErr"));
+    } else {
+      setParamsQuantity(prevQuantity => prevQuantity + 1);
+      setText(prevText => prevText + "{{" + param + "}}")
     }
+
+    handleCloseParamModal();
   };
 
   const handleChange = (e) => {
     setText(e.target.value);
   }
 
+  const handleChangeParam = (e) => {
+    setParam(e.target.value)
+  };
+
+  const handleOpenParamModal = () => {
+    setOpenParamModal(true);
+  };
+
+  const handleCloseParamModal = () => {
+    setParam("");
+    setOpenParamModal(false);
+  };
+
+  useEffect(() => {
+    const testParams = () => {
+      let result = 0;
+      result += text.split("{{name}}").length - 1
+      result += text.split("{{document}}").length - 1
+      result += text.split("{{phoneNumber}}").length - 1
+
+      if (paramsQuantity > 3) {
+        toast.error(i18n.t("templates.templateModal.toastErr"));
+      }
+
+      setParamsQuantity(result);
+    }
+    testParams();
+  }, [text])
+
   return (
     <div className={classes.root}>
+      <div>
+        <Dialog open={openParamModal} onClose={handleCloseParamModal}>
+          <DialogTitle>Selecione uma variável</DialogTitle>
+          <DialogContent>
+              <FormControl className={classes.multFieldLine}>
+                <Select
+                  variant="outlined"
+                  id="demo-dialog-select"
+                  value={param}
+                  onChange={handleChangeParam}
+                  style={{width: "100%"}}
+                >
+                  <MenuItem value={'name'}>Nome</MenuItem>
+                  <MenuItem value={'document'}>Documento</MenuItem>
+                  <MenuItem value={'phoneNumber'}>Número de Telefone</MenuItem>
+                </Select>
+              </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseParamModal} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleParams} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -193,7 +270,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                   variant="contained"
                   className={classes.btnWrapper}
                   disabled={isSubmitting}
-                  onClick={handleArray}
+                  onClick={handleOpenParamModal}
                 >
                   {"{{ }}"}
                 </Button>

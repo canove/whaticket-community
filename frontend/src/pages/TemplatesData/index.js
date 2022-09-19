@@ -253,7 +253,6 @@ const TemplatesData = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("templatesData.grid.name")}</TableCell>
-              <TableCell align="center">{i18n.t("templatesData.grid.status")}</TableCell>
               <TableCell align="center">{i18n.t("templatesData.grid.text")}</TableCell>
               <TableCell align="center">{i18n.t("templatesData.grid.footer")}</TableCell>
               <TableCell align="center">{i18n.t("templatesData.grid.createdAt")}</TableCell>
@@ -266,7 +265,6 @@ const TemplatesData = () => {
               {templates && templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
-                    <TableCell align="center">{template.status}</TableCell>
                     <TableCell align="center">{template.text}</TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">
