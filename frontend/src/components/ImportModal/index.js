@@ -75,6 +75,8 @@ const ImportModal = ({ open, onClose }) => {
 	const [openSelect, setOpenSelect] = useState(false);
 	const [menus, setMenus] = useState();
 	const [useType, setUseType] = useState(false);
+	const [templates, setTemplates] = useState([]);
+	const [selectedTemplate, setSelectedTemplate] = useState("Nenhum");
 
 	const handleClose = () => {
 		onClose();
@@ -105,6 +107,9 @@ const ImportModal = ({ open, onClose }) => {
 				} else {
 					const selectedConnectionToString = selectedConnection.join();
 					formData.set("whatsappIds", selectedConnectionToString);
+				}
+				if (selectedTemplate !== "Nenhum") {
+					formData.set("templateId", selectedTemplate);
 				}
 
 				await api.post("file/upload", formData);
@@ -143,6 +148,10 @@ const ImportModal = ({ open, onClose }) => {
 		}
 	}
 
+	const handleChangeTemplate = (e) => {
+		setSelectedTemplate(e.target.value);
+	}
+
 	const handleOpenSelect = () => {
 		setOpenSelect(true)
 	};
@@ -162,6 +171,22 @@ const ImportModal = ({ open, onClose }) => {
 		}
 		fetchMenus();
 	}, [])
+
+	useEffect(() => {
+		const fetchTemplates = async () => {
+			try {
+				const { data } = await api.get('/TemplatesData/list/');
+				setTemplates(data.templates);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+		fetchTemplates();
+	}, [])
+
+	useEffect(() => {
+		console.log(templates);
+	},[])
 
 	useEffect(() => {
 		if (menus) {
@@ -255,6 +280,27 @@ const ImportModal = ({ open, onClose }) => {
 										)
 									}
 								} return null
+							})}
+						</Select>
+					</div>
+					<div className={classes.multFieldLine}>
+						<Typography variant="subtitle1" gutterBottom>
+                        	Template:
+						</Typography>
+						<Select
+							variant="outlined"
+							labelId="type-select-label"
+							id="type-select"
+							value={selectedTemplate}
+							label="Type"
+							onChange={(e) => { handleChangeTemplate(e) }}
+							style={{width: "50%"}}
+						>
+							<MenuItem value={"Nenhum"}>Nenhum</MenuItem>
+							{templates.length > 0 && templates.map((template, index) => {
+								return (
+									<MenuItem key={index} value={template.id}>{template.name}</MenuItem>
+								)
 							})}
 						</Select>
 					</div>

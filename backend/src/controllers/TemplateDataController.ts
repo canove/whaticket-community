@@ -13,7 +13,7 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const { templates, count, hasMore } = await ListTemplateDataService({
     searchParam,

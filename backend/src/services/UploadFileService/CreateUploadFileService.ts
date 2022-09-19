@@ -10,6 +10,7 @@ interface Request {
   whatsappIds: string;
   filePath: string;
   companyId: number;
+  templateId?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -21,7 +22,8 @@ const CreateUploadFileService = async ({
   official,
   whatsappIds,
   filePath,
-  companyId
+  companyId,
+  templateId = null
 }: Request): Promise<Response | null> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
@@ -51,8 +53,10 @@ const CreateUploadFileService = async ({
     official,
     whatsappIds,
     status: 0,
-    companyId
+    companyId,
+    templateId
   });
+
   return file;
 };
 
