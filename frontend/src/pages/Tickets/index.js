@@ -7,8 +7,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import TicketsManager from "../../components/TicketsManager/";
 import Ticket from "../../components/Ticket/";
 
-import { i18n } from "../../translate/i18n";
 import Hidden from "@material-ui/core/Hidden";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
@@ -64,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Chat = () => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
   const { ticketId } = useParams();
 
   return (

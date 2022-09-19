@@ -23,12 +23,12 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import QuickAnswersModal from "../../components/QuickAnswersModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_QUICK_ANSWERS") {
@@ -85,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
 
 const QuickAnswers = () => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);

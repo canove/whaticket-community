@@ -1,10 +1,11 @@
 import qrCode from "qrcode-terminal";
-import { Client, LocalAuth } from "whatsapp-web.js";
+import { Client } from "whatsapp-web.js";
 import { getIO } from "./socket";
-import Whatsapp from "../models/Whatsapp";
+import Whatsapp from "../database/models/Whatsapp";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
 import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+const fs = require('fs');
 
 interface Session extends Client {
   id?: number;
@@ -39,22 +40,13 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const sessionName = whatsapp.name;
       let sessionCfg;
 
-      if (whatsapp && whatsapp.session) {
-        sessionCfg = JSON.parse(whatsapp.session);
+      const SESSION_FILE_PATH = './session.json';
+
+      if(fs.existsSync(SESSION_FILE_PATH)){
+        sessionCfg = require(SESSION_FILE_PATH);
       }
 
-      const args:String = process.env.CHROME_ARGS || "";
-
-      const wbot: Session = new Client({
-        session: sessionCfg,
-        authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
-        puppeteer: {
-          executablePath: process.env.CHROME_BIN || undefined,
-          // @ts-ignore
-          browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: args.split(' ')
-        }
-      });
+      const wbot: Session = new Client({puppeteer: {headless:true}});
 
       wbot.initialize();
 
@@ -77,6 +69,9 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 
       wbot.on("authenticated", async session => {
         logger.info(`Session: ${sessionName} AUTHENTICATED`);
+        await whatsapp.update({
+          session: JSON.stringify(session)
+        });
       });
 
       wbot.on("auth_failure", async msg => {
@@ -128,7 +123,8 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         resolve(wbot);
       });
     } catch (err) {
-      logger.error(err);
+      logger.error('--ERRO--:');
+      logger.error(JSON.stringify(err));
     }
   });
 };
@@ -150,6 +146,6 @@ export const removeWbot = (whatsappId: number): void => {
       sessions.splice(sessionIndex, 1);
     }
   } catch (err) {
-    logger.error(err);
+    //logger.error(err);
   }
 };

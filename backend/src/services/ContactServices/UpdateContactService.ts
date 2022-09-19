@@ -1,6 +1,6 @@
 import AppError from "../../errors/AppError";
-import Contact from "../../models/Contact";
-import ContactCustomField from "../../models/ContactCustomField";
+import Contact from "../../database/models/Contact";
+import ContactCustomField from "../../database/models/ContactCustomField";
 
 interface ExtraInfo {
   id?: number;
@@ -10,6 +10,7 @@ interface ExtraInfo {
 interface ContactData {
   email?: string;
   number?: string;
+  companyId?: string | number;
   name?: string;
   extraInfo?: ExtraInfo[];
 }
@@ -27,7 +28,7 @@ const UpdateContactService = async ({
 
   const contact = await Contact.findOne({
     where: { id: contactId },
-    attributes: ["id", "name", "number", "email", "profilePicUrl"],
+    attributes: ["id", "name", "number", "email", "companyId", "profilePicUrl"],
     include: ["extraInfo"]
   });
 

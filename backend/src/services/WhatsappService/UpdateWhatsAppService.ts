@@ -2,7 +2,7 @@ import * as Yup from "yup";
 import { Op } from "sequelize";
 
 import AppError from "../../errors/AppError";
-import Whatsapp from "../../models/Whatsapp";
+import Whatsapp from "../../database/models/Whatsapp";
 import ShowWhatsAppService from "./ShowWhatsAppService";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
@@ -14,6 +14,10 @@ interface WhatsappData {
   greetingMessage?: string;
   farewellMessage?: string;
   queueIds?: number[];
+  official?: boolean;
+  facebookToken?: string;
+  facebookPhoneNumberId?: string;
+  phoneNumber?: string;
 }
 
 interface Request {
@@ -43,7 +47,11 @@ const UpdateWhatsAppService = async ({
     session,
     greetingMessage,
     farewellMessage,
-    queueIds = []
+    queueIds = [],
+    official,
+    facebookToken,
+    facebookPhoneNumberId,
+    phoneNumber
   } = whatsappData;
 
   try {
@@ -67,6 +75,10 @@ const UpdateWhatsAppService = async ({
     }
   }
 
+  if (!official && (facebookToken || facebookPhoneNumberId || phoneNumber)) {
+    throw new AppError("ERRO!");
+  }
+
   const whatsapp = await ShowWhatsAppService(whatsappId);
 
   await whatsapp.update({
@@ -75,7 +87,11 @@ const UpdateWhatsAppService = async ({
     session,
     greetingMessage,
     farewellMessage,
-    isDefault
+    isDefault,
+    official,
+    facebookToken,
+    facebookPhoneNumberId,
+    phoneNumber
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);

@@ -11,6 +11,18 @@ import whatsappSessionRoutes from "./whatsappSessionRoutes";
 import queueRoutes from "./queueRoutes";
 import quickAnswerRoutes from "./quickAnswerRoutes";
 import apiRoutes from "./apiRoutes";
+import healthRoutes from "./healthRoutes";
+import reportTalkRoutes from "./reportTalkRoutes";
+import ticketsReportRoutes from "./ticketsReportRoutes";
+import ticketsExportReportRoutes from "./ticketsExportReportRoutes";
+import ticketsExportReportTalkRoutes from "./ticketsExportReportTalkRoutes";
+import fileRoutes from "./fileRoutes";
+import registerRoutes from "./registersRoutes";
+import templateRoutes from "./templateRoutes";
+import whatsConfigRoutes from "./whatsConfigRoutes";
+import companyRoutes from "./companyRoutes";
+import menuRoutes from "./menuRoutes";
+import templateDataRoutes from "./templateDataRoutes";
 
 const routes = Router();
 
@@ -24,6 +36,18 @@ routes.use(messageRoutes);
 routes.use(whatsappSessionRoutes);
 routes.use(queueRoutes);
 routes.use(quickAnswerRoutes);
+routes.use(healthRoutes);
 routes.use("/api/messages", apiRoutes);
+routes.use(reportTalkRoutes);
+routes.use(ticketsReportRoutes);
+routes.use(ticketsExportReportRoutes);
+routes.use(ticketsExportReportTalkRoutes);
+routes.use(fileRoutes);
+routes.use(registerRoutes);
+routes.use(templateRoutes);
+routes.use(whatsConfigRoutes);
+routes.use(companyRoutes);
+routes.use(menuRoutes);
+routes.use(templateDataRoutes);
 
 export default routes;

@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
-import Whatsapp from "../../models/Whatsapp";
+import Whatsapp from "../../database/models/Whatsapp";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
 interface Request {
@@ -11,6 +11,11 @@ interface Request {
   farewellMessage?: string;
   status?: string;
   isDefault?: boolean;
+  official?: boolean;
+  facebookToken?: string;
+  facebookPhoneNumberId?: string;
+  phoneNumber?: string;
+  companyId?: string | number;
 }
 
 interface Response {
@@ -24,7 +29,12 @@ const CreateWhatsAppService = async ({
   queueIds = [],
   greetingMessage,
   farewellMessage,
-  isDefault = false
+  isDefault = false,
+  official,
+  facebookToken,
+  facebookPhoneNumberId,
+  phoneNumber,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -69,13 +79,25 @@ const CreateWhatsAppService = async ({
     throw new AppError("ERR_WAPP_GREETING_REQUIRED");
   }
 
+  if (!official && (facebookToken || facebookPhoneNumberId || phoneNumber)) {
+    throw new AppError("ERRO!");
+  }
+  const lastPingDate = new Date();
+  lastPingDate.setDate(lastPingDate.getDate() + 2);
+
   const whatsapp = await Whatsapp.create(
     {
       name,
       status,
       greetingMessage,
       farewellMessage,
-      isDefault
+      isDefault,
+      official,
+      facebookToken,
+      facebookPhoneNumberId,
+      phoneNumber,
+      lastPingDate,
+      companyId
     },
     { include: ["queues"] }
   );

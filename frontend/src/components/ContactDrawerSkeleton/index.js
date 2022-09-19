@@ -2,9 +2,11 @@ import React from "react";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
-import { i18n } from "../../translate/i18n";
+import { useTranslation } from "react-i18next";
 
 const ContactDrawerSkeleton = ({ classes }) => {
+	const { i18n } = useTranslation();
+	
 	return (
 		<div className={classes.content}>
 			<Paper square variant="outlined" className={classes.contactHeader}>

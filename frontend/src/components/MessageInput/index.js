@@ -29,13 +29,13 @@ import {
 } from "@material-ui/core";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import RecordingTimer from "./RecordingTimer";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -203,6 +203,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MessageInput = ({ ticketStatus }) => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
   const { ticketId } = useParams();
 
   const [medias, setMedias] = useState([]);

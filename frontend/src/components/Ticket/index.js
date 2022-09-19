@@ -36,8 +36,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   ticketActionButtons: {
-    maxWidth: "50%",
-    flexBasis: "50%",
+    maxWidth: "60%",
+    flexBasis: "100%",
     display: "flex",
     [theme.breakpoints.down("sm")]: {
       maxWidth: "100%",

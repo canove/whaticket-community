@@ -1,14 +1,14 @@
-import Queue from "../models/Queue";
-import User from "../models/User";
-import Whatsapp from "../models/Whatsapp";
+import Queue from "../database/models/Queue";
+import User from "../database/models/User";
 
 interface SerializedUser {
   id: number;
   name: string;
   email: string;
   profile: string;
+  lang: string;
   queues: Queue[];
-  whatsapp: Whatsapp;
+  companyId: number;
 }
 
 export const SerializeUser = (user: User): SerializedUser => {
@@ -17,7 +17,8 @@ export const SerializeUser = (user: User): SerializedUser => {
     name: user.name,
     email: user.email,
     profile: user.profile,
+    lang: user.lang,
     queues: user.queues,
-    whatsapp: user.whatsapp
+    companyId: user.companyId
   };
 };

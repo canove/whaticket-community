@@ -20,13 +20,13 @@ import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Title from "../../components/Title";
-import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { DeleteOutline, Edit } from "@material-ui/icons";
 import QueueModal from "../../components/QueueModal";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -87,6 +87,7 @@ const reducer = (state, action) => {
 
 const Queues = () => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
 
   const [queues, dispatch] = useReducer(reducer, []);
   const [loading, setLoading] = useState(false);

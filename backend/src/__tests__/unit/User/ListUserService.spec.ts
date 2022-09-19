@@ -1,5 +1,5 @@
 import faker from "faker";
-import User from "../../../models/User";
+import User from "../../../database/models/User";
 import CreateUserService from "../../../services/UserServices/CreateUserService";
 import ListUsersService from "../../../services/UserServices/ListUsersService";
 import { disconnect, truncate } from "../../utils/database";
@@ -21,11 +21,13 @@ describe("User", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      companyId: null
     });
 
     const response = await ListUsersService({
-      pageNumber: 1
+      pageNumber: 1,
+      companyId: 1
     });
 
     expect(response).toHaveProperty("users");

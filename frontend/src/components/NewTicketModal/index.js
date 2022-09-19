@@ -13,12 +13,12 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const filter = createFilterOptions({
 	trim: true,
@@ -26,6 +26,7 @@ const filter = createFilterOptions({
 
 const NewTicketModal = ({ modalOpen, onClose }) => {
 	const history = useHistory();
+	const { i18n } = useTranslation();
 
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);

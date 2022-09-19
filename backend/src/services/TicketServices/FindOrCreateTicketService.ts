@@ -1,12 +1,13 @@
 import { subHours } from "date-fns";
 import { Op } from "sequelize";
-import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
+import Contact from "../../database/models/Contact";
+import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "./ShowTicketService";
 
 const FindOrCreateTicketService = async (
   contact: Contact,
   whatsappId: number,
+  companyId: number,
   unreadMessages: number,
   groupContact?: Contact
 ): Promise<Ticket> => {
@@ -15,8 +16,9 @@ const FindOrCreateTicketService = async (
       status: {
         [Op.or]: ["open", "pending"]
       },
+      whatsappId,
       contactId: groupContact ? groupContact.id : contact.id,
-      whatsappId: whatsappId
+      companyId
     }
   });
 
@@ -28,7 +30,7 @@ const FindOrCreateTicketService = async (
     ticket = await Ticket.findOne({
       where: {
         contactId: groupContact.id,
-        whatsappId: whatsappId
+        companyId
       },
       order: [["updatedAt", "DESC"]]
     });
@@ -48,8 +50,9 @@ const FindOrCreateTicketService = async (
         updatedAt: {
           [Op.between]: [+subHours(new Date(), 2), +new Date()]
         },
+        whatsappId,
         contactId: contact.id,
-        whatsappId: whatsappId
+        companyId
       },
       order: [["updatedAt", "DESC"]]
     });
@@ -69,7 +72,8 @@ const FindOrCreateTicketService = async (
       status: "pending",
       isGroup: !!groupContact,
       unreadMessages,
-      whatsappId
+      whatsappId,
+      companyId
     });
   }
 

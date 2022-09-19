@@ -7,15 +7,13 @@ import api from "../../services/api";
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
 		const whatsApps = action.payload;
-
 		return [...whatsApps];
 	}
 
 	if (action.type === "UPDATE_WHATSAPPS") {
 		const whatsApp = action.payload;
 		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
+		if (whatsAppIndex !== -1 || whatsApp.official === true) {
 			state[whatsAppIndex] = whatsApp;
 			return [...state];
 		} else {
@@ -61,7 +59,7 @@ const useWhatsApps = () => {
 		setLoading(true);
 		const fetchSession = async () => {
 			try {
-				const { data } = await api.get("/whatsapp/");
+				const { data } = await api.get(`/whatsapp/`);
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
 				setLoading(false);
 			} catch (err) {

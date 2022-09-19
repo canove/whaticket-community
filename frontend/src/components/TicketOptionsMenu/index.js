@@ -3,19 +3,20 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
-import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
 import toastError from "../../errors/toastError";
 import { Can } from "../Can";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
 	const isMounted = useRef(true);
 	const { user } = useContext(AuthContext);
+	const { i18n } = useTranslation();
 
 	useEffect(() => {
 		return () => {
@@ -94,7 +95,6 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				modalOpen={transferTicketModalOpen}
 				onClose={handleCloseTransferTicketModal}
 				ticketid={ticket.id}
-				ticketWhatsappId={ticket.whatsappId}
 			/>
 		</>
 	);

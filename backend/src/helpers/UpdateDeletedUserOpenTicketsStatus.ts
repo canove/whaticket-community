@@ -1,4 +1,4 @@
-import Ticket from "../models/Ticket";
+import Ticket from "../database/models/Ticket";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 
 const UpdateDeletedUserOpenTicketsStatus = async (

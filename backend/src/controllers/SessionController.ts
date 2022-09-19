@@ -6,12 +6,14 @@ import { SendRefreshToken } from "../helpers/SendRefreshToken";
 import { RefreshTokenService } from "../services/AuthServices/RefreshTokenService";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password } = req.body;
+  const { email, password, company } = req.body;
 
   const { token, serializedUser, refreshToken } = await AuthUserService({
     email,
-    password
+    password,
+    company,
   });
+
 
   SendRefreshToken(res, refreshToken);
 

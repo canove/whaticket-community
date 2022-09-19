@@ -1,27 +1,19 @@
-import React, { useState, useContext } from "react";
-import { Link as RouterLink } from "react-router-dom";
-
+import React, { useState, useContext} from "react";
 import {
   Avatar,
   Button,
   CssBaseline,
   TextField,
-  Grid,
   Box,
   Typography,
   Container,
   InputAdornment,
   IconButton,
-  Link
 } from '@material-ui/core';
-
 import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
-
 import { makeStyles } from "@material-ui/core/styles";
-
-import { i18n } from "../../translate/i18n";
-
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { useTranslation } from "react-i18next";
 
 // const Copyright = () => {
 // 	return (
@@ -58,10 +50,9 @@ const useStyles = makeStyles((theme) => ({
 
 const Login = () => {
   const classes = useStyles();
-
-  const [user, setUser] = useState({ email: "", password: "" });
+  const { i18n } = useTranslation();
+  const [user, setUser] = useState({ email: "", password: "", company: "" });
   const [showPassword, setShowPassword] = useState(false);
-
   const { handleLogin } = useContext(AuthContext);
 
   const handleChangeInput = (e) => {
@@ -70,8 +61,8 @@ const Login = () => {
 
   const handlSubmit = (e) => {
     e.preventDefault();
-    handleLogin(user);
-  };
+      handleLogin(user);
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -84,6 +75,19 @@ const Login = () => {
           {i18n.t("login.title")}
         </Typography>
         <form className={classes.form} noValidate onSubmit={handlSubmit}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="company"
+            label={i18n.t("Empresa")}
+            name="company"
+            value={user.company}
+            onChange={handleChangeInput}
+            autoComplete="company"
+            autoFocus
+          />
           <TextField
             variant="outlined"
             margin="normal"
@@ -131,18 +135,6 @@ const Login = () => {
           >
             {i18n.t("login.buttons.submit")}
           </Button>
-          <Grid container>
-            <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                component={RouterLink}
-                to="/signup"
-              >
-                {i18n.t("login.buttons.register")}
-              </Link>
-            </Grid>
-          </Grid>
         </form>
       </div>
       <Box mt={8}>{/* <Copyright /> */}</Box>

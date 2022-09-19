@@ -10,8 +10,8 @@ import TextField from "@material-ui/core/TextField";
 import { toast } from "react-toastify";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n.js";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -39,6 +39,7 @@ const useStyles = makeStyles(theme => ({
 
 const Settings = () => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 
 	const [settings, setSettings] = useState([]);
 
@@ -127,7 +128,7 @@ const Settings = () => {
 				<Paper className={classes.paper}>
 					<TextField
 						id="api-token-setting"
-						readonly
+						readOnly
 						label="Token Api"
 						margin="dense"
 						variant="outlined"

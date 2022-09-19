@@ -1,6 +1,6 @@
 import faker from "faker";
 import AppError from "../../../errors/AppError";
-import User from "../../../models/User";
+import User from "../../../database/models/User";
 import CreateUserService from "../../../services/UserServices/CreateUserService";
 import ShowUserService from "../../../services/UserServices/ShowUserService";
 import { disconnect, truncate } from "../../utils/database";
@@ -22,7 +22,8 @@ describe("User", () => {
     const newUser = await CreateUserService({
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      companyId: null
     });
 
     const user = await ShowUserService(newUser.id);

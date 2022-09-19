@@ -10,9 +10,9 @@ import {
   Client
 } from "whatsapp-web.js";
 
-import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
-import Message from "../../models/Message";
+import Contact from "../../database/models/Contact";
+import Ticket from "../../database/models/Ticket";
+import Message from "../../database/models/Message";
 
 import { getIO } from "../../libs/socket";
 import CreateMessageService from "../MessageServices/CreateMessageService";
@@ -279,6 +279,7 @@ const handleMessage = async (
     const ticket = await FindOrCreateTicketService(
       contact,
       wbot.id!,
+      whatsapp.companyId,
       unreadMessages,
       groupContact
     );
@@ -319,74 +320,14 @@ const handleMessage = async (
         for await (const ob of obj) {
           const cont = await CreateContactService({
             name: contact,
-            number: ob.number.replace(/\D/g, "")
+            number: ob.number.replace(/\D/g, ""),
+            companyId: ob.companyId
           });
         }
       } catch (error) {
         console.log(error);
       }
     }
-
-    /* if (msg.type === "multi_vcard") {
-      try {
-        const array = msg.vCards.toString().split("\n");
-        let name = "";
-        let number = "";
-        const obj = [];
-        const conts = [];
-        for (let index = 0; index < array.length; index++) {
-          const v = array[index];
-          const values = v.split(":");
-          for (let ind = 0; ind < values.length; ind++) {
-            if (values[ind].indexOf("+") !== -1) {
-              number = values[ind];
-            }
-            if (values[ind].indexOf("FN") !== -1) {
-              name = values[ind + 1];
-            }
-            if (name !== "" && number !== "") {
-              obj.push({
-                name,
-                number
-              });
-              name = "";
-              number = "";
-            }
-          }
-        }
-
-        // eslint-disable-next-line no-restricted-syntax
-        for await (const ob of obj) {
-          try {
-            const cont = await CreateContactService({
-              name: ob.name,
-              number: ob.number.replace(/\D/g, "")
-            });
-            conts.push({
-              id: cont.id,
-              name: cont.name,
-              number: cont.number
-            });
-          } catch (error) {
-            if (error.message === "ERR_DUPLICATED_CONTACT") {
-              const cont = await GetContactService({
-                name: ob.name,
-                number: ob.number.replace(/\D/g, ""),
-                email: ""
-              });
-              conts.push({
-                id: cont.id,
-                name: cont.name,
-                number: cont.number
-              });
-            }
-          }
-        }
-        msg.body = JSON.stringify(conts);
-      } catch (error) {
-        console.log(error);
-      }
-    } */
   } catch (err) {
     Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);

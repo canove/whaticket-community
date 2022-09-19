@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../libs/socket";
-import Message from "../models/Message";
+import Message from "../database/models/Message";
 
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
@@ -37,8 +37,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { body, quotedMsg }: MessageData = req.body;
+  const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
+  const { companyId } = req.user;
 
   const ticket = await ShowTicketService(ticketId);
 
@@ -47,11 +48,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {
-        await SendWhatsAppMedia({ media, ticket });
+        await SendWhatsAppMedia({ media, ticket, companyId, body });
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket, quotedMsg });
+    await SendWhatsAppMessage({ body, ticket, companyId });
   }
 
   return res.send();

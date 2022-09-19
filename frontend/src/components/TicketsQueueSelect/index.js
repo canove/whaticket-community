@@ -4,13 +4,15 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import { Checkbox, ListItemText } from "@material-ui/core";
-import { i18n } from "../../translate/i18n";
+import { useTranslation } from "react-i18next";
 
 const TicketsQueueSelect = ({
 	userQueues,
 	selectedQueueIds = [],
 	onChange,
 }) => {
+	const { i18n } = useTranslation();
+	
 	const handleChange = e => {
 		onChange(e.target.value);
 	};

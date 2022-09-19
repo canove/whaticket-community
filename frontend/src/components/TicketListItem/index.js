@@ -14,14 +14,13 @@ import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
 
-import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -99,25 +98,11 @@ const useStyles = makeStyles(theme => ({
 		top: "0%",
 		left: "0%",
 	},
-
-	userTag: {
-		position: "absolute",
-		marginRight: 5,
-		right: 5,
-		bottom: 5,
-		background: "#2576D2",
-		color: "#ffffff",
-		border: "1px solid #CCC",
-		padding: 1,
-		paddingLeft: 5,
-		paddingRight: 5,
-		borderRadius: 10,
-		fontSize: "0.9em"
-	},
 }));
 
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
+	const { i18n } = useTranslation();
 	const history = useHistory();
 	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
@@ -192,6 +177,7 @@ const TicketListItem = ({ ticket }) => {
 							</Typography>
 							{ticket.status === "closed" && (
 								<Badge
+									overlap="rectangular"
 									className={classes.closedBadge}
 									badgeContent={"closed"}
 									color="primary"
@@ -210,9 +196,6 @@ const TicketListItem = ({ ticket }) => {
 										<>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
 									)}
 								</Typography>
-							)}
-							{ticket.whatsappId && (
-								<div className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{ticket.whatsapp?.name}</div>
 							)}
 						</span>
 					}
@@ -233,6 +216,7 @@ const TicketListItem = ({ ticket }) => {
 							</Typography>
 
 							<Badge
+								overlap="rectangular"
 								className={classes.newMessagesCount}
 								badgeContent={ticket.unreadMessages}
 								classes={{

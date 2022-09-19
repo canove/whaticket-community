@@ -19,9 +19,9 @@ import {
 } from "@material-ui/core";
 
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -58,12 +58,14 @@ const SessionSchema = Yup.object().shape({
 });
 
 const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
+	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
 		name: "",
 		greetingMessage: "",
 		farewellMessage: "",
 		isDefault: false,
+		official: false
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -164,7 +166,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										label={i18n.t("queueModal.form.greetingMessage")}
 										type="greetingMessage"
 										multiline
-										rows={5}
+										minRows={5}
 										fullWidth
 										name="greetingMessage"
 										error={
@@ -183,7 +185,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										label={i18n.t("whatsappModal.form.farewellMessage")}
 										type="farewellMessage"
 										multiline
-										rows={5}
+										minRows={5}
 										fullWidth
 										name="farewellMessage"
 										error={

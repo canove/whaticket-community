@@ -23,13 +23,12 @@ const VcardPreview = ({ contact, numbers }) => {
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            const fetchContacts = async () => {
+            const fetchContacts = async() => {
                 try {
                     let contactObj = {
                         name: contact,
-                        // number: numbers.replace(/\D/g, ""),
-                        number: numbers !== undefined && numbers.replace(/\D/g, ""),
-                        email: ""
+                        number: numbers.replace(/\D/g, ""),
+                        email: "",
                     }
                     const { data } = await api.post("/contact", contactObj);
                     setContact(data)
@@ -44,7 +43,7 @@ const VcardPreview = ({ contact, numbers }) => {
         return () => clearTimeout(delayDebounceFn);
     }, [contact, numbers]);
 
-    const handleNewChat = async () => {
+    const handleNewChat = async() => {
         try {
             const { data: ticket } = await api.post("/tickets", {
                 contactId: selectedContact.id,
@@ -58,32 +57,32 @@ const VcardPreview = ({ contact, numbers }) => {
     }
 
     return (
-        <>
-            <div style={{
-                minWidth: "250px",
-            }}>
-                <Grid container spacing={1}>
-                    <Grid item xs={2}>
-                        <Avatar src={selectedContact.profilePicUrl} />
-                    </Grid>
-                    <Grid item xs={9}>
-                        <Typography style={{ marginTop: "12px", marginLeft: "10px" }} variant="subtitle1" color="primary" gutterBottom>
-                            {selectedContact.name}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Divider />
-                        <Button
-                            fullWidth
-                            color="primary"
-                            onClick={handleNewChat}
-                            disabled={!selectedContact.number}
-                        >Conversar</Button>
-                    </Grid>
-                </Grid>
-            </div>
-        </>
-    );
+		<>
+			<div style={{
+				minWidth: "250px",
+			}}>
+				<Grid container spacing={1}>
+					<Grid item xs={2}>
+						<Avatar src={selectedContact.profilePicUrl} />
+					</Grid>
+					<Grid item xs={9}>
+						<Typography style={{ marginTop: "12px", marginLeft: "10px" }} variant="subtitle1" color="primary" gutterBottom>
+							{selectedContact.name}
+						</Typography>
+					</Grid>
+					<Grid item xs={12}>
+						<Divider />
+						<Button
+							fullWidth
+							color="primary"
+							onClick={handleNewChat}
+							disabled={!selectedContact.number}
+						>Conversar</Button>
+					</Grid>
+				</Grid>
+			</div>
+		</>
+	);
 
 };
 

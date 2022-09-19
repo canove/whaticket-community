@@ -1,5 +1,5 @@
 import AppError from "../../errors/AppError";
-import QuickAnswer from "../../models/QuickAnswer";
+import QuickAnswer from "../../database/models/QuickAnswer";
 
 interface Request {
   shortcut: string;

@@ -35,9 +35,12 @@ const messages = {
         },
       },
       dashboard: {
+        title: "Dashboard",
+        file: "Archivo",
         charts: {
           perDay: {
             title: "Tickets hoy: ",
+            calls: "Iiamadas"
           },
         },
         messages: {
@@ -49,6 +52,21 @@ const messages = {
           },
           closed: {
             title: "Finalizado"
+          },
+          imported: {
+            title: "Importado"
+          },
+          sent: {
+            title: "Enviado"
+          },
+          handedOut: {
+            title: "Entregado"
+          },
+          read: {
+            title: "Leer"
+          },
+          mistake: {
+            title: "Errors"
           }
         }
       },
@@ -99,8 +117,31 @@ const messages = {
           default: "Por Defecto",
           actions: "Acciones",
           session: "Sesión",
+          quality: "Calidad",
+          limit: "Límite"
         },
       },
+      officialConnections: {
+        title: "Conexiones Oficiales",
+      },
+      officialWhatsappModal: {
+        title:{
+        add:"Agregar Whatsapp Oficial",
+        edit: "Para Editar WhatsApp Oficial",
+        labelNumber: "Número de teléfono",
+        labelToken: "Ficha de autenticación de Facebook",
+        labelId: "Identificación de teléfono de Facebook",
+        labelBusiness: "Identificación Comercial de Facebook",
+        greetingMessage: "Mensaje de Saludo",
+        farewellMessage: "Mensaje de Despedida",
+        },
+        buttons: {
+          cancel: "Cancelar",
+          testConnection: "Testar Conexion",
+          add: "Agregar",
+        },
+      },
+
       whatsappModal: {
         title: {
           add: "Agrega WhatsApp",
@@ -109,6 +150,7 @@ const messages = {
         form: {
           name: "Nombre",
           default: "Por Defecto",
+          farewellMessage: "Farewell Message",
         },
         buttons: {
           okAdd: "Agregar",
@@ -209,7 +251,12 @@ const messages = {
           email: "Correo Electrónico",
           password: "Contraseña",
           profile: "Perfil",
-          whatsapp: "Conexión estándar",
+          language: "Language",
+          languages: {
+            pt: "Portuguese",
+            en: "English",
+            es: "Spanish",
+          },
         },
         buttons: {
           okAdd: "Agregar",
@@ -252,9 +299,7 @@ const messages = {
         title: "Transferir Ticket",
         fieldLabel: "Escriba para buscar usuarios",
         fieldQueueLabel: "Transferir a la cola",
-        fieldConnectionLabel: "Transferir to conexión",
         fieldQueuePlaceholder: "Seleccione una cola",
-        fieldConnectionPlaceholder: "Seleccione una conexión",
         noOptions: "No se encontraron usuarios con ese nombre",
         buttons: {
           ok: "Transferir",
@@ -265,7 +310,6 @@ const messages = {
         pendingHeader: "Cola",
         assignedHeader: "Trabajando en",
         noTicketsTitle: "¡Nada acá!",
-        connectionTitle: "Conexión que se está utilizando actualmente.",
         noTicketsMessage:
           "No se encontraron tickets con este estado o término de búsqueda",
         buttons: {
@@ -284,15 +328,30 @@ const messages = {
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
-          connections: "Conexiones",
+          template: "Plantilla",
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
+          importation: "Importar",
           queues: "Linhas",
           administration: "Administración",
           users: "Usuarios",
           settings: "Configuración",
+          reportsTalk: "Informe de Conversación",
+          reportsTicket: "Informe de entradas",
+          logReports: "Informes de Registro",
+          reports: "Informes",
+          whatsOff: "WhatsApp",
+          whatsNoOff: "WhatsApp 2",
+          company: "Compañías",
+          menus: "Menus",
         },
+        whatsApp: {
+          connections: "Conexiones",
+          officialConnections: "Conexiones",
+          settings: "Configuración",
+        },
+
         appBar: {
           user: {
             profile: "Perfil",
@@ -343,13 +402,64 @@ const messages = {
           deleteMessage: "Esta acción no se puede deshacer.",
         },
       },
+      importation: {
+        title: "Importar",
+        form: {
+          status: "Estado",
+          date: "Fecha",
+        },
+        buttons: {
+          import: "Fotos Importadas",
+          filter: "Filtrar",
+        },
+        table: {
+          uploadDate: "Fecha de Carga",
+          fileName: "Nombre del Archivo",
+          sentBy: "Enviado Por",
+          numberOfRecords: "Número de Registros",
+          status: "Estado",
+          official: "Oficial",
+          actions: "Comportamiento",
+        },
+        registryModal:{
+          title: "Registros",
+          id: "Id",
+          name: "Nombre",
+          template: "Template",
+          message: "Mensaje",
+          phoneNumber: "Número de Teléfono",
+          documentNumber: "Número del Documento",
+          cancel: "Cancelar",
+          refuse: "Rechazar",
+          approve: "Aprobar",
+        },
+      },
+      importModal: {
+        title: "Importar",
+        buttons: {
+          uploadFile: "Importar Archivo",
+          cancel: "Cancelar",
+          import: "Importar",
+        },
+        form: {
+          shotType: "Tipo de Disparo",
+          official: "Oficial",
+          notOfficial: "No Oficial",
+          noFile: "Sin Archivos Importados",
+          uploadedFile: "Archivo Importado",
+          supportedTriggerModel: "Modelo de Disparo Compatible",
+          connection:"Conexión",
+          selectAConnection: "Seleccione una Conexión",
+          show: "Mostrar",
+          toHide: "Esconder"
+        },
+      },
       users: {
         title: "Usuarios",
         table: {
           name: "Nombre",
           email: "Correo Electrónico",
           profile: "Perfil",
-          whatsapp: "Conexión estándar",
           actions: "Acciones",
         },
         buttons: {
@@ -376,6 +486,29 @@ const messages = {
             },
           },
         },
+      },
+      reports: {
+        title: "Informes",
+        buttons: {
+          filter: "Filtrar informes",
+          exportPdf: "Export PDF",
+        },
+        form: {
+          initialDate: "Fecha inicial",
+          finalDate: "Fecha final",
+          user: "Usuario",
+        },
+        table: {
+          messageId: "Message ID",
+          messageBody: "Message Body",
+          read: "Read",
+          mediaURL: "Media URL",
+          ticketId: "Ticket ID",
+          date: "Date",
+        }
+      },
+      reportsTicket: {
+        title: "Reports Ticket",
       },
       messagesList: {
         header: {
@@ -429,6 +562,158 @@ const messages = {
           message: "Esta acción no puede ser revertida.",
         },
       },
+      templates: {
+          title: "Plantilla",
+          table:{
+            name: "Nombre",
+            preview: "Avance",
+            category: "Categoría",
+            classification: "Clasificación",
+            language: "Idioma",
+            status: "Estado",
+            action: "Comportamiento"
+          },
+          buttons:{
+            newTemplate: "Nueva Plantilla",
+            cancel: "Cancelar",
+            add: "Agregar",
+            connection: "Conexiones"
+          },
+          templateModal:{
+            title: "Nueva Plantilla",
+            name: "Nombre",
+            category: "Categoría",
+            body: "Cuerpo",
+            footer: "Zócalo",
+            connection: "Conexiones",
+            transactional: "Transaccional",
+            marketing: "Marketing",
+            edit: "Para Editar",
+            cancel: "Cancelar",
+            success: "¡Plantilla creada con éxito!",
+            connectionFailed: "¡Seleccione una conexión!",
+            delete: "¡Plantilla eliminada con éxito!",
+            toastErr: "¡Límite de parámetro excedido!"
+          },
+        },
+        logReport:{
+          title: "Informes de Registro",
+          select:{
+            file: "Archivo",
+            status: "Estado",
+            all: "Todos",
+            sent: "Enviado",
+            delivered: "Repartido",
+            read: "Leer",
+            errors: "Errores",
+          },
+          buttons:{
+            createPdf: "Crea Pdf",
+            exportPdf:  "Exportar Pdf",
+            previous: "Anterior",
+            next: "Siguinte",
+            page: "Página: " ,
+          },
+          grid:{
+            name: "Nombre",
+            sent: "Enviado",
+            delivered: "Repartido",
+            read: "Leer",
+            errors: "Errores"
+          },
+        },
+
+        settingsWhats:{
+          title: "Configuración",
+          triggerTime: "Tiempo de activación entre instancias",
+          connections: "conexiones",
+          all: "Todos",
+      },
+
+      historicTicket:{
+        button: "Histórico",
+      historicModal:{
+        title: "Histórico",
+        name: "Nombre",
+        message: "Mensaje",
+        status: "Estado",
+        createAt: "Fecha de Creación",
+        actions: "Comportamiento",
+        closed: "Cerca",
+        back: "Regresar"
+        },
+      },
+
+      company:{
+        title: "Compañías",
+        search: "Búsqueda",
+          grid:{
+          companyId: "ID de la Compañía",
+          name: "Nombres",
+          cnpj: "CNPJ",
+          phone: "Teléfono",
+          email: "Email",
+          address:  "Endereço",
+          actions: "Acción"
+          },
+          buttons: {
+            addCompany: "Registrar Compañía"
+          },
+          companyModal: {
+            titleAdd: "Añadir Compañía",
+            titleEdit: "Editar Registro de Compañía",
+            name: "Nombre da Compañía",
+            cnpj: "CNPJ",
+            phone: "Teléfono",
+            email: "Email",
+            address: "Endereço"
+          },
+          success: "Compañía registrada con éxito!",
+          deleteCompany: "Todos los datos de la compañía registrada se perderán, ¿realmente desea eliminarlos? ",
+          toast: "¡Compañía eliminada con éxito!"
+          },
+
+          menu:{
+            title: "Menú",
+            success: "¡Menú guardado con éxito!!",
+          buttons:{
+            save: "Guardar",
+            menus: "Menú",
+            company: "Compañías"
+          },
+        },
+      templatesData:{
+        title: "Plantillas",
+        buttons: {
+          connection: "Conexión",
+          search: "Búsqueda",
+          newTemplate: "Nueva Plantilla"
+        },
+        grid: {
+          name: "Nombre",
+          status: "Status",
+          text: "Texto",
+          footer: "Zócalo",
+          createdAt: "Fecha de Creación",
+          updateAt: "Editado en",
+          actions: "Comportamiento",
+        },
+        templateModal: {
+          add: "Agregar Plantilla",
+          edit: "Editar Plantilla",
+          name: "Nombre",
+          bodyText: "cuerpo do Texto",
+          footer: "Zócalo",
+          buttonAdd: "Agregar",
+          buttonEdit: "Editar",
+        },
+        modalConfirm: {
+          delete: "¡Realmente quiero eliminar, todos los datos de la plantilla se perderán!",
+          successDelete: "¡Plantilla eliminada con éxito!",
+          successAdd: "¡Plantilla agregada con éxito!",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
@@ -465,6 +750,8 @@ const messages = {
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
+        ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
+        ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
       },
     },
   },
