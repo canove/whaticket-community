@@ -118,6 +118,7 @@ const TicketsManager = () => {
   useEffect(() => {
     if (tab === "search") {
       searchInputRef.current.focus();
+      setSearchParam("");
     }
   }, [tab]);
 

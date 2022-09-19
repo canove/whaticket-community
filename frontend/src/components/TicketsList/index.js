@@ -179,12 +179,12 @@ const reducer = (state, action) => {
 			type: "LOAD_TICKETS",
 			payload: tickets,
 		});
-	}, [tickets, status, searchParam]);
+	}, [tickets]);
 
 	useEffect(() => {
 		const socket = openSocket();
 
-		const shouldUpdateTicket = ticket =>
+		const shouldUpdateTicket = ticket => !searchParam &&
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&
 			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
@@ -244,7 +244,7 @@ const reducer = (state, action) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, showAll, user, selectedQueueIds]);
+	}, [status, searchParam, showAll, user, selectedQueueIds]);
 
 	useEffect(() => {
     if (typeof updateCount === "function") {
