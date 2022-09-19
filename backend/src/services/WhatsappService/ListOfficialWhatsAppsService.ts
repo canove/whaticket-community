@@ -40,7 +40,7 @@ const ListWhatsAppsService = async ({
         attributes: ["id", "name", "color", "greetingMessage"]
       }
     ],
-    order: ["status", "DESC"]
+    order: [["status", "DESC"]]
   });
 
   const hasMore = count > offset + whatsapps.length;
