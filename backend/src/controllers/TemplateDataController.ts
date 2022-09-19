@@ -13,10 +13,12 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const { templates, count, hasMore } = await ListTemplateDataService({
     searchParam,
-    pageNumber
+    pageNumber,
+    companyId
   });
 
   return res.json({ templates, count, hasMore });
@@ -24,8 +26,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
     const { name, status, text, footer, createdAt, updatedAt } = req.body;
+    const companyId = req.user.companyId;
 
-    const response = await CreateTemplateDataService({ name, status, text, footer, createdAt, updatedAt });
+    const response = await CreateTemplateDataService({ name, status, text, footer, companyId, createdAt, updatedAt });
 
     const io = getIO();
     io.emit("templates", {

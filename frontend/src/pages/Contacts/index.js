@@ -195,7 +195,7 @@ const Contacts = () => {
     setPageNumber(1);
   };
 
-  const handleimportContact = async () => {
+  const handleImportContact = async () => {
     try {
       await api.post("/contacts/import");
       history.go(0);
@@ -237,7 +237,7 @@ const Contacts = () => {
         onConfirm={(e) =>
           deletingContact
             ? handleDeleteContact(deletingContact.id)
-            : handleimportContact()
+            : handleImportContact()
         }
       >
         {deletingContact

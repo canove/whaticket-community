@@ -6,8 +6,10 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
+  ForeignKey,
 
 } from "sequelize-typescript";
+import Company from "./Company";
 
 @Table
 class Templates extends Model<Templates> {
@@ -27,6 +29,10 @@ class Templates extends Model<Templates> {
 
   @Column
   footer: string;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @CreatedAt
   createdAt: Date;

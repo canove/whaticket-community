@@ -28,6 +28,7 @@ interface ExtraInfo {
   name: string;
   value: string;
 }
+
 interface ContactData {
   name: string;
   number: string;
@@ -37,10 +38,12 @@ interface ContactData {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
+  const companyId = req.user.companyId;
 
   const { contacts, count, hasMore } = await ListContactsService({
     searchParam,
-    pageNumber
+    pageNumber,
+    companyId
   });
 
   return res.json({ contacts, count, hasMore });
@@ -48,10 +51,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const getContact = async (req: Request, res: Response): Promise<Response> => {
   const { name, number } = req.body as IndexGetContactQuery;
+  const companyId = req.user.companyId;
 
   const contact = await GetContactService({
     name,
-    number
+    number,
+    companyId
   });
 
   return res.status(200).json(contact);
@@ -81,12 +86,14 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   let name = newContact.name
   let number = validNumber
+  let companyId = req.user.companyId
   let email = newContact.email
   let extraInfo = newContact.extraInfo
 
   const contact = await CreateContactService({
     name,
     number,
+    companyId,
     email,
     extraInfo,
     profilePicUrl

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
-import FileService from "../services/FileService/ListFileService";
+import ListFileService from "../services/FileService/ListFileService";
 import UpdateFileService from "../services/UploadFileService/UpdateFileService";
 
 type IndexQuery = {
@@ -10,10 +10,12 @@ type IndexQuery = {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { Status, initialDate } = req.query as unknown as IndexQuery;
+  const companyId = req.user.companyId;
 
-  const report = await FileService({
+  const report = await ListFileService({
     Status,
-    initialDate
+    initialDate,
+    companyId
   });
 
   return res.status(200).json(report);

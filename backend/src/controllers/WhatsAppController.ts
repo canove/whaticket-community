@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 import { removeWbot } from "../libs/wbot";
@@ -14,6 +15,12 @@ import ListOfficialWhatsAppsService from "../services/WhatsappService/ListOffici
 import QualityNumberWhatsappService from "../services/WhatsappService/QualityNumberWhatsappService";
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
+import axios from "axios";
+
+type ListQuery = {
+  pageNumber: string | number;
+  official: string | boolean;
+}
 
 interface WhatsappData {
   name: string;
@@ -26,10 +33,13 @@ interface WhatsappData {
   facebookToken?: string;
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
+  companyId?: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const whatsapps = await ListWhatsAppsService();
+  const companyId = req.user.companyId;
+
+  const whatsapps = await ListWhatsAppsService(companyId);
 
   return res.status(200).json(whatsapps);
 };
@@ -45,8 +55,27 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
-    phoneNumber
+    phoneNumber,
   }: WhatsappData = req.body;
+
+  //FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
+  const companyId = req.user.companyId;
+
+  const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
+   
+  const payload = {
+    "companyId": companyId
+  };
+  try {
+    await axios.post(apiUrl, payload, {
+      headers: {
+        "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+        "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+      }
+    });
+  }catch(err) {
+    return res.status(500).json(err['response'].data['message']);
+  }
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -58,7 +87,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
-    phoneNumber
+    phoneNumber,
+    companyId
   });
 
   StartWhatsAppSession(whatsapp);
@@ -122,7 +152,6 @@ export const remove = async (
   const { whatsappId } = req.params;
 
   await DeleteWhatsAppService(whatsappId);
-  removeWbot(+whatsappId);
 
   const io = getIO();
   io.emit("whatsapp", {
@@ -134,11 +163,20 @@ export const remove = async (
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official } = req.params;
+  const { official, pageNumber } = req.query as ListQuery;
+  const companyId = req.user.companyId;
 
-  const whatsapp = await ListOfficialWhatsAppsService(official);
+  const {
+    whatsapps,
+    count,
+    hasMore
+  } = await ListOfficialWhatsAppsService({ companyId, official, pageNumber });
 
-  return res.status(200).json(whatsapp);
+  return res.status(200).json({
+    whatsapps,
+    count,
+    hasMore
+  });
 };
 
 export const newMessage = async (
@@ -155,6 +193,7 @@ export const newMessage = async (
     body,
     contactName,
     identification,
+    file,
     session
   } = req.body;
 
@@ -168,6 +207,7 @@ export const newMessage = async (
     body,
     contactName,
     identification,
+    file,
     session
   });
 

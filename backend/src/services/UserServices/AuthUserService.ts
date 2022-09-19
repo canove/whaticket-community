@@ -35,22 +35,19 @@ const AuthUserService = async ({
   password,
   company
 }: Request): Promise<Response> => {
-  const whereCondition =
-
-      {
-        "$Company.name$": Sequelize.where(
-          Sequelize.fn("LOWER", Sequelize.col("Company.alias")),
-          "LIKE",
-          `%${company.toLowerCase()}%`
-        )
-      };
-
+  const whereCondition = {
+    "$Company.name$": Sequelize.where(
+      Sequelize.fn("LOWER", Sequelize.col("Company.alias")),
+      "LIKE",
+      `%${company.toLowerCase()}%`
+    )
+  };
 
   const companyDb = await Company.findOne({
     where: whereCondition
   });
 
-if (!companyDb) {
+  if (!companyDb) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);
   }
 

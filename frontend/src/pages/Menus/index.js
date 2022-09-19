@@ -218,7 +218,6 @@ const Menus = () => {
           menus.push(menu);
         }
       })
-
       setMenus(menus);
     } catch (err) {
       toastError(err);

@@ -40,7 +40,8 @@ const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
             documentNumber: infos[1],
             template: infos[3],
             templateParams: infos[4],
-            message: infos[5]
+            message: infos[5],
+            companyId: file.companyId
           });
   
           if (registersToInsert.length >= 500) {

@@ -4,7 +4,6 @@ import { ToastContainer } from "react-toastify";
 
 import Route from "./Route";
 import RenderRoutes from "./RenderRoutes";
-
 import Login from "../pages/Login/";
 
 import { AuthProvider } from "../context/Auth/AuthContext";

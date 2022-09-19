@@ -54,6 +54,7 @@ const createContact = async (newContact: string) => {
   const createTicket = await FindOrCreateTicketService(
     contact,
     defaultWhatsapp.id,
+    defaultWhatsapp.companyId,
     1
   );
 
@@ -66,7 +67,7 @@ const createContact = async (newContact: string) => {
 /* eslint-disable */
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const files = await ListFileService({ Status: FileStatus.WaitingImport,initialDate:null, limit: 1 });
+  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1 });
   if (files) {
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
@@ -91,12 +92,12 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 /* eslint-disable */
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher,initialDate:null, limit: 1 });
-  const sendingFiles = await ListFileService({ Status: FileStatus.Sending,initialDate:null, limit: 1 });
+  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1 });
+  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1 });
 
   if (sendingFiles?.length > 0) {
     sendingFiles.forEach(async (file) => {
-      await DispatcherRegisterService({ file: file });
+      await DispatcherRegisterService({ file });
     });
   } else {
     if (files?.length > 0) {
@@ -108,7 +109,7 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
           file
         });
   
-        await DispatcherRegisterService({ file: file });
+        await DispatcherRegisterService({ file });
 
         io.emit("file", {
         action: "update",
@@ -132,6 +133,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const newContact: ContactData = req.body;
   const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
+  const companyId = req.user.companyId;
 
   newContact.number = newContact.number.replace("-", "").replace(" ", "");
 
@@ -152,11 +154,11 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {
-        await SendWhatsAppMedia({ body, media, ticket: contactAndTicket });
+        await SendWhatsAppMedia({ media, ticket: contactAndTicket, companyId, body });
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket: contactAndTicket });
+    await SendWhatsAppMessage({ body, ticket: contactAndTicket, companyId });
   }
 
   return res.send();

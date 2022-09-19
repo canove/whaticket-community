@@ -6,6 +6,7 @@ import User from "../../database/models/User";
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
+  companyId: number;
 }
 
 interface Response {
@@ -16,7 +17,8 @@ interface Response {
 
 const ListUsersService = async ({
   searchParam = "",
-  pageNumber = "1"
+  pageNumber = "1",
+  companyId
 }: Request): Promise<Response> => {
   const whereCondition = {
     [Op.or]: [
@@ -28,7 +30,8 @@ const ListUsersService = async ({
         )
       },
       { email: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
-    ]
+    ],
+    companyId
   };
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
@@ -41,10 +44,10 @@ const ListUsersService = async ({
     order: [["createdAt", "DESC"]],
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
-      { model: Company, as:"company", attributes: ["name"], required:true }
-  ],
-raw:true
-  });
+      { model: Company, as:"company", attributes: ["name"], required: true }
+    ],
+    raw: true
+    });
 
   const hasMore = count > offset + users.length;
 

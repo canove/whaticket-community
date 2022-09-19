@@ -11,6 +11,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     const containPending = await FileRegister.findAll({ 
       where: {
         fileId: file.id,
+        companyId: file.companyId,
         processedAt: null
       }
     });
@@ -54,6 +55,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
         const registers = await FileRegister.findAll({
           where: {
             fileId: file.id,
+            companyId: file.companyId,
             sentAt: null,
             processedAt: null
           },
@@ -98,6 +100,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
             where: {
               fileId: file.id,
               sentAt: null,
+              companyId: file.companyId,
               processedAt: null
             },
             limit: 1
