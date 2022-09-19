@@ -48,11 +48,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     display: "flex",
     marginTop: 10
-},
-  titleStyle: {
-    marginLeft: 20,
-    marginTop: 10,
-    width: 200
+  },
+  selectStyle: {
+    width: "100%",
+    marginTop: -10
   },
 }));
 
@@ -162,30 +161,47 @@ const Dashboard = () => {
     <div>
       <MainHeader>
         <Title>{i18n.t("dashboard.title")}</Title>
-        <div className={classes.titleStyle}>
-          <Autocomplete
-              onChange={(e, newValue) => handleSelectOption(e, newValue)}
-              className={classes.root}
-              options={files}
-              getOptionLabel={renderOptionLabel}
-              renderInput={(params) =>
-                  <TextField
-                      {...params}
-                      label={"Arquivo"}
-                      InputLabelProps={{ required: true}}
-                  />
-              }
-          />
-        </div>
-        <TextField className={classes.titleStyle}
-            onChange={(e) => { setDate(e.target.value) }}
-            label={"Data"}
-            InputLabelProps={{ shrink: true, required: true }}
-            type="date"
-        />
       </MainHeader>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
+          <Grid item xs={6}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+            >
+              <Typography style={{display:"inlineBlock"}}  component="h3" variant="h6" color="primary" paragraph>
+                Arquivo
+              </Typography>
+              <Autocomplete
+                  onChange={(e, newValue) => handleSelectOption(e, newValue)}
+                  className={classes.selectStyle}
+                  options={files}
+                  getOptionLabel={renderOptionLabel}
+                  renderInput={(params) =>
+                      <TextField
+                          {...params}
+                          label={"Arquivo"}
+                          InputLabelProps={{ required: true}}
+                      />
+                  }
+              />
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+            >
+              <Typography style={{display:"inlineBlock"}} component="h3" variant="h6" color="primary" paragraph>
+                Data
+              </Typography>
+              <TextField
+                className={classes.selectStyle}
+                onChange={(e) => { setDate(e.target.value) }}
+                label={"Data"}
+                InputLabelProps={{ shrink: true, required: true }}
+                type="date"
+              />
+            </Paper>
+          </Grid>
           <Grid item xs={4}>
             <Paper
               className={classes.customFixedHeightPaper}
