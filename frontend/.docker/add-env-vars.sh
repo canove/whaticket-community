@@ -26,5 +26,5 @@ _addSslConfig() {
 _writeFrontendEnvVars;
 _writeNginxEnvVars;
 
-_addSslConfig 'backend'
-_addSslConfig 'frontend'
+#_addSslConfig 'backend'
+#_addSslConfig 'frontend'
