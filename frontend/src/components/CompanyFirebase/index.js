@@ -12,7 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { MenuItem, Paper, Select, TextField } from "@material-ui/core";
+import { MenuItem, Paper, Select, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@material-ui/core";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
@@ -70,6 +70,13 @@ const useStyles = makeStyles(theme => ({
 	formTitle: {
 		marginRight: 10,
 	},
+
+	mainPaper: {
+		flex: 1,
+		padding: theme.spacing(1),
+		overflowY: "scroll",
+		...theme.scrollbarStyles,
+	},
 }));
 
 const CompanyFirebase = ({ open, onClose, companyId }) => {
@@ -79,20 +86,31 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 
 	const [connected, setConnected] = useState(false);
 	const [isFull, setIsFull] = useState(false);
-	const [service, setService] = useState("");
 	const [newService, setNewService] = useState("");
 	const [openServiceModal, setOpenServiceModal] = useState(false);
+	const [services, setServices] = useState([]);
+
+	useEffect(() => {
+		const fetchServices = async () => {
+			try {
+				const { data } = await api.get(`/firebase/company/${companyId}`);
+				setServices(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+		fetchServices();
+	}, [companyId])
 
 	const handleClose = () => {
 		setConnected(false);
 		setIsFull(false);
-		setService("");
 		setNewService("");
 		onClose();
 	};
 
 	const handleSubmit = async () => {
-		const companyFirebaseBody = { connected, isFull, service }
+		const companyFirebaseBody = { connected, isFull, newService }
 		try {
 			await api.post(`/firebase/company/${companyId}`, companyFirebaseBody);
 		} catch (err) {
@@ -114,8 +132,20 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 	}
 
 	const addService = () => {
-		setService(newService);
+		handleSubmit();
 		handleCloseServiceModal();
+	}
+
+	const optionsTranslation = (option) => {
+		if (option === true) {
+			return "Sim";
+		}
+
+		if (option === false) {
+			return "Não";
+		}
+
+		return option;
 	}
 
 	return (
@@ -150,7 +180,48 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					Firebase Config
 				</DialogTitle>
                 <DialogContent dividers>
-					<div className={classes.form}>
+				<Paper
+					className={classes.mainPaper}
+					variant="outlined"
+				>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>
+									Company ID
+								</TableCell>
+								<TableCell>
+									Connected
+								</TableCell>
+								<TableCell>
+									Is Full
+								</TableCell>
+								<TableCell>
+									Service
+								</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{ services && services.map((service, index) => (
+								<TableRow key={index}>
+									<TableCell>
+										Company ID
+									</TableCell>
+									<TableCell>
+										Connected
+									</TableCell>
+									<TableCell>
+										Is Full
+									</TableCell>
+									<TableCell>
+										Service
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</Paper>
+					{/* <div className={classes.form}>
 						<Typography variant="subtitle1" gutterBottom displayInline className={classes.formTitle}>
 							CompanyID: 
 						</Typography>
@@ -193,7 +264,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 							value={service}
 							disabled
 						/>
-					</div>
+					</div> */}
                 </DialogContent>
 				<DialogActions>
 					<Button
@@ -215,8 +286,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 						color="primary"
 						variant="contained"
 						className={classes.btnWrapper}
-						onClick={handleSubmit}
-						disabled={!service}
+						onClick={handleClose}
 					>
 						Criar
 					</Button>

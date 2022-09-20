@@ -9,7 +9,7 @@ interface CompanyFirebaseBody {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.params;
 
-  return res.status(200).json(companyId);
+  return res.status(200).json([companyId]);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
