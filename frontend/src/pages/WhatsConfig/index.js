@@ -27,6 +27,7 @@ import GreetingMessageModal from "../../components/GreetingMessageModal";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
+import { AuthContext } from "../../context/Auth/AuthContext";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
 import { toast } from "react-toastify";
@@ -112,7 +113,7 @@ const WhatsConfig = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
     const { whatsApps } = useContext(WhatsAppsContext);
-
+    const { user } = useContext(AuthContext);
     const [intervalValue, setIntervalValue] = useState(1);
     const [selectedConnection, setSelectedConnection] = useState([]);
     const [useGreetingMessage, setUseGreetingMessage] = useState(false);
@@ -316,7 +317,7 @@ const WhatsConfig = () => {
     useEffect(() => {
         const socket = openSocket();
 
-        socket.on("config", (data) => {
+        socket.on(`config${user.companyId}`, (data) => {
           if (data.action === "update" || data.action === "create") {
             dispatch({ type: "UPDATE_CONFIG", payload: data.config });
           }

@@ -11,6 +11,7 @@ interface Request {
   statusType: string;
   msgWhatsId?: string;
   errorMessage?: string;
+  companyId?: number;
 }
 
 interface Response {
@@ -20,7 +21,8 @@ const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
   msgWhatsId,
-  errorMessage
+  errorMessage,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     statusType: Yup.string().required()
@@ -119,7 +121,7 @@ const StatusMessageWhatsappService = async ({
         }
     })
     await file.update({ Status: FileStatus.Finished });
-    io.emit("file", {
+    io.emit(`file${companyId}`, {
       action: "update",
       file
     });

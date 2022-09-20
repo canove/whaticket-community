@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useReducer } from "react";
+import React, { useState, useCallback, useEffect, useReducer, useContext } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -40,6 +40,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
 import { useTranslation } from 'react-i18next'
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -162,6 +163,7 @@ const Connections = () => {
 	const [pageNumber, setPageNumber] = useState(1);
 	const [count, setCount] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -189,19 +191,19 @@ const Connections = () => {
 	useEffect(() => {
 		const socket = openSocket();
 
-		socket.on("whatsapp", data => {
+		socket.on(`whatsapp${user.companyId}`, data => {
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
 			}
 		});
 
-		socket.on("whatsapp", data => {
+		socket.on(`whatsapp${user.companyId}`, data => {
 			if (data.action === "delete") {
 				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
 			}
 		});
 
-		socket.on("whatsappSession", data => {
+		socket.on(`whatsappSession${user.companyId}`, data => {
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_SESSION", payload: data.session });
 			}

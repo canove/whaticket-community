@@ -6,6 +6,7 @@ import { getIO } from "../../libs/socket";
 interface Request {
   session: string;
   status: string;
+  companyId: number;
 }
 
 interface Response {
@@ -13,7 +14,8 @@ interface Response {
 }
 const NOFWhatsappSessionStatusService = async ({
   session,
-  status
+  status,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     session: Yup.string().required(),
@@ -65,7 +67,7 @@ const NOFWhatsappSessionStatusService = async ({
   }
   
   const io = getIO();
-  io.emit("whatsappSession", {
+  io.emit(`whatsappSession${companyId}`, {
     action: "update",
     session: whatsapp
   });

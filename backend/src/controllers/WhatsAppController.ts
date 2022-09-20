@@ -1,7 +1,6 @@
 /*eslint-disable*/
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
-import { removeWbot } from "../libs/wbot";
 import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 
 import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
@@ -94,13 +93,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   StartWhatsAppSession(whatsapp);
 
   const io = getIO();
-  io.emit("whatsapp", {
+  io.emit(`whatsapp${companyId}`, {
     action: "update",
     whatsapp
   });
 
   if (oldDefaultWhatsapp) {
-    io.emit("whatsapp", {
+    io.emit(`whatsapp${companyId}`, {
       action: "update",
       whatsapp: oldDefaultWhatsapp
     });
@@ -123,6 +122,7 @@ export const update = async (
 ): Promise<Response> => {
   const { whatsappId } = req.params;
   const whatsappData = req.body;
+  const { companyId } = req.user;
 
   const { whatsapp, oldDefaultWhatsapp } = await UpdateWhatsAppService({
     whatsappData,
@@ -130,13 +130,13 @@ export const update = async (
   });
 
   const io = getIO();
-  io.emit("whatsapp", {
+  io.emit(`whatsapp${companyId}`, {
     action: "update",
     whatsapp
   });
 
   if (oldDefaultWhatsapp) {
-    io.emit("whatsapp", {
+    io.emit(`whatsapp${companyId}`, {
       action: "update",
       whatsapp: oldDefaultWhatsapp
     });
@@ -150,11 +150,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { whatsappId } = req.params;
+  const { companyId } = req.user;
 
   await DeleteWhatsAppService(whatsappId);
 
   const io = getIO();
-  io.emit("whatsapp", {
+  io.emit(`whatsapp${companyId}`, {
     action: "delete",
     whatsappId: +whatsappId
   });
@@ -218,10 +219,10 @@ export const messageStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
+  const { companyId } = req.user;
   const { statusType, msgId, msgWhatsId, errorMessage } = req.body;
 
-  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId, errorMessage });
+  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId, errorMessage, companyId });
 
   return res.status(200).json(message);
 };
@@ -257,10 +258,12 @@ export const nofSessionStatus = async (
 ): Promise<Response> => {
 
   const { session, status } = req.body;
+  const { companyId } = req.user;
 
   const message = await NOFWhatsappSessionStatusService({
     session,
-    status
+    status,
+    companyId
   });
 
   return res.status(200).json(message);
@@ -272,11 +275,13 @@ export const nofSessionQRUpdate = async (
 ): Promise<Response> => {
 
   const { result, session, qrcode } = req.body;
+  const { companyId } = req.user;
 
   const message = await NOFWhatsappQRCodeService({
     result,
     session,
-    qrcode
+    qrcode,
+    companyId
   });
 
   return res.status(200).json(message);

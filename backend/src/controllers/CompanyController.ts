@@ -25,6 +25,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { alias, name, cnpj, phone, email, address } = req.body;
+  const { companyId } = req.user;
 
   const company = await CreateCompanyService({
     alias,
@@ -36,7 +37,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("company", {
+  io.emit(`company${companyId}`, {
     action: "create",
     company
   });
@@ -58,11 +59,12 @@ export const update = async (
 ): Promise<Response> => {
   const { companyId } = req.params;
   const companyData = req.body;
+  const userCompanyId = req.user.companyId;
 
   const company = await UpdateCompanyService({ companyData, companyId});
 
   const io = getIO();
-  io.emit("company", {
+  io.emit(`company${userCompanyId}`, {
     action: "update",
     company
   });
@@ -75,11 +77,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { companyId } = req.params;
+  const userCompanyId = req.user.companyId;
 
   await DeleteCompanyService(companyId);
 
   const io = getIO();
-  io.emit("company", {
+  io.emit(`company${userCompanyId}`, {
     action: "delete",
     companyId
   });

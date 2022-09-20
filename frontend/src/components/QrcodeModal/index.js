@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
 
+import { AuthContext } from "../../context/Auth/AuthContext";
 import { Dialog, DialogContent, Paper, Typography } from "@material-ui/core";
 import api from "../../services/api";
 import { useTranslation } from "react-i18next";
@@ -9,6 +10,7 @@ import { useTranslation } from "react-i18next";
 const QrcodeModal = ({ open, onClose, whatsAppId }) => {
 	const { i18n } = useTranslation();
 	const [qrCode, setQrCode] = useState("");
+	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -28,7 +30,7 @@ const QrcodeModal = ({ open, onClose, whatsAppId }) => {
 		if (!whatsAppId) return;
 		const socket = openSocket();
 
-		socket.on("whatsappSession", data => {
+		socket.on(`whatsappSession${user.companyId}`, data => {
 			if (data.action === "update" && data.session.id === whatsAppId) {
 				setQrCode(data.session.qrcode);
 			}

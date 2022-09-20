@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useReducer } from "react";
+import React, { useState, useCallback, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
 
 import { CheckCircle, DeleteOutline, Edit } from "@material-ui/icons";
@@ -25,6 +25,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 
 import OfficialWhatsAppModal from "../../components/OfficialWhatsAppModal";
 
+import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from 'react-i18next'
 import { format, parseISO } from "date-fns";
 import api from "../../services/api";
@@ -114,6 +115,7 @@ const OfficialConnections = () => {
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [whatsApps, dispatch] = useReducer(reducer, []);
 	const [loading, setLoading] = useState(true);
+	const { user } = useContext(AuthContext);
 
 	const confirmationModalInitialState = {
 		action: "",
@@ -156,19 +158,19 @@ const OfficialConnections = () => {
 	useEffect(() => {
 		const socket = openSocket();
 
-		socket.on("whatsapp", data => {
+		socket.on(`whatsapp${user.companyId}`, data => {
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
 			}
 		});
 
-		socket.on("whatsapp", data => {
+		socket.on(`whatsapp${user.companyId}`, data => {
 			if (data.action === "delete") {
 				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
 			}
 		});
 
-		socket.on("whatsappSession", data => {
+		socket.on(`whatsappSession${user.companyId}`, data => {
 			if (data.action === "update") {
 				dispatch({ type: "UPDATE_SESSION", payload: data.session });
 			}

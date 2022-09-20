@@ -150,7 +150,8 @@ const verifyContact = async (
   const contactData = {
     name: contactName,
     number: contactNumber,
-    isGroup: false
+    isGroup: false,
+    companyId
   };
 
   const contact = CreateOrUpdateContactService(contactData);

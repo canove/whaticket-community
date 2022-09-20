@@ -233,7 +233,7 @@ const reducer = (state, action) => {
 			}
 		});
 
-		socket.on("contact", data => {
+		socket.on(`contact${user.companyId}`, data => {
 			if (data.action === "update") {
 				dispatch({
 					type: "UPDATE_TICKET_CONTACT",

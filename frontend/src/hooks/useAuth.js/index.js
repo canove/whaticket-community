@@ -76,7 +76,7 @@ const useAuth = () => {
 	useEffect(() => {
 		const socket = openSocket();
 
-		socket.on("user", data => {
+		socket.on(`user${user.companyId}`, data => {
 			if (data.action === "update" && data.user.id === user.id) {
 				setUser(data.user);
 			}

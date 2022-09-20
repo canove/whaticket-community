@@ -7,6 +7,7 @@ interface Request {
   result: number;
   session: string;
   qrcode: string;
+  companyId: number;
 }
 
 interface Response {
@@ -15,7 +16,8 @@ interface Response {
 const NOFWhatsappQRCodeService = async ({
   result,
   session,
-  qrcode
+  qrcode,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     result: Yup.number().required(),
@@ -48,7 +50,7 @@ const NOFWhatsappQRCodeService = async ({
   });
 
   const io = getIO();
-  io.emit("whatsappSession", {
+  io.emit(`whatsappSession${companyId}`, {
     action: "update",
     session: whatsapp
   });

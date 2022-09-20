@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 
@@ -31,6 +31,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import CompanyFirebase from "../../components/CompanyFirebase";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_COMPANIES") {
@@ -99,6 +100,7 @@ const Company= () => {
   const [companyFirebaseModalOpen, setCompanyFirebaseModalOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [companies, dispatch] = useReducer(reducer, []);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -128,7 +130,7 @@ const Company= () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("company", (data) => {
+    socket.on(`company${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_COMPANIES", payload: data.company });
       }

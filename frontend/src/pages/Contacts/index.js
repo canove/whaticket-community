@@ -133,7 +133,7 @@ const Contacts = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("contact", (data) => {
+    socket.on(`contact${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
       }
