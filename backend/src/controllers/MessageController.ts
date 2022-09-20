@@ -7,6 +7,7 @@ import ListMessagesService from "../services/MessageServices/ListMessagesService
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 
 type IndexQuery = {
   pageNumber: string;
@@ -28,6 +29,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     ticketId
   });
 
+  SetTicketMessagesAsRead(ticket);
+
   return res.json({ count, messages, ticket, hasMore });
 };
 
@@ -48,6 +51,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   } else {
     await SendWhatsAppMessage({ body, ticket, companyId });
   }
+
+  SetTicketMessagesAsRead(ticket);
 
   return res.send();
 };
