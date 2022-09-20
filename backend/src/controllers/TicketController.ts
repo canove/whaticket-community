@@ -40,14 +40,14 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   let queueIds: number[] = [];
 
   if (queueIdsStringified) {
     queueIds = JSON.parse(queueIdsStringified);
   }
-  
+
   const { tickets, count, hasMore } = await ListTicketsService({
     searchParam,
     pageNumber,
@@ -65,12 +65,17 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { contactId, status, userId }: TicketData = req.body;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
-  const ticket = await CreateTicketService({ contactId, status, userId, companyId });
+  const ticket = await CreateTicketService({
+    contactId,
+    status,
+    userId,
+    companyId
+  });
 
   const io = getIO();
-  io.to(ticket.status).emit("ticket", {
+  io.to(ticket.status).emit(`ticket${companyId}`, {
     action: "update",
     ticket
   });
@@ -136,7 +141,7 @@ export const remove = async (
   io.to(ticket.status)
     .to(ticketId)
     .to("notification")
-    .emit("ticket", {
+    .emit(`ticket${ticket.companyId}`, {
       action: "delete",
       ticketId: +ticketId
     });

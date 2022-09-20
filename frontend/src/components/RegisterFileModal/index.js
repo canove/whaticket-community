@@ -159,7 +159,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("reports", (data) => {
+    socket.on(`reports${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_REPORTS", payload: data.reports });
       }

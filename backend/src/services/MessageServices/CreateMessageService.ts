@@ -11,6 +11,7 @@ interface MessageData {
   read?: boolean;
   mediaType?: string;
   mediaUrl?: string;
+  companyId: number;
 }
 interface Request {
   messageData: MessageData;
@@ -45,7 +46,7 @@ const CreateMessageService = async ({
   io.to(message.ticketId.toString())
     .to(message.ticket.status)
     .to("notification")
-    .emit("appMessage", {
+    .emit(`appMessage${messageData.companyId}`, {
       action: "create",
       message,
       ticket: message.ticket,

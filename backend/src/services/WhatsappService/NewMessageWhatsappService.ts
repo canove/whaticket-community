@@ -129,7 +129,8 @@ const verifyMessage = async (
     body: msg.body,
     fromMe: msg.fromMe,
     mediaType: msg.type,
-    read: msg.fromMe
+    read: msg.fromMe,
+    companyId: ticket.companyId
   };
 
   await ticket.update({ lastMessage: msg.body });
@@ -255,7 +256,8 @@ const verifyMediaMessage = async (
     fromMe: msg.fromMe,
     read: msg.fromMe,
     mediaUrl: msg.body,
-    mediaType: msg.type
+    mediaType: msg.type,
+    companyId: ticket.companyId
   };
 
   await ticket.update({ lastMessage: msg.file });
