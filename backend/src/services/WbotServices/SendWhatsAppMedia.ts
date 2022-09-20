@@ -88,7 +88,8 @@ const SendWhatsAppMedia = async ({
               read: true,
               mediaUrl: null,
               mediaType: null,
-              quotedMsgId: null
+              quotedMsgId: null,
+              companyId
             };
           
             await ticket.update({ lastMessage: body });
@@ -149,7 +150,8 @@ const SendWhatsAppMedia = async ({
               read: true,
               mediaUrl: mediaUrl,
               mediaType: media.mimetype.split('/')[0],
-              quotedMsgId: null
+              quotedMsgId: null,
+              companyId
             };
           
             await ticket.update({ lastMessage: body });

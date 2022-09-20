@@ -83,7 +83,7 @@ const StatusMessageWhatsappService = async ({
     }
 
     const io = getIO();
-    io.to(msgRegister.ticketId.toString()).emit("whatsapp-message", {
+    io.to(msgRegister.ticketId.toString()).emit(`whatsapp-message${companyId}`, {
       action: "update",
       message: msgRegister
     });
@@ -119,7 +119,8 @@ const StatusMessageWhatsappService = async ({
             name: `${register.name}`,
             number: register.phoneNumber,
             profilePicUrl: null,
-            isGroup: false
+            isGroup: false,
+            companyId
           };
         
           const contact = await CreateOrUpdateContactService(contactData);
@@ -143,7 +144,8 @@ const StatusMessageWhatsappService = async ({
             read: true,
             mediaUrl: null,
             mediaType: null,
-            quotedMsgId: null
+            quotedMsgId: null,
+            companyId
           };
         
           await CreateMessageService({ messageData });
