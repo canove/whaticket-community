@@ -375,7 +375,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
       }
     });
 
-    socket.on(`whatsapp-message${companyId}`, (data) => {
+    socket.on(`whatsapp-message${user.companyId}`, (data) => {
       if (data.action === "update") {
         dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
       }
