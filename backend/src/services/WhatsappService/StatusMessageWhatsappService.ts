@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import FileRegister from "../../database/models/FileRegister";
@@ -5,12 +6,17 @@ import { FileStatus } from "../../enum/FileStatus";
 import File from "../../database/models/File";
 import Message from "../../database/models/Message";
 import { getIO } from "../../libs/socket";
+import CreateMessageService from "../MessageServices/CreateMessageService";
+import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
+import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
+import Templates from "../../database/models/TemplatesData";
 
 interface Request {
   msgId: number;
   statusType: string;
   msgWhatsId?: string;
   errorMessage?: string;
+  companyId?: number;
 }
 
 interface Response {
@@ -20,7 +26,8 @@ const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
   msgWhatsId,
-  errorMessage
+  errorMessage,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     statusType: Yup.string().required()
@@ -92,6 +99,56 @@ const StatusMessageWhatsappService = async ({
   switch(statusType){
     case "sent":
       await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId });
+
+      const message = await Message.findByPk(msgWhatsId);
+        if(!message) {
+          const file = await File.findByPk(register.fileId);
+          let template = null;
+          if(file.templateId) {
+            template = await Templates.findByPk(file.templateId);
+          }
+          let messageTxt = register.message;
+          if(template) {
+            messageTxt = template.text
+            .replace("{{name}}", register.name)
+            .replace("{{documentNumber}}", register.documentNumber)
+            .replace("{{phoneNumber}}", register.phoneNumber);
+          }
+
+          const contactData = {
+            name: `${register.name}`,
+            number: register.phoneNumber,
+            profilePicUrl: null,
+            isGroup: false
+          };
+        
+          const contact = await CreateOrUpdateContactService(contactData);
+          
+          const createTicket = await FindOrCreateTicketService(
+            contact,
+            register.whatsappId,
+            register.companyId,
+            0,
+            null,
+            true
+          );
+          /*CRIA A MENSAGEM NO CHAT*/
+          const messageData = {
+            id: msgWhatsId,
+            ticketId: createTicket.id,
+            contactId: undefined,
+            body: messageTxt,
+            ack: 3,
+            fromMe: true,
+            read: true,
+            mediaUrl: null,
+            mediaType: null,
+            quotedMsgId: null
+          };
+        
+          await CreateMessageService({ messageData });
+        }
+        /*FIM*/
       break;
     case "delivered":
       await register?.update({ deliveredAt: new Date() });
@@ -119,7 +176,7 @@ const StatusMessageWhatsappService = async ({
         }
     })
     await file.update({ Status: FileStatus.Finished });
-    io.emit("file", {
+    io.emit(`file${companyId}`, {
       action: "update",
       file
     });

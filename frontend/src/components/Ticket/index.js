@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import MessagesList from "../MessagesList";
 import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const drawerWidth = 320;
 
@@ -82,6 +83,7 @@ const Ticket = () => {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     setLoading(true);
@@ -119,7 +121,7 @@ const Ticket = () => {
       }
     });
 
-    socket.on("contact", (data) => {
+    socket.on(`contact${user.companyId}`, (data) => {
       if (data.action === "update") {
         setContact((prevState) => {
           if (prevState.id === data.contact?.id) {

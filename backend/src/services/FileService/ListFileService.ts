@@ -32,7 +32,9 @@ const ListFileService = async ({
     };
   }
 
-  where = { ...where, companyId };
+  where = { ...where };
+  if(companyId > 0)
+    where = { ...where, companyId }
 
   return await File.findAll({
     where,

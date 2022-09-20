@@ -13,6 +13,7 @@ interface Request {
   email?: string;
   profilePicUrl?: string;
   extraInfo?: ExtraInfo[];
+  companyId: number;
 }
 
 const CreateOrUpdateContactService = async ({
@@ -21,7 +22,8 @@ const CreateOrUpdateContactService = async ({
   profilePicUrl,
   isGroup,
   email = "",
-  extraInfo = []
+  extraInfo = [],
+  companyId
 }: Request): Promise<Contact> => {
   const number = isGroup ? rawNumber : rawNumber.replace(/[^0-9]/g, "");
 
@@ -33,7 +35,7 @@ const CreateOrUpdateContactService = async ({
   if (contact) {
     contact.update({ profilePicUrl });
 
-    io.emit("contact", {
+    io.emit(`contact${companyId}`, {
       action: "update",
       contact
     });
@@ -47,7 +49,7 @@ const CreateOrUpdateContactService = async ({
       extraInfo
     });
 
-    io.emit("contact", {
+    io.emit(`contact${companyId}`, {
       action: "create",
       contact
     });

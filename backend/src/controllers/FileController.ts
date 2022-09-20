@@ -27,11 +27,12 @@ export const update = async (
 ): Promise<Response> => {
   const { fileId } = req.params;
   const { status, userId } = req.query;
+  const { companyId } = req.user;
 
   const file = await UpdateFileService({ status, userId, fileId });
 
   const io = getIO();
-  io.emit("file", {
+  io.emit(`file${companyId}`, {
     action: "update",
     file
   });

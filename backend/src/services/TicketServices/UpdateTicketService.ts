@@ -1,5 +1,4 @@
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
-import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../../libs/socket";
 import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "./ShowTicketService";
@@ -28,7 +27,6 @@ const UpdateTicketService = async ({
   const { status, userId, queueId } = ticketData;
 
   const ticket = await ShowTicketService(ticketId);
-  await SetTicketMessagesAsRead(ticket);
 
   const oldStatus = ticket.status;
   const oldUserId = ticket.user?.id;

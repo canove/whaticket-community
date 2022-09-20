@@ -47,7 +47,8 @@ const GetWhatsappByIdentification = async (
 const GetWhatsappBySession = async (session: string): Promise<Whatsapp> => {
   const whatsapp = await Whatsapp.findOne({
     where: {
-      name: session
+      name: session,
+      deleted: false
     }
   });
 
@@ -150,7 +151,8 @@ const verifyContact = async (
   const contactData = {
     name: contactName,
     number: contactNumber,
-    isGroup: false
+    isGroup: false,
+    companyId
   };
 
   const contact = CreateOrUpdateContactService(contactData);

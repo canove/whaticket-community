@@ -1,5 +1,4 @@
 /*eslint-disable*/
-import { initWbot } from "../../libs/wbot";
 import Whatsapp from "../../database/models/Whatsapp";
 import axios from "axios";
 //import { wbotMessageListener } from "./wbotMessageListener";
@@ -13,7 +12,7 @@ export const StartWhatsAppSession = async (
   await whatsapp.update({ status: "OPENING" });
 
   const io = getIO();
-  io.emit("whatsappSession", {
+  io.emit(`whatsappSession${whatsapp.companyId}`, {
     action: "update",
     session: whatsapp
   });

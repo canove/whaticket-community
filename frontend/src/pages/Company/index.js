@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 
@@ -14,6 +14,7 @@ import IconButton from "@material-ui/core/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
@@ -29,6 +30,8 @@ import CompanyRegistration from "../../components/CompanyRegistration";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import CompanyFirebase from "../../components/CompanyFirebase";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_COMPANIES") {
@@ -94,8 +97,10 @@ const Company= () => {
   const [deletingCompany, setDeletingcompany] = useState(null);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [companyFirebaseModalOpen, setCompanyFirebaseModalOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [companies, dispatch] = useReducer(reducer, []);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -125,7 +130,7 @@ const Company= () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("company", (data) => {
+    socket.on(`company${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_COMPANIES", payload: data.company });
       }
@@ -148,6 +153,16 @@ const Company= () => {
   const handleCloseCompanyModal = () => {
     setSelectedCompany(null);
     setCompanyModalOpen(false);
+  };
+
+  const handleOpenCompanyFirebaseModal = (company) => {
+    setSelectedCompany(company);
+    setCompanyFirebaseModalOpen(true);
+  };
+
+  const handleCloseCompanyFirebaseModal = () => {
+    setSelectedCompany(null);
+    setCompanyFirebaseModalOpen(false);
   };
 
   const handleSearch = (event) => {
@@ -203,6 +218,11 @@ const Company= () => {
         aria-labelledby="form-dialog-title"
         companyId={selectedCompany && selectedCompany.id}
       />
+      <CompanyFirebase
+        open={companyFirebaseModalOpen}
+        onClose={handleCloseCompanyFirebaseModal}
+        companyId={selectedCompany && selectedCompany.id}
+      />
       <MainHeader>
         <Title>{i18n.t("company.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -244,7 +264,6 @@ const Company= () => {
               <TableCell align="center">{i18n.t("company.grid.email")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.address")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.actions")}</TableCell>
-
             </TableRow>
           </TableHead>
           <TableBody>
@@ -259,6 +278,13 @@ const Company= () => {
                   <TableCell align="center">{company.email}</TableCell>
                   <TableCell align="center">{company.address}</TableCell>
                   <TableCell align="center">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenCompanyFirebaseModal(company)}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+
                     <IconButton
                       size="small"
                       onClick={() => handleEditCompany(company)}

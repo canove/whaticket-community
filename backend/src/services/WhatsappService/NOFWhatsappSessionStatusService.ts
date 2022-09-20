@@ -2,10 +2,11 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../database/models/Whatsapp";
 import { getIO } from "../../libs/socket";
-
+/*eslint-disable*/
 interface Request {
   session: string;
   status: string;
+  companyId: number;
 }
 
 interface Response {
@@ -13,7 +14,8 @@ interface Response {
 }
 const NOFWhatsappSessionStatusService = async ({
   session,
-  status
+  status,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     session: Yup.string().required(),
@@ -30,7 +32,8 @@ const NOFWhatsappSessionStatusService = async ({
   }
   const whatsapp = await Whatsapp.findOne({
     where: {
-      name: session
+      name: session,
+      deleted: false
     }
   });
 
@@ -65,7 +68,7 @@ const NOFWhatsappSessionStatusService = async ({
   }
   
   const io = getIO();
-  io.emit("whatsappSession", {
+  io.emit(`whatsappSession${companyId}`, {
     action: "update",
     session: whatsapp
   });

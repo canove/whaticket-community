@@ -25,19 +25,27 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-    const { name, status, text, footer, createdAt, updatedAt } = req.body;
-    const companyId = req.user.companyId;
+  const { name, status, text, footer, createdAt, updatedAt } = req.body;
+  const { companyId } = req.user;
 
-    const response = await CreateTemplateDataService({ name, status, text, footer, companyId, createdAt, updatedAt });
+  const response = await CreateTemplateDataService({
+    name,
+    status,
+    text,
+    footer,
+    companyId,
+    createdAt,
+    updatedAt
+  });
 
-    const io = getIO();
-    io.emit("templates", {
+  const io = getIO();
+  io.emit(`templates${companyId}`, {
     action: "create",
     response
   });
 
-    return res.status(200).json(response);
-}
+  return res.status(200).json(response);
+};
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { templatesId } = req.params;
@@ -47,31 +55,39 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(response);
 };
 
-export const update = async (req: Request, res: Response): Promise<Response> => {
-    const { templatesId } = req.params;
-    const templatesData = req.body;
+export const update = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { templatesId } = req.params;
+  const templatesData = req.body;
+  const { companyId } = req.user;
 
-    const response = await UpdateTemplateDataService({ templatesId, templatesData });
+  const response = await UpdateTemplateDataService({
+    templatesId,
+    templatesData
+  });
 
-    const io = getIO();
-    io.emit("templates", {
+  const io = getIO();
+  io.emit(`templates${companyId}`, {
     action: "update",
     response
   });
 
-    return res.status(200).json(response);
-}
+  return res.status(200).json(response);
+};
 
 export const remove = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
   const { templateId } = req.params;
+  const { companyId } = req.user;
 
   await DeleteTemplateDataService(templateId);
 
   const io = getIO();
-  io.emit("templates", {
+  io.emit(`templates${companyId}`, {
     action: "delete",
     templateId
   });

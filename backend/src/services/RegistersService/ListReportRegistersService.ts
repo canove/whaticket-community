@@ -16,12 +16,14 @@ const ListReportRegistersService = async ({
 }: Request) => {
   let whereCondition = null;
 
+  whereCondition = { companyId };
+
   if (fileIds) {
     whereCondition = {
+      ...whereCondition,
       fileId: {
-        [Op.or]: fileIds,
-      },
-      companyId
+        [Op.or]: fileIds
+      }
     };
   }
 

@@ -26,7 +26,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     });
 
     const io = getIO();
-    io.emit("file", {
+    io.emit(`file${companyId}`, {
       action: "create",
       file
     });

@@ -4,6 +4,7 @@ import axios from "axios";
 import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import { FileStatus } from "../../enum/FileStatus";
+import Templates from "../../database/models/TemplatesData";
 
 /* eslint-disable */
 const DispatcherRegisterService = async ({ file }): Promise<void> => {
@@ -30,13 +31,15 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     if(whatsappIds) {
       accounts = await Whatsapp.findAll({
         where: {
-          id: whatsappIds
+          id: whatsappIds,
+          companyId: file.companyId
         }
       });
     }else{
       accounts = await Whatsapp.findAll({
         where: {
           status: "CONNECTED",
+          companyId: file.companyId,
           [Op.or]: [
             {
               official: file.official
@@ -49,6 +52,12 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     const payload = [];
     const apiUrl = `${process.env.WPP_OFFICIAL_URL}?x-api-key=${process.env.WPP_OFFICIAL_API_KEY}`;
     let processedRegister = [];
+
+    let template = null;
+    if(file.templateId) {
+      template = await Templates.findByPk(file.templateId);
+    }
+      
    
     for (const account of accounts) {
       if (account.official) {
@@ -121,31 +130,39 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
           
               }
 
-                processedRegister.push(reg);
-                payload.push({
-                  company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
-                  person: reg.documentNumber,
-                  activationMessage: {
-                    session: account.name,
-                    msgid: reg.id,
-                    channel: "wpp_no",
-                    template: "",
-                    to: {
-                      identifier: phoneNumber,
-                      name: reg.name
-                    },
-                    text: reg.message,
-                    parameters: []
-                  }
-                });
+              let messageTxt = reg.message;
 
-                await reg.update({ processedAt: new Date(), whatsappId: account.id });
-            }
-
-              if(registers.length > 0) {
-                await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
+              if(template) {
+                messageTxt = template.text
+                .replace("{{name}}", reg.name)
+                .replace("{{documentNumber}}", reg.documentNumber)
+                .replace("{{phoneNumber}}", reg.phoneNumber);
               }
+              processedRegister.push(reg);
+              payload.push({
+                company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
+                person: reg.documentNumber,
+                activationMessage: {
+                  session: account.name,
+                  msgid: reg.id,
+                  channel: "wpp_no",
+                  template: "",
+                  to: {
+                    identifier: phoneNumber,
+                    name: reg.name
+                  },
+                  text: messageTxt,
+                  parameters: []
+                }
+              });
+
+              await reg.update({ processedAt: new Date(), whatsappId: account.id });
             }
+
+            if(registers.length > 0) {
+              await account.update({ lastSendDate: now.setMinutes(now.getMinutes() + 2) });
+            }
+          }
         }
     }
     

@@ -30,7 +30,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("queue", {
+  io.emit(`queue${companyId}`, {
     action: "update",
     queue
   });
@@ -51,11 +51,12 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   const { queueId } = req.params;
+  const { companyId } = req.user;
 
   const queue = await UpdateQueueService(queueId, req.body);
 
   const io = getIO();
-  io.emit("queue", {
+  io.emit(`queue${companyId}`, {
     action: "update",
     queue
   });
@@ -68,11 +69,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { queueId } = req.params;
+  const { companyId } = req.user;
 
   await DeleteQueueService(queueId);
 
   const io = getIO();
-  io.emit("queue", {
+  io.emit(`queue${companyId}`, {
     action: "delete",
     queueId: +queueId
   });

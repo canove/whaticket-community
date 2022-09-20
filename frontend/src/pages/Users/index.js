@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 
@@ -29,6 +29,7 @@ import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -86,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
 const Users = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
+  const { user } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
@@ -125,7 +127,7 @@ const Users = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("user", (data) => {
+    socket.on(`user${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_USERS", payload: data.user });
       }
