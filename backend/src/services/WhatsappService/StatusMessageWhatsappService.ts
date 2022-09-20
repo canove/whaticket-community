@@ -119,7 +119,8 @@ const StatusMessageWhatsappService = async ({
             name: `${register.name}`,
             number: register.phoneNumber,
             profilePicUrl: null,
-            isGroup: false
+            isGroup: false,
+            companyId
           };
         
           const contact = await CreateOrUpdateContactService(contactData);
