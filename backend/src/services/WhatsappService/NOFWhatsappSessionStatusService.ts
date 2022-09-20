@@ -2,7 +2,7 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../database/models/Whatsapp";
 import { getIO } from "../../libs/socket";
-
+/*eslint-disable*/
 interface Request {
   session: string;
   status: string;
@@ -32,7 +32,8 @@ const NOFWhatsappSessionStatusService = async ({
   }
   const whatsapp = await Whatsapp.findOne({
     where: {
-      name: session
+      name: session,
+      deleted: false
     }
   });
 

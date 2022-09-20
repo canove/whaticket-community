@@ -1,5 +1,7 @@
+import File from "../../database/models/File";
 import FileRegister from "../../database/models/FileRegister";
-
+import Templates from "../../database/models/TemplatesData";
+/*eslint-disable*/
 interface Response {
   reports: FileRegister[];
   count: number;
@@ -22,6 +24,20 @@ const ListFileRegistersService = async ({
     offset,
     order: [["createdAt", "DESC"]],
   });
+
+  if (fileId != '' && fileId != null) {
+    const file = await File.findByPk(fileId);
+    if (file.templateId) {
+      const template = await Templates.findByPk(file.templateId);
+      reports.forEach((reg) => {
+        reg.message = template.text
+        .replace("{{name}}", reg.name)
+        .replace("{{documentNumber}}", reg.documentNumber)
+        .replace("{{phoneNumber}}", reg.phoneNumber);
+      });    
+    }
+  }
+  
 
   const hasMore = count > offset + reports.length;
 

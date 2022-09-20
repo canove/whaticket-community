@@ -15,6 +15,7 @@ import QualityNumberWhatsappService from "../services/WhatsappService/QualityNum
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
 import axios from "axios";
+import AppError from "../errors/AppError";
 
 type ListQuery = {
   pageNumber: string | number;
@@ -73,7 +74,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       }
     });
   }catch(err) {
-    return res.status(500).json(err['response'].data['message']);
+    throw new AppError(err['response'].data['message']);
   }
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
