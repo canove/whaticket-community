@@ -39,14 +39,14 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
 
-      io.emit(`file${companyId}`, {
+      io.emit(`file${file.companyId}`, {
         action: "update",
         file
       });
 
       await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
 
-      io.emit(`file${companyId}`, {
+      io.emit(`file${file.companyId}`, {
         action: "update",
         file
       });
@@ -72,14 +72,14 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
       files.forEach(async (file) => {
         await file.update({ Status: FileStatus.Sending });
 
-        io.emit(`file${companyId}`, {
+        io.emit(`file${file.companyId}`, {
           action: "update",
           file
         });
   
         await DispatcherRegisterService({ file });
 
-        io.emit(`file${companyId}`, {
+        io.emit(`file${file.companyId}`, {
         action: "update",
         file
       });

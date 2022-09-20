@@ -16,7 +16,6 @@ interface Request {
   statusType: string;
   msgWhatsId?: string;
   errorMessage?: string;
-  companyId?: number;
 }
 
 interface Response {
@@ -26,8 +25,7 @@ const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
   msgWhatsId,
-  errorMessage,
-  companyId
+  errorMessage
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     statusType: Yup.string().required()
@@ -118,6 +116,7 @@ const StatusMessageWhatsappService = async ({
           const contactData = {
             name: `${register.name}`,
             number: register.phoneNumber,
+            companyId: file.companyId,
             profilePicUrl: null,
             isGroup: false
           };
@@ -176,7 +175,7 @@ const StatusMessageWhatsappService = async ({
         }
     })
     await file.update({ Status: FileStatus.Finished });
-    io.emit(`file${companyId}`, {
+    io.emit(`file${file.companyId}`, {
       action: "update",
       file
     });
