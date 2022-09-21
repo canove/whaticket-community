@@ -10,6 +10,7 @@ import {
   DialogTitle,
   CircularProgress,
   TextField,
+  Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -71,6 +72,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 
   const [company, setCompany] = useState(initialState);
   const [textAlias, setAlias] = useState("");
+  const [logo, setLogo] = useState();
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -95,6 +97,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   const handleClose = () => {
     onClose();
     setCompany(initialState);
+    setLogo(null);
   };
 
   const handleSaveCompany = async (values) => {
@@ -117,6 +120,10 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
     setAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ""));
     e.preventDefault();
   };
+
+  const handleLogoUpload = (e) => {
+    setLogo(e.target.files[0]);
+  }
 
   return (
     <div className={classes.root}>
@@ -219,6 +226,22 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                     margin="dense"
                     fullWidth
                   />
+                </div>
+                <div className={classes.multFieldLine}>
+                  <Button
+                    variant="contained"
+                    component="label"
+                  >
+                    Upload Logo
+                    <input
+                      type="file"
+                      onChange={(e) => {handleLogoUpload(e)}}
+                      hidden
+                    />
+                  </Button>
+                  <Typography variant="subtitle1" gutterBottom>
+                    { logo ? 'Com Logo' : 'Sem Logo' }
+                  </Typography>
                 </div>
               </DialogContent>
               <DialogActions>
