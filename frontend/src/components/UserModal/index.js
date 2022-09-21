@@ -81,7 +81,6 @@ const UserModal = ({ open, onClose, userId }) => {
 		email: "",
 		password: "",
 		profile: "user",
-		lang: "",
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
@@ -89,18 +88,18 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [showPassword, setShowPassword] = useState(false);
 	const [language, setLanguage] = useState('');
-	const [changingLang, setChangingLang] = useState(false);
 	const [companies, setCompanies] = useState([]);
 	const [selectedCompany, setSelectedCompany] = useState();
 
-	const handleChange = (e) => {
-		setChangingLang(true);
+	const handleLanguageChange = (e) => {
 		setLanguage(e.target.value);
 	};
 
-	function handleChangeLanguage(language) {
-		i18n.changeLanguage(language);
-	}
+	useEffect(() => {
+		if (user.id === loggedInUser.id) {
+			i18n.changeLanguage(language);
+		}
+	}, [language]);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -110,8 +109,12 @@ const UserModal = ({ open, onClose, userId }) => {
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
+				setLanguage(data.lang)
 				const userQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(userQueueIds);
+				if (loggedInUser.companyId === 1) {
+					setSelectedCompany(data.companyId);
+				}
 			} catch (err) {
 				toastError(err);
 			}
@@ -137,7 +140,8 @@ const UserModal = ({ open, onClose, userId }) => {
 	const handleClose = () => {
 		onClose();
 		setUser(initialState);
-		setChangingLang(false);
+		setSelectedCompany("");
+		setLanguage("");
 	};
 
 	const handleCompanyChange = (e) => {
@@ -180,7 +184,7 @@ const UserModal = ({ open, onClose, userId }) => {
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
 							if (user.id === loggedInUser.id) {
-								handleChangeLanguage(language);
+								setLanguage(language);
 							}
 							handleSaveUser(values);
 							actions.setSubmitting(false);
@@ -279,11 +283,9 @@ const UserModal = ({ open, onClose, userId }) => {
 										<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
 										<Select
 											label={i18n.t("userModal.form.language")}
-											name="lang"
 											labelId="language-selection-label"
-											id="language-selection"
-											value={changingLang ? language : user.lang}
-											onChange={handleChange}
+											value={language}
+											onChange={handleLanguageChange}
 										>
 											<MenuItem value="pt">Português</MenuItem>
 											<MenuItem value="en">Inglês</MenuItem>
