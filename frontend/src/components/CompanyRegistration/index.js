@@ -151,7 +151,12 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   };
 
   const handleLogoUpload = (e) => {
-    setLogo(e.target.files[0]);
+    const megabyte = 1000000;
+    if (e.target.files[0].size >= megabyte) {
+      toast.error("Tamanho excede o valor máximo de 1 Megabyte.");
+    } else {
+      setLogo(e.target.files[0]);
+    }
   }
 
   return (
