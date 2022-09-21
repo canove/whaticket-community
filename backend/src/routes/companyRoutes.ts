@@ -16,6 +16,12 @@ companyRoutes.get("/companies/:companyId", isAuth, CompanyController.show);
 
 companyRoutes.delete("/companies/:companyId", isAuth, CompanyController.remove);
 
+companyRoutes.post(
+  "/companies/uploadLogo/:companyId",
+  isAuth,
+  CompanyController.uploadLogoToS3
+);
+
 companyRoutes.get(
   "/firebase/company/:companyId",
   isAuth,

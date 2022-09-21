@@ -1,5 +1,8 @@
+/*eslint-disable*/
 import FileRegister from "../../database/models/FileRegister";
 import {Op} from "sequelize"
+import File from "../../database/models/File";
+import { FileStatus } from "../../enum/FileStatus";
 
 interface Request {
   type?: string,
@@ -123,6 +126,17 @@ const ListRegistersService = async ({
       case 'error':
         whereCondition = { errorAt: { [Op.ne]: null } }
         break;
+    }
+  }
+
+  if (!fileId) {
+    const files = await File.findAll({
+      where: { status: 7, companyId }
+    });
+
+    if (files.length > 0) {
+      const filesArray = files.map(file => file.id);
+      whereCondition = { ...whereCondition, fileId: { [Op.notIn]: filesArray } }
     }
   }
 

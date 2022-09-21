@@ -94,11 +94,13 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 
 	useEffect(() => {
 		const fetchServices = async () => {
-			try {
-				const { data } = await api.get(`/firebase/company/${companyId}`);
-				setServices(data);
-			} catch (err) {
-				toastError(err);
+			if (companyId) {
+				try {
+					const { data } = await api.get(`/firebase/company/${companyId}`);
+					setServices(data);
+				} catch (err) {
+					toastError(err);
+				}
 			}
 		}
 		fetchServices();

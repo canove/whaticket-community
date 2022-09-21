@@ -82,6 +82,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         setCompany((prevState) => {
           return { ...prevState, ...data };
         });
+        setLogo(data.logo);
       } catch (err) {
         toastError(err);
       }
@@ -101,16 +102,44 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   };
 
   const handleSaveCompany = async (values) => {
-    const companyData = { ...values, alias: textAlias };
-    try {
-      if (companyId) {
-        await api.put(`/companies/${companyId}`, companyData);
-      } else {
-        await api.post("/companies", companyData);
+    const uploadLogo = async (logo, compId) => {
+      if (compId && logo) {
+        const formData = new FormData();
+        formData.append("file", logo, logo.name);
+        formData.set("name", logo.name);
+  
+        try {
+          const { data } = await api.post(`/companies/uploadLogo/${compId}`, formData);
+          return data;
+        } catch (err) {
+          toastError(err);
+        }
       }
-      toast.success(i18n.t("company.success"));
-    } catch (err) {
-      toastError(err);
+      return null;
+    }
+
+    const companyData = { ...values, alias: textAlias };
+
+    if (companyId) {
+      try {
+        const { data } = await api.put(`/companies/${companyId}`, companyData);
+        if (logo) {
+          await uploadLogo(logo, data.id);
+        }
+        toast.success("Empresa Atualizada com Sucesso!");
+      } catch (err) {
+        toastError(err);
+      }
+    } else {
+      try {
+        const { data } = await api.post("/companies", companyData);
+        if (logo) {
+          await uploadLogo(logo, data.id);
+        }
+        toast.success("Empresa Criado com Sucesso!");
+      } catch (err) {
+        toastError(err);
+      }
     }
 
     handleClose();
@@ -240,7 +269,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                     />
                   </Button>
                   <Typography variant="subtitle1" gutterBottom>
-                    { logo ? 'Com Logo' : 'Sem Logo' }
+                    { logo ? <img src={logo} alt="Logo" height="50px" />: 'Sem Logo' }
                   </Typography>
                 </div>
               </DialogContent>

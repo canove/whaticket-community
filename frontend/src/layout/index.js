@@ -130,6 +130,7 @@ const LoggedInLayout = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
+  const [logo, setLogo] = useState("");
 
   const mainListItems = useMemo(() => <MainListItems />, [user])
 
@@ -153,6 +154,20 @@ const LoggedInLayout = ({ children }) => {
 			toastError(err);
 		}
 	};
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const { data } = await api.get(`/companies/${user.companyId}`);
+        setLogo(data.logo);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+    if (user.companyId) {
+      fetchLogo();
+    }
+  }, [user.companyId])
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -261,7 +276,7 @@ const LoggedInLayout = ({ children }) => {
             color="inherit"
             noWrap
             className={classes.title}
-          ><img src = { brainit } alt= "Logo-BrainIT"/>
+          ><img src={ logo ? logo : brainit } height="50px" style={{paddingTop: "5px", paddingBottom: "5px"}}  alt="Logo"/>
           </Typography>
           {user.id && <NotificationsPopOver />}
 
