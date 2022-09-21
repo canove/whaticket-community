@@ -12,10 +12,13 @@ import Typography from "@material-ui/core/Typography";
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { MenuItem, Paper, Select, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@material-ui/core";
+import { IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@material-ui/core";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -84,11 +87,10 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 	const { i18n } = useTranslation();
 	const { user } = useContext(AuthContext);
 
-	const [connected, setConnected] = useState(false);
-	const [isFull, setIsFull] = useState(false);
-	const [newService, setNewService] = useState("");
 	const [openServiceModal, setOpenServiceModal] = useState(false);
+	const [newService, setNewService] = useState("");
 	const [services, setServices] = useState([]);
+	const [docId, setDocId] = useState("");
 
 	useEffect(() => {
 		const fetchServices = async () => {
@@ -100,23 +102,27 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 			}
 		}
 		fetchServices();
-	}, [companyId])
+	}, [companyId, services])
 
 	const handleClose = () => {
-		setConnected(false);
-		setIsFull(false);
 		setNewService("");
 		onClose();
 	};
 
-	const handleSubmit = async () => {
-		const companyFirebaseBody = { connected, isFull, newService }
+	const handleSubmitService = async () => {
 		try {
-			await api.post(`/firebase/company/${companyId}`, companyFirebaseBody);
+			await api.post(`/firebase/company/${companyId}`, { newService, docId });
+			setServices(prevServices => [...prevServices]);
+			if (docId) {
+				toast.success("Service editado com sucesso.");
+			} else {
+				toast.success("Service criado com sucesso.");
+			}
 		} catch (err) {
 			toastError(err);
 		}
-		handleClose();
+
+		handleCloseServiceModal();
 	}
 
 	const handleOpenServiceModal = () => {
@@ -124,6 +130,8 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 	}
 
 	const handleCloseServiceModal = () => {
+		setNewService("");
+		setDocId("");
 		setOpenServiceModal(false);
 	}
 
@@ -131,21 +139,34 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 		setNewService(e.target.value);
 	}
 
-	const addService = () => {
-		handleSubmit();
-		handleCloseServiceModal();
+	const handleEditService = (service, docId) => {
+		setNewService(service);
+		setDocId(docId);
+		setOpenServiceModal(true);
 	}
 
-	const optionsTranslation = (option) => {
-		if (option === true) {
+	const getIsFullTranslation = (isFull) => {
+		if (isFull === true) {
 			return "Sim";
 		}
 
-		if (option === false) {
+		if (isFull === false) {
 			return "Não";
 		}
 
-		return option;
+		return null;
+	}
+
+	const getConnectedTranslation = (connected) => {
+		if (connected === true) {
+			return <CheckCircleIcon style={{ color: green[500] }} />;
+		}
+
+		if (connected === false) {
+			return <CancelIcon style={{ color: red[500] }} />;
+		}
+
+		return null;
 	}
 
 	return (
@@ -157,6 +178,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					<TextField
 						variant="outlined"
 						style={{width:"100%"}}
+						value={newService}
 						onChange={(e) => (handleServiceChange(e))}
 					/>
 				</DialogContent>
@@ -164,7 +186,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					<Button onClick={handleCloseServiceModal} color="primary">
 						Cancel
 					</Button>
-					<Button onClick={(e) => {addService(e)}} color="primary">
+					<Button onClick={(e) => {handleSubmitService(e)}} color="primary">
 						Ok
 					</Button>
 				</DialogActions>
@@ -199,22 +221,33 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 								<TableCell>
 									Service
 								</TableCell>
+								<TableCell>
+									Edit
+								</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
 							{ services && services.map((service, index) => (
 								<TableRow key={index}>
 									<TableCell>
-										Company ID
+										{ service.data.companyId }
 									</TableCell>
 									<TableCell>
-										Connected
+										{ getConnectedTranslation(service.data.connected) }
 									</TableCell>
 									<TableCell>
-										Is Full
+										{ getIsFullTranslation(service.data.isFull) }
 									</TableCell>
 									<TableCell>
-										Service
+										{ service.data.service }
+									</TableCell>
+									<TableCell>
+										<IconButton
+											size="small"
+											onClick={() => handleEditService(service.data.service, service.id)}
+										>
+											<EditIcon />
+										</IconButton>
 									</TableCell>
 								</TableRow>
 							))}
@@ -281,14 +314,6 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 						onClick={handleOpenServiceModal}
 					>
 						Adicionar Service
-					</Button>
-					<Button
-						color="primary"
-						variant="contained"
-						className={classes.btnWrapper}
-						onClick={handleClose}
-					>
-						Criar
 					</Button>
 				</DialogActions>
 			</Dialog>
