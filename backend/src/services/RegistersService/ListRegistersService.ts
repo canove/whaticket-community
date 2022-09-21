@@ -127,7 +127,7 @@ const ListRegistersService = async ({
   }
 
   const { count } = await FileRegister.findAndCountAll({
-    where: { ...whereCondition, companyId, refusedAt: { [Op.ne]: null } }
+    where: { ...whereCondition, companyId }
   });
 
   return { count };
