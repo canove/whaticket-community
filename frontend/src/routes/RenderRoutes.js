@@ -18,11 +18,13 @@ import Templates from "../pages/Templates";
 import Company from "../pages/Company";
 import MenuLink from "../pages/MenuLink";
 import TemplatesData from "../pages/TemplatesData";
+import Registration from "../pages/Registration";
+import Products from "../pages/Products";
+import Pricing from "../pages/Pricing";
 
 import { AuthContext } from "../context/Auth/AuthContext";
 import toastError from "../errors/toastError";
 import api from "../services/api";
-import Registration from "../pages/Registration";
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
@@ -98,6 +100,12 @@ const RenderRoutes = () => {
         }
         if (name === "Registration") {
             return Registration
+        }
+        if (name === "Products") {
+            return Products
+        }
+        if (name === "Pricing") {
+            return Pricing
         }
     }
 
