@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
+import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -7,6 +8,7 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import { TableCell } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -14,7 +16,52 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 
 import { useTranslation } from "react-i18next";
-import { TableCell } from "@material-ui/core";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
+
+const reducer = (state, action) => {
+    if (action.type === "LOAD_PRODUCTS") {
+        const products = action.payload;
+        const newProducts = [];
+  
+        products.forEach((product) => {
+            const productIndex = state.findIndex((p) => p.id === product.id);
+            if (productIndex !== -1) {
+                state[productIndex] = product;
+            } else {
+                newProducts.push(product);
+            }
+        });
+  
+        return [...state, ...newProducts];
+    }
+  
+    if (action.type === "UPDATE_PRODUCTS") {
+        const product = action.payload;
+        const productIndex = state.findIndex((p) => p.id === product.id);
+  
+        if (productIndex !== -1) {
+            state[productIndex] = product;
+            return [...state];
+        } else {
+            return [product, ...state];
+        }
+    }
+  
+    if (action.type === "DELETE_PRODUCT") {
+        const productId = action.payload;
+  
+        const productIndex = state.findIndex((p) => p.id === productId);
+        if (productIndex !== -1) {
+            state.splice(productIndex, 1);
+        }
+        return [...state];
+    }
+  
+    if (action.type === "RESET") {
+        return [];
+    }
+};
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -28,6 +75,42 @@ const useStyles = makeStyles((theme) => ({
 const Products = () => {
     const classes = useStyles();
     const { i18n } = useTranslation();
+
+    const [products, dispatch] = useReducer(reducer, []);
+
+    useEffect(() => {
+        dispatch({ type: "RESET" });
+    }, []);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const { data } = await api.get("/products/");
+                dispatch({ type: "LOAD_PRODUCTS", payload: data });
+            } catch (err) {
+                toastError(err);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    useEffect(() => {
+        const socket = openSocket();
+    
+        socket.on("product", (data) => {
+            if (data.action === "update" || data.action === "create") {
+                dispatch({ type: "UPDATE_PRODUCTS", payload: data.product });
+            }
+    
+            if (data.action === "delete") {
+                dispatch({ type: "DELETE_PRODUCT", payload: + data.productId });
+            }
+        });
+    
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
 
     return (
         <MainContainer>

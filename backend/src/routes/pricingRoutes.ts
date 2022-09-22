@@ -5,14 +5,14 @@ import * as PricingController from "../controllers/PricingController";
 
 const pricingRoutes = Router();
 
-pricingRoutes.get("/pricing", isAuth, PricingController.index);
+pricingRoutes.get("/pricings", isAuth, PricingController.index);
 
-pricingRoutes.post("/pricing", isAuth, PricingController.store);
+pricingRoutes.post("/pricings", isAuth, PricingController.store);
 
-pricingRoutes.get("/pricing/:pricingId", isAuth, PricingController.show);
+pricingRoutes.get("/pricings/:pricingId", isAuth, PricingController.show);
 
-pricingRoutes.put("/pricing/:pricingId", isAuth, PricingController.update);
+pricingRoutes.put("/pricings/:pricingId", isAuth, PricingController.update);
 
-pricingRoutes.delete("/pricing/:pricingId", isAuth, PricingController.remove);
+pricingRoutes.delete("/pricings/:pricingId", isAuth, PricingController.remove);
 
 export default pricingRoutes;

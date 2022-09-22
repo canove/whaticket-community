@@ -2,7 +2,7 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   up: (queryInterface: QueryInterface) => {
-    return queryInterface.createTable("Pricing", {
+    return queryInterface.createTable("Pricings", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -36,6 +36,6 @@ module.exports = {
   },
 
   down: (queryInterface: QueryInterface) => {
-    return queryInterface.dropTable("Pricing");
+    return queryInterface.dropTable("Pricings");
   }
 };

@@ -23,6 +23,8 @@ import whatsConfigRoutes from "./whatsConfigRoutes";
 import companyRoutes from "./companyRoutes";
 import menuRoutes from "./menuRoutes";
 import templateDataRoutes from "./templateDataRoutes";
+import productRoutes from "./productRoutes";
+import pricingRoutes from "./pricingRoutes";
 
 const routes = Router();
 
@@ -49,5 +51,7 @@ routes.use(whatsConfigRoutes);
 routes.use(companyRoutes);
 routes.use(menuRoutes);
 routes.use(templateDataRoutes);
+routes.use(productRoutes);
+routes.use(pricingRoutes);
 
 export default routes;
