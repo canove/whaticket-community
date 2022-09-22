@@ -50,6 +50,11 @@ class Company extends Model<Company> {
   @Column
   address: string;
 
+  @AllowNull(false)
+  @Default("ativo")
+  @Column
+  status: string;
+
   @BelongsToMany(() => Menu, () => MenuCompanies)
   menus: Menu[];
 
