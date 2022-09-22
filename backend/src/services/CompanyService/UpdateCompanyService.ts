@@ -13,7 +13,9 @@ interface CompanyData {
   address?: string;
   menusIds?: string;
   alias?: string;
-}interface Request {
+  logo?: string;
+}
+interface Request {
   companyData: CompanyData;
   companyId: string | number;
 }
@@ -25,6 +27,7 @@ interface Response {
   email: string;
   address: string;
   alias: string;
+  logo: string;
 }
 
 const UpdateCompanyService = async ({
@@ -45,8 +48,9 @@ const UpdateCompanyService = async ({
     cnpj,
     phone,
     email,
-    address = [],
-    menusIds = []
+    address,
+    menusIds = [],
+    logo
   } = companyData;
 
   try {
@@ -62,7 +66,8 @@ const UpdateCompanyService = async ({
     cnpj,
     phone,
     email,
-    address
+    address,
+    logo
   });
 
   await company.$set("menus", menusIds);
@@ -76,7 +81,8 @@ const UpdateCompanyService = async ({
     cnpj: company.cnpj,
     phone: company.phone,
     email: company.email,
-    address: company.address
+    address: company.address,
+    logo: company.logo
   };
 
   return serializedCompany;

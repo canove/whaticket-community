@@ -20,7 +20,7 @@ type Query = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { fileId, date } = req.query as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const report = await ListRegistersService({ type:"", fileId, date, companyId });
 

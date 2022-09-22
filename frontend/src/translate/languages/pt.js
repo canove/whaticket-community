@@ -702,7 +702,7 @@ const messages = {
           bodyText: "Corpo do Texto",
           footer: "Rodapé",
           buttonAdd: "Adicionar",
-          buttonEdit: "Editar",
+          buttonEdit: "Salvar",
         },
         modalConfirm: {
           delete: "Deseja realmente excluir, todos os dados da Template serão perdidos!",

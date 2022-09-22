@@ -39,6 +39,10 @@ class Company extends Model<Company> {
   @Column
   phone: string;
 
+  @AllowNull(true)
+  @Column
+  logo: string;
+
   @Column
   email: string;
 

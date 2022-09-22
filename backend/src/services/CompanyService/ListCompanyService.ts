@@ -34,7 +34,16 @@ const ListCompanyService = async ({
 
   const { count, rows: companies } = await Company.findAndCountAll({
     where: whereCondition,
-    attributes: ["id", "alias", "name", "cnpj", "phone", "email", "address"],
+    attributes: [
+      "id",
+      "alias",
+      "name",
+      "cnpj",
+      "phone",
+      "email",
+      "address",
+      "logo"
+    ],
     order: [["createdAt", "DESC"]],
     include: [
       {
