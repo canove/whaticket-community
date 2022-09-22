@@ -158,7 +158,6 @@ const MenuLink = () => {
     }
   };
 
-
   const getMenuName = (menuName) => {
     if(menuName === "Dashboard"){
       return i18n.t("Dashboard")

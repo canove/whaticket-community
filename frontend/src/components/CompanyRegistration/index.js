@@ -71,7 +71,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   };
 
   const [company, setCompany] = useState(initialState);
-  const [textAlias, setAlias] = useState("");
+  const [textAlias, setTextAlias] = useState("");
   const [logo, setLogo] = useState();
 
   useEffect(() => {
@@ -92,7 +92,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   }, [companyId, open]);
 
   useEffect(() => {
-    setAlias(company.alias);
+    setTextAlias(company.alias);
   }, [company]);
 
   const handleClose = () => {
@@ -107,7 +107,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         const formData = new FormData();
         formData.append("file", logo, logo.name);
         formData.set("name", logo.name);
-  
+
         try {
           const { data } = await api.post(`/companies/uploadLogo/${compId}`, formData);
           return data;
@@ -146,7 +146,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   };
 
   const handleChangeAlias = (e) => {
-    setAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ""));
+    setTextAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ""));
     e.preventDefault();
   };
 
