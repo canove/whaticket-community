@@ -4,8 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import { Badge } from "@material-ui/core";
+import { Badge, makeStyles } from "@material-ui/core";
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
@@ -22,17 +21,31 @@ import ChatIcon from "@material-ui/icons/Chat";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import MenuIcon from '@material-ui/icons/Menu';
+import BallotIcon from '@material-ui/icons/Ballot';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
 
-import ExpandLess from "@material-ui/icons/ExpandLess";
-import ExpandMore from "@material-ui/icons/ExpandMore";
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import List from "@material-ui/core/List";
 import Collapse from "@material-ui/core/Collapse";
 import api from "../services/api";
 import toastError from "../errors/toastError";
 import { AuthContext } from "../context/Auth/AuthContext";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+    maxWidth: 360,
+
+  },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
+}
+));
 
 function getIcon(icon) {
   if (icon === "DashboardOutlinedIcon") {
@@ -67,6 +80,10 @@ function getIcon(icon) {
     return <ApartmentIcon />;
   } else if (icon === "ListAltIcon") {
     return <ListAltIcon />
+  } else if (icon === "MenuIcon") {
+    return <MenuIcon />
+  } else if (icon === "BallotIcon") {
+    return <BallotIcon />
   } else {
     return null;
   }
@@ -74,7 +91,7 @@ function getIcon(icon) {
 
 function ListParentItemLink(props) {
   const { icon, primary, className, connectionWarning, children } = props;
-
+  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const renderedIcon = getIcon(icon);
 
@@ -83,18 +100,18 @@ function ListParentItemLink(props) {
   }
 
   // <Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error"></Badge>
-  
+
   return (
     <List>
       <li>
-        <ListItem button open={open} onClick={handleClick} className={className}>
+        <ListItem button open={open} onClick={handleClick} className={classes.root}>
           {renderedIcon ? <ListItemIcon>{renderedIcon}</ListItemIcon> : null}
           <ListItemText primary={primary} />
-          {open ? <ExpandLess /> : <ExpandMore />}
+          {open ? < KeyboardArrowDownIcon fontSize="large" /> : <ArrowForwardIosIcon fontSize="small" />}
         </ListItem>
       </li>
       <Collapse component="li" in={open} timeout="auto" unmountOnExit>
-        <List disablePadding>
+        <List disablePadding className={classes.nested} >
           { children && children.map(child => {
             if (child.isParent) {
               return (
@@ -162,7 +179,7 @@ const MainListItems = (props) => {
     const fetchMenus = async () => {
       try {
         const { data } = await api.get(`/menus/company`);
-        
+
         const menus = [];
         const allMenus = [];
         const parentMenusIds = [];
@@ -201,7 +218,6 @@ const MainListItems = (props) => {
             menus.push(menu);
           }
         }
-
         setMenus(menus);
       } catch (err) {
         console.log(err);

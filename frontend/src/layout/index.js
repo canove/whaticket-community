@@ -31,7 +31,7 @@ import brainit from "../assets/brainit500.png";
 import api from "../services/api";
 import { toast } from "react-toastify";
 import toastError from "../errors/toastError";
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,9 +43,10 @@ const useStyles = makeStyles((theme) => ({
   },
 
   toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
+    display: "flex",
+    //paddingRight: 24, // keep right padding when drawer closed
     backgroundColor: "#F5F5F5",
-    color: "#363636"
+    color: "#363636",
   },
   toolbarIcon: {
     display: "flex",
@@ -62,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   appBarShift: {
+    display: "flex",
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(["width", "margin"], {
@@ -83,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#363636",
     position: "relative",
     whiteSpace: "nowrap",
-    width: drawerWidth,
+    width: theme.spacing(35),
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,

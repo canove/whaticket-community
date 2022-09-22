@@ -3,7 +3,7 @@ import Menu from "../../database/models/Menu";
 
 const ListMenusService = async (): Promise<Menu[]> => {
   const menus = await Menu.findAll({
-    attributes: ["id", "name", "icon", "isParent", "parentId"],
+    attributes: ["id", "name", "icon", "isParent", "parentId", "createdAt", "updatedAt"],
     include: [
       {
         model: Company,

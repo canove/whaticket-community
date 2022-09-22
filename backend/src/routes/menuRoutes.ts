@@ -15,4 +15,6 @@ menuRoutes.post("/menus/", isAuth, MenuController.store);
 
 menuRoutes.put("/menus/:menuId", isAuth, MenuController.update);
 
+menuRoutes.delete("/menus/:menuId", isAuth, MenuController.remove);
+
 export default menuRoutes;
