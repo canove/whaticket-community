@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
@@ -57,7 +57,9 @@ const TemplateModal = ({ open, onClose }) => {
   const { whatsApps } = useContext(WhatsAppsContext);
   const [category, setCategory] = useState("");
   const [bodyText, setBodyText] = useState("");
-  const [params, setParams] = useState(0);
+  const [paramsQuantity, setParamsQuantity] = useState(0);
+  const [param, setParam] = useState("");
+  const [openParamModal, setOpenParamModal] = useState(false);
 
   const handleClose = () => {
     onClose();
@@ -97,31 +99,79 @@ const TemplateModal = ({ open, onClose }) => {
     setCategory(e.target.value);
   };
 
-  const handleArray = () => {
-    switch (params) {
-      case 0:
-        setParams(prevTimes => prevTimes + 1);
-        setBodyText(prevText => prevText + "{{0}}");
-        break;
-      case 1:
-        setParams(prevTimes => prevTimes + 1);
-        setBodyText(prevText => prevText + "{{1}}");
-        break;
-      case 2:
-        setParams(prevTimes => prevTimes + 1);
-        setBodyText(prevText => prevText + "{{2}}");
-        break;
-      default:
-        toast.error(i18n.t("templates.templateModal.toastErr"));
+  const handleParams = () => {
+    if (paramsQuantity >= 3) {
+      toast.error(i18n.t("templates.templateModal.toastErr"));
+    } else {
+      setBodyText(prevText => prevText + "{{" + param + "}}")
     }
+
+    handleCloseParamModal();
   };
 
   const handleChangeBodyText = (e) => {
     setBodyText(e.target.value);
   }
 
+  const handleChangeParam = (e) => {
+    setParam(e.target.value)
+  };
+
+  const handleOpenParamModal = () => {
+    setOpenParamModal(true);
+  };
+
+  const handleCloseParamModal = () => {
+    setParam("");
+    setOpenParamModal(false);
+  };
+
+  useEffect(() => {
+    const testParams = () => {
+      let result = 0;
+      result += bodyText.split("{{name}}").length - 1
+      result += bodyText.split("{{documentNumber}}").length - 1
+      result += bodyText.split("{{phoneNumber}}").length - 1
+
+      if (paramsQuantity > 3) {
+        toast.error(i18n.t("templates.templateModal.toastErr"));
+      }
+
+      setParamsQuantity(result);
+    }
+    testParams();
+  }, [bodyText])
+
   return (
     <div className={classes.root}>
+      <div>
+        <Dialog open={openParamModal} onClose={handleCloseParamModal}>
+          <DialogTitle>Selecione uma variável</DialogTitle>
+          <DialogContent>
+              <FormControl className={classes.multFieldLine}>
+                <Select
+                  variant="outlined"
+                  id="demo-dialog-select"
+                  value={param}
+                  onChange={handleChangeParam}
+                  style={{width: "100%"}}
+                >
+                  <MenuItem value={'name'}>Nome</MenuItem>
+                  <MenuItem value={'documentNumber'}>Documento</MenuItem>
+                  <MenuItem value={'phoneNumber'}>Número de Telefone</MenuItem>
+                </Select>
+              </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseParamModal} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleParams} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -246,7 +296,7 @@ const TemplateModal = ({ open, onClose }) => {
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
-                  onClick={handleArray}
+                  onClick={handleOpenParamModal}
                 >
                   {"{{ }}"}
                 </Button>

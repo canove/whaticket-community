@@ -13,8 +13,8 @@ import {
   Default
 } from "sequelize-typescript";
 import Company from "./Company";
+import Templates from "./TemplatesData";
 import User from "./User";
-import Whatsapp from "./Whatsapp";
 
 @Table
 class File extends Model<File> {
@@ -46,6 +46,10 @@ class File extends Model<File> {
 
   @Column
   official: boolean;
+
+  @ForeignKey(() => Templates)
+  @Column
+  templateId: number;
 
   @AllowNull(true)
   @Column

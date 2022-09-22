@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -31,6 +31,7 @@ import openSocket from "../../services/socket-io";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import SearchIcon from "@material-ui/icons/Search";
 import { format, parseISO } from "date-fns";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_TEMPLATES") {
@@ -113,6 +114,7 @@ const TemplatesData = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState(null);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -141,7 +143,7 @@ const TemplatesData = () => {
 
   useEffect(() => {
     const socket = openSocket();
-    socket.on("templates", (data) => {
+    socket.on(`templates${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_TEMPLATES", payload: data.response });
       }
@@ -253,7 +255,6 @@ const TemplatesData = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("templatesData.grid.name")}</TableCell>
-              <TableCell align="center">{i18n.t("templatesData.grid.status")}</TableCell>
               <TableCell align="center">{i18n.t("templatesData.grid.text")}</TableCell>
               <TableCell align="center">{i18n.t("templatesData.grid.footer")}</TableCell>
               <TableCell align="center">{i18n.t("templatesData.grid.createdAt")}</TableCell>
@@ -266,7 +267,6 @@ const TemplatesData = () => {
               {templates && templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
-                    <TableCell align="center">{template.status}</TableCell>
                     <TableCell align="center">{template.text}</TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">

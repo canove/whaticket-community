@@ -75,6 +75,8 @@ const ImportModal = ({ open, onClose }) => {
 	const [openSelect, setOpenSelect] = useState(false);
 	const [menus, setMenus] = useState();
 	const [useType, setUseType] = useState(false);
+	const [templates, setTemplates] = useState([]);
+	const [selectedTemplate, setSelectedTemplate] = useState("Nenhum");
 
 	const handleClose = () => {
 		onClose();
@@ -105,6 +107,9 @@ const ImportModal = ({ open, onClose }) => {
 				} else {
 					const selectedConnectionToString = selectedConnection.join();
 					formData.set("whatsappIds", selectedConnectionToString);
+				}
+				if (selectedTemplate !== "Nenhum") {
+					formData.set("templateId", selectedTemplate);
 				}
 
 				await api.post("file/upload", formData);
@@ -143,6 +148,10 @@ const ImportModal = ({ open, onClose }) => {
 		}
 	}
 
+	const handleChangeTemplate = (e) => {
+		setSelectedTemplate(e.target.value);
+	}
+
 	const handleOpenSelect = () => {
 		setOpenSelect(true)
 	};
@@ -161,6 +170,18 @@ const ImportModal = ({ open, onClose }) => {
 			}
 		}
 		fetchMenus();
+	}, [])
+
+	useEffect(() => {
+		const fetchTemplates = async () => {
+			try {
+				const { data } = await api.get('/TemplatesData/list/');
+				setTemplates(data.templates);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+		fetchTemplates();
 	}, [])
 
 	useEffect(() => {
@@ -207,28 +228,30 @@ const ImportModal = ({ open, onClose }) => {
 				</DialogTitle>
                 <DialogContent dividers>
 					{ useType && 
-					<div className={classes.multFieldLine}>
 						<Typography variant="subtitle1" gutterBottom>
 							{i18n.t('importModal.form.shotType')}:
 						</Typography>
+					}
+					{ useType && 
+					<div className={classes.multFieldLine}>
 						<Select
 							labelId="type-select-label"
 							id="type-select"
 							value={selectedType}
 							label="Type"
 							onChange={handleChange}
-							style={{width: "50%"}}
+							style={{width: "100%"}}
 							variant="outlined"
 						>
 							<MenuItem value={true}>{i18n.t('importModal.form.official')}</MenuItem>
 							<MenuItem value={false}>{i18n.t('importModal.form.notOfficial')}</MenuItem>
 						</Select>
 					</div>
-					}	
+					}
+					<Typography variant="subtitle1" gutterBottom>
+                        Conexões:
+					</Typography>
 					<div className={classes.multFieldLine}>
-						<Typography variant="subtitle1" gutterBottom>
-                        	Conexões:
-						</Typography>
 						<Select
 							variant="outlined"
 							labelId="type-select-label"
@@ -240,7 +263,7 @@ const ImportModal = ({ open, onClose }) => {
 							open={openSelect}
 							onOpen={handleOpenSelect}
 							onClose={handleCloseSelect}
-							style={{width: "50%"}}
+							style={{width: "100%"}}
 						>
 							<MenuItem value={"Todos"}>Todos</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
@@ -258,6 +281,31 @@ const ImportModal = ({ open, onClose }) => {
 							})}
 						</Select>
 					</div>
+					{ selectedType === false &&
+						<Typography variant="subtitle1" gutterBottom>
+							Template:
+						</Typography>
+					}
+					{ selectedType === false &&
+					<div className={classes.multFieldLine}>
+						<Select
+							variant="outlined"
+							labelId="type-select-label"
+							id="type-select"
+							value={selectedTemplate}
+							label="Type"
+							onChange={(e) => { handleChangeTemplate(e) }}
+							style={{width: "100%"}}
+						>
+							<MenuItem value={"Nenhum"}>Nenhum</MenuItem>
+							{templates.length > 0 && templates.map((template, index) => {
+								return (
+									<MenuItem key={index} value={template.id}>{template.name}</MenuItem>
+								)
+							})}
+						</Select>
+					</div>
+					}
 					<div className={classes.multFieldLine}>
 						<Button
 							variant="contained"

@@ -200,7 +200,7 @@ const reducer = (state, action) => {
 			}
 		});
 
-		socket.on("ticket", data => {
+		socket.on(`ticket${user.companyId}`, data => {
 			if (data.action === "updateUnread") {
 				dispatch({
 					type: "RESET_UNREAD",
@@ -224,7 +224,7 @@ const reducer = (state, action) => {
 			}
 		});
 
-		socket.on("appMessage", data => {
+		socket.on(`appMessage${user.companyId}`, data => {
 			if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
 					type: "UPDATE_TICKET_UNREAD_MESSAGES",
@@ -233,7 +233,7 @@ const reducer = (state, action) => {
 			}
 		});
 
-		socket.on("contact", data => {
+		socket.on(`contact${user.companyId}`, data => {
 			if (data.action === "update") {
 				dispatch({
 					type: "UPDATE_TICKET_CONTACT",

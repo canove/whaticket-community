@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useRef } from "react";
+import React, { useState, useEffect, useReducer, useRef, useContext } from "react";
 
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -30,6 +30,7 @@ import whatsBackground from "../../assets/wa-background.png";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   messagesListWrapper: {
@@ -319,6 +320,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
+  const { user } = useContext(AuthContext); 
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -362,7 +364,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 
     socket.on("connect", () => socket.emit("joinChatBox", ticketId));
 
-    socket.on("appMessage", (data) => {
+    socket.on(`appMessage${user.companyId}`, (data) => {
       if (data.action === "create") {
         dispatch({ type: "ADD_MESSAGE", payload: data.message });
         scrollToBottom();
@@ -373,7 +375,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
       }
     });
 
-    socket.on("whatsapp-message", (data) => {
+    socket.on(`whatsapp-message${user.companyId}`, (data) => {
       if (data.action === "update") {
         dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
       }

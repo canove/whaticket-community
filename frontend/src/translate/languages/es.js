@@ -341,10 +341,14 @@ const messages = {
           reportsTicket: "Informe de entradas",
           logReports: "Informes de Registro",
           reports: "Informes",
+          whatsOff: "WhatsApp",
+          whatsNoOff: "WhatsApp 2",
+          company: "Compañías",
+          menus: "Menus",
         },
         whatsApp: {
           connections: "Conexiones",
-          officialConnections: "Conexiones Oficiales",
+          officialConnections: "Conexiones",
           settings: "Configuración",
         },
 

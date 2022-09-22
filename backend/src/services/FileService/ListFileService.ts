@@ -6,7 +6,7 @@ const ListFileService = async ({
   Status,
   initialDate,
   limit = null,
-  companyId = null
+  companyId
 }): Promise<File[] | undefined> => {
   let where = null;
 
@@ -17,7 +17,6 @@ const ListFileService = async ({
   if(initialDate === '') {
     initialDate = null;
   } 
-   
 
   if (Status != null && Status != undefined && !initialDate) {
     where = {
@@ -32,10 +31,11 @@ const ListFileService = async ({
       }
     };
   }
-  if(companyId) {
-    where = {...where, companyId }
-  }
-  // eslint-disable-next-line no-return-await
+
+  where = { ...where };
+  if(companyId > 0)
+    where = { ...where, companyId }
+
   return await File.findAll({
     where,
     order: [['createdAt', 'DESC']],

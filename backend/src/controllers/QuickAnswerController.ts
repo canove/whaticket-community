@@ -22,7 +22,7 @@ interface QuickAnswerData {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const { quickAnswers, count, hasMore } = await ListQuickAnswerService({
     searchParam,
@@ -35,6 +35,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const newQuickAnswer: QuickAnswerData = req.body;
+  const { companyId } = req.user;
 
   const QuickAnswerSchema = Yup.object().shape({
     shortcut: Yup.string().required(),
@@ -48,11 +49,12 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   }
 
   const quickAnswer = await CreateQuickAnswerService({
-    ...newQuickAnswer
+    ...newQuickAnswer,
+    companyId
   });
 
   const io = getIO();
-  io.emit("quickAnswer", {
+  io.emit(`quickAnswer${companyId}`, {
     action: "create",
     quickAnswer
   });
@@ -73,6 +75,7 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   const quickAnswerData: QuickAnswerData = req.body;
+  const { companyId } = req.user;
 
   const schema = Yup.object().shape({
     shortcut: Yup.string(),
@@ -93,7 +96,7 @@ export const update = async (
   });
 
   const io = getIO();
-  io.emit("quickAnswer", {
+  io.emit(`quickAnswer${companyId}`, {
     action: "update",
     quickAnswer
   });
@@ -106,11 +109,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { quickAnswerId } = req.params;
+  const { companyId } = req.user;
 
   await DeleteQuickAnswerService(quickAnswerId);
 
   const io = getIO();
-  io.emit("quickAnswer", {
+  io.emit(`quickAnswer${companyId}`, {
     action: "delete",
     quickAnswerId
   });

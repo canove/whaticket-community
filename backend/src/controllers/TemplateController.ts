@@ -5,12 +5,12 @@ import UpdateTemplateService from "../services/TemplateService/UpdateTemplateSer
 import DeleteTemplateService from "../services/TemplateService/DeleteTemplateService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-    const { whatsAppId } = req.params;
+  const { whatsAppId } = req.params;
 
-    const response = await ListTemplateService({ whatsAppId })
+  const response = await ListTemplateService({ whatsAppId });
 
-    return res.status(200).json(response);
-}
+  return res.status(200).json(response);
+};
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
     const { templateName, category, whatsAppsId, bodyText, footerText } = req.body;

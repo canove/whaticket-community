@@ -34,7 +34,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     active,
   } = req.body as ConfigData;
 
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const config = await CreateWhatsConfigService({
     triggerInterval,
@@ -46,7 +46,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("config", {
+  io.emit(`config${companyId}`, {
     action: "create",
     config
   });
@@ -60,11 +60,12 @@ export const update = async (
 ): Promise<Response> => {
   const { configId } = req.params;
   const configData = req.body;
+  const { companyId } = req.user;
 
   const config = await UpdateConfigService({ configData, configId });
 
   const io = getIO();
-  io.emit("config", {
+  io.emit(`config${companyId}`, {
     action: "update",
     config
   });
@@ -77,11 +78,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { configId } = req.params;
+  const { companyId } = req.body;
 
   await DeleteConfigService(configId);
 
   const io = getIO();
-  io.emit("config", {
+  io.emit(`config${companyId}`, {
     action: "delete",
     configId
   });

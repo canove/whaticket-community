@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import openSocket from "../../services/socket-io";
 
@@ -27,6 +27,7 @@ import QueueModal from "../../components/QueueModal";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -96,6 +97,8 @@ const Queues = () => {
   const [selectedQueue, setSelectedQueue] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
+  const { user } = useContext(AuthContext);
+
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -114,7 +117,7 @@ const Queues = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("queue", (data) => {
+    socket.on(`queue${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_QUEUES", payload: data.queue });
       }

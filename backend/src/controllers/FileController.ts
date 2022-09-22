@@ -10,7 +10,7 @@ type IndexQuery = {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { Status, initialDate } = req.query as unknown as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const report = await ListFileService({
     Status,
@@ -27,11 +27,12 @@ export const update = async (
 ): Promise<Response> => {
   const { fileId } = req.params;
   const { status, userId } = req.query;
+  const { companyId } = req.user;
 
   const file = await UpdateFileService({ status, userId, fileId });
 
   const io = getIO();
-  io.emit("file", {
+  io.emit(`file${companyId}`, {
     action: "update",
     file
   });

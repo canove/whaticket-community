@@ -20,7 +20,9 @@ const ListUsersService = async ({
   pageNumber = "1",
   companyId
 }: Request): Promise<Response> => {
-  const whereCondition = {
+  let whereCondition = null;
+
+  whereCondition = {
     [Op.or]: [
       {
         "$User.name$": Sequelize.where(
@@ -30,9 +32,16 @@ const ListUsersService = async ({
         )
       },
       { email: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
-    ],
-    companyId
+    ]
   };
+
+  if (companyId !== 1) {
+    whereCondition = {
+      ...whereCondition,
+      companyId
+    };
+  }
+
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
@@ -47,7 +56,7 @@ const ListUsersService = async ({
       { model: Company, as:"company", attributes: ["name"], required: true }
     ],
     raw: true
-    });
+  });
 
   const hasMore = count > offset + users.length;
 

@@ -17,7 +17,7 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
@@ -48,11 +48,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       name,
       profile,
       queueIds,
-      companyId: companyId ? companyId : userCompanyId
+      companyId: companyId || userCompanyId
     });
 
     const io = getIO();
-    io.emit("user", {
+    io.emit(`user${userCompanyId}`, {
       action: "create",
       user
     });
@@ -70,7 +70,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("user", {
+  io.emit(`user${companyId}`, {
     action: "create",
     user
   });
@@ -101,7 +101,7 @@ export const update = async (
   const user = await UpdateUserService({ userData, userId, userCompanyId });
 
   const io = getIO();
-  io.emit("user", {
+  io.emit(`user${userCompanyId}`, {
     action: "update",
     user
   });
@@ -114,6 +114,7 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { userId } = req.params;
+  const { companyId } = req.user;
 
   if (req.user.profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
@@ -122,7 +123,7 @@ export const remove = async (
   await DeleteUserService(userId);
 
   const io = getIO();
-  io.emit("user", {
+  io.emit(`user${companyId}`, {
     action: "delete",
     userId
   });

@@ -4,21 +4,27 @@ import QuickAnswer from "../../database/models/QuickAnswer";
 interface Request {
   shortcut: string;
   message: string;
+  companyId: number;
 }
 
 const CreateQuickAnswerService = async ({
   shortcut,
-  message
+  message,
+  companyId
 }: Request): Promise<QuickAnswer> => {
   const nameExists = await QuickAnswer.findOne({
-    where: { shortcut }
+    where: { shortcut, companyId }
   });
 
   if (nameExists) {
     throw new AppError("ERR__SHORTCUT_DUPLICATED");
   }
 
-  const quickAnswer = await QuickAnswer.create({ shortcut, message });
+  const quickAnswer = await QuickAnswer.create({
+    shortcut,
+    message,
+    companyId
+  });
 
   return quickAnswer;
 };

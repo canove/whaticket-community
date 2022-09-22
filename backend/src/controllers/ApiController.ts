@@ -3,14 +3,10 @@ import * as Yup from "yup";
 import path from "path";
 import AppError from "../errors/AppError";
 import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp";
-import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import Message from "../database/models/Message";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
 import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
-import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
-import CheckContactNumber from "../services/WbotServices/CheckNumber";
-import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ListFileService from "../services/FileService/ListFileService";
@@ -31,55 +27,26 @@ interface ContactData {
   number: string;
 }
 
-const createContact = async (newContact: string) => {
-  await CheckIsValidContact(newContact);
-
-  const validNumber: any = await CheckContactNumber(newContact);
-
-  const profilePicUrl = await GetProfilePicUrl(validNumber);
-
-  const number = validNumber;
-
-  const contactData = {
-    name: `${number}`,
-    number,
-    profilePicUrl,
-    isGroup: false
-  };
-
-  const contact = await CreateOrUpdateContactService(contactData);
-
-  const defaultWhatsapp = await GetDefaultWhatsApp();
-
-  const createTicket = await FindOrCreateTicketService(
-    contact,
-    defaultWhatsapp.id,
-    defaultWhatsapp.companyId,
-    1
-  );
-
-  const ticket = await ShowTicketService(createTicket.id);
-
-  SetTicketMessagesAsRead(ticket);
-
-  return ticket;
+const createContact = async (newContact: string, companyId: number) => {
+  return null;
 };
 /* eslint-disable */
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1 });
+
+  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1, companyId: 0 });
   if (files) {
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
 
-      io.emit("file", {
+      io.emit(`file${file.companyId}`, {
         action: "update",
         file
       });
 
       await ImportFileService({ key: path.basename(file.url), createdAt: file.CreatedAt, file: file });
 
-      io.emit("file", {
+      io.emit(`file${file.companyId}`, {
         action: "update",
         file
       });
@@ -92,8 +59,9 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 /* eslint-disable */
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
   const io = getIO();
-  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1 });
-  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1 });
+  
+  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1, companyId:0 });
+  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1, companyId:0 });
 
   if (sendingFiles?.length > 0) {
     sendingFiles.forEach(async (file) => {
@@ -104,14 +72,14 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
       files.forEach(async (file) => {
         await file.update({ Status: FileStatus.Sending });
 
-        io.emit("file", {
+        io.emit(`file${file.companyId}`, {
           action: "update",
           file
         });
   
         await DispatcherRegisterService({ file });
 
-        io.emit("file", {
+        io.emit(`file${file.companyId}`, {
         action: "update",
         file
       });
@@ -149,7 +117,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError(err.message);
   }
 
-  const contactAndTicket = await createContact(newContact.number);
+  const contactAndTicket = await createContact(newContact.number, companyId);
 
   if (medias) {
     await Promise.all(

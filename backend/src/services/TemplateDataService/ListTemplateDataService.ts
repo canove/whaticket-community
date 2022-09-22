@@ -34,13 +34,21 @@ const ListTemplateDataService = async ({
     ],
     companyId
   };
-  
+
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: templates } = await Templates.findAndCountAll({
     where: whereCondition,
-    attributes: ["id", "name", "status", "text", "footer", "createdAt", "updatedAt"],
+    attributes: [
+      "id",
+      "name",
+      "status",
+      "text",
+      "footer",
+      "createdAt",
+      "updatedAt"
+    ],
     order: [["createdAt", "DESC"]],
 
   });

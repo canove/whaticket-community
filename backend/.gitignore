@@ -9,6 +9,7 @@ package-lock.json
 yarn.lock
 yarn-error.log
 
+/src/utils/key.json
 /src/config/sentry.js
 
 # Ignore test-related files

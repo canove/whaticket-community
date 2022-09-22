@@ -1,8 +1,8 @@
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
-import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../../libs/socket";
 import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "./ShowTicketService";
+import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 
 interface TicketData {
   status?: string;
@@ -43,25 +43,21 @@ const UpdateTicketService = async ({
     userId
   });
 
-
-
   await ticket.reload();
 
   const io = getIO();
 
   if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
-    io.to(oldStatus).emit("ticket", {
+    io.to(oldStatus).emit(`ticket${ticket.companyId}`, {
       action: "delete",
       ticketId: ticket.id
     });
   }
 
-
-
   io.to(ticket.status)
     .to("notification")
     .to(ticketId.toString())
-    .emit("ticket", {
+    .emit(`ticket${ticket.companyId}`, {
       action: "update",
       ticket
     });

@@ -5,17 +5,15 @@ import CreateUploadFileService from "../services/UploadFileService/CreateUploadF
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const form = formidable({ multiples: false });
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   return form.parse(req, async (err, fields, files) => {
-    if (err)
-      return res.status(500).json("occured an error");
-    if (!files)
-      return res.status(500).json("file is expected");
+    if (err) return res.status(500).json("occured an error");
+    if (!files) return res.status(500).json("file is expected");
 
     const filePath = files.file.filepath;
 
-    const { ownerid, name, official, whatsappIds } = fields;
+    const { ownerid, name, official, whatsappIds, templateId } = fields;
 
     const file = await CreateUploadFileService({
       name,
@@ -23,11 +21,12 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       official,
       whatsappIds,
       filePath,
-      companyId
+      companyId,
+      templateId
     });
 
     const io = getIO();
-    io.emit("file", {
+    io.emit(`file${companyId}`, {
       action: "create",
       file
     });

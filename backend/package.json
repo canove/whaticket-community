@@ -32,6 +32,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
+    "firebase": "^9.10.0",
+    "firebase-admin": "^11.0.1",
     "formidable": "^2.0.1",
     "http-graceful-shutdown": "^2.3.2",
     "jsonwebtoken": "^8.5.1",

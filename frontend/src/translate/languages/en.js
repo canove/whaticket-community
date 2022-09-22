@@ -337,10 +337,14 @@ const messages = {
           reportsTicket: "Ticket Report",
           logReports: "Log Reports",
           reports: "Reports",
+          whatsOff: "WhatsApp",
+          whatsNoOff: "WhatsApp 2",
+          company: "Companies",
+          menus: "Menus",
         },
         whatsApp: {
           connections: "Connections",
-          officialConnections: "Official Connections",
+          officialConnections: "Connections",
           settings: "Settings",
         },
 

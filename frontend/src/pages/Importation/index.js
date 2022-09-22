@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -25,6 +25,7 @@ import { parseISO, format } from "date-fns";
 import { IconButton } from "@material-ui/core";
 import { Visibility } from "@material-ui/icons";
 import RegisterFileModal from "../../components/RegisterFileModal";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -99,6 +100,7 @@ const Importation = () => {
   const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState("");
 
+  const { user } = useContext(AuthContext);
   const [users, dispatchUsers] = useReducer(reducer, []);
   const [imports, dispatchImports] = useReducer(reducer, []);
 
@@ -240,7 +242,7 @@ const Importation = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("file", (data) => {
+    socket.on(`file${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatchImports({ type: "UPDATE_FILES", payload: data.file });
       }

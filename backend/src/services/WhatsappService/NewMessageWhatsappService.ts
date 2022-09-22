@@ -47,7 +47,8 @@ const GetWhatsappByIdentification = async (
 const GetWhatsappBySession = async (session: string): Promise<Whatsapp> => {
   const whatsapp = await Whatsapp.findOne({
     where: {
-      name: session
+      name: session,
+      deleted: false
     }
   });
 
@@ -128,7 +129,8 @@ const verifyMessage = async (
     body: msg.body,
     fromMe: msg.fromMe,
     mediaType: msg.type,
-    read: msg.fromMe
+    read: msg.fromMe,
+    companyId: ticket.companyId
   };
 
   await ticket.update({ lastMessage: msg.body });
@@ -150,7 +152,8 @@ const verifyContact = async (
   const contactData = {
     name: contactName,
     number: contactNumber,
-    isGroup: false
+    isGroup: false,
+    companyId
   };
 
   const contact = CreateOrUpdateContactService(contactData);
@@ -253,7 +256,8 @@ const verifyMediaMessage = async (
     fromMe: msg.fromMe,
     read: msg.fromMe,
     mediaUrl: msg.body,
-    mediaType: msg.type
+    mediaType: msg.type,
+    companyId: ticket.companyId
   };
 
   await ticket.update({ lastMessage: msg.file });
