@@ -5,6 +5,9 @@ import ShowMenuService from "../services/MenuServices/ShowMenuService";
 import ShowCompanyMenuService from "../services/MenuServices/ShowCompanyMenuService";
 import CreateMenuService from "../services/MenuServices/CreateMenuService";
 import UpdateMenuService from "../services/MenuServices/UpdateMenuService";
+import { getIO } from "../libs/socket";
+import AppError from "../errors/AppError";
+import DeleteMenuService from "../services/MenuServices/DeleteMenuService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const menus = await ListMenusService();
@@ -39,6 +42,12 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isParent
   });
 
+ const io = getIO();
+  io.emit("menu", {
+    action: "create",
+    menu
+  });
+
   return res.status(200).json(menu);
 };
 
@@ -51,5 +60,28 @@ export const update = async (
 
   const menu = await UpdateMenuService({ menuData, menuId });
 
+  const io = getIO();
+  io.emit("menu", {
+    action: "update",
+    menu
+  });
+
   return res.status(200).json(menu);
+};
+
+export const remove = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { menuId } = req.params;
+
+  await DeleteMenuService(menuId);
+
+  const io = getIO();
+  io.emit("menu", {
+    action: "delete",
+    menuId
+  });
+
+  return res.status(200).json({ message: "Menu deleted" });
 };
