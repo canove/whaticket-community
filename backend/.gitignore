@@ -8,6 +8,7 @@ dist
 package-lock.json
 yarn.lock
 yarn-error.log
+key.json
 
 /src/utils/key.json
 /src/config/sentry.js
