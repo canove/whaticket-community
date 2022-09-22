@@ -70,7 +70,9 @@ const UpdateCompanyService = async ({
     logo
   });
 
-  await company.$set("menus", menusIds);
+  if (menusIds.length > 0) {
+    await company.$set("menus", menusIds);
+  }
 
   await company.reload();
 
