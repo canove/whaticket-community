@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +14,7 @@ import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
+import PricingModal from "../../components/PricingModal";
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
@@ -77,6 +78,8 @@ const Pricing = () => {
     const { i18n } = useTranslation();
 
     const [pricings, dispatch] = useReducer(reducer, []);
+    const [selectedPricing, setSelectedPricing] = useState(null);
+    const [pricingModalOpen, setPricingModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -112,12 +115,34 @@ const Pricing = () => {
         };
     }, []);
 
+    const handleOpenPricingModal = () => {
+        setSelectedPricing(null);
+        setPricingModalOpen(true);
+    };
+    
+    const handleClosePricingModal = () => {
+        setSelectedPricing(null);
+        setPricingModalOpen(false);
+    };
+
+    const handleEditPricing = (pricing) => {
+        setSelectedPricing(pricing);
+        setPricingModalOpen(true);
+    };
+
     return (
         <MainContainer>
+            <PricingModal
+                open={pricingModalOpen}
+                onClose={handleClosePricingModal}
+                aria-labelledby="form-dialog-title"
+                userId={selectedPricing && selectedPricing.id}
+            />
             <MainHeader>
                 <Title>Precificação</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
+                        onClick={handleOpenPricingModal}
                         variant="contained"
                         color="primary"
                     >

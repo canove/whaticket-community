@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +14,7 @@ import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
+import ProductModal from "../../components/ProductModal";
 
 import { useTranslation } from "react-i18next";
 import toastError from "../../errors/toastError";
@@ -77,6 +78,8 @@ const Products = () => {
     const { i18n } = useTranslation();
 
     const [products, dispatch] = useReducer(reducer, []);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [productModalOpen, setProductModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -112,12 +115,34 @@ const Products = () => {
         };
     }, []);
 
+    const handleOpenProductModal = () => {
+        setSelectedProduct(null);
+        setProductModalOpen(true);
+    };
+    
+    const handleCloseProductModal = () => {
+        setSelectedProduct(null);
+        setProductModalOpen(false);
+    };
+
+    const handleEditProduct = (product) => {
+        setSelectedProduct(product);
+        setProductModalOpen(true);
+    };
+
     return (
         <MainContainer>
+            <ProductModal
+                open={productModalOpen}
+                onClose={handleCloseProductModal}
+                aria-labelledby="form-dialog-title"
+                userId={selectedProduct && selectedProduct.id}
+            />
             <MainHeader>
                 <Title>Produtos</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
+                        onClick={handleOpenProductModal}
                         variant="contained"
                         color="primary"
                     >
