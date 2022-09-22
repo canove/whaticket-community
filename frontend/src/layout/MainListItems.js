@@ -90,13 +90,8 @@ function getIcon(icon) {
 }
 
 function ListParentItemLink(props) {
-<<<<<<< HEAD
-  const { icon, primary, className, connectionWarning, children } = props;
-  const classes = useStyles();
-=======
   const { icon, primary, className, connectionWarning, children, translation } = props;
 
->>>>>>> 8b034a7e2c552d04904855121055dfa312a9d7b5
   const [open, setOpen] = useState(false);
   const renderedIcon = getIcon(icon);
 
@@ -261,11 +256,11 @@ const MainListItems = (props) => {
     if (name === "Dashboard") {
       return i18n.t("mainDrawer.listItems.dashboard");
     }
-  
+
     if (name === "WhatsApp") {
       return i18n.t("mainDrawer.listItems.whatsOff");
     }
-  
+
     if (name === "Official Connections") {
       return i18n.t("mainDrawer.whatsApp.officialConnections");
     }
@@ -273,7 +268,7 @@ const MainListItems = (props) => {
     if (name === "Templates") {
       return i18n.t("mainDrawer.listItems.template");
     }
-  
+
     if (name === "WhatsApp 2") {
       return i18n.t("mainDrawer.listItems.whatsNoOff");
     }
@@ -297,7 +292,7 @@ const MainListItems = (props) => {
     if (name === "Contacts") {
       return i18n.t("mainDrawer.listItems.contacts");
     }
-  
+
     if (name === "Quick Answers") {
       return i18n.t("mainDrawer.listItems.quickAnswers");
     }
@@ -345,7 +340,7 @@ const MainListItems = (props) => {
     if (name === "Registers Reports") {
       return i18n.t("mainDrawer.listItems.logReports");
     }
-    
+
     return name;
   }
 
