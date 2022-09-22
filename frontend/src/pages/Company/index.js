@@ -278,29 +278,31 @@ const Company= () => {
                   <TableCell align="center">{company.email}</TableCell>
                   <TableCell align="center">{company.address}</TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleOpenCompanyFirebaseModal(company)}
-                    >
-                      <SettingsIcon />
-                    </IconButton>
+                    <div style={{display:"inline-block", minWidth:"90px"}}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenCompanyFirebaseModal(company)}
+                      >
+                        <SettingsIcon />
+                      </IconButton>
 
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditCompany(company)}
-                    >
-                      <EditIcon />
-                    </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditCompany(company)}
+                      >
+                        <EditIcon />
+                      </IconButton>
 
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        setConfirmModalOpen(true);
-                        setDeletingcompany(company);
-                      }}
-                    >
-                      <DeleteOutlineIcon />
-                    </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          setConfirmModalOpen(true);
+                          setDeletingcompany(company);
+                        }}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
