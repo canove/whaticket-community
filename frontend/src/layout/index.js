@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
   toolbar: {
     display: "flex",
-    //paddingRight: 24, // keep right padding when drawer closed
+    paddingRight: 24, // keep right padding when drawer closed
     backgroundColor: "#F5F5F5",
     color: "#363636",
   },
@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "flex-end",
     padding: "0 8px",
     minHeight: "48px",
+
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -79,6 +80,8 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    display: "flex",
+
   },
   drawerPaper: {
     backgroundColor: "#F5F5F5",
@@ -108,6 +111,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flex: 1,
     overflow: "auto",
+    paddingTop: 5,
   },
   container: {
     paddingTop: theme.spacing(4),
@@ -118,6 +122,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
+
   },
 }));
 
