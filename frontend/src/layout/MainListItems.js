@@ -90,8 +90,9 @@ function getIcon(icon) {
 }
 
 function ListParentItemLink(props) {
-  const { icon, primary, className, connectionWarning, children, translation } = props;
+  const { icon, primary, connectionWarning, children, translation } = props;
 
+  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const renderedIcon = getIcon(icon);
 
