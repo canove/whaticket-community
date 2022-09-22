@@ -16,7 +16,6 @@ Sentry.init({ dsn: process.env.SENTRY_DSN });
 
 const app = express();
 
-
 app.use(
   cors({
     credentials: true,
