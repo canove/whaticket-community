@@ -164,9 +164,9 @@ module.exports = {
         },
         {
           name: "Menus",
-          icon: "ListAltIcon",
+          icon: "MenuIcon",
           parentId: Administration[0][0].id,
-          isParent: false,
+          isParent: true,
           createdAt: new Date(),
           updatedAt: new Date()
         },
@@ -194,6 +194,33 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date()
         }
+      ],
+      {}
+    );
+
+    const Menus: any = await queryInterface.sequelize.query(
+      'SELECT id FROM whaticket.Menus WHERE name="Menus" and isParent=true;'
+    );
+
+    await queryInterface.bulkInsert(
+      "Menus",
+      [
+        {
+          name: "Menu Link",
+          icon: "ListAltIcon",
+          parentId: Menus[0][0].id,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          name: "Registration",
+          icon: "BallotIcon",
+          parentId: Menus[0][0].id,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
       ],
       {}
     );
