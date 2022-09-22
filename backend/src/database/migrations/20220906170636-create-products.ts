@@ -22,7 +22,7 @@ module.exports = {
       monthlyInterestRate: {
         type: DataTypes.FLOAT
       },
-      lateFine: {
+      penaltyMount: {
         type: DataTypes.FLOAT
       },
       createdAt: {

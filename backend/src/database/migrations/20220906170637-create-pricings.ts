@@ -24,6 +24,9 @@ module.exports = {
       gracePeriod: {
         type: DataTypes.INTEGER
       },
+      graceTrigger: {
+        type: DataTypes.INTEGER
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false

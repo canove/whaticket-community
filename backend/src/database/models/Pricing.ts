@@ -21,6 +21,9 @@ class Pricing extends Model<Pricing> {
   @Column
   gracePeriod: number;
 
+  @Column
+  graceTrigger: number;
+
   @ForeignKey(() => Company)
   @Column
   companyId: number;

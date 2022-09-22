@@ -4,17 +4,20 @@ interface Request {
   companyId: number;
   productId: number;
   gracePeriod: number;
+  graceTrigger: number;
 }
 
 const CreatePricingService = async ({
   companyId,
   productId,
-  gracePeriod
+  gracePeriod,
+  graceTrigger
 }: Request): Promise<Pricing> => {
   const pricing = await Pricing.create({
     companyId,
     productId,
-    gracePeriod
+    gracePeriod,
+    graceTrigger
   });
 
   return pricing;

@@ -30,7 +30,7 @@ class Product extends Model<Product> {
   monthlyInterestRate: number;
 
   @Column
-  lateFine: number;
+  penaltyMount: number;
 
   @CreatedAt
   createdAt: Date;
