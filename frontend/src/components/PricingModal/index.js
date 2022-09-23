@@ -141,9 +141,8 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 			} catch (err) {
 				toastError(err);
 			}
+			handleClose();
 		}
-
-		handleClose();
 	};
 
 	const handleEdit = async () => {
@@ -160,6 +159,8 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 		} catch (err) {
 			toastError(err);
 		}
+
+		handleClose();
 	}
 
 	const handleCompanyChange = (e) => {
@@ -181,12 +182,12 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 	return (
 		<div className={classes.root}>
 			<ConfirmationModal
-				title={ pricingId && 'Você tem certeza que vai editar a precificação?' }
+				title='Editar a Precificação'
 				open={confirmModalOpen}
 				onClose={setConfirmModalOpen}
 				onConfirm={handleEdit}
 			>
-				{i18n.t("users.confirmationModal.deleteMessage")}
+				Você tem certeza que vai editar a precificação?
 			</ConfirmationModal>
 			<Dialog
 				open={open}

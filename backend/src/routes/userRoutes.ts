@@ -11,6 +11,12 @@ userRoutes.post("/users", isAuth, UserController.store);
 
 userRoutes.put("/users/:userId", isAuth, UserController.update);
 
+userRoutes.put(
+  "/users/language/:userId",
+  isAuth,
+  UserController.updateLanguage
+);
+
 userRoutes.get("/users/:userId", isAuth, UserController.show);
 
 userRoutes.delete("/users/:userId", isAuth, UserController.remove);

@@ -149,17 +149,13 @@ const LoggedInLayout = ({ children }) => {
   }
 
   const handleSaveUser = async (language) => {
-    const userData = { lang: language };
-		try {
-			if (user.id) {
-				await api.put(`/users/${user.id}`, userData);
-			} else {
-				await api.post("/users", userData);
-			}
-			toast.success(i18n.t("userModal.success"));
-		} catch (err) {
-			toastError(err);
-		}
+    if (user.id) {
+      try {
+        await api.put(`/users/language/${user.id}`, language);
+      } catch (err) {
+        toastError(err);
+      }
+    }
 	};
 
   useEffect(() => {
