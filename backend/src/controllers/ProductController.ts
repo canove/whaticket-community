@@ -8,6 +8,7 @@ import DeleteProductService from "../services/ProductServices/DeleteProductServi
 
 import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
+import CreateHistoricService from "../services/HistoricServices/CreateHistoricService";
 
 interface ProductData {
   name: string;
@@ -52,6 +53,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     penaltyMount
   });
 
+  await CreateHistoricService({
+    userId: user.id,
+    systemChange: 0,
+    update: product,
+    registerId: product.id
+  });
+
   const io = getIO();
   io.emit("product", {
     action: "create",
@@ -90,6 +98,13 @@ export const update = async (
 
   const product = await UpdateProductService({ productData, productId });
 
+  await CreateHistoricService({
+    userId: user.id,
+    systemChange: 0,
+    update: product,
+    registerId: product.id
+  });
+
   const io = getIO();
   io.emit("product", {
     action: "update",
@@ -112,6 +127,13 @@ export const remove = async (
   const { productId } = req.params;
 
   await DeleteProductService(productId);
+
+  await CreateHistoricService({
+    userId: user.id,
+    systemChange: 0,
+    update: "Deleted",
+    registerId: productId
+  });
 
   const io = getIO();
   io.emit("product", {

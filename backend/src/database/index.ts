@@ -20,6 +20,7 @@ import MenuCompanies from "./models/MenuCompanies";
 import Templates from "./models/TemplatesData";
 import Products from "./models/Products";
 import Pricing from "./models/Pricing";
+import Historic from "./models/Historic";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -47,7 +48,8 @@ const models = [
   MenuCompanies,
   Templates,
   Products,
-  Pricing
+  Pricing,
+  Historic
 ];
 
 sequelize.addModels(models);
