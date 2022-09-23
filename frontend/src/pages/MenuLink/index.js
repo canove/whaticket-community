@@ -212,10 +212,10 @@ const MenuLink = () => {
       const menus = [];
       let childrenMenus = [];
 
-      data.forEach((menu) => {
+      data.menus.forEach((menu) => {
         if (menu.parentId || menu.isParent) {
           if (menu.isParent) {
-            data.forEach((menu2) => {
+            data.menus.forEach((menu2) => {
               if (menu2.parentId === menu.id && !menu2.isParent) {
                 childrenMenus.push(menu2);
               }
