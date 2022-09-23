@@ -63,7 +63,6 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   const initialState = {
     id: "",
     name: "",
-    cnpj: "",
     phone: "",
     email: "",
     address: "",
@@ -73,6 +72,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   const [company, setCompany] = useState(initialState);
   const [textAlias, setTextAlias] = useState("");
   const [logo, setLogo] = useState();
+  const [cnpj, setCnpj] = useState("");
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -82,6 +82,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         setCompany((prevState) => {
           return { ...prevState, ...data };
         });
+        setCnpj(data.cnpj)
         setLogo(data.logo);
       } catch (err) {
         toastError(err);
@@ -118,7 +119,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
       return null;
     }
 
-    const companyData = { ...values, alias: textAlias };
+    const companyData = { ...values, alias: textAlias, cnpj };
 
     if (companyId) {
       try {
@@ -147,6 +148,11 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 
   const handleChangeAlias = (e) => {
     setTextAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ""));
+    e.preventDefault();
+  };
+
+  const handleChangeCnpj = (e) => {
+    setCnpj(e.target.value.replace(/[^0-9]/gi, ""));
     e.preventDefault();
   };
 
@@ -218,6 +224,8 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                     as={TextField}
                     label={i18n.t("company.companyModal.cnpj")}
                     name="cnpj"
+                    value={cnpj}
+                    onChange={handleChangeCnpj}
                     error={touched.cnpj && Boolean(errors.cnpj)}
                     helperText={touched.cnpj && errors.cnpj}
                     variant="outlined"

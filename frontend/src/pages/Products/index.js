@@ -8,7 +8,7 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { TableCell } from "@material-ui/core";
+import { IconButton, TableCell } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -19,12 +19,17 @@ import ProductModal from "../../components/ProductModal";
 import { useTranslation } from "react-i18next";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
+import { toast } from "react-toastify";
+import EditIcon from "@material-ui/icons/Edit";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { DeleteOutline } from "@material-ui/icons";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRODUCTS") {
         const products = action.payload;
         const newProducts = [];
-  
+
         products.forEach((product) => {
             const productIndex = state.findIndex((p) => p.id === product.id);
             if (productIndex !== -1) {
@@ -33,14 +38,14 @@ const reducer = (state, action) => {
                 newProducts.push(product);
             }
         });
-  
+
         return [...state, ...newProducts];
     }
-  
+
     if (action.type === "UPDATE_PRODUCTS") {
         const product = action.payload;
         const productIndex = state.findIndex((p) => p.id === product.id);
-  
+
         if (productIndex !== -1) {
             state[productIndex] = product;
             return [...state];
@@ -48,17 +53,17 @@ const reducer = (state, action) => {
             return [product, ...state];
         }
     }
-  
+
     if (action.type === "DELETE_PRODUCT") {
         const productId = action.payload;
-  
+
         const productIndex = state.findIndex((p) => p.id === productId);
         if (productIndex !== -1) {
             state.splice(productIndex, 1);
         }
         return [...state];
     }
-  
+
     if (action.type === "RESET") {
         return [];
     }
@@ -80,6 +85,9 @@ const Products = () => {
     const [products, dispatch] = useReducer(reducer, []);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [productModalOpen, setProductModalOpen] = useState(false);
+    const [deletingProduct, setDeletingProduct] = useState(null);
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -90,6 +98,7 @@ const Products = () => {
             try {
                 const { data } = await api.get("/products/");
                 dispatch({ type: "LOAD_PRODUCTS", payload: data });
+                setLoading(false);
             } catch (err) {
                 toastError(err);
             }
@@ -99,17 +108,17 @@ const Products = () => {
 
     useEffect(() => {
         const socket = openSocket();
-    
+
         socket.on("product", (data) => {
             if (data.action === "update" || data.action === "create") {
                 dispatch({ type: "UPDATE_PRODUCTS", payload: data.product });
             }
-    
+
             if (data.action === "delete") {
                 dispatch({ type: "DELETE_PRODUCT", payload: + data.productId });
             }
         });
-    
+
         return () => {
             socket.disconnect();
         };
@@ -119,7 +128,7 @@ const Products = () => {
         setSelectedProduct(null);
         setProductModalOpen(true);
     };
-    
+
     const handleCloseProductModal = () => {
         setSelectedProduct(null);
         setProductModalOpen(false);
@@ -130,14 +139,34 @@ const Products = () => {
         setProductModalOpen(true);
     };
 
+    const handleDeleteProduct = async (deletingId) => {
+        try {
+            await api.delete(`/products/${deletingId}`);
+            toast.success(i18n.t("Produto excluído com sucesso!"));
+        } catch (err) {
+            toastError(err);
+        }
+        setDeletingProduct(null);
+  };
+
     return (
         <MainContainer>
             <ProductModal
                 open={productModalOpen}
                 onClose={handleCloseProductModal}
                 aria-labelledby="form-dialog-title"
-                userId={selectedProduct && selectedProduct.id}
+                productId={selectedProduct && selectedProduct.id}
             />
+            <ConfirmationModal
+                title={
+                deletingProduct &&
+                `Deletar Produto`}
+                open={confirmModalOpen}
+                onClose={setConfirmModalOpen}
+                onConfirm={() => handleDeleteProduct(deletingProduct.id)}
+            >
+                {i18n.t("Todos os dados do produto se perderão, deseja realmente excluir?")}
+            </ConfirmationModal>
             <MainHeader>
                 <Title>Produtos</Title>
                 <MainHeaderButtonsWrapper>
@@ -157,15 +186,44 @@ const Products = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Nome do Produto</TableCell>
-                            <TableCell>Valor da Mensalidade</TableCell>
-                            <TableCell>Valor Custo Disparo</TableCell>
-                            <TableCell>Taxa Juros Mensal</TableCell>
-                            <TableCell>Multa Atraso</TableCell>
-                            <TableCell>Ações</TableCell>
+                            <TableCell align="center">Nome do Produto</TableCell>
+                            <TableCell align="center">Valor da Mensalidade</TableCell>
+                            <TableCell align="center">Valor Custo Disparo</TableCell>
+                            <TableCell align="center">Taxa Juros Mensal</TableCell>
+                            <TableCell align="center">Multa Atraso</TableCell>
+                            <TableCell align="center">Ações</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
+
+                        {products && products.map((product) => (
+                            <TableRow key={product.id}>
+                                <TableCell align="center">{product.name}</TableCell>
+                                <TableCell align="center">{product.monthlyFee}</TableCell>
+                                <TableCell align="center">{product.triggerFee}</TableCell>
+                                <TableCell align="center">{product.monthlyInterestRate}</TableCell>
+                                <TableCell align="center">{product.penaltyMount}</TableCell>
+                                <TableCell align="center">
+                                <IconButton
+                                    size="small"
+                                    onClick={(e) => handleEditProduct(product)}
+                                >
+                                    <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                    setDeletingProduct(product);
+                                    setConfirmModalOpen(true);
+                                    }}
+                                >
+                                    <DeleteOutline />
+                                </IconButton>
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        {loading && <TableRowSkeleton columns={6} />}
+
                     </TableBody>
                 </Table>
         </Paper>

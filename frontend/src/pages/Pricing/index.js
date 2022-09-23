@@ -27,7 +27,7 @@ const reducer = (state, action) => {
     if (action.type === "LOAD_PRICINGS") {
         const pricings = action.payload;
         const newPricings = [];
-  
+
         pricings.forEach((pricing) => {
             const pricingIndex = state.findIndex((p) => p.id === pricing.id);
             if (pricingIndex !== -1) {
@@ -36,14 +36,14 @@ const reducer = (state, action) => {
                 newPricings.push(pricing);
             }
         });
-  
+
         return [...state, ...newPricings];
     }
-  
+
     if (action.type === "UPDATE_PRICINGS") {
         const pricing = action.payload;
         const pricingIndex = state.findIndex((p) => p.id === pricing.id);
-  
+
         if (pricingIndex !== -1) {
             state[pricingIndex] = pricing;
             return [...state];
@@ -51,17 +51,17 @@ const reducer = (state, action) => {
             return [pricing, ...state];
         }
     }
-  
+
     if (action.type === "DELETE_PRICING") {
         const pricingId = action.payload;
-  
+
         const pricingIndex = state.findIndex((p) => p.id === pricingId);
         if (pricingIndex !== -1) {
             state.splice(pricingIndex, 1);
         }
         return [...state];
     }
-  
+
     if (action.type === "RESET") {
         return [];
     }
@@ -102,17 +102,17 @@ const Pricing = () => {
 
     useEffect(() => {
         const socket = openSocket();
-    
+
         socket.on("pricing", (data) => {
             if (data.action === "update" || data.action === "create") {
                 dispatch({ type: "UPDATE_PRICINGS", payload: data.pricing });
             }
-    
+
             if (data.action === "delete") {
                 dispatch({ type: "DELETE_PRICING", payload: + data.pricingId });
             }
         });
-    
+
         return () => {
             socket.disconnect();
         };
@@ -122,7 +122,7 @@ const Pricing = () => {
         setSelectedPricing(null);
         setPricingModalOpen(true);
     };
-    
+
     const handleClosePricingModal = () => {
         setSelectedPricing(null);
         setPricingModalOpen(false);

@@ -9,11 +9,23 @@ import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
 import DeleteMenuService from "../services/MenuServices/DeleteMenuService";
 
-export const index = async (req: Request, res: Response): Promise<Response> => {
-  const menus = await ListMenusService();
-
-  return res.json(menus);
+type IndexQuery = {
+  searchParam: string;
+  pageNumber: string;
 };
+
+export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam, pageNumber } = req.query as IndexQuery;
+
+  const { menus, count, hasMore } = await ListMenusService({
+    searchParam,
+    pageNumber
+
+  });
+
+  return res.json({ menus, count, hasMore });
+};
+
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { menuId } = req.params;
