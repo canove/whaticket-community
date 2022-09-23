@@ -6,7 +6,8 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
 import Company from "./Company";
 import Product from "./Products";
@@ -37,6 +38,12 @@ class Pricing extends Model<Pricing> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @BelongsTo(() => Company)
+  company: Company;
+
+  @BelongsTo(() => Product)
+  product: Product;
 }
 
 export default Pricing;

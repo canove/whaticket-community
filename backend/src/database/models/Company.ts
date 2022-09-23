@@ -66,7 +66,6 @@ class Company extends Model<Company> {
 
   @HasMany(() => User)
   users: User[];
-
 }
 
 export default Company;

@@ -66,7 +66,7 @@ class User extends Model<User> {
 
   @ForeignKey(() => Company)
   @Column
-  companyId: number
+  companyId: number;
 
   @BelongsTo(() => Company)
   company: Company;

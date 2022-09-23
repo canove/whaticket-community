@@ -1,4 +1,5 @@
 import Pricing from "../../database/models/Pricing";
+import ShowPricingService from "./ShowPricingService";
 
 interface Request {
   companyId: number;
@@ -20,7 +21,9 @@ const CreatePricingService = async ({
     graceTrigger
   });
 
-  return pricing;
+  const createdPricing = await ShowPricingService(pricing.id);
+
+  return createdPricing;
 };
 
 export default CreatePricingService;
