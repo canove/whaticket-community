@@ -5,6 +5,6 @@ import * as HistoricController from "../controllers/HistoricController";
 
 const historicRoutes = Router();
 
-historicRoutes.get("/menus/", isAuth, HistoricController.show);
+historicRoutes.get("/historics/", isAuth, HistoricController.show);
 
 export default historicRoutes;
