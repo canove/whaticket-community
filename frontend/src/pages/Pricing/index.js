@@ -139,7 +139,7 @@ const Pricing = () => {
                 open={pricingModalOpen}
                 onClose={handleClosePricingModal}
                 aria-labelledby="form-dialog-title"
-                userId={selectedPricing && selectedPricing.id}
+                pricingId={selectedPricing && selectedPricing.id}
             />
             <MainHeader>
                 <Title>Precificação</Title>
@@ -160,26 +160,26 @@ const Pricing = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Empresa</TableCell>
-                            <TableCell>Produto Constratado</TableCell>
-                            <TableCell>Cliente Desde De</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>Valor a Pagar</TableCell>
-                            <TableCell>Valor Pago</TableCell>
-                            <TableCell>Ações</TableCell>
+                            <TableCell align="center">Empresa</TableCell>
+                            <TableCell align="center">Produto Constratado</TableCell>
+                            <TableCell align="center">Cliente Desde De</TableCell>
+                            <TableCell align="center">Status</TableCell>
+                            <TableCell align="center">Valor a Pagar</TableCell>
+                            <TableCell align="center">Valor Pago</TableCell>
+                            <TableCell align="center">Ações</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         { pricings && pricings.map(pricing => {
                             return (
-                                <TableRow>
-                                    <TableCell>{pricing.company.name}</TableCell>
-                                    <TableCell>{pricing.product.name}</TableCell>
-                                    <TableCell>{pricing.createdAt}</TableCell>
-                                    <TableCell>{pricing.company.status}</TableCell>
-                                    <TableCell>Valor a Pagar</TableCell>
-                                    <TableCell>Valor Pago</TableCell>
-                                    <TableCell>
+                                <TableRow key={pricing.id}>
+                                    <TableCell align="center">{pricing.company.name}</TableCell>
+                                    <TableCell align="center">{pricing.product.name}</TableCell>
+                                    <TableCell align="center">{pricing.createdAt}</TableCell>
+                                    <TableCell align="center">{pricing.company.status}</TableCell>
+                                    <TableCell align="center">Valor a Pagar</TableCell>
+                                    <TableCell align="center">Valor Pago</TableCell>
+                                    <TableCell align="center">
                                         <IconButton
                                             size="small"
                                             onClick={() => handleEditPricing(pricing)}
