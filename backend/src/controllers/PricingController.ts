@@ -46,7 +46,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const io = getIO();
   io.emit("pricing", {
-    action: "update",
+    action: "create",
     pricing
   });
 
