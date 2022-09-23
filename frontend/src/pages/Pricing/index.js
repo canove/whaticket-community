@@ -8,13 +8,16 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { TableCell } from "@material-ui/core";
+import { IconButton, TableCell } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 import PricingModal from "../../components/PricingModal";
+
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import EditIcon from "@material-ui/icons/Edit";
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
@@ -167,6 +170,32 @@ const Pricing = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
+                        { pricings && pricings.map(pricing => {
+                            return (
+                                <TableRow>
+                                    <TableCell>{pricing.company.name}</TableCell>
+                                    <TableCell>{pricing.product.name}</TableCell>
+                                    <TableCell>{pricing.createdAt}</TableCell>
+                                    <TableCell>{pricing.company.status}</TableCell>
+                                    <TableCell>Valor a Pagar</TableCell>
+                                    <TableCell>Valor Pago</TableCell>
+                                    <TableCell>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleEditPricing(pricing)}
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+
+                                        <IconButton
+                                            size="small"
+                                        >
+                                            <DeleteOutlineIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
                     </TableBody>
                 </Table>
         </Paper>
