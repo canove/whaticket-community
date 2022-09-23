@@ -22,6 +22,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { parseISO, format } from "date-fns";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRICINGS") {
@@ -133,6 +134,34 @@ const Pricing = () => {
         setPricingModalOpen(true);
     };
 
+    const formatDate = (date) => {
+        if (date) {
+            return format(parseISO(date), "dd/MM/yyyy HH:mm");
+        }
+
+        return date;
+    }
+
+    const formatStatus = (status) => {
+        if (status === "ativo") {
+            return "Ativo";
+        }
+
+        if (status === "inativo") {
+            return "Inativo";
+        }
+
+        if (status === "inadimplente") {
+            return "Inadimplente";
+        }
+
+        if (status === "bloqueado") {
+            return "Bloqueado"
+        }
+
+        return status;
+    }
+
     return (
         <MainContainer>
             <PricingModal
@@ -162,10 +191,12 @@ const Pricing = () => {
                         <TableRow>
                             <TableCell align="center">Empresa</TableCell>
                             <TableCell align="center">Produto Constratado</TableCell>
-                            <TableCell align="center">Cliente Desde De</TableCell>
                             <TableCell align="center">Status</TableCell>
+                            <TableCell align="center">Periodo de Carência (dias)</TableCell>
+                            <TableCell align="center">Carência de Disparos</TableCell>
                             <TableCell align="center">Valor a Pagar</TableCell>
                             <TableCell align="center">Valor Pago</TableCell>
+                            <TableCell align="center">Cliente Desde De</TableCell>
                             <TableCell align="center">Ações</TableCell>
                         </TableRow>
                     </TableHead>
@@ -175,10 +206,12 @@ const Pricing = () => {
                                 <TableRow key={pricing.id}>
                                     <TableCell align="center">{pricing.company.name}</TableCell>
                                     <TableCell align="center">{pricing.product.name}</TableCell>
-                                    <TableCell align="center">{pricing.createdAt}</TableCell>
-                                    <TableCell align="center">{pricing.company.status}</TableCell>
+                                    <TableCell align="center">{formatStatus(pricing.company.status)}</TableCell>
+                                    <TableCell align="center">{pricing.gracePeriod}</TableCell>
+                                    <TableCell align="center">{pricing.graceTrigger}</TableCell>
                                     <TableCell align="center">Valor a Pagar</TableCell>
                                     <TableCell align="center">Valor Pago</TableCell>
+                                    <TableCell align="center">{formatDate(pricing.createdAt)}</TableCell>
                                     <TableCell align="center">
                                         <IconButton
                                             size="small"
