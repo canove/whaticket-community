@@ -47,7 +47,6 @@ const UpdateUserService = async ({
     companyId = userCompanyId;
   }
 
-
   try {
     await schema.validate({ email, password, profile, name });
   } catch (err) {
