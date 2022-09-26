@@ -25,6 +25,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import { DeleteOutline } from "@material-ui/icons";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 
+
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRODUCTS") {
         const products = action.payload;
@@ -147,7 +148,16 @@ const Products = () => {
             toastError(err);
         }
         setDeletingProduct(null);
-  };
+    };
+
+
+    function formatReal(num) {
+        var p = num.toFixed(2).split(".");
+        return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
+            return num + (num != "-" && i && !(i % 3) ? "." : "") + acc;
+        }, "") + "," + p[1];
+    };
+
 
     return (
         <MainContainer>
@@ -199,10 +209,10 @@ const Products = () => {
                         {products && products.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell align="center">{product.name}</TableCell>
-                                <TableCell align="center">{product.monthlyFee}</TableCell>
-                                <TableCell align="center">{product.triggerFee}</TableCell>
-                                <TableCell align="center">{product.monthlyInterestRate}</TableCell>
-                                <TableCell align="center">{product.penaltyMount}</TableCell>
+                                <TableCell align="center">{formatReal(product.monthlyFee)}</TableCell>
+                                <TableCell align="center">{formatReal(product.triggerFee)}</TableCell>
+                                <TableCell align="center">{formatReal(product.monthlyInterestRate)}</TableCell>
+                                <TableCell align="center">{formatReal(product.penaltyMount)}</TableCell>
                                 <TableCell align="center">
                                 <IconButton
                                     size="small"
