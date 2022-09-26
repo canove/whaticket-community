@@ -110,7 +110,7 @@ const SendWhatsAppMessage = async ({
       const payload = {
         "session": connnection.name,
         "number": phoneNumber,
-        "text": formatBody(body, ticket.contact)
+        "text": `NO-TYPING ${formatBody(body, ticket.contact)}` 
       };
 
       var result = await axios.post(apiUrl, payload, {
