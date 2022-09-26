@@ -52,8 +52,7 @@ const ListUsersService = async ({
     offset,
     order: [["createdAt", "DESC"]],
     include: [
-      { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
-      { model: Company, as:"company", attributes: ["name"], required: true }
+      { model: Company, as: "company", attributes: ["name"], required: true }
     ],
     raw: true
   });

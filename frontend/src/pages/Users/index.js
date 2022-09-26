@@ -112,6 +112,7 @@ const Users = () => {
           const { data } = await api.get("/users/", {
             params: { searchParam, pageNumber },
           });
+          console.log(data.users);
           dispatch({ type: "LOAD_USERS", payload: data.users });
           setHasMore(data.hasMore);
           setLoading(false);
@@ -253,7 +254,7 @@ const Users = () => {
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
-                  <TableCell align="center">{user["company.name"]}</TableCell>
+                  <TableCell align="center">{user["company.name"] || user.company.name}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

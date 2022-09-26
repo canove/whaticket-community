@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
+import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import ShowUserService from "./ShowUserService";
 
 interface UserData {
@@ -66,13 +67,16 @@ const UpdateUserService = async ({
 
   await user.reload();
 
+  const company = await ShowCompanyService(companyId);
+
   const serializedUser = {
     id: user.id,
     name: user.name,
     email: user.email,
     profile: user.profile,
     queues: user.queues,
-    companyId: user.companyId
+    companyId: user.companyId,
+    company
   };
 
   return serializedUser;

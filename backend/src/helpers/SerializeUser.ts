@@ -1,3 +1,4 @@
+import Company from "../database/models/Company";
 import Queue from "../database/models/Queue";
 import User from "../database/models/User";
 
@@ -9,6 +10,7 @@ interface SerializedUser {
   lang: string;
   queues: Queue[];
   companyId: number;
+  company?: Company;
 }
 
 export const SerializeUser = (user: User): SerializedUser => {
