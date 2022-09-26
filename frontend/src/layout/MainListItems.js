@@ -185,6 +185,7 @@ const MainListItems = (props) => {
 
         const menus = [];
         const allMenus = [];
+        const parentMenus = [];
         const parentMenusIds = [];
 
         for (const menu of data) {
@@ -193,6 +194,7 @@ const MainListItems = (props) => {
               parentMenusIds.push(menu.parentId);
 
               const parentMenu = await getParentMenu(menu.parentId);
+              parentMenus.push(parentMenu);
               allMenus.push(parentMenu);
               allMenus.push(menu);
             } else {
@@ -200,6 +202,15 @@ const MainListItems = (props) => {
             }
           } else {
             allMenus.push(menu);
+          }
+        }
+
+        for (const parent of parentMenus) {
+          if (parent.parentId && parentMenusIds.indexOf(parent.parentId) === -1) {
+            parentMenusIds.push(parent.parentId);
+
+            const parentMenu = await getParentMenu(parent.parentId);
+            allMenus.push(parentMenu);
           }
         }
 
@@ -223,7 +234,6 @@ const MainListItems = (props) => {
         }
         setMenus(menus);
       } catch (err) {
-        console.log(err);
         toastError(err);
       }
     }
