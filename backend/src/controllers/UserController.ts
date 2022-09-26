@@ -9,6 +9,7 @@ import ListUsersService from "../services/UserServices/ListUsersService";
 import UpdateUserService from "../services/UserServices/UpdateUserService";
 import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
+import UpdateUserLanguageService from "../services/UserServices/UpdateUserLanguageService";
 
 type IndexQuery = {
   searchParam: string;
@@ -102,6 +103,28 @@ export const update = async (
 
   const io = getIO();
   io.emit(`user${userCompanyId}`, {
+    action: "update",
+    user
+  });
+
+  return res.status(200).json(user);
+};
+
+export const updateLanguage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { userId } = req.params;
+  const { language } = req.body;
+  const { companyId } = req.user;
+
+  const user = await UpdateUserLanguageService({
+    userId,
+    language
+  });
+
+  const io = getIO();
+  io.emit(`user${companyId}`, {
     action: "update",
     user
   });

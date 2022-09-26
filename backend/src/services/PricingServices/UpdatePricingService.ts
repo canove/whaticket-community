@@ -28,7 +28,9 @@ const UpdatePricingService = async ({
     graceTrigger
   });
 
-  return pricing;
+  const updatedPricing = ShowPricingService(pricingId);
+
+  return updatedPricing;
 };
 
 export default UpdatePricingService;

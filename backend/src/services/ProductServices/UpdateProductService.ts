@@ -6,7 +6,7 @@ interface ProductData {
   monthlyFee: number;
   triggerFee: number;
   monthlyInterestRate: number;
-  lateFine: number;
+  penaltyMount: number;
 }
 
 interface Request {
@@ -20,7 +20,7 @@ const UpdateProductService = async ({
 }: Request): Promise<Product> => {
   const product = await ShowProductService(productId);
 
-  const { name, monthlyFee, triggerFee, monthlyInterestRate, lateFine } =
+  const { name, monthlyFee, triggerFee, monthlyInterestRate, penaltyMount } =
     productData;
 
   await product.update({
@@ -28,7 +28,7 @@ const UpdateProductService = async ({
     monthlyFee,
     triggerFee,
     monthlyInterestRate,
-    lateFine
+    penaltyMount
   });
 
   return product;

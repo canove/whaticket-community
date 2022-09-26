@@ -143,7 +143,7 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
         const fetchMenus = async () => {
             try {
                 const { data } = await api.get('/menus/');
-                setMenus(data);
+                setMenus(data.menus);
             } catch (err) {
                 toastError(err);
             }
@@ -177,7 +177,7 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                 await api.put(`/menus/${registrationId}`, menuData);
                 toast.success("Menu editado com sucesso!");
             } else {
-                await api.post("menus/", menuData);
+                await api.post("/menus/", menuData);
                 toast.success("Menu adicionado com sucesso!");
             }
             } catch (err) {

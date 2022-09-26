@@ -147,7 +147,7 @@ const Registration = () => {
           const { data } = await api.get("/menus/", {
             params: { searchParam, pageNumber },
           });
-          dispatch({ type: "LOAD_REGISTRATION", payload: data });
+          dispatch({ type: "LOAD_REGISTRATION", payload: data.menus });
           setHasMore(data.hasMore);
           setLoading(false);
         } catch (err) {
@@ -210,10 +210,10 @@ const Registration = () => {
 
   const handleDeleteMenu = async () => {
     try {
-        await api.delete(`/menus/${deletingMenu.id}`);
-        toast.success(i18n.t("Cadastro excluído com sucesso!"));
-      } catch (err) {
-        toastError(err);
+      await api.delete(`/menus/${deletingMenu.id}`);
+      toast.success(i18n.t("Cadastro excluído com sucesso!"));
+    } catch (err) {
+      toastError(err);
       }
     setDeletingMenu(null);
     setSearchParam("");

@@ -42,6 +42,8 @@ const useStyles = makeStyles((theme) => ({
 
   },
   nested: {
+    padding: 15,
+    width: '100%',
     paddingLeft: theme.spacing(4),
   },
 }
