@@ -258,12 +258,9 @@ export const nofSessionStatus = async (
 ): Promise<Response> => {
 
   const { session, status } = req.body;
-  const { companyId } = req.user;
-
   const message = await NOFWhatsappSessionStatusService({
     session,
-    status,
-    companyId
+    status
   });
 
   return res.status(200).json(message);
@@ -275,13 +272,11 @@ export const nofSessionQRUpdate = async (
 ): Promise<Response> => {
 
   const { result, session, qrcode } = req.body;
-  const { companyId } = req.user;
 
   const message = await NOFWhatsappQRCodeService({
     result,
     session,
-    qrcode,
-    companyId
+    qrcode
   });
 
   return res.status(200).json(message);

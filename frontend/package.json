@@ -59,5 +59,7 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "react-intl-currency-input": "^0.2.6"
+  }
 }
