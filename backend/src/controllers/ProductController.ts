@@ -57,7 +57,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     userId: user.id,
     systemChange: 0,
     update: product,
-    registerId: product.id
+    registerId: product.id,
+    actionType: 0
   });
 
   const io = getIO();
@@ -102,7 +103,8 @@ export const update = async (
     userId: user.id,
     systemChange: 0,
     update: product,
-    registerId: product.id
+    registerId: product.id,
+    actionType: 1
   });
 
   const io = getIO();
@@ -132,7 +134,8 @@ export const remove = async (
     userId: user.id,
     systemChange: 0,
     update: "Deleted",
-    registerId: productId
+    registerId: productId,
+    actionType: 2
   });
 
   const io = getIO();

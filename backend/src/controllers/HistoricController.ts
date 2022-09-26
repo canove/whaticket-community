@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import ShowHistoricService from "../services/HistoricServices/ShowHistoricService";
 
+type Query = {
+  systemChange: number | string;
+  registerId: number | string;
+};
+
 export const show = async (req: Request, res: Response): Promise<Response> => {
-  const { systemChange, registerId } = req.body;
+  const { systemChange, registerId } = req.query as Query;
 
-  const pricings = await ShowHistoricService({ systemChange, registerId });
+  const historics = await ShowHistoricService({ systemChange, registerId });
 
-  return res.status(200).json(pricings);
+  return res.status(200).json(historics);
 };

@@ -5,13 +5,15 @@ interface Request {
   systemChange: number;
   update: any;
   registerId: number | string;
+  actionType: number | string;
 }
 
 const CreateHistoricService = async ({
   userId,
   systemChange,
   update,
-  registerId
+  registerId,
+  actionType
 }: Request): Promise<void> => {
   const allHistorics = await Historic.findAll({
     where: { systemChange, registerId },
@@ -30,7 +32,8 @@ const CreateHistoricService = async ({
     systemChange,
     currentJSON: lastHistoric && lastHistoric.updatedJSON,
     updatedJSON: current,
-    registerId
+    registerId,
+    actionType
   });
 };
 
@@ -40,4 +43,9 @@ export default CreateHistoricService;
     System Change:
         0 -> Product
         1 -> Pricing
+
+    Action Type:
+        0 -> Create
+        1 -> Edit
+        2 -> Delete
 */

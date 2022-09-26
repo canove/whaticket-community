@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   AutoIncrement,
   ForeignKey,
+  BelongsTo,
 } from "sequelize-typescript";
 import User from "./User";
 
@@ -28,10 +29,16 @@ class Historic extends Model<Historic> {
   updatedJSON: string;
 
   @Column
+  actionType: string;
+
+  @Column
   systemChange: number;
 
   @Column
   registerId: number;
+
+  @BelongsTo(() => User)
+  user: User;
 
   @CreatedAt
   createdAt: Date;

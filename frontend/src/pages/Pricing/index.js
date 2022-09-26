@@ -17,12 +17,14 @@ import Title from "../../components/Title";
 import PricingModal from "../../components/PricingModal";
 
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import HistoryIcon from '@material-ui/icons/History';
 import EditIcon from "@material-ui/icons/Edit";
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { parseISO, format } from "date-fns";
+import SystemChangeModal from "../../components/SystemChangeModal";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRICINGS") {
@@ -84,6 +86,8 @@ const Pricing = () => {
     const [pricings, dispatch] = useReducer(reducer, []);
     const [selectedPricing, setSelectedPricing] = useState(null);
     const [pricingModalOpen, setPricingModalOpen] = useState(false);
+    const [selectedHistoric, setSelectedHistoric] = useState(null);
+    const [historicModalOpen, setHistoricModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -162,6 +166,16 @@ const Pricing = () => {
         return status;
     }
 
+    const handleOpenHistoricModal = (pricing) => {
+        setSelectedHistoric(pricing);
+        setHistoricModalOpen(true);
+    };
+
+    const handleCloseHistoricModal = () => {
+        setSelectedHistoric(null);
+        setHistoricModalOpen(false);
+    };
+
     return (
         <MainContainer>
             <PricingModal
@@ -169,6 +183,13 @@ const Pricing = () => {
                 onClose={handleClosePricingModal}
                 aria-labelledby="form-dialog-title"
                 pricingId={selectedPricing && selectedPricing.id}
+            />
+            <SystemChangeModal
+                open={historicModalOpen}
+                onClose={handleCloseHistoricModal}
+                aria-labelledby="form-dialog-title"
+                registerId={selectedHistoric && selectedHistoric.id}
+                systemChange={1}
             />
             <MainHeader>
                 <Title>Precificação</Title>
@@ -219,7 +240,12 @@ const Pricing = () => {
                                         >
                                             <EditIcon />
                                         </IconButton>
-
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleOpenHistoricModal(pricing)}
+                                        >
+                                            <HistoryIcon />
+                                        </IconButton>
                                         <IconButton
                                             size="small"
                                         >

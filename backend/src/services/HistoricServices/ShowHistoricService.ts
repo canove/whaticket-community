@@ -1,4 +1,5 @@
 import Historic from "../../database/models/Historic";
+import User from "../../database/models/User";
 
 interface Request {
   systemChange: number | string;
@@ -11,7 +12,15 @@ const ShowHistoricService = async ({
 }: Request): Promise<Historic[]> => {
   const historics = await Historic.findAll({
     where: { systemChange, registerId },
-    order: [["createdAt", "ASC"]]
+    order: [["createdAt", "DESC"]],
+    limit: 5,
+    include: [
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name"]
+      }
+    ]
   });
 
   return historics;
