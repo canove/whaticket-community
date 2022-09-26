@@ -6,7 +6,6 @@ import { getIO } from "../../libs/socket";
 interface Request {
   session: string;
   status: string;
-  companyId: number;
 }
 
 interface Response {
@@ -14,8 +13,7 @@ interface Response {
 }
 const NOFWhatsappSessionStatusService = async ({
   session,
-  status,
-  companyId
+  status
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     session: Yup.string().required(),
@@ -42,33 +40,35 @@ const NOFWhatsappSessionStatusService = async ({
   }
 
   switch(status){
+    case "isLogged":
     case "connected":
       await whatsapp.update({
         status: "CONNECTED"
       });
       break;
     case "disconnectedMobile":
+    case "notLogged":
+    case "autocloseCalled":
       await whatsapp.update({
         status: "DISCONNECTED",
         qrcode: null
       });
-      break;
-     case "notLogged":
-        await whatsapp.update({
-          status: "DISCONNECTED",
-          qrcode: null
-        });
-      break;
-      case "autocloseCalled":
-        await whatsapp.update({
-          status: "TIMEOUT",
-          qrcode: null
-        });
-      break;
+    break;
+    case "OPENING":
+      await whatsapp.update({
+        status: "OPENING",
+        qrcode: null
+      });
+    break;
+    default:
+      await whatsapp.update({
+        status: "DISCONNECTED",
+        qrcode: null
+      });
   }
   
   const io = getIO();
-  io.emit(`whatsappSession${companyId}`, {
+  io.emit(`whatsappSession${whatsapp.companyId}`, {
     action: "update",
     session: whatsapp
   });
