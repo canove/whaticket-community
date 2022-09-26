@@ -24,6 +24,8 @@ import EditIcon from "@material-ui/icons/Edit";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { DeleteOutline } from "@material-ui/icons";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import SystemChangeModal from "../../components/SystemChangeModal";
+import HistoryIcon from '@material-ui/icons/History';
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRODUCTS") {
@@ -87,6 +89,8 @@ const Products = () => {
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [deletingProduct, setDeletingProduct] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [selectedHistoric, setSelectedHistoric] = useState(null);
+    const [historicModalOpen, setHistoricModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -149,6 +153,16 @@ const Products = () => {
         setDeletingProduct(null);
   };
 
+    const handleOpenHistoricModal = (pricing) => {
+        setSelectedHistoric(pricing);
+        setHistoricModalOpen(true);
+    };
+
+    const handleCloseHistoricModal = () => {
+        setSelectedHistoric(null);
+        setHistoricModalOpen(false);
+    };
+
     return (
         <MainContainer>
             <ProductModal
@@ -156,6 +170,13 @@ const Products = () => {
                 onClose={handleCloseProductModal}
                 aria-labelledby="form-dialog-title"
                 productId={selectedProduct && selectedProduct.id}
+            />
+            <SystemChangeModal
+                open={historicModalOpen}
+                onClose={handleCloseHistoricModal}
+                aria-labelledby="form-dialog-title"
+                registerId={selectedHistoric && selectedHistoric.id}
+                systemChange={0}
             />
             <ConfirmationModal
                 title={
@@ -212,6 +233,12 @@ const Products = () => {
                                 </IconButton>
                                 <IconButton
                                     size="small"
+                                    onClick={() => handleOpenHistoricModal(product)}
+                                >
+                                    <HistoryIcon />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
                                     onClick={(e) => {
                                     setDeletingProduct(product);
                                     setConfirmModalOpen(true);
@@ -223,7 +250,6 @@ const Products = () => {
                             </TableRow>
                             ))}
                         {loading && <TableRowSkeleton columns={6} />}
-
                     </TableBody>
                 </Table>
         </Paper>

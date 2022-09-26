@@ -4,6 +4,7 @@ import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../database/models/User";
 import Company from "../../database/models/Company";
+import ShowCompanyService from "../CompanyService/ShowCompanyService";
 
 interface Request {
   email: string;
@@ -11,8 +12,7 @@ interface Request {
   name: string;
   queueIds?: number[];
   profile?: string;
-  companyId: number | string
-
+  companyId: number | string;
 }
 
 interface Response {
@@ -28,7 +28,7 @@ const CreateUserService = async ({
   name,
   queueIds = [],
   profile = "admin",
-  companyId,
+  companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().required().min(2),
@@ -46,7 +46,7 @@ const CreateUserService = async ({
           return !emailExists;
         }
       ),
-    password: Yup.string().required().min(5),
+    password: Yup.string().required().min(5)
   });
 
   try {
@@ -70,7 +70,12 @@ const CreateUserService = async ({
 
   await user.reload();
 
-  const serializedUser = SerializeUser(user);
+  let serializedUser = SerializeUser(user);
+
+  if (companyId) {
+    const company = await ShowCompanyService(companyId);
+    serializedUser = { ...serializedUser, company };
+  }
 
   return serializedUser;
 };
