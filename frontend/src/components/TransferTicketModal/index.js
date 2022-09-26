@@ -97,6 +97,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 
 			if (selectedUser) {
 				data.userId = selectedUser.id
+				data.queueId = null;
 			}
 
 			if (selectedQueue && selectedQueue !== null) {
@@ -143,6 +144,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 						autoHighlight
 						noOptionsText={i18n.t("transferTicketModal.noOptions")}
 						loading={loading}
+						disabled={selectedQueue}
 						renderInput={params => (
 							<TextField
 								{...params}
