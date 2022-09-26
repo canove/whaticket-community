@@ -24,6 +24,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { DeleteOutline } from "@material-ui/icons";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import SystemChangeModal from "../../components/SystemChangeModal";
+import HistoryIcon from '@material-ui/icons/History';
+
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRODUCTS") {
@@ -87,6 +90,8 @@ const Products = () => {
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [deletingProduct, setDeletingProduct] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [selectedHistoric, setSelectedHistoric] = useState(null);
+    const [historicModalOpen, setHistoricModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -147,7 +152,26 @@ const Products = () => {
             toastError(err);
         }
         setDeletingProduct(null);
-  };
+    };
+
+
+    function formatReal(num) {
+        var p = num.toFixed(2).split(".");
+        return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
+            return num + (num != "-" && i && !(i % 3) ? "." : "") + acc;
+        }, "") + "," + p[1];
+    };
+
+
+    const handleOpenHistoricModal = (pricing) => {
+        setSelectedHistoric(pricing);
+        setHistoricModalOpen(true);
+    };
+
+    const handleCloseHistoricModal = () => {
+        setSelectedHistoric(null);
+        setHistoricModalOpen(false);
+    };
 
     return (
         <MainContainer>
@@ -156,6 +180,13 @@ const Products = () => {
                 onClose={handleCloseProductModal}
                 aria-labelledby="form-dialog-title"
                 productId={selectedProduct && selectedProduct.id}
+            />
+            <SystemChangeModal
+                open={historicModalOpen}
+                onClose={handleCloseHistoricModal}
+                aria-labelledby="form-dialog-title"
+                registerId={selectedHistoric && selectedHistoric.id}
+                systemChange={0}
             />
             <ConfirmationModal
                 title={
@@ -199,16 +230,22 @@ const Products = () => {
                         {products && products.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell align="center">{product.name}</TableCell>
-                                <TableCell align="center">{product.monthlyFee}</TableCell>
-                                <TableCell align="center">{product.triggerFee}</TableCell>
-                                <TableCell align="center">{product.monthlyInterestRate}</TableCell>
-                                <TableCell align="center">{product.penaltyMount}</TableCell>
+                                <TableCell align="center">{formatReal(product.monthlyFee)}</TableCell>
+                                <TableCell align="center">{formatReal(product.triggerFee)}</TableCell>
+                                <TableCell align="center">{formatReal(product.monthlyInterestRate)}</TableCell>
+                                <TableCell align="center">{formatReal(product.penaltyMount)}</TableCell>
                                 <TableCell align="center">
                                 <IconButton
                                     size="small"
                                     onClick={(e) => handleEditProduct(product)}
                                 >
                                     <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleOpenHistoricModal(product)}
+                                >
+                                    <HistoryIcon />
                                 </IconButton>
                                 <IconButton
                                     size="small"
@@ -223,7 +260,6 @@ const Products = () => {
                             </TableRow>
                             ))}
                         {loading && <TableRowSkeleton columns={6} />}
-
                     </TableBody>
                 </Table>
         </Paper>

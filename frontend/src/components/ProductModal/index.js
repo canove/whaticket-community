@@ -1,38 +1,22 @@
-import React, { useState, useEffect, useContext, } from "react";
-
+import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
-
 import {
 	Button,
 	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	CircularProgress,
-	Select,
-	InputLabel,
-	MenuItem,
-	FormControl,
 	TextField,
-	InputAdornment,
-	IconButton
+	Typography,
   } from '@material-ui/core';
-
-import { Visibility, VisibilityOff } from '@material-ui/icons';
-
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import QueueSelect from "../QueueSelect";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../Can";
 import { useTranslation } from "react-i18next";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import ConfirmationModal from "../ConfirmationModal";
+import IntlCurrencyInput from "react-intl-currency-input"
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -87,20 +71,24 @@ const ProductModal = ({ open, onClose, productId }) => {
 		setName(e.target.value);
 	};
 
-	const handleMonthyFee = (e) =>{
-		setMonthlyFee(e.target.value);
+	const handleMonthyFee = (e, value) =>{
+		e.preventDefault();
+		setMonthlyFee(value);
 	};
 
-	const handleTriggerFee = (e) =>{
-		setTriggerFee(e.target.value);
+	const handleTriggerFee = (e, value) =>{
+		e.preventDefault();
+		setTriggerFee(value);
 	};
 
-	const handleMonthlyInterestRate = (e) =>{
-		setMonthlyInterestRate(e.target.value);
+	const handleMonthlyInterestRate = (e, value) =>{
+		e.preventDefault();
+		setMonthlyInterestRate(value);
 	};
 
-	const handlePenaltyMount = (e) =>{
-		setPenaltyMount(e.target.value);
+	const handlePenaltyMount = (e, value) =>{
+		e.preventDefault();
+		setPenaltyMount(value);
 	};
 
 	useEffect(() => {
@@ -145,6 +133,19 @@ const ProductModal = ({ open, onClose, productId }) => {
         handleClose();
 	};
 
+	const currencyConfig = {
+		locale: "pt-BR",
+		formats: {
+			number: {
+			BRL: {
+				style: "currency",
+				currency: "BRL",
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2,
+			},
+			},
+		},
+	};
 
 	return (
 		<div className={classes.root}>
@@ -161,6 +162,7 @@ const ProductModal = ({ open, onClose, productId }) => {
 				<DialogContent dividers>
 				<div className={classes.multFieldLine}>
                   <TextField
+
 					as={TextField}
                     name="name"
                     variant="outlined"
@@ -171,54 +173,42 @@ const ProductModal = ({ open, onClose, productId }) => {
 					onChange={handleNameChange}
                   />
                 </div>
-				<div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    name="monthlyFee"
-                    variant="outlined"
-                    margin="dense"
-                    label={i18n.t("Valor Mensal")}
-                    fullWidth
-					value={monthlyFee}
-					onChange={handleMonthyFee}
+					<Typography variant="subtitle1">Valor Mensal</Typography>
+					<IntlCurrencyInput
+						name="monthlyFee"
+						value={monthlyFee}
+						onChange={handleMonthyFee}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+					/>
+					<Typography variant="subtitle1">Valor do disparo</Typography>
+					<IntlCurrencyInput
+						name="triggerFee"
+						value={triggerFee}
+						onChange={handleTriggerFee}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+					/>
+					<Typography variant="subtitle1">Taxa de Juros</Typography>
+                  	<IntlCurrencyInput
+						name="monthlyInterestRate"
+						value={monthlyInterestRate}
+						onChange={handleMonthlyInterestRate}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
                   />
-                </div>
-				<div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    name="triggerFee"
-                    variant="outlined"
-                    margin="dense"
-                    label={i18n.t("Valor custo disparo")}
-                    fullWidth
-					value={triggerFee}
-					onChange={handleTriggerFee}
-                  />
-                </div>
-				<div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    name="monthlyInterestRate"
-                    variant="outlined"
-                    margin="dense"
-                    label={i18n.t("Taxa juros Mensal")}
-                    fullWidth
-					value={monthlyInterestRate}
-					onChange={handleMonthlyInterestRate}
-                  />
-                </div>
-				<div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    name="penaltyMount"
-                    variant="outlined"
-                    margin="dense"
-                    label={i18n.t("Multa Atraso")}
-                    fullWidth
-					value={penaltyMount}
-					onChange={handlePenaltyMount}
-                  />
-                </div>
+					<Typography variant="subtitle1">Multa atraso</Typography>
+                 	<IntlCurrencyInput
+						name="penaltyMount"
+						value={penaltyMount}
+						onChange={handlePenaltyMount}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+                  	/>
 				</DialogContent>
 				<DialogActions>
 					<Button
