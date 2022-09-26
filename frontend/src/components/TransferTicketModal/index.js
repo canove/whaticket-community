@@ -148,7 +148,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 								{...params}
 								label={i18n.t("transferTicketModal.fieldLabel")}
 								variant="outlined"
-								required
+								disabled={selectedQueue}
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
 								InputProps={{
@@ -171,6 +171,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 							value={selectedQueue}
 							onChange={(e) => setSelectedQueue(e.target.value)}
 							label={i18n.t("transferTicketModal.fieldQueuePlaceholder")}
+							disabled={selectedUser}
 						>
 							<MenuItem value={''}>&nbsp;</MenuItem>
 							{queues.map((queue) => (
