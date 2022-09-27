@@ -25,6 +25,8 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { parseISO, format } from "date-fns";
 import SystemChangeModal from "../../components/SystemChangeModal";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { toast } from "react-toastify";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRICINGS") {
@@ -88,6 +90,8 @@ const Pricing = () => {
     const [pricingModalOpen, setPricingModalOpen] = useState(false);
     const [selectedHistoric, setSelectedHistoric] = useState(null);
     const [historicModalOpen, setHistoricModalOpen] = useState(false);
+    const [deletingPricing, setDeletingPricing] = useState(null);
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -97,7 +101,6 @@ const Pricing = () => {
         const fetchPricings = async () => {
             try {
                 const { data } = await api.get("/pricings/");
-                console.log(data);
                 dispatch({ type: "LOAD_PRICINGS", payload: data });
             } catch (err) {
                 toastError(err);
@@ -177,6 +180,16 @@ const Pricing = () => {
         setHistoricModalOpen(false);
     };
 
+    const handleDeletePricing = async (deletingId) => {
+        try {
+            await api.delete(`/pricings/${deletingId}`);
+            toast.success("Precificação Excluida com Sucesso!");
+        } catch (err) {
+            toastError(err);
+        }
+        setDeletingPricing(null);
+  };
+
     return (
         <MainContainer>
             <PricingModal
@@ -192,6 +205,14 @@ const Pricing = () => {
                 registerId={selectedHistoric && selectedHistoric.id}
                 systemChange={1}
             />
+            <ConfirmationModal
+                title={deletingPricing && 'Deletar Precificação'}
+                open={confirmModalOpen}
+                onClose={setConfirmModalOpen}
+                onConfirm={() => handleDeletePricing(deletingPricing.id)}
+            >
+                Você realmente deseja excluir está precifição?
+            </ConfirmationModal>
             <MainHeader>
                 <Title>Precificação</Title>
                 <MainHeaderButtonsWrapper>
@@ -251,6 +272,10 @@ const Pricing = () => {
                                         </IconButton>
                                         <IconButton
                                             size="small"
+                                            onClick={() => {
+                                                setDeletingPricing(pricing);
+                                                setConfirmModalOpen(true);
+                                            }}
                                         >
                                             <DeleteOutlineIcon />
                                         </IconButton>

@@ -33,6 +33,9 @@ class Pricing extends Model<Pricing> {
   @Column
   productId: number;
 
+  @Column
+  deletedAt: Date;
+
   @CreatedAt
   createdAt: Date;
 
