@@ -21,6 +21,7 @@ import Templates from "./models/TemplatesData";
 import Products from "./models/Products";
 import Pricing from "./models/Pricing";
 import Historic from "./models/Historic";
+import FileCounters from "./models/FileCounters";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -49,7 +50,8 @@ const models = [
   Templates,
   Products,
   Pricing,
-  Historic
+  Historic,
+  FileCounters
 ];
 
 sequelize.addModels(models);
