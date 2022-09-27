@@ -97,6 +97,7 @@ const Pricing = () => {
         const fetchPricings = async () => {
             try {
                 const { data } = await api.get("/pricings/");
+                console.log(data);
                 dispatch({ type: "LOAD_PRICINGS", payload: data });
             } catch (err) {
                 toastError(err);
@@ -215,6 +216,7 @@ const Pricing = () => {
                             <TableCell align="center">Status</TableCell>
                             <TableCell align="center">Periodo de Carência (dias)</TableCell>
                             <TableCell align="center">Carência de Disparos</TableCell>
+                            <TableCell align="center">Valor Estimado</TableCell>
                             <TableCell align="center">Valor a Pagar</TableCell>
                             <TableCell align="center">Valor Pago</TableCell>
                             <TableCell align="center">Cliente Desde De</TableCell>
@@ -230,6 +232,7 @@ const Pricing = () => {
                                     <TableCell align="center">{formatStatus(pricing.company.status)}</TableCell>
                                     <TableCell align="center">{pricing.gracePeriod}</TableCell>
                                     <TableCell align="center">{pricing.graceTrigger}</TableCell>
+                                    <TableCell align="center">Valor Estimado</TableCell>
                                     <TableCell align="center">Valor a Pagar</TableCell>
                                     <TableCell align="center">Valor Pago</TableCell>
                                     <TableCell align="center">{formatDate(pricing.createdAt)}</TableCell>
