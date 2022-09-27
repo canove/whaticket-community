@@ -27,6 +27,9 @@ class BillingControls extends Model<BillingControls> {
   @Column
   registerId: number;
 
+  @Column
+  triggerFee: number;
+
   @CreatedAt
   createdAt: Date;
 
