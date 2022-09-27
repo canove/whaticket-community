@@ -5,7 +5,12 @@ import Product from "../../database/models/Products";
 const ListPricingsService = async (): Promise<Pricing[]> => {
   const pricing = await Pricing.findAll({
     include: [
-      { model: Product, as: "product", attributes: ["name", "monthlyFee", "triggerFee"], required: true },
+      {
+        model: Product,
+        as: "product",
+        attributes: ["name", "monthlyFee", "triggerFee"],
+        required: true
+      },
       {
         model: Company,
         as: "company",

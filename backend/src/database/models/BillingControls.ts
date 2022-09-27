@@ -11,7 +11,7 @@ import {
 import Company from "./Company";
 
 @Table
-class FileCounters extends Model<FileCounters> {
+class BillingControls extends Model<BillingControls> {
   @PrimaryKey
   @AutoIncrement
   @Column
@@ -34,4 +34,4 @@ class FileCounters extends Model<FileCounters> {
   updatedAt: Date;
 }
 
-export default FileCounters;
+export default BillingControls;

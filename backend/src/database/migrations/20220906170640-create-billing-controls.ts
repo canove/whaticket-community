@@ -2,7 +2,7 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   up: (queryInterface: QueryInterface) => {
-    return queryInterface.createTable("FileCounters", {
+    return queryInterface.createTable("BillingControls", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -18,6 +18,12 @@ module.exports = {
       quantity: {
         type: DataTypes.INTEGER
       },
+      triggerFee: {
+        type: DataTypes.INTEGER
+      },
+      processedAt: {
+        type: DataTypes.DATE
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false
@@ -30,6 +36,6 @@ module.exports = {
   },
 
   down: (queryInterface: QueryInterface) => {
-    return queryInterface.dropTable("FileCounters");
+    return queryInterface.dropTable("BillingControls");
   }
 };
