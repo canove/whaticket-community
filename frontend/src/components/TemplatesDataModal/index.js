@@ -130,7 +130,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
           if ((body.type === "audio" || body.type === "video" || body.type === "image" || body.type === "file") && (typeof body.value !== 'string')) {
             formData.append("file", body.value, `${body.value.name}/${body.type}/${index}`);
           } else {
-            formData.append("bodies", `${JSON.stringify(body)}/${index}`);
+            formData.append("bodies", `${JSON.stringify(body)}${index}`);
           }
           index++;
         }

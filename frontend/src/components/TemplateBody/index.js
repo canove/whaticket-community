@@ -111,6 +111,9 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setText("");
         setPhoneNumber("");
         setFile(null);
+        setAudio(null);
+        setVideo(null);
+        setImage(null);
         setDisableButton(false);
 
         setOpenParamModal(false);

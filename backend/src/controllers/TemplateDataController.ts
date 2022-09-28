@@ -46,12 +46,16 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     if (bodies) {
       if (Array.isArray(bodies)) {
         for (const body of bodies) {
-          const [bodyValue, index] = body.split("/")
+          const index = body.charAt(body.length - 1)
+          let bodyValue = body;
+          bodyValue = bodyValue.slice(0, -1);
           const bodyJSON = JSON.parse(bodyValue);
-          text[index] = bodyJSON;
+          text[index]= bodyJSON;
         }
       } else {
-        const [bodyValue, index] = bodies.split("/")
+        const index = bodies.charAt(bodies.length - 1)
+        let bodyValue = bodies;
+        bodyValue = bodyValue.slice(0, -1);
         const bodyJSON = JSON.parse(bodyValue);
         text[index] = bodyJSON;
       }
@@ -124,12 +128,16 @@ export const update = async (
     if (bodies) {
       if (Array.isArray(bodies)) {
         for (const body of bodies) {
-          const [bodyValue, index] = body.split("/");
+          const index = body.charAt(body.length - 1)
+          let bodyValue = body;
+          bodyValue = bodyValue.slice(0, -1);
           const bodyJSON = JSON.parse(bodyValue);
           text[index]= bodyJSON;
         }
       } else {
-        const [bodyValue, index] = bodies.split("/")
+        const index = bodies.charAt(bodies.length - 1)
+        let bodyValue = bodies;
+        bodyValue = bodyValue.slice(0, -1);
         const bodyJSON = JSON.parse(bodyValue);
         text[index] = bodyJSON;
       }
