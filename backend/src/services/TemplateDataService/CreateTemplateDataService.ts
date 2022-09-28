@@ -1,34 +1,34 @@
 import Templates from "../../database/models/TemplatesData";
 
+interface Body {
+  type: string;
+  value: string;
+}
 interface Request {
-  name?: string;
-  status?: number;
-  text?: string;
-  footer?: string;
+  name: string;
+  text: Body[];
+  footer: string;
   companyId: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const CreateTemplateDataService = async ({
   name,
-  status,
   text,
   footer,
-  companyId,
-  createdAt,
-  updatedAt
+  companyId
 }: Request): Promise<Templates> => {
-const templates = await Templates.create({
-  name,
-  status,
-  text,
-  footer,
-  companyId,
-  createdAt,
-  updatedAt
-});
-  return templates.reload();
+  const body = JSON.stringify(text);
+
+  const templates = await Templates.create({
+    name,
+    text: body,
+    footer,
+    companyId
+  });
+
+  await templates.reload();
+
+  return templates;
 };
 
 export default CreateTemplateDataService;

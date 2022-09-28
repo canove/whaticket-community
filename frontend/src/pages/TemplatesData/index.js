@@ -145,7 +145,7 @@ const TemplatesData = () => {
     const socket = openSocket();
     socket.on(`templates${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_TEMPLATES", payload: data.response });
+        dispatch({ type: "UPDATE_TEMPLATES", payload: data.template });
       }
 
       if (data.action === "delete") {
@@ -213,11 +213,12 @@ const TemplatesData = () => {
         <ConfirmationModal
             title={
             deletingTemplate &&
-            `${i18n.t("templatesData.modalConfirm.delete")}`}
+            'Deletar Template'}
             open={confirmModalOpen}
             onClose={setConfirmModalOpen}
             onConfirm={() => handleDeleteTemplate(deletingTemplate.id)}
         >
+          {i18n.t("templatesData.modalConfirm.delete")}
       </ConfirmationModal>
       <MainHeader>
         <div className={classes.titleStyle}>

@@ -1,10 +1,16 @@
+/*eslint-disable*/
+
 import { Request, Response } from "express";
+import formidable from "formidable";
+import fs from "fs";
+import AWS from "aws-sdk";
 import ListTemplateDataService from "../services/TemplateDataService/ListTemplateDataService";
 import CreateTemplateDataService from "../services/TemplateDataService/CreateTemplateDataService";
 import UpdateTemplateDataService from "../services/TemplateDataService/UpdateTemplateDataService";
 import DeleteTemplateDataService from "../services/TemplateDataService/DeleteTemplateDataService";
 import ShowTemplateDataService from "../services/TemplateDataService/ShowTemplateDataService";
 import { getIO } from "../libs/socket";
+import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 
 type IndexQuery = {
   searchParam: string;
@@ -25,26 +31,67 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { name, status, text, footer, createdAt, updatedAt } = req.body;
+  const form = formidable({ multiples: true });
+
   const { companyId } = req.user;
 
-  const response = await CreateTemplateDataService({
-    name,
-    status,
-    text,
-    footer,
-    companyId,
-    createdAt,
-    updatedAt
-  });
+  return form.parse(req, async (err, fields, files) => {
+    if (err) return res.status(500).json("occured an error");
+    if (!files) return res.status(500).json("file is expected");
 
-  const io = getIO();
-  io.emit(`templates${companyId}`, {
-    action: "create",
-    response
-  });
+    const { name, bodies, footer } = fields;
 
-  return res.status(200).json(response);
+    let text = []
+
+    if (bodies) {
+      if (Array.isArray(bodies)) {
+        for (const body of bodies) {
+          const bodyJSON = JSON.parse(body);
+          text.push(bodyJSON)
+        }
+      } else {
+        const bodyJSON = JSON.parse(bodies);
+        text.push(bodyJSON)
+      }
+    }
+
+    const allFiles = files.file;
+
+    if (allFiles) {
+      if (Array.isArray(allFiles)) {
+        for (const file of allFiles) {
+          const filePath = file.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = file.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
+        }
+      } else {
+          const filePath = allFiles.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = allFiles.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
+      }
+    }
+
+    const template = await CreateTemplateDataService({
+      name,
+      text,
+      footer,
+      companyId
+    });
+
+    const io = getIO();
+    io.emit(`templates${companyId}`, {
+      action: "create",
+      template
+    });
+
+    return res.status(200).json(template);
+  });
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
@@ -59,22 +106,68 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  const form = formidable({ multiples: true });
+
   const { templatesId } = req.params;
-  const templatesData = req.body;
   const { companyId } = req.user;
 
-  const response = await UpdateTemplateDataService({
-    templatesId,
-    templatesData
-  });
+  return form.parse(req, async (err, fields, files) => {
+    if (err) return res.status(500).json("occured an error");
+    if (!files) return res.status(500).json("file is expected");
 
-  const io = getIO();
-  io.emit(`templates${companyId}`, {
-    action: "update",
-    response
-  });
+    const { name, bodies, footer } = fields;
 
-  return res.status(200).json(response);
+    let text = []
+
+    if (bodies) {
+      if (Array.isArray(bodies)) {
+        for (const body of bodies) {
+          const bodyJSON = JSON.parse(body);
+          text.push(bodyJSON)
+        }
+      } else {
+        const bodyJSON = JSON.parse(bodies);
+        text.push(bodyJSON)
+      }
+    }
+
+    const allFiles = files.file;
+
+    if (allFiles) {
+      if (Array.isArray(allFiles)) {
+        for (const file of allFiles) {
+          const filePath = file.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = file.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
+        }
+      } else {
+          const filePath = allFiles.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = allFiles.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
+      }
+    }
+
+    const templatesData = { name, footer, text: JSON.stringify(text) }
+
+    const template = await UpdateTemplateDataService({
+      templatesId,
+      templatesData
+    });
+  
+    const io = getIO();
+    io.emit(`templates${companyId}`, {
+      action: "update",
+      template
+    });
+  
+    return res.status(200).json(template);
+  });
 };
 
 export const remove = async (
@@ -94,3 +187,45 @@ export const remove = async (
 
   return res.status(200).json({ message: "Template deleted" });
 };
+
+const uploadToS3 = async (name, companyId, buffer) => {
+  const companyData = await ShowCompanyService(companyId);
+  const companyAlias = companyData.alias;
+
+  try {
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    });
+    const dt = new Date();
+    const fileName = `${dt.getTime()}_${name}`;
+    const ext = name.split(".").pop();
+
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: `${companyAlias}/${dt.getFullYear()}/${(dt.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}/${dt
+        .getDate()
+        .toString()
+        .padStart(2, "0")}/${fileName}`,
+      Body: buffer,
+      ContentEncoding: "base64",
+      ContentType: `image/${ext}`
+    };
+
+    const result = await new Promise<string>(resolve => {
+      s3.upload(params, (err, data) => {
+        resolve(data.Location);
+      });
+    });
+
+    return result;
+  } catch (err) {
+    console.log("ocorreu um erro ao tentar enviar o arquivo para o s3", err);
+    console.log(
+      "ocorreu um erro ao tentar enviar o arquivo para o s3",
+      JSON.stringify(err)
+    );
+  }
+}
