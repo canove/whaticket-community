@@ -12,7 +12,6 @@ import Queues from "../pages/Queues/";
 import Reports from "../pages/Reports"
 import ReportsTicket from "../pages/ReportsTicket"
 import RegistersReports from "../pages/RegistersReports"
-import Importation from "../pages/Importation"
 import WhatsConfig from "../pages/WhatsConfig"
 import Templates from "../pages/Templates";
 import Company from "../pages/Company";
@@ -25,6 +24,8 @@ import Pricing from "../pages/Pricing";
 import { AuthContext } from "../context/Auth/AuthContext";
 import toastError from "../errors/toastError";
 import api from "../services/api";
+import IntegratedImport from "../pages/IntegratedImport";
+import FileImport from "../pages/FileImport";
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
@@ -74,9 +75,6 @@ const RenderRoutes = () => {
         if (name === "Quick Answers") {
             return QuickAnswers
         }
-        if (name === "Importation") {
-            return Importation
-        }
         if (name === "Settings") {
             return Settings
         }
@@ -106,6 +104,12 @@ const RenderRoutes = () => {
         }
         if (name === "Pricing") {
             return Pricing
+        }
+        if (name === "File Import") {
+            return FileImport
+        }
+        if (name === "Integrated Import") {
+            return IntegratedImport
         }
     }
 

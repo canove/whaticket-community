@@ -227,12 +227,12 @@ const ImportModal = ({ open, onClose }) => {
 					{i18n.t('importModal.title')}
 				</DialogTitle>
                 <DialogContent dividers>
-					{ useType && 
+					{ useType &&
 						<Typography variant="subtitle1" gutterBottom>
 							{i18n.t('importModal.form.shotType')}:
 						</Typography>
 					}
-					{ useType && 
+					{ useType &&
 					<div className={classes.multFieldLine}>
 						<Select
 							labelId="type-select-label"

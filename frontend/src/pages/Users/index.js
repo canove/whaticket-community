@@ -112,7 +112,6 @@ const Users = () => {
           const { data } = await api.get("/users/", {
             params: { searchParam, pageNumber },
           });
-          console.log(data.users);
           dispatch({ type: "LOAD_USERS", payload: data.users });
           setHasMore(data.hasMore);
           setLoading(false);

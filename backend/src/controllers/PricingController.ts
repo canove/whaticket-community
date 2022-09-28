@@ -121,19 +121,19 @@ export const remove = async (
 
   const { pricingId } = req.params;
 
-  await DeletePricingService(pricingId);
+  const pricing = await DeletePricingService(pricingId);
 
   await CreateHistoricService({
     userId: user.id,
     systemChange: 1,
-    update: "Deleted",
+    update: pricing,
     registerId: pricingId,
     actionType: 2
   });
 
   const io = getIO();
   io.emit("pricing", {
-    action: "update",
+    action: "delete",
     pricingId
   });
 
