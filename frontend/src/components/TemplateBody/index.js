@@ -64,6 +64,9 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     const [type, setType] = useState("");
     const [text, setText] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [audio, setAudio] = useState("");
+    const [video, setVideo] = useState("");
+    const [image, setImage] = useState("");
     const [file, setFile] = useState("");
 
     const [param, setParam] = useState("");
@@ -84,7 +87,19 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                 setPhoneNumber(body.value)
             }
 
-            if (body.type === "audio" || body.type === "video" || body.type === "image") {
+            if (body.type === "audio") {
+                setAudio(body.value);
+            }
+
+            if (body.type === "video") {
+                setVideo(body.value);
+            }
+
+            if (body.type === "image") {
+                setImage(body.value);
+            }
+
+            if (body.type === "file") {
                 setFile(body.value);
             }
         }
@@ -121,7 +136,34 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             handleBodiesChange(bodyData, index);
         }
 
-        if (type === "audio" || type === "video" || type === "image") {
+        if (type === "audio") {
+            const bodyData = {
+                type,
+                value: audio
+            }
+
+            handleBodiesChange(bodyData, index);
+        }
+
+        if (type === "video") {
+            const bodyData = {
+                type,
+                value: video
+            }
+
+            handleBodiesChange(bodyData, index);
+        }
+
+        if (type === "image") {
+            const bodyData = {
+                type,
+                value: image
+            }
+
+            handleBodiesChange(bodyData, index);
+        }
+
+        if (type === "file") {
             const bodyData = {
                 type,
                 value: file
@@ -168,6 +210,18 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setOpenParamModal(false);
     };
 
+    const handleAudioChange = (e) => {
+		setAudio(e.target.files[0]);
+    }
+
+    const handleVideoChange = (e) => {
+		setVideo(e.target.files[0]);
+    }
+
+    const handleImageChange = (e) => {
+		setImage(e.target.files[0]);
+    }
+
     const handleFileChange = (e) => {
 		setFile(e.target.files[0]);
     }
@@ -185,12 +239,24 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     }, [text])
 
     useEffect(() => {
-        if (type === "text" && paramsQuantity > 3) {
-          setDisableButton(true);
+        if (type === "text") {
+            if (paramsQuantity > 3) {
+                toast.error("Limite de parâmetros exedido!");
+                setDisableButton(true);
+            } else {
+                setDisableButton(false);
+            }
+        } else if (type === "video") {
+            if (video.size > 10000000) {
+                toast.error("Tamanho do vídeo excede o valor máximo de 10 Megabyte.");
+                setDisableButton(true);
+            } else {
+                setDisableButton(false);
+            }
         } else {
-          setDisableButton(false);
+            setDisableButton(false);
         }
-    }, [type, paramsQuantity])
+    }, [type, paramsQuantity, video])
 
 	return (
 		<div className={classes.root}>
@@ -255,6 +321,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 <MenuItem value={"video"}>Vídeo</MenuItem>
                                 <MenuItem value={"image"}>Imagem</MenuItem>
                                 <MenuItem value={"contact"}>Contato</MenuItem>
+                                <MenuItem value={"file"}>Arquivo</MenuItem>
 							</Select>
 						</FormControl>
                     </div>
@@ -293,27 +360,98 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 						</FormControl>
                         </div>
                     }
-                    { (type === "audio" || type === "video" || type === "image") &&
-                    <div className={classes.multFieldLine}>
-                        <TextField
-							label="Arquivo"
-							variant="outlined"
-							value={file ? file.name || file : ""}
-							fullWidth
-                            disabled
-						/>
-                        <Button
-                            variant="contained"
-                            component="label"
-                        >
-                            Upload
-                            <input
-                                type="file"
-                                onChange={handleFileChange}
-                                hidden
+                    { type === "audio" &&
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                label="Arquivo"
+                                variant="outlined"
+                                value={audio ? audio.name || audio : ""}
+                                fullWidth
+                                disabled
                             />
-                        </Button>
-                    </div>}
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                                Upload
+                                <input
+                                    type="file"
+                                    onChange={handleAudioChange}
+                                    hidden
+                                    accept="audio/*"
+                                />
+                            </Button>
+                        </div>
+                    }
+                    { type === "video" &&
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                label="Arquivo"
+                                variant="outlined"
+                                value={video ? video.name || video : ""}
+                                fullWidth
+                                disabled
+                            />
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                                Upload
+                                <input
+                                    type="file"
+                                    onChange={handleVideoChange}
+                                    hidden
+                                    accept="video/*"
+                                />
+                            </Button>
+                        </div>
+                    }
+                    { type === "image" && 
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                label="Arquivo"
+                                variant="outlined"
+                                value={image ? image.name || image : ""}
+                                fullWidth
+                                disabled
+                            />
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                                Upload
+                                <input
+                                    type="file"
+                                    onChange={handleImageChange}
+                                    hidden
+                                    accept="image/*"
+                                />
+                            </Button>
+                        </div>
+                    }
+                    { type === "file" &&
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                label="Arquivo"
+                                variant="outlined"
+                                value={file ? file.name || file : ""}
+                                fullWidth
+                                disabled
+                            />
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                                Upload
+                                <input
+                                    type="file"
+                                    onChange={handleFileChange}
+                                    hidden
+                                    accept=".pdf, .xls, .xlsx, .csv, .txt, .doc, .docx, .ppt, .rar, .zip"
+                                />
+                            </Button>
+                        </div>
+                    }
 				</DialogContent>
 				<DialogActions>
 					<Button
