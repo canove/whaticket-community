@@ -31,6 +31,8 @@ const UpdateProductService = async ({
     penaltyMount
   });
 
+  product.reload();
+
   return product;
 };
 

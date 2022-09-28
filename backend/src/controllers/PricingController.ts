@@ -8,6 +8,7 @@ import DeletePricingService from "../services/PricingServices/DeletePricingServi
 
 import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
+import CreateHistoricService from "../services/HistoricServices/CreateHistoricService";
 
 interface PricingData {
   companyId: number;
@@ -35,13 +36,22 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
-  const { companyId, productId, gracePeriod, graceTrigger }: PricingData = req.body;
+  const { companyId, productId, gracePeriod, graceTrigger }: PricingData =
+    req.body;
 
   const pricing = await CreatePricingService({
     companyId,
     productId,
     gracePeriod,
     graceTrigger
+  });
+
+  await CreateHistoricService({
+    userId: user.id,
+    systemChange: 1,
+    update: pricing,
+    registerId: pricing.id,
+    actionType: 0
   });
 
   const io = getIO();
@@ -82,6 +92,14 @@ export const update = async (
 
   const pricing = await UpdatePricingService({ pricingData, pricingId });
 
+  await CreateHistoricService({
+    userId: user.id,
+    systemChange: 1,
+    update: pricing,
+    registerId: pricing.id,
+    actionType: 1
+  });
+
   const io = getIO();
   io.emit("pricing", {
     action: "update",
@@ -103,11 +121,19 @@ export const remove = async (
 
   const { pricingId } = req.params;
 
-  await DeletePricingService(pricingId);
+  const pricing = await DeletePricingService(pricingId);
+
+  await CreateHistoricService({
+    userId: user.id,
+    systemChange: 1,
+    update: pricing,
+    registerId: pricingId,
+    actionType: 2
+  });
 
   const io = getIO();
   io.emit("pricing", {
-    action: "update",
+    action: "delete",
     pricingId
   });
 

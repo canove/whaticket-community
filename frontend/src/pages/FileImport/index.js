@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -239,8 +240,22 @@ const FileImport = () => {
     }
   };
 
+  // useEffect(() => {
+  //   const socket = openSocket();
+
+  //   socket.on(`file${user.companyId}`, (data) => {
+  //     if (data.action === "update" || data.action === "create") {
+  //       dispatchImports({ type: "UPDATE_FILES", payload: data.file });
+  //     }
+  //   });
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    const socket = openSocket();
+    const socket = openWorkerSocket();
 
     socket.on(`file${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {

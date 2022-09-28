@@ -9,7 +9,8 @@ import {
   AllowNull,
   Unique,
   BelongsTo,
-  ForeignKey
+  ForeignKey,
+  Default
 } from "sequelize-typescript";
 import Company from "./Company";
 import File from "./File";
@@ -69,6 +70,10 @@ class FileRegister extends Model<FileRegister> {
   @AllowNull(true)
   @Column
   processedAt: Date;
+
+  @AllowNull(true)
+  @Column
+  billingProcessedAt: Date;
 
   @AllowNull(true)
   @Column

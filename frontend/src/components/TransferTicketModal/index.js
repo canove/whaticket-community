@@ -97,6 +97,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 
 			if (selectedUser) {
 				data.userId = selectedUser.id
+				data.queueId = null;
 			}
 
 			if (selectedQueue && selectedQueue !== null) {
@@ -143,12 +144,13 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 						autoHighlight
 						noOptionsText={i18n.t("transferTicketModal.noOptions")}
 						loading={loading}
+						disabled={selectedQueue}
 						renderInput={params => (
 							<TextField
 								{...params}
 								label={i18n.t("transferTicketModal.fieldLabel")}
 								variant="outlined"
-								required
+								disabled={selectedQueue}
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
 								InputProps={{
@@ -171,6 +173,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 							value={selectedQueue}
 							onChange={(e) => setSelectedQueue(e.target.value)}
 							label={i18n.t("transferTicketModal.fieldQueuePlaceholder")}
+							disabled={selectedUser}
 						>
 							<MenuItem value={''}>&nbsp;</MenuItem>
 							{queues.map((queue) => (
