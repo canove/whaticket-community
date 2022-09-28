@@ -70,6 +70,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     const [paramsQuantity, setParamsQuantity] = useState(0);
     const [openParamModal, setOpenParamModal] = useState(false);
 
+    const [disableButton, setDisableButton] = useState(false);
+
     useEffect(() => {
         if (body) {
             setType(body.type);
@@ -81,6 +83,10 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             if (body.type === "contact") {
                 setPhoneNumber(body.value)
             }
+
+            if (body.type === "audio" || body.type === "video" || body.type === "image") {
+                setFile(body.value);
+            }
         }
     }, [open, body])
 
@@ -90,6 +96,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setText("");
         setPhoneNumber("");
         setFile(null);
+        setDisableButton(false);
 
         setOpenParamModal(false);
         setParamsQuantity(0);
@@ -115,10 +122,6 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         }
 
         if (type === "audio" || type === "video" || type === "image") {
-            const formData = new FormData();
-            formData.append("file", file, file.name);
-            formData.set("name", file.name);
-
             const bodyData = {
                 type,
                 value: file
@@ -180,6 +183,14 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         }
         testParams();
     }, [text])
+
+    useEffect(() => {
+        if (type === "text" && paramsQuantity > 3) {
+          setDisableButton(true);
+        } else {
+          setDisableButton(false);
+        }
+    }, [type, paramsQuantity])
 
 	return (
 		<div className={classes.root}>
@@ -287,7 +298,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                         <TextField
 							label="Arquivo"
 							variant="outlined"
-							value={file ? file.name : ""}
+							value={file ? file.name || file : ""}
 							fullWidth
                             disabled
 						/>
@@ -326,7 +337,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                         onClick={handleSubmit}
 						color="primary"
 						variant="contained"
-                        disabled={paramsQuantity > 3}
+                        disabled={disableButton}
 					>
 						{ body ? 'Editar' : 'Criar' }
 					</Button>

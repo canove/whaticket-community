@@ -35,27 +35,45 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const { companyId } = req.user;
 
-  form.parse(req, async (err, fields, files) => {
+  return form.parse(req, async (err, fields, files) => {
     if (err) return res.status(500).json("occured an error");
     if (!files) return res.status(500).json("file is expected");
 
-    const { name, bodies, types, footer } = fields;
+    const { name, bodies, footer } = fields;
 
     let text = []
 
     if (bodies) {
-      text = JSON.parse(bodies);
+      if (Array.isArray(bodies)) {
+        for (const body of bodies) {
+          const bodyJSON = JSON.parse(body);
+          text.push(bodyJSON)
+        }
+      } else {
+        const bodyJSON = JSON.parse(bodies);
+        text.push(bodyJSON)
+      }
     }
 
-    for (const file of files.file) {
-      const filePath = file.filepath;
-      const buffer = await fs.readFileSync(filePath);
-      const fileLink = await uploadToS3(file.originalFilename, companyId, buffer);
+    const allFiles = files.file;
 
-      for (const type of types) {
-        if (type.file === file.originalFilename) {
-          text.push({type: type.type, value: fileLink});
+    if (allFiles) {
+      if (Array.isArray(allFiles)) {
+        for (const file of allFiles) {
+          const filePath = file.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = file.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
         }
+      } else {
+          const filePath = allFiles.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = allFiles.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
       }
     }
 
@@ -88,22 +106,68 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  const form = formidable({ multiples: true });
+
   const { templatesId } = req.params;
-  const templatesData = req.body;
   const { companyId } = req.user;
 
-  const response = await UpdateTemplateDataService({
-    templatesId,
-    templatesData
-  });
+  return form.parse(req, async (err, fields, files) => {
+    if (err) return res.status(500).json("occured an error");
+    if (!files) return res.status(500).json("file is expected");
 
-  const io = getIO();
-  io.emit(`templates${companyId}`, {
-    action: "update",
-    response
-  });
+    const { name, bodies, footer } = fields;
 
-  return res.status(200).json(response);
+    let text = []
+
+    if (bodies) {
+      if (Array.isArray(bodies)) {
+        for (const body of bodies) {
+          const bodyJSON = JSON.parse(body);
+          text.push(bodyJSON)
+        }
+      } else {
+        const bodyJSON = JSON.parse(bodies);
+        text.push(bodyJSON)
+      }
+    }
+
+    const allFiles = files.file;
+
+    if (allFiles) {
+      if (Array.isArray(allFiles)) {
+        for (const file of allFiles) {
+          const filePath = file.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = file.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
+        }
+      } else {
+          const filePath = allFiles.filepath;
+          const buffer = await fs.readFileSync(filePath);
+          const [fileName, fileType] = allFiles.originalFilename.split("/");
+
+          const fileLink = await uploadToS3(fileName, companyId, buffer);
+          text.push({type: fileType, value: fileLink});
+      }
+    }
+
+    const templatesData = { name, footer, text: JSON.stringify(text) }
+
+    const template = await UpdateTemplateDataService({
+      templatesId,
+      templatesData
+    });
+  
+    const io = getIO();
+    io.emit(`templates${companyId}`, {
+      action: "update",
+      template
+    });
+  
+    return res.status(200).json(template);
+  });
 };
 
 export const remove = async (

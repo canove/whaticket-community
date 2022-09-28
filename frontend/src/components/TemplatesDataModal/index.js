@@ -30,6 +30,8 @@ import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import TemplateBody from "../TemplateBody";
 import EditIcon from '@material-ui/icons/Edit';
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import ButtonWithSpinner from "../ButtonWithSpinner";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,15 +85,20 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     const [selectedBody, setSelectedBody] = useState(null);
     const [selectedBodyIndex, setSelectedBodyIndex] = useState("");
     const [bodyModalOpen, setBodyModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
       const fetchTemplates = async () => {
+        setLoading(true);
         try {
           const { data } = await api.get(`/TemplatesData/show/${templatesId}`);
           setName(data.name);
           setFooter(data.footer);
+          setBodies(JSON.parse(data.text));
+          setLoading(false);
         } catch (err) {
           toastError(err);
+          setLoading(false);
         }
       };
       if (templatesId) {
@@ -109,6 +116,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     };
 
     const handleSubmit = async () => {
+      setLoading(true);
       try {
 				const formData = new FormData();
 
@@ -116,24 +124,24 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 				formData.set("footer", footer);
       
         for (const body of bodies) {
-          if (body.type === "audio" || body.type === "video" || body.type === "image") {
-            formData.append("file", body.value, body.value.name);
-            formData.append("types", JSON.stringify({ type: body.type, file: body.value.name }));
-          }
-
-          if (body.type === "text" || body.type === "contact") {
+          if ((body.type === "audio" || body.type === "video" || body.type === "image") && (typeof body.value !== 'string')) {
+            formData.append("file", body.value, `${body.value.name}/${body.type}`);
+          } else {
             formData.append("bodies", JSON.stringify(body));
           }
         }
 
         if (templatesId) {
-				  await api.post(`/TemplatesData/create/`, formData);
+				  await api.put(`/TemplatesData/edit/${templatesId}`, formData);
         } else {
           await api.post(`/TemplatesData/create/`, formData);
         }
         toast.success(i18n.t("templatesData.modalConfirm.successAdd"));
+
+        setLoading(false);
 			} catch (err) {
 				toastError(err);
+        setLoading(false);
 			}
 
       handleClose();
@@ -174,9 +182,12 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
       }
     }
 
-    // useEffect(() => {
-    //   console.log(bodies);
-    // }, [bodies])
+    const handleDeleteBodyModal = (body, index) => {
+      const array = [...bodies];
+      array.splice(index, 1);
+
+      setBodies(array);
+    }
 
   return (
     <div className={classes.root}>
@@ -237,7 +248,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                               <TableCell align="center">{body.value}</TableCell>
                             }
                             { (body.type === "audio" || body.type === "video" || body.type === "image") &&
-                              <TableCell align="center">{body.value.name}</TableCell>
+                              <TableCell align="center">{body.value.name || body.value}</TableCell>
                             }
                             <TableCell align="center">
                               <IconButton
@@ -245,6 +256,12 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                                 onClick={() => handleEditBodyModal(body, index)}
                               >
                                 <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteBodyModal(body, index)}
+                              >
+                                <DeleteOutlineIcon />
                               </IconButton>
                             </TableCell>
                           </TableRow>
@@ -290,13 +307,14 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 					>
 						Cancelar
 					</Button>
-          <Button
-            onClick={handleSubmit}
+          <ButtonWithSpinner
+						onClick={handleSubmit}
 						color="primary"
 						variant="contained"
+            loading={loading}
 					>
 						{ templatesId ? 'Editar' : 'Criar' }
-					</Button>
+					</ButtonWithSpinner>
 				</DialogActions>
 			</Dialog>
     </div>
