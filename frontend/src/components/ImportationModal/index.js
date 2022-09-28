@@ -20,7 +20,6 @@ import { green } from "@material-ui/core/colors";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
-import { Field } from "formik";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -31,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 	multFieldLine: {
 		display: "flex",
 		"& > *:not(:last-child)": {
-			marginRight: theme.spacing(1),
+			marginRight: theme.spacing(3),
 		},
 	},
 
@@ -88,6 +87,13 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 	}, [open, integratedImportId])
 
     const handleClose = () => {
+        setName("");
+        setSelectedMethod("");
+        setUrl("");
+        setKey("");
+        setToken("");
+        setBodyDe("");
+        setBodyPara("");
         onClose();
 	};
 
@@ -153,7 +159,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 			<Dialog
 				open={open}
 				onClose={handleClose}
-				maxWidth="xs"
+				maxWidth="md"
 				fullWidth
 				scroll="paper"
 			>
@@ -188,8 +194,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                         value={method}
                         onChange={(e) => {handleMethodChange(e)}}
                     >
-                        <MenuItem value={true}>{i18n.t('GET')}</MenuItem>
-                        <MenuItem value={false}>{i18n.t('POST')}</MenuItem>
+                        <MenuItem value="GET"> {i18n.t('GET')}</MenuItem>
+                        <MenuItem value= "POST">{i18n.t('POST')}</MenuItem>
                     </Select>
                     </FormControl>
                 </div>
@@ -217,6 +223,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     label={i18n.t("Key")}
                     value={key}
 					onChange={handleKeyChange}
+                    fullWidth
                   />
                   <TextField
 					as={TextField}
@@ -226,12 +233,13 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     label={i18n.t("Token")}
                     value={token}
 					onChange={handleTokenChange}
+                    fullWidth
                   />
                 </div>
-                <Button onClick={handleAuthenticate} color="primary">
+                <Button onClick={handleAuthenticate} color="primary" variant="contained">
                     Autenticar
                 </Button>
-                 <div>
+                 <div className={classes.multFieldLine}>
                   <TextField
                     as={TextField}
                     label={i18n.t("De")}
@@ -246,6 +254,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     name="bodyDe"
                     variant="outlined"
                     margin="normal"
+                    fullWidth
                   />
                     <TextField
                     as={TextField}
@@ -261,6 +270,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     name="bodyPara"
                     variant="outlined"
                     margin="normal"
+                    fullWidth
                   />
                 </div>
 				</DialogContent>

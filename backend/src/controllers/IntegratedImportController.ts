@@ -9,8 +9,6 @@ import DeleteIntegratedImportService from "../services/IntegratedImportService/D
 import { getIO } from "../libs/socket";
 
 interface IntegratedImportData {
-
-    id: number;
     name: string;
     method: string;
     qtdeRegister: number;
@@ -19,7 +17,6 @@ interface IntegratedImportData {
     key: string;
     token: string;
     mapping: string;
-    createdAt: Date;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -32,7 +29,6 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const {
-    id,
     name,
     method,
     qtdeRegister,
@@ -41,11 +37,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     key,
     token,
     mapping,
-    createdAt,
+
   }: IntegratedImportData = req.body;
 
   const integratedImport = await CreateIntegratedImportService({
-    id,
     name,
     method,
     qtdeRegister,
@@ -54,7 +49,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     key,
     token,
     mapping,
-    createdAt,
   });
 
   const io = getIO();
@@ -62,7 +56,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     action: "create",
     integratedImport
   });
-
   return res.status(200).json(integratedImport);
 };
 

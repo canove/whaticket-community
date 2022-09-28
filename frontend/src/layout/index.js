@@ -31,7 +31,8 @@ import brainit from "../assets/brainit500.png";
 import api from "../services/api";
 import { toast } from "react-toastify";
 import toastError from "../errors/toastError";
-const drawerWidth = 280;
+
+const drawerWidth = 320;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#363636",
     position: "relative",
     whiteSpace: "nowrap",
-    width: theme.spacing(35),
+    width: theme.spacing(40),
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,

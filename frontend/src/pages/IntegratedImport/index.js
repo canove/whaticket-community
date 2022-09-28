@@ -151,6 +151,27 @@ const IntegratedImport = () => {
         setDeletingImportation(null);
     };
 
+ const getStatusById = (id) => {
+    if (id === 0) {
+      return "Aguardando Importação";
+    } else if (id === 1) {
+      return "Processando";
+    } else if (id === 2) {
+      return "Aguardando Aprovação";
+    } else if (id === 3) {
+      return "Erro";
+    } else if (id === 4) {
+      return "Aprovado";
+    } else if (id === 5) {
+      return "Disparando";
+    } else if (id === 6) {
+      return "Finalizado";
+    } else if (id === 7) {
+      return "Recusado";
+    } else {
+      return id;
+    }
+  }
 
     return (
         <MainContainer>
@@ -205,7 +226,7 @@ const IntegratedImport = () => {
                                 <TableCell align="center">{importation.name}</TableCell>
                                 <TableCell align="center">{importation.method}</TableCell>
                                 <TableCell align="center">{importation.qtdeRegister}</TableCell>
-                                <TableCell align="center">{importation.status}</TableCell>
+                                <TableCell align="center">{getStatusById(importation.status)}</TableCell>
                                 <TableCell align="center">
                                 <IconButton
                                     size="small"

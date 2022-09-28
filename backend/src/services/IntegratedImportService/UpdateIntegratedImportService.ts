@@ -1,6 +1,5 @@
 import IntegratedImport from "../../database/models/IntegratedImport";
 import ShowIntegratedImportService from "./ShowIntegratedImportService";
-
 interface IntegratedImportData {
     name: string;
     method: string;
@@ -10,9 +9,7 @@ interface IntegratedImportData {
     key: string;
     token: string;
     mapping: string;
-    createdAt: Date;
 }
-
 interface Request {
   importData: IntegratedImportData;
   integratedImportId: number | string;
@@ -24,7 +21,7 @@ const UpdateIntegratedImportService = async ({
 }: Request): Promise<IntegratedImport> => {
   const integratedImport = await ShowIntegratedImportService(integratedImportId);
 
-  const { name, method, qtdeRegister, status, url, key, token, mapping, createdAt} =
+  const { name, method, qtdeRegister, status, url, key, token, mapping } =
     importData;
 
   await integratedImport.update({
@@ -36,7 +33,7 @@ const UpdateIntegratedImportService = async ({
     key,
     token,
     mapping,
-    createdAt,
+
   });
 
   return integratedImport;

@@ -1,7 +1,6 @@
 import IntegratedImport from "../../database/models/IntegratedImport";
 
 interface Request {
-    id: number;
     name: string;
     method: string;
     qtdeRegister: number;
@@ -10,26 +9,21 @@ interface Request {
     key: string;
     token: string;
     mapping: string;
-    createdAt: Date;
 };
 
-const CreateProductService = async ({
-
-    id,
+const CreateIntegratedImportService = async ({
     name,
     method,
     qtdeRegister,
-    status,
+    status = 0,
     url,
     key,
     token,
     mapping,
-    createdAt,
+
 }: Request): Promise<IntegratedImport> => {
 
 const integratedImport = await IntegratedImport.create({
-
-    id,
     name,
     method,
     qtdeRegister,
@@ -38,10 +32,9 @@ const integratedImport = await IntegratedImport.create({
     key,
     token,
     mapping,
-    createdAt,
   });
 
   return integratedImport;
 };
 
-export default CreateProductService;
+export default CreateIntegratedImportService;
