@@ -125,12 +125,14 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 				formData.set("name", name);
 				formData.set("footer", footer);
       
+        let index = 0;
         for (const body of bodies) {
           if ((body.type === "audio" || body.type === "video" || body.type === "image" || body.type === "file") && (typeof body.value !== 'string')) {
-            formData.append("file", body.value, `${body.value.name}/${body.type}`);
+            formData.append("file", body.value, `${body.value.name}/${body.type}/${index}`);
           } else {
-            formData.append("bodies", JSON.stringify(body));
+            formData.append("bodies", `${JSON.stringify(body)}${index}`);
           }
+          index++;
         }
 
         if (templatesId) {
@@ -324,6 +326,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                 color="primary"
                 variant="contained"
                 fullWidth
+                style={{ margin: "5px" }}
                 onClick={handleOpenBodyModal}
                 disabled={bodies.length >= 5}
               >

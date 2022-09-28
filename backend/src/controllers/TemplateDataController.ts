@@ -46,12 +46,18 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     if (bodies) {
       if (Array.isArray(bodies)) {
         for (const body of bodies) {
-          const bodyJSON = JSON.parse(body);
-          text.push(bodyJSON)
+          const index = body.charAt(body.length - 1)
+          let bodyValue = body;
+          bodyValue = bodyValue.slice(0, -1);
+          const bodyJSON = JSON.parse(bodyValue);
+          text[index]= bodyJSON;
         }
       } else {
-        const bodyJSON = JSON.parse(bodies);
-        text.push(bodyJSON)
+        const index = bodies.charAt(bodies.length - 1)
+        let bodyValue = bodies;
+        bodyValue = bodyValue.slice(0, -1);
+        const bodyJSON = JSON.parse(bodyValue);
+        text[index] = bodyJSON;
       }
     }
 
@@ -62,18 +68,18 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         for (const file of allFiles) {
           const filePath = file.filepath;
           const buffer = await fs.readFileSync(filePath);
-          const [fileName, fileType] = file.originalFilename.split("/");
+          const [fileName, fileType, index] = file.originalFilename.split("/");
 
           const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text.push({type: fileType, value: fileLink});
+          text[index] = {type: fileType, value: fileLink};
         }
       } else {
           const filePath = allFiles.filepath;
           const buffer = await fs.readFileSync(filePath);
-          const [fileName, fileType] = allFiles.originalFilename.split("/");
+          const [fileName, fileType, index] = allFiles.originalFilename.split("/");
 
           const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text.push({type: fileType, value: fileLink});
+          text[index] = {type: fileType, value: fileLink};
       }
     }
 
@@ -122,12 +128,18 @@ export const update = async (
     if (bodies) {
       if (Array.isArray(bodies)) {
         for (const body of bodies) {
-          const bodyJSON = JSON.parse(body);
-          text.push(bodyJSON)
+          const index = body.charAt(body.length - 1)
+          let bodyValue = body;
+          bodyValue = bodyValue.slice(0, -1);
+          const bodyJSON = JSON.parse(bodyValue);
+          text[index]= bodyJSON;
         }
       } else {
-        const bodyJSON = JSON.parse(bodies);
-        text.push(bodyJSON)
+        const index = bodies.charAt(bodies.length - 1)
+        let bodyValue = bodies;
+        bodyValue = bodyValue.slice(0, -1);
+        const bodyJSON = JSON.parse(bodyValue);
+        text[index] = bodyJSON;
       }
     }
 
@@ -138,18 +150,18 @@ export const update = async (
         for (const file of allFiles) {
           const filePath = file.filepath;
           const buffer = await fs.readFileSync(filePath);
-          const [fileName, fileType] = file.originalFilename.split("/");
+          const [fileName, fileType, index] = file.originalFilename.split("/");
 
           const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text.push({type: fileType, value: fileLink});
+          text[index] = {type: fileType, value: fileLink};
         }
       } else {
           const filePath = allFiles.filepath;
           const buffer = await fs.readFileSync(filePath);
-          const [fileName, fileType] = allFiles.originalFilename.split("/");
+          const [fileName, fileType, index] = allFiles.originalFilename.split("/");
 
           const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text.push({type: fileType, value: fileLink});
+          text[index] = {type: fileType, value: fileLink};
       }
     }
 
