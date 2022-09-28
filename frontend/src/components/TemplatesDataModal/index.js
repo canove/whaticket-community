@@ -32,6 +32,8 @@ import TemplateBody from "../TemplateBody";
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ButtonWithSpinner from "../ButtonWithSpinner";
+import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -124,7 +126,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 				formData.set("footer", footer);
       
         for (const body of bodies) {
-          if ((body.type === "audio" || body.type === "video" || body.type === "image") && (typeof body.value !== 'string')) {
+          if ((body.type === "audio" || body.type === "video" || body.type === "image" || body.type === "file") && (typeof body.value !== 'string')) {
             formData.append("file", body.value, `${body.value.name}/${body.type}`);
           } else {
             formData.append("bodies", JSON.stringify(body));
@@ -189,6 +191,54 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
       setBodies(array);
     }
 
+    const Body = (props) => {
+      const { body } = props;
+
+      const value = body.value;
+
+      if (body.type === "text") {
+        return <TableCell align="center">{value}</TableCell>;
+      }
+
+      if (body.type === "contact") {
+        return <TableCell align="center">{value}</TableCell>;
+      }
+
+      if (body.type === "image") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">${value.name}</TableCell>;
+        } else {
+          return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} /></TableCell>
+        }
+      }
+
+      if (body.type === "video") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">${value.name}</TableCell>;
+        } else {
+          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a></TableCell>;
+        }
+      }
+
+      if (body.type === "audio") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">{value.name}</TableCell>;
+        } else {
+          return <TableCell align="center"><audio controls><source src={value} type="audio/ogg"></source></audio></TableCell>;
+        }
+      }
+
+      if (body.type === "file") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">{value.name}</TableCell>
+        } else {
+          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a></TableCell>;
+        }
+      }
+
+      return "";
+    }
+
   return (
     <div className={classes.root}>
       <TemplateBody
@@ -244,12 +294,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                         return (
                           <TableRow key={index}>
                             <TableCell align="center">{body.type}</TableCell>
-                            { (body.type === "text" || body.type === "contact") &&
-                              <TableCell align="center">{body.value}</TableCell>
-                            }
-                            { (body.type === "audio" || body.type === "video" || body.type === "image") &&
-                              <TableCell align="center">{body.value.name || body.value}</TableCell>
-                            }
+                              <Body body={body} />
                             <TableCell align="center">
                               <IconButton
                                 size="small"
@@ -273,16 +318,19 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
               </TableContainer>
             </Paper>
           }
-          <div className={classes.root}>
-            <Button
-              color="primary"
-              variant="contained"
-              fullWidth
-              onClick={handleOpenBodyModal}
-            >
-              Adicionar Body
-            </Button>
-          </div>
+          {!(bodies.length >= 5) && 
+            <div className={classes.root}>
+              <Button
+                color="primary"
+                variant="contained"
+                fullWidth
+                onClick={handleOpenBodyModal}
+                disabled={bodies.length >= 5}
+              >
+                Adicionar Body
+              </Button>
+            </div>
+          }
           <div className={classes.root}>
 						<FormControl
 							variant="outlined"
