@@ -20,6 +20,8 @@ import MenuCompanies from "./models/MenuCompanies";
 import Templates from "./models/TemplatesData";
 import Products from "./models/Products";
 import Pricing from "./models/Pricing";
+import IntegratedImport from "./models/IntegratedImport";
+
 import Historic from "./models/Historic";
 import BillingControls from "./models/BillingControls";
 // eslint-disable-next-line
@@ -50,6 +52,7 @@ const models = [
   Templates,
   Products,
   Pricing,
+  IntegratedImport,,
   Historic,
   BillingControls
 ];

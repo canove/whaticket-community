@@ -342,6 +342,8 @@ const messages = {
           whatsNoOff: "WhatsApp 2",
           company: "Empresas",
           menus: "Menus",
+          fileImport: "Importação Arquivo",
+          integratedImport:"Importação Integrada",
         },
         whatsApp: {
           connections: "Conexões",
@@ -399,7 +401,7 @@ const messages = {
         },
       },
       importation: {
-        title: "Importação",
+        title: "Importação Arquivo",
         form: {
           status: "Status",
           date: "Data",
