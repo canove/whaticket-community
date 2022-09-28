@@ -25,6 +25,8 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { parseISO, format } from "date-fns";
 import SystemChangeModal from "../../components/SystemChangeModal";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { toast } from "react-toastify";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRICINGS") {
@@ -88,6 +90,8 @@ const Pricing = () => {
     const [pricingModalOpen, setPricingModalOpen] = useState(false);
     const [selectedHistoric, setSelectedHistoric] = useState(null);
     const [historicModalOpen, setHistoricModalOpen] = useState(false);
+    const [deletingPricing, setDeletingPricing] = useState(null);
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -176,6 +180,16 @@ const Pricing = () => {
         setHistoricModalOpen(false);
     };
 
+    const handleDeletePricing = async (deletingId) => {
+        try {
+            await api.delete(`/pricings/${deletingId}`);
+            toast.success("Precificação Excluida com Sucesso!");
+        } catch (err) {
+            toastError(err);
+        }
+        setDeletingPricing(null);
+  };
+
     return (
         <MainContainer>
             <PricingModal
@@ -191,6 +205,14 @@ const Pricing = () => {
                 registerId={selectedHistoric && selectedHistoric.id}
                 systemChange={1}
             />
+            <ConfirmationModal
+                title={deletingPricing && 'Deletar Precificação'}
+                open={confirmModalOpen}
+                onClose={setConfirmModalOpen}
+                onConfirm={() => handleDeletePricing(deletingPricing.id)}
+            >
+                Você realmente deseja excluir está precifição?
+            </ConfirmationModal>
             <MainHeader>
                 <Title>Precificação</Title>
                 <MainHeaderButtonsWrapper>
@@ -215,6 +237,7 @@ const Pricing = () => {
                             <TableCell align="center">Status</TableCell>
                             <TableCell align="center">Periodo de Carência (dias)</TableCell>
                             <TableCell align="center">Carência de Disparos</TableCell>
+                            <TableCell align="center">Valor Estimado</TableCell>
                             <TableCell align="center">Valor a Pagar</TableCell>
                             <TableCell align="center">Valor Pago</TableCell>
                             <TableCell align="center">Cliente Desde De</TableCell>
@@ -230,6 +253,7 @@ const Pricing = () => {
                                     <TableCell align="center">{formatStatus(pricing.company.status)}</TableCell>
                                     <TableCell align="center">{pricing.gracePeriod}</TableCell>
                                     <TableCell align="center">{pricing.graceTrigger}</TableCell>
+                                    <TableCell align="center">Valor Estimado</TableCell>
                                     <TableCell align="center">Valor a Pagar</TableCell>
                                     <TableCell align="center">Valor Pago</TableCell>
                                     <TableCell align="center">{formatDate(pricing.createdAt)}</TableCell>
@@ -248,6 +272,10 @@ const Pricing = () => {
                                         </IconButton>
                                         <IconButton
                                             size="small"
+                                            onClick={() => {
+                                                setDeletingPricing(pricing);
+                                                setConfirmModalOpen(true);
+                                            }}
                                         >
                                             <DeleteOutlineIcon />
                                         </IconButton>

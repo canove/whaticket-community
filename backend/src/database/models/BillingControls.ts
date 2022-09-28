@@ -6,47 +6,35 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  ForeignKey,
-  BelongsTo
+  ForeignKey
 } from "sequelize-typescript";
 import Company from "./Company";
-import Product from "./Products";
 
 @Table
-class Pricing extends Model<Pricing> {
+class BillingControls extends Model<BillingControls> {
   @PrimaryKey
   @AutoIncrement
   @Column
   id: number;
 
-  @Column
-  gracePeriod: number;
-
-  @Column
-  graceTrigger: number;
-
   @ForeignKey(() => Company)
   @Column
   companyId: number;
 
-  @ForeignKey(() => Product)
   @Column
-  productId: number;
+  quantity: number;
 
   @Column
-  deletedAt: Date;
+  registerId: number;
+
+  @Column
+  triggerFee: number;
 
   @CreatedAt
   createdAt: Date;
 
   @UpdatedAt
   updatedAt: Date;
-
-  @BelongsTo(() => Company)
-  company: Company;
-
-  @BelongsTo(() => Product)
-  product: Product;
 }
 
-export default Pricing;
+export default BillingControls;
