@@ -89,7 +89,7 @@ const reducer = (state, action) => {
   }
 };
 
-const Importation = () => {
+const FileImport = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
 
@@ -374,4 +374,4 @@ const Importation = () => {
   );
 }
 
-export default Importation;
+export default FileImport;

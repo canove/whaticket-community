@@ -37,6 +37,8 @@ import ApartmentIcon from '@material-ui/icons/Apartment';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import MenuIcon from '@material-ui/icons/Menu';
 import BallotIcon from '@material-ui/icons/Ballot';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import LanguageIcon from '@material-ui/icons/Language';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,41 +61,65 @@ const useStyles = makeStyles((theme) => ({
 function getIcon(icon) {
     if (icon === "DashboardOutlinedIcon") {
         return <DashboardOutlinedIcon />;
-    } else if (icon === "WhatsAppIcon") {
+    }
+    else if (icon === "WhatsAppIcon") {
         return <WhatsAppIcon />;
-    } else if (icon === "SyncAltIcon") {
+    }
+    else if (icon === "SyncAltIcon") {
         return <SyncAltIcon />;
-    } else if (icon === "SettingsOutlinedIcon") {
+    }
+    else if (icon === "SettingsOutlinedIcon") {
         return <SettingsOutlinedIcon />;
-    } else if (icon === "DvrIcon") {
+    }
+    else if (icon === "DvrIcon") {
         return <DvrIcon />;
-    } else if (icon === "ChatIcon") {
+    }
+    else if (icon === "ChatIcon") {
         return <ChatIcon />;
-    } else if (icon === "ContactPhoneOutlinedIcon") {
+    }
+    else if (icon === "ContactPhoneOutlinedIcon") {
         return <ContactPhoneOutlinedIcon />;
-    } else if (icon === "QuestionAnswerOutlinedIcon") {
+    }
+    else if (icon === "QuestionAnswerOutlinedIcon") {
         return <QuestionAnswerOutlinedIcon />;
-    } else if (icon === "ImportExportOutlinedIcon") {
+    }
+    else if (icon === "ImportExportOutlinedIcon") {
         return <ImportExportOutlinedIcon />;
-    } else if (icon === "AccountCircleIcon") {
+    }
+    else if (icon === "AccountCircleIcon") {
         return <AccountCircleIcon />;
-    } else if (icon === "PeopleAltOutlinedIcon") {
+    }
+    else if (icon === "PeopleAltOutlinedIcon") {
         return <PeopleAltOutlinedIcon />;
-    } else if (icon === "AccountTreeOutlinedIcon") {
+    }
+    else if (icon === "AccountTreeOutlinedIcon") {
         return <AccountTreeOutlinedIcon />;
-    } else if (icon === "EqualizerIcon") {
+    }
+    else if (icon === "EqualizerIcon") {
         return <EqualizerIcon />;
-    } else if (icon === "AssessmentOutlinedIcon") {
+    }
+    else if (icon === "AssessmentOutlinedIcon") {
         return <AssessmentOutlinedIcon />
-    } else if (icon === "ApartmentIcon") {
+    }
+    else if (icon === "ApartmentIcon") {
         return <ApartmentIcon />;
-    } else if (icon === "ListAltIcon") {
+    }
+    else if (icon === "ListAltIcon") {
         return <ListAltIcon />
-    } else if (icon === "MenuIcon") {
+    }
+    else if (icon === "MenuIcon") {
         return <MenuIcon />
-    } else if (icon === "BallotIcon") {
+    }
+    else if (icon === "BallotIcon") {
         return <BallotIcon />
-    } else {
+    }
+    else if (icon === "ArchiveIcon") {
+        return <ArchiveIcon/>
+    }
+    else if (icon === "LanguageIcon") {
+        return<LanguageIcon/>
+    }
+    else {
         return null;
     }
 }
@@ -114,6 +140,9 @@ const icons = [
     "ListAltIcon",
     "MenuIcon",
     "BallotIcon",
+    "ArchiveIcon",
+    "LanguageIcon",
+
 ]
 
 const RegistrationModal = ({ open, onClose, registrationId }) => {
