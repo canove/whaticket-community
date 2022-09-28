@@ -21,6 +21,7 @@ import {
   IconButton,
   TextField,
   InputAdornment,
+  Typography,
 } from "@material-ui/core";
 import TemplatesDataModal from "../../components/TemplatesDataModal";
 import { DeleteOutline } from "@material-ui/icons";
@@ -32,6 +33,8 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import SearchIcon from "@material-ui/icons/Search";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_TEMPLATES") {
@@ -201,6 +204,50 @@ const TemplatesData = () => {
     setPageNumber(1);
   };
 
+  const Body = (props) => {
+    const { bodiesString } = props;
+    const bodies = JSON.parse(bodiesString);
+
+    let response = [];
+    let index = 0;
+
+    for (const body of bodies) {
+      let value = body.value;
+
+      if (body.type === "text") {
+        response.push(<Typography key={index}>{value}</Typography>)
+      }
+
+      if (body.type === "contact") {
+        response.push(<Typography key={index}>{value}</Typography>)
+      }
+
+      if (body.type === "image") {
+        response.push(<img key={index} style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} />)
+      }
+
+      if (body.type === "video") {
+        response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a>)
+      }
+
+      if (body.type === "audio") {
+        response.push(<audio key={index} controls><source src={value} type="audio/ogg"></source></audio>)
+      }
+
+      if (body.type === "file") {
+          response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a>);
+      }
+
+      index++;
+    }
+
+    return (
+      <>
+        { response && response.map(res => res) }
+      </>
+    );
+  }
+
   return (
     <MainContainer>
       <TemplatesDataModal
@@ -268,7 +315,7 @@ const TemplatesData = () => {
               {templates && templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
-                    <TableCell align="center">{template.text}</TableCell>
+                    <TableCell align="center"><Body bodiesString={template.text} /></TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">
                       {format(parseISO(template.createdAt), "dd/MM/yy HH:mm")}
