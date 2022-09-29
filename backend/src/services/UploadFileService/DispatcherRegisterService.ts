@@ -5,6 +5,7 @@ import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import { FileStatus } from "../../enum/FileStatus";
 import Templates from "../../database/models/TemplatesData";
+import { preparePhoneNumber } from "../../utils/common";
 
 /* eslint-disable */
 const DispatcherRegisterService = async ({ file }): Promise<void> => {
@@ -117,44 +118,70 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
           if(!lastSend || now > lastSend && registers.length > 0){
             
-
+            //tratar numero de telefone
             for (const reg of registers){
-              let phoneNumber = reg.phoneNumber;
-              if (phoneNumber.length > 12) {
-                if (phoneNumber.length > 12){
-                  let firstNumber = phoneNumber.substring(6,5);
-                  if(firstNumber == "9" || firstNumber == "8") {
-                    phoneNumber = `${phoneNumber.substring(4, 0)}${phoneNumber.substring(phoneNumber.length, 5)}`;
-                  }
-                }
-          
-              }
-
+              let phoneNumber = preparePhoneNumber(reg.phoneNumber);
               let messageTxt = reg.message;
-
+              let contactName ='';
               if(template) {
-                messageTxt = template.text
-                .replace("{{name}}", reg.name)
-                .replace("{{documentNumber}}", reg.documentNumber)
-                .replace("{{phoneNumber}}", reg.phoneNumber);
+                const messagesTemplate = JSON.parse(template.text);
+                
+                for(const temp of messagesTemplate) {
+                  switch(temp['type']) {
+                    case 'contact':
+                      messageTxt = preparePhoneNumber(temp['value']);
+                      contactName = temp['name'];
+                      break;
+                    case 'text':
+                      messageTxt = temp['value']
+                      .replace("{{name}}", reg.name)
+                      .replace("{{documentNumber}}", reg.documentNumber)
+                      .replace("{{phoneNumber}}", reg.phoneNumber);
+                      break;
+
+                      default:
+                         messageTxt = temp['value'];
+                  }
+
+                  payload.push({
+                    company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
+                    person: reg.documentNumber,
+                    activationMessage: {
+                      session: account.name,
+                      msgid: reg.id,
+                      channel: "wpp_no",
+                      type: temp['type'],
+                      template: "",
+                      to: {
+                        identifier: phoneNumber,
+                        name: reg.name
+                      },
+                      path: contactName != ''? contactName: messageTxt,
+                      text: messageTxt,
+                      parameters: []
+                    }
+                  });
+                }
+              } else { 
+                payload.push({
+                  company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
+                  person: reg.documentNumber,
+                  activationMessage: {
+                    session: account.name,
+                    msgid: reg.id,
+                    channel: "wpp_no",
+                    type: '',
+                    template: "",
+                    to: {
+                      identifier: phoneNumber,
+                      name: reg.name
+                    },
+                    text: messageTxt,
+                    parameters: []
+                  }
+                });
               }
               processedRegister.push(reg);
-              payload.push({
-                company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
-                person: reg.documentNumber,
-                activationMessage: {
-                  session: account.name,
-                  msgid: reg.id,
-                  channel: "wpp_no",
-                  template: "",
-                  to: {
-                    identifier: phoneNumber,
-                    name: reg.name
-                  },
-                  text: messageTxt,
-                  parameters: []
-                }
-              });
 
               await reg.update({ processedAt: new Date(), whatsappId: account.id });
             }

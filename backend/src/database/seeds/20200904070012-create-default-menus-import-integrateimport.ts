@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { QueryInterface } from "sequelize";
 
 module.exports = {
