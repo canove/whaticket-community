@@ -21,6 +21,7 @@ import TemplatesData from "../pages/TemplatesData";
 import Registration from "../pages/Registration";
 import Products from "../pages/Products";
 import Pricing from "../pages/Pricing";
+import Payments from "../pages/Payments";
 
 import { AuthContext } from "../context/Auth/AuthContext";
 import toastError from "../errors/toastError";
@@ -106,6 +107,9 @@ const RenderRoutes = () => {
         }
         if (name === "Pricing") {
             return Pricing
+        }
+        if (name === "Payments") {
+            return Payments
         }
     }
 

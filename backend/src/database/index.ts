@@ -22,6 +22,7 @@ import Products from "./models/Products";
 import Pricing from "./models/Pricing";
 import Historic from "./models/Historic";
 import BillingControls from "./models/BillingControls";
+import Billings from "./models/Billings";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -51,7 +52,8 @@ const models = [
   Products,
   Pricing,
   Historic,
-  BillingControls
+  BillingControls,
+  Billings
 ];
 
 sequelize.addModels(models);

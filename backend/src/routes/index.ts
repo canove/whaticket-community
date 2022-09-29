@@ -26,6 +26,7 @@ import templateDataRoutes from "./templateDataRoutes";
 import productRoutes from "./productRoutes";
 import pricingRoutes from "./pricingRoutes";
 import historicRoutes from "./historicRoutes";
+import billingsRoutes from "./billingsRoutes";
 
 const routes = Router();
 
@@ -55,5 +56,6 @@ routes.use(templateDataRoutes);
 routes.use(productRoutes);
 routes.use(pricingRoutes);
 routes.use(historicRoutes);
+routes.use(billingsRoutes);
 
 export default routes;
