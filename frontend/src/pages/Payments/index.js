@@ -27,6 +27,7 @@ import { parseISO, format, getMonth } from "date-fns";
 import SystemChangeModal from "../../components/SystemChangeModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
+import BillingHistoricModal from "../../components/BillingHistoricModal";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_BILLINGS") {
@@ -65,6 +66,8 @@ const Payments = () => {
 
     const [loading, setLoading] = useState(false);
     const [billings, dispatch] = useReducer(reducer, []);
+    const [billingHistoricModalOpen, setBillingHistoricModalOpen] = useState(false);
+    const [selectedBillingHistoric, setSelectedBillingHistoric] = useState(null);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -99,8 +102,24 @@ const Payments = () => {
         return meses[month-1];
     } 
 
+    const handleOpenBillingHistoricModal = (billing) => {
+        setSelectedBillingHistoric(billing);
+        setBillingHistoricModalOpen(true);
+    };
+
+    const handleCloseBillingHistoricModal = () => {
+        setSelectedBillingHistoric(null);
+        setBillingHistoricModalOpen(false);
+    };
+
     return (
         <MainContainer>
+            <BillingHistoricModal
+                open={billingHistoricModalOpen}
+                onClose={handleCloseBillingHistoricModal}
+                aria-labelledby="form-dialog-title"
+                billingId={selectedBillingHistoric && selectedBillingHistoric.id}
+            />
             <MainHeader>
                 <Title>Pagamentos</Title>
             </MainHeader>
@@ -118,6 +137,7 @@ const Payments = () => {
                             <TableCell align="center">Valor da Mensalidade</TableCell>
                             <TableCell align="center">Valor Total</TableCell>
                             <TableCell align="center">Valor Pago</TableCell>
+                            <TableCell align="center">Ações</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -131,6 +151,14 @@ const Payments = () => {
                                     <TableCell align="center">{formatToBRL(billing.totalMonthValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalValue)}</TableCell>
                                     <TableCell align="center">Valor Pago</TableCell>
+                                    <TableCell align="center">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleOpenBillingHistoricModal(billing)}
+                                        >
+                                            <HistoryIcon />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
                             )
                         })}
