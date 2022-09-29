@@ -66,6 +66,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 
     const [type, setType] = useState("");
     const [text, setText] = useState("");
+    const [contactName, setContactName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [audio, setAudio] = useState("");
     const [video, setVideo] = useState("");
@@ -136,7 +137,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         if (type === "contact") {
             const bodyData = {
                 type,
-                value: phoneNumber
+                value: phoneNumber,
+                name: contactName
             }
 
             handleBodiesChange(bodyData, index);
@@ -189,8 +191,28 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setText(e.target.value);
     }
 
+    const handleContactNameChange = (e) => {
+        setContactName(e.target.value);
+    }
+
     const handlePhoneNumberChange = (value) => {
         setPhoneNumber(value);
+    }
+
+    const handleAudioChange = (e) => {
+		setAudio(e.target.files[0]);
+    }
+
+    const handleVideoChange = (e) => {
+		setVideo(e.target.files[0]);
+    }
+
+    const handleImageChange = (e) => {
+		setImage(e.target.files[0]);
+    }
+
+    const handleFileChange = (e) => {
+		setFile(e.target.files[0]);
     }
 
     const handleParams = () => {
@@ -215,22 +237,6 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setParam("");
         setOpenParamModal(false);
     };
-
-    const handleAudioChange = (e) => {
-		setAudio(e.target.files[0]);
-    }
-
-    const handleVideoChange = (e) => {
-		setVideo(e.target.files[0]);
-    }
-
-    const handleImageChange = (e) => {
-		setImage(e.target.files[0]);
-    }
-
-    const handleFileChange = (e) => {
-		setFile(e.target.files[0]);
-    }
 
     useEffect(() => {
         const testParams = () => {
@@ -334,18 +340,18 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                     { type === "text" &&
                         <div className={classes.root}>
                             <FormControl
-							variant="outlined"
-							margin="dense"
-							fullWidth
-						>
-							<TextField
-								label="Texto"
-								variant="outlined"
-								value={text}
-								onChange={handleTextChange}
-								fullWidth
-							/>
-						</FormControl>
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+						    >
+                                <TextField
+                                    label="Texto"
+                                    variant="outlined"
+                                    value={text}
+                                    onChange={handleTextChange}
+                                    fullWidth
+                                />
+						    </FormControl>
                         </div>
                     }
                     { type === "contact" &&
@@ -366,6 +372,19 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 						//     </FormControl>
                         // </div>
                         <div className={classes.root}>
+                            <FormControl
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+						    >
+                                <TextField
+                                    label="Nome do Contato"
+                                    variant="outlined"
+                                    value={contactName}
+                                    onChange={handleContactNameChange}
+                                    fullWidth
+                                />
+						    </FormControl>
                             <FormControl
                                 variant="outlined"
                                 margin="dense"
