@@ -30,6 +30,7 @@
     "react-i18next": "^11.18.3",
     "react-icons": "^4.4.0",
     "react-modal-image": "^2.5.0",
+    "react-phone-number-input": "^3.2.11",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.3.1",
     "react-toastify": "^6.0.9",

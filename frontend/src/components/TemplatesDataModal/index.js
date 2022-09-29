@@ -203,7 +203,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
       }
 
       if (body.type === "contact") {
-        return <TableCell align="center">{value}</TableCell>;
+        return <TableCell align="center">{body.name}:{value}</TableCell>;
       }
 
       if (body.type === "image") {
