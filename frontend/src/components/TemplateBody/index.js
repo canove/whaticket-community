@@ -18,6 +18,9 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 
+import 'react-phone-number-input/style.css'
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input/input'
+
 import ConfirmationModal from "../../components/ConfirmationModal";
 
 import api from "../../services/api";
@@ -186,8 +189,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setText(e.target.value);
     }
 
-    const handlePhoneNumberChange = (e) => {
-        setPhoneNumber(e.target.value);
+    const handlePhoneNumberChange = (value) => {
+        setPhoneNumber(value);
     }
 
     const handleParams = () => {
@@ -346,21 +349,36 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                         </div>
                     }
                     { type === "contact" &&
+                        // <div className={classes.root}>
+                        //     <FormControl
+						// 	variant="outlined"
+						// 	margin="dense"
+						// 	fullWidth
+						//     >
+                        //         <TextField
+                        //             label="Número de Telefone"
+                        //             placeholder="(00) 0000-0000"
+                        //             variant="outlined"
+                        //             value={phoneNumber}
+                        //             onChange={handlePhoneNumberChange}
+                        //             fullWidth
+                        //         />
+						//     </FormControl>
+                        // </div>
                         <div className={classes.root}>
                             <FormControl
-							variant="outlined"
-							margin="dense"
-							fullWidth
-						>
-							<TextField
-								label="Número de Telefone"
-                                placeholder="(00) 0000-0000"
-								variant="outlined"
-								value={phoneNumber}
-								onChange={handlePhoneNumberChange}
-								fullWidth
-							/>
-						</FormControl>
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+                            >
+                                <PhoneInput
+                                    style={{ width:"100%", padding:"10px", fontSize:"16px" }}
+                                    country="BR"
+                                    placeholder="(00) 0000-0000"
+                                    value={phoneNumber}
+                                    onChange={handlePhoneNumberChange}
+                                />
+                            </FormControl>
                         </div>
                     }
                     { type === "audio" &&

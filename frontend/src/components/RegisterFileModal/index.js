@@ -13,12 +13,14 @@ import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
-import { Table, TableRow } from "@material-ui/core";
+import { Table, TableRow, Typography } from "@material-ui/core";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableContainer from "@material-ui/core/TableContainer";
 import toastError from "../../errors/toastError";
+import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -180,6 +182,67 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
     setPageNumber(pageNumber - 1);
   }
 
+  const Body = (props) => {
+    const { bodiesString } = props;
+    const bodies = JSON.parse(bodiesString);
+
+    let response = [];
+    let index = 0;
+
+    for (const body of bodies) {
+      let value = body.value;
+
+      if (body.type === "text") {
+        response.push(<Typography key={index}>{value}</Typography>)
+      }
+
+      if (body.type === "contact") {
+        response.push(<Typography key={index}>{value}</Typography>)
+      }
+
+      if (body.type === "image") {
+        response.push(<img key={index} style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} />)
+      }
+
+      if (body.type === "video") {
+        response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a>)
+      }
+
+      if (body.type === "audio") {
+        response.push(<audio key={index} controls><source src={value} type="audio/ogg"></source></audio>)
+      }
+
+      if (body.type === "file") {
+          response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a>);
+      }
+
+      index++;
+    }
+
+    return (
+      <>
+        { response && response.map(res => res) }
+      </>
+    );
+  }
+
+  const isJsonString = (str) => {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
+  const getMessage = (message) => {
+    if (isJsonString(message)) {
+      return <Body bodiesString={message} />;
+    }
+
+    return message;
+  }
+
   return (
     <div className={classes.root}>
       <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
@@ -205,7 +268,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
                             <TableCell align="center">{item.id}</TableCell>
                             <TableCell align="center">{item.name}</TableCell>
                             <TableCell align="center">{item.template}</TableCell>
-                            <TableCell align="center">{item.message}</TableCell>
+                            <TableCell align="center">{getMessage(item.message)}</TableCell>
                             <TableCell align="center">{item.phoneNumber}</TableCell>
                             <TableCell align="center">{item.documentNumber}</TableCell>
                           </TableRow>
