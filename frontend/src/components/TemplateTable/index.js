@@ -74,7 +74,7 @@ const TemplateTable = ({ body }) => {
 
     useEffect(() => {
         setBodyObject(JSON.parse(body))
-    }, [])
+    }, [body])
 
     const Body = ({ body }) => {  
         const value = body.value;

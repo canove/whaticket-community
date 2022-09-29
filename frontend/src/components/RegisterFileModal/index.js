@@ -21,6 +21,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import toastError from "../../errors/toastError";
 import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
 import DescriptionIcon from '@material-ui/icons/Description';
+import TemplateTable from "../TemplateTable";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -237,7 +238,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
 
   const getMessage = (message) => {
     if (isJsonString(message)) {
-      return <Body bodiesString={message} />;
+      return <TemplateTable body={message} />
     }
 
     return message;

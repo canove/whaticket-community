@@ -88,7 +88,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             }
 
             if (body.type === "contact") {
-                setPhoneNumber(body.value)
+                setPhoneNumber(body.value);
+                setContactName(body.name);
             }
 
             if (body.type === "audio") {
@@ -113,6 +114,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 		onClose();
         setType("");
         setText("");
+        setContactName("");
         setPhoneNumber("");
         setFile(null);
         setAudio(null);

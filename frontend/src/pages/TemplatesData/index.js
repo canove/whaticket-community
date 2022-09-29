@@ -43,7 +43,7 @@ const reducer = (state, action) => {
     const newTemplates = [];
 
     templates.forEach((template) => {
-      const templateIndex = state.findIndex((u) => u.id === template.id);
+      const templateIndex = state.findIndex((t) => t.id === template.id);
       if (templateIndex !== -1) {
         state[templateIndex] = template;
       } else {
@@ -56,7 +56,7 @@ const reducer = (state, action) => {
 
   if (action.type === "UPDATE_TEMPLATES") {
     const template = action.payload;
-    const templateIndex = state.findIndex((u) => u.id === template.id);
+    const templateIndex = state.findIndex((t) => t.id === template.id);
 
     if (templateIndex !== -1) {
       state[templateIndex] = template;
@@ -69,7 +69,7 @@ const reducer = (state, action) => {
   if (action.type === "DELETE_TEMPLATE") {
     const templatesId = action.payload;
 
-    const templateIndex = state.findIndex((u) => u.id === templatesId);
+    const templateIndex = state.findIndex((t) => t.id === templatesId);
     if (templateIndex !== -1) {
       state.splice(templateIndex, 1);
     }
