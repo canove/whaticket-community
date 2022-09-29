@@ -94,11 +94,9 @@ const Payments = () => {
         const meses = [ 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         let month = format(parseISO(date), "MM");
 
-        if (month !== "10") {
-            month = month.replace("0", "");
-        }
+        month = parseInt(month)
 
-        return meses[month];
+        return meses[month-1];
     } 
 
     return (
