@@ -35,6 +35,7 @@ import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
 import DescriptionIcon from '@material-ui/icons/Description';
+import TemplateTable from "../../components/TemplateTable";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_TEMPLATES") {
@@ -42,7 +43,7 @@ const reducer = (state, action) => {
     const newTemplates = [];
 
     templates.forEach((template) => {
-      const templateIndex = state.findIndex((u) => u.id === template.id);
+      const templateIndex = state.findIndex((t) => t.id === template.id);
       if (templateIndex !== -1) {
         state[templateIndex] = template;
       } else {
@@ -55,7 +56,7 @@ const reducer = (state, action) => {
 
   if (action.type === "UPDATE_TEMPLATES") {
     const template = action.payload;
-    const templateIndex = state.findIndex((u) => u.id === template.id);
+    const templateIndex = state.findIndex((t) => t.id === template.id);
 
     if (templateIndex !== -1) {
       state[templateIndex] = template;
@@ -68,7 +69,7 @@ const reducer = (state, action) => {
   if (action.type === "DELETE_TEMPLATE") {
     const templatesId = action.payload;
 
-    const templateIndex = state.findIndex((u) => u.id === templatesId);
+    const templateIndex = state.findIndex((t) => t.id === templatesId);
     if (templateIndex !== -1) {
       state.splice(templateIndex, 1);
     }
@@ -204,50 +205,6 @@ const TemplatesData = () => {
     setPageNumber(1);
   };
 
-  const Body = (props) => {
-    const { bodiesString } = props;
-    const bodies = JSON.parse(bodiesString);
-
-    let response = [];
-    let index = 0;
-
-    for (const body of bodies) {
-      let value = body.value;
-
-      if (body.type === "text") {
-        response.push(<Typography key={index}>{value}</Typography>)
-      }
-
-      if (body.type === "contact") {
-        response.push(<Typography key={index}>{value}</Typography>)
-      }
-
-      if (body.type === "image") {
-        response.push(<img key={index} style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} />)
-      }
-
-      if (body.type === "video") {
-        response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a>)
-      }
-
-      if (body.type === "audio") {
-        response.push(<audio key={index} controls><source src={value} type="audio/ogg"></source></audio>)
-      }
-
-      if (body.type === "file") {
-          response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a>);
-      }
-
-      index++;
-    }
-
-    return (
-      <>
-        { response && response.map(res => res) }
-      </>
-    );
-  }
-
   return (
     <MainContainer>
       <TemplatesDataModal
@@ -315,7 +272,9 @@ const TemplatesData = () => {
               {templates && templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
-                    <TableCell align="center"><Body bodiesString={template.text} /></TableCell>
+                    <TableCell align="center">
+                      <TemplateTable body={template.text} />
+                    </TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">
                       {format(parseISO(template.createdAt), "dd/MM/yy HH:mm")}
