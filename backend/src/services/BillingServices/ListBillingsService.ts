@@ -4,8 +4,8 @@ import Company from "../../database/models/Company";
 const ListBillingsService = async (): Promise<Billing[]> => {
   const billings = await Billing.findAll({
     include: [
-      { model: Company, as: "company", attributes: ["name"], required: true }
-    ],
+      { model: Company, as: "company", attributes: ["name"], required: true },
+    ]
   });
 
   return billings;

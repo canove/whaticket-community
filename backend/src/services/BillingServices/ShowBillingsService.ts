@@ -1,13 +1,11 @@
-import BillingControls from "../../database/models/BillingControls";
+import Billings from "../../database/models/Billings";
 
-const ListBillingsService = async (
+const ShowBillingsService = async (
   billingId: number | string
-): Promise<BillingControls[]> => {
-  const billings = await BillingControls.findAll({
-    where: { billingId }
-  });
+): Promise<Billings> => {
+  const billing = await Billings.findByPk(billingId);
 
-  return billings;
+  return billing;
 };
 
-export default ListBillingsService;
+export default ShowBillingsService;

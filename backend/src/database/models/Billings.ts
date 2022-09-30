@@ -9,6 +9,7 @@ import {
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
+import BillingControls from "./BillingControls";
 import Company from "./Company";
 
 @Table

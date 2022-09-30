@@ -35,6 +35,9 @@ class BillingControls extends Model<BillingControls> {
   @Column
   processedAt: Date;
 
+  @Column
+  usedGraceTriggers: number;
+
   @CreatedAt
   createdAt: Date;
 

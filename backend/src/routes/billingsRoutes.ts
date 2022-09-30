@@ -7,10 +7,12 @@ const billingsRoutes = Router();
 
 billingsRoutes.get("/billings/", isAuth, BillingsController.index);
 
+billingsRoutes.get("/billings/:billingId", isAuth, BillingsController.show);
+
 billingsRoutes.get(
   "/billingControls/:billingId",
   isAuth,
-  BillingsController.show
+  BillingsController.historic
 );
 
 export default billingsRoutes;
