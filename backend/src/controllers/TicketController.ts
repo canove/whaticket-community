@@ -10,6 +10,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import formatBody from "../helpers/Mustache";
 import HistoricService from "../services/TicketServices/HistoricService";
+import ResolveService from "../services/TicketServices/HistoricService";
 
 type IndexQuery = {
   searchParam: string;
@@ -26,6 +27,7 @@ interface TicketData {
   status: string;
   queueId: number;
   userId: number;
+  categoryId: number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -99,6 +101,14 @@ export const historic = async (req: Request, res: Response): Promise<Response> =
   return res.status(200).json(contact);
 };
 
+export const resolve = async (req: Request, res: Response): Promise<Response> => {
+  const { categoryId } = req.params;
+
+  const category = await ResolveService(categoryId);
+
+  return res.status(200).json(category);
+};
+
 export const update = async (
   req: Request,
   res: Response
@@ -109,7 +119,7 @@ export const update = async (
 
   const { ticket } = await UpdateTicketService({
     ticketData,
-    ticketId
+    ticketId,
   });
 
   if (ticket.status === "closed") {

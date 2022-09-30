@@ -169,7 +169,7 @@ const Dashboard = () => {
               className={classes.customFixedHeightPaper}
             >
               <Typography style={{display:"inlineBlock"}}  component="h3" variant="h6" color="primary" paragraph>
-                Arquivo
+                {i18n.t("dashboard.file")}
               </Typography>
               <Autocomplete
                   onChange={(e, newValue) => handleSelectOption(e, newValue)}
@@ -191,7 +191,7 @@ const Dashboard = () => {
               className={classes.customFixedHeightPaper}
             >
               <Typography style={{display:"inlineBlock"}} component="h3" variant="h6" color="primary" paragraph>
-                Data
+                {i18n.t("dashboard.date")}
               </Typography>
               <TextField
                 className={classes.selectStyle}

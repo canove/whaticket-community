@@ -25,7 +25,7 @@ const FindOrCreateTicketService = async (
 
   if (ticket) {
     await ticket.update({ unreadMessages });
-    if (ticket.status === "dispatcher") {
+    if (ticket.status === "dispatcher" && !isDispatcher) {
       await ticket.update({ status: "pending" });
     }
   }
@@ -41,7 +41,7 @@ const FindOrCreateTicketService = async (
 
     if (ticket) {
       await ticket.update({
-        status: "pending",
+        status: isDispatcher === true ? "dispatcher" : "pending",
         userId: null,
         unreadMessages
       });
@@ -63,7 +63,7 @@ const FindOrCreateTicketService = async (
 
     if (ticket) {
       await ticket.update({
-        status: "pending",
+        status: isDispatcher === true ? "dispatcher" : "pending",
         userId: null,
         unreadMessages
       });

@@ -21,6 +21,7 @@ import {
   IconButton,
   TextField,
   InputAdornment,
+  Typography,
 } from "@material-ui/core";
 import TemplatesDataModal from "../../components/TemplatesDataModal";
 import { DeleteOutline } from "@material-ui/icons";
@@ -32,6 +33,9 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import SearchIcon from "@material-ui/icons/Search";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
+import DescriptionIcon from '@material-ui/icons/Description';
+import TemplateTable from "../../components/TemplateTable";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_TEMPLATES") {
@@ -39,7 +43,7 @@ const reducer = (state, action) => {
     const newTemplates = [];
 
     templates.forEach((template) => {
-      const templateIndex = state.findIndex((u) => u.id === template.id);
+      const templateIndex = state.findIndex((t) => t.id === template.id);
       if (templateIndex !== -1) {
         state[templateIndex] = template;
       } else {
@@ -52,7 +56,7 @@ const reducer = (state, action) => {
 
   if (action.type === "UPDATE_TEMPLATES") {
     const template = action.payload;
-    const templateIndex = state.findIndex((u) => u.id === template.id);
+    const templateIndex = state.findIndex((t) => t.id === template.id);
 
     if (templateIndex !== -1) {
       state[templateIndex] = template;
@@ -65,7 +69,7 @@ const reducer = (state, action) => {
   if (action.type === "DELETE_TEMPLATE") {
     const templatesId = action.payload;
 
-    const templateIndex = state.findIndex((u) => u.id === templatesId);
+    const templateIndex = state.findIndex((t) => t.id === templatesId);
     if (templateIndex !== -1) {
       state.splice(templateIndex, 1);
     }
@@ -145,7 +149,7 @@ const TemplatesData = () => {
     const socket = openSocket();
     socket.on(`templates${user.companyId}`, (data) => {
       if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_TEMPLATES", payload: data.response });
+        dispatch({ type: "UPDATE_TEMPLATES", payload: data.template });
       }
 
       if (data.action === "delete") {
@@ -213,11 +217,12 @@ const TemplatesData = () => {
         <ConfirmationModal
             title={
             deletingTemplate &&
-            `${i18n.t("templatesData.modalConfirm.delete")}`}
+            'Deletar Template'}
             open={confirmModalOpen}
             onClose={setConfirmModalOpen}
             onConfirm={() => handleDeleteTemplate(deletingTemplate.id)}
         >
+          {i18n.t("templatesData.modalConfirm.delete")}
       </ConfirmationModal>
       <MainHeader>
         <div className={classes.titleStyle}>
@@ -267,7 +272,9 @@ const TemplatesData = () => {
               {templates && templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
-                    <TableCell align="center">{template.text}</TableCell>
+                    <TableCell align="center">
+                      <TemplateTable body={template.text} />
+                    </TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">
                       {format(parseISO(template.createdAt), "dd/MM/yy HH:mm")}

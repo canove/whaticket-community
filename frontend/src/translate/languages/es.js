@@ -37,6 +37,7 @@ const messages = {
       dashboard: {
         title: "Dashboard",
         file: "Archivo",
+        date: "Fecha",
         charts: {
           perDay: {
             title: "Tickets hoy: ",
@@ -45,7 +46,7 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "En servicio"
+            title: "En Servicio"
           },
           waiting: {
             title: "Esperando"
@@ -345,6 +346,9 @@ const messages = {
           whatsNoOff: "WhatsApp 2",
           company: "Compañías",
           menus: "Menus",
+          fileImport: "Importación de Archivos",
+          integratedImport:"Importación Integrada",
+          category: "Categoría",
         },
         whatsApp: {
           connections: "Conexiones",
@@ -403,7 +407,7 @@ const messages = {
         },
       },
       importation: {
-        title: "Importar",
+        title: "Importar Archivo",
         form: {
           status: "Estado",
           date: "Fecha",
@@ -714,6 +718,36 @@ const messages = {
         },
       },
 
+      category: {
+        title: "Categoría",
+        buttons: {
+          create: "Crear Categoría",
+          edit: "Para editar",
+          add: "Crear",
+        },
+        grid: {
+          name: "Nombre",
+          description: "Descripción",
+          createdAt: "Fecha de Creación",
+          action: "Comportamiento",
+        },
+        categoryModal: {
+          create: "Crear Categoría",
+          edit: "Para editar Categoría",
+          cancel: "Cancelar",
+          name: "Nombre",
+          description: "Descripción",
+        },
+        confirmation: {
+          delete: "¡Categoría eliminada con éxito!",
+          deleteTitle: "Eliminar categoría",
+          deleteMsg: "¿Está seguro de que desea eliminar la categoría?",
+          editMsg: "¡Categoría editada con éxito!",
+          addMsg: "¡Categoría agregada con éxito!",
+
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
@@ -752,6 +786,7 @@ const messages = {
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
         ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
+        ERR_NO_CATEGORY_FOUND : "¡Categoría de error no encontrada!",
       },
     },
   },

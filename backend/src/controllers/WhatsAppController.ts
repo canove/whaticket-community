@@ -220,9 +220,9 @@ export const messageStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { statusType, msgId, msgWhatsId, errorMessage } = req.body;
+  const { statusType, msgId, msgWhatsId, errorMessage, messageType } = req.body;
 
-  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId, errorMessage });
+  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId, errorMessage, messageType });
 
   return res.status(200).json(message);
 };

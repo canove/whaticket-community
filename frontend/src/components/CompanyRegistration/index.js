@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UserSchema = Yup.object().shape({
   name: Yup.string().required("Campo Obrigatório!"),
-  cnpj: Yup.number().typeError().required("Campo Obrigatório!"),
+  //cnpj: Yup.string().required("Campo Obrigatório!"),
   phone: Yup.number().typeError().required("Campo Obrigatório!"),
   email: Yup.string().email("Invalid email").required("Campo Obrigatório!"),
   address: Yup.string().required("Campo Obrigatório!"),
@@ -63,6 +63,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   const initialState = {
     id: "",
     name: "",
+    cnpj: "",
     phone: "",
     email: "",
     address: "",
@@ -98,6 +99,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 
   const handleClose = () => {
     onClose();
+    setCnpj("");
     setCompany(initialState);
     setLogo(null);
   };
@@ -119,7 +121,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
       return null;
     }
 
-    const companyData = { ...values, alias: textAlias, cnpj };
+    const companyData = { ...values, alias: textAlias };
 
     if (companyId) {
       try {
@@ -146,13 +148,16 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
     handleClose();
   };
 
+
   const handleChangeAlias = (e) => {
     setTextAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ""));
     e.preventDefault();
   };
 
   const handleChangeCnpj = (e) => {
-    setCnpj(e.target.value.replace(/[^0-9]/gi, ""));
+     setCompany((prevState) => {
+          return { ...prevState, cnpj:e.target.value.replace(/[^0-9]/gi, "")};
+        });
     e.preventDefault();
   };
 
@@ -298,7 +303,6 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <Button
                   type="submit"
                   color="primary"
-                  disabled={isSubmitting}
                   variant="contained"
                   className={classes.btnWrapper}
                 >

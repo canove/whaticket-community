@@ -25,8 +25,10 @@ import menuRoutes from "./menuRoutes";
 import templateDataRoutes from "./templateDataRoutes";
 import productRoutes from "./productRoutes";
 import pricingRoutes from "./pricingRoutes";
+import integratedImportRoutes from "./integratedImportRoutes";
 import historicRoutes from "./historicRoutes";
 import billingsRoutes from "./billingsRoutes";
+import categoryRoutes from "./categoryRoutes";
 
 const routes = Router();
 
@@ -55,7 +57,9 @@ routes.use(menuRoutes);
 routes.use(templateDataRoutes);
 routes.use(productRoutes);
 routes.use(pricingRoutes);
+routes.use(integratedImportRoutes)
 routes.use(historicRoutes);
 routes.use(billingsRoutes);
+routes.use(categoryRoutes);
 
 export default routes;
