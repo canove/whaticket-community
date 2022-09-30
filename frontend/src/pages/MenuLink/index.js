@@ -43,6 +43,9 @@ import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import BallotIcon from '@material-ui/icons/Ballot';
 import MenuIcon from '@material-ui/icons/Menu';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import LanguageIcon from '@material-ui/icons/Language';
+import CategoryIcon from '@material-ui/icons/Category';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -97,41 +100,68 @@ function getIconStyles(id, menuId) {
 function getIcon(icon, id, selectedMenusIds) {
   if (icon === "DashboardOutlinedIcon") {
     return (<DashboardOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "WhatsAppIcon") {
+  }
+  else if (icon === "WhatsAppIcon") {
     return <WhatsAppIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "SyncAltIcon") {
+  }
+  else if (icon === "SyncAltIcon") {
     return <SyncAltIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "SettingsOutlinedIcon") {
+  }
+  else if (icon === "SettingsOutlinedIcon") {
     return <SettingsOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "DvrIcon") {
+  }
+  else if (icon === "DvrIcon") {
     return <DvrIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "ChatIcon") {
+  }
+  else if (icon === "ChatIcon") {
     return <ChatIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "ContactPhoneOutlinedIcon")
-  { return (<ContactPhoneOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "QuestionAnswerOutlinedIcon") {
+  }
+  else if (icon === "ContactPhoneOutlinedIcon") {
+    return (<ContactPhoneOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
+  }
+  else if (icon === "QuestionAnswerOutlinedIcon") {
     return (<QuestionAnswerOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "ImportExportOutlinedIcon") {
+  }
+  else if (icon === "ImportExportOutlinedIcon") {
     return (<ImportExportOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "AccountCircleIcon") {
+  }
+  else if (icon === "AccountCircleIcon") {
     return <AccountCircleIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "PeopleAltOutlinedIcon") {
+  }
+  else if (icon === "PeopleAltOutlinedIcon") {
     return (<PeopleAltOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "AccountTreeOutlinedIcon") {
+  }
+  else if (icon === "AccountTreeOutlinedIcon") {
     return (<AccountTreeOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "EqualizerIcon") {
+  }
+  else if (icon === "EqualizerIcon") {
     return <EqualizerIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "AssessmentOutlinedIcon") {
+  }
+  else if (icon === "AssessmentOutlinedIcon") {
     return (<AssessmentOutlinedIcon style={getIconStyles(id, selectedMenusIds)} />);
-  } else if (icon === "ApartmentIcon") {
+  }
+  else if (icon === "ApartmentIcon") {
     return <ApartmentIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "ListAltIcon") {
+  }
+  else if (icon === "ListAltIcon") {
     return <ListAltIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "MenuIcon") {
+  }
+  else if (icon === "MenuIcon") {
     return <MenuIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else if (icon === "BallotIcon") {
+  }
+  else if (icon === "BallotIcon") {
     return <BallotIcon style={getIconStyles(id, selectedMenusIds)} />;
-  } else {
+  }
+  else if (icon === "ArchiveIcon") {
+    return <ArchiveIcon style={getIconStyles(id, selectedMenusIds)} />;
+  }
+  else if (icon === "LanguageIcon") {
+    return <LanguageIcon style={getIconStyles(id, selectedMenusIds)} />;
+  }
+  else if (icon === "CategoryIcon") {
+    return <CategoryIcon style={getIconStyles(id, selectedMenusIds)} />;
+  }
+  else {
     return null;
   }
 }
@@ -161,49 +191,80 @@ const MenuLink = () => {
   const getMenuName = (menuName) => {
     if(menuName === "Dashboard"){
       return i18n.t("Dashboard")
-    }if(menuName === "Official Connections"){
+    }
+    if(menuName === "Official Connections"){
       return i18n.t("Conexões Oficiais")
-    }if(menuName === "Templates"){
+    }
+    if(menuName === "Templates"){
       return i18n.t("Templates")
-    }if(menuName === "Connections"){
+    }
+    if(menuName === "Connections"){
       return i18n.t("Conexões")
-    }if(menuName === "Templates Data"){
+    }
+    if(menuName === "Templates Data"){
       return i18n.t("Templates Data")
-    }if(menuName === "Whats Config"){
+    }
+    if(menuName === "Whats Config"){
       return i18n.t("Configurações")
-    }if(menuName === "Tickets"){
+    }
+    if(menuName === "Tickets"){
       return i18n.t("Chamadas")
-    }if(menuName === "Contacts"){
+    }
+    if(menuName === "Contacts"){
       return i18n.t("Contatos")
-    }if(menuName === "Quick Answers"){
+    }
+    if(menuName === "Quick Answers"){
       return i18n.t("Respostas Rápidas")
-    }if(menuName === "Importation"){
+    }
+    if(menuName === "Importation"){
       return i18n.t("Importação")
-    }if(menuName === "Administration"){
+    }
+    if(menuName === "Administration"){
       return i18n.t("Administração")
-    }if(menuName === "Users"){
+    }
+    if(menuName === "Users"){
       return i18n.t("Usuário")
-    }if(menuName === "Company"){
+    }
+    if(menuName === "Company"){
       return i18n.t("Empresa")
-    }if(menuName === "Menus"){
+    }
+    if(menuName === "Menus"){
       return i18n.t("Menus")
-    }if(menuName === "Menu Link"){
+    }
+    if(menuName === "Menu Link"){
       return i18n.t("Vínculo de Menus")
-    }if(menuName === "Registration"){
+    }
+    if(menuName === "Registration"){
       return i18n.t("Cadastro")
-    }if(menuName === "Queues"){
+    }
+    if(menuName === "Queues"){
       return i18n.t("Filas")
-    }if(menuName === "Setting"){
+    }
+    if(menuName === "Setting"){
       return i18n.t("Configurações")
-    }if(menuName === "Reports"){
+    }
+    if(menuName === "Reports"){
       return i18n.t("Relatórios Conversa")
-    }if(menuName === "Talk Reports"){
+    }
+    if(menuName === "Talk Reports"){
       return i18n.t("Relatórios Conversa")
-    }if(menuName === "Reports Ticket"){
+    }
+    if(menuName === "Reports Ticket"){
       return i18n.t("Relatórios Chamadas")
-    }if(menuName === "Registers Reports"){
+    }
+    if(menuName === "Registers Reports"){
       return i18n.t("Relatório Registro")
-    }return menuName
+    }
+    if(menuName === "Fle Import"){
+      return i18n.t("Importação Arquivo")
+    }
+    if(menuName === "Integrated Import"){
+      return i18n.t("Importação Integrada")
+    }
+    if(menuName === "Category"){
+      return i18n.t("Categoria")
+    }
+    return menuName
   };
 
   const fetchMenus = async () => {

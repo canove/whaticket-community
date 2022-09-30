@@ -11,6 +11,7 @@ import {
   AutoIncrement,
   Default
 } from "sequelize-typescript";
+import Category from "./Category";
 
 import Company from "./Company";
 import Contact from "./Contact";
@@ -79,6 +80,13 @@ class Ticket extends Model<Ticket> {
 
   @HasMany(() => Message)
   messages: Message[];
+
+  @ForeignKey(() => Category)
+  @Column
+  categoryId: number;
+
+  @BelongsTo(() => Category)
+  category: Category;
 }
 
 export default Ticket;

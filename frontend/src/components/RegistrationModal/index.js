@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +37,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import BallotIcon from '@material-ui/icons/Ballot';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
+import CategoryIcon from '@material-ui/icons/Category';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -119,6 +118,9 @@ function getIcon(icon) {
     else if (icon === "LanguageIcon") {
         return<LanguageIcon/>
     }
+    else if (icon === "CategoryIcon") {
+        return<CategoryIcon/>
+  }
     else {
         return null;
     }
@@ -142,6 +144,7 @@ const icons = [
     "BallotIcon",
     "ArchiveIcon",
     "LanguageIcon",
+    "CategoryIcon",
 
 ]
 
