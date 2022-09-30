@@ -54,7 +54,7 @@ const UpdateTemplateDataService = async ({
       footer,
 
     });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

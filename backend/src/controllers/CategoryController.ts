@@ -12,11 +12,12 @@ import { getIO } from "../libs/socket";
 interface CategoryData {
     name: string;
     description:string;
+    companyId: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-
-  const category = await ListCategoryService();
+  const companyId = req.user.companyId;
+  const category = await ListCategoryService(companyId);
 
   return res.status(200).json(category);
 };
@@ -24,14 +25,16 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const {name, description,}: CategoryData = req.body;
+  const { companyId } = req.user;
 
   const category = await CreateCategoryService({
     name,
     description,
+    companyId,
   });
 
   const io = getIO();
-  io.emit("category", {
+  io.emit(`category${companyId}`, {
     action: "create",
     category
   });
@@ -55,11 +58,12 @@ export const update = async (
 
   const categoryData: CategoryData = req.body;
   const { categoryId } = req.params;
+  const { companyId } = req.user;
 
   const category = await UpdateCategoryService({ categoryData, categoryId });
 
   const io = getIO();
-  io.emit("category", {
+  io.emit(`category${companyId}`, {
     action: "update",
     category
   });
@@ -73,11 +77,12 @@ export const remove = async (
 ): Promise<Response> => {
 
   const { categoryId } = req.params;
+  const { companyId } = req.user;
 
   await DeleteCategoryService(categoryId);
 
   const io = getIO();
-  io.emit("category", {
+  io.emit(`category${companyId}`, {
     action: "delete",
     categoryId
   });

@@ -59,7 +59,7 @@ const UpdateQueueService = async (
 
   try {
     await queueSchema.validate({ color, name });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

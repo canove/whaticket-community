@@ -50,11 +50,11 @@ const useStyles = makeStyles((theme) => ({
 
 const UserSchema = Yup.object().shape({
   name: Yup.string().required("Campo Obrigatório!"),
-  //cnpj: Yup.string().required("Campo Obrigatório!"),
+  cnpj: Yup.string().required("Campo Obrigatório!"),
   phone: Yup.number().typeError().required("Campo Obrigatório!"),
   email: Yup.string().email("Invalid email").required("Campo Obrigatório!"),
   address: Yup.string().required("Campo Obrigatório!"),
-  //alias: Yup.string().nullable().required("Campo Obrigatório!"),
+  alias: Yup.string().nullable().required("Campo Obrigatório!"),
 });
 
 const CompanyRegistration = ({ open, onClose, companyId }) => {
@@ -83,7 +83,6 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         setCompany((prevState) => {
           return { ...prevState, ...data };
         });
-        setCnpj(data.cnpj)
         setLogo(data.logo);
       } catch (err) {
         toastError(err);
@@ -99,7 +98,6 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
 
   const handleClose = () => {
     onClose();
-    setCnpj("");
     setCompany(initialState);
     setLogo(null);
   };
@@ -121,7 +119,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
       return null;
     }
 
-    const companyData = { ...values, alias: textAlias };
+    const companyData = { ...values };
 
     if (companyId) {
       try {
@@ -144,20 +142,54 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         toastError(err);
       }
     }
-
     handleClose();
   };
 
-
   const handleChangeAlias = (e) => {
-    setTextAlias(e.target.value.replace(/[^0-9a-zA-Z]/gi, ""));
+    const alias = e.target.value.replace(/[^0-9a-zA-Z]/gi, "")
+    setCompany((prevState) => {
+      return{ ...prevState, alias};
+    })
+    e.preventDefault();
+  };
+
+  const handleChangeName = (e) => {
+    const name = e.target.value
+    setCompany((prevState) => {
+      return{ ...prevState, name};
+    })
     e.preventDefault();
   };
 
   const handleChangeCnpj = (e) => {
-     setCompany((prevState) => {
-          return { ...prevState, cnpj:e.target.value.replace(/[^0-9]/gi, "")};
-        });
+      const cnpj = e.target.value.replace(/[^0-9]/gi, "")
+      setCompany((prevState) => {
+        return { ...prevState, cnpj};
+      });
+    e.preventDefault();
+  };
+
+  const handleChangePhone = (e) => {
+    const phone = e.target.value
+    setCompany((prevState) => {
+      return{ ...prevState, phone};
+    })
+    e.preventDefault();
+  };
+
+  const handleChangeEmail = (e) => {
+    const email = e.target.value
+    setCompany((prevState) => {
+      return{ ...prevState, email};
+    })
+    e.preventDefault();
+  };
+
+  const handleChangeAddress = (e) => {
+    const address = e.target.value
+    setCompany((prevState) => {
+      return{ ...prevState, address};
+    })
     e.preventDefault();
   };
 
@@ -201,7 +233,6 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <div className={classes.multFieldLine}>
                   <Field
                     as={TextField}
-                    value={textAlias}
                     onChange={handleChangeAlias}
                     name="alias"
                     variant="outlined"
@@ -215,6 +246,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <div className={classes.multFieldLine}>
                   <Field
                     as={TextField}
+                    onChange={handleChangeName}
                     name="name"
                     variant="outlined"
                     margin="dense"
@@ -227,10 +259,9 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <div className={classes.multFieldLine}>
                   <Field
                     as={TextField}
+                    onChange={handleChangeCnpj}
                     label={i18n.t("company.companyModal.cnpj")}
                     name="cnpj"
-                    value={cnpj}
-                    onChange={handleChangeCnpj}
                     error={touched.cnpj && Boolean(errors.cnpj)}
                     helperText={touched.cnpj && errors.cnpj}
                     variant="outlined"
@@ -241,6 +272,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <div className={classes.multFieldLine}>
                   <Field
                     as={TextField}
+                    onChange={handleChangePhone}
                     label={i18n.t("company.companyModal.phone")}
                     name="phone"
                     error={touched.phone && Boolean(errors.phone)}
@@ -253,6 +285,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <div className={classes.multFieldLine}>
                   <Field
                     as={TextField}
+                    onChange={handleChangeEmail}
                     label={i18n.t("company.companyModal.email")}
                     name="email"
                     error={touched.email && Boolean(errors.email)}
@@ -265,6 +298,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                 <div className={classes.multFieldLine}>
                   <Field
                     as={TextField}
+                    onChange={handleChangeAddress}
                     label={i18n.t("company.companyModal.address")}
                     name="address"
                     error={touched.address && Boolean(errors.address)}
