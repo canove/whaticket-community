@@ -27,6 +27,7 @@ import productRoutes from "./productRoutes";
 import pricingRoutes from "./pricingRoutes";
 import integratedImportRoutes from "./integratedImportRoutes";
 import historicRoutes from "./historicRoutes";
+import categoryRoutes from "./categoryRoutes";
 
 const routes = Router();
 
@@ -57,5 +58,6 @@ routes.use(productRoutes);
 routes.use(pricingRoutes);
 routes.use(integratedImportRoutes)
 routes.use(historicRoutes);
+routes.use(categoryRoutes);
 
 export default routes;

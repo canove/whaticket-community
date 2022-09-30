@@ -12,10 +12,7 @@ import {
   TextField,
   FormControl,
   Select,
-  InputLabel,
   MenuItem,
-  Input,
-  Typography,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -25,10 +22,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
-  },
-
-  multFieldLine: {
-    display: "flex",
   },
 
   btnWrapper: {

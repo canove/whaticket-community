@@ -26,6 +26,7 @@ import toastError from "../errors/toastError";
 import api from "../services/api";
 import IntegratedImport from "../pages/IntegratedImport";
 import FileImport from "../pages/FileImport";
+import Category from "../pages/Category";
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
@@ -110,6 +111,9 @@ const RenderRoutes = () => {
         }
         if (name === "Integrated Import") {
             return IntegratedImport
+        }
+        if (name === "Category") {
+            return Category
         }
     }
 

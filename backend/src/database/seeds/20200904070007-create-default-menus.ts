@@ -206,6 +206,14 @@ module.exports = {
           updatedAt: new Date()
         },
         {
+          name: "Category",
+          icon: "CategoryIcon",
+          parentId: Administration[0][0].id,
+          isParent: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
           name: "Settings",
           icon: "SettingsOutlinedIcon",
           parentId: Administration[0][0].id,
