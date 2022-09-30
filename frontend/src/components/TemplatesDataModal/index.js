@@ -13,19 +13,6 @@ import {
   FormControl,
   Select,
   MenuItem,
-<<<<<<< HEAD
-  Input,
-  Typography,
-  Paper,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
-=======
->>>>>>> origin/bits/02
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
