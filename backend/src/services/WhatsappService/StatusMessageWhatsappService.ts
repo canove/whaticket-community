@@ -11,10 +11,12 @@ import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketServi
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import Templates from "../../database/models/TemplatesData";
 import Ticket from "../../database/models/Ticket";
+import { preparePhoneNumber } from "../../utils/common";
 
 interface Request {
   msgId: number;
   statusType: string;
+  messageType?: string;
   msgWhatsId?: string;
   errorMessage?: string;
 }
@@ -26,7 +28,8 @@ const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
   msgWhatsId,
-  errorMessage
+  errorMessage,
+  messageType
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     statusType: Yup.string().required()
@@ -108,11 +111,37 @@ const StatusMessageWhatsappService = async ({
             template = await Templates.findByPk(file.templateId);
           }
           let messageTxt = register.message;
+          let mediaUrl = null;
+
           if(template) {
-            messageTxt = template.text
-            .replace("{{name}}", register.name)
-            .replace("{{documentNumber}}", register.documentNumber)
-            .replace("{{phoneNumber}}", register.phoneNumber);
+            const messagesTemplate = JSON.parse(template.text);
+           
+            switch (messageType) {
+              case 'text':
+                let text = messagesTemplate.find((m) => m['type'] == messageType);
+                messageTxt = text['value']
+                .replace("{{name}}", register.name)
+                .replace("{{documentNumber}}", register.documentNumber)
+                .replace("{{phoneNumber}}", register.phoneNumber);
+              break;
+              case 'vcard':
+              case 'contact':
+                let contact = messagesTemplate.find((m) => m['type'] == 'contact');
+                messageTxt = 'CONTATO: ' + preparePhoneNumber(contact['value']);
+                break;
+                case 'ptt':
+                case 'image':
+                case 'video':
+                case 'audio':
+                  if(messageType == 'ptt') {
+                    messageType = 'audio';
+                  }
+                  let media = messagesTemplate.find((m) => m['type'] == messageType);
+                  messageTxt = media['value'];
+                  mediaUrl = messageTxt;
+                  break;
+
+            }
           }
 
           const contactData = {
@@ -138,12 +167,12 @@ const StatusMessageWhatsappService = async ({
             id: msgWhatsId,
             ticketId: createTicket.id,
             contactId: undefined,
-            body: messageTxt,
+            body: mediaUrl != null ? '' :messageTxt,
             ack: 3,
             fromMe: true,
             read: true,
-            mediaUrl: null,
-            mediaType: null,
+            mediaUrl: mediaUrl,
+            mediaType: messageType,
             quotedMsgId: null,
             companyId: file.companyId
           };
