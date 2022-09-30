@@ -24,6 +24,7 @@ import IntegratedImport from "./models/IntegratedImport";
 
 import Historic from "./models/Historic";
 import BillingControls from "./models/BillingControls";
+import Category from "./models/Category";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -52,9 +53,10 @@ const models = [
   Templates,
   Products,
   Pricing,
-  IntegratedImport,,
+  IntegratedImport,
   Historic,
-  BillingControls
+  BillingControls,
+  Category,
 ];
 
 sequelize.addModels(models);

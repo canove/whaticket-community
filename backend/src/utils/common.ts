@@ -1,6 +1,6 @@
 /*eslint-disable */
 const preparePhoneNumber = (phone:string): string => {
-  let phoneNumber = phone;
+  let phoneNumber = phone.replace('+','');
   let country = phoneNumber.substring(0,2);
   if(country != '55' && phoneNumber.length < 12) {
     phoneNumber = '55' + phoneNumber;

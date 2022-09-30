@@ -36,6 +36,7 @@ const messages = {
       dashboard: {
       title: "Dashboard",
       file: "File",
+      date: "Date",
         charts: {
           perDay: {
             title: "Tickets today: ",
@@ -343,6 +344,7 @@ const messages = {
           menus: "Menus",
           fileImport: "File Import",
           integratedImport:"Integrated Import",
+          category: "Category"
         },
         whatsApp: {
           connections: "Connections",
@@ -711,6 +713,36 @@ const messages = {
         },
       },
 
+      category: {
+        title: "Category",
+        buttons: {
+          create: "Create Category",
+          edit: "Edit",
+          add: "Create",
+        },
+        grid: {
+          name: "Name",
+          description: "Description",
+          createdAt: "Creation Date",
+          action: "Actions",
+        },
+        categoryModal: {
+          create: "Create Category",
+          edit: "Edit Category",
+          cancel: "Cancel",
+          name: "Name",
+          description: "Description",
+        },
+        confirmation: {
+          delete: "Category deleted successfully!",
+          deleteTitle: "Delete Category",
+          deleteMsg: "Are you sure you want to delete the category?",
+          editMsg: "Category edited successfully!",
+          addMsg: "Category added successfully!",
+
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
@@ -749,6 +781,7 @@ const messages = {
           "Greeting message is required if there is more than one queue.",
         ERR_NO_COMPANY_FOUND: "Error deleting the Company.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "There is already a company with this CNPJ.",
+        ERR_NO_CATEGORY_FOUND : "Error category not found!",
       },
     },
   },

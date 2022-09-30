@@ -36,6 +36,7 @@ const messages = {
       dashboard: {
         title: "Dashboard",
         file: " Arquivo",
+        date: "Data",
         charts: {
           perDay: {
             title: "Chamadas hoje: ",
@@ -344,6 +345,7 @@ const messages = {
           menus: "Menus",
           fileImport: "Importação Arquivo",
           integratedImport:"Importação Integrada",
+          category: "Categoria",
         },
         whatsApp: {
           connections: "Conexões",
@@ -713,6 +715,36 @@ const messages = {
         },
       },
 
+      category: {
+        title: "Categoria",
+        buttons: {
+          create: "Criar Categoria",
+          edit: "Editar",
+          add: "Criar"
+        },
+        grid: {
+          name: "Nome",
+          description: "Descrição",
+          createdAt: "Data de Criação",
+          action: "Ações",
+        },
+        categoryModal: {
+          create: "Criar Categoria",
+          edit: "Editar Categoria",
+          cancel: "Cancelar",
+          name: "Nome",
+          description: "Descrição",
+        },
+        confirmation: {
+          delete: "Categoria excluida com sucesso!",
+          deleteTitle: "Excluir Categoria",
+          deleteMsg: "Tem certeza que deseja excluir a categoria?",
+          editMsg: "Categoria editada com sucesso!",
+          addMsg: "Categoria adicionada com sucesso!",
+
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
@@ -750,6 +782,7 @@ const messages = {
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
         ERR_NO_COMPANY_FOUND: "Erro ao excluir a Empresa.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Já existe uma empresa com esse CNPJ.",
+        ERR_NO_CATEGORY_FOUND : "Erro categoria não encontrada!"
       },
     },
   },

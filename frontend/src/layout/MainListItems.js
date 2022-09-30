@@ -25,6 +25,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import BallotIcon from '@material-ui/icons/Ballot';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
+import CategoryIcon from '@material-ui/icons/Category';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
@@ -36,6 +37,7 @@ import Collapse from "@material-ui/core/Collapse";
 import api from "../services/api";
 import toastError from "../errors/toastError";
 import { AuthContext } from "../context/Auth/AuthContext";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -111,6 +113,9 @@ function getIcon(icon) {
   }
   else if (icon === "LanguageIcon") {
     return<LanguageIcon/>
+  }
+  else if (icon === "CategoryIcon") {
+    return<CategoryIcon/>
   }
   else {
     return null;
@@ -366,6 +371,10 @@ const MainListItems = (props) => {
 
     if (name === "Queues") {
       return i18n.t("mainDrawer.listItems.queues");
+    }
+
+    if (name === "Category") {
+      return i18n.t("mainDrawer.listItems.category");
     }
 
     if (name === "Settings") {

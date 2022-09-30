@@ -12,6 +12,7 @@ import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
 import HistoricModal from "../HistoricModal";
+import ResolveModal from "../ResolveModal";
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -34,6 +35,7 @@ const TicketActionButtons = ({ ticket }) => {
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
 	const [historicModalOpen, setHistoricModalOpen] = useState(false);
+	const [resolveModalOpen, setResolveModalOpen] = useState(false);
 
 	const handleOpenTicketOptionsMenu = e => {
 		setAnchorEl(e.currentTarget);
@@ -65,11 +67,19 @@ const TicketActionButtons = ({ ticket }) => {
 
 	const handleOpenHistoricModal = () => {
 		setHistoricModalOpen(true);
-	}
+	};
 
 	const handleCloseHistoricModal = () => {
 		setHistoricModalOpen(false);
-	}
+	};
+
+	const handleOpenResolveModal = () => {
+		setResolveModalOpen(true);
+	};
+
+	const handleClosedResolveModal = () => {
+		setResolveModalOpen(false);
+	};
 
 	return (
 		<div className={classes.actionButtons}>
@@ -78,6 +88,13 @@ const TicketActionButtons = ({ ticket }) => {
 				onClose={handleCloseHistoricModal}
 				ticket={ticket}
 				aria-labelledby="form-dialog-title"
+			/>
+			<ResolveModal
+				open={resolveModalOpen}
+				onClose={handleClosedResolveModal}
+				ticketId={ticket.id}
+				aria-labelledby="form-dialog-title"
+				userId={user?.id}
 			/>
 			{ticket.status === "closed" && (
 				<ButtonWithSpinner
@@ -113,7 +130,7 @@ const TicketActionButtons = ({ ticket }) => {
 						size="small"
 						variant="contained"
 						color="primary"
-						onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)}
+						onClick={handleOpenResolveModal}
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
