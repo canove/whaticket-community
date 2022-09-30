@@ -8,12 +8,21 @@ interface Response {
   hasMore: boolean;
 }
 
+interface Request {
+  status?: number | string;
+  initialDate?: Date | string;
+  companyId?: number | string;
+  pageNumber?: number | string;
+  limiting?: number;
+}
+
 const ListFileService = async ({
   status,
   initialDate,
   companyId,
-  pageNumber
-}): Promise<Response> => {
+  pageNumber,
+  limiting
+}: Request): Promise<Response> => {
   let where = null;
 
   if(status === ''){
@@ -60,6 +69,7 @@ const ListFileService = async ({
     const { count, rows: reports } = await File.findAndCountAll({
       where,
       order: [['createdAt', 'DESC']],
+      limit: limiting
     });
   
     const hasMore = false;
