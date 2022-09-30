@@ -32,7 +32,7 @@
     "react-modal-image": "^2.5.0",
     "react-phone-number-input": "^3.2.11",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.3.1",
+    "react-scripts": "3.4.0",
     "react-toastify": "^6.0.9",
     "recharts": "^2.0.2",
     "socket.io-client": "^3.0.5",
