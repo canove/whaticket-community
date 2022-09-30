@@ -1,0 +1,279 @@
+import React, { useContext, useEffect, useReducer, useState } from "react";
+
+import openSocket from "../../services/socket-io";
+
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  makeStyles,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+} from "@material-ui/core";
+
+import MainContainer from "../../components/MainContainer";
+import MainHeader from "../../components/MainHeader";
+import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
+import Title from "../../components/Title";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import { DeleteOutline, Edit } from "@material-ui/icons";
+import SearchIcon from "@material-ui/icons/Search";
+import { toast } from "react-toastify";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { useTranslation } from "react-i18next";
+import { format, parseISO } from "date-fns";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import FlowModal from "../../components/FlowModal";
+
+const useStyles = makeStyles((theme) => ({
+  mainPaper: {
+    flex: 1,
+    padding: theme.spacing(1),
+    overflowY: "scroll",
+    ...theme.scrollbarStyles,
+  },
+  customTableCell: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+}));
+
+const reducer = (state, action) => {
+  if (action.type === "LOAD_FLOW") {
+    const flows = action.payload;
+    const newFlow = [];
+
+    flows.forEach((flow) => {
+      const flowIndex = state.findIndex((f) => f.id === flow.id);
+      if (flowIndex !== -1) {
+        state[flowIndex] = flow;
+      } else {
+        newFlow.push(flow);
+      }
+    });
+
+    return [...state, ...newFlow];
+  }
+
+  if (action.type === "UPDATE_FLOW") {
+    const flow = action.payload;
+    const flowIndex = state.findIndex((f) => f.id === flow.id);
+
+    if (flowIndex !== -1) {
+      state[flowIndex] = flow;
+      return [...state];
+    } else {
+      return [flow, ...state];
+    }
+  }
+
+  if (action.type === "DELETE_FLOW") {
+    const flowId = action.payload;
+    const flowIndex = state.findIndex((f) => f.id === flowId);
+    if (flowIndex !== -1) {
+      state.splice(flowIndex, 1);
+    }
+    return [...state];
+  }
+
+  if (action.type === "RESET") {
+    return [];
+  }
+};
+
+const Flows = () => {
+  const classes = useStyles();
+  const { i18n } = useTranslation();
+  const { user } = useContext(AuthContext);
+
+  const [flows, dispatch] = useReducer(reducer, []);
+  const [loading, setLoading] = useState(false);
+  const [searchParam, setSearchParam] = useState("");
+  const [flowModalOpen, setFlowModalOpen] = useState(false);
+  const [selectedFlow, setSelectedFlow] = useState(null);
+  const [deletingFlow, setDeletingFlow] = useState(null);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch({ type: "RESET" });
+  }, [searchParam]);
+
+  useEffect(() => {
+    const fetchFlows = async () => {
+      try {
+        const { data } = await api.get("/flows", {
+          params: { searchParam }
+        });
+        dispatch({ type: "LOAD_FLOW", payload: data });
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+    fetchFlows();
+  }, [searchParam]);
+
+  useEffect(() => {
+    const socket = openSocket();
+
+    socket.on(`flows${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_FLOW", payload: data.flow });
+      }
+
+      if (data.action === "delete") {
+        dispatch({ type: "DELETE_FLOW", payload: +data.flowId });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
+
+  const formatDate = (date) => {
+    if (date) {
+      return format(parseISO(date), "dd/MM/yyyy HH:mm");
+    }
+
+    return date;
+  };
+
+  const handleSearch = (e) => {
+    setSearchParam(e.target.value.toLowerCase());
+  };
+
+  const handleOpenFlowModal = () => {
+    setFlowModalOpen(true);
+    setSelectedFlow(null);
+  };
+
+  const handleCloseFlowModal = () => {
+    setFlowModalOpen(false);
+    setSelectedFlow(null);
+  };
+
+  const handleEditFlow = (flow) => {
+    setSelectedFlow(flow);
+    setFlowModalOpen(true);
+  };
+
+  const handleCloseConfirmationModal = () => {
+    setConfirmModalOpen(false);
+    setSelectedFlow(null);
+  };
+
+  const handleDeleteFlow = async (flowId) => {
+    try {
+        await api.delete(`/flows/${flowId}`);
+        toast.success('Fluxo deletado com sucesso');
+    } catch (err) {
+        toastError(err);
+    }
+    setDeletingFlow(null);
+  };
+
+  return (
+    <MainContainer>
+      <FlowModal
+        open={flowModalOpen}
+        onClose={handleCloseFlowModal}
+        aria-labelledby="form-dialog-title"
+        flowId={selectedFlow && selectedFlow.id}
+      />
+      <ConfirmationModal
+        title='Deletar Fluxo'
+        open={confirmModalOpen}
+        onClose={handleCloseConfirmationModal}
+        onConfirm={() => handleDeleteFlow(deletingFlow.id)}
+      >
+        Você tem certeza que deseja deletar este fluxo?
+      </ConfirmationModal>
+      <MainHeader>
+        <Title>Fluxos</Title>
+        <MainHeaderButtonsWrapper>
+          <TextField
+            placeholder="Pesquisar"
+            type="search"
+            value={searchParam}
+            onChange={handleSearch}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon style={{ color: "gray" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenFlowModal}
+          >
+            Criar
+          </Button>
+        </MainHeaderButtonsWrapper>
+      </MainHeader>
+      <Paper className={classes.mainPaper} variant="outlined">
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Nome</TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Criado em</TableCell>
+              <TableCell align="center">Atualizado em</TableCell>
+              <TableCell align="center">Ações</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <>
+              {flows &&
+                flows.map((flow) => {
+                  return (
+                    <TableRow key={flow.id}>
+                      <TableCell align="center">{flow.name}</TableCell>
+                      <TableCell align="center">{flow.status}</TableCell>
+                      <TableCell align="center">
+                        {formatDate(flow.createdAt)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {formatDate(flow.updatedAt)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditFlow(flow)}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setDeletingFlow(flow);
+                            setConfirmModalOpen(true);
+                          }}
+                        >
+                          <DeleteOutline />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              {loading && <TableRowSkeleton columns={5} />}
+            </>
+          </TableBody>
+        </Table>
+      </Paper>
+    </MainContainer>
+  );
+};
+
+export default Flows;

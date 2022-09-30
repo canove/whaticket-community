@@ -25,6 +25,7 @@ import Historic from "./models/Historic";
 import BillingControls from "./models/BillingControls";
 import Billings from "./models/Billings";
 import Category from "./models/Category";
+import Flows from "./models/Flows";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -57,7 +58,8 @@ const models = [
   Historic,
   BillingControls,
   Category,
-  Billings
+  Billings,
+  Flows
 ];
 
 sequelize.addModels(models);

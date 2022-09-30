@@ -28,6 +28,7 @@ import api from "../services/api";
 import IntegratedImport from "../pages/IntegratedImport";
 import FileImport from "../pages/FileImport";
 import Category from "../pages/Category";
+import Flows from "../pages/Flows";
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
@@ -118,6 +119,9 @@ const RenderRoutes = () => {
         }
         if (name === "Category") {
             return Category
+        }
+        if (name === "Flows") {
+            return Flows
         }
     }
 
