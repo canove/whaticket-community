@@ -23,7 +23,7 @@ import ImportModal from "../../components/ImportModal";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { parseISO, format } from "date-fns";
-import { IconButton } from "@material-ui/core";
+import { IconButton, Typography } from "@material-ui/core";
 import { Visibility } from "@material-ui/icons";
 import RegisterFileModal from "../../components/RegisterFileModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -104,11 +104,14 @@ const FileImport = () => {
   const { user } = useContext(AuthContext);
   const [users, dispatchUsers] = useReducer(reducer, []);
   const [imports, dispatchImports] = useReducer(reducer, []);
+  const [hasMore, setHasMore] = useState(false);
+  const [count, setCount] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
 
   useEffect(() => {
     dispatchUsers({ type: "RESET" });
     dispatchImports({ type: "RESET" });
-  }, []);
+  }, [pageNumber, status, date]);
 
   useEffect(() => {
     setLoading(true);
@@ -224,16 +227,29 @@ const FileImport = () => {
   };
 
   useEffect(() => {
+    setPageNumber(1);
+  }, [status, date])
+
+  useEffect(() => {
     handleFilter();
 // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [importModalOpen, registerFileModalOpen]);
+  }, [importModalOpen, registerFileModalOpen, status, date, pageNumber]);
 
   const handleFilter = async () => {
     setLoading(true);
     try {
       setLoading(true);
-      const { data } = await api.get(`file/list?Status=${status}&initialDate=${date}`);
-      dispatchImports({ type: "LOAD_FILES", payload: data });
+      console.log("?");
+      const { data } = await api.get(`file/list`, {
+        params: {
+          status,
+          date,
+          pageNumber
+        }
+      });
+      dispatchImports({ type: "LOAD_FILES", payload: data.reports });
+      setCount(data.count);
+      setHasMore(data.hasMore);
       setLoading(false);
     } catch (err) {
       toastError(err);
@@ -348,7 +364,7 @@ const FileImport = () => {
           </TableHead>
           <TableBody>
             <>
-              {imports.map((item, index) => {
+              {imports && imports.map((item, index) => {
                 return (
                   <TableRow key={index}>
                     <TableCell align="center">
@@ -384,6 +400,29 @@ const FileImport = () => {
             </>
           </TableBody>
         </Table>
+        <div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1} 
+					>
+						Página Anterior
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 10) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						Próxima Página
+					</Button>
+				</div>
       </Paper>
     </MainContainer>
   );
