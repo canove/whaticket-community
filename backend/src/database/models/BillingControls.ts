@@ -8,6 +8,7 @@ import {
   AutoIncrement,
   ForeignKey
 } from "sequelize-typescript";
+import Billings from "./Billings";
 import Company from "./Company";
 
 @Table
@@ -25,10 +26,17 @@ class BillingControls extends Model<BillingControls> {
   quantity: number;
 
   @Column
-  registerId: number;
+  triggerFee: number;
+
+  @ForeignKey(() => Billings)
+  @Column
+  billingId: number;
 
   @Column
-  triggerFee: number;
+  processedAt: Date;
+
+  @Column
+  usedGraceTriggers: number;
 
   @CreatedAt
   createdAt: Date;

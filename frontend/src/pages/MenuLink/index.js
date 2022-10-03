@@ -46,6 +46,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
 import CategoryIcon from '@material-ui/icons/Category';
+import TimelineIcon from '@material-ui/icons/Timeline';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -160,6 +161,9 @@ function getIcon(icon, id, selectedMenusIds) {
   }
   else if (icon === "CategoryIcon") {
     return <CategoryIcon style={getIconStyles(id, selectedMenusIds)} />;
+  }
+  else if (icon === "TimelineIcon") {
+    return <TimelineIcon style={getIconStyles(id, selectedMenusIds)} />
   }
   else {
     return null;

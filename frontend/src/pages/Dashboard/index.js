@@ -121,7 +121,7 @@ const Dashboard = () => {
         setLoading(true);
 
         const { data } = await api.get('file/list?Status=5');
-        setFiles(data);
+        setFiles(data.reports);
 
         setLoading(false);
       } catch (err) {
@@ -131,7 +131,7 @@ const Dashboard = () => {
         setLoading(true);
 
         const { data } = await api.get('file/list?Status=6');
-        setFiles(files.concat(data));
+        setFiles(files.concat(data.reports));
         setLoading(false);
       } catch (err) {
         toastError(err);

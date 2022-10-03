@@ -34,6 +34,9 @@ class Pricing extends Model<Pricing> {
   productId: number;
 
   @Column
+  usedGraceTriggers: number;
+
+  @Column
   deletedAt: Date;
 
   @CreatedAt

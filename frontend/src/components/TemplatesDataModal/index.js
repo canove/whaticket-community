@@ -13,10 +13,24 @@ import {
   FormControl,
   Select,
   MenuItem,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  Paper,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import TemplateBody from "../TemplateBody";
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import ButtonWithSpinner from "../ButtonWithSpinner";
+import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,131 +71,179 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const TemplatesDataModal = ({ open, onClose, templatesId }) => {
-  const { i18n } = useTranslation();
-  const classes = useStyles();
-  const initialState = {
-    name: "",
-    text:"",
-    footer: "",
-  };
-  const [template, setTemplate] = useState(initialState);
-  const [text, setText] = useState("");
-  const [paramsQuantity, setParamsQuantity] = useState(0);
-  const [param, setParam] = useState("");
-  const [openParamModal, setOpenParamModal] = useState(false);
+    const { i18n } = useTranslation();
+    const classes = useStyles();
 
-  useEffect(() => {
-    setText("");
-    setParamsQuantity(0);
-    const fetchTemplates = async () => {
-      try {
-        const { data } = await api.get(`/TemplatesData/show/${templatesId}`);
-        setText(data.text);
-        setTemplate((prevState) => {
-          return { ...prevState, ...data };
-        });
-      } catch (err) {
-        toastError(err);
-      }
-    };
-    if (templatesId) {
-      fetchTemplates();
-    }
-  }, [templatesId, open]);
+    const [name, setName] = useState("");
+    const [footer, setFooter] = useState("");
+    const [bodies, setBodies] = useState([]);
+    const [selectedBody, setSelectedBody] = useState(null);
+    const [selectedBodyIndex, setSelectedBodyIndex] = useState("");
+    const [bodyModalOpen, setBodyModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-  const handleClose = () => {
-    onClose();
-    setTemplate(initialState);
-  };
-
-  const handleSubmit = async (values) => {
-    const templatesData = { ...values, text };
-    try {
+    useEffect(() => {
+      const fetchTemplates = async () => {
+        setLoading(true);
+        try {
+          const { data } = await api.get(`/TemplatesData/show/${templatesId}`);
+          setName(data.name);
+          setFooter(data.footer);
+          setBodies(JSON.parse(data.text));
+          setLoading(false);
+        } catch (err) {
+          toastError(err);
+          setLoading(false);
+        }
+      };
       if (templatesId) {
-        await api.put(`/TemplatesData/edit/${templatesId}`, templatesData);
+        fetchTemplates();
+      }
+    }, [templatesId, open]);
+
+    const handleClose = () => {
+      onClose();
+      setName("");
+      setFooter("");
+      setBodies([]);
+      setSelectedBody(null);
+      setBodyModalOpen(false);
+    };
+
+    const handleSubmit = async () => {
+      setLoading(true);
+      try {
+				const formData = new FormData();
+
+				formData.set("name", name);
+				formData.set("footer", footer);
+      
+        let index = 0;
+        for (const body of bodies) {
+          if ((body.type === "audio" || body.type === "video" || body.type === "image" || body.type === "file") && (typeof body.value !== 'string')) {
+            formData.append("file", body.value, `${body.value.name}/${body.type}/${index}`);
+          } else {
+            formData.append("bodies", `${JSON.stringify(body)}${index}`);
+          }
+          index++;
+        }
+
+        if (templatesId) {
+				  await api.put(`/TemplatesData/edit/${templatesId}`, formData);
+        } else {
+          await api.post(`/TemplatesData/create/`, formData);
+        }
+        toast.success(i18n.t("templatesData.modalConfirm.successAdd"));
+
+        setLoading(false);
+			} catch (err) {
+				toastError(err);
+        setLoading(false);
+			}
+
+      handleClose();
+    };
+
+    const handleOpenBodyModal = () => {
+      setBodyModalOpen(true);
+    }
+
+    const handleCloseBodyModal = () => {
+      setSelectedBody(null);
+      setSelectedBodyIndex("");
+      setBodyModalOpen(false);
+    }
+
+    const handleEditBodyModal = (body, index) => {
+      setSelectedBody(body);
+      setSelectedBodyIndex(index);
+      setBodyModalOpen(true);
+    }
+
+    const handleNameChange = (e) => {
+      setName(e.target.value);
+    }
+
+    const handleFooterChange = (e) => {
+      setFooter(e.target.value);
+    }
+    
+    const handleBodiesChange = (body, index) => {
+      let array = [...bodies];
+      if (index || index === 0) {
+        array[index] = body;
+        setBodies(array);
       } else {
-        await api.post(`/TemplatesData/create/`, templatesData);
+        array.push(body);
+        setBodies(array);
       }
-      toast.success(i18n.t("templatesData.modalConfirm.successAdd"));
-    } catch (err) {
-      toastError(err);
-    }
-    handleClose();
-  };
-
-  const handleParams = () => {
-    if (paramsQuantity >= 3) {
-      toast.error(i18n.t("templates.templateModal.toastErr"));
-    } else {
-      setText(prevText => prevText + "{{" + param + "}}")
     }
 
-    handleCloseParamModal();
-  };
+    const handleDeleteBodyModal = (body, index) => {
+      const array = [...bodies];
+      array.splice(index, 1);
 
-  const handleChange = (e) => {
-    setText(e.target.value);
-  }
+      setBodies(array);
+    }
 
-  const handleChangeParam = (e) => {
-    setParam(e.target.value)
-  };
+    const Body = (props) => {
+      const { body } = props;
 
-  const handleOpenParamModal = () => {
-    setOpenParamModal(true);
-  };
+      const value = body.value;
 
-  const handleCloseParamModal = () => {
-    setParam("");
-    setOpenParamModal(false);
-  };
-
-  useEffect(() => {
-    const testParams = () => {
-      let result = 0;
-      result += text.split("{{name}}").length - 1
-      result += text.split("{{documentNumber}}").length - 1
-      result += text.split("{{phoneNumber}}").length - 1
-
-      if (paramsQuantity > 3) {
-        toast.error(i18n.t("templates.templateModal.toastErr"));
+      if (body.type === "text") {
+        return <TableCell align="center">{value}</TableCell>;
       }
 
-      setParamsQuantity(result);
+      if (body.type === "contact") {
+        return <TableCell align="center">{body.name}:{value}</TableCell>;
+      }
+
+      if (body.type === "image") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">${value.name}</TableCell>;
+        } else {
+          return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} /></TableCell>
+        }
+      }
+
+      if (body.type === "video") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">${value.name}</TableCell>;
+        } else {
+          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a></TableCell>;
+        }
+      }
+
+      if (body.type === "audio") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">{value.name}</TableCell>;
+        } else {
+          return <TableCell align="center"><audio controls><source src={value} type="audio/ogg"></source></audio></TableCell>;
+        }
+      }
+
+      if (body.type === "file") {
+        if (typeof value !== 'string') {
+          return <TableCell align="center">{value.name}</TableCell>
+        } else {
+          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a></TableCell>;
+        }
+      }
+
+      return "";
     }
-    testParams();
-  }, [text])
 
   return (
     <div className={classes.root}>
-      <div>
-        <Dialog open={openParamModal} onClose={handleCloseParamModal}>
-          <DialogTitle>Selecione uma variável</DialogTitle>
-          <DialogContent>
-              <FormControl className={classes.multFieldLine}>
-                <Select
-                  variant="outlined"
-                  id="demo-dialog-select"
-                  value={param}
-                  onChange={handleChangeParam}
-                  style={{width: "100%"}}
-                >
-                  <MenuItem value={'name'}>Nome</MenuItem>
-                  <MenuItem value={'documentNumber'}>Documento</MenuItem>
-                  <MenuItem value={'phoneNumber'}>Número de Telefone</MenuItem>
-                </Select>
-              </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseParamModal} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleParams} color="primary">
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+      <TemplateBody
+        open={bodyModalOpen}
+        onClose={handleCloseBodyModal}
+        aria-labelledby="form-dialog-title"
+        body={selectedBody}
+        index={selectedBodyIndex}
+        handleBodiesChange={handleBodiesChange}
+      />
       <Dialog
         open={open}
         onClose={handleClose}
@@ -194,102 +256,111 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
             ? `${i18n.t("templatesData.templateModal.buttonEdit")}`
             : `${i18n.t("templatesData.templateModal.buttonAdd")}`}
         </DialogTitle>
-        <Formik
-          initialValues={template}
-          enableReinitialize={true}
-          onSubmit={(values, actions) => {
-            setTimeout(() => {
-              handleSubmit(values);
-              actions.setSubmitting(false);
-            }, 400);
-          }}
-        >
-          {({ touched, errors, isSubmitting }) => (
-            <Form>
-              <DialogContent dividers>
-                <div className={classes.multFieldLine}>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("templatesData.templateModal.name")}
-                    autoFocus
-                    name="name"
-                    error={touched.name && Boolean(errors.name)}
-                    helperText={touched.name && errors.name}
-                    variant="outlined"
-                    margin="dense"
-                    fullWidth
-                    className={classes.textField}
-                  />
-                </div>
-                <div>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("templatesData.templateModal.bodyText")}
-                    type="text"
-                    onChange={(e) => { handleChange(e) }}
-                    value={text}
-                    multiline
-                    minRows={5}
-                    fullWidth
-                    maxLength="1024"
-                    name="text"
-                    error={touched.text && Boolean(errors.text)}
-                    helperText={touched.text && errors.text}
-                    variant="outlined"
-                    margin="dense"
-                  />
-                </div>
-                <div>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("templatesData.templateModal.footer")}
-                    type="footer"
-                    multiline
-                    minRows={2}
-                    fullWidth
-                    maxLength="60"
-                    name="footer"
-                    error={touched.footer && Boolean(errors.footer)}
-                    helperText={touched.footer && errors.footer}
-                    variant="outlined"
-                    margin="dense"
-                  />
-                </div>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  className={classes.btnWrapper}
-                  disabled={isSubmitting}
-                  onClick={handleOpenParamModal}
-                >
-                  {"{{ }}"}
-                </Button>
-                <Button
-                  type="submit"
-                  color="primary"
-                  variant="contained"
-                  className={classes.btnWrapper}
-                  disabled={isSubmitting}
-                >
-                   {templatesId
-                    ? `${i18n.t("templatesData.templateModal.buttonEdit")}`
-                    : `${i18n.t("templatesData.templateModal.buttonAdd")}`}
-                </Button>
-                <Button
-                  onClick={handleClose}
-                  color="secondary"
-                  disabled={isSubmitting}
-                  variant="outlined"
-                >
-                  {i18n.t("templates.buttons.cancel")}
-                </Button>
-              </DialogActions>
-            </Form>
-          )}
-        </Formik>
-      </Dialog>
+				<DialogContent dividers>
+          <div className={classes.root}>
+						<FormControl
+							variant="outlined"
+							margin="dense"
+							fullWidth
+						>
+							<TextField
+								label="Nome"
+								variant="outlined"
+								value={name}
+								onChange={handleNameChange}
+								fullWidth
+							/>
+						</FormControl>
+					</div>
+          { bodies.length > 0 &&
+            <Paper className={classes.mainPaper} variant="outlined">
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Tipo</TableCell>
+                      <TableCell align="center">Body</TableCell>
+                      <TableCell align="center">Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <>
+                      {bodies && bodies.map((body, index) => {
+                        return (
+                          <TableRow key={index}>
+                            <TableCell align="center">{body.type}</TableCell>
+                              <Body body={body} />
+                            <TableCell align="center">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEditBodyModal(body, index)}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteBodyModal(body, index)}
+                              >
+                                <DeleteOutlineIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        );
+                        })}
+                    </>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          }
+          {!(bodies.length >= 5) && 
+            <div className={classes.root}>
+              <Button
+                color="primary"
+                variant="contained"
+                fullWidth
+                style={{ margin: "5px" }}
+                onClick={handleOpenBodyModal}
+                disabled={bodies.length >= 5}
+              >
+                Adicionar Body
+              </Button>
+            </div>
+          }
+          <div className={classes.root}>
+						<FormControl
+							variant="outlined"
+							margin="dense"
+							fullWidth
+						>
+							<TextField
+								label="Footer"
+								variant="outlined"
+								value={footer}
+								onChange={handleFooterChange}
+								fullWidth
+							/>
+						</FormControl>
+					</div>
+				</DialogContent>
+				<DialogActions>
+          <Button
+						onClick={handleClose}
+						color="secondary"
+						variant="outlined"
+					>
+						Cancelar
+					</Button>
+          <ButtonWithSpinner
+						onClick={handleSubmit}
+						color="primary"
+						variant="contained"
+            loading={loading}
+					>
+						{ templatesId ? 'Editar' : 'Criar' }
+					</ButtonWithSpinner>
+				</DialogActions>
+			</Dialog>
     </div>
   );
 };

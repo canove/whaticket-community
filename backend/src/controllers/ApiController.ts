@@ -2,11 +2,7 @@ import { Request, Response } from "express";
 import * as Yup from "yup";
 import path from "path";
 import AppError from "../errors/AppError";
-import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp";
 import Message from "../database/models/Message";
-import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
-import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
-import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ListFileService from "../services/FileService/ListFileService";
@@ -34,7 +30,7 @@ const createContact = async (newContact: string, companyId: number) => {
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
   const io = getIO();
 
-  const files = await ListFileService({ Status: FileStatus.WaitingImport, initialDate: null, limit: 1, companyId: 0 });
+  const { reports: files } = await ListFileService({ status: FileStatus.WaitingImport, initialDate: null, limiting: 1, companyId: 0 });
   if (files) {
     files.forEach(async (file) => {
       await file.update({ Status: FileStatus.Processing });
@@ -60,8 +56,8 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
   const io = getIO();
   
-  const files = await ListFileService({ Status: FileStatus.WaitingDispatcher, initialDate: null, limit: 1, companyId:0 });
-  const sendingFiles = await ListFileService({ Status: FileStatus.Sending, initialDate: null, limit: 1, companyId:0 });
+  const { reports: files } = await ListFileService({ status: FileStatus.WaitingDispatcher, initialDate: null, limiting: 1, companyId: 0 });
+  const { reports: sendingFiles } = await ListFileService({ status: FileStatus.Sending, initialDate: null, limiting: 1, companyId: 0 });
 
   if (sendingFiles?.length > 0) {
     sendingFiles.forEach(async (file) => {
