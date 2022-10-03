@@ -89,6 +89,7 @@ const SendWhatsAppMedia = async ({
               mediaUrl: null,
               mediaType: null,
               quotedMsgId: null,
+              bot: ticket.status == 'inbot',
               companyId
             };
           
@@ -144,6 +145,7 @@ const SendWhatsAppMedia = async ({
             const messageData = {
               id: msgWhatsId,
               ticketId: ticket.id,
+              bot: ticket.status == 'inbot',
               contactId: undefined,
               body: body,
               fromMe: true,

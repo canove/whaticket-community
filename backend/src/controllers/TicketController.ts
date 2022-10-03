@@ -131,7 +131,8 @@ export const update = async (
       await SendWhatsAppMessage({
         body: formatBody(farewellMessage, ticket.contact),
         ticket,
-        companyId
+        companyId,
+        fromMe: true
       });
     }
   }

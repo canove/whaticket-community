@@ -16,6 +16,12 @@ import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRC
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
 import axios from "axios";
 import AppError from "../errors/AppError";
+import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import Whatsapp from "../database/models/Whatsapp";
+import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
+import Contact from "../database/models/Contact";
+import FileRegister from "../database/models/FileRegister";
+import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
 
 type ListQuery = {
   pageNumber: string | number;
@@ -196,7 +202,8 @@ export const newMessage = async (
     contactName,
     identification,
     file,
-    session
+    session,
+    bot
   } = req.body;
 
   const message = await NewMessageWhatsapp({
@@ -210,7 +217,8 @@ export const newMessage = async (
     contactName,
     identification,
     file,
-    session
+    session,
+    bot
   });
 
   return res.status(200).json(message);
@@ -249,6 +257,69 @@ export const health = async (
 ): Promise<Response> => {
 
   return res.status(200).json("api is active and running");
+};
+
+const verifyContact = async (
+  contactName: string,
+  contactNumber: string,
+  companyId: number
+): Promise<Contact> => {
+  if (contactName == '') {
+    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber, companyId }, limit: 1 });
+    if (contact.length > 0)
+      contactName = contact[0].name;
+  }
+
+  const contactData = {
+    name: contactName,
+    number: contactNumber,
+    isGroup: false,
+    companyId
+  };
+
+  const contact = CreateOrUpdateContactService(contactData);
+
+  return contact;
+}
+
+export const botMessage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+
+  const {
+    fromMe,
+    to,
+    body,
+    contactName,
+    session,
+    bot
+  } = req.body;
+
+  if (!fromMe) {
+    return await newMessage(req, res);
+  } else {
+    const whatsapp = await Whatsapp.findOne({
+      where: {
+        name: session,
+        deleted: false
+      }
+    })
+  
+    const contact = await verifyContact(contactName, to, whatsapp.companyId);
+    const ticket = await FindOrCreateTicketService(
+      contact,
+      whatsapp.id,
+      whatsapp.companyId,
+      0,null,false,bot
+    );
+  
+    
+    await SendWhatsAppMessage({ body, ticket: ticket, companyId: ticket.companyId, fromMe });
+  }
+  
+
+  return res.status(200).json('success');
 };
 
 
