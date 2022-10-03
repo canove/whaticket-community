@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import FlowModal from "../../components/FlowModal";
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -166,6 +167,19 @@ const Flows = () => {
     setFlowModalOpen(true);
   };
 
+  const handleCopyFlow = async (flow) => {
+    const flowData = {
+      name: `${flow.name} copy`
+    }
+
+    try {
+      await api.post(`/flows/`, flowData);
+      toast.success("Fluxo Duplicado com Sucesso");
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
   const handleCloseConfirmationModal = () => {
     setConfirmModalOpen(false);
     setSelectedFlow(null);
@@ -253,6 +267,12 @@ const Flows = () => {
                           onClick={() => handleEditFlow(flow)}
                         >
                           <Edit />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleCopyFlow(flow)}
+                        >
+                          <FileCopyIcon />
                         </IconButton>
                         <IconButton
                           size="small"
