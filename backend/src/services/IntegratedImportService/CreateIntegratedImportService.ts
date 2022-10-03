@@ -9,6 +9,7 @@ interface Request {
     key: string;
     token: string;
     mapping: string;
+    companyId: string | number;
 };
 
 const CreateIntegratedImportService = async ({
@@ -20,6 +21,7 @@ const CreateIntegratedImportService = async ({
     key,
     token,
     mapping,
+    companyId,
 
 }: Request): Promise<IntegratedImport> => {
 
@@ -32,6 +34,7 @@ const integratedImport = await IntegratedImport.create({
     key,
     token,
     mapping,
+    companyId,
   });
 
   return integratedImport;

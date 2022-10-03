@@ -23,7 +23,7 @@ const DeleteWhatsAppService = async (id: string): Promise<void> => {
       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
       "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
     }});
-  } catch (err) {
+  } catch (err: any) {
     logger.error(err);
   }
 
@@ -31,7 +31,7 @@ const DeleteWhatsAppService = async (id: string): Promise<void> => {
     deleted: true,
   });
 
-  // await whatsapp.destroy();  
+  // await whatsapp.destroy();
 };
 
 export default DeleteWhatsAppService;

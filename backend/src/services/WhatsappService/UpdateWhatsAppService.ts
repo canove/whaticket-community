@@ -56,7 +56,7 @@ const UpdateWhatsAppService = async ({
 
   try {
     await schema.validate({ name, status, isDefault });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

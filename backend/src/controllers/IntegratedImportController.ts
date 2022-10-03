@@ -17,17 +17,17 @@ interface IntegratedImportData {
     key: string;
     token: string;
     mapping: string;
+    companyId: string | number;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-
-  const integratedImport = await ListIntegratedImportService();
+  const companyId = req.user.companyId;
+  const integratedImport = await ListIntegratedImportService(companyId);
 
   return res.status(200).json(integratedImport);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-
   const {
     name,
     method,
@@ -39,6 +39,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     mapping,
 
   }: IntegratedImportData = req.body;
+  const { companyId } = req.user;
 
   const integratedImport = await CreateIntegratedImportService({
     name,
@@ -49,10 +50,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     key,
     token,
     mapping,
+    companyId,
   });
 
   const io = getIO();
-  io.emit("integratedImport", {
+  io.emit(`integratedImport${companyId}`, {
     action: "create",
     integratedImport
   });
@@ -75,11 +77,11 @@ export const update = async (
 
   const importData: IntegratedImportData = req.body;
   const { integratedImportId } = req.params;
-
+  const { companyId } = req.user;
   const integratedImport = await UpdateIntegratedImportService({ importData, integratedImportId });
 
   const io = getIO();
-  io.emit("integratedImport", {
+  io.emit(`integratedImport${companyId}`, {
     action: "update",
     integratedImport
   });
@@ -93,11 +95,11 @@ export const remove = async (
 ): Promise<Response> => {
 
   const { integratedImportId } = req.params;
-
+  const { companyId } = req.user;
   await DeleteIntegratedImportService(integratedImportId);
 
   const io = getIO();
-  io.emit("integratedImport", {
+  io.emit(`integratedImport${companyId}`, {
     action: "delete",
     integratedImportId
   });
