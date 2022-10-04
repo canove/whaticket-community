@@ -49,7 +49,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket, companyId });
+    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true });
   }
 
   SetTicketMessagesAsRead(ticket);
