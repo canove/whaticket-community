@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import openSocket from "../../services/socket-io";
 
@@ -27,6 +27,7 @@ import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { useTranslation } from "react-i18next";
 import { format, parseISO } from "date-fns";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -96,6 +97,8 @@ const Category = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
+  const {user} = useContext(AuthContext)
+
      useEffect(() => {
         dispatch({ type: "RESET" });
     }, []);
@@ -103,7 +106,7 @@ const Category = () => {
     useEffect(() => {
         const fetchCategory = async () => {
             try {
-                const { data } = await api.get("/category");
+                const { data } = await api.get("/category/");
                 dispatch({ type: "LOAD_CATEGORY", payload: data });
                 setLoading(false);
             } catch (err) {
@@ -113,23 +116,23 @@ const Category = () => {
         fetchCategory();
     }, []);
 
-  useEffect(() => {
-    const socket = openSocket();
+    useEffect(() => {
+      const socket = openSocket();
 
-    socket.on("category", (data) => {
-      if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_CATEGORY", payload: data.category });
-      }
+      socket.on(`category${user.companyId}`, (data) => {
+        if (data.action === "update" || data.action === "create") {
+          dispatch({ type: "UPDATE_CATEGORY", payload: data.category });
+        }
 
-      if (data.action === "delete") {
-        dispatch({ type: "DELETE_CATEGORY", payload:+ data.categoryId });
-      }
-    });
+        if (data.action === "delete") {
+          dispatch({ type: "DELETE_CATEGORY", payload: + data.categoryId });
+        }
+      });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+      return () => {
+        socket.disconnect();
+      };
+    }, []);
 
   const handleOpenCategoryModal = () => {
     setCategoryModalOpen(true);

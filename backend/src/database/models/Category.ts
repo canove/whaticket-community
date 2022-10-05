@@ -7,8 +7,11 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  HasMany
+  HasMany,
+  ForeignKey
 } from "sequelize-typescript";
+import Company from "./Company";
+import FileRegister from "./FileRegister";
 import Ticket from "./Ticket";
 
 @Table
@@ -34,7 +37,13 @@ class Category extends Model<Category> {
   @HasMany(() => Ticket)
   tickets: Ticket[];
 
-}
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
+  @HasMany(() => FileRegister)
+  fileRegister: FileRegister[];
+
+}
 
 export default Category;

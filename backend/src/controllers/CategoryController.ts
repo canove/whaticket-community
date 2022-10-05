@@ -5,8 +5,8 @@ import CreateCategoryService from "../services/CategoryServices/CreateCategorySe
 import ShowCategoryService from "../services/CategoryServices/ShowCategoryService";
 import UpdateCategoryService from "../services/CategoryServices/UpdateCategoryService";
 import DeleteCategoryService from "../services/CategoryServices/DeleteCategoryService";
+import DashboardCategoryService from "../services/CategoryServices/DashboardCategoryService";
 
-import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
 
 interface CategoryData {
@@ -88,4 +88,11 @@ export const remove = async (
   });
 
   return res.status(200).json({ message: "Category deleted" });
+};
+
+export const list = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+  const categories = await DashboardCategoryService(companyId)
+
+  return res.status(200).json(categories);
 };

@@ -3,19 +3,20 @@ import { Op } from "sequelize";
 import Contact from "../../database/models/Contact";
 import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "./ShowTicketService";
-
+/*eslint-disable */
 const FindOrCreateTicketService = async (
   contact: Contact,
   whatsappId: number,
   companyId: number,
   unreadMessages: number,
   groupContact?: Contact,
-  isDispatcher?: boolean
+  isDispatcher?: boolean,
+  inBot?: boolean
 ): Promise<Ticket> => {
   let ticket = await Ticket.findOne({
     where: {
       status: {
-        [Op.or]: ["open", "pending", "dispatcher"]
+        [Op.or]: ["open", "pending", "dispatcher", "inbot"]
       },
       whatsappId,
       contactId: groupContact ? groupContact.id : contact.id,
@@ -25,7 +26,10 @@ const FindOrCreateTicketService = async (
 
   if (ticket) {
     await ticket.update({ unreadMessages });
-    if (ticket.status === "dispatcher" && !isDispatcher) {
+    if (
+      !inBot &&
+      !isDispatcher
+    ) {
       await ticket.update({ status: "pending" });
     }
   }
@@ -41,7 +45,7 @@ const FindOrCreateTicketService = async (
 
     if (ticket) {
       await ticket.update({
-        status: isDispatcher === true ? "dispatcher" : "pending",
+        status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
         userId: null,
         unreadMessages
       });
@@ -63,7 +67,7 @@ const FindOrCreateTicketService = async (
 
     if (ticket) {
       await ticket.update({
-        status: isDispatcher === true ? "dispatcher" : "pending",
+        status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
         userId: null,
         unreadMessages
       });
@@ -73,7 +77,7 @@ const FindOrCreateTicketService = async (
   if (!ticket) {
     ticket = await Ticket.create({
       contactId: groupContact ? groupContact.id : contact.id,
-      status: isDispatcher === true ? "dispatcher" : "pending",
+      status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
       isGroup: !!groupContact,
       unreadMessages,
       whatsappId,

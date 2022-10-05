@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface: QueryInterface) => {
     return queryInterface.addColumn("Categories", "companyId", {
       type: DataTypes.INTEGER,
-      references: { model: "Categories", key: "id" },
+      references: { model: "Companies", key: "id" },
       onUpdate: "CASCADE",
       onDelete: "SET NULL"
     });

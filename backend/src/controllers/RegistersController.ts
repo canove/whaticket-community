@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import DashboardCategoryService from "../services/CategoryServices/DashboardCategoryService";
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
 import ListReportRegistersService from "../services/RegistersService/ListReportRegistersService";
 
@@ -34,7 +35,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const error = await ListRegistersService ({ type:"error", fileId, date, companyId });
 
-  return res.status(200).json({report, register, sent, delivered, read, error});
+  const category = await DashboardCategoryService (companyId);
+
+  return res.status(200).json({report, register, sent, delivered, read, error, category});
 }
 
 export const list = async (req: Request, res: Response): Promise<Response> => {

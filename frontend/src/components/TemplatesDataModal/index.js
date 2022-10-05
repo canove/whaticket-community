@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Formik, Form, Field } from "formik";
+
 import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -11,16 +11,14 @@ import {
   DialogActions,
   TextField,
   FormControl,
-  Select,
-  MenuItem,
+  TableCell,
+  Paper,
   TableContainer,
   Table,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
   IconButton,
-  Paper,
+  TableBody,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -117,7 +115,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 
 				formData.set("name", name);
 				formData.set("footer", footer);
-      
+
         let index = 0;
         for (const body of bodies) {
           if ((body.type === "audio" || body.type === "video" || body.type === "image" || body.type === "file") && (typeof body.value !== 'string')) {
@@ -167,7 +165,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     const handleFooterChange = (e) => {
       setFooter(e.target.value);
     }
-    
+
     const handleBodiesChange = (body, index) => {
       let array = [...bodies];
       if (index || index === 0) {
@@ -313,7 +311,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
               </TableContainer>
             </Paper>
           }
-          {!(bodies.length >= 5) && 
+          {!(bodies.length >= 5) &&
             <div className={classes.root}>
               <Button
                 color="primary"

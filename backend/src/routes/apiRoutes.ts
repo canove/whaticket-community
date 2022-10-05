@@ -10,6 +10,11 @@ const upload = multer(uploadConfig);
 
 const ApiRoutes = express.Router();
 ApiRoutes.post(
+  "/whatsapp/botmessage",
+  isAuthApi,
+  WhatsAppController.botMessage
+);
+ApiRoutes.post(
   "/whatsapp/nof/sessionstatus",
   isAuthApi,
   WhatsAppController.nofSessionStatus

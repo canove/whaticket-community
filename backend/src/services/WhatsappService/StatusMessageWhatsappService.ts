@@ -166,6 +166,7 @@ const StatusMessageWhatsappService = async ({
           const messageData = {
             id: msgWhatsId,
             ticketId: createTicket.id,
+            bot: createTicket.status == 'inbot',
             contactId: undefined,
             body: mediaUrl != null ? '' :messageTxt,
             ack: 3,
