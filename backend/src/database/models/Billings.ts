@@ -9,35 +9,28 @@ import {
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
+import BillingControls from "./BillingControls";
 import Company from "./Company";
-import Product from "./Products";
 
 @Table
-class Pricing extends Model<Pricing> {
+class Billings extends Model<Billings> {
   @PrimaryKey
   @AutoIncrement
   @Column
   id: number;
 
-  @Column
-  gracePeriod: number;
-
-  @Column
-  graceTrigger: number;
-
   @ForeignKey(() => Company)
   @Column
   companyId: number;
 
-  @ForeignKey(() => Product)
   @Column
-  productId: number;
+  totalValue: number;
 
   @Column
-  usedGraceTriggers: number;
+  totalTriggerValue: number;
 
   @Column
-  deletedAt: Date;
+  totalMonthValue: number;
 
   @CreatedAt
   createdAt: Date;
@@ -47,9 +40,6 @@ class Pricing extends Model<Pricing> {
 
   @BelongsTo(() => Company)
   company: Company;
-
-  @BelongsTo(() => Product)
-  product: Product;
 }
 
-export default Pricing;
+export default Billings;

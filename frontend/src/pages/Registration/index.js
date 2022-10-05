@@ -52,6 +52,7 @@ import BallotIcon from '@material-ui/icons/Ballot';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
 import CategoryIcon from '@material-ui/icons/Category';
+import TimelineIcon from '@material-ui/icons/Timeline';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -285,6 +286,9 @@ function getIcon(icon) {
   }
   else if (icon === "CategoryIcon") {
     return<CategoryIcon/>
+  }
+  else if (icon === "TimelineIcon") {
+    return <TimelineIcon />
   }
   else {
     return null;

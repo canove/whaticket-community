@@ -58,7 +58,7 @@ const RegistersReports = () => {
         const fetchFiles = async () => {
             try {
                 const { data } = await api.get('file/list');
-                setFiles(data);
+                setFiles(data.reports);
             } catch (err) {
                 toastError(err);
             }

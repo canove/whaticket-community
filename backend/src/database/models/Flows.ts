@@ -6,13 +6,13 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
+  AllowNull,
   ForeignKey
 } from "sequelize-typescript";
-import Billings from "./Billings";
 import Company from "./Company";
 
 @Table
-class BillingControls extends Model<BillingControls> {
+class Flows extends Model<Flows> {
   @PrimaryKey
   @AutoIncrement
   @Column
@@ -22,21 +22,12 @@ class BillingControls extends Model<BillingControls> {
   @Column
   companyId: number;
 
+  @AllowNull(false)
   @Column
-  quantity: number;
+  name: string;
 
   @Column
-  triggerFee: number;
-
-  @ForeignKey(() => Billings)
-  @Column
-  billingId: number;
-
-  @Column
-  processedAt: Date;
-
-  @Column
-  usedGraceTriggers: number;
+  status: string;
 
   @CreatedAt
   createdAt: Date;
@@ -45,4 +36,4 @@ class BillingControls extends Model<BillingControls> {
   updatedAt: Date;
 }
 
-export default BillingControls;
+export default Flows;

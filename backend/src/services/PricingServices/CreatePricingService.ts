@@ -18,7 +18,8 @@ const CreatePricingService = async ({
     companyId,
     productId,
     gracePeriod,
-    graceTrigger
+    graceTrigger,
+    usedGraceTriggers: 0
   });
 
   const createdPricing = await ShowPricingService(pricing.id);
