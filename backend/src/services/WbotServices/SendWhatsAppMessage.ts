@@ -13,13 +13,15 @@ interface Request {
   body: string;
   ticket: Ticket;
   quotedMsg?: Message;
+  fromMe: boolean;
   companyId: number;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
   body,
   ticket,
-  companyId
+  companyId,
+  fromMe,
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -78,7 +80,7 @@ const SendWhatsAppMessage = async ({
             ticketId: ticket.id,
             contactId: undefined,
             body: body,
-            fromMe: true,
+            fromMe: fromMe,
             read: true,
             mediaUrl: null,
             mediaType: null,
@@ -128,11 +130,12 @@ const SendWhatsAppMessage = async ({
             ticketId: ticket.id,
             contactId: undefined,
             body: body,
-            fromMe: true,
+            fromMe: fromMe,
             read: true,
             mediaUrl: null,
             mediaType: null,
             quotedMsgId: null,
+            bot: ticket.status == 'inbot',
             companyId
           };
         

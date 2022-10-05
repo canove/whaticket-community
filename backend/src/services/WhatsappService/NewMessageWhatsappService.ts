@@ -26,6 +26,7 @@ interface Request {
   session: string;
   file: string;
   identification: number;
+  bot?: boolean,
 }
 
 interface Response {
@@ -66,7 +67,8 @@ const NewMessageWhatsappService = async ({
   contactName,
   identification,
   file,
-  session
+  session,
+  bot
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     id: Yup.string().required(),
@@ -103,7 +105,8 @@ const NewMessageWhatsappService = async ({
     isGroup,
     identification,
     file,
-    session
+    session,
+    bot
   );
   return { success: true };
 };
@@ -125,6 +128,7 @@ const verifyMessage = async (
   const messageData = {
     id: msg.id,
     ticketId: ticket.id,
+    bot: ticket.status == 'inbot',
     contactId: msg.fromMe ? undefined : contact.id,
     body: msg.body,
     fromMe: msg.fromMe,
@@ -172,7 +176,8 @@ const handleMessage = async (
   isGroup: boolean,
   identification: number,
   file: string = null,
-  session: string
+  session: string,
+  bot: boolean = false
 ): Promise<void> => {
   try {
     const unreadMessages = 1;
@@ -193,7 +198,8 @@ const handleMessage = async (
       contact,
       whatsapp.id,
       whatsapp.companyId,
-      unreadMessages
+      unreadMessages,
+      null,false, bot
     );
 
     if (type !== "text") {
@@ -251,6 +257,7 @@ const verifyMediaMessage = async (
   const messageData = {
     id: msg.id,
     ticketId: ticket.id,
+    bot: ticket.status == 'inbot',
     contactId: msg.fromMe ? undefined : contact.id,
     body: "",
     fromMe: msg.fromMe,
