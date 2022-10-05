@@ -261,6 +261,7 @@ const WhatsConfig = () => {
             setIsActive(config[0].active);
             setIntervalValue(config[0].triggerInterval);
             setGreetingMessages(config[0].greetingMessages);
+            setUseGreetingMessage(config[0].useGreetingMessages);
 
             if (config[0].whatsappIds === null) {
                 setSelectedConnection(['all']);
@@ -292,12 +293,6 @@ const WhatsConfig = () => {
                 setSelectedConnection(connectedArray);
                 setDisconnectedWhatsapps(disconnectArray);
                 setDeletedWhatsapps(deletedArray);
-            }
-
-            if (config[0].greetingMessages && config[0].greetingMessages.length > 0) {
-                setUseGreetingMessage(true);
-            } else {
-                setUseGreetingMessage(false);
             }
         }
     }, [config, whatsApps]);

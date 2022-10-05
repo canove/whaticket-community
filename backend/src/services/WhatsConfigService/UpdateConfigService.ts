@@ -9,7 +9,7 @@ interface Request {
 
 const UpdateConfigService = async ({
   configData,
-  configId,
+  configId
 }: Request): Promise<WhatsappsConfig | undefined> => {
   const config = await ShowConfigService(configId);
 
@@ -18,6 +18,7 @@ const UpdateConfigService = async ({
     triggerInterval,
     whatsappIds,
     active,
+    useGreetingMessages,
     greetingMessages = []
   } = configData;
 
@@ -25,7 +26,8 @@ const UpdateConfigService = async ({
     id,
     triggerInterval,
     whatsappIds,
-    active
+    active,
+    useGreetingMessages
   });
 
   greetingMessages.forEach(async greetingMessage => {
