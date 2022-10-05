@@ -40,6 +40,9 @@ class WhatsappsConfig extends Model<WhatsappsConfig> {
 
   @Column
   active: boolean;
+
+  @Column
+  useGreetingMessages: boolean;
 }
 
 export default WhatsappsConfig;
