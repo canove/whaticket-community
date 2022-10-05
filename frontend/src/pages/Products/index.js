@@ -154,14 +154,12 @@ const Products = () => {
         setDeletingProduct(null);
     };
 
-
     function formatReal(num) {
         var p = num.toFixed(2).split(".");
         return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
             return num + (num != "-" && i && !(i % 3) ? "." : "") + acc;
         }, "") + "," + p[1];
     };
-
 
     const handleOpenHistoricModal = (pricing) => {
         setSelectedHistoric(pricing);

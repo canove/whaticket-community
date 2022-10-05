@@ -88,24 +88,24 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
 			}
 		} catch (err) {
 			toastError(err);
-		}
-	};
+		  }
+	  };
 
     const handleClose = () => {
       onClose();
     };
 
     const handleSelectDescription = (e) => {
-        setSelectedDescription(e.target.value);
+      setSelectedDescription(e.target.value);
     };
 
     const handleOpenSelect = () => {
-		setOpenSelect(true)
-	};
+		  setOpenSelect(true)
+	  };
 
-	const handleCloseSelect = () => {
-		setOpenSelect(false)
-	};
+    const handleCloseSelect = () => {
+      setOpenSelect(false)
+    };
 
     return (
       <div className={classes.root}>
@@ -136,10 +136,10 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
 							onClose={handleCloseSelect}
 							style={{width: "100%"}}
 						>
-                            <MenuItem value={"Nenhuma"}>Nenhuma</MenuItem>
+              <MenuItem value={"Nenhuma"}>Nenhuma</MenuItem>
 							{description.length > 0 && description.map((category, index) => {
 										return (
-											<MenuItem key={index} value={category.id}>{category.name}</MenuItem>
+							<MenuItem key={index} value={category.id}>{category.name}</MenuItem>
 										)
 							})}
 						</Select>

@@ -12,7 +12,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { TextField } from "@material-ui/core";
+import { MenuItem, TextField } from "@material-ui/core";
 import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -60,6 +60,7 @@ const Dashboard = () => {
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
   var userQueueIds = [];
+  var render = false;
 
   const [loading, setLoading] = useState(false);
   const [registerCount, setRegisterCount] = useState(0)
@@ -70,6 +71,7 @@ const Dashboard = () => {
   const [fileId, setFileId] = useState("");
   const [files, setFiles] = useState([]);
   const [date, setDate] = useState("");
+  const [categoryCount, setCategoryCount] = useState([]);
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -105,7 +107,7 @@ const Dashboard = () => {
         setDeliveredCount(response.data.delivered.count);
         setReadCount(response.data.read.count);
         setErrorCount(response.data.error.count);
-
+        setCategoryCount(response.data.category);
         setLoading(false);
       } catch (err) {
         toastError(err);
@@ -323,6 +325,26 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
+          { categoryCount.length > 0 &&
+           <Grid item xs={12}>
+            <Paper style={{ overflow: "hidden", padding: "20px" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                {i18n.t("Atendimentos por Categoria")}
+              </Typography>
+              <Grid item>
+                {categoryCount.map(category => {
+                    return(
+                          <Typography key={category.name} component="h1" variant="h6">
+                            {category.name} : {category.count}
+                          </Typography>
+                          )
+                        }
+                      )}
+              </Grid>
+            </Paper>
+          </Grid>
+          }
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart />

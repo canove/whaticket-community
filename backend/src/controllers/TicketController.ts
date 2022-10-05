@@ -10,7 +10,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import formatBody from "../helpers/Mustache";
 import HistoricService from "../services/TicketServices/HistoricService";
-import ResolveService from "../services/TicketServices/HistoricService";
+import ResolveService from "../services/TicketServices/ResolveService";
 
 type IndexQuery = {
   searchParam: string;
