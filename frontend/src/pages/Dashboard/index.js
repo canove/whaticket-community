@@ -100,14 +100,13 @@ const Dashboard = () => {
 			setLoading(true);
       try {
         setLoading(true);
-
-        let response = await api.get(`/registers/list?fileId=${fileId}&date=${date}`);
-        setRegisterCount(response.data.register.count);
-        setSentCount(response.data.sent.count);
-        setDeliveredCount(response.data.delivered.count);
-        setReadCount(response.data.read.count);
-        setErrorCount(response.data.error.count);
-        setCategoryCount(response.data.category);
+        const { data } = await api.get(`/registers/list?fileId=${fileId}&date=${date}`);
+        setRegisterCount(data.register.count);
+        setSentCount(data.sent.count);
+        setDeliveredCount(data.delivered.count);
+        setReadCount(data.read.count);
+        setErrorCount(data.error.count);
+        setCategoryCount(data.category);
         setLoading(false);
       } catch (err) {
         toastError(err);
@@ -325,7 +324,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          { categoryCount.length > 0 &&
+          { categoryCount && categoryCount.length > 0 &&
            <Grid item xs={12}>
             <Paper style={{ overflow: "hidden", padding: "20px" }}
             >

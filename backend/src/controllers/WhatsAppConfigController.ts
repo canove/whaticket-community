@@ -18,7 +18,7 @@ interface ConfigData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const config = await ListWhatsConfigService(companyId);
 
@@ -31,7 +31,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     whatsappIds,
     useGreetingMessages,
     greetingMessages,
-    active,
+    active
   } = req.body as ConfigData;
 
   const { companyId } = req.user;

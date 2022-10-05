@@ -40,10 +40,6 @@ class Category extends Model<Category> {
   @ForeignKey(() => Company)
   @Column
   companyId: number;
-
-  @HasMany(() => FileRegister)
-  fileRegister: FileRegister[];
-
 }
 
 export default Category;

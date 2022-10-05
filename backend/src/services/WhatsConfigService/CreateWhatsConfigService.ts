@@ -24,7 +24,8 @@ const CreateWhatsConfigService = async ({
       triggerInterval,
       whatsappIds,
       active,
-      companyId
+      companyId,
+      useGreetingMessages
     });
 
     const configId = config.id;

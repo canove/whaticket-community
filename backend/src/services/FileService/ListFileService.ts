@@ -39,7 +39,7 @@ const ListFileService = async ({
     };
   }
 
-  if (!status && initialDate !== null) {
+  if (!status && initialDate !== null && initialDate !== undefined) {
     where = {
       createdAt: {
         [Op.gte]: new Date(initialDate)
