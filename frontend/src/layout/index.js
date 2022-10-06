@@ -152,7 +152,7 @@ const LoggedInLayout = ({ children }) => {
   const handleSaveUser = async (language) => {
     if (user.id) {
       try {
-        await api.put(`/users/language/${user.id}`, language);
+        await api.put(`/users/language/${user.id}`, { language });
       } catch (err) {
         toastError(err);
       }
