@@ -140,7 +140,7 @@ const LoggedInLayout = ({ children }) => {
   const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
   const [logo, setLogo] = useState("");
 
-  const mainListItems = useMemo(() => <MainListItems />, [user])
+  const mainListItems = useMemo(() => <MainListItems drawerOpen={drawerOpen} />, [user, drawerOpen])
 
   const { i18n } = useTranslation();
 
