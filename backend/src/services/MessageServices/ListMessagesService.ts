@@ -6,6 +6,7 @@ import ShowTicketService from "../TicketServices/ShowTicketService";
 interface Request {
   ticketId: string;
   pageNumber?: string;
+  companyId: number | string;
 }
 
 interface Response {
@@ -17,9 +18,10 @@ interface Response {
 
 const ListMessagesService = async ({
   pageNumber = "1",
-  ticketId
+  ticketId,
+  companyId
 }: Request): Promise<Response> => {
-  const ticket = await ShowTicketService(ticketId);
+  const ticket = await ShowTicketService(ticketId, companyId);
 
   if (!ticket) {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);

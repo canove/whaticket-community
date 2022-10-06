@@ -4,8 +4,12 @@ import Contact from "../../database/models/Contact";
 import User from "../../database/models/User";
 import Queue from "../../database/models/Queue";
 
-const ShowTicketService = async (id: string | number): Promise<Ticket> => {
-  const ticket = await Ticket.findByPk(id, {
+const ShowTicketService = async (
+  id: string | number,
+  companyId: string | number
+): Promise<Ticket> => {
+  const ticket = await Ticket.findOne({
+    where: { id, companyId },
     include: [
       {
         model: Contact,
