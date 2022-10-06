@@ -35,7 +35,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const error = await ListRegistersService ({ type:"error", fileId, date, companyId });
 
-  const category = await DashboardCategoryService (companyId);
+  const category = await DashboardCategoryService (companyId, date);
 
   return res.status(200).json({report, register, sent, delivered, read, error, category});
 }

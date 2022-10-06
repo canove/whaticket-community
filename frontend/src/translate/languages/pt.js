@@ -346,6 +346,15 @@ const messages = {
           fileImport: "Importação Arquivo",
           integratedImport:"Importação Integrada",
           category: "Categoria",
+          adminBits: "Admin BITS",
+          menuLink: "Vínculo de Menu",
+          registration: "Cadastro",
+          finance: "Finanças",
+          products: "Produtos",
+          pricing: "Precificação",
+          payment: "Pagamento",
+          flows: "Fluxo",
+
         },
         whatsApp: {
           connections: "Conexões",

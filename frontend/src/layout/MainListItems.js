@@ -27,6 +27,10 @@ import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
 import CategoryIcon from '@material-ui/icons/Category';
 import TimelineIcon from '@material-ui/icons/Timeline';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import PaymentIcon from '@material-ui/icons/Payment';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
@@ -120,6 +124,18 @@ function getIcon(icon) {
   }
   else if (icon === "TimelineIcon") {
     return <TimelineIcon />
+  }
+  else if (icon === "AttachMoneyIcon") {
+        return <AttachMoneyIcon />
+  }
+  else if (icon === "MonetizationOnIcon") {
+        return <MonetizationOnIcon />
+  }
+  else if (icon === "PaymentIcon") {
+        return <PaymentIcon />
+  }
+  else if (icon === "ShoppingCartIcon") {
+        return <ShoppingCartIcon />
   }
   else {
     return null;
@@ -399,6 +415,30 @@ const MainListItems = (props) => {
 
     if (name === "Registers Reports") {
       return i18n.t("mainDrawer.listItems.logReports");
+    }
+    if (name === "Admin BITS") {
+      return i18n.t("mainDrawer.listItems.adminBits");
+    }
+    if (name === "Menu Link") {
+      return i18n.t("mainDrawer.listItems.menuLink");
+    }
+    if (name === "Registration") {
+      return i18n.t("mainDrawer.listItems.registration");
+    }
+    if (name === "Finance") {
+      return i18n.t("mainDrawer.listItems.finance");
+    }
+    if (name === "Products") {
+      return i18n.t("mainDrawer.listItems.products");
+    }
+    if (name === "Pricing") {
+      return i18n.t("mainDrawer.listItems.pricing");
+    }
+    if (name === "Payment") {
+      return i18n.t("mainDrawer.listItems.payment");
+    }
+    if (name === "Flows") {
+      return i18n.t("mainDrawer.listItems.flows");
     }
 
     return name;

@@ -89,10 +89,3 @@ export const remove = async (
 
   return res.status(200).json({ message: "Category deleted" });
 };
-
-export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { companyId } = req.user;
-  const categories = await DashboardCategoryService(companyId)
-
-  return res.status(200).json(categories);
-};

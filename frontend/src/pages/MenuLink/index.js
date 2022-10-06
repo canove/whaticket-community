@@ -47,6 +47,10 @@ import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
 import CategoryIcon from '@material-ui/icons/Category';
 import TimelineIcon from '@material-ui/icons/Timeline';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import PaymentIcon from '@material-ui/icons/Payment';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -165,6 +169,18 @@ function getIcon(icon, id, selectedMenusIds) {
   else if (icon === "TimelineIcon") {
     return <TimelineIcon style={getIconStyles(id, selectedMenusIds)} />
   }
+  else if (icon === "AttachMoneyIcon") {
+    return <AttachMoneyIcon style={getIconStyles(id, selectedMenusIds)} />
+  }
+  else if (icon === "MonetizationOnIcon") {
+    return <MonetizationOnIcon style={getIconStyles(id, selectedMenusIds)} />
+  }
+  else if (icon === "PaymentIcon") {
+    return <PaymentIcon style={getIconStyles(id, selectedMenusIds)} />
+  }
+  else if (icon === "ShoppingCartIcon") {
+    return <ShoppingCartIcon style={getIconStyles(id, selectedMenusIds)} />
+  }
   else {
     return null;
   }
@@ -268,6 +284,25 @@ const MenuLink = () => {
     if(menuName === "Category"){
       return i18n.t("Categoria")
     }
+    if(menuName === "Admin BITS"){
+      return i18n.t("Admin BITS")
+    }
+    if(menuName === "Finance"){
+      return i18n.t("Finanças")
+    }
+    if(menuName === "Products"){
+      return i18n.t("Produtos")
+    }
+    if(menuName === "Pricing"){
+      return i18n.t("Precificação")
+    }
+    if(menuName === "Payment"){
+      return i18n.t("Pagamento")
+    }
+    if(menuName === "Flows"){
+      return i18n.t("Fluxo")
+    }
+
     return menuName
   };
 

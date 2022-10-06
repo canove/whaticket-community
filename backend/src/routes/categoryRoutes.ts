@@ -9,8 +9,6 @@ categoryRoutes.get("/category", isAuth, CategoryController.index);
 
 categoryRoutes.post("/category", isAuth, CategoryController.store);
 
-categoryRoutes.get("category/list", isAuth, CategoryController.list);
-
 categoryRoutes.get("/category/:categoryId", isAuth, CategoryController.show);
 
 categoryRoutes.put("/category/:categoryId", isAuth, CategoryController.update);

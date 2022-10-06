@@ -60,7 +60,6 @@ const Dashboard = () => {
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
   var userQueueIds = [];
-  var render = false;
 
   const [loading, setLoading] = useState(false);
   const [registerCount, setRegisterCount] = useState(0)
@@ -156,6 +155,19 @@ const Dashboard = () => {
       } else {
         return `${option.name}`;
       }
+  };
+
+  const getGridSize = () => {
+    if (categoryCount.length === 1){
+      return 12
+    }
+    if (categoryCount.length === 2){
+      return 6
+    }
+    if (categoryCount.length === 3){
+      return 4
+    }
+    return 12
   };
 
   return (
@@ -325,25 +337,30 @@ const Dashboard = () => {
             </Paper>
           </Grid>
           { categoryCount && categoryCount.length > 0 &&
-           <Grid item xs={12}>
-            <Paper style={{ overflow: "hidden", padding: "20px" }}
-            >
+            <Grid item xs={12}>
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("Atendimentos por Categoria")}
+                  {i18n.t("Atendimentos por Categoria")}
               </Typography>
-              <Grid item>
-                {categoryCount.map(category => {
-                    return(
-                          <Typography key={category.name} component="h1" variant="h6">
-                            {category.name} : {category.count}
-                          </Typography>
-                          )
-                        }
-                      )}
-              </Grid>
-            </Paper>
-          </Grid>
-          }
+            </Grid>}
+          { categoryCount && categoryCount.map((category) => (
+
+             <Grid item xs={getGridSize()} key={category.name} >
+              <Paper className={classes.customFixedHeightPaper}
+                style={{ overflow: "hidden" }}
+              >
+                <Typography component="h3" variant="h6" color="primary" paragraph>
+                  {category.name}
+                </Typography>
+                <Grid item>
+                <Typography component="h1" variant="h4">
+                 {category.count}
+                </Typography>
+                </Grid>
+              </Paper>
+            </Grid>
+
+
+          ))}
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart />

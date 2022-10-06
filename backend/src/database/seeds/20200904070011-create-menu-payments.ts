@@ -12,7 +12,7 @@ module.exports = {
       [
         {
           name: "Payments",
-          icon: "EqualizerIcon",
+          icon: "PaymentIcon",
           parentId: Menus[0][0].id,
           isParent: false,
           createdAt: new Date(),

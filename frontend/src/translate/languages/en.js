@@ -344,7 +344,15 @@ const messages = {
           menus: "Menus",
           fileImport: "File Import",
           integratedImport:"Integrated Import",
-          category: "Category"
+          category: "Category",
+          adminBits: "Admin BITS",
+          menuLink: "Menu Link",
+          registration: "Registration",
+          finance: "Finance",
+          products: "Products",
+          pricing: "Pricing",
+          payment: "Payment",
+          flows: "Flows",
         },
         whatsApp: {
           connections: "Connections",
