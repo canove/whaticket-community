@@ -13,6 +13,10 @@ categoryRoutes.get("/category/:categoryId", isAuth, CategoryController.show);
 
 categoryRoutes.put("/category/:categoryId", isAuth, CategoryController.update);
 
-categoryRoutes.delete("/category/:categoryId", isAuth, CategoryController.remove);
+categoryRoutes.delete(
+  "/category/:categoryId",
+  isAuth,
+  CategoryController.remove
+);
 
 export default categoryRoutes;

@@ -17,15 +17,19 @@ type IndexQuery = {
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
 
+  const { user } = req;
+
+  if (user.profile !== "admin" || user.companyId !== 1) {
+    throw new AppError("ERR_NO_PERMISSION", 403);
+  }
+
   const { menus, count, hasMore } = await ListMenusService({
     searchParam,
     pageNumber
-
   });
 
   return res.json({ menus, count, hasMore });
 };
-
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { menuId } = req.params;
@@ -39,13 +43,21 @@ export const showCompany = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const menus = await ShowCompanyMenuService(req.user.companyId);
+  const { companyId } = req.user;
+
+  const menus = await ShowCompanyMenuService(companyId);
 
   return res.status(200).json(menus);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { name, icon, parentId, isParent } = req.body;
+
+  const { user } = req;
+
+  if (user.profile !== "admin" || user.companyId !== 1) {
+    throw new AppError("ERR_NO_PERMISSION", 403);
+  }
 
   const menu = await CreateMenuService({
     name,
@@ -54,7 +66,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isParent
   });
 
- const io = getIO();
+  const io = getIO();
   io.emit("menu", {
     action: "create",
     menu
@@ -69,6 +81,12 @@ export const update = async (
 ): Promise<Response> => {
   const { menuId } = req.params;
   const menuData = req.body;
+
+  const { user } = req;
+
+  if (user.profile !== "admin" || user.companyId !== 1) {
+    throw new AppError("ERR_NO_PERMISSION", 403);
+  }
 
   const menu = await UpdateMenuService({ menuData, menuId });
 
@@ -86,6 +104,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { menuId } = req.params;
+
+  const { user } = req;
+
+  if (user.profile !== "admin" || user.companyId !== 1) {
+    throw new AppError("ERR_NO_PERMISSION", 403);
+  }
 
   await DeleteMenuService(menuId);
 

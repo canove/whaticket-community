@@ -143,7 +143,7 @@ function getIcon(icon) {
 }
 
 function ListParentItemLink(props) {
-  const { icon, primary, connectionWarning, children, translation } = props;
+  const { icon, primary, connectionWarning, children, translation, drawerOpen } = props;
 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
@@ -165,7 +165,7 @@ function ListParentItemLink(props) {
         </ListItem>
       </li>
       <Collapse component="li" in={open} timeout="auto" unmountOnExit>
-        <List disablePadding className={classes.nested} >
+        <List disablePadding className={drawerOpen ? classes.nested : ""} >
           { children && children.map(child => {
             if (child.isParent) {
               return (
@@ -175,6 +175,7 @@ function ListParentItemLink(props) {
                   primary={translation(child.name)}
                   children={child.children}
                   translation={translation}
+                  drawerOpen={drawerOpen}
                 />
               )
             } else {
@@ -184,6 +185,7 @@ function ListParentItemLink(props) {
                   to={`/${(child.name).replaceAll(" ", "")}`}
                   primary={translation(child.name)}
                   icon={child.icon}
+                  drawerOpen={drawerOpen}
                 />
               )
             }
@@ -195,7 +197,7 @@ function ListParentItemLink(props) {
 }
 
 function ListItemLink(props) {
-  const { icon, to, primary, className, ...other } = props;
+  const { icon, to, primary, className, drawerOpen, ...other } = props;
 
   const renderLink = forwardRef((itemProps, ref) => (<RouterLink to={to} ref={ref} {...itemProps} />))
 
@@ -212,7 +214,7 @@ function ListItemLink(props) {
 }
 
 const MainListItems = (props) => {
-  const { drawerClose } = props;
+  const { drawerOpen, drawerClose } = props;
   const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const { i18n } = useTranslation();
@@ -454,6 +456,7 @@ const MainListItems = (props) => {
               to={`/`}
               primary={getTranslation(menu.name)}
               icon={menu.icon}
+              drawerOpen={drawerOpen}
             />
           )
         }
@@ -466,6 +469,7 @@ const MainListItems = (props) => {
               primary={getTranslation(menu.name)}
               children={menu.children}
               translation={getTranslation}
+              drawerOpen={drawerOpen}
             />
           )
         } else {
@@ -475,6 +479,7 @@ const MainListItems = (props) => {
               to={`/${(menu.name).replaceAll(" ", "")}`}
               primary={getTranslation(menu.name)}
               icon={menu.icon}
+              drawerOpen={drawerOpen}
             />
           )
         }

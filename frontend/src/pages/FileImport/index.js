@@ -239,7 +239,6 @@ const FileImport = () => {
     setLoading(true);
     try {
       setLoading(true);
-      console.log("?");
       const { data } = await api.get(`file/list`, {
         params: {
           status,

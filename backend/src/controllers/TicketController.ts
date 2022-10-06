@@ -38,7 +38,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     searchParam,
     showAll,
     queueIds: queueIdsStringified,
-    withUnreadMessages,
+    withUnreadMessages
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -87,13 +87,17 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
+  const { companyId } = req.user;
 
-  const contact = await ShowTicketService(ticketId);
+  const contact = await ShowTicketService(ticketId, companyId);
 
   return res.status(200).json(contact);
 };
 
-export const historic = async (req: Request, res: Response): Promise<Response> => {
+export const historic = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { contactId } = req.params;
 
   const contact = await HistoricService(contactId);
@@ -101,7 +105,10 @@ export const historic = async (req: Request, res: Response): Promise<Response> =
   return res.status(200).json(contact);
 };
 
-export const resolve = async (req: Request, res: Response): Promise<Response> => {
+export const resolve = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { categoryId } = req.params;
 
   const category = await ResolveService(categoryId);
@@ -120,10 +127,11 @@ export const update = async (
   const { ticket } = await UpdateTicketService({
     ticketData,
     ticketId,
+    companyId
   });
 
   if (ticket.status === "closed") {
-    const whatsapp = await ShowWhatsAppService(ticket.whatsappId);
+    const whatsapp = await ShowWhatsAppService(ticket.whatsappId, companyId);
 
     const { farewellMessage } = whatsapp;
 

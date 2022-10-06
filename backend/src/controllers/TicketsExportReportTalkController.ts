@@ -2,30 +2,35 @@ import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
 import Message from "../database/models/Message";
 
-var fs = require("fs");
-var pdf = require("pdf-creator-node");
-var pdf2base64 = require('pdf-to-base64');
+const fs = require("fs");
+const pdf = require("pdf-creator-node");
+const pdf2base64 = require("pdf-to-base64");
 
 type IndexQuery = {
-    userId: Number;
-    initialDate: string;
-    finalDate: string;
-}
+  userId: number;
+  initialDate: string;
+  finalDate: string;
+};
 
 type Report = {
-    id: string,
-    body: string,
-    mediaUrl: string | null,
-    ticketId: number,
-    createdAt: Date,
-    read: number | boolean,
-}
+  id: string;
+  body: string;
+  mediaUrl: string | null;
+  ticketId: number;
+  createdAt: Date;
+  read: number | boolean;
+};
 
-export const index = async (req: Request, res: Response) => {
-    const { userId="", initialDate="", finalDate="" } = req.query as unknown as IndexQuery;
-    const companyId = req.user.companyId;
+export const index = async (req: Request, res: Response): Promise<void> => {
+  const {
+    userId = "",
+    initialDate = "",
+    finalDate = ""
+  } = req.query as unknown as IndexQuery;
+  const { companyId } = req.user;
 
-    const reports:Array<Report> = await Message.sequelize?.query(`
+  const reports: Array<Report> = await Message.sequelize?.query(
+    `
         select
 	        msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
         from
@@ -42,45 +47,46 @@ export const index = async (req: Request, res: Response) => {
             tickets.companyId = ${companyId}
     `,
     { type: QueryTypes.SELECT }
-    );
+  );
 
-    const checkZero = (data) => {
-        if(data.length == 1){
-            data = "0" + data;
-        }
-        return data;
+  const checkZero = data => {
+    if (data.length == 1) {
+      data = `0${data}`;
     }
-    
-    const formatDate = (date) => {
-        if (date === null) {
-            return "";
-        } else {
-            let dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(date.getHours() + "")}:${checkZero(date.getMinutes() + "")}`;
-            return dateString;
-        }
-    }
+    return data;
+  };
 
-    const isRead = (read) => {
-        if (read === 1) {
-            return "Sim";
-        } else if (read === 2) {
-            return "Não";
-        } else {
-            return read;
-        }
+  const formatDate = date => {
+    if (date === null) {
+      return "";
     }
-    
-    const getReportData = () => {
-        let text = '';
-        reports.forEach((report: Report) => {
-            const id = report.id;
-            const body = report.body;
-            const read = isRead(report.read);
-            const mediaUrl = report.mediaUrl ? report.mediaUrl : '';
-            const ticketId = report.ticketId;
-            const createdAt = formatDate(report.createdAt);
+    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
+      `${date.getHours()}`
+    )}:${checkZero(`${date.getMinutes()}`)}`;
+    return dateString;
+  };
 
-            text += `
+  const isRead = read => {
+    if (read === 1) {
+      return "Sim";
+    }
+    if (read === 2) {
+      return "Não";
+    }
+    return read;
+  };
+
+  const getReportData = () => {
+    let text = "";
+    reports.forEach((report: Report) => {
+      const { id } = report;
+      const { body } = report;
+      const read = isRead(report.read);
+      const mediaUrl = report.mediaUrl ? report.mediaUrl : "";
+      const { ticketId } = report;
+      const createdAt = formatDate(report.createdAt);
+
+      text += `
                 <tr>
                     <td style="border: 1px solid black">${id}</td>
                     <td style="border: 1px solid black">${body}</td>
@@ -89,12 +95,12 @@ export const index = async (req: Request, res: Response) => {
                     <td style="border: 1px solid black">${ticketId}</td>
                     <td style="border: 1px solid black">${createdAt}</td>
                 </tr>
-            `
-        });
-        return text;
-    }
+            `;
+    });
+    return text;
+  };
 
-    var html = `
+  const html = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -125,37 +131,37 @@ export const index = async (req: Request, res: Response) => {
         </html>
     `;
 
-    var options = {
-        format: "A3",
-        orientation: "portrait",
-        border: "10mm",
-        footer: {
-            height: "28mm",
-            contents: {
-                default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>',
-            }
-        }
-    };
+  const options = {
+    format: "A3",
+    orientation: "portrait",
+    border: "10mm",
+    footer: {
+      height: "28mm",
+      contents: {
+        default:
+          '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>'
+      }
+    }
+  };
 
-    var documento = {
-        html: html,
-        data: {
-          reports: reports,
-        },
-        path: "./src/downloads/output.pdf",
-        type: "",
-    };
+  const documento = {
+    html,
+    data: {
+      reports
+    },
+    path: "./src/downloads/output.pdf",
+    type: ""
+  };
 
-    await pdf.create(documento, options);
+  await pdf.create(documento, options);
 
-    pdf2base64("./src/downloads/output.pdf").then((pdfBase: Response) => {
-        return res.status(200).json(pdfBase);
-    })
+  pdf2base64("./src/downloads/output.pdf").then((pdfBase: Response) => {
+    return res.status(200).json(pdfBase);
+  });
 
-    fs.unlink('./src/downloads/output.pdf', (err: Error) => {
-        if (err) {
-            throw err;
-        }
-    });
-
-}
+  fs.unlink("./src/downloads/output.pdf", (err: Error) => {
+    if (err) {
+      throw err;
+    }
+  });
+};

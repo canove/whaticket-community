@@ -1,9 +1,10 @@
-import AppError from "../../errors/AppError";
+import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import ShowUserService from "./ShowUserService";
 
 interface Request {
   userId: string | number;
   language: string;
+  companyId: string | number;
 }
 
 interface Response {
@@ -15,15 +16,18 @@ interface Response {
 
 const UpdateUserLanguageService = async ({
   userId,
-  language
+  language,
+  companyId
 }: Request): Promise<Response | undefined> => {
-  const user = await ShowUserService(userId);
+  const user = await ShowUserService(userId, companyId);
 
   await user.update({
     lang: language
   });
 
   await user.reload();
+
+  const company = await ShowCompanyService(user.companyId);
 
   const serializedUser = {
     id: user.id,
@@ -32,7 +36,8 @@ const UpdateUserLanguageService = async ({
     profile: user.profile,
     queues: user.queues,
     lang: user.lang,
-    companyId: user.companyId
+    companyId: user.companyId,
+    company
   };
 
   return serializedUser;

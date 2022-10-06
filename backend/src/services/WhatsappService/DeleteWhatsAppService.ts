@@ -3,9 +3,9 @@ import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 import { logger } from "../../utils/logger";
 /*eslint-disable*/
-const DeleteWhatsAppService = async (id: string): Promise<void> => {
+const DeleteWhatsAppService = async (id: string, companyId: string | number): Promise<void> => {
   const whatsapp = await Whatsapp.findOne({
-    where: { id }
+    where: { id, companyId }
   });
 
   if (!whatsapp) {

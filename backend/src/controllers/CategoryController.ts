@@ -10,27 +10,27 @@ import DashboardCategoryService from "../services/CategoryServices/DashboardCate
 import { getIO } from "../libs/socket";
 
 interface CategoryData {
-    name: string;
-    description:string;
-    companyId: string | number;
+  name: string;
+  description: string;
+  companyId: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
+
   const category = await ListCategoryService(companyId);
 
   return res.status(200).json(category);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-
-  const {name, description,}: CategoryData = req.body;
+  const { name, description }: CategoryData = req.body;
   const { companyId } = req.user;
 
   const category = await CreateCategoryService({
     name,
     description,
-    companyId,
+    companyId
   });
 
   const io = getIO();
@@ -43,10 +43,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
-
   const { categoryId } = req.params;
+  const { companyId } = req.user;
 
-  const category = await ShowCategoryService(categoryId);
+  const category = await ShowCategoryService(categoryId, companyId);
 
   return res.status(200).json(category);
 };
@@ -55,12 +55,15 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   const categoryData: CategoryData = req.body;
   const { categoryId } = req.params;
   const { companyId } = req.user;
 
-  const category = await UpdateCategoryService({ categoryData, categoryId });
+  const category = await UpdateCategoryService({
+    categoryData,
+    categoryId,
+    companyId
+  });
 
   const io = getIO();
   io.emit(`category${companyId}`, {
@@ -75,11 +78,10 @@ export const remove = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   const { categoryId } = req.params;
   const { companyId } = req.user;
 
-  await DeleteCategoryService(categoryId);
+  await DeleteCategoryService(categoryId, companyId);
 
   const io = getIO();
   io.emit(`category${companyId}`, {

@@ -4,14 +4,18 @@ import ListFileService from "../services/FileService/ListFileService";
 import UpdateFileService from "../services/UploadFileService/UpdateFileService";
 
 type IndexQuery = {
-  status: number;
-  initialDate: string;
-  pageNumber: string;
+  status?: number;
+  initialDate?: string;
+  pageNumber?: string;
+};
+
+type UpdateQuery = {
+  status: number | string;
+  userId: number | string;
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { status, initialDate, pageNumber } =
-    req.query as unknown as IndexQuery;
+  const { status, initialDate, pageNumber } = req.query as IndexQuery;
 
   const { companyId } = req.user;
 
@@ -30,10 +34,10 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   const { fileId } = req.params;
-  const { status, userId } = req.query;
+  const { status, userId } = req.query as UpdateQuery;
   const { companyId } = req.user;
 
-  const file = await UpdateFileService({ status, userId, fileId });
+  const file = await UpdateFileService({ status, userId, fileId, companyId });
 
   const io = getIO();
   io.emit(`file${companyId}`, {
@@ -42,4 +46,4 @@ export const update = async (
   });
 
   return res.status(200).json(file);
-}
+};

@@ -32,8 +32,6 @@ const UpdateUserService = async ({
   userId,
   userCompanyId
 }: Request): Promise<Response | undefined> => {
-  const user = await ShowUserService(userId);
-
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
     email: Yup.string().email(),
@@ -48,9 +46,11 @@ const UpdateUserService = async ({
     companyId = userCompanyId;
   }
 
+  const user = await ShowUserService(userId, companyId);
+
   try {
     await schema.validate({ email, password, profile, name });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
