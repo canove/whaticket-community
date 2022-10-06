@@ -339,6 +339,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
+                  disabled={isSubmitting}
                 >
                   {companyId
                     ? `${i18n.t("userModal.buttons.okEdit")}`
