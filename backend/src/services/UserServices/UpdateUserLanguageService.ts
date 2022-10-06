@@ -1,4 +1,5 @@
 import AppError from "../../errors/AppError";
+import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import ShowUserService from "./ShowUserService";
 
 interface Request {
@@ -25,6 +26,8 @@ const UpdateUserLanguageService = async ({
 
   await user.reload();
 
+  const company = await ShowCompanyService(user.companyId);
+
   const serializedUser = {
     id: user.id,
     name: user.name,
@@ -32,7 +35,8 @@ const UpdateUserLanguageService = async ({
     profile: user.profile,
     queues: user.queues,
     lang: user.lang,
-    companyId: user.companyId
+    companyId: user.companyId,
+    company
   };
 
   return serializedUser;
