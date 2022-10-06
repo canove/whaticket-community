@@ -13,9 +13,6 @@ interface Request {
   templateId?: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Response {}
-
 const CreateUploadFileService = async ({
   name,
   ownerid,
@@ -24,7 +21,7 @@ const CreateUploadFileService = async ({
   filePath,
   companyId,
   templateId = null
-}: Request): Promise<Response | null> => {
+}: Request): Promise<File> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
     region: process.env.AWS_REGION

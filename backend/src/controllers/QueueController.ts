@@ -6,12 +6,8 @@ import ListQueuesService from "../services/QueueService/ListQueuesService";
 import ShowQueueService from "../services/QueueService/ShowQueueService";
 import UpdateQueueService from "../services/QueueService/UpdateQueueService";
 
-type IndexQuery = {
-  companyId: string | number;
-}
-
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const queues = await ListQueuesService(companyId);
 
@@ -40,8 +36,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { queueId } = req.params;
+  const { companyId } = req.user;
 
-  const queue = await ShowQueueService(queueId);
+  const queue = await ShowQueueService(queueId, companyId);
 
   return res.status(200).json(queue);
 };
@@ -50,10 +47,11 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  const queueData = req.body;
   const { queueId } = req.params;
   const { companyId } = req.user;
 
-  const queue = await UpdateQueueService(queueId, req.body);
+  const queue = await UpdateQueueService(queueId, queueData, companyId);
 
   const io = getIO();
   io.emit(`queue${companyId}`, {
@@ -71,7 +69,7 @@ export const remove = async (
   const { queueId } = req.params;
   const { companyId } = req.user;
 
-  await DeleteQueueService(queueId);
+  await DeleteQueueService(queueId, companyId);
 
   const io = getIO();
   io.emit(`queue${companyId}`, {

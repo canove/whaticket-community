@@ -1,9 +1,17 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import AppError from "../../errors/AppError";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 
-const ListTemplateService = async ({ whatsAppId }): Promise<unknown> => {
-  const whatsApp = await ShowWhatsAppService(whatsAppId);
+interface Request {
+  whatsAppId: string | number;
+  companyId: string | number;
+}
+
+const ListTemplateService = async ({
+  whatsAppId,
+  companyId
+}: Request): Promise<AxiosResponse> => {
+  const whatsApp = await ShowWhatsAppService(whatsAppId, companyId);
 
   const { facebookBusinessId } = whatsApp;
   const { facebookToken } = whatsApp;

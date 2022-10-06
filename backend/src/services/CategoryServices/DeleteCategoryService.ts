@@ -1,9 +1,12 @@
 import Category from "../../database/models/Category";
 import AppError from "../../errors/AppError";
 
-const DeleteCategoryService = async (id: string | number): Promise<void> => {
+const DeleteCategoryService = async (
+  id: string | number,
+  companyId: string | number
+): Promise<void> => {
   const category = await Category.findOne({
-    where: { id }
+    where: { id, companyId }
   });
 
   if (!category) {

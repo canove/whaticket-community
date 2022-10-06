@@ -1,5 +1,4 @@
 /*eslint-disable*/
-
 import { Request, Response } from "express";
 import formidable from "formidable";
 import fs from "fs";
@@ -41,19 +40,19 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
     const { name, bodies, footer } = fields;
 
-    let text = []
+    const text = [];
 
     if (bodies) {
       if (Array.isArray(bodies)) {
         for (const body of bodies) {
-          const index = body.charAt(body.length - 1)
+          const index = body.charAt(body.length - 1);
           let bodyValue = body;
           bodyValue = bodyValue.slice(0, -1);
           const bodyJSON = JSON.parse(bodyValue);
-          text[index]= bodyJSON;
+          text[index] = bodyJSON;
         }
       } else {
-        const index = bodies.charAt(bodies.length - 1)
+        const index = bodies.charAt(bodies.length - 1);
         let bodyValue = bodies;
         bodyValue = bodyValue.slice(0, -1);
         const bodyJSON = JSON.parse(bodyValue);
@@ -71,15 +70,16 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
           const [fileName, fileType, index] = file.originalFilename.split("/");
 
           const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text[index] = {type: fileType, value: fileLink};
+          text[index] = { type: fileType, value: fileLink };
         }
       } else {
-          const filePath = allFiles.filepath;
-          const buffer = await fs.readFileSync(filePath);
-          const [fileName, fileType, index] = allFiles.originalFilename.split("/");
+        const filePath = allFiles.filepath;
+        const buffer = await fs.readFileSync(filePath);
+        const [fileName, fileType, index] =
+          allFiles.originalFilename.split("/");
 
-          const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text[index] = {type: fileType, value: fileLink};
+        const fileLink = await uploadToS3(fileName, companyId, buffer);
+        text[index] = { type: fileType, value: fileLink };
       }
     }
 
@@ -123,19 +123,19 @@ export const update = async (
 
     const { name, bodies, footer } = fields;
 
-    let text = []
+    const text = [];
 
     if (bodies) {
       if (Array.isArray(bodies)) {
         for (const body of bodies) {
-          const index = body.charAt(body.length - 1)
+          const index = body.charAt(body.length - 1);
           let bodyValue = body;
           bodyValue = bodyValue.slice(0, -1);
           const bodyJSON = JSON.parse(bodyValue);
-          text[index]= bodyJSON;
+          text[index] = bodyJSON;
         }
       } else {
-        const index = bodies.charAt(bodies.length - 1)
+        const index = bodies.charAt(bodies.length - 1);
         let bodyValue = bodies;
         bodyValue = bodyValue.slice(0, -1);
         const bodyJSON = JSON.parse(bodyValue);
@@ -153,31 +153,32 @@ export const update = async (
           const [fileName, fileType, index] = file.originalFilename.split("/");
 
           const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text[index] = {type: fileType, value: fileLink};
+          text[index] = { type: fileType, value: fileLink };
         }
       } else {
-          const filePath = allFiles.filepath;
-          const buffer = await fs.readFileSync(filePath);
-          const [fileName, fileType, index] = allFiles.originalFilename.split("/");
+        const filePath = allFiles.filepath;
+        const buffer = await fs.readFileSync(filePath);
+        const [fileName, fileType, index] =
+          allFiles.originalFilename.split("/");
 
-          const fileLink = await uploadToS3(fileName, companyId, buffer);
-          text[index] = {type: fileType, value: fileLink};
+        const fileLink = await uploadToS3(fileName, companyId, buffer);
+        text[index] = { type: fileType, value: fileLink };
       }
     }
 
-    const templatesData = { name, footer, text: JSON.stringify(text) }
+    const templatesData = { name, footer, text: JSON.stringify(text) };
 
     const template = await UpdateTemplateDataService({
       templatesId,
       templatesData
     });
-  
+
     const io = getIO();
     io.emit(`templates${companyId}`, {
       action: "update",
       template
     });
-  
+
     return res.status(200).json(template);
   });
 };
@@ -240,4 +241,4 @@ const uploadToS3 = async (name, companyId, buffer) => {
       JSON.stringify(err)
     );
   }
-}
+};

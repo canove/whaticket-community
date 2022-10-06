@@ -1,9 +1,12 @@
 import Flows from "../../database/models/Flows";
 import AppError from "../../errors/AppError";
 
-const DeleteFlowService = async (id: string | number): Promise<void> => {
+const DeleteFlowService = async (
+  id: string | number,
+  companyId: string | number
+): Promise<void> => {
   const flow = await Flows.findOne({
-    where: { id }
+    where: { id, companyId }
   });
 
   if (!flow) {

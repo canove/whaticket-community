@@ -85,7 +85,7 @@ const FindOrCreateTicketService = async (
     });
   }
 
-  ticket = await ShowTicketService(ticket.id);
+  ticket = await ShowTicketService(ticket.id, companyId);
 
   return ticket;
 };

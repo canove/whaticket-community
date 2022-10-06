@@ -3,9 +3,12 @@ import AppError from "../../errors/AppError";
 import Ticket from "../../database/models/Ticket";
 import UpdateDeletedUserOpenTicketsStatus from "../../helpers/UpdateDeletedUserOpenTicketsStatus";
 
-const DeleteUserService = async (id: string | number): Promise<void> => {
+const DeleteUserService = async (
+  id: string | number,
+  companyId: string | number
+): Promise<void> => {
   const user = await User.findOne({
-    where: { id }
+    where: { id, companyId }
   });
 
   if (!user) {
@@ -13,7 +16,7 @@ const DeleteUserService = async (id: string | number): Promise<void> => {
   }
 
   const userOpenTickets: Ticket[] = await user.$get("tickets", {
-    where: { status: "open" }
+    where: { status: "open", companyId }
   });
 
   if (userOpenTickets.length > 0) {

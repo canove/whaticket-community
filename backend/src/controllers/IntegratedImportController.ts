@@ -9,19 +9,20 @@ import DeleteIntegratedImportService from "../services/IntegratedImportService/D
 import { getIO } from "../libs/socket";
 
 interface IntegratedImportData {
-    name: string;
-    method: string;
-    qtdeRegister: number;
-    status: number;
-    url: string;
-    key: string;
-    token: string;
-    mapping: string;
-    companyId: string | number;
-};
+  name: string;
+  method: string;
+  qtdeRegister: number;
+  status: number;
+  url: string;
+  key: string;
+  token: string;
+  mapping: string;
+  companyId: string | number;
+}
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
+
   const integratedImport = await ListIntegratedImportService(companyId);
 
   return res.status(200).json(integratedImport);
@@ -36,9 +37,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     url,
     key,
     token,
-    mapping,
-
+    mapping
   }: IntegratedImportData = req.body;
+
   const { companyId } = req.user;
 
   const integratedImport = await CreateIntegratedImportService({
@@ -50,7 +51,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     key,
     token,
     mapping,
-    companyId,
+    companyId
   });
 
   const io = getIO();
@@ -58,14 +59,18 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     action: "create",
     integratedImport
   });
+
   return res.status(200).json(integratedImport);
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
-
   const { integratedImportId } = req.params;
+  const { companyId } = req.user;
 
-  const integratedImport = await ShowIntegratedImportService(integratedImportId);
+  const integratedImport = await ShowIntegratedImportService(
+    integratedImportId,
+    companyId
+  );
 
   return res.status(200).json(integratedImport);
 };
@@ -73,12 +78,16 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
 export const update = async (
   req: Request,
   res: Response
-): Promise<Response> => {;
-
+): Promise<Response> => {
   const importData: IntegratedImportData = req.body;
   const { integratedImportId } = req.params;
   const { companyId } = req.user;
-  const integratedImport = await UpdateIntegratedImportService({ importData, integratedImportId });
+
+  const integratedImport = await UpdateIntegratedImportService({
+    importData,
+    integratedImportId,
+    companyId
+  });
 
   const io = getIO();
   io.emit(`integratedImport${companyId}`, {
@@ -93,10 +102,10 @@ export const remove = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   const { integratedImportId } = req.params;
   const { companyId } = req.user;
-  await DeleteIntegratedImportService(integratedImportId);
+
+  await DeleteIntegratedImportService(integratedImportId, companyId);
 
   const io = getIO();
   io.emit(`integratedImport${companyId}`, {

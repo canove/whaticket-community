@@ -6,18 +6,30 @@ import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppSer
 import TestWhatsAppConnectionService from "../services/WhatsappService/TestWhatsAppConnectionService";
 import { logger } from "../utils/logger";
 
-/*eslint-disable*/
-const index = async (req: Request, res: Response): Promise<Response> => {
-  const { facebookToken, facebookPhoneNumberId, facebookBusinessId } = req.query;
+type IndexQuery = {
+  facebookToken: string;
+  facebookPhoneNumberId: string;
+  facebookBusinessId: string;
+};
 
-  const response = await TestWhatsAppConnectionService({ facebookToken, facebookPhoneNumberId, facebookBusinessId });
+const index = async (req: Request, res: Response): Promise<Response> => {
+  const { facebookToken, facebookPhoneNumberId, facebookBusinessId } =
+    req.query as IndexQuery;
+
+  const response = await TestWhatsAppConnectionService({
+    facebookToken,
+    facebookPhoneNumberId,
+    facebookBusinessId
+  });
 
   return res.status(200).json(response);
-}
+};
 
 const store = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
-  const whatsapp = await ShowWhatsAppService(whatsappId);
+  const { companyId } = req.user;
+
+  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
   StartWhatsAppSession(whatsapp);
 
@@ -26,10 +38,12 @@ const store = async (req: Request, res: Response): Promise<Response> => {
 
 const update = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
+  const { companyId } = req.user;
 
   const { whatsapp } = await UpdateWhatsAppService({
     whatsappId,
-    whatsappData: { session: "" }
+    whatsappData: { session: "" },
+    companyId
   });
 
   StartWhatsAppSession(whatsapp);
@@ -39,7 +53,9 @@ const update = async (req: Request, res: Response): Promise<Response> => {
 
 const remove = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
-  const whatsapp = await ShowWhatsAppService(whatsappId);
+  const { companyId } = req.user;
+
+  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
   try {
     const apiUrl = `${process.env.WPPNOF_URL}/stop`;
@@ -48,17 +64,19 @@ const remove = async (req: Request, res: Response): Promise<Response> => {
       companyId: whatsapp.companyId
     };
 
-    await axios.post(apiUrl, payload, { headers: {
-      "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-      "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
-    }});
+    await axios.post(apiUrl, payload, {
+      headers: {
+        "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+        sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+      }
+    });
   } catch (err) {
     logger.error(err);
   }
 
-  /*const wbot = getWbot(whatsapp.id);
+  /* const wbot = getWbot(whatsapp.id);
 
-  wbot.logout();*/
+  wbot.logout(); */
 
   return res.status(200).json({ message: "Session disconnected." });
 };

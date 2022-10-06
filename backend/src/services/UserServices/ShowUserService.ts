@@ -2,8 +2,12 @@ import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
 import Queue from "../../database/models/Queue";
 
-const ShowUserService = async (id: string | number): Promise<User> => {
-  const user = await User.findByPk(id, {
+const ShowUserService = async (
+  id: string | number,
+  companyId: string | number
+): Promise<User> => {
+  const user = await User.findOne({
+    where: { id, companyId },
     attributes: [
       "name",
       "id",

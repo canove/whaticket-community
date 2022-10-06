@@ -9,13 +9,15 @@ interface FlowsData {
 interface Request {
   flowData: FlowsData;
   flowId: number | string;
+  companyId: number | string;
 }
 
 const UpdateFlowService = async ({
   flowData,
-  flowId
+  flowId,
+  companyId
 }: Request): Promise<Flows> => {
-  const flow = await ShowFlowService(flowId);
+  const flow = await ShowFlowService(flowId, companyId);
 
   const { name, status } = flowData;
 

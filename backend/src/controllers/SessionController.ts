@@ -11,9 +11,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const { token, serializedUser, refreshToken } = await AuthUserService({
     email,
     password,
-    company,
+    company
   });
-
 
   SendRefreshToken(res, refreshToken);
 

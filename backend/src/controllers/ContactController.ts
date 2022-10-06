@@ -16,7 +16,7 @@ type IndexQuery = {
   pageNumber: string;
 };
 
-type IndexGetContactQuery = {
+type GetContactQuery = {
   name: string;
   number: string;
 };
@@ -35,7 +35,7 @@ interface ContactData {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const { contacts, count, hasMore } = await ListContactsService({
     searchParam,
@@ -46,9 +46,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   return res.json({ contacts, count, hasMore });
 };
 
-export const getContact = async (req: Request, res: Response): Promise<Response> => {
-  const { name, number } = req.body as IndexGetContactQuery;
-  const companyId = req.user.companyId;
+export const getContact = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { name, number } = req.body as GetContactQuery;
+  const { companyId } = req.user;
 
   const contact = await GetContactService({
     name,
@@ -88,7 +91,7 @@ export const update = async (
 
   try {
     await schema.validate(contactData);
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

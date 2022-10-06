@@ -2,19 +2,16 @@ import { QueryTypes } from "sequelize";
 import Message from "../../database/models/Message";
 
 interface Request {
-    ticketId: number;
-    companyId: number;
-}
-
-interface Response {
-
+  ticketId: number;
+  companyId: number;
 }
 
 const ListTicketsReportService = async ({
-    ticketId,
-    companyId
-}: Request): Promise<Response | undefined> => {
-    return await Message.sequelize?.query(`
+  ticketId,
+  companyId
+}: Request): Promise<Message[]> => {
+  const messages: Message[] = await Message.sequelize?.query(
+    `
         select
             msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
         from
@@ -29,7 +26,9 @@ const ListTicketsReportService = async ({
             ticket.companyId = ${companyId} 
     `,
     { type: QueryTypes.SELECT }
-    );
+  );
+
+  return messages;
 };
 
 export default ListTicketsReportService;

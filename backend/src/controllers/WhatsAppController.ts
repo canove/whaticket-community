@@ -1,5 +1,5 @@
-/*eslint-disable*/
 import { Request, Response } from "express";
+import axios from "axios";
 import { getIO } from "../libs/socket";
 import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 
@@ -14,7 +14,6 @@ import ListOfficialWhatsAppsService from "../services/WhatsappService/ListOffici
 import QualityNumberWhatsappService from "../services/WhatsappService/QualityNumberWhatsappService";
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
-import axios from "axios";
 import AppError from "../errors/AppError";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import Whatsapp from "../database/models/Whatsapp";
@@ -26,7 +25,7 @@ import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUp
 type ListQuery = {
   pageNumber: string | number;
   official: string | boolean;
-}
+};
 
 interface WhatsappData {
   name: string;
@@ -43,7 +42,7 @@ interface WhatsappData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
   const whatsapps = await ListWhatsAppsService(companyId);
 
@@ -61,26 +60,26 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
-    phoneNumber,
+    phoneNumber
   }: WhatsappData = req.body;
 
-  //FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
-  const companyId = req.user.companyId;
+  // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
+  const { companyId } = req.user;
 
   const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
-   
+
   const payload = {
-    "companyId": companyId
+    companyId
   };
   try {
     await axios.post(apiUrl, payload, {
       headers: {
         "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-        "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+        sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
       }
     });
-  }catch(err) {
-    throw new AppError(err['response'].data['message']);
+  } catch (err: any) {
+    throw new AppError(err.response.data.message);
   }
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
@@ -117,8 +116,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
+  const { companyId } = req.user;
 
-  const whatsapp = await ShowWhatsAppService(whatsappId);
+  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
   return res.status(200).json(whatsapp);
 };
@@ -133,7 +133,8 @@ export const update = async (
 
   const { whatsapp, oldDefaultWhatsapp } = await UpdateWhatsAppService({
     whatsappData,
-    whatsappId
+    whatsappId,
+    companyId
   });
 
   const io = getIO();
@@ -159,7 +160,7 @@ export const remove = async (
   const { whatsappId } = req.params;
   const { companyId } = req.user;
 
-  await DeleteWhatsAppService(whatsappId);
+  await DeleteWhatsAppService(whatsappId, companyId);
 
   const io = getIO();
   io.emit(`whatsapp${companyId}`, {
@@ -172,13 +173,13 @@ export const remove = async (
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
   const { official, pageNumber } = req.query as ListQuery;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
-  const {
-    whatsapps,
-    count,
-    hasMore
-  } = await ListOfficialWhatsAppsService({ companyId, official, pageNumber });
+  const { whatsapps, count, hasMore } = await ListOfficialWhatsAppsService({
+    companyId,
+    official,
+    pageNumber
+  });
 
   return res.status(200).json({
     whatsapps,
@@ -230,7 +231,13 @@ export const messageStatus = async (
 ): Promise<Response> => {
   const { statusType, msgId, msgWhatsId, errorMessage, messageType } = req.body;
 
-  const message = await StatusMessageWhatsappService({ statusType, msgId, msgWhatsId, errorMessage, messageType });
+  const message = await StatusMessageWhatsappService({
+    statusType,
+    msgId,
+    msgWhatsId,
+    errorMessage,
+    messageType
+  });
 
   return res.status(200).json(message);
 };
@@ -239,7 +246,6 @@ export const qualityNumber = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   const { displayPhoneNumber, event, currentLimit } = req.body;
 
   const message = await QualityNumberWhatsappService({
@@ -255,7 +261,6 @@ export const health = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   return res.status(200).json("api is active and running");
 };
 
@@ -264,10 +269,12 @@ const verifyContact = async (
   contactNumber: string,
   companyId: number
 ): Promise<Contact> => {
-  if (contactName == '') {
-    const contact = await FileRegister.findAll({ where: { phoneNumber: contactNumber, companyId }, limit: 1 });
-    if (contact.length > 0)
-      contactName = contact[0].name;
+  if (contactName === "") {
+    const contact = await FileRegister.findAll({
+      where: { phoneNumber: contactNumber, companyId },
+      limit: 1
+    });
+    if (contact.length > 0) contactName = contact[0].name;
   }
 
   const contactData = {
@@ -280,54 +287,52 @@ const verifyContact = async (
   const contact = CreateOrUpdateContactService(contactData);
 
   return contact;
-}
+};
 
 export const botMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
-  const {
-    fromMe,
-    to,
-    body,
-    contactName,
-    session,
-    bot
-  } = req.body;
+  const { fromMe, to, body, contactName, session, bot } = req.body;
 
   if (!fromMe) {
-    return await newMessage(req, res);
-  } else {
-    const whatsapp = await Whatsapp.findOne({
-      where: {
-        name: session,
-        deleted: false
-      }
-    })
-  
-    const contact = await verifyContact(contactName, to, whatsapp.companyId);
-    const ticket = await FindOrCreateTicketService(
-      contact,
-      whatsapp.id,
-      whatsapp.companyId,
-      0,null,false,bot
-    );
-  
-    
-    await SendWhatsAppMessage({ body, ticket: ticket, companyId: ticket.companyId, fromMe });
+    const message = await newMessage(req, res);
+    return message;
   }
-  
 
-  return res.status(200).json('success');
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      name: session,
+      deleted: false
+    }
+  });
+
+  const contact = await verifyContact(contactName, to, whatsapp.companyId);
+
+  const ticket = await FindOrCreateTicketService(
+    contact,
+    whatsapp.id,
+    whatsapp.companyId,
+    0,
+    null,
+    false,
+    bot
+  );
+
+  await SendWhatsAppMessage({
+    body,
+    ticket,
+    companyId: ticket.companyId,
+    fromMe
+  });
+
+  return res.status(200).json("success");
 };
-
 
 export const nofSessionStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   const { session, status } = req.body;
   const message = await NOFWhatsappSessionStatusService({
     session,
@@ -341,7 +346,6 @@ export const nofSessionQRUpdate = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-
   const { result, session, qrcode } = req.body;
 
   const message = await NOFWhatsappQRCodeService({

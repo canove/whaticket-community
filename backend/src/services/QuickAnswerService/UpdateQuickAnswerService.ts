@@ -9,16 +9,18 @@ interface QuickAnswerData {
 interface Request {
   quickAnswerData: QuickAnswerData;
   quickAnswerId: string;
+  companyId: string | number;
 }
 
 const UpdateQuickAnswerService = async ({
   quickAnswerData,
-  quickAnswerId
+  quickAnswerId,
+  companyId
 }: Request): Promise<QuickAnswer> => {
   const { shortcut, message } = quickAnswerData;
 
   const quickAnswer = await QuickAnswer.findOne({
-    where: { id: quickAnswerId },
+    where: { id: quickAnswerId, companyId },
     attributes: ["id", "shortcut", "message"]
   });
 

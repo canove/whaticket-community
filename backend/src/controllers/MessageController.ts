@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 
-import { getIO } from "../libs/socket";
 import Message from "../database/models/Message";
 
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
@@ -23,10 +22,12 @@ type MessageData = {
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const { pageNumber } = req.query as IndexQuery;
+  const { companyId } = req.user;
 
   const { count, messages, ticket, hasMore } = await ListMessagesService({
     pageNumber,
-    ticketId
+    ticketId,
+    companyId
   });
 
   SetTicketMessagesAsRead(ticket);
@@ -40,7 +41,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const medias = req.files as Express.Multer.File[];
   const { companyId } = req.user;
 
-  const ticket = await ShowTicketService(ticketId);
+  const ticket = await ShowTicketService(ticketId, companyId);
 
   if (medias) {
     await Promise.all(
