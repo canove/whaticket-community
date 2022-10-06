@@ -39,6 +39,10 @@ import ArchiveIcon from '@material-ui/icons/Archive';
 import LanguageIcon from '@material-ui/icons/Language';
 import CategoryIcon from '@material-ui/icons/Category';
 import TimelineIcon from '@material-ui/icons/Timeline';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import PaymentIcon from '@material-ui/icons/Payment';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -125,6 +129,18 @@ function getIcon(icon) {
     else if (icon === "TimelineIcon") {
         return <TimelineIcon />
     }
+    else if (icon === "AttachMoneyIcon") {
+        return <AttachMoneyIcon />
+    }
+    else if (icon === "MonetizationOnIcon") {
+        return <MonetizationOnIcon />
+    }
+    else if (icon === "PaymentIcon") {
+        return <PaymentIcon />
+    }
+    else if (icon === "ShoppingCartIcon") {
+        return <ShoppingCartIcon />
+    }
     else {
         return null;
     }
@@ -141,14 +157,22 @@ const icons = [
     "QuestionAnswerOutlinedIcon",
     "ImportExportOutlinedIcon",
     "AccountCircleIcon",
+    "PeopleAltOutlinedIcon",
+    "AccountTreeOutlinedIcon",
     "EqualizerIcon",
     "AssessmentOutlinedIcon",
+    "ApartmentIcon",
     "ListAltIcon",
     "MenuIcon",
     "BallotIcon",
     "ArchiveIcon",
     "LanguageIcon",
     "CategoryIcon",
+    "TimelineIcon",
+    "AttachMoneyIcon",
+    "MonetizationOnIcon",
+    "PaymentIcon",
+    "ShoppingCartIcon",
 
 ]
 
