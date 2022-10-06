@@ -10,7 +10,7 @@ interface Request {
 interface Response {
   count: number;
   hasMore: boolean;
-  menus: Menu [];
+  menus: Menu[];
 }
 
 const ListMenusService = async ({
@@ -29,12 +29,21 @@ const ListMenusService = async ({
       { id: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
     ]
   };
+
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
-  const {count, rows: menus} = await Menu.findAndCountAll({
-  where: whereCondition,
-    attributes: ["id", "name", "icon", "isParent", "parentId", "createdAt", "updatedAt"],
+  const { count, rows: menus } = await Menu.findAndCountAll({
+    where: whereCondition,
+    attributes: [
+      "id",
+      "name",
+      "icon",
+      "isParent",
+      "parentId",
+      "createdAt",
+      "updatedAt"
+    ],
     include: [
       {
         model: Company,
@@ -43,13 +52,14 @@ const ListMenusService = async ({
       }
     ]
   });
-const hasMore = count > offset + menus.length;
+
+  const hasMore = count > offset + menus.length;
 
   return {
     menus,
     count,
     hasMore
   };
-
 };
+
 export default ListMenusService;

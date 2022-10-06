@@ -1,10 +1,10 @@
-import AppError from "../../errors/AppError";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import ShowUserService from "./ShowUserService";
 
 interface Request {
   userId: string | number;
   language: string;
+  companyId: string | number;
 }
 
 interface Response {
@@ -16,9 +16,10 @@ interface Response {
 
 const UpdateUserLanguageService = async ({
   userId,
-  language
+  language,
+  companyId
 }: Request): Promise<Response | undefined> => {
-  const user = await ShowUserService(userId);
+  const user = await ShowUserService(userId, companyId);
 
   await user.update({
     lang: language

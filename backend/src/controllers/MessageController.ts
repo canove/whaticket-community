@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 
-import { getIO } from "../libs/socket";
 import Message from "../database/models/Message";
 
 import ListMessagesService from "../services/MessageServices/ListMessagesService";

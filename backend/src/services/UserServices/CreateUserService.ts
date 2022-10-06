@@ -3,7 +3,6 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../database/models/User";
-import Company from "../../database/models/Company";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 
 interface Request {
@@ -51,7 +50,7 @@ const CreateUserService = async ({
 
   try {
     await schema.validate({ email, password, name });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

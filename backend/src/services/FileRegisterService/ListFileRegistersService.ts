@@ -26,9 +26,9 @@ const ListFileRegistersService = async ({
   });
 
   if (fileId != '' && fileId != null) {
-    const file = await File.findByPk(fileId);
+    const file = await File.findOne({ where: { id: fileId, companyId } });
     if (file.templateId) {
-      const template = await Templates.findByPk(file.templateId);
+      const template = await Templates.findOne({ where: { id: file.templateId, companyId } });
       reports.forEach((reg) => {
         reg.message = template.text
         .replace("{{name}}", reg.name)

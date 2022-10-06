@@ -1,10 +1,9 @@
-/*eslint-disable*/
-import Whatsapp from "../../database/models/Whatsapp";
 import axios from "axios";
-//import { wbotMessageListener } from "./wbotMessageListener";
+import Whatsapp from "../../database/models/Whatsapp";
 import { getIO } from "../../libs/socket";
-//import wbotMonitor from "./wbotMonitor";
 import { logger } from "../../utils/logger";
+// import wbotMonitor from "./wbotMonitor";
+// import { wbotMessageListener } from "./wbotMessageListener";
 
 export const StartWhatsAppSession = async (
   whatsapp: Whatsapp
@@ -28,18 +27,20 @@ export const StartWhatsAppSession = async (
       wh_connect: process.env.WPP_NOF_WEBHOOK_URL
     };
 
-    axios.post(apiUrl, JSON.stringify(payload), { headers: {
-      "x-api-key": process.env.WPP_NOF_API_KEY
-    }});
+    axios.post(apiUrl, JSON.stringify(payload), {
+      headers: {
+        "x-api-key": process.env.WPP_NOF_API_KEY
+      }
+    });
   } catch (err) {
     logger.error(err);
   }
 
-  /*try {
+  /* try {
     const wbot = await initWbot(whatsapp);
     wbotMessageListener(wbot);
     wbotMonitor(wbot, whatsapp);
   } catch (err) {
     logger.error(err);
-  }*/
+  } */
 };

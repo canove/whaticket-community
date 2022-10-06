@@ -3,78 +3,121 @@ import DashboardCategoryService from "../services/CategoryServices/DashboardCate
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
 import ListReportRegistersService from "../services/RegistersService/ListReportRegistersService";
 
-var fs = require("fs");
-var pdf = require("pdf-creator-node");
-var pdf2base64 = require("pdf-to-base64");
+const fs = require("fs");
+const pdf = require("pdf-creator-node");
+const pdf2base64 = require("pdf-to-base64");
 
 type IndexQuery = {
-  type?: string,
-  fileId?: number | string,
-  date?: string
+  type?: string;
+  fileId?: number | string;
+  date?: string;
 };
 
 type Query = {
-  statuses: Array<any>,
-  fileIds: Array<any>,
-  pageNumber: number | string
-}
+  statuses: Array<any>;
+  fileIds: Array<any>;
+  pageNumber: number | string;
+};
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { fileId, date } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const report = await ListRegistersService({ type:"", fileId, date, companyId });
+  const report = await ListRegistersService({
+    type: "",
+    fileId,
+    date,
+    companyId
+  });
 
-  const register = await ListRegistersService ({ type:"register", fileId, date, companyId });
+  const register = await ListRegistersService({
+    type: "register",
+    fileId,
+    date,
+    companyId
+  });
 
-  const sent = await ListRegistersService ({ type:"sent", fileId, date, companyId });
+  const sent = await ListRegistersService({
+    type: "sent",
+    fileId,
+    date,
+    companyId
+  });
 
-  const delivered = await ListRegistersService ({ type:"delivered", fileId, date, companyId });
+  const delivered = await ListRegistersService({
+    type: "delivered",
+    fileId,
+    date,
+    companyId
+  });
 
-  const read = await ListRegistersService ({ type:"read", fileId, date, companyId });
+  const read = await ListRegistersService({
+    type: "read",
+    fileId,
+    date,
+    companyId
+  });
 
-  const error = await ListRegistersService ({ type:"error", fileId, date, companyId });
+  const error = await ListRegistersService({
+    type: "error",
+    fileId,
+    date,
+    companyId
+  });
 
-  const category = await DashboardCategoryService (companyId);
+  const category = await DashboardCategoryService(companyId);
 
-  return res.status(200).json({report, register, sent, delivered, read, error, category});
-}
+  return res
+    .status(200)
+    .json({ report, register, sent, delivered, read, error, category });
+};
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
+  const { registers, count, hasMore } = await ListReportRegistersService({
+    statuses,
+    fileIds,
+    pageNumber,
+    companyId
+  });
 
   return res.json({ registers, count, hasMore });
-}
+};
 
-export const exportPdf = async (req: Request, res: Response) => {
+export const exportPdf = async (req: Request, res: Response): Promise<void> => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
+  const { registers } = await ListReportRegistersService({
+    statuses,
+    fileIds,
+    pageNumber,
+    companyId
+  });
 
-  const checkZero = (data) => {
-    if(data.length == 1){
-      data = "0" + data;
+  const checkZero = data => {
+    if (data.length === 1) {
+      data = `0${data}`;
     }
     return data;
-  }
+  };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (date === null) {
       return "";
-    } else {
-      let dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(date.getHours() + "")}:${checkZero(date.getMinutes() + "")}`;
-      return dateString;
     }
-  }
+    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
+      `${date.getHours()}`
+    )}:${checkZero(`${date.getMinutes()}`)}`;
+    return dateString;
+  };
 
   const getRegistersData = () => {
-    let text = ""
+    let text = "";
 
-    registers.forEach((register) => {
+    registers.forEach(register => {
       const name = register.getDataValue("name");
       const sentAt = formatDate(register.getDataValue("sentAt"));
       const deliveredAt = formatDate(register.getDataValue("deliveredAt"));
@@ -101,13 +144,13 @@ export const exportPdf = async (req: Request, res: Response) => {
           <td style="border: 1px solid black">${readAt}</td>
           <td style="border: 1px solid black">${errorAt}</td>
         </tr>
-      `
+      `;
     });
 
     return text;
-  }
+  };
 
-  let html = `
+  const html = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -135,66 +178,76 @@ export const exportPdf = async (req: Request, res: Response) => {
         </html>
     `;
 
-  let options = {
+  const options = {
     format: "A3",
     orientation: "portrait",
     border: "10mm",
     footer: {
-        height: "28mm",
-        contents: {
-            default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>',
-        }
+      height: "28mm",
+      contents: {
+        default:
+          '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>'
+      }
     }
   };
 
-  let documento = {
-    html: html,
+  const documento = {
+    html,
     data: {
-      registers: registers,
+      registers
     },
     path: "./src/downloads/output.pdf",
-    type: "",
+    type: ""
   };
 
   await pdf.create(documento, options);
 
   pdf2base64("./src/downloads/output.pdf").then((pdfBase: Response) => {
     return res.status(200).json(pdfBase);
-  })
+  });
 
   fs.unlink("./src/downloads/output.pdf", (err: Error) => {
-      if (err) {
-          throw err;
-      }
+    if (err) {
+      throw err;
+    }
   });
-}
+};
 
-export const exportCsv = async (req: Request, res: Response) => {
+export const exportCsv = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { statuses, fileIds, pageNumber } = req.query as Query;
-  const companyId = req.user.companyId;
+  const { companyId } = req.user;
 
-  const { registers, count, hasMore } = await ListReportRegistersService({ statuses, fileIds, pageNumber, companyId });
+  const { registers } = await ListReportRegistersService({
+    statuses,
+    fileIds,
+    pageNumber,
+    companyId
+  });
 
-  const checkZero = (data) => {
-    if(data.length == 1){
-      data = "0" + data;
+  const checkZero = data => {
+    if (data.length === 1) {
+      data = `0${data}`;
     }
     return data;
-  }
+  };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (date === null) {
       return "";
-    } else {
-      let dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(date.getHours() + "")}:${checkZero(date.getMinutes() + "")}`;
-      return dateString;
     }
-  }
+    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
+      `${date.getHours()}`
+    )}:${checkZero(`${date.getMinutes()}`)}`;
+    return dateString;
+  };
 
-  let rows = [['Nome', 'Status', 'Enviado', 'Entregue', 'Lido', 'Erro']];
+  const rows = [["Nome", "Status", "Enviado", "Entregue", "Lido", "Erro"]];
 
-  registers.forEach((register) => {
-    const name = register.name;
+  registers.forEach(register => {
+    const { name } = register;
     const sentAt = formatDate(register.sentAt);
     const deliveredAt = formatDate(register.deliveredAt);
     const readAt = formatDate(register.readAt);
@@ -211,7 +264,7 @@ export const exportCsv = async (req: Request, res: Response) => {
       status = "Enviado";
     }
 
-    let columns = [];
+    const columns = [];
 
     columns.push(name);
     columns.push(status);
@@ -223,10 +276,10 @@ export const exportCsv = async (req: Request, res: Response) => {
   });
 
   let csvContent = "data:text/csv;charset=utf-8,";
-  rows.forEach((rowArray) => {
-    let row = rowArray.join(";");
-    csvContent += row + "\r\n";
+  rows.forEach(rowArray => {
+    const row = rowArray.join(";");
+    csvContent += `${row}\r\n`;
   });
 
   return res.status(200).json(csvContent);
-}
+};

@@ -12,7 +12,8 @@ interface QueueData {
 
 const UpdateQueueService = async (
   queueId: number | string,
-  queueData: QueueData
+  queueData: QueueData,
+  companyId: number | string
 ): Promise<Queue> => {
   const { color, name } = queueData;
 
@@ -25,7 +26,7 @@ const UpdateQueueService = async (
         async value => {
           if (value) {
             const queueWithSameName = await Queue.findOne({
-              where: { name: value, id: { [Op.not]: queueId } }
+              where: { name: value, id: { [Op.not]: queueId }, companyId }
             });
 
             return !queueWithSameName;
@@ -48,7 +49,7 @@ const UpdateQueueService = async (
         async value => {
           if (value) {
             const queueWithSameColor = await Queue.findOne({
-              where: { color: value, id: { [Op.not]: queueId } }
+              where: { color: value, id: { [Op.not]: queueId }, companyId }
             });
             return !queueWithSameColor;
           }
@@ -63,7 +64,7 @@ const UpdateQueueService = async (
     throw new AppError(err.message);
   }
 
-  const queue = await ShowQueueService(queueId);
+  const queue = await ShowQueueService(queueId, companyId);
 
   await queue.update(queueData);
 

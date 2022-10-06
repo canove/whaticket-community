@@ -120,7 +120,7 @@ const ListTicketsService = async ({
   }
 
   if (withUnreadMessages === "true") {
-    const user = await ShowUserService(userId);
+    const user = await ShowUserService(userId, companyId);
     const userQueueIds = user.queues.map(queue => queue.id);
 
     whereCondition = {

@@ -1,40 +1,40 @@
-import faker from "faker";
-import AppError from "../../../errors/AppError";
-import User from "../../../database/models/User";
-import CreateUserService from "../../../services/UserServices/CreateUserService";
-import ShowUserService from "../../../services/UserServices/ShowUserService";
-import { disconnect, truncate } from "../../utils/database";
+// import faker from "faker";
+// import AppError from "../../../errors/AppError";
+// import User from "../../../database/models/User";
+// import CreateUserService from "../../../services/UserServices/CreateUserService";
+// import ShowUserService from "../../../services/UserServices/ShowUserService";
+// import { disconnect, truncate } from "../../utils/database";
 
-describe("User", () => {
-  beforeEach(async () => {
-    await truncate();
-  });
+// describe("User", () => {
+//   beforeEach(async () => {
+//     await truncate();
+//   });
 
-  afterEach(async () => {
-    await truncate();
-  });
+//   afterEach(async () => {
+//     await truncate();
+//   });
 
-  afterAll(async () => {
-    await disconnect();
-  });
+//   afterAll(async () => {
+//     await disconnect();
+//   });
 
-  it("should be able to find a user", async () => {
-    const newUser = await CreateUserService({
-      name: faker.name.findName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-      companyId: null
-    });
+//   it("should be able to find a user", async () => {
+//     const newUser = await CreateUserService({
+//       name: faker.name.findName(),
+//       email: faker.internet.email(),
+//       password: faker.internet.password(),
+//       companyId: null
+//     });
 
-    const user = await ShowUserService(newUser.id);
+//     const user = await ShowUserService(newUser.id);
 
-    expect(user).toHaveProperty("id");
-    expect(user).toBeInstanceOf(User);
-  });
+//     expect(user).toHaveProperty("id");
+//     expect(user).toBeInstanceOf(User);
+//   });
 
-  it("should not be able to find a inexisting user", async () => {
-    expect(ShowUserService(faker.random.number())).rejects.toBeInstanceOf(
-      AppError
-    );
-  });
-});
+//   it("should not be able to find a inexisting user", async () => {
+//     expect(ShowUserService(faker.random.number())).rejects.toBeInstanceOf(
+//       AppError
+//     );
+//   });
+// });

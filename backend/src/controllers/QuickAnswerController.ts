@@ -64,8 +64,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { quickAnswerId } = req.params;
+  const { companyId } = req.user;
 
-  const quickAnswer = await ShowQuickAnswerService(quickAnswerId);
+  const quickAnswer = await ShowQuickAnswerService(quickAnswerId, companyId);
 
   return res.status(200).json(quickAnswer);
 };
@@ -92,7 +93,8 @@ export const update = async (
 
   const quickAnswer = await UpdateQuickAnswerService({
     quickAnswerData,
-    quickAnswerId
+    quickAnswerId,
+    companyId
   });
 
   const io = getIO();
@@ -111,7 +113,7 @@ export const remove = async (
   const { quickAnswerId } = req.params;
   const { companyId } = req.user;
 
-  await DeleteQuickAnswerService(quickAnswerId);
+  await DeleteQuickAnswerService(quickAnswerId, companyId);
 
   const io = getIO();
   io.emit(`quickAnswer${companyId}`, {

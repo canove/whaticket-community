@@ -2,8 +2,12 @@ import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 import Queue from "../../database/models/Queue";
 
-const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
-  const whatsapp = await Whatsapp.findByPk(id, {
+const ShowWhatsAppService = async (
+  id: string | number,
+  companyId: string | number
+): Promise<Whatsapp> => {
+  const whatsapp = await Whatsapp.findOne({
+    where: { id, companyId },
     include: [
       {
         model: Queue,
