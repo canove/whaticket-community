@@ -104,6 +104,7 @@ const Category = () => {
     }, []);
 
     useEffect(() => {
+        setLoading(true); 
         const fetchCategory = async () => {
             try {
                 const { data } = await api.get("/category/");
@@ -112,6 +113,7 @@ const Category = () => {
                 setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         };
         fetchCategory();

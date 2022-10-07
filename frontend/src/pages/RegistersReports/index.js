@@ -22,6 +22,7 @@ import {
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { format, parseISO } from "date-fns";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,20 +42,19 @@ const RegistersReports = () => {
     const { i18n } = useTranslation();
 
     const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(false);
     const [files, setFiles] = useState([]);
     const [fileIds, setFileIds] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [registers, setRegisters] = useState([]);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [count, setCount] = useState(0);
     const [pdf, setPdf] = useState("");
     const [disablePdfButton, setDisablePdfButton] = useState(true);
     const [csv, setCsv] = useState("");
     const [disableCsvButton, setDisableCsvButton] = useState(true);
+    const [pageNumber, setPageNumber] = useState(1);
+	const [count, setCount] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
         const fetchFiles = async () => {
             try {
                 const { data } = await api.get('file/list');
@@ -114,8 +114,10 @@ const RegistersReports = () => {
                setRegisters(data.registers);
                setCount(data.count);
                setHasMore(data.hasMore);
+               setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         }
         fetchRegisters();
@@ -281,32 +283,33 @@ const RegistersReports = () => {
                                     </TableRow>
                                 )
                             }))}
-                            {loading}
+                            {loading && <TableRowSkeleton columns={6} />}
                         </>
                     </TableBody>
                 </Table>
-            </Paper>
-            <Paper className={classes.mainPaper}
-                variant="outlined">
-                <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handlePreviousPage}
-                        disabled={pageNumber === 1}
-                    >
-                        {i18n.t("logReport.buttons.previous")}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNextPage}
-                        disabled={!hasMore}
-                    >
-                        {i18n.t("logReport.buttons.next")}
-                    </Button>
-                    <Typography>
-                        {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
-                    </Typography>
+                <div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1} 
+					>
+						Página Anterior
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 20) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						Próxima Página
+					</Button>
+				</div>
             </Paper>
         </MainContainer>
     );

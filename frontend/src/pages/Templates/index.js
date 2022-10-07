@@ -29,6 +29,7 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { DeleteOutline } from "@material-ui/icons";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -62,6 +63,7 @@ const Templates = () => {
   const [connection, setConnection] = useState("");
   const { whatsApps } = useContext(WhatsAppsContext);
   const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(true);
   const confirmationModalInitialState = {
@@ -94,11 +96,14 @@ const Templates = () => {
       try {
         const { data } = await api.get(`/whatsappTemplate/list/${connection}`);
         setTemplates(data);
+        setLoading(false);
       } catch (err) {
         toastError(err);
+        setLoading(false);
       }
     };
     if (connection) {
+      setLoading(true);
       fetchTemplates();
     }
   }, [connection]);
@@ -239,6 +244,7 @@ const Templates = () => {
 											</TableCell>
                 </TableRow>
               ))}
+              {loading && <TableRowSkeleton columns={4} />}
             </>
           </TableBody>
         </Table>

@@ -97,6 +97,7 @@ const IntegratedImport = () => {
     }, []);
 
     useEffect(() => {
+        setLoading(true);
         const fetchImportation = async () => {
             try {
                 const { data } = await api.get("/integratedImport");
@@ -104,6 +105,7 @@ const IntegratedImport = () => {
                 setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         };
         fetchImportation();
@@ -246,9 +248,9 @@ const IntegratedImport = () => {
                                 </IconButton>
                                 </TableCell>
                             </TableRow>
-                            ))}
-                        {loading && <TableRowSkeleton columns={6} />}
+                        ))}
 
+                        {loading && <TableRowSkeleton columns={6} />}
                     </TableBody>
                 </Table>
         </Paper>

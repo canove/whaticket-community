@@ -27,6 +27,7 @@ import { parseISO, format } from "date-fns";
 import SystemChangeModal from "../../components/SystemChangeModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_PRICINGS") {
@@ -92,18 +93,22 @@ const Pricing = () => {
     const [historicModalOpen, setHistoricModalOpen] = useState(false);
     const [deletingPricing, setDeletingPricing] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "RESET" });
     }, []);
 
     useEffect(() => {
+        setLoading(true);
         const fetchPricings = async () => {
             try {
                 const { data } = await api.get("/pricings/");
                 dispatch({ type: "LOAD_PRICINGS", payload: data });
+                setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         };
         fetchPricings();
@@ -277,6 +282,7 @@ const Pricing = () => {
                                 </TableRow>
                             )
                         })}
+                        {loading && <TableRowSkeleton columns={6} />}
                     </TableBody>
                 </Table>
         </Paper>

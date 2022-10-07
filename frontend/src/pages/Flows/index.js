@@ -108,6 +108,7 @@ const Flows = () => {
   }, [searchParam]);
 
   useEffect(() => {
+    setLoading(true);
     const fetchFlows = async () => {
       try {
         const { data } = await api.get("/flows", {
@@ -117,6 +118,7 @@ const Flows = () => {
         setLoading(false);
       } catch (err) {
         toastError(err);
+        setLoading(false);
       }
     };
     fetchFlows();

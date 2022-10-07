@@ -55,87 +55,96 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     paddingLeft: theme.spacing(4),
   },
+  open: {
+    backgroundColor: "lightgray",
+  }
 }
 ));
 
-function getIcon(icon) {
+function getIcon(icon, isParent) {
+  let color = "";
+
+  if (isParent) {
+    color = "black";
+  }
+
   if (icon === "DashboardOutlinedIcon") {
-    return <DashboardOutlinedIcon />;
+    return <DashboardOutlinedIcon style={{ color }} />;
   }
   else if (icon === "WhatsAppIcon") {
-    return <WhatsAppIcon />;
+    return <WhatsAppIcon style={{ color }} />;
   }
   else if (icon === "SyncAltIcon") {
-    return <SyncAltIcon />;
+    return <SyncAltIcon style={{ color }} />;
   }
   else if (icon === "SettingsOutlinedIcon") {
-    return <SettingsOutlinedIcon />;
+    return <SettingsOutlinedIcon style={{ color }} />;
   }
   else if (icon === "DvrIcon") {
-    return <DvrIcon />;
+    return <DvrIcon style={{ color }} />;
   }
   else if (icon === "ChatIcon") {
-    return <ChatIcon />;
+    return <ChatIcon style={{ color }} />;
   }
   else if (icon === "ContactPhoneOutlinedIcon") {
-    return <ContactPhoneOutlinedIcon />;
+    return <ContactPhoneOutlinedIcon style={{ color }} />;
   }
   else if (icon === "QuestionAnswerOutlinedIcon") {
-    return <QuestionAnswerOutlinedIcon />;
+    return <QuestionAnswerOutlinedIcon style={{ color }} />;
   }
   else if (icon === "ImportExportOutlinedIcon") {
-    return <ImportExportOutlinedIcon />;
+    return <ImportExportOutlinedIcon style={{ color }} />;
   }
   else if (icon === "AccountCircleIcon") {
-    return <AccountCircleIcon />;
+    return <AccountCircleIcon style={{ color }} />;
   }
   else if (icon === "PeopleAltOutlinedIcon") {
-    return <PeopleAltOutlinedIcon />;
+    return <PeopleAltOutlinedIcon style={{ color }} />;
   }
   else if (icon === "AccountTreeOutlinedIcon") {
-    return <AccountTreeOutlinedIcon />;
+    return <AccountTreeOutlinedIcon style={{ color }} />;
   }
   else if (icon === "EqualizerIcon") {
-    return <EqualizerIcon />;
+    return <EqualizerIcon style={{ color }} />;
   }
   else if (icon === "AssessmentOutlinedIcon") {
-    return <AssessmentOutlinedIcon />
+    return <AssessmentOutlinedIcon style={{ color }} />
   }
   else if (icon === "ApartmentIcon") {
-    return <ApartmentIcon />;
+    return <ApartmentIcon style={{ color }} />;
   }
   else if (icon === "ListAltIcon") {
-    return <ListAltIcon />
+    return <ListAltIcon style={{ color }} />
   }
   else if (icon === "MenuIcon") {
-    return <MenuIcon />
+    return <MenuIcon style={{ color }} />
   }
   else if (icon === "BallotIcon") {
-    return <BallotIcon />
+    return <BallotIcon style={{ color }} />
   }
   else if (icon === "ArchiveIcon") {
-    return <ArchiveIcon />
+    return <ArchiveIcon style={{ color }} />
   }
   else if (icon === "LanguageIcon") {
-    return<LanguageIcon/>
+    return <LanguageIcon style={{ color }} />
   }
   else if (icon === "CategoryIcon") {
-    return<CategoryIcon/>
+    return <CategoryIcon style={{ color }} />
   }
   else if (icon === "TimelineIcon") {
-    return <TimelineIcon />
+    return <TimelineIcon style={{ color }} />
   }
   else if (icon === "AttachMoneyIcon") {
-        return <AttachMoneyIcon />
+        return <AttachMoneyIcon style={{ color }} />
   }
   else if (icon === "MonetizationOnIcon") {
-        return <MonetizationOnIcon />
+        return <MonetizationOnIcon style={{ color }} />
   }
   else if (icon === "PaymentIcon") {
-        return <PaymentIcon />
+        return <PaymentIcon style={{ color }} />
   }
   else if (icon === "ShoppingCartIcon") {
-        return <ShoppingCartIcon />
+        return <ShoppingCartIcon style={{ color }} />
   }
   else {
     return null;
@@ -147,7 +156,7 @@ function ListParentItemLink(props) {
 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const renderedIcon = getIcon(icon);
+  const renderedIcon = getIcon(icon, true);
 
   const handleClick = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -201,7 +210,7 @@ function ListItemLink(props) {
 
   const renderLink = forwardRef((itemProps, ref) => (<RouterLink to={to} ref={ref} {...itemProps} />))
 
-  const renderedIcon = getIcon(icon);
+  const renderedIcon = getIcon(icon, false);
 
   return (
     <li>

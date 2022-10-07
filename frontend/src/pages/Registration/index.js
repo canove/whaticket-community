@@ -159,6 +159,7 @@ const Registration = () => {
           setLoading(false);
         } catch (err) {
           toastError(err);
+          setLoading(false);
         }
       };
       fetchRegistration();

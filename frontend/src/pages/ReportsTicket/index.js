@@ -20,6 +20,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -171,7 +172,7 @@ const ReportsTicket = () => {
                   <TableCell align="center">{report.ticketId}</TableCell>
                 </TableRow>
               ))}
-              {loading}
+              {loading && <TableRowSkeleton columns={4} />}
             </>
           </TableBody>
         </Table>

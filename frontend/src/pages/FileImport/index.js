@@ -27,6 +27,7 @@ import { IconButton, Typography } from "@material-ui/core";
 import { Visibility } from "@material-ui/icons";
 import RegisterFileModal from "../../components/RegisterFileModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -123,6 +124,7 @@ const FileImport = () => {
           setLoading(false);
         } catch (err) {
           toastError(err);
+          setLoading(false);
         }
       };
       fetchUsers();
@@ -395,7 +397,7 @@ const FileImport = () => {
                   </TableRow>
                 );
               })}
-              {loading}
+              {loading && <TableRowSkeleton columns={7} />}
             </>
           </TableBody>
         </Table>
