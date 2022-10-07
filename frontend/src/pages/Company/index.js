@@ -143,6 +143,7 @@ const Company= () => {
     return () => {
       socket.disconnect();
     };
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpenCompanyModal = () => {
@@ -257,7 +258,7 @@ const Company= () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("company.grid.companyId")}</TableCell>
-              <TableCell align="center">{i18n.t("Alias")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.alias")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.name")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.cnpj")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.phone")}</TableCell>

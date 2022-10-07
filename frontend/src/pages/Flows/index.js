@@ -174,7 +174,7 @@ const Flows = () => {
 
     try {
       await api.post(`/flows/`, flowData);
-      toast.success("Fluxo Duplicado com Sucesso");
+      toast.success(i18n.t("flows.confirmation.duplicate"));
     } catch (err) {
       toastError(err);
     }
@@ -188,7 +188,7 @@ const Flows = () => {
   const handleDeleteFlow = async (flowId) => {
     try {
         await api.delete(`/flows/${flowId}`);
-        toast.success('Fluxo deletado com sucesso');
+        toast.success(i18n.t("flows.confirmation.delete"));
     } catch (err) {
         toastError(err);
     }
@@ -204,18 +204,18 @@ const Flows = () => {
         flowId={selectedFlow && selectedFlow.id}
       />
       <ConfirmationModal
-        title='Deletar Fluxo'
+        title={i18n.t("flows.confirmation.title")}
         open={confirmModalOpen}
         onClose={handleCloseConfirmationModal}
         onConfirm={() => handleDeleteFlow(deletingFlow.id)}
       >
-        Você tem certeza que deseja deletar este fluxo?
+        {i18n.t("flows.confirmation.confirmDelete")}
       </ConfirmationModal>
       <MainHeader>
-        <Title>Fluxos</Title>
+        <Title>{i18n.t("flows.title")}</Title>
         <MainHeaderButtonsWrapper>
           <TextField
-            placeholder="Pesquisar"
+            placeholder={i18n.t("flows.buttons.search")}
             type="search"
             value={searchParam}
             onChange={handleSearch}
@@ -232,7 +232,7 @@ const Flows = () => {
             color="primary"
             onClick={handleOpenFlowModal}
           >
-            Criar
+            {i18n.t("flows.buttons.create")}
           </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -240,11 +240,11 @@ const Flows = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">Nome</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Criado em</TableCell>
-              <TableCell align="center">Atualizado em</TableCell>
-              <TableCell align="center">Ações</TableCell>
+              <TableCell align="center">{i18n.t("flows.grid.name")}</TableCell>
+              <TableCell align="center">{i18n.t("flows.grid.status")}</TableCell>
+              <TableCell align="center">{i18n.t("flows.grid.createdAt")}</TableCell>
+              <TableCell align="center">{i18n.t("flows.grid.updatedAt")}</TableCell>
+              <TableCell align="center">{i18n.t("flows.grid.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

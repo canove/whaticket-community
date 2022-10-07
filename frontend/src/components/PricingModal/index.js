@@ -137,7 +137,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 		} else {
 			try {
 				await api.post('/pricings/', pricingData);
-				toast.success("Precificação criada com sucesso!");
+				toast.success(i18n.t("pricing.confirmation.create"));
 			} catch (err) {
 				toastError(err);
 			}
@@ -155,7 +155,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 
 		try {
 			await api.put(`/pricings/${pricingId}`, pricingData);
-			toast.success("Precificação editada com sucesso!");
+			toast.success(i18n.t("pricing.confirmation.edit"));
 		} catch (err) {
 			toastError(err);
 		}
@@ -182,12 +182,12 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 	return (
 		<div className={classes.root}>
 			<ConfirmationModal
-				title='Editar a Precificação'
+				title={i18n.t("pricing.confirmation.titleEdit")}
 				open={confirmModalOpen}
 				onClose={setConfirmModalOpen}
 				onConfirm={handleEdit}
 			>
-				Você tem certeza que vai editar a precificação?
+				{i18n.t("pricing.confirmation.confirmEdit")}
 			</ConfirmationModal>
 			<Dialog
 				open={open}
@@ -197,7 +197,10 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 				scroll="paper"
 			>
 				<DialogTitle id="form-dialog-title">
-					{ pricingId ? 'Editar' : 'Criar' }
+					{ pricingId
+					 ? `${i18n.t("pricing.pricingModal.edited")}`
+					 : `${i18n.t("pricing.pricingModal.created")}`
+					}
 				</DialogTitle>
 				<DialogContent dividers>
 					<div className={classes.root}>
@@ -207,7 +210,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 							fullWidth
 						>
 							<InputLabel id="company-select-label">
-								Empresa
+								{i18n.t("pricing.pricingModal.company")}
 							</InputLabel>
 							<Select
 								labelId="company-select-label"
@@ -232,7 +235,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 							fullWidth
 						>
 							<InputLabel id="product-select-label">
-								Produto
+								{i18n.t("pricing.pricingModal.product")}
 							</InputLabel>
 							<Select
 								labelId="product-select-label"
@@ -258,7 +261,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 						>
 							<TextField
 								id="grace-days-number"
-								label="Carência (dias)"
+								label={i18n.t("pricing.pricingModal.graceDays")}
 								type="number"
 								variant="outlined"
 								value={gracePeriod}
@@ -280,7 +283,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 						>
 							<TextField
 								id="grace-triggers-number"
-								label="Carência de Disparos"
+								label={i18n.t("pricing.pricingModal.lackOfShots")}
 								type="number"
 								variant="outlined"
 								value={graceTrigger}
@@ -301,7 +304,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Cancelar
+						{i18n.t("pricing.pricingModal.cancel")}
 					</Button>
 					<Button
                         onClick={handleSubmit}
@@ -309,7 +312,10 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 						color="primary"
 						variant="contained"
 					>
-						{ pricingId ? 'Editar' : 'Criar' }
+						{ pricingId
+						 ? `${i18n.t("pricing.pricingModal.save")}`
+						 : `${i18n.t("pricing.pricingModal.created")}`
+						}
 					</Button>
 				</DialogActions>
 			</Dialog>

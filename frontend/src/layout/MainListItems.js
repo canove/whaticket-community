@@ -436,8 +436,8 @@ const MainListItems = (props) => {
     if (name === "Pricing") {
       return i18n.t("mainDrawer.listItems.pricing");
     }
-    if (name === "Payment") {
-      return i18n.t("mainDrawer.listItems.payment");
+    if (name === "Payments") {
+      return i18n.t("mainDrawer.listItems.payments");
     }
     if (name === "Flows") {
       return i18n.t("mainDrawer.listItems.flows");

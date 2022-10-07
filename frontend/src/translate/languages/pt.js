@@ -20,6 +20,7 @@ const messages = {
       login: {
         title: "Login",
         form: {
+          company: "Empresa",
           email: "Email",
           password: "Senha",
         },
@@ -68,6 +69,9 @@ const messages = {
           mistake: {
             title: "Erros",
           },
+          category: {
+            title: "Atendimento por Categoria",
+          },
         },
       },
       connections: {
@@ -89,6 +93,8 @@ const messages = {
           qrcode: "QR CODE",
           newQr: "Novo QR CODE",
           connecting: "Conectando",
+          previousPage: "Página Anterior",
+          nextPage: "Próxima Página"
         },
         toolTips: {
           disconnected: {
@@ -123,6 +129,8 @@ const messages = {
       },
       officialConnections: {
         title: "Conexões Oficiais",
+        previousPage: "Página Anterior",
+        nextPage: "Próxima Página",
       },
       officialWhatsappModal: {
         title: {
@@ -352,7 +360,7 @@ const messages = {
           finance: "Finanças",
           products: "Produtos",
           pricing: "Precificação",
-          payment: "Pagamento",
+          payments: "Pagamentos",
           flows: "Fluxo",
 
         },
@@ -420,6 +428,8 @@ const messages = {
         buttons: {
           import: "Importar Disparos",
           filter: "Filtrar",
+          previousPage: "Página Anterior",
+          nextPage: "Próxima Página",
         },
         table: {
           uploadDate: "Data de Upload",
@@ -659,6 +669,7 @@ const messages = {
         search: "Pesquisar",
       grid:{
         companyId: "Id da Empresa",
+        alias: "Pseudônimo",
         name: "Nome",
         cnpj: "CNPJ",
         phone: "Telefone",
@@ -672,6 +683,7 @@ const messages = {
       companyModal: {
         titleAdd: "Adicionar Empresa",
         titleEdit: "Editar Cadastro da Empresa",
+        alias: "Pseudônimo",
         name: "Nome da Empresa",
         cnpj: "CNPJ",
         phone: "Telefone",
@@ -684,14 +696,15 @@ const messages = {
       },
 
       menu:{
-            title: "Menus",
-            success: "Menu salvo com sucesso!",
-          buttons:{
-            save: "Salvar",
-            menus: "Menus",
-            company: "Empresas"
-          },
+        title: "Menus",
+        success: "Menu salvo com sucesso!",
+        buttons:{
+          save: "Salvar",
+          menus: "Menus",
+          company: "Empresas"
         },
+      },
+
       templatesData:{
         title: "Templates Data",
         buttons: {
@@ -706,7 +719,7 @@ const messages = {
           footer: "Rodapé",
           createdAt: "Data da Criação",
           updateAt: "Editado em",
-          actions: "Acões",
+          actions: "Ações",
         },
         templateModal: {
           add: "Adicionar Template",
@@ -750,7 +763,178 @@ const messages = {
           deleteMsg: "Tem certeza que deseja excluir a categoria?",
           editMsg: "Categoria editada com sucesso!",
           addMsg: "Categoria adicionada com sucesso!",
+        },
+      },
 
+      flows: {
+        title: "Fluxos",
+        buttons:{
+          create: "Criar",
+          search: "Pesquisar"
+        },
+        grid:{
+          name: "Nome",
+          status: "Status",
+          createdAt: "Criado em",
+          updatedAt: "Atualizado em",
+          actions: "Ações",
+        },
+        flowsModal:{
+          add: "Criar Fluxo",
+          edit: "Editar Fluxo",
+          name: "Nome",
+          cancel: "Cancelar",
+          create: "Criar",
+          save: "salvar",
+        },
+        confirmation:{
+          title: "Deletar Fluxo",
+          create: "Fluxo Criado com Sucesso!",
+          edit: "Fluxo Editado com Sucesso!",
+          duplicate: "Fluxo Duplicado com Sucesso!",
+          delete: "Fluxo deletado com sucesso!",
+          confirmDelete: "Você tem certeza que deseja deletar este fluxo?",
+        },
+      },
+
+      integratedImport: {
+        title: "Importação Integrada",
+        buttons:{
+          createdImport: "Criar Importação"
+        },
+        grid:{
+          createdAt: "Data da Criação",
+          name: "Nome",
+          method: "Método",
+          registers: "Qtde de Registros",
+          status: "Status",
+          actions: "Ações"
+        },
+        integratedModal:{
+          add: "Criar Importação",
+          edited: "Editar importação",
+          name: "Nome",
+          method: "Método",
+          url: "URL",
+          autentication: "Autenticação",
+          key: "Key",
+          token: "Token",
+          autentic: "Autenticar",
+          in: "De",
+          for: "Para",
+          cancel: "Cancelar",
+          save: "Salvar",
+          edit: "Editar"
+        },
+        confirmation: {
+          createdAt: "Importação adicionada com sucesso!",
+          updatedAt: "Importação editada com sucesso!",
+          delete: "Importação excluída com sucesso!",
+          confirmDelete: "Todos os dados da importação se perderão, deseja realmente excluir?",
+          title: "Deletar Importação",
+        },
+        status: {
+          awaitingImport: "Aguardando Importação",
+          processing: "Processando",
+          awaitingApprove: "Aguardando Aprovação",
+          err: "Erro",
+          approve: "Aprovado",
+          shooting: "Disparando",
+          finished: "Finalizado",
+          refused: "Recusado"
+        },
+      },
+
+      payments: {
+        title: "Pagamentos",
+        grid: {
+          company: "Empresa",
+          month: "Mês",
+          shotsValue: "Valor Total dos Disparos",
+          monthValue: "Valor da Mensalidade",
+          amounth: "Valor Total",
+          amounthPaind: "Valor Pago",
+          actions: "Ações"
+        },
+      },
+
+      pricing: {
+        title: "Precificação",
+        buttons: {
+          create: "Criar",
+        },
+        grid: {
+          company: "Empresa",
+          registeredProduct: "Produto Cadastrado",
+          status: "Status",
+          gracePeriod: "Período de Carência (dias)",
+          lackOfShots: "Carência de Disparos",
+          customerSince: "Cliente Desde",
+          actions: "Ações",
+          active: "Ativo",
+          inactive: "Inativo",
+          defaulter: "Inadimplente",
+          blocked: "Bloqueado",
+        },
+        pricingModal: {
+          created: "Criar",
+          edited: "Editar",
+          company: "Empresa",
+          product: "Produto",
+          graceDays: "Carência (dias)",
+          lackOfShots: "Carência de Disparos",
+          cancel: "Cancelar",
+          save: "Salvar",
+          historic: "Histórico",
+          closed: "Fechar",
+          createdAt: "Criado",
+          updatedAt: "Editado",
+          deletedAt: "Deletado",
+          by: " por ",
+          update: "Atualizado: ",
+          current: "Atual: ",
+        },
+        confirmation:{
+          title: "Deletar Precificação",
+          delete: "Precificação excluida com Sucesso!",
+          confirmDelete: "Você realmente deseja excluir está precifição?",
+          create: "Precificação criada com Sucesso!",
+          edit: "Precificação editada com Sucesso!",
+          titleEdit: "Editar Precificação",
+          confirmEdit: "Você tem certeza que vai editar a precificação?",
+        },
+      },
+
+      product:{
+        title: "Produtos",
+        buttons:{
+          created: "Criar",
+        },
+        grid: {
+          productName: "Nome do Produto",
+          monthValue: "Valor da Mensalidade",
+          tripCostValue: "Valor Custo Disparo",
+          monthlyInterestRate: "Taxa juros Mensal",
+          penaltyMount: "Multa Atraso",
+          actions: "Ações",
+        },
+        productModal: {
+          productName: "Nome do produto",
+          monthValue: "Valor Mensal",
+          shotsValue: "Valor do Disparo",
+          interestRate: "Taxa de Juros",
+          penaltyMount: "Multa Atraso",
+          cancel: "Cancelar",
+          created: "Criar",
+          edited: "Editar",
+          save: "Salvar",
+        },
+        confirmation: {
+          delete: "Produto excluído com sucesso!",
+          title: "Deletar Produto",
+          confirmDelete: "Todos os dados do produto se perderão, deseja realmente excluir?",
+          edited: "Produto atualizado com sucesso!",
+          created: "Produto adicionado com sucesso!",
         },
       },
 

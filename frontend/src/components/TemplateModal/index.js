@@ -140,6 +140,7 @@ const TemplateModal = ({ open, onClose }) => {
       setParamsQuantity(result);
     }
     testParams();
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bodyText])
 
   return (

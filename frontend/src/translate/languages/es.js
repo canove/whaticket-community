@@ -21,6 +21,7 @@ const messages = {
       login: {
         title: "Inicio de Sesión",
         form: {
+          company: "Empresa",
           email: "Correo Electrónico",
           password: "Contraseña",
         },
@@ -68,7 +69,10 @@ const messages = {
           },
           mistake: {
             title: "Errors"
-          }
+          },
+          category: {
+            title: "Servicio por Categoría"
+          },
         }
       },
       connections: {
@@ -90,6 +94,8 @@ const messages = {
           qrcode: "QR CODE",
           newQr: "Nuevo QR CODE",
           connecting: "Conectando",
+          previousPage: "Pagina Anterior",
+          nextPage: "Siguuinte Página",
         },
         toolTips: {
           disconnected: {
@@ -124,6 +130,8 @@ const messages = {
       },
       officialConnections: {
         title: "Conexiones Oficiales",
+        previousPage: "Página Anterior",
+        nextPage: "Seguiente Página",
       },
       officialWhatsappModal: {
         title:{
@@ -355,7 +363,7 @@ const messages = {
           finance: "Finanzas",
           products: "Producto",
           pricing: "Fijación de Precios",
-          payment: "Pago",
+          payments: "Pago",
           flows: "Fluye",
         },
         whatsApp: {
@@ -421,8 +429,10 @@ const messages = {
           date: "Fecha",
         },
         buttons: {
-          import: "Fotos Importadas",
+          import: "Importar Archivo",
           filter: "Filtrar",
+          previousPage: "Página Anterior",
+          nextPage: "Siguiente Página",
         },
         table: {
           uploadDate: "Fecha de Carga",
@@ -661,6 +671,7 @@ const messages = {
         search: "Búsqueda",
           grid:{
           companyId: "ID de la Compañía",
+          alias: "Seudónimo",
           name: "Nombres",
           cnpj: "CNPJ",
           phone: "Teléfono",
@@ -674,6 +685,7 @@ const messages = {
           companyModal: {
             titleAdd: "Añadir Compañía",
             titleEdit: "Editar Registro de Compañía",
+            alias: "Seudónimo",
             name: "Nombre da Compañía",
             cnpj: "CNPJ",
             phone: "Teléfono",
@@ -753,6 +765,168 @@ const messages = {
           editMsg: "¡Categoría editada con éxito!",
           addMsg: "¡Categoría agregada con éxito!",
 
+        },
+      },
+
+      flows: {
+        title: "Fluye",
+        buttons:{
+          create: "Crear",
+          search: "Búsqueda"
+        },
+        grid:{
+          name: "Nombre",
+          status: "Status",
+          createdAt: "Creado en",
+          updatedAt: "Actualizado en",
+          actions: "Comportamiento",
+        },
+        flowsModal:{
+          add: "Crear Flujo",
+          edit: "Editar Flujo",
+          name: "Nombre",
+          cancel: "Cancelar",
+          create: "Crear",
+          save: "Ahorrar",
+        },
+        confirmation:{
+          title: "Eliminar Flujo",
+          create: "¡Flujo creado con éxito!",
+          edit: "¡Flujo editado con éxito!",
+          duplicate: "¡Flujo duplicado con éxito!",
+          delete: "¡Flujo eliminado con éxito!",
+          confirmDelete: "¿Está seguro de que desea eliminar esta transmisión?",
+        },
+      },
+
+      integratedImport: {
+        title: "Importación Integrada",
+        buttons:{
+          createdImport: "Crear Importación"
+        },
+        grid:{
+          createdAt: "Fecha de Creación",
+          name: "Nombre",
+          method: "Método",
+          registers: "Número de Registros",
+          status: "Status",
+          actions: "Comportamiento"
+        },
+        integratedModal:{
+          add: "Crear Importación",
+          edited: "Editar Importación",
+          name: "Nombre",
+          method: "Método",
+          url: "URL",
+          autentication: "Autenticación",
+          key: "Key",
+          token: "Token",
+          autentic: "Autenticar",
+          in: "De",
+          for: "Para",
+          cancel: "Cancelar",
+          save: "Guardar",
+          edit: "Editar"
+        },
+        confirmation: {
+          createAt: "¡Importación agregada con éxito!",
+          updatedAt: "¡Importación editada con éxito!",
+          delete: "¡Importación eliminada con éxito!",
+          confirmDelete: "Se perderán todos los datos de la importación, ¿realmente desea eliminarlos?",
+          title: "Eliminar importación",
+        },
+      },
+
+      payments: {
+        title: "Pagos",
+        grid: {
+          company: "Compañías",
+          month: "Mes",
+          shotsValue: "Cantidad total de Disparos",
+          monthValue: "Cuota Mensual",
+          amounth: "Valor Total",
+          amounthPaind: "Valor Pago",
+          actions: "Comportamiento"
+        },
+      },
+
+      pricing: {
+        title: "Fijación de Precios",
+        buttons: {
+          create: "Crear",
+        },
+        grid: {
+          company: "Compañía",
+          registeredProduct: "Producto Registrado",
+          status: "Status",
+          gracePeriod: "Periodo de Carencia (dias)",
+          lackOfShots: "Falta de Disparos",
+          customerSince: "Cliente Desde",
+          actions: "Comportamiento",
+          active: "Activo",
+          inactive: "Inactivo",
+          defaulter: "Moroso",
+          blocked: "Obstruido",
+        },
+        pricingModal: {
+          created: "Crear",
+          edited: "Editar",
+          company: "Compañía",
+          product: "Producto",
+          graceDays: "Carencia (dias)",
+          lackOfShots: "Carencia de Disparos",
+          cancel: "Cancelar",
+          save: "Ahorrar",
+          historic: "Histórico",
+          closed: "Cerca",
+          createdAt: "Creado",
+          updatedAt: "Actualizado",
+          deletedAt: "Eliminado",
+          by: " por ",
+          update: "Actualizado: ",
+          current: "Actual: ",
+        },
+        confirmation:{
+          title: "Eliminar precios",
+          delete: "¡Precio eliminado con éxito!",
+          confirmDelete: "¿Realmente desea eliminar este precio?",
+          create: "¡Precio creado con éxito!",
+          edit: "¡Precio editado con éxito!",
+          titleEdit: "Editar precios",
+          confirmEdit: "¿Estás seguro de que editarás el precio?",
+        },
+      },
+
+      product:{
+        title: "Productos",
+        buttons:{
+          created: "Crear",
+        },
+        grid: {
+          productName: "Nombre del Producto",
+          monthValue: "Cuota Mensual",
+          tripCostValue: "Valor del Costo del Tiro",
+          monthlyInterestRate: "Tasa de Interés Mensual",
+          penaltyMount: "Bien Tarde",
+          actions: "Comportamiento",
+        },
+        productModal: {
+          productName: "Nombre del Producto",
+          monthValue: "Cuota Mensual",
+          shotsValue: "Valor del Tiro",
+          interestRate: "Tasa de Interés",
+          penaltyMount: "Bien Tarde",
+          cancel: "Cancelar",
+          created: "Crear",
+          edited: "Editar",
+          save: "Ahorrar",
+        },
+        confirmation: {
+          delete: "¡Producto eliminado con éxito!",
+          title: "Eliminar producto",
+          confirmDelete: "Se perderán todos los datos del producto, ¿realmente desea eliminarlos?",
+          edited: "¡Producto actualizado con éxito!",
+          created: "¡Producto agregado con éxito!",
         },
       },
 

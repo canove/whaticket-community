@@ -20,6 +20,7 @@ const messages = {
       login: {
         title: "Login",
         form: {
+          company: "Company",
           email: "Email",
           password: "Password",
         },
@@ -67,8 +68,11 @@ const messages = {
           },
           mistake: {
             title: "Mistakes"
-          }
-        }
+          },
+          category: {
+            title: "Service by Category",
+          },
+        },
       },
       connections: {
         title: "Connections",
@@ -88,6 +92,8 @@ const messages = {
           qrcode: "QR CODE",
           newQr: "New QR CODE",
           connecting: "Connectiing",
+          previousPage: "Previous Page",
+          nextPage: "Next Page",
         },
         toolTips: {
           disconnected: {
@@ -122,6 +128,8 @@ const messages = {
       },
       officialConnections: {
         title: "Official Connections",
+        previousPage: "Previous Page",
+        nextPage: "Next Page",
       },
       officialWhatsappModal: {
         title:{
@@ -351,7 +359,7 @@ const messages = {
           finance: "Finance",
           products: "Products",
           pricing: "Pricing",
-          payment: "Payment",
+          payments: "Payments",
           flows: "Flows",
         },
         whatsApp: {
@@ -418,6 +426,8 @@ const messages = {
         buttons: {
           import: "Import",
           filter: "Filter",
+          previousPage: "Previous Page",
+          nextPage: "Next Page",
         },
         table: {
           uploadDate: "Upload Date",
@@ -656,6 +666,7 @@ const messages = {
         search: "Search",
           grid:{
           companyId: "Company Id",
+          alias: "Alias",
           name: "Name",
           cnpj: "CNPJ",
           phone: "Phone",
@@ -669,6 +680,7 @@ const messages = {
           companyModal: {
             titleAdd: "Add Company",
             titleEdit: "Edit Company Registration",
+            alias: "Alias",
             name: "Company Name",
             cnpj: "CNPJ",
             phone: "Phone",
@@ -747,7 +759,168 @@ const messages = {
           deleteMsg: "Are you sure you want to delete the category?",
           editMsg: "Category edited successfully!",
           addMsg: "Category added successfully!",
+        },
+      },
 
+      flows: {
+        title: "Flows",
+        buttons:{
+          create: "Create",
+          search: "Search"
+        },
+        grid:{
+          name: "Name",
+          status: "Status",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+          actions: "Actions",
+        },
+        flowsModal:{
+          add: "Create Flow",
+          edit: "Edit Flow",
+          name: "Name",
+          cancel: "Cancel",
+          create: "Create",
+          save: "Save",
+        },
+        confirmation:{
+          title: "Delete Flow",
+          create: "Flow Created Successfully!",
+          edit: "Flow Edited Successfully!",
+          duplicate: "Successfully Duplicated Flow!",
+          delete: "Flow deleted successfully!",
+          confirmDelete: "Are you sure you want to delete this stream?",
+        },
+      },
+
+      integratedImport: {
+        title: "Integrated Import",
+        buttons:{
+          createdImport: "Create Import"
+        },
+        grid:{
+          createdAt: "Create At",
+          name: "Name",
+          method: "Method",
+          registers: "Registration Amount",
+          status: "Status",
+          actions: "Actions"
+        },
+        integratedModal:{
+          add: "Create Import",
+          edited: "Edit Import",
+          name: "Name",
+          method: "Method",
+          url: "URL",
+          autentication: "Autentication",
+          key: "Key",
+          token: "Token",
+          autentic: "Authenticate",
+          in: "In",
+          for: "For",
+          cancel: "Cancel",
+          save: "Save",
+          edit: "Edit"
+        },
+        confirmation: {
+          createAt: "Import successfully added!",
+          updatedAt: "Import edited successfully!",
+          delete: "Import deleted successfully!",
+          confirmDelete: "All data from import will be lost, do you really want to delete?",
+          title: "Delete Import",
+        },
+      },
+
+      payments: {
+        title: "Payments",
+        grid: {
+          company: "Company",
+          month: "Month",
+          shotsValue: "Shots Value",
+          monthValue: "Month Value",
+          amounth: "Amounth",
+          amounthPaind: "Amounth Paind",
+          actions: "Actions"
+        },
+      },
+
+      pricing: {
+        title: "Pricing",
+        buttons: {
+          create: "Create",
+        },
+        grid: {
+          company: "Company",
+          registeredProduct: "Registered Product",
+          status: "Status",
+          gracePeriod: "Grace Period (days)",
+          lackOfShots: "Lack of Shots",
+          customerSince: "Customer Since",
+          actions: "Actions",
+          active: "Active",
+          inactive: "Inactive",
+          defaulter: "Dafauter",
+          blocked: "Blocked",
+        },
+        pricingModal: {
+          created: "Create",
+          edited: "Edit",
+          company: "Company",
+          product: "Product",
+          graceDays: "Grace (days)",
+          lackOfShots: "Lack of Shots",
+          cancel: "Cancel",
+          save: "Save",
+          historic: "Historic",
+          closed: "Closed",
+          createdAt: "Created",
+          updatedAt: "Updated",
+          deletedAt: "Deleted",
+          by: " by ",
+          update: "Updated: ",
+          current: "Current: ",
+        },
+        confirmation:{
+          title: "Delete Pricing",
+          delete: "Pricing Deleted Successfully!",
+          confirmDelete: "Do you really want to delete this pricing?",
+          create: "Pricing created successfully!",
+          edit: "Successfully edited pricing!",
+          titleEdit: "Edit Pricing",
+          confirmEdit: "Are you sure you will edit the pricing?",
+        },
+      },
+
+      product:{
+        title: "Products",
+        buttons:{
+          created: "Created",
+        },
+        grid: {
+          productName: "Product Name",
+          monthValue: "Month Value",
+          tripCostValue: "Trigger Fee",
+          monthlyInterestRate: "Monthly Interest Rate",
+          penaltyMount: "Penalty Mount",
+          actions: "Actions",
+        },
+        productModal: {
+          productName: "Product Name",
+          monthValue: "Month Value",
+          shotsValue: "Shots Value",
+          interestRate: "Interest Rate",
+          penaltyMount: "Penalty Mount",
+          cancel: "Cancel",
+          created: "Created",
+          edited: "Edited",
+          save: "Save",
+        },
+        confirmation: {
+          delete: "Product deleted successfully!",
+          title: "Delete Product",
+          confirmDelete: "All product data will be lost, do you really want to delete?",
+          edited: "Product updated successfully!",
+          created: "Product added successfully!",
         },
       },
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import * as Yup from "yup";
 import { toast } from "react-toastify";
 import {
 	Button,
@@ -122,10 +121,10 @@ const ProductModal = ({ open, onClose, productId }) => {
 		 try {
             if (productId) {
                 await api.put(`/products/${productId}`, productData);
-                toast.success("Produto editado com sucesso!");
+                toast.success(i18n.t("product.confirmation.edited"));
             } else {
                 await api.post("/products/", productData);
-                toast.success("Produto adicionado com sucesso!");
+                toast.success(i18n.t("product.confirmation.created"));
             }
             } catch (err) {
                 toastError(err);
@@ -157,7 +156,10 @@ const ProductModal = ({ open, onClose, productId }) => {
 				scroll="paper"
 			>
 				<DialogTitle id="form-dialog-title">
-					{ productId ? 'Editar' : 'Criar' }
+					{ productId
+					 ? `${i18n.t("product.productModal.edited")}`
+					 : `${i18n.t("product.productModal.created")}`
+					}
 				</DialogTitle>
 				<DialogContent dividers>
 				<div className={classes.multFieldLine}>
@@ -167,13 +169,13 @@ const ProductModal = ({ open, onClose, productId }) => {
                     name="name"
                     variant="outlined"
                     margin="dense"
-                    label={i18n.t("Nome do produto")}
+                    label={i18n.t("product.productModal.productName")}
                     fullWidth
 					value={name}
 					onChange={handleNameChange}
                   />
                 </div>
-					<Typography variant="subtitle1">Valor Mensal</Typography>
+					<Typography variant="subtitle1">{i18n.t("product.productModal.monthValue")}</Typography>
 					<IntlCurrencyInput
 						name="monthlyFee"
 						value={monthlyFee}
@@ -182,7 +184,7 @@ const ProductModal = ({ open, onClose, productId }) => {
 						currency="BRL"
 						style={{width:"100%", padding:"10px", fontSize:"16px"}}
 					/>
-					<Typography variant="subtitle1">Valor do disparo</Typography>
+					<Typography variant="subtitle1">{i18n.t("product.productModal.shotsValue")}</Typography>
 					<IntlCurrencyInput
 						name="triggerFee"
 						value={triggerFee}
@@ -191,7 +193,7 @@ const ProductModal = ({ open, onClose, productId }) => {
 						currency="BRL"
 						style={{width:"100%", padding:"10px", fontSize:"16px"}}
 					/>
-					<Typography variant="subtitle1">Taxa de Juros</Typography>
+					<Typography variant="subtitle1">{i18n.t("product.productModal.interestRate")}</Typography>
                   	<IntlCurrencyInput
 						name="monthlyInterestRate"
 						value={monthlyInterestRate}
@@ -200,7 +202,7 @@ const ProductModal = ({ open, onClose, productId }) => {
 						currency="BRL"
 						style={{width:"100%", padding:"10px", fontSize:"16px"}}
                   />
-					<Typography variant="subtitle1">Multa atraso</Typography>
+					<Typography variant="subtitle1">{i18n.t("product.productModal.penaltyMount")}</Typography>
                  	<IntlCurrencyInput
 						name="penaltyMount"
 						value={penaltyMount}
@@ -216,14 +218,17 @@ const ProductModal = ({ open, onClose, productId }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Cancelar
+						{i18n.t("product.productModal.cancel")}
 					</Button>
 					<Button
                         onClick={handleSubmit}
 						color="primary"
 						variant="contained"
 					>
-						{ productId ? 'Editar' : 'Criar' }
+						{ productId
+						 ? `${i18n.t("product.productModal.save")}`
+						 : `${i18n.t("product.productModal.created")}`
+						}
 					</Button>
 				</DialogActions>
 			</Dialog>

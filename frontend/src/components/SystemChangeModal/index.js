@@ -8,13 +8,6 @@ import {
   DialogTitle,
   Button,
   DialogActions,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
 } from "@material-ui/core";
 
 import Timeline from '@material-ui/lab/Timeline';
@@ -25,10 +18,6 @@ import TimelineContent from '@material-ui/lab/TimelineContent';
 import TimelineDot from '@material-ui/lab/TimelineDot';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
 import Typography from '@material-ui/core/Typography';
-
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -92,15 +81,15 @@ const SystemChangeModal = ({ open, onClose, systemChange, registerId }) => {
 
     const getActionType = (actionType) => {
         if (actionType === 0) {
-            return "Created";
+            return `${i18n.t("pricing.pricingModal.createdAt")}`;
         }
 
         if (actionType === 1) {
-            return "Edited";
+            return `${i18n.t("pricing.pricingModal.updatedAt")}`;
         }
 
         if (actionType === 2) {
-            return "Deleted";
+            return `${i18n.t("pricing.pricingModal.deletedAt")}`;
         }
     }
 
@@ -113,7 +102,6 @@ const SystemChangeModal = ({ open, onClose, systemChange, registerId }) => {
         setSelectedHistoricJSON(null);
         setHistoricJSONModalOpen(false);
     };
-
 
     return (
         <div className={classes.root}>
@@ -131,7 +119,7 @@ const SystemChangeModal = ({ open, onClose, systemChange, registerId }) => {
                 scroll="paper"
             >
                 <DialogTitle id="form-dialog-title">
-                    Histórico
+                   {i18n.t("pricing.pricingModal.historic")}
                 </DialogTitle>
                 <DialogContent dividers>
                     <Timeline align="alternate">
@@ -150,7 +138,11 @@ const SystemChangeModal = ({ open, onClose, systemChange, registerId }) => {
                                         <TimelineConnector />
                                     </TimelineSeparator>
                                     <TimelineContent>
-                                        <Typography>{getActionType(historic.actionType)} by {historic.user.name}</Typography>
+                                        <Typography>
+                                            {getActionType(historic.actionType)}
+                                                {i18n.t("pricing.pricingModal.by")}
+                                            {historic.user.name}
+                                        </Typography>
                                     </TimelineContent>
                                 </TimelineItem>
                             );
@@ -163,7 +155,7 @@ const SystemChangeModal = ({ open, onClose, systemChange, registerId }) => {
                         color="secondary"
                         variant="outlined"
                     >
-                        Fechar
+                        {i18n.t("pricing.pricingModal.closed")}
                     </Button>
                 </DialogActions>
             </Dialog>
