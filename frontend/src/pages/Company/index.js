@@ -120,6 +120,7 @@ const Company= () => {
           setLoading(false);
         } catch (err) {
           toastError(err);
+          setLoading(false);
         }
       };
       fetchCompanies();
@@ -306,7 +307,7 @@ const Company= () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {loading && <TableRowSkeleton columns={4} />}
+              {loading && <TableRowSkeleton columns={8} />}
             </>
           </TableBody>
         </Table>

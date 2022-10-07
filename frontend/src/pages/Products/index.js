@@ -99,6 +99,7 @@ const Products = () => {
     }, []);
 
     useEffect(() => {
+        setLoading(true);
         const fetchProducts = async () => {
             try {
                 const { data } = await api.get("/products/");
@@ -106,6 +107,7 @@ const Products = () => {
                 setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         };
         fetchProducts();

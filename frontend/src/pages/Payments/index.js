@@ -19,6 +19,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { parseISO, format, getMonth } from "date-fns";
 import BillingHistoricModal from "../../components/BillingHistoricModal";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -39,6 +40,7 @@ const Payments = () => {
     const [selectedBillingHistoric, setSelectedBillingHistoric] = useState(null);
 
     useEffect(() => {
+        setLoading(true);
         const fetchProducts = async () => {
             try {
                 const { data } = await api.get("/billings/");
@@ -46,6 +48,7 @@ const Payments = () => {
                 setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         };
         fetchProducts();
@@ -110,7 +113,6 @@ const Payments = () => {
                                 <TableRow key={billing.id}>
                                     <TableCell align="center">{billing.company.name}</TableCell>
                                     <TableCell align="center">{getMonth(billing.createdAt)}</TableCell>
-    
                                     <TableCell align="center">{formatToBRL(billing.totalTriggerValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalMonthValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalValue)}</TableCell>
@@ -126,6 +128,7 @@ const Payments = () => {
                                 </TableRow>
                             )
                         })}
+                        {loading && <TableRowSkeleton columns={7} />}
                     </TableBody>
                 </Table>
         </Paper>
