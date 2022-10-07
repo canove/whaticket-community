@@ -450,7 +450,7 @@ const Connections = () => {
 					</TableHead>
 					<TableBody>
 						{loading ? (
-							<TableRowSkeleton />
+							<TableRowSkeleton columns={6} />
 						) : (
 							<>
 								{whatsApps?.length > 0 &&

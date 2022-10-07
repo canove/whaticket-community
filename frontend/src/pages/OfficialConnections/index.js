@@ -114,7 +114,7 @@ const OfficialConnections = () => {
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [whatsApps, dispatch] = useReducer(reducer, []);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const { user } = useContext(AuthContext);
 
 	const confirmationModalInitialState = {
@@ -148,8 +148,8 @@ const OfficialConnections = () => {
 				setHasMore(data.hasMore);
 				setLoading(false);
 			} catch (err) {
-				setLoading(false);
 				toastError(err);
+				setLoading(false);
 			}
 		};
 		fetchWhats();
@@ -277,7 +277,7 @@ const OfficialConnections = () => {
 					</TableHead>
 					<TableBody>
 						{loading ? (
-							<TableRowSkeleton />
+							<TableRowSkeleton columns={7} />
 						) : (
 							<>
 								{whatsApps?.length > 0 &&

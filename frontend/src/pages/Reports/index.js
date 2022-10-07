@@ -21,6 +21,7 @@ import toastError from "../../errors/toastError";
 import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -227,8 +228,7 @@ const Reports = () => {
                             </TableRow>
                         ))
                         }
-
-                        {loading}
+                        {loading && <TableRowSkeleton columns={6} />}
                     </>
                 </TableBody>
                 </Table>

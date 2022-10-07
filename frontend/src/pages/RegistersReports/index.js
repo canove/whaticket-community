@@ -22,6 +22,7 @@ import {
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { format, parseISO } from "date-fns";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -54,7 +55,6 @@ const RegistersReports = () => {
 	const [hasMore, setHasMore] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
         const fetchFiles = async () => {
             try {
                 const { data } = await api.get('file/list');
@@ -114,8 +114,10 @@ const RegistersReports = () => {
                setRegisters(data.registers);
                setCount(data.count);
                setHasMore(data.hasMore);
+               setLoading(false);
             } catch (err) {
                 toastError(err);
+                setLoading(false);
             }
         }
         fetchRegisters();
@@ -281,7 +283,7 @@ const RegistersReports = () => {
                                     </TableRow>
                                 )
                             }))}
-                            {loading}
+                            {loading && <TableRowSkeleton columns={6} />}
                         </>
                     </TableBody>
                 </Table>
