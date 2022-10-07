@@ -188,6 +188,11 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
         default:
           '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>'
       }
+    },
+    childProcessOptions: {
+      env: {
+        OPENSSL_CONF: "/dev/null"
+      }
     }
   };
 

@@ -41,17 +41,17 @@ const RegistersReports = () => {
     const { i18n } = useTranslation();
 
     const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(false);
     const [files, setFiles] = useState([]);
     const [fileIds, setFileIds] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [registers, setRegisters] = useState([]);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [count, setCount] = useState(0);
     const [pdf, setPdf] = useState("");
     const [disablePdfButton, setDisablePdfButton] = useState(true);
     const [csv, setCsv] = useState("");
     const [disableCsvButton, setDisableCsvButton] = useState(true);
+    const [pageNumber, setPageNumber] = useState(1);
+	const [count, setCount] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -285,28 +285,29 @@ const RegistersReports = () => {
                         </>
                     </TableBody>
                 </Table>
-            </Paper>
-            <Paper className={classes.mainPaper}
-                variant="outlined">
-                <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handlePreviousPage}
-                        disabled={pageNumber === 1}
-                    >
-                        {i18n.t("logReport.buttons.previous")}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNextPage}
-                        disabled={!hasMore}
-                    >
-                        {i18n.t("logReport.buttons.next")}
-                    </Button>
-                    <Typography>
-                        {i18n.t("logReport.buttons.page")}{ pageNumber } / { Math.ceil(count / 20)}
-                    </Typography>
+                <div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1} 
+					>
+						Página Anterior
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 20) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						Próxima Página
+					</Button>
+				</div>
             </Paper>
         </MainContainer>
     );
