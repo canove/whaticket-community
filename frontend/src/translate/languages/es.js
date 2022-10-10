@@ -1,39 +1,25 @@
 const messages = {
   es: {
     translations: {
-      signup: {
-        title: "Registro",
-        toasts: {
-          success:
-            "¡El usuario ha sido creado satisfactoriamente! ¡Ahora inicia sesión!",
-          fail: "Error creando el usuario. Verifica la data reportada.",
-        },
-        form: {
-          name: "Nombre",
-          email: "Correo Electrónico",
-          password: "Contraseña",
-        },
-        buttons: {
-          submit: "Regístrate",
-          login: "¿Ya tienes una cuenta? ¡Inicia sesión!",
-        },
-      },
+
       login: {
         title: "Inicio de Sesión",
         form: {
+          company: "Empresa",
           email: "Correo Electrónico",
           password: "Contraseña",
         },
         buttons: {
           submit: "Ingresa",
-          register: "¿No tienes cuenta? ¡Regístrate!",
         },
       },
+
       auth: {
         toasts: {
           success: "¡Inicio de sesión exitoso!",
         },
       },
+
       dashboard: {
         title: "Dashboard",
         file: "Archivo",
@@ -68,9 +54,13 @@ const messages = {
           },
           mistake: {
             title: "Errors"
-          }
+          },
+          category: {
+            title: "Servicio por Categoría"
+          },
         }
       },
+
       connections: {
         title: "Conexiones",
         toasts: {
@@ -90,6 +80,8 @@ const messages = {
           qrcode: "QR CODE",
           newQr: "Nuevo QR CODE",
           connecting: "Conectando",
+          previousPage: "Pagina Anterior",
+          nextPage: "Siguuinte Página",
         },
         toolTips: {
           disconnected: {
@@ -122,9 +114,13 @@ const messages = {
           limit: "Límite"
         },
       },
+
       officialConnections: {
         title: "Conexiones Oficiales",
+        previousPage: "Página Anterior",
+        nextPage: "Seguiente Página",
       },
+
       officialWhatsappModal: {
         title:{
         add:"Agregar Whatsapp Oficial",
@@ -163,10 +159,15 @@ const messages = {
       qrCode: {
         message: "Lée el código QR para empezar la sesión.",
       },
+
       contacts: {
         title: "Contactos",
         toasts: {
           deleted: "¡Contacto borrado satisfactoriamente!",
+          required: "¡Campo obligatorio!",
+          short: "¡Demasiado corto!",
+          long: "¡Se excedió el número de caracteres!",
+          email: "¡Email inválido!"
         },
         searchPlaceholder: "Buscar...",
         confirmationModal: {
@@ -188,6 +189,7 @@ const messages = {
           actions: "Acciones",
         },
       },
+
       contactModal: {
         title: {
           add: "Agregar contacto",
@@ -210,6 +212,7 @@ const messages = {
         },
         success: "Contacto guardado satisfactoriamente.",
       },
+
       quickAnswersModal: {
         title: {
           add: "Agregar respuesta rápida",
@@ -226,6 +229,7 @@ const messages = {
         },
         success: "Respuesta rápida guardada correctamente.",
       },
+
       queueModal: {
         title: {
           add: "Agregar cola",
@@ -235,6 +239,7 @@ const messages = {
           name: "Nombre",
           color: "Color",
           greetingMessage: "Mensaje de saludo",
+          success: "¡Cola guardada con éxito!",
         },
         buttons: {
           okAdd: "Añadir",
@@ -242,6 +247,7 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+
       userModal: {
         title: {
           add: "Agregar usuario",
@@ -266,17 +272,21 @@ const messages = {
         },
         success: "Usuario guardado satisfactoriamente.",
       },
+
       chat: {
         noTicketMessage: "Selecciona un ticket para empezar a chatear.",
       },
+
       ticketsManager: {
         buttons: {
           newTicket: "Nuevo",
         },
       },
+
       ticketsQueueSelect: {
         placeholder: "Linhas",
       },
+
       tickets: {
         toasts: {
           deleted: "El ticket en el que estabas ha sido borrado.",
@@ -296,6 +306,7 @@ const messages = {
           showAll: "Todos",
         },
       },
+
       transferTicketModal: {
         title: "Transferir Ticket",
         fieldLabel: "Escriba para buscar usuarios",
@@ -307,6 +318,7 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+
       ticketsList: {
         pendingHeader: "Cola",
         assignedHeader: "Trabajando en",
@@ -317,6 +329,7 @@ const messages = {
           accept: "Acceptar",
         },
       },
+
       newTicketModal: {
         title: "Crear Ticket",
         fieldLabel: "Escribe para buscar un contacto",
@@ -326,6 +339,7 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
@@ -355,7 +369,7 @@ const messages = {
           finance: "Finanzas",
           products: "Producto",
           pricing: "Fijación de Precios",
-          payment: "Pago",
+          payments: "Pago",
           flows: "Fluye",
         },
         whatsApp: {
@@ -371,9 +385,11 @@ const messages = {
           },
         },
       },
+
       notifications: {
         noTickets: "Sin notificaciones.",
       },
+
       queues: {
         title: "Linhas",
         table: {
@@ -391,9 +407,11 @@ const messages = {
             "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ninguna cola asignada.",
         },
       },
+
       queueSelect: {
         inputLabel: "Linhas",
       },
+
       quickAnswers: {
         title: "Respuestas rápidas",
         table: {
@@ -414,15 +432,26 @@ const messages = {
           deleteMessage: "Esta acción no se puede deshacer.",
         },
       },
+
       importation: {
         title: "Importar Archivo",
         form: {
           status: "Estado",
           date: "Fecha",
+          awaitingImport: "Esperando Importación",
+          processing: "Procesando",
+          waitingForApproval: "Esperando aprobación",
+          error: "Error",
+          aproved: "Aprobado",
+          shooting: "Disparo",
+          finished: "Acabado",
+          refused: "Rechazado",
         },
         buttons: {
-          import: "Fotos Importadas",
+          import: "Importar Archivo",
           filter: "Filtrar",
+          previousPage: "Página Anterior",
+          nextPage: "Siguiente Página",
         },
         table: {
           uploadDate: "Fecha de Carga",
@@ -446,6 +475,7 @@ const messages = {
           approve: "Aprobar",
         },
       },
+
       importModal: {
         title: "Importar",
         buttons: {
@@ -460,12 +490,30 @@ const messages = {
           noFile: "Sin Archivos Importados",
           uploadedFile: "Archivo Importado",
           supportedTriggerModel: "Modelo de Disparo Compatible",
-          connection:"Conexión",
+          connection:"Conexiónes",
           selectAConnection: "Seleccione una Conexión",
           show: "Mostrar",
-          toHide: "Esconder"
+          toHide: "Esconder",
+          all: "Todos",
+          template: "Modelo",
+          none: "Ninguma",
+        },
+        confirmation: {
+          errors: "Seleccione una o más conexiones y un archivo desencadenante.",
+          errorConnection: "Seleccione una o más conexiones.",
+          errorShots:"Seleccione un archivo desencadenante.",
+        },
+        model:{
+          line1: "NOMBRE;CPF/CNPJ;TELÉFONO;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXT_MESSAGE",
+          line2: "- CAMPOS OPCIONALES (SI MENSAJE_TEXTO COMPLETO)",
+          line3: "PLANTILLA_WHATS",
+          line4: "PARAMETERS_TEMPLATE",
+          line5: "- CAMPOS OPCIONALES (SI LA PLANTILLA_LO LLENÓ)",
+          line6: "MENSAJE DE TEXTO",
+          line7: "PARAMETERS_TEMPLATE",
         },
       },
+
       users: {
         title: "Usuarios",
         table: {
@@ -473,6 +521,7 @@ const messages = {
           email: "Correo Electrónico",
           profile: "Perfil",
           actions: "Acciones",
+          companyName: "Nombre de la Empresa",
         },
         buttons: {
           add: "Agregar usuario",
@@ -486,6 +535,7 @@ const messages = {
             "Toda la información del usuario se perderá. Los tickets abiertos de los usuarios se moverán a la cola.",
         },
       },
+
       settings: {
         success: "Configuración guardada satisfactoriamente.",
         title: "Configuración",
@@ -499,11 +549,12 @@ const messages = {
           },
         },
       },
+
       reports: {
         title: "Informes",
         buttons: {
           filter: "Filtrar informes",
-          exportPdf: "Export PDF",
+          exportPdf: "Exportar PDF",
         },
         form: {
           initialDate: "Fecha inicial",
@@ -511,17 +562,36 @@ const messages = {
           user: "Usuario",
         },
         table: {
-          messageId: "Message ID",
-          messageBody: "Message Body",
-          read: "Read",
-          mediaURL: "Media URL",
-          ticketId: "Ticket ID",
-          date: "Date",
-        }
+          messageId: "Mensaje Id",
+          messageBody: "Cuerpo del Mensaje",
+          read: "Leer",
+          mediaURL: "URL de Medios",
+          ticketId: "Identificación de Entradas",
+          date: "Fecha",
+        },
+        errors:{
+          toastErr: "¡Complete todos los campos!"
+        },
       },
+
       reportsTicket: {
-        title: "Reports Ticket",
+        title: "Informe de llamadas",
+        buttons: {
+          ticketId: "Id de llamadas",
+          filterReports: "Filtrar Informes",
+          exportPdf: "Exportar Pdf",
+        },
+        grid: {
+          messageId: "Id del mensaje",
+          bodyText: "Cuerpo del Mensaje",
+          read: "Leer",
+          ticketId: "Id de llamadas",
+        },
+        errors: {
+          toastErr: "¡Seleccione una llamada!"
+        },
       },
+
       messagesList: {
         header: {
           assignedTo: "Asignado a:",
@@ -605,7 +675,11 @@ const messages = {
             success: "¡Plantilla creada con éxito!",
             connectionFailed: "¡Seleccione una conexión!",
             delete: "¡Plantilla eliminada con éxito!",
-            toastErr: "¡Límite de parámetro excedido!"
+            toastErr: "¡Límite de parámetro excedido!",
+            selectVar: "Seleccione una variable",
+            document: "Documento",
+            phoneNumber: "Número de Teléfono",
+            ok: "OK",
           },
         },
         logReport:{
@@ -623,23 +697,48 @@ const messages = {
             createPdf: "Crea Pdf",
             exportPdf:  "Exportar Pdf",
             previous: "Anterior",
-            next: "Siguinte",
-            page: "Página: " ,
+            exportCsv: "Exportar Csv",
+            previousPage: "Página Anterior",
+            nextPage: "Siguinte Página",
           },
           grid:{
             name: "Nombre",
             sent: "Enviado",
             delivered: "Repartido",
             read: "Leer",
-            errors: "Errores"
+            errors: "Errores",
+            status: "Status",
           },
         },
 
-        settingsWhats:{
-          title: "Configuración",
-          triggerTime: "Tiempo de activación entre instancias",
-          connections: "conexiones",
-          all: "Todos",
+      settingsWhats:{
+        title: "Ajustes",
+        triggerTime: "Tiempo de activación entre instancias",
+        connections: "Conexiones",
+        all: "Todos",
+        disconnected: "Conexiones desconectadas:",
+        delete: "Se han eliminado algunas conexiones...",
+        salutation: "¿Usar mensaje de saludo?",
+        modal: {
+          salutation: "Mensaje de saludo",
+          actions: "Comportamiento",
+          edit: "Editar",
+          delete: "Deletar",
+          create: "Crear",
+          edited: "Editar mensaje de saludo",
+          createdAt: "Crear mensaje de saludo",
+        },
+        buttons: {
+          save: "Ahorrar",
+          activConfig: "Habilitar Configuración",
+          created: "Crear un mensaje",
+        },
+        confirmation: {
+          updated: "¡Configuración cambiada con éxito!",
+          saved: "¡Configuración guardada con éxito!",
+          title: "Borrar mensaje",
+          confirmDelete: "¿Está seguro de que desea eliminar este mensaje de saludo?",
+        },
       },
 
       historicTicket:{
@@ -661,6 +760,7 @@ const messages = {
         search: "Búsqueda",
           grid:{
           companyId: "ID de la Compañía",
+          alias: "Seudónimo",
           name: "Nombres",
           cnpj: "CNPJ",
           phone: "Teléfono",
@@ -674,16 +774,41 @@ const messages = {
           companyModal: {
             titleAdd: "Añadir Compañía",
             titleEdit: "Editar Registro de Compañía",
+            alias: "Seudónimo",
             name: "Nombre da Compañía",
             cnpj: "CNPJ",
             phone: "Teléfono",
             email: "Email",
-            address: "Endereço"
+            address: "Endereço",
+            required: "¡Campo obligatorio!",
+            invalidEmail: "¡Email inválido!",
+            image: "El tamaño excede el valor máximo de 1 Megabyte.",
+            upload: "Cargar logotipo",
+            logo: "Sin logotipo",
           },
           success: "Compañía registrada con éxito!",
+          deleteTitle: "Eliminar empresa, ",
           deleteCompany: "Todos los datos de la compañía registrada se perderán, ¿realmente desea eliminarlos? ",
-          toast: "¡Compañía eliminada con éxito!"
-          },
+          toast: "¡Compañía eliminada con éxito!",
+          update: "¡Empresa actualizada con éxito!",
+          createdAt: "¡Empresa creada con éxito!",
+          edited: "¡Servicio editado con éxito!",
+          create: "¡Servicio creado con éxito!",
+        firebase: {
+          yes: "Sí",
+          no: "No",
+          title: "Añadir un servicio:",
+          cancel: "Cancelar",
+          ok: "OK",
+          config: "Configuración de Firebase",
+          companyId: "Id de la Compañía",
+          connected: "Conectado",
+          isFull: "Cheio",
+          service: "Servicio",
+          edit: "Editar",
+          add: "Agregar Servicio"
+        },
+      },
 
           menu:{
             title: "Menú",
@@ -754,6 +879,229 @@ const messages = {
           addMsg: "¡Categoría agregada con éxito!",
 
         },
+      },
+
+      flows: {
+        title: "Fluye",
+        buttons:{
+          create: "Crear",
+          search: "Búsqueda"
+        },
+        grid:{
+          name: "Nombre",
+          status: "Status",
+          createdAt: "Creado en",
+          updatedAt: "Actualizado en",
+          actions: "Comportamiento",
+        },
+        flowsModal:{
+          add: "Crear Flujo",
+          edit: "Editar Flujo",
+          name: "Nombre",
+          cancel: "Cancelar",
+          create: "Crear",
+          save: "Ahorrar",
+        },
+        confirmation:{
+          title: "Eliminar Flujo",
+          create: "¡Flujo creado con éxito!",
+          edit: "¡Flujo editado con éxito!",
+          duplicate: "¡Flujo duplicado con éxito!",
+          delete: "¡Flujo eliminado con éxito!",
+          confirmDelete: "¿Está seguro de que desea eliminar esta transmisión?",
+        },
+      },
+
+      integratedImport: {
+        title: "Importación Integrada",
+        buttons:{
+          createdImport: "Crear Importación"
+        },
+        grid:{
+          createdAt: "Fecha de Creación",
+          name: "Nombre",
+          method: "Método",
+          registers: "Número de Registros",
+          status: "Status",
+          actions: "Comportamiento"
+        },
+        integratedModal:{
+          add: "Crear Importación",
+          edited: "Editar Importación",
+          name: "Nombre",
+          method: "Método",
+          url: "URL",
+          autentication: "Autenticación",
+          key: "Key",
+          token: "Token",
+          autentic: "Autenticar",
+          in: "De",
+          for: "Para",
+          cancel: "Cancelar",
+          save: "Guardar",
+          edit: "Editar",
+        },
+        confirmation: {
+          createAt: "¡Importación agregada con éxito!",
+          updatedAt: "¡Importación editada con éxito!",
+          delete: "¡Importación eliminada con éxito!",
+          confirmDelete: "Se perderán todos los datos de la importación, ¿realmente desea eliminarlos?",
+          title: "Eliminar importación",
+        },
+        status: {
+          awaitingImport: "Esperando Importación",
+          processing: "Procesando",
+          awaitingApprove: "Esperando aprobación",
+          err: "Error",
+          approve: "Aprobado",
+          shooting: "Disparo",
+          finished: "Acabado",
+          refused: "Rechazado",
+        },
+      },
+
+      payments: {
+        title: "Pagos",
+        grid: {
+          company: "Compañías",
+          month: "Mes",
+          shotsValue: "Cantidad total de Disparos",
+          monthValue: "Cuota Mensual",
+          amounth: "Valor Total",
+          amounthPaind: "Valor Pago",
+          actions: "Comportamiento"
+        },
+        modal:{
+          title: "Historial de precios",
+          date: "Fecha",
+          value: "Valor",
+          shots: "Tiros",
+          freeShots: "Tiros Gratis",
+          closed: "Cerca",
+        },
+      },
+
+      pricing: {
+        title: "Fijación de Precios",
+        buttons: {
+          create: "Crear",
+        },
+        grid: {
+          company: "Compañía",
+          registeredProduct: "Producto Registrado",
+          status: "Status",
+          gracePeriod: "Periodo de Carencia (dias)",
+          lackOfShots: "Falta de Disparos",
+          customerSince: "Cliente Desde",
+          actions: "Comportamiento",
+          active: "Activo",
+          inactive: "Inactivo",
+          defaulter: "Moroso",
+          blocked: "Obstruido",
+        },
+        pricingModal: {
+          created: "Crear",
+          edited: "Editar",
+          company: "Compañía",
+          product: "Producto",
+          graceDays: "Carencia (dias)",
+          lackOfShots: "Carencia de Disparos",
+          cancel: "Cancelar",
+          save: "Ahorrar",
+          historic: "Histórico",
+          closed: "Cerca",
+          createdAt: "Creado",
+          updatedAt: "Actualizado",
+          deletedAt: "Eliminado",
+          by: " por ",
+          update: "Actualizado: ",
+          current: "Actual: ",
+        },
+        confirmation:{
+          title: "Eliminar precios",
+          delete: "¡Precio eliminado con éxito!",
+          confirmDelete: "¿Realmente desea eliminar este precio?",
+          create: "¡Precio creado con éxito!",
+          edit: "¡Precio editado con éxito!",
+          titleEdit: "Editar precios",
+          confirmEdit: "¿Estás seguro de que editarás el precio?",
+        },
+      },
+
+      product:{
+        title: "Productos",
+        buttons:{
+          created: "Crear",
+        },
+        grid: {
+          productName: "Nombre del Producto",
+          monthValue: "Cuota Mensual",
+          tripCostValue: "Valor del Costo del Tiro",
+          monthlyInterestRate: "Tasa de Interés Mensual",
+          penaltyMount: "Bien Tarde",
+          actions: "Comportamiento",
+        },
+        productModal: {
+          productName: "Nombre del Producto",
+          monthValue: "Cuota Mensual",
+          shotsValue: "Valor del Tiro",
+          interestRate: "Tasa de Interés",
+          penaltyMount: "Bien Tarde",
+          cancel: "Cancelar",
+          created: "Crear",
+          edited: "Editar",
+          save: "Ahorrar",
+        },
+        confirmation: {
+          delete: "¡Producto eliminado con éxito!",
+          title: "Eliminar producto",
+          confirmDelete: "Se perderán todos los datos del producto, ¿realmente desea eliminarlos?",
+          edited: "¡Producto actualizado con éxito!",
+          created: "¡Producto agregado con éxito!",
+        },
+      },
+
+      registration: {
+        title: "Registro",
+        buttons: {
+          new: "Nuevo Menú",
+          search: "Búsqueda",
+        },
+        grid: {
+          icon: "Icono",
+          name: "Nombre",
+          main: "Principal",
+          relation: "Relación",
+          createdAt: "Fecha de Creación",
+          actions: "Comportamiento",
+        },
+        registrationModal: {
+          add: "Agregar",
+          edit: "Editar",
+          name: "Nombre",
+          icon: "Icono",
+          main: "Pincipal",
+          relation: "Relación",
+          cancel: "Cancelar",
+          created: "Crear",
+          save: "Ahorrar",
+          yes: "Sí",
+          no: "No",
+          none: "Ninguma",
+        },
+        confirmation: {
+          delete: "¡Registro eliminado con éxito!",
+          title: "Eliminar registro",
+          confirmDelete: "Todos los datos de registro se perderán, ¿realmente desea eliminarlos?",
+          update: "¡Menú actualizado con éxito!",
+          created: "¡Menú creado con éxito!",
+        },
+      },
+
+      locationPreview: {
+        toView: "Visualizar",
+        download: "Bajar",
+        hello: "¡Saluda a tu nuevo contacto!"
       },
 
       backendErrors: {

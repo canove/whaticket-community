@@ -7,8 +7,10 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  AllowNull
+  AllowNull,
+  ForeignKey
 } from "sequelize-typescript";
+import Company from "./Company";
 
 @Table
 class IntegratedImport extends Model<IntegratedImport> {
@@ -47,6 +49,11 @@ class IntegratedImport extends Model<IntegratedImport> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
+
 }
 
 export default IntegratedImport;

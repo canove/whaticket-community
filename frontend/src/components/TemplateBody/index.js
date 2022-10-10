@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
@@ -19,13 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 
 import 'react-phone-number-input/style.css'
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input/input'
-
-import ConfirmationModal from "../../components/ConfirmationModal";
-
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-
+import PhoneInput from 'react-phone-number-input/input'
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -219,22 +213,22 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 
     const handleParams = () => {
         if (paramsQuantity >= 3) {
-             toast.error(i18n.t("templates.templateModal.toastErr"));
+             toast.error(i18n.t("templatesData.modalConfirm.exceeded"));
         } else {
              setText(prevText => prevText + "{{" + param + "}}")
         }
-  
+
         handleCloseParamModal();
     };
-  
+
     const handleChangeParam = (e) => {
         setParam(e.target.value)
     };
-  
+
     const handleOpenParamModal = () => {
         setOpenParamModal(true);
     };
-  
+
     const handleCloseParamModal = () => {
         setParam("");
         setOpenParamModal(false);
@@ -246,7 +240,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             result += text.split("{{name}}").length - 1
             result += text.split("{{documentNumber}}").length - 1
             result += text.split("{{phoneNumber}}").length - 1
-    
+
             setParamsQuantity(result);
         }
         testParams();
@@ -255,14 +249,14 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     useEffect(() => {
         if (type === "text") {
             if (paramsQuantity > 3) {
-                toast.error("Limite de parâmetros exedido!");
+                toast.error(i18n.t("templatesData.modalConfirm.exceeded"));
                 setDisableButton(true);
             } else {
                 setDisableButton(false);
             }
         } else if (type === "video") {
             if (video.size > 10000000) {
-                toast.error("Tamanho do vídeo excede o valor máximo de 10 Megabyte.");
+                toast.error(i18n.t("templatesData.modalConfirm.videoExceeded"));
                 setDisableButton(true);
             } else {
                 setDisableButton(false);
@@ -276,7 +270,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 		<div className={classes.root}>
             <div>
                 <Dialog open={openParamModal} onClose={handleCloseParamModal}>
-                <DialogTitle>Selecione uma variável</DialogTitle>
+                <DialogTitle>{i18n.t("templatesData.modal.selectVar")}</DialogTitle>
                 <DialogContent>
                     <FormControl className={classes.multFieldLine}>
                     <Select
@@ -286,18 +280,18 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                         onChange={handleChangeParam}
                         style={{width: "100%"}}
                     >
-                        <MenuItem value={'name'}>Nome</MenuItem>
-                        <MenuItem value={'documentNumber'}>Documento</MenuItem>
-                        <MenuItem value={'phoneNumber'}>Número de Telefone</MenuItem>
+                        <MenuItem value={'name'}>{i18n.t("templatesData.modal.name")}</MenuItem>
+                        <MenuItem value={'documentNumber'}>{i18n.t("templatesData.modal.document")}</MenuItem>
+                        <MenuItem value={'phoneNumber'}>{i18n.t("templatesData.modal.phoneNumber")}</MenuItem>
                     </Select>
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseParamModal} color="primary">
-                    Cancel
+                    {i18n.t("templatesData.modal.cancel")}
                     </Button>
                     <Button onClick={handleParams} color="primary">
-                    Ok
+                    {i18n.t("templatesData.modal.ok")}
                     </Button>
                 </DialogActions>
                 </Dialog>
@@ -310,7 +304,10 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 				scroll="paper"
 			>
 				<DialogTitle id="form-dialog-title">
-					{ body ? 'Editar' : 'Criar' }
+					{ body
+                     ? `${i18n.t("templatesData.modal.edited")}`
+                     : `${i18n.t("templatesData.modal.created")}`
+                    }
 				</DialogTitle>
 				<DialogContent dividers>
 					<div className={classes.root}>
@@ -320,22 +317,22 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 							fullWidth
 						>
 							<InputLabel id="type-select-label">
-								Tipo
+								{i18n.t("templatesData.modal.type")}
 							</InputLabel>
 							<Select
 								labelId="type-select-label"
-								label="Tipo"
+								label={i18n.t("templatesData.modal.type")}
 								id="type-select"
 								value={type}
 								onChange={(e) => { handleTypeChange(e) }}
 								fullWidth
 							>
-								<MenuItem value={"text"}>Texto</MenuItem>
-                                <MenuItem value={"audio"}>Áudio</MenuItem>
-                                <MenuItem value={"video"}>Vídeo</MenuItem>
-                                <MenuItem value={"image"}>Imagem</MenuItem>
-                                <MenuItem value={"contact"}>Contato</MenuItem>
-                                <MenuItem value={"file"}>Arquivo</MenuItem>
+								<MenuItem value={"text"}>{i18n.t("templatesData.modal.text")}</MenuItem>
+                                <MenuItem value={"audio"}>{i18n.t("templatesData.modal.audio")}</MenuItem>
+                                <MenuItem value={"video"}>{i18n.t("templatesData.modal.movie")}</MenuItem>
+                                <MenuItem value={"image"}>{i18n.t("templatesData.modal.image")}</MenuItem>
+                                <MenuItem value={"contact"}>{i18n.t("templatesData.modal.contact")}</MenuItem>
+                                <MenuItem value={"file"}>{i18n.t("templatesData.modal.file")}</MenuItem>
 							</Select>
 						</FormControl>
                     </div>
@@ -347,7 +344,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 fullWidth
 						    >
                                 <TextField
-                                    label="Texto"
+                                    label={i18n.t("templatesData.modal.text")}
                                     variant="outlined"
                                     value={text}
                                     onChange={handleTextChange}
@@ -380,7 +377,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 fullWidth
 						    >
                                 <TextField
-                                    label="Nome do Contato"
+                                    label={i18n.t("templatesData.modal.nameContact")}
                                     variant="outlined"
                                     value={contactName}
                                     onChange={handleContactNameChange}
@@ -405,7 +402,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                     { type === "audio" &&
                         <div className={classes.multFieldLine}>
                             <TextField
-                                label="Arquivo"
+                                label={i18n.t("templatesData.modal.file")}
                                 variant="outlined"
                                 value={audio ? audio.name || audio : ""}
                                 fullWidth
@@ -415,7 +412,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 variant="contained"
                                 component="label"
                             >
-                                Upload
+                                {i18n.t("templatesData.modal.load")}
                                 <input
                                     type="file"
                                     onChange={handleAudioChange}
@@ -428,7 +425,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                     { type === "video" &&
                         <div className={classes.multFieldLine}>
                             <TextField
-                                label="Arquivo"
+                                label={i18n.t("templatesData.modal.file")}
                                 variant="outlined"
                                 value={video ? video.name || video : ""}
                                 fullWidth
@@ -438,7 +435,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 variant="contained"
                                 component="label"
                             >
-                                Upload
+                                {i18n.t("templatesData.modal.load")}
                                 <input
                                     type="file"
                                     onChange={handleVideoChange}
@@ -448,10 +445,10 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                             </Button>
                         </div>
                     }
-                    { type === "image" && 
+                    { type === "image" &&
                         <div className={classes.multFieldLine}>
                             <TextField
-                                label="Arquivo"
+                                label={i18n.t("templatesData.modal.file")}
                                 variant="outlined"
                                 value={image ? image.name || image : ""}
                                 fullWidth
@@ -461,7 +458,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 variant="contained"
                                 component="label"
                             >
-                                Upload
+                                {i18n.t("templatesData.modal.load")}
                                 <input
                                     type="file"
                                     onChange={handleImageChange}
@@ -474,7 +471,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                     { type === "file" &&
                         <div className={classes.multFieldLine}>
                             <TextField
-                                label="Arquivo"
+                                label={i18n.t("templatesData.modal.file")}
                                 variant="outlined"
                                 value={file ? file.name || file : ""}
                                 fullWidth
@@ -484,7 +481,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 variant="contained"
                                 component="label"
                             >
-                                Upload
+                                {i18n.t("templatesData.modal.load")}
                                 <input
                                     type="file"
                                     onChange={handleFileChange}
@@ -501,9 +498,9 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Cancelar
+						{i18n.t("templatesData.modal.cancel")}
 					</Button>
-                    { type === "text" && 
+                    { type === "text" &&
                         <Button
                             color="primary"
                             variant="contained"
@@ -519,7 +516,10 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 						variant="contained"
                         disabled={disableButton}
 					>
-						{ body ? 'Editar' : 'Criar' }
+						{ body
+                         ? `${i18n.t("templatesData.modal.edited")}`
+                         : `${i18n.t("templatesData.modal.created")}`
+                        }
 					</Button>
 				</DialogActions>
 			</Dialog>

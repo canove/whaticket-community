@@ -157,19 +157,19 @@ const Pricing = () => {
 
     const formatStatus = (status) => {
         if (status === "ativo") {
-            return "Ativo";
+            return `${i18n.t("pricing.grid.active")}`;
         }
 
         if (status === "inativo") {
-            return "Inativo";
+            return `${i18n.t("pricing.grid.inactive")}`;
         }
 
         if (status === "inadimplente") {
-            return "Inadimplente";
+            return `${i18n.t("pricing.grid.defaulter")}`;
         }
 
         if (status === "bloqueado") {
-            return "Bloqueado"
+            return `${i18n.t("pricing.grid.blocked")}`;
         }
 
         return status;
@@ -188,7 +188,7 @@ const Pricing = () => {
     const handleDeletePricing = async (deletingId) => {
         try {
             await api.delete(`/pricings/${deletingId}`);
-            toast.success("Precificação Excluida com Sucesso!");
+            toast.success(i18n.t("pricing.confirmation.delete"));
         } catch (err) {
             toastError(err);
         }
@@ -211,22 +211,22 @@ const Pricing = () => {
                 systemChange={1}
             />
             <ConfirmationModal
-                title={deletingPricing && 'Deletar Precificação'}
+                title={deletingPricing && `${i18n.t("pricing.confirmation.title")}`}
                 open={confirmModalOpen}
                 onClose={setConfirmModalOpen}
                 onConfirm={() => handleDeletePricing(deletingPricing.id)}
             >
-                Você realmente deseja excluir está precifição?
+                {i18n.t("pricing.confirmation.confirmDelete")}
             </ConfirmationModal>
             <MainHeader>
-                <Title>Precificação</Title>
+                <Title>{i18n.t("pricing.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
                         onClick={handleOpenPricingModal}
                         variant="contained"
                         color="primary"
                     >
-                        Criar
+                      {i18n.t("pricing.buttons.create")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -237,13 +237,13 @@ const Pricing = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Empresa</TableCell>
-                            <TableCell align="center">Produto Constratado</TableCell>
-                            <TableCell align="center">Status</TableCell>
-                            <TableCell align="center">Periodo de Carência (dias)</TableCell>
-                            <TableCell align="center">Carência de Disparos</TableCell>
-                            <TableCell align="center">Cliente Desde De</TableCell>
-                            <TableCell align="center">Ações</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.company")}</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.registeredProduct")}</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.status")}</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.gracePeriod")}</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.lackOfShots")}</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.customerSince")}</TableCell>
+                            <TableCell align="center">{i18n.t("pricing.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

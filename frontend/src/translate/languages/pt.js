@@ -1,38 +1,24 @@
 const messages = {
   pt: {
     translations: {
-      signup: {
-        title: "Cadastre-se",
-        toasts: {
-          success: "Usuário criado com sucesso! Faça seu login!!!.",
-          fail: "Erro ao criar usuário. Verifique os dados informados.",
-        },
-        form: {
-          name: "Nome",
-          email: "Email",
-          password: "Senha",
-        },
-        buttons: {
-          submit: "Cadastrar",
-          login: "Já tem uma conta? Entre!",
-        },
-      },
       login: {
         title: "Login",
         form: {
+          company: "Empresa",
           email: "Email",
           password: "Senha",
         },
         buttons: {
           submit: "Entrar",
-          register: "Não tem um conta? Cadastre-se!",
         },
       },
+
       auth: {
         toasts: {
           success: "Login efetuado com sucesso!",
         },
       },
+
       dashboard: {
         title: "Dashboard",
         file: " Arquivo",
@@ -68,8 +54,12 @@ const messages = {
           mistake: {
             title: "Erros",
           },
+          category: {
+            title: "Atendimento por Categoria",
+          },
         },
       },
+
       connections: {
         title: "Conexões",
         toasts: {
@@ -89,6 +79,8 @@ const messages = {
           qrcode: "QR CODE",
           newQr: "Novo QR CODE",
           connecting: "Conectando",
+          previousPage: "Página Anterior",
+          nextPage: "Próxima Página"
         },
         toolTips: {
           disconnected: {
@@ -121,9 +113,13 @@ const messages = {
           limit: "Limite",
         },
       },
+
       officialConnections: {
         title: "Conexões Oficiais",
+        previousPage: "Página Anterior",
+        nextPage: "Próxima Página",
       },
+
       officialWhatsappModal: {
         title: {
           add: "Adicionar WhatsApp Oficial",
@@ -141,6 +137,7 @@ const messages = {
           add: "Adicionar",
         },
       },
+
       whatsappModal: {
         title: {
           add: "Adicionar WhatsApp",
@@ -158,13 +155,19 @@ const messages = {
         },
         success: "WhatsApp salvo com sucesso.",
       },
+
       qrCode: {
         message: "Leia o QrCode para iniciar a sessão",
       },
+
       contacts: {
         title: "Contatos",
         toasts: {
           deleted: "Contato excluído com sucesso!",
+          required: "Campo Obrigatório!",
+          short: "Curto Demais!",
+          long: "Número de caracteres excedido!",
+          email: "Email Inválido!"
         },
         searchPlaceholder: "Pesquisar...",
         confirmationModal: {
@@ -185,6 +188,7 @@ const messages = {
           actions: "Ações",
         },
       },
+
       contactModal: {
         title: {
           add: "Adicionar contato",
@@ -207,6 +211,7 @@ const messages = {
         },
         success: "Contato salvo com sucesso.",
       },
+
       quickAnswersModal: {
         title: {
           add: "Adicionar Resposta Rápida",
@@ -223,6 +228,7 @@ const messages = {
         },
         success: "Resposta Rápida salva com sucesso.",
       },
+
       queueModal: {
         title: {
           add: "Adicionar fila",
@@ -232,6 +238,7 @@ const messages = {
           name: "Nome",
           color: "Cor",
           greetingMessage: "Mensagem de saudação",
+          success: "Fila salva com sucesso!",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -239,6 +246,7 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+
       userModal: {
         title: {
           add: "Adicionar usuário",
@@ -263,17 +271,21 @@ const messages = {
         },
         success: "Usuário salvo com sucesso.",
       },
+
       chat: {
         noTicketMessage: "Selecione uma chamada para começar a conversar.",
       },
+
       ticketsManager: {
         buttons: {
           newTicket: "Novo",
         },
       },
+
       ticketsQueueSelect: {
         placeholder: "Filas",
       },
+
       tickets: {
         toasts: {
           deleted: "A chamada que você estava foi deletado.",
@@ -293,6 +305,7 @@ const messages = {
           showAll: "Todos",
         },
       },
+
       transferTicketModal: {
         title: "Transferir Chamada",
         fieldLabel: "Digite para buscar usuários",
@@ -304,6 +317,7 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+
       ticketsList: {
         pendingHeader: "Aguardando",
         assignedHeader: "Atendendo",
@@ -314,6 +328,7 @@ const messages = {
           accept: "Aceitar",
         },
       },
+
       newTicketModal: {
         title: "Criar Chamada",
         fieldLabel: "Digite para pesquisar o contato",
@@ -323,6 +338,7 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
@@ -352,7 +368,7 @@ const messages = {
           finance: "Finanças",
           products: "Produtos",
           pricing: "Precificação",
-          payment: "Pagamento",
+          payments: "Pagamentos",
           flows: "Fluxo",
 
         },
@@ -368,9 +384,11 @@ const messages = {
           },
         },
       },
+
       notifications: {
         noTickets: "Nenhuma notificação.",
       },
+
       queues: {
         title: "Filas",
         table: {
@@ -388,9 +406,11 @@ const messages = {
             "Você tem certeza? Essa ação não pode ser revertida! As chamadas dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
         },
       },
+
       queueSelect: {
         inputLabel: "Filas",
       },
+
       quickAnswers: {
         title: "Respostas Rápidas",
         table: {
@@ -411,15 +431,26 @@ const messages = {
           deleteMessage: "Esta ação não pode ser revertida.",
         },
       },
+
       importation: {
         title: "Importação Arquivo",
         form: {
           status: "Status",
           date: "Data",
+          awaitingImport: "Aguardando Importação",
+          processing: "Processando",
+          waitingForApproval: "Aguardando Aprovação",
+          error: "Erro",
+          aproved: "Aprovado",
+          shooting: "Disparando",
+          finished: "Finalizado",
+          refused: "Recusado",
         },
         buttons: {
           import: "Importar Disparos",
           filter: "Filtrar",
+          previousPage: "Página Anterior",
+          nextPage: "Próxima Página",
         },
         table: {
           uploadDate: "Data de Upload",
@@ -443,6 +474,7 @@ const messages = {
           approve: "Aprovar",
         },
       },
+
       importModal: {
         title: "Importar",
         buttons: {
@@ -457,12 +489,30 @@ const messages = {
           noFile: "Nenhum Arquivo Importado",
           uploadedFile: "Arquivo Importado",
           supportedTriggerModel: "Modelo de Disparo Suportado",
-          connection: "Conexão",
+          connection: "Conexões: ",
           selectAConnection: "Selecione uma Conexão",
           show: "Mostrar",
           toHide: "Esconder",
+          all: "Todos",
+          template: "Template",
+          none: "Nenhum",
+        },
+        confirmation: {
+          errors: "Por favor, selecione uma ou mais conexões e um arquivo de disparo.",
+          errorConnection: "Por favor, selecione uma ou mais conexões.",
+          errorShots: "Por favor, selecione um arquivo de disparo.",
+        },
+        model:{
+          line1: "NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM",
+          line2: "- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)",
+          line3: "TEMPLATE_WHATS",
+          line4: "PARAMETROS_TEMPLATE",
+          line5: "- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)",
+          line6: "TEXTO_MENSAGEM",
+          line7: "PARAMETROS_TEMPLATE",
         },
       },
+
       users: {
         title: "Usuários",
         table: {
@@ -470,6 +520,7 @@ const messages = {
           email: "Email",
           profile: "Perfil",
           actions: "Ações",
+          companyName: "Nome da empresa",
         },
         buttons: {
           add: "Adicionar usuário",
@@ -483,6 +534,7 @@ const messages = {
             "Todos os dados do usuário serão perdidos. Os tickets abertos deste usuário serão movidos para a fila.",
         },
       },
+
       settings: {
         success: "Configurações salvas com sucesso.",
         title: "Configurações",
@@ -496,6 +548,7 @@ const messages = {
           },
         },
       },
+
       reports: {
         title: "Relatório Conversa",
         buttons: {
@@ -508,17 +561,36 @@ const messages = {
           user: "Usuário",
         },
         table: {
-          messageId: "Id da mensagem",
-          messageBody: "Corpo da mensagem",
+          messageId: "Id da Mensagem",
+          messageBody: "Corpo da Mensagem",
           read: "Lida",
-          mediaURL: "URL da mídia",
-          ticketId: "ID da chamada",
+          mediaURL: "URL da Mídia",
+          ticketId: "Id da Chamada",
           date: "Data",
         },
+        errors:{
+          toastErr: "Preencha todos os Campos!"
+        },
       },
+
       reportsTicket: {
         title: "Relatório Chamadas",
+        buttons: {
+          ticketId: "Id da Chamada",
+          filterReports: "Filtrar Relatórios",
+          exportPdf: "Exportar Pdf",
+        },
+        grid: {
+          messageId: "Id da Menssagem",
+          bodyText: "Corpo da Mensagem",
+          read: "Lida",
+          ticketId: "Id da Chamada",
+        },
+        errors: {
+          toastErr: "Selecione uma Chamada!"
+        },
       },
+
       messagesList: {
         header: {
           assignedTo: "Atribuído à:",
@@ -602,7 +674,11 @@ const messages = {
           success: "Template criada com sucesso!",
           connectionFailed: "Favor selecione uma conexão!",
           delete: "Template excluida com sucesso!",
-          toastErr: "Limite de parâmetros exedido!"
+          toastErr: "Limite de parâmetros exedido!",
+          selectVar: "Selecione uma Variável",
+          document: "Documento",
+          phoneNumber: "Número de Telefone",
+          ok: "OK",
         },
       },
 
@@ -620,9 +696,9 @@ const messages = {
         buttons: {
           createPdf: "Criar Pdf",
           exportPdf: "Exportar Pdf",
-          previous: "Anterior",
-          next: "Próxima",
-          page: "Página: ",
+          exportCsv: "Exportar Csv",
+          previousPage: "Página Anterior",
+          nextPage: "Próxima Pàgina",
         },
         grid: {
           name: "Nome",
@@ -630,6 +706,7 @@ const messages = {
           delivered: "Entregue",
           read: "Lido",
           errors: "Erro",
+          status: "Status",
         },
       },
 
@@ -638,60 +715,110 @@ const messages = {
         triggerTime: "Tempo de Disparo entre as Instâncias",
         connections: "Conexões",
         all: "Todos",
+        disconnected: "Conexões Desconectadas:",
+        delete: "Algumas Conexões Foram Deletadas...",
+        salutation: "Usar mensagem de saudação?",
+        modal: {
+          salutation: "Mensagem de saldação",
+          actions: "Ações",
+          edit: "Editar",
+          delete: "Deletar",
+          create: "Criar",
+          edited: "Editar Mensagem de Saudação",
+          createdAt: "Criar Mensagem de Saudação",
+        },
+        buttons: {
+          save: "Salvar",
+          activConfig: "Ativar Configuração",
+          created: "Criar Mensagem",
+        },
+        confirmation: {
+          updated: "Configuração alterada com sucesso!",
+          saved: "Configuração salva com sucesso!",
+          title: "Deletar Mensagem",
+          confirmDelete: "Você tem certeza que deseja deletar esta mensagem de saudação?",
+        },
       },
 
       historicTicket:{
-        button: "Histórico",
-      historicModal:{
-        title: "Histórico",
-        name: "Nome",
-        message: "Mensagem",
-        status: "Status",
-        createAt: "Data Criação",
-        actions: "Ações",
-        closed: "Fechar",
-        back: "Voltar"
+          button: "Histórico",
+        historicModal:{
+          title: "Histórico",
+          name: "Nome",
+          message: "Mensagem",
+          status: "Status",
+          createAt: "Data Criação",
+          actions: "Ações",
+          closed: "Fechar",
+          back: "Voltar"
         },
       },
 
       company:{
-        title: "Empresas",
-        search: "Pesquisar",
-      grid:{
-        companyId: "Id da Empresa",
-        name: "Nome",
-        cnpj: "CNPJ",
-        phone: "Telefone",
-        email: "Email",
-        address:  "Endereço",
-        actions: "Ações"
-      },
-      buttons: {
-        addCompany: "Cadastrar Empresa"
-      },
-      companyModal: {
-        titleAdd: "Adicionar Empresa",
-        titleEdit: "Editar Cadastro da Empresa",
-        name: "Nome da Empresa",
-        cnpj: "CNPJ",
-        phone: "Telefone",
-        email: "Email",
-        address: "Endereço"
-      },
-      success: "Empresa cadastrada com Sucesso!",
-      deleteCompany: "Todos os dados da empresa cadastrada serão perdidos, deseja realmente excluir, ",
-      toast: "Empresa excluida com sucesso!"
+          title: "Empresas",
+          search: "Pesquisar",
+        grid:{
+          companyId: "Id da Empresa",
+          alias: "Pseudônimo",
+          name: "Nome",
+          cnpj: "CNPJ",
+          phone: "Telefone",
+          email: "Email",
+          address:  "Endereço",
+          actions: "Ações"
+        },
+        buttons: {
+          addCompany: "Cadastrar Empresa"
+        },
+        companyModal: {
+          titleAdd: "Adicionar Empresa",
+          titleEdit: "Editar Cadastro da Empresa",
+          alias: "Pseudônimo",
+          name: "Nome da Empresa",
+          cnpj: "CNPJ",
+          phone: "Telefone",
+          email: "Email",
+          address: "Endereço",
+          required: "Campo obrigatório!",
+          invalidEmail: "Email Inválido!",
+          image: "Tamanho excede o valor máximo de 1 Megabyte.",
+          upload: "Carregar Logo",
+          logo: "Sem logo",
+        },
+          success: "Empresa cadastrada com Sucesso!",
+          deleteTitle: "Excluir Empresa, ",
+          deleteCompany: "Todos os dados da empresa cadastrada serão perdidos, deseja realmente excluir, ",
+          toast: "Empresa excluida com sucesso!",
+          update: "Empresa atualizada com Sucesso!",
+          createdAt: "Empresa criada com Sucesso!",
+          edited: "Serviço editado com Sucesso!",
+          create: "Serviço criado com Sucesso!",
+        firebase: {
+          yes: "Sim",
+          no: "Não",
+          title: "Adicione um serviço:",
+          cancel: "Cancelar",
+          ok: "OK",
+          config: "Configurações Firebase",
+          companyId: "Id da Empresa",
+          connected: "Conectado",
+          isFull: "Cheio",
+          service: "Serviço",
+          edit: "Editar",
+          add: "Adicionar Serviço"
+        },
       },
 
       menu:{
-            title: "Menus",
-            success: "Menu salvo com sucesso!",
-          buttons:{
-            save: "Salvar",
-            menus: "Menus",
-            company: "Empresas"
-          },
+        title: "Menus",
+        success: "Menu salvo com sucesso!",
+        buttons:{
+          save: "Salvar",
+          menus: "Menus",
+          company: "Empresas"
         },
+      },
+
       templatesData:{
         title: "Templates Data",
         buttons: {
@@ -706,7 +833,7 @@ const messages = {
           footer: "Rodapé",
           createdAt: "Data da Criação",
           updateAt: "Editado em",
-          actions: "Acões",
+          actions: "Ações",
         },
         templateModal: {
           add: "Adicionar Template",
@@ -718,9 +845,39 @@ const messages = {
           buttonEdit: "Salvar",
         },
         modalConfirm: {
+          title: "Deletar Template",
           delete: "Deseja realmente excluir, todos os dados da Template serão perdidos!",
           successDelete: "Template Deletada com Sucesso!",
           successAdd: "Template Adicionada com sucesso!",
+          exceeded: "Limite de Parâmetros Excedido!",
+          videoExceeded: "Tamanho do vídeo excede o valor máximo de 10 Megabyte."
+
+        },
+        modal: {
+          type: "Tipo",
+          body: "Corpo",
+          actions: "Ações",
+          name: "Nome",
+          addBody: "Adicionar ao Corpo",
+          footer: "Rodapé",
+          cancel: "Cancelar",
+          edited: "Editar",
+          created: "Criar",
+          save: "Salvar",
+          selectVar: "Selecione uma Variável",
+          document: "Documento",
+          phoneNumber: "Número de Telefone",
+          ok: "OK",
+          text: "Texto",
+          audio: "Áudio",
+          movie: "Vídeo",
+          image: "Imagem",
+          contact: "Contato",
+          file: "Arquivo",
+          load: "Carregar",
+          order: "Ordem",
+          value: "Valor",
+          nameContact: "Nome do Contato",
         },
       },
 
@@ -750,8 +907,230 @@ const messages = {
           deleteMsg: "Tem certeza que deseja excluir a categoria?",
           editMsg: "Categoria editada com sucesso!",
           addMsg: "Categoria adicionada com sucesso!",
-
         },
+      },
+
+      flows: {
+        title: "Fluxos",
+        buttons:{
+          create: "Criar",
+          search: "Pesquisar"
+        },
+        grid:{
+          name: "Nome",
+          status: "Status",
+          createdAt: "Criado em",
+          updatedAt: "Atualizado em",
+          actions: "Ações",
+        },
+        flowsModal:{
+          add: "Criar Fluxo",
+          edit: "Editar Fluxo",
+          name: "Nome",
+          cancel: "Cancelar",
+          create: "Criar",
+          save: "salvar",
+        },
+        confirmation:{
+          title: "Deletar Fluxo",
+          create: "Fluxo Criado com Sucesso!",
+          edit: "Fluxo Editado com Sucesso!",
+          duplicate: "Fluxo Duplicado com Sucesso!",
+          delete: "Fluxo deletado com sucesso!",
+          confirmDelete: "Você tem certeza que deseja deletar este fluxo?",
+        },
+      },
+
+      integratedImport: {
+        title: "Importação Integrada",
+        buttons:{
+          createdImport: "Criar Importação"
+        },
+        grid:{
+          createdAt: "Data da Criação",
+          name: "Nome",
+          method: "Método",
+          registers: "Qtde de Registros",
+          status: "Status",
+          actions: "Ações"
+        },
+        integratedModal:{
+          add: "Criar Importação",
+          edited: "Editar importação",
+          name: "Nome",
+          method: "Método",
+          url: "URL",
+          autentication: "Autenticação",
+          key: "Key",
+          token: "Token",
+          autentic: "Autenticar",
+          in: "De",
+          for: "Para",
+          cancel: "Cancelar",
+          save: "Salvar",
+          edit: "Editar"
+        },
+        confirmation: {
+          createdAt: "Importação adicionada com sucesso!",
+          updatedAt: "Importação editada com sucesso!",
+          delete: "Importação excluída com sucesso!",
+          confirmDelete: "Todos os dados da importação se perderão, deseja realmente excluir?",
+          title: "Deletar Importação",
+        },
+        status: {
+          awaitingImport: "Aguardando Importação",
+          processing: "Processando",
+          awaitingApprove: "Aguardando Aprovação",
+          err: "Erro",
+          approve: "Aprovado",
+          shooting: "Disparando",
+          finished: "Finalizado",
+          refused: "Recusado",
+        },
+      },
+
+      payments: {
+        title: "Pagamentos",
+        grid: {
+          company: "Empresa",
+          month: "Mês",
+          shotsValue: "Valor Total dos Disparos",
+          monthValue: "Valor da Mensalidade",
+          amounth: "Valor Total",
+          amounthPaind: "Valor Pago",
+          actions: "Ações"
+        },
+        modal:{
+          title: "Hitórico de preço",
+          date: "Data",
+          value: "Valor",
+          shots: "Disparos",
+          freeShots: "Disparos Grátis",
+          closed: "Fechar",
+        },
+      },
+
+      pricing: {
+        title: "Precificação",
+        buttons: {
+          create: "Criar",
+        },
+        grid: {
+          company: "Empresa",
+          registeredProduct: "Produto Cadastrado",
+          status: "Status",
+          gracePeriod: "Período de Carência (dias)",
+          lackOfShots: "Carência de Disparos",
+          customerSince: "Cliente Desde",
+          actions: "Ações",
+          active: "Ativo",
+          inactive: "Inativo",
+          defaulter: "Inadimplente",
+          blocked: "Bloqueado",
+        },
+        pricingModal: {
+          created: "Criar",
+          edited: "Editar",
+          company: "Empresa",
+          product: "Produto",
+          graceDays: "Carência (dias)",
+          lackOfShots: "Carência de Disparos",
+          cancel: "Cancelar",
+          save: "Salvar",
+          historic: "Histórico",
+          closed: "Fechar",
+          createdAt: "Criado",
+          updatedAt: "Editado",
+          deletedAt: "Deletado",
+          by: " por ",
+          update: "Atualizado: ",
+          current: "Atual: ",
+        },
+        confirmation:{
+          title: "Deletar Precificação",
+          delete: "Precificação excluida com Sucesso!",
+          confirmDelete: "Você realmente deseja excluir está precifição?",
+          create: "Precificação criada com Sucesso!",
+          edit: "Precificação editada com Sucesso!",
+          titleEdit: "Editar Precificação",
+          confirmEdit: "Você tem certeza que vai editar a precificação?",
+        },
+      },
+
+      product:{
+        title: "Produtos",
+        buttons:{
+          created: "Criar",
+        },
+        grid: {
+          productName: "Nome do Produto",
+          monthValue: "Valor da Mensalidade",
+          tripCostValue: "Valor Custo Disparo",
+          monthlyInterestRate: "Taxa juros Mensal",
+          penaltyMount: "Multa Atraso",
+          actions: "Ações",
+        },
+        productModal: {
+          productName: "Nome do produto",
+          monthValue: "Valor Mensal",
+          shotsValue: "Valor do Disparo",
+          interestRate: "Taxa de Juros",
+          penaltyMount: "Multa Atraso",
+          cancel: "Cancelar",
+          created: "Criar",
+          edited: "Editar",
+          save: "Salvar",
+        },
+        confirmation: {
+          delete: "Produto excluído com sucesso!",
+          title: "Deletar Produto",
+          confirmDelete: "Todos os dados do produto se perderão, deseja realmente excluir?",
+          edited: "Produto atualizado com sucesso!",
+          created: "Produto adicionado com sucesso!",
+        },
+      },
+
+      registration: {
+        title: "Cadastro",
+        buttons: {
+          new: "Novo Menu",
+          search: "Pesquisar",
+        },
+        grid: {
+          icon: "Ícone",
+          name: "Nome",
+          main: "Principal",
+          relation: "Relação",
+          createdAt: "Data da Criação",
+          actions: "Ações",
+        },
+        registrationModal: {
+          add: "Adicionar",
+          edit: "Editar",
+          name: "Nome",
+          icon: "Ícone",
+          main: "Pincipal",
+          relation: "Ralação",
+          cancel: "Cancelar",
+          created: "Criar",
+          save: "Salvar",
+          yes: "Sim",
+          no: "Não",
+          none: "Nenhum",
+        },
+        confirmation: {
+          delete: "Cadastro excluído com sucesso!",
+          title: "Excluir Cadastro",
+          confirmDelete: "Todos os dados do cadastro se perderão, deseja realmente excluir?",
+          update: "Menu atualizado com sucesso!",
+          created: "Menu criado com sucesso!",
+        },
+      },
+
+      locationPreview: {
+        toView: "Visualizar",
+        download: "Baixar",
+        hello: "Diga olá ao seu novo contato!"
       },
 
       backendErrors: {

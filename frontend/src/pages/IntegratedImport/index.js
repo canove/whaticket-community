@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -25,7 +25,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import { DeleteOutline } from "@material-ui/icons";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
-
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_IMPORTATION") {
@@ -90,6 +90,7 @@ const IntegratedImport = () => {
     const [deletingImportation, setDeletingImportation] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const {user} = useContext(AuthContext)
 
     useEffect(() => {
         dispatch({ type: "RESET" });
@@ -113,7 +114,7 @@ const IntegratedImport = () => {
     useEffect(() => {
         const socket = openSocket();
 
-        socket.on("integratedImport", (data) => {
+        socket.on(`integratedImport${user.companyId}`, (data) => {
             if (data.action === "update" || data.action === "create") {
                 dispatch({ type: "UPDATE_IMPORTATION", payload: data.integratedImport });
             }
@@ -146,7 +147,7 @@ const IntegratedImport = () => {
     const handleDeleteImportation = async (deletingImportation) => {
         try {
             await api.delete(`/integratedImport/${deletingImportation}`);
-            toast.success(i18n.t("Importação excluída com sucesso!"));
+            toast.success(i18n.t("integratedImport.confirmation.delete"));
         } catch (err) {
             toastError(err);
         }
@@ -155,21 +156,21 @@ const IntegratedImport = () => {
 
  const getStatusById = (id) => {
     if (id === 0) {
-      return "Aguardando Importação";
+      return `${i18n.t("integratedImport.status.awaitingImport")}`;
     } else if (id === 1) {
-      return "Processando";
+      return `${i18n.t("integratedImport.status.processing")}`;
     } else if (id === 2) {
-      return "Aguardando Aprovação";
+      return `${i18n.t("integratedImport.status.awaitingApprove")}`;
     } else if (id === 3) {
-      return "Erro";
+      return `${i18n.t("integratedImport.status.err")}`;
     } else if (id === 4) {
-      return "Aprovado";
+      return `${i18n.t("integratedImport.status.approve")}`;
     } else if (id === 5) {
-      return "Disparando";
+      return `${i18n.t("integratedImport.status.shooting")}`;
     } else if (id === 6) {
-      return "Finalizado";
+      return `${i18n.t("integratedImport.status.finished")}`;
     } else if (id === 7) {
-      return "Recusado";
+      return `${i18n.t("integratedImport.status.refused")}`;
     } else {
       return id;
     }
@@ -186,22 +187,22 @@ const IntegratedImport = () => {
             <ConfirmationModal
                 title={
                 deletingImportation &&
-                `Deletar Importação`}
+                `${i18n.t("integratedImport.confirmation.title")}`}
                 open={confirmModalOpen}
                 onClose={setConfirmModalOpen}
                 onConfirm={() => handleDeleteImportation(deletingImportation.id)}
             >
-                {i18n.t("Todos os dados da importação se perderão, deseja realmente excluir?")}
+                {i18n.t("integratedImport.confirmation.confirmDelete")}
             </ConfirmationModal>
             <MainHeader>
-                <Title>Importação Integrada</Title>
+                <Title>{i18n.t("integratedImport.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
                         onClick={handleOpenImportationModal}
                         variant="contained"
                         color="primary"
                     >
-                        Criar nova Importação
+                        {i18n.t("integratedImport.buttons.createdImport")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -212,12 +213,12 @@ const IntegratedImport = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Data da Criação</TableCell>
-                            <TableCell align="center">Nome</TableCell>
-                            <TableCell align="center">Método</TableCell>
-                            <TableCell align="center">Qtde de Registros</TableCell>
-                            <TableCell align="center">Status</TableCell>
-                            <TableCell align="center">Ações</TableCell>
+                            <TableCell align="center">{i18n.t("integratedImport.grid.createdAt")}</TableCell>
+                            <TableCell align="center">{i18n.t("integratedImport.grid.name")}</TableCell>
+                            <TableCell align="center">{i18n.t("integratedImport.grid.method")}</TableCell>
+                            <TableCell align="center">{i18n.t("integratedImport.grid.registers")}</TableCell>
+                            <TableCell align="center">{i18n.t("integratedImport.grid.status")}</TableCell>
+                            <TableCell align="center">{i18n.t("integratedImport.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

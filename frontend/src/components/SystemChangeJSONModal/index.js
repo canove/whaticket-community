@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext, } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
 
 import {
 	Button,
@@ -8,11 +7,6 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	Select,
-	InputLabel,
-	MenuItem,
-	FormControl,
-	TextField,
 	Paper,
 	Typography,
 } from '@material-ui/core';
@@ -20,12 +14,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 
-import ConfirmationModal from "../../components/ConfirmationModal";
-
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
 import { format, parseISO } from "date-fns";
-
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -118,9 +107,9 @@ const SystemChangeJSONModal = ({ open, onClose, historic }) => {
 				</DialogTitle>
 				<DialogContent dividers>
 					<div className={classes.main}>
-							{ updatedJSON && 
+							{ updatedJSON &&
 								<Paper className={classes.paper} variant="outlined">
-									<Typography>Updated:</Typography>
+									<Typography>{i18n.t("pricing.pricingModal.update")}</Typography>
 									<div className={classes.item}>
 										<pre>
 											{ JSON.stringify(updatedJSON, null, 2) }
@@ -128,9 +117,9 @@ const SystemChangeJSONModal = ({ open, onClose, historic }) => {
 									</div>
 								</Paper>
 							}
-							{ currentJSON && 
+							{ currentJSON &&
 								<Paper className={classes.paper} variant="outlined">
-									<Typography>Current:</Typography>
+									<Typography>{i18n.t("pricing.pricingModal.current")}</Typography>
 									<div className={classes.item}>
 										<pre>
 											{ JSON.stringify(currentJSON, null, 2) }
@@ -146,7 +135,7 @@ const SystemChangeJSONModal = ({ open, onClose, historic }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Fechar
+						{i18n.t("pricing.pricingModal.closed")}
 					</Button>
 				</DialogActions>
 			</Dialog>

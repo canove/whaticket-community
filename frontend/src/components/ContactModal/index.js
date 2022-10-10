@@ -51,15 +51,6 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactSchema = Yup.object().shape({
-	name: Yup.string()
-		.min(2, "Too Short!")
-		.max(50, "Too Long!")
-		.required("Required"),
-	number: Yup.string().min(8, "Too Short!").max(50, "Too Long!"),
-	email: Yup.string().email("Invalid email"),
-});
-
 const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -70,6 +61,15 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 		number: "",
 		email: "",
 	};
+
+	const ContactSchema = Yup.object().shape({
+		name: Yup.string()
+			.min(2, `${i18n.t("contacts.toasts.short")}`)
+			.max(50, `${i18n.t("contacts.toasts.long")}`)
+			.required(`${i18n.t("contacts.toasts.required")}`),
+		number: Yup.string().min(8,`${i18n.t("contacts.toasts.short")}`).max(50,`${i18n.t("contacts.toasts.long")}`),
+		email: Yup.string().email(`${i18n.t("contacts.toasts.email")}`),
+	});
 
 	const [contact, setContact] = useState(initialState);
 
@@ -178,7 +178,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 										name="email"
 										error={touched.email && Boolean(errors.email)}
 										helperText={touched.email && errors.email}
-										placeholder="Email address"
+										placeholder={i18n.t("contactModal.form.email")}
 										fullWidth
 										margin="dense"
 										variant="outlined"

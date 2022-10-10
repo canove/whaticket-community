@@ -144,6 +144,7 @@ const Company= () => {
     return () => {
       socket.disconnect();
     };
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpenCompanyModal = () => {
@@ -204,7 +205,7 @@ const Company= () => {
       <ConfirmationModal
         title={
           deletingCompany &&
-          `${i18n.t("company.deleteCompany")} ${
+          `${i18n.t("company.deleteTitle")} ${
             deletingCompany.name
           }?`
         }
@@ -212,6 +213,7 @@ const Company= () => {
         onClose={setConfirmModalOpen}
         onConfirm={() => handleDeleteCompany(deletingCompany.id)}
       >
+        {i18n.t("company.deleteCompany")}
       </ConfirmationModal>
       <CompanyRegistration
         open={companyModalOpen}
@@ -258,7 +260,7 @@ const Company= () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("company.grid.companyId")}</TableCell>
-              <TableCell align="center">{i18n.t("Alias")}</TableCell>
+              <TableCell align="center">{i18n.t("company.grid.alias")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.name")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.cnpj")}</TableCell>
               <TableCell align="center">{i18n.t("company.grid.phone")}</TableCell>

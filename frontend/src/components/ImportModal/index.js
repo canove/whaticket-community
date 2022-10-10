@@ -90,11 +90,11 @@ const ImportModal = ({ open, onClose }) => {
 	const handleSubmit = async () => {
 		setLoading(true);
 		if (selectedConnection.length === 0 && !file) {
-			toast.error("Por favor, selecione uma ou mais conexões e um arquivo de disparo.");
+			toast.error(i18n.t("importModal.confirmation.errors"));
 		} else if (selectedConnection.length === 0 ) {
-			toast.error("Por favor, selecione uma ou mais conexões.");
+			toast.error(i18n.t("importModal.confirmation.errorConnection"));
 		} else if (!file) {
-			toast.error("Por favor, selecione um arquivo de disparo.");
+			toast.error(i18n.t("importModal.confirmation.errorShots"));
 		} else {
 			try {
 				const formData = new FormData();
@@ -249,7 +249,7 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					}
 					<Typography variant="subtitle1" gutterBottom>
-                        Conexões:
+                        {i18n.t('importModal.form.connection')}
 					</Typography>
 					<div className={classes.multFieldLine}>
 						<Select
@@ -265,7 +265,7 @@ const ImportModal = ({ open, onClose }) => {
 							onClose={handleCloseSelect}
 							style={{width: "100%"}}
 						>
-							<MenuItem value={"Todos"}>Todos</MenuItem>
+							<MenuItem value={"Todos"}>{i18n.t('importModal.form.all')}</MenuItem>
 							{whatsApps && whatsApps.map((whats, index) => {
 								if (whats.official === selectedType) {
 									if (selectedType === false && whats.status === "CONNECTED") {
@@ -283,7 +283,7 @@ const ImportModal = ({ open, onClose }) => {
 					</div>
 					{ selectedType === false &&
 						<Typography variant="subtitle1" gutterBottom>
-							Template:
+							{i18n.t('importModal.form.template')}
 						</Typography>
 					}
 					{ selectedType === false &&
@@ -297,7 +297,7 @@ const ImportModal = ({ open, onClose }) => {
 							onChange={(e) => { handleChangeTemplate(e) }}
 							style={{width: "100%"}}
 						>
-							<MenuItem value={"Nenhum"}>Nenhum</MenuItem>
+							<MenuItem value={"Nenhum"}>{i18n.t('importModal.form.none')}</MenuItem>
 							{templates.length > 0 && templates.map((template, index) => {
 								return (
 									<MenuItem key={index} value={template.id}>{template.name}</MenuItem>
@@ -326,7 +326,11 @@ const ImportModal = ({ open, onClose }) => {
 						<Typography variant="subtitle1" gutterBottom>
 							{i18n.t('importModal.form.supportedTriggerModel')}
 						</Typography>
-						<Button onClick={() => setShowInfo(!showInfo)}>{showInfo ? "Esconder" : "Mostrar"}
+						<Button onClick={() => setShowInfo(!showInfo)}>
+							{showInfo
+							 ? `${i18n.t("importModal.form.toHide")}`
+							 : `${i18n.t("importModal.form.show")}`
+							}
 						</Button>
 					</div>
 					<div>
@@ -335,13 +339,13 @@ const ImportModal = ({ open, onClose }) => {
 								variant="outlined"
 							>
 								<Typography variant="subtitle1" gutterBottom>
-									NOME;CPF/CNPJ;TELEFONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXTO_MENSAGEM<br /><br />
-									- CAMPOS OPCIONAIS (SE TEXTO_MENSAGEM PREENCHIDO)<br />
-									TEMPLATE_WHATS<br />
-									PARAMETROS_TEMPLATE<br /><br />
-									- CAMPOS OPCIONAIS (SE TEMPLATE_WHATS PREENCHIDO)<br />
-									TEXTO_MENSAGEM<br />
-									PARAMETROS_TEMPLATE<br />
+									{i18n.t("importModal.model.line1")}<br /><br />
+									{i18n.t("importModal.model.line2")}<br />
+									{i18n.t("importModal.model.line3")}<br />
+									{i18n.t("importModal.model.line4")}<br /><br />
+									{i18n.t("importModal.model.line5")}<br />
+									{i18n.t("importModal.model.line6")}<br />
+									{i18n.t("importModal.model.line7")}<br />
 								</Typography>
 							</Paper>
 						)}

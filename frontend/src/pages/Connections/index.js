@@ -502,9 +502,9 @@ const Connections = () => {
 					<Button
 						variant="outlined"
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
-						disabled={ pageNumber === 1} 
+						disabled={ pageNumber === 1}
 					>
-						Página Anterior
+						{i18n.t("connections.buttons.previousPage")}
 					</Button>
 					<Typography
 						style={{ display: "inline-block", fontSize: "1.25rem" }}
@@ -516,7 +516,7 @@ const Connections = () => {
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
 						disabled={ !hasMore }
 					>
-						Próxima Página
+						{i18n.t("connections.buttons.nextPage")}
 					</Button>
 				</div>
 			</Paper>

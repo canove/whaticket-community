@@ -1,18 +1,7 @@
-import React, { useState, useEffect, useContext, } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
 
 import {
-	Button,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogTitle,
-	Select,
-	InputLabel,
-	MenuItem,
-	FormControl,
-	TextField,
     Table,
     TableHead,
     TableRow,
@@ -24,11 +13,6 @@ import {
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
-
-import ConfirmationModal from "../../components/ConfirmationModal";
-
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
 
 import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
 import DescriptionIcon from '@material-ui/icons/Description';
@@ -76,17 +60,17 @@ const TemplateTable = ({ body }) => {
         setBodyObject(JSON.parse(body))
     }, [body])
 
-    const Body = ({ body }) => {  
+    const Body = ({ body }) => {
         const value = body.value;
-  
+
         if (body.type === "text") {
             return <TableCell align="center">{value}</TableCell>;
         }
-  
+
         if (body.type === "contact") {
             return <TableCell align="center">{body.name}: {value}</TableCell>;
         }
-  
+
         if (body.type === "image") {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>;
@@ -94,7 +78,7 @@ const TemplateTable = ({ body }) => {
                 return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} /></TableCell>
             }
         }
-  
+
         if (body.type === "video") {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>;
@@ -102,7 +86,7 @@ const TemplateTable = ({ body }) => {
                 return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a></TableCell>;
             }
         }
-  
+
         if (body.type === "audio") {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>;
@@ -110,7 +94,7 @@ const TemplateTable = ({ body }) => {
                 return <TableCell align="center"><audio controls><source src={value} type="audio/ogg"></source></audio></TableCell>;
             }
         }
-  
+
         if (body.type === "file") {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>
@@ -118,19 +102,19 @@ const TemplateTable = ({ body }) => {
                 return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a></TableCell>;
             }
         }
-  
+
         return "";
       }
 
 	return (
 		<TableContainer component={Paper}>
-            { body && 
+            { body &&
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Ordem</TableCell>
-                            <TableCell align="center">Tipo</TableCell>
-                            <TableCell align="center">Valor</TableCell>
+                            <TableCell align="center">{i18n.t("templatesData.modal.order")}</TableCell>
+                            <TableCell align="center">{i18n.t("templatesData.modal.type")}</TableCell>
+                            <TableCell align="center">{i18n.t("templatesData.modal.value")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -145,7 +129,7 @@ const TemplateTable = ({ body }) => {
                         }) }
                     </TableBody>
                 </Table>
-            }      
+            }
 		</TableContainer>
 	);
 };

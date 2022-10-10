@@ -153,6 +153,7 @@ const OfficialConnections = () => {
 			}
 		};
 		fetchWhats();
+// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -287,7 +288,7 @@ const OfficialConnections = () => {
 											<TableCell align="center">{whatsApp.quality}</TableCell>
 											<TableCell align="center">{whatsApp.tierLimit}</TableCell>
 											<TableCell align="center">
-												Sessão
+												{i18n.t("connections.table.session")}
 											</TableCell>
 											<TableCell align="center">
 												{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
@@ -328,9 +329,9 @@ const OfficialConnections = () => {
 					<Button
 						variant="outlined"
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
-						disabled={ pageNumber === 1} 
+						disabled={ pageNumber === 1}
 					>
-						Página Anterior
+						{i18n.t("officialConnections.previousPage")}
 					</Button>
 					<Typography
 						style={{ display: "inline-block", fontSize: "1.25rem" }}
@@ -342,7 +343,7 @@ const OfficialConnections = () => {
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
 						disabled={ !hasMore }
 					>
-						Próxima Página
+						{i18n.t("officialConnections.nextPage")}
 					</Button>
 				</div>
 			</Paper>

@@ -55,7 +55,7 @@ const ReportsTicket = () => {
 
   const createPdf = async () => {
     if (!ticketId) {
-      toast.error("Select a ticket");
+      toast.error(i18n.t("reportsTicket.errors.toastErr"));
     } else {
       try {
         const { data } = await api.get(`/tickets-export-report?ticketId=${ticketId}`);
@@ -95,7 +95,7 @@ const ReportsTicket = () => {
 
   const fetchReports = async (ticketId) => {
     if (!ticketId) {
-      toast.error("Select a ticket");
+      toast.error(i18n.t("reportsTicket.errors.toastErr"));
     } else {
       try {
         setLoading(true);
@@ -124,7 +124,7 @@ const ReportsTicket = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={i18n.t("ID da Chamada")}
+                label={i18n.t("reportsTicket.buttons.ticketId")}
                 InputLabelProps={{ required: true }}
               />
             )}
@@ -134,7 +134,7 @@ const ReportsTicket = () => {
             color="primary"
             onClick={ filterReports }
           >
-            {i18n.t("reports.buttons.filter")}
+            {i18n.t("reportsTicket.buttons.filterReports")}
           </Button>
           <Button
             variant="contained"
@@ -142,7 +142,7 @@ const ReportsTicket = () => {
             onClick={ downloadPdf }
             disabled={ disableButton }
           >
-            {i18n.t("reports.buttons.exportPdf")}
+            {i18n.t("reportsTicket.buttons.exportPdf")}
           </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -150,16 +150,10 @@ const ReportsTicket = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">
-                {i18n.t("reports.table.messageId")}
-              </TableCell>
-              <TableCell align="center">
-                {i18n.t("reports.table.messageBody")}
-              </TableCell>
-              <TableCell align="center">{i18n.t("reports.table.read")}</TableCell>
-              <TableCell align="center">
-                {i18n.t("reports.table.ticketId")}
-              </TableCell>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.messageId")}</TableCell>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.bodyText")}</TableCell>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.read")}</TableCell>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.ticketId")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
