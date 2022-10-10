@@ -17,6 +17,7 @@ import { green } from "@material-ui/core/colors";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,15 +49,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UserSchema = Yup.object().shape({
-  name: Yup.string().required("Campo Obrigatório!"),
-  cnpj: Yup.string().required("Campo Obrigatório!"),
-  phone: Yup.number().typeError().required("Campo Obrigatório!"),
-  email: Yup.string().email("Invalid email").required("Campo Obrigatório!"),
-  address: Yup.string().required("Campo Obrigatório!"),
-  alias: Yup.string().nullable().required("Campo Obrigatório!"),
-});
-
 const CompanyRegistration = ({ open, onClose, companyId }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
@@ -70,10 +62,18 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
     alias: "",
   };
 
+const UserSchema = Yup.object().shape({
+  name: Yup.string().required(`${i18n.t("company.companyModal.required")}`),
+  cnpj: Yup.string().required(`${i18n.t("company.companyModal.required")}`),
+  phone: Yup.number().typeError().required(`${i18n.t("company.companyModal.required")}`),
+  email: Yup.string().email(`${i18n.t("company.companyModal.invalidEmail")}`).required(`${i18n.t("company.companyModal.required")}`),
+  address: Yup.string().required(`${i18n.t("company.companyModal.required")}`),
+  alias: Yup.string().nullable().required(`${i18n.t("company.companyModal.required")}`),
+});
+
   const [company, setCompany] = useState(initialState);
   const [textAlias, setTextAlias] = useState("");
   const [logo, setLogo] = useState();
-  const [cnpj, setCnpj] = useState("");
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -127,7 +127,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         if (logo) {
           await uploadLogo(logo, data.id);
         }
-        toast.success("Empresa Atualizada com Sucesso!");
+        toast.success(i18n.t("company.update"));
       } catch (err) {
         toastError(err);
       }
@@ -137,7 +137,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
         if (logo) {
           await uploadLogo(logo, data.id);
         }
-        toast.success("Empresa Criado com Sucesso!");
+        toast.success(i18n.t("company.createdAt"));
       } catch (err) {
         toastError(err);
       }
@@ -196,7 +196,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
   const handleLogoUpload = (e) => {
     const megabyte = 1000000;
     if (e.target.files[0].size >= megabyte) {
-      toast.error("Tamanho excede o valor máximo de 1 Megabyte.");
+      toast.error(i18n.t("company.companyModal.image"));
     } else {
       setLogo(e.target.files[0]);
     }
@@ -237,7 +237,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                     name="alias"
                     variant="outlined"
                     margin="dense"
-                    label={i18n.t("Alias")}
+                    label={i18n.t("company.companyModal.alias")}
                     error={touched.alias && Boolean(errors.alias)}
                     helperText={touched.alias && errors.alias}
                     fullWidth
@@ -313,7 +313,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                     variant="contained"
                     component="label"
                   >
-                    Upload Logo
+                    {i18n.t("company.companyModal.upload")}
                     <input
                       type="file"
                       onChange={(e) => {handleLogoUpload(e)}}
@@ -321,7 +321,7 @@ const CompanyRegistration = ({ open, onClose, companyId }) => {
                     />
                   </Button>
                   <Typography variant="subtitle1" gutterBottom>
-                    { logo ? <img src={logo} alt="Logo" height="50px" />: 'Sem Logo' }
+                    { logo ? <img src={logo} alt="Logo" height="50px" />: `${i18n.t("company.companyModal.logo")}` }
                   </Typography>
                 </div>
               </DialogContent>

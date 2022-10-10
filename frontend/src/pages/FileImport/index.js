@@ -154,21 +154,21 @@ const FileImport = () => {
   };
 
   const getStatusByName = (status) => {
-    if (status === "Aguardando Importação") {
+    if (status === `${i18n.t("importation.form.awaitingImport")}`) {
       return "0";
-    } else if (status === "Processando") {
+    } else if (status === `${i18n.t("importation.form.processing")}`) {
       return "1";
-    } else if (status === "Aguardando Aprovação") {
+    } else if (status === `${i18n.t("importation.form.waitingForApproval")}`) {
       return "2";
-    } else if (status === "Erro") {
+    } else if (status === `${i18n.t("importation.form.error")}`) {
       return "3";
-    } else if (status === "Aprovado") {
+    } else if (status === `${i18n.t("importation.form.aproved")}`) {
       return "4";
-    } else if (status === "Disparando") {
+    } else if (status === `${i18n.t("importation.form.shooting")}`) {
       return "5";
-    } else if (status === "Finalizado") {
+    } else if (status === `${i18n.t("importation.form.finished")}`) {
       return "6";
-    } else if (status === "Recusado") {
+    } else if (status === `${i18n.t("importation.form.refused")}`) {
       return "7";
     } else {
       return status;
@@ -177,21 +177,21 @@ const FileImport = () => {
 
   const getStatusById = (id) => {
     if (id === 0) {
-      return "Aguardando Importação";
+      return `${i18n.t("importation.form.awaitingImport")}`;
     } else if (id === 1) {
-      return "Processando";
+      return `${i18n.t("importation.form.processing")}`;
     } else if (id === 2) {
-      return "Aguardando Aprovação";
+      return `${i18n.t("importation.form.waitingForApproval")}`;
     } else if (id === 3) {
-      return "Erro";
+      return `${i18n.t("importation.form.error")}`;
     } else if (id === 4) {
-      return "Aprovado";
+      return `${i18n.t("importation.form.aproved")}`;
     } else if (id === 5) {
-      return "Disparando";
+      return `${i18n.t("importation.form.shooting")}`;
     } else if (id === 6) {
-      return "Finalizado";
+      return `${i18n.t("importation.form.finished")}`;
     } else if (id === 7) {
-      return "Recusado";
+      return `${i18n.t("importation.form.refused")}`;
     } else {
       return id;
     }
@@ -305,7 +305,16 @@ const FileImport = () => {
         <MainHeaderButtonsWrapper>
           <Autocomplete
             className={classes.root}
-            options={["Aguardando Importação", "Processando", "Aguardando Aprovação", "Erro", "Aprovado", "Disparando", "Finalizado", "Recusado"]}
+            options={[
+              `${i18n.t("importation.form.awaitingImport")}`,
+              `${i18n.t("importation.form.processing")}`,
+              `${i18n.t("importation.form.waitingForApproval")}`,
+              `${i18n.t("importation.form.error")}`,
+              `${i18n.t("importation.form.aproved")}`,
+              `${i18n.t("importation.form.shooting")}`,
+              `${i18n.t("importation.form.finished")}`,
+              `${i18n.t("importation.form.refused")}`,
+            ]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
             renderInput={(params) => (

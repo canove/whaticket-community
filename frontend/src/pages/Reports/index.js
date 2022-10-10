@@ -89,7 +89,7 @@ const Reports = () => {
 
     const createPdf = async () => {
         if (!initialDate || !finalDate || !userId) {
-            toast.error("Fill the form");
+            toast.error(i18n.t("reports.errors.toastErr"));
         } else {
             try {
                 const { data } = await api.get(`/tickets-export-report-talk?initialDate=${initialDate}&finalDate=${finalDate}&userId=${userId}`);
@@ -133,7 +133,7 @@ const Reports = () => {
                 toastError(err);
             }
         } else {
-            toast.error("Fill the form")
+            toast.error(i18n.t("reports.errors.toastErr"));
         }
     };
 
@@ -190,9 +190,9 @@ const Reports = () => {
                     >
                         {i18n.t("reports.buttons.filter")}
                     </Button>
-                    <Button 
-                        variant="contained" 
-                        color="primary" 
+                    <Button
+                        variant="contained"
+                        color="primary"
                         onClick={ downloadPdf }
                         disabled={ disableButton }
                     >

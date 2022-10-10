@@ -250,7 +250,7 @@ const RegistersReports = () => {
                         onClick={downloadCsv}
                         disabled={disableCsvButton}
                     >
-                        Exportar CSV
+                        {i18n.t("logReport.buttons.exportCsv")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -262,7 +262,7 @@ const RegistersReports = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">{i18n.t("logReport.grid.name")}</TableCell>
-                            <TableCell align="center">Status</TableCell>
+                            <TableCell align="center">{i18n.t("logReport.grid.status")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.sent")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.read")}</TableCell>
@@ -293,9 +293,9 @@ const RegistersReports = () => {
 					<Button
 						variant="outlined"
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
-						disabled={ pageNumber === 1} 
+						disabled={ pageNumber === 1}
 					>
-						Página Anterior
+						{i18n.t("logReport.buttons.previousPage")}
 					</Button>
 					<Typography
 						style={{ display: "inline-block", fontSize: "1.25rem" }}
@@ -307,7 +307,7 @@ const RegistersReports = () => {
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
 						disabled={ !hasMore }
 					>
-						Próxima Página
+						{i18n.t("logReport.buttons.nextPage")}
 					</Button>
 				</div>
             </Paper>

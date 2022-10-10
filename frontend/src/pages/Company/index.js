@@ -205,7 +205,7 @@ const Company= () => {
       <ConfirmationModal
         title={
           deletingCompany &&
-          `${i18n.t("company.deleteCompany")} ${
+          `${i18n.t("company.deleteTitle")} ${
             deletingCompany.name
           }?`
         }
@@ -213,6 +213,7 @@ const Company= () => {
         onClose={setConfirmModalOpen}
         onConfirm={() => handleDeleteCompany(deletingCompany.id)}
       >
+        {i18n.t("company.deleteCompany")}
       </ConfirmationModal>
       <CompanyRegistration
         open={companyModalOpen}

@@ -243,7 +243,7 @@ const Users = () => {
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.email")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.profile")}</TableCell>
-              <TableCell align="center">{i18n.t("Nome da Empresa")}</TableCell>
+              <TableCell align="center">{i18n.t("users.table.companyName")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.actions")}</TableCell>
             </TableRow>
           </TableHead>

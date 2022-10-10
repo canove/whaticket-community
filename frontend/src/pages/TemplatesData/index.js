@@ -21,7 +21,6 @@ import {
   IconButton,
   TextField,
   InputAdornment,
-  Typography,
 } from "@material-ui/core";
 import TemplatesDataModal from "../../components/TemplatesDataModal";
 import { DeleteOutline } from "@material-ui/icons";
@@ -33,8 +32,6 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import SearchIcon from "@material-ui/icons/Search";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
-import DescriptionIcon from '@material-ui/icons/Description';
 import TemplateTable from "../../components/TemplateTable";
 
 const reducer = (state, action) => {
@@ -217,7 +214,7 @@ const TemplatesData = () => {
         <ConfirmationModal
             title={
             deletingTemplate &&
-            'Deletar Template'}
+            `${i18n.t("templatesData.modalConfirm.title")}`}
             open={confirmModalOpen}
             onClose={setConfirmModalOpen}
             onConfirm={() => handleDeleteTemplate(deletingTemplate.id)}

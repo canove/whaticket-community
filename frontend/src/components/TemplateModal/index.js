@@ -147,7 +147,7 @@ const TemplateModal = ({ open, onClose }) => {
     <div className={classes.root}>
       <div>
         <Dialog open={openParamModal} onClose={handleCloseParamModal}>
-          <DialogTitle>Selecione uma variável</DialogTitle>
+          <DialogTitle>{i18n.t("templates.templateModal.selectVar")}</DialogTitle>
           <DialogContent>
               <FormControl className={classes.multFieldLine}>
                 <Select
@@ -157,18 +157,18 @@ const TemplateModal = ({ open, onClose }) => {
                   onChange={handleChangeParam}
                   style={{width: "100%"}}
                 >
-                  <MenuItem value={'name'}>Nome</MenuItem>
-                  <MenuItem value={'documentNumber'}>Documento</MenuItem>
-                  <MenuItem value={'phoneNumber'}>Número de Telefone</MenuItem>
+                  <MenuItem value={'name'}>{i18n.t("templates.templateModal.name")}</MenuItem>
+                  <MenuItem value={'documentNumber'}>{i18n.t("templates.templateModal.document")}</MenuItem>
+                  <MenuItem value={'phoneNumber'}>{i18n.t("templates.templateModal.phoneNumber")}</MenuItem>
                 </Select>
               </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseParamModal} color="primary">
-              Cancel
+             {i18n.t("templates.templateModal.cancel")}
             </Button>
             <Button onClick={handleParams} color="primary">
-              Ok
+             {i18n.t("templates.templateModal.ok")}
             </Button>
           </DialogActions>
         </Dialog>

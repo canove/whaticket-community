@@ -235,10 +235,10 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
         try {
             if (registrationId) {
                 await api.put(`/menus/${registrationId}`, menuData);
-                toast.success("Menu editado com sucesso!");
+                toast.success(i18n.t("registration.confirmation.update"));
             } else {
                 await api.post("/menus/", menuData);
-                toast.success("Menu adicionado com sucesso!");
+                toast.success(i18n.t("registration.confirmation.created"));
             }
             } catch (err) {
                 toastError(err);
@@ -272,13 +272,16 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                 scroll="paper"
             >
                 <DialogTitle id="form-dialog-title">
-                    { registrationId ? 'Editar' : 'Adicionar' }
+                    { registrationId
+                     ? `${i18n.t("registration.registrationModal.edit")}`
+                     : `${i18n.t("registration.registrationModal.add")}`
+                    }
                 </DialogTitle>
                 <DialogContent dividers>
                     <div>
                         <TextField
-                            label="Nome"
-                            placeholder="Nome"
+                            label={i18n.t("registration.registrationModal.name")}
+                            placeholder={i18n.t("registration.registrationModal.name")}
                             fullWidth
                             margin="normal"
                             style={{ margin: 8 }}
@@ -297,7 +300,7 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                             margin="dense"
                             fullWidth
                         >
-                            <InputLabel>Icon</InputLabel>
+                            <InputLabel>{i18n.t("registration.registrationModal.icon")}</InputLabel>
                             <Select
                                 value={icon}
                                 onChange={(e) => { handleIconChange(e) }}
@@ -318,14 +321,14 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                             margin="dense"
                             fullWidth
                         >
-                            <InputLabel>Principal</InputLabel>
+                            <InputLabel>{i18n.t("registration.registrationModal.main")}</InputLabel>
                             <Select
                                 value={principal}
                                 onChange={(e) => { handlePrincipalChange(e) }}
                                 label="Principal"
                             >
-                                <MenuItem value={true}>Sim</MenuItem>
-                                <MenuItem value={false}>Não</MenuItem>
+                                <MenuItem value={true}>{i18n.t("registration.registrationModal.yes")}</MenuItem>
+                                <MenuItem value={false}>{i18n.t("registration.registrationModal.no")}</MenuItem>
                             </Select>
                         </FormControl>
                     </div>
@@ -336,13 +339,13 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                             margin="dense"
                             fullWidth
                         >
-                            <InputLabel>Relation</InputLabel>
+                            <InputLabel>{i18n.t("registration.registrationModal.relation")}</InputLabel>
                             <Select
                                 value={relation}
                                 onChange={(e) => { handleRelationChange(e) }}
                                 label="Relation"
                             >
-                              <MenuItem value="">Nenhum</MenuItem>
+                              <MenuItem value="">{i18n.t("registration.registrationModal.none")}</MenuItem>
                               { menus && menus.map(menu => {
                                   if (menu.isParent) {
                                       return (
@@ -356,18 +359,21 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={handleSubmit}
-                        color="primary"
-                        variant="contained"
-                    >
-                        { registrationId ? 'Salvar' : 'Criar' }
-                    </Button>
-                    <Button
                         onClick={handleClose}
                         color="secondary"
                         variant="outlined"
                     >
-                        Cancelar
+                        {i18n.t("registration.registrationModal.cancel")}
+                    </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        color="primary"
+                        variant="contained"
+                    >
+                        { registrationId
+                         ? `${i18n.t("registration.registrationModal.save")}`
+                         : `${i18n.t("registration.registrationModal.created")}`
+                        }
                     </Button>
                 </DialogActions>
             </Dialog>
