@@ -87,8 +87,8 @@ const GreetingMessageModal = ({ open, onClose, greetingMessageText, getGreetingM
 			>
 				<DialogTitle>
 					{greetingMessageText
-						? 'Editar Mensagem de Saudação'
-						: 'Criar Mensagem de Saudação'
+						? `${i18n.t("settingsWhats.modal.edited")}`
+						: `${i18n.t("settingsWhats.modal.createdAt")}`
                     }
 				</DialogTitle>
 				<Formik
@@ -107,7 +107,7 @@ const GreetingMessageModal = ({ open, onClose, greetingMessageText, getGreetingM
 								<div>
 									<Field
 										as={TextField}
-										label='Mensagem de Saudação'
+										label={i18n.t("settingsWhats.modal.salutation")}
 										type="greetingMessage"
 										multiline
 										minRows={5}
@@ -141,8 +141,8 @@ const GreetingMessageModal = ({ open, onClose, greetingMessageText, getGreetingM
 									className={classes.btnWrapper}
 								>
 									{greetingMessageText
-										? 'Editar'
-										: 'Criar'
+										? `${i18n.t("settingsWhats.modal.edit")}`
+										: `${i18n.t("settingsWhats.modal.create")}`
                                     }
 									{isSubmitting && (
 										<CircularProgress

@@ -251,8 +251,8 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
       >
         <DialogTitle id="form-dialog-title">
           {templatesId
-            ? `${i18n.t("templatesData.templateModal.buttonEdit")}`
-            : `${i18n.t("templatesData.templateModal.buttonAdd")}`}
+            ? `${i18n.t("templatesData.modal.edited")}`
+            : `${i18n.t("templatesData.modal.created")}`}
         </DialogTitle>
 				<DialogContent dividers>
           <div className={classes.root}>
@@ -262,7 +262,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 							fullWidth
 						>
 							<TextField
-								label="Nome"
+								label={i18n.t("templatesData.modal.name")}
 								variant="outlined"
 								value={name}
 								onChange={handleNameChange}
@@ -276,9 +276,9 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell align="center">Tipo</TableCell>
-                      <TableCell align="center">Body</TableCell>
-                      <TableCell align="center">Ações</TableCell>
+                      <TableCell align="center">{i18n.t("templatesData.modal.type")}</TableCell>
+                      <TableCell align="center">{i18n.t("templatesData.modal.body")}</TableCell>
+                      <TableCell align="center">{i18n.t("templatesData.modal.actions")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -321,7 +321,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
                 onClick={handleOpenBodyModal}
                 disabled={bodies.length >= 5}
               >
-                Adicionar Body
+                {i18n.t("templatesData.modal.addBody")}
               </Button>
             </div>
           }
@@ -332,7 +332,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 							fullWidth
 						>
 							<TextField
-								label="Footer"
+								label={i18n.t("templatesData.modal.footer")}
 								variant="outlined"
 								value={footer}
 								onChange={handleFooterChange}
@@ -347,7 +347,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Cancelar
+						{i18n.t("templatesData.modal.cancel")}
 					</Button>
           <ButtonWithSpinner
 						onClick={handleSubmit}
@@ -355,7 +355,10 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 						variant="contained"
             loading={loading}
 					>
-						{ templatesId ? 'Editar' : 'Criar' }
+						{ templatesId
+             ? `${i18n.t("templatesData.modal.save")}`
+             : `${i18n.t("templatesData.modal.created")}`
+            }
 					</ButtonWithSpinner>
 				</DialogActions>
 			</Dialog>

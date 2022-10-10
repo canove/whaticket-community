@@ -242,10 +242,10 @@ const WhatsConfig = () => {
         try {
             if (config.length > 0) {
                 await api.put(`/whatsconfig/${config[0].id}`, configData);
-                toast.success("Config Alterada com Sucesso!");
+                toast.success(i18n.t("settingsWhats.confirmation.update"));
             } else {
                 await api.post(`/whatsconfig/`, configData);
-                toast.success("Config Salva com Sucesso!");
+                toast.success(i18n.t("settingsWhats.confirmation.saved"));
             }
         } catch (err) {
             toastError(err);
@@ -330,12 +330,12 @@ const WhatsConfig = () => {
 	return (
 	    <MainContainer>
             <ConfirmationModal
-                title='Deletar Mensagem'
+                title={i18n.t("settingsWhats.confirmation.title")}
                 open={confirmationOpen}
                 onClose={handleCloseConfirmationModal}
                 onConfirm={handleDeleteMessage}
             >
-                Você tem certeza que deseja deletar esta mensagem de saudação?
+                {i18n.t("settingsWhats.confirmation.confirmDelete")}
             </ConfirmationModal>
             <GreetingMessageModal
 				open={greetingMessageOpen}
@@ -352,7 +352,7 @@ const WhatsConfig = () => {
                         onClick={handleSaveConfig}
                         disabled={selectedConnection.length === 0}
                     >
-                        Salvar
+                       {i18n.t("settingsWhats.buttons.save")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -365,7 +365,7 @@ const WhatsConfig = () => {
                     variant="outlined"
                 >
                     <Typography variant="subtitle1" gutterBottom>
-                        Ativar config?
+                       {i18n.t("settingsWhats.buttons.activConfig")}
                     </Typography>
                     <Checkbox
                         {...label}
@@ -413,7 +413,7 @@ const WhatsConfig = () => {
                             variant="outlined"
                         >
                             <Typography variant="subtitle1" gutterBottom>
-                                 Conexões Desconectadas:
+                                 {i18n.t("settingsWhats.disconnected")}
                             </Typography>
 
                             { disconnectedWhatsapps.length > 0 && disconnectedWhatsapps.map((disconnectWhats, index) => {
@@ -431,7 +431,7 @@ const WhatsConfig = () => {
                             variant="outlined"
                         >
                             <Typography variant="subtitle1" gutterBottom>
-                                Algumas Conexões Foram Deletadas...
+                                {i18n.t("settingsWhats.delete")}
                             </Typography>
                         </Paper>
                     }
@@ -477,7 +477,7 @@ const WhatsConfig = () => {
                     variant="outlined"
                 >
                     <Typography variant="subtitle1" gutterBottom>
-                        Usar mensagem de saudação?
+                       {i18n.t("settingsWhats.salutation")}
                     </Typography>
                     <Checkbox
                         {...label}
@@ -494,7 +494,7 @@ const WhatsConfig = () => {
                             color="primary"
                             onClick={handleGreetingMessageOpenModal}
                         >
-                            Criar Mensagem
+                           {i18n.t("settingsWhats.buttons.created")}
                         </Button>
                         <Paper
                             className={classes.paper}
@@ -503,8 +503,8 @@ const WhatsConfig = () => {
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Mensagem de Saudação</TableCell>
-                                        <TableCell>Ações</TableCell>
+                                        <TableCell>{i18n.t("settingsWhats.modal.salutation")}</TableCell>
+                                        <TableCell>{i18n.t("settingsWhats.modal.actions")}</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -516,12 +516,12 @@ const WhatsConfig = () => {
                                                 <Button
                                                     onClick={(e) => {handleEditGreetingMessage(greetingMessage, index)}}
                                                 >
-                                                    Editar
+                                                    {i18n.t("settingsWhats.modal.edit")}
                                                 </Button>
                                                 <Button
                                                     onClick={(e) => {handleOpenConfirmationModal(greetingMessage, index)}}
                                                 >
-                                                    Deletar
+                                                    {i18n.t("settingsWhats.modal.delete")}
                                                 </Button>
                                             </TableCell>
                                         </TableRow>

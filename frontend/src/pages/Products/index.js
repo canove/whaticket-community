@@ -149,7 +149,7 @@ const Products = () => {
     const handleDeleteProduct = async (deletingId) => {
         try {
             await api.delete(`/products/${deletingId}`);
-            toast.success(i18n.t("Produto excluído com sucesso!"));
+            toast.success(i18n.t("product.confirmation.delete"));
         } catch (err) {
             toastError(err);
         }
@@ -159,7 +159,7 @@ const Products = () => {
     function formatReal(num) {
         var p = num.toFixed(2).split(".");
         return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
-            return num + (num != "-" && i && !(i % 3) ? "." : "") + acc;
+            return num + (num !== "-" && i && !(i % 3) ? "." : "") + acc;
         }, "") + "," + p[1];
     };
 
@@ -191,22 +191,22 @@ const Products = () => {
             <ConfirmationModal
                 title={
                 deletingProduct &&
-                `Deletar Produto`}
+                `${i18n.t("product.confirmation.title")}`}
                 open={confirmModalOpen}
                 onClose={setConfirmModalOpen}
                 onConfirm={() => handleDeleteProduct(deletingProduct.id)}
             >
-                {i18n.t("Todos os dados do produto se perderão, deseja realmente excluir?")}
+                {i18n.t("product.confirmation.confirmDelete")}
             </ConfirmationModal>
             <MainHeader>
-                <Title>Produtos</Title>
+                <Title>{i18n.t("product.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
                         onClick={handleOpenProductModal}
                         variant="contained"
                         color="primary"
                     >
-                        Criar
+                        {i18n.t("product.buttons.created")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -217,12 +217,12 @@ const Products = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Nome do Produto</TableCell>
-                            <TableCell align="center">Valor da Mensalidade</TableCell>
-                            <TableCell align="center">Valor Custo Disparo</TableCell>
-                            <TableCell align="center">Taxa Juros Mensal</TableCell>
-                            <TableCell align="center">Multa Atraso</TableCell>
-                            <TableCell align="center">Ações</TableCell>
+                            <TableCell align="center">{i18n.t("product.grid.productName")}</TableCell>
+                            <TableCell align="center">{i18n.t("product.grid.monthValue")}</TableCell>
+                            <TableCell align="center">{i18n.t("product.grid.tripCostValue")}</TableCell>
+                            <TableCell align="center">{i18n.t("product.grid.monthlyInterestRate")}</TableCell>
+                            <TableCell align="center">{i18n.t("product.grid.penaltyMount")}</TableCell>
+                            <TableCell align="center">{i18n.t("product.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

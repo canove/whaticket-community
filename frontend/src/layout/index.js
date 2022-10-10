@@ -29,7 +29,6 @@ import { IconFlagBR, IconFlagUS, IconFlagES } from 'material-ui-flags';
 
 import brainit from "../assets/brainit500.png";
 import api from "../services/api";
-import { toast } from "react-toastify";
 import toastError from "../errors/toastError";
 
 const drawerWidth = 320;
@@ -140,6 +139,7 @@ const LoggedInLayout = ({ children }) => {
   const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
   const [logo, setLogo] = useState("");
 
+// eslint-disable-next-line react-hooks/exhaustive-deps
   const mainListItems = useMemo(() => <MainListItems drawerOpen={drawerOpen} />, [user, drawerOpen])
 
   const { i18n } = useTranslation();
@@ -217,11 +217,11 @@ const LoggedInLayout = ({ children }) => {
     handleLogout();
   };
 
-  const drawerClose = () => {
-    if (document.body.offsetWidth < 600) {
-      setDrawerOpen(false);
-    }
-  };
+  // const drawerClose = () => {
+  //   if (document.body.offsetWidth < 600) {
+  //     setDrawerOpen(false);
+  //   }
+  // };
 
   if (loading) {
     return <BackdropLoading />;

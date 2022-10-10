@@ -68,7 +68,7 @@ const Payments = () => {
         month = parseInt(month)
 
         return meses[month-1];
-    } 
+    }
 
     const handleOpenBillingHistoricModal = (billing) => {
         setSelectedBillingHistoric(billing);
@@ -89,7 +89,7 @@ const Payments = () => {
                 billingId={selectedBillingHistoric && selectedBillingHistoric.id}
             />
             <MainHeader>
-                <Title>Pagamentos</Title>
+                <Title>{i18n.t("payments.title")}</Title>
             </MainHeader>
             <Paper
                 className={classes.mainPaper}
@@ -98,13 +98,13 @@ const Payments = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Empresa</TableCell>
-                            <TableCell align="center">Mês</TableCell>
-                            <TableCell align="center">Valor Total dos Disparos</TableCell>
-                            <TableCell align="center">Valor da Mensalidade</TableCell>
-                            <TableCell align="center">Valor Total</TableCell>
-                            <TableCell align="center">Valor Pago</TableCell>
-                            <TableCell align="center">Ações</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.company")}</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.month")}</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.shotsValue")}</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.monthValue")}</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.amounth")}</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.amounthPaind")}</TableCell>
+                            <TableCell align="center">{i18n.t("payments.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -116,7 +116,7 @@ const Payments = () => {
                                     <TableCell align="center">{formatToBRL(billing.totalTriggerValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalMonthValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalValue)}</TableCell>
-                                    <TableCell align="center">Valor Pago</TableCell>
+                                    <TableCell align="center">{i18n.t("payments.grid.amounthPaind")}</TableCell>
                                     <TableCell align="center">
                                         <IconButton
                                             size="small"

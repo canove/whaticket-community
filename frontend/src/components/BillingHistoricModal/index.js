@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext, } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
 
 import {
 	Button,
@@ -8,11 +7,6 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	Select,
-	InputLabel,
-	MenuItem,
-	FormControl,
-	TextField,
 	TableBody,
 	Table,
 	TableHead,
@@ -25,8 +19,6 @@ import {
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
-
-import ConfirmationModal from "../../components/ConfirmationModal";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -105,15 +97,15 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 			if (dates.indexOf(date) === -1) {
 				dates.push(date);
 				daily.push({
-					...historic, 
+					...historic,
 					totalValue: historic.triggerFee * (historic.quantity - historic.usedGraceTriggers),
 					totalTrigger: historic.quantity,
 					totalGraceTriggers: historic.usedGraceTriggers
 				})
 			} else {
 				const index = dates.indexOf(date);
-				daily[index] = { 
-					...daily[index], 
+				daily[index] = {
+					...daily[index],
 					totalValue: daily[index].totalValue + (historic.triggerFee * (historic.quantity - historic.usedGraceTriggers)),
 					totalTrigger: daily[index].totalTrigger + historic.quantity,
 					totalGraceTriggers: daily[index].totalGraceTriggers + historic.usedGraceTriggers
@@ -155,17 +147,17 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 				scroll="paper"
 			>
 				<DialogTitle id="form-dialog-title">
-					Histórico do Preço
+					{i18n.t("payments.modal.title")}
 				</DialogTitle>
 				<DialogContent dividers>
 					<TableContainer component={Paper}>
 						<Table>
 							<TableHead>
 								<TableRow>
-									<TableCell align="center">Data</TableCell>
-									<TableCell align="center">Valor</TableCell>
-									<TableCell align="center">Disparos</TableCell>
-									<TableCell align="center">Disparos Gratis</TableCell>
+									<TableCell align="center">{i18n.t("payments.modal.date")}</TableCell>
+									<TableCell align="center">{i18n.t("payments.modal.value")}</TableCell>
+									<TableCell align="center">{i18n.t("payments.modal.shots")}</TableCell>
+									<TableCell align="center">{i18n.t("payments.modal.freeShots")}</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -195,7 +187,7 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Fechar
+						{i18n.t("payments.modal.closed")}
 					</Button>
 				</DialogActions>
 			</Dialog>

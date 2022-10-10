@@ -296,7 +296,7 @@ const MenuLink = () => {
     if(menuName === "Pricing"){
       return i18n.t("Precificação")
     }
-    if(menuName === "Payment"){
+    if(menuName === "Payments"){
       return i18n.t("Pagamento")
     }
     if(menuName === "Flows"){

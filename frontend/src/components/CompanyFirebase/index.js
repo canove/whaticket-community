@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -7,13 +7,10 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import Typography from "@material-ui/core/Typography";
 
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import { IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@material-ui/core";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import { IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@material-ui/core";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -85,7 +82,6 @@ const useStyles = makeStyles(theme => ({
 const CompanyFirebase = ({ open, onClose, companyId }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
-	const { user } = useContext(AuthContext);
 
 	const [openServiceModal, setOpenServiceModal] = useState(false);
 	const [newService, setNewService] = useState("");
@@ -116,9 +112,9 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 			await api.post(`/firebase/company/${companyId}`, { newService, docId });
 			setServices(prevServices => [...prevServices]);
 			if (docId) {
-				toast.success("Service editado com sucesso.");
+				toast.success(i18n.t("company.edited"));
 			} else {
-				toast.success("Service criado com sucesso.");
+				toast.success(i18n.t("company.create"));
 			}
 		} catch (err) {
 			toastError(err);
@@ -149,11 +145,11 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 
 	const getIsFullTranslation = (isFull) => {
 		if (isFull === true) {
-			return "Sim";
+			return `${i18n.t("company.firebase.yes")}`;
 		}
 
 		if (isFull === false) {
-			return "Não";
+			return `${i18n.t("company.firebase.no")}`;
 		}
 
 		return null;
@@ -175,7 +171,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 		<div className={classes.root}>
 			<div>
 				<Dialog open={openServiceModal} onClose={handleCloseServiceModal}>
-				<DialogTitle>Adicione um Service:</DialogTitle>
+				<DialogTitle>{i18n.t("company.firebase.title")}</DialogTitle>
 				<DialogContent>
 					<TextField
 						variant="outlined"
@@ -186,10 +182,10 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={handleCloseServiceModal} color="primary">
-						Cancel
+						{i18n.t("company.firebase.cancel")}
 					</Button>
 					<Button onClick={(e) => {handleSubmitService(e)}} color="primary">
-						Ok
+						{i18n.t("company.firebase.ok")}
 					</Button>
 				</DialogActions>
 				</Dialog>
@@ -201,7 +197,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
                 scroll="paper"
             >
                 <DialogTitle id="form-dialog-title">
-					Firebase Config
+					{i18n.t("company.firebase.config")}
 				</DialogTitle>
                 <DialogContent dividers>
 				<Paper
@@ -211,20 +207,20 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					<Table>
 						<TableHead>
 							<TableRow>
-								<TableCell>
-									Company ID
+								<TableCell align="center">
+									{i18n.t("company.firebase.companyId")}
 								</TableCell>
-								<TableCell>
-									Connected
+								<TableCell align="center">
+									{i18n.t("company.firebase.connected")}
 								</TableCell>
-								<TableCell>
-									Is Full
+								<TableCell align="center">
+									{i18n.t("company.firebase.isFull")}
 								</TableCell>
-								<TableCell>
-									Service
+								<TableCell align="center">
+									{i18n.t("company.firebase.service")}
 								</TableCell>
-								<TableCell>
-									Edit
+								<TableCell align="center">
+									{i18n.t("company.firebase.edit")}
 								</TableCell>
 							</TableRow>
 						</TableHead>
@@ -258,7 +254,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 				</Paper>
 					{/* <div className={classes.form}>
 						<Typography variant="subtitle1" gutterBottom displayInline className={classes.formTitle}>
-							CompanyID: 
+							CompanyID:
 						</Typography>
 						<TextField
 							variant="outlined"
@@ -269,7 +265,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					</div>
 					<div className={classes.form}>
 						<Typography variant="subtitle1" gutterBottom displayInline className={classes.formTitle}>
-							Connected: 
+							Connected:
 						</Typography>
 						<TextField
 							variant="outlined"
@@ -280,7 +276,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					</div>
 					<div className={classes.form}>
 						<Typography variant="subtitle1" gutterBottom displayInline className={classes.formTitle}>
-							isFull: 
+							isFull:
 						</Typography>
 						<TextField
 							variant="outlined"
@@ -291,7 +287,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 					</div>
 					<div className={classes.form}>
 						<Typography variant="subtitle1" gutterBottom displayInline className={classes.formTitle}>
-							Service: 
+							Service:
 						</Typography>
 						<TextField
 							variant="outlined"
@@ -307,7 +303,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 						variant="outlined"
 						onClick={handleClose}
 					>
-						Cancelar
+						{i18n.t("company.firebase.cancel")}
 					</Button>
 					<Button
 						color="primary"
@@ -315,7 +311,7 @@ const CompanyFirebase = ({ open, onClose, companyId }) => {
 						className={classes.btnWrapper}
 						onClick={handleOpenServiceModal}
 					>
-						Adicionar Service
+						{i18n.t("company.firebase.add")}
 					</Button>
 				</DialogActions>
 			</Dialog>

@@ -12,7 +12,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { MenuItem, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -339,7 +339,7 @@ const Dashboard = () => {
           { categoryCount && categoryCount.length > 0 &&
             <Grid item xs={12}>
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                  {i18n.t("Atendimentos por Categoria")}
+                  {i18n.t("dashboard.messages.category.title")}
               </Typography>
             </Grid>}
           { categoryCount && categoryCount.map((category) => (

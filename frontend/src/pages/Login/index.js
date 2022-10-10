@@ -81,7 +81,7 @@ const Login = () => {
             required
             fullWidth
             id="company"
-            label={i18n.t("Empresa")}
+            label={i18n.t("login.form.company")}
             name="company"
             value={user.company}
             onChange={handleChangeInput}

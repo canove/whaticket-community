@@ -1,38 +1,25 @@
 const messages = {
   en: {
     translations: {
-      signup: {
-        title: "Sign up",
-        toasts: {
-          success: "User created successfully! Please login!",
-          fail: "Error creating user. Check the reported data.",
-        },
-        form: {
-          name: "Name",
-          email: "Email",
-          password: "Password",
-        },
-        buttons: {
-          submit: "Register",
-          login: "Already have an account? Log in!",
-        },
-      },
+
       login: {
         title: "Login",
         form: {
+          company: "Company",
           email: "Email",
           password: "Password",
         },
         buttons: {
           submit: "Enter",
-          register: "Don't have an account? Register!",
         },
       },
+
       auth: {
         toasts: {
           success: "Login successfully!",
         },
       },
+
       dashboard: {
       title: "Dashboard",
       file: "File",
@@ -67,9 +54,13 @@ const messages = {
           },
           mistake: {
             title: "Mistakes"
-          }
-        }
+          },
+          category: {
+            title: "Service by Category",
+          },
+        },
       },
+
       connections: {
         title: "Connections",
         toasts: {
@@ -88,6 +79,8 @@ const messages = {
           qrcode: "QR CODE",
           newQr: "New QR CODE",
           connecting: "Connectiing",
+          previousPage: "Previous Page",
+          nextPage: "Next Page",
         },
         toolTips: {
           disconnected: {
@@ -120,9 +113,13 @@ const messages = {
           limit: "Limit"
         },
       },
+
       officialConnections: {
         title: "Official Connections",
+        previousPage: "Previous Page",
+        nextPage: "Next Page",
       },
+
       officialWhatsappModal: {
         title:{
         add:"Add Official WhatsApp",
@@ -161,10 +158,15 @@ const messages = {
       qrCode: {
         message: "Read QrCode to start the session",
       },
+
       contacts: {
         title: "Contacts",
         toasts: {
           deleted: "Contact deleted sucessfully!",
+          required: "Required!",
+          short: "Too Short!",
+          long: "Too Long!",
+          email: "Invalid Email!"
         },
         searchPlaceholder: "Search ...",
         confirmationModal: {
@@ -185,6 +187,7 @@ const messages = {
           actions: "Actions",
         },
       },
+
       contactModal: {
         title: {
           add: "Add contact",
@@ -207,6 +210,7 @@ const messages = {
         },
         success: "Contact saved successfully.",
       },
+
       quickAnswersModal: {
         title: {
           add: "Add Quick Reply",
@@ -223,6 +227,7 @@ const messages = {
         },
         success: "Quick Reply saved successfully.",
       },
+
       queueModal: {
         title: {
           add: "Add queue",
@@ -232,6 +237,7 @@ const messages = {
           name: "Name",
           color: "Color",
           greetingMessage: "Greeting Message",
+          success: "Queue saved successfully!",
         },
         buttons: {
           okAdd: "Add",
@@ -239,6 +245,7 @@ const messages = {
           cancel: "Cancel",
         },
       },
+
       userModal: {
         title: {
           add: "Add user",
@@ -263,17 +270,21 @@ const messages = {
         },
         success: "User saved successfully.",
       },
+
       chat: {
         noTicketMessage: "Select a ticket to start chatting.",
       },
+
       ticketsManager: {
         buttons: {
           newTicket: "New",
         },
       },
+
       ticketsQueueSelect: {
         placeholder: "Queues",
       },
+
       tickets: {
         toasts: {
           deleted: "The ticket you were on has been deleted.",
@@ -293,6 +304,7 @@ const messages = {
           showAll: "All",
         },
       },
+
       transferTicketModal: {
         title: "Transfer Ticket",
         fieldLabel: "Type to search for users",
@@ -304,6 +316,7 @@ const messages = {
           cancel: "Cancel",
         },
       },
+
       ticketsList: {
         pendingHeader: "Queue",
         assignedHeader: "Working on",
@@ -313,6 +326,7 @@ const messages = {
           accept: "Accept",
         },
       },
+
       newTicketModal: {
         title: "Create Ticket",
         fieldLabel: "Type to search for a contact",
@@ -322,6 +336,7 @@ const messages = {
           cancel: "Cancel",
         },
       },
+
       mainDrawer: {
         listItems: {
           dashboard: "Dashboard",
@@ -351,7 +366,7 @@ const messages = {
           finance: "Finance",
           products: "Products",
           pricing: "Pricing",
-          payment: "Payment",
+          payments: "Payments",
           flows: "Flows",
         },
         whatsApp: {
@@ -367,9 +382,11 @@ const messages = {
           },
         },
       },
+
       notifications: {
         noTickets: "No notifications.",
       },
+
       queues: {
         title: "Queues",
         table: {
@@ -387,9 +404,11 @@ const messages = {
             "Are you sure? It cannot be reverted! Tickets in this queue will still exist, but will not have any queues assigned.",
         },
       },
+
       queueSelect: {
         inputLabel: "Queues",
       },
+
       quickAnswers: {
         title: "Quick Answers",
         table: {
@@ -409,15 +428,26 @@ const messages = {
           deleteMessage: "This action cannot be undone.",
         },
       },
+
       importation: {
         title: "File Import",
         form: {
           status: "Status",
           date: "Date",
+          awaitingImport: "Awaiting Import",
+          processing: "Processing",
+          waitingForApproval: "Waitiing Approval",
+          error: "Error",
+          aproved: "Aproved",
+          shooting: "Shooting",
+          finished: "Finished",
+          refused: "Refused",
         },
         buttons: {
           import: "Import",
           filter: "Filter",
+          previousPage: "Previous Page",
+          nextPage: "Next Page",
         },
         table: {
           uploadDate: "Upload Date",
@@ -441,6 +471,7 @@ const messages = {
           approve: "To Approve",
         },
       },
+
       importModal: {
         title: "Import",
         buttons: {
@@ -455,12 +486,30 @@ const messages = {
           official: "Official",
           notOfficial: "Not Official",
           supportedTriggerModel: "Supported Trigger Model",
-          connection:"Connection",
+          connection:"Connections",
           selectAConnection: "Select A Connetion",
           show: "Show",
           toHide: "To Hide",
+          all: "All",
+          template: "Template",
+          none: "None",
+        },
+        confirmation: {
+          errors: "Please select one or more connections and a trigger file.",
+          errorConnection: "Please select one or more connections.",
+          errorShots: "Please select a trigger file.",
+        },
+        model:{
+          line1: "NAME;CPF/CNPJ;PHONE;TEMPLATE_WHATS;PARAMETROS_TEMPLATE;TEXT_MESSAGE",
+          line2: "- OPTIONAL FIELDS (IF MESSAGE_TEXT FILLED IN)",
+          line3: "TEMPLATE_WHATS",
+          line4: "PARAMETERS_TEMPLATE",
+          line5: "- OPTIONAL FIELDS (IF TEMPLATE_WHATS FILLED IN)",
+          line6: "TEXT_MESSAGE",
+          line7: "PARAMETERS_TEMPLATE",
         },
       },
+
       users: {
         title: "Users",
         table: {
@@ -468,6 +517,7 @@ const messages = {
           email: "Email",
           profile: "Profile",
           actions: "Actions",
+          companyName: "Company Name",
         },
         buttons: {
           add: "Add user",
@@ -481,6 +531,7 @@ const messages = {
             "All user data will be lost. Users' open tickets will be moved to queue.",
         },
       },
+
       settings: {
         success: "Settings saved successfully.",
         title: "Settings",
@@ -494,6 +545,7 @@ const messages = {
           },
         },
       },
+
       reports: {
         title: "Reports",
         buttons: {
@@ -506,17 +558,36 @@ const messages = {
           user: "User",
         },
         table: {
-          messageId: "Message ID",
-          messageBody: "Message Body",
+          messageId: "Message Id",
+          messageBody: "Body Message",
           read: "Read",
           mediaURL: "Media URL",
-          ticketId: "Ticket ID",
+          ticketId: "Ticket Id",
           date: "Date",
-        }
+        },
+        errors:{
+          toastErr: "Fill in all Fields!"
+        },
       },
+
       reportsTicket: {
         title: "Reports Ticket",
+        buttons: {
+          ticketId: "Ticket Id",
+          filterReports: "Filter Reports",
+          exportPdf: "Export Pdf",
+        },
+        grid: {
+          messageId: "Message Id",
+          bodyText: "Body Text",
+          read: "Read",
+          ticketId: "Ticket Id",
+        },
+        errors: {
+          toastErr: "Select a Call!"
+        },
       },
+
       messagesList: {
         header: {
           assignedTo: "Assigned to:",
@@ -599,7 +670,11 @@ const messages = {
           success: "Template created successfully!",
           connectionFailed: "Please select a connection!",
           delete: "Template successfully deleted!",
-          toastErr: "Parameter limit exceeded!"
+          toastErr: "Parameter limit exceeded!",
+          selectVar: "Select a Variable",
+          document: "Document",
+          phoneNumber: "Phone Number",
+          ok: "OK",
         },
       },
 
@@ -618,15 +693,17 @@ const messages = {
           createPdf: "Create Pdf",
           exportPdf:  "Export Pdf",
           previous: "Previous",
-          next: "Next",
-          page: "Page: ",
+          exportCsv: "Export Csv",
+          previousPage: "Previous Page",
+          nextPage: "Next Page",
         },
         grid:{
           name: "Name",
           sent: "Sent",
           delivered: "Delivered",
           read: "Read",
-          errors: "Errors"
+          errors: "Errors",
+          status: "Status",
         },
       },
 
@@ -635,6 +712,29 @@ const messages = {
         triggerTime: "Trigger Time Between Instances",
         connections: "Connections",
         all: "All",
+        disconnected: "Disconnected Connections:",
+        delete: "Some Connections Have Been Deleted...",
+        salutation: "Use greeting message?",
+        modal: {
+          salutation: "Greeting message",
+          actions: "Actions",
+          edit: "Edited",
+          delete: "Delete",
+          create: "Create",
+          edited: "Edit Greeting Message",
+          createdAt: "Create Greeting Message",
+        },
+        buttons: {
+          save: "Save",
+          activConfig: "Enable Configuration",
+          created: "Create Message",
+        },
+        confirmation: {
+          updated: "Configuration changed successfully!",
+          saved: "Configuration saved successfully!",
+          title: "Delete Message",
+          confirmDelete: "Are you sure you want to delete this greeting message?",
+        },
       },
 
       historicTicket:{
@@ -656,6 +756,7 @@ const messages = {
         search: "Search",
           grid:{
           companyId: "Company Id",
+          alias: "Alias",
           name: "Name",
           cnpj: "CNPJ",
           phone: "Phone",
@@ -669,16 +770,41 @@ const messages = {
           companyModal: {
             titleAdd: "Add Company",
             titleEdit: "Edit Company Registration",
+            alias: "Alias",
             name: "Company Name",
             cnpj: "CNPJ",
             phone: "Phone",
             email: "Email",
-            address: "Address"
+            address: "Address",
+            required: "Required!",
+            invalidEmail: "Invalid email!",
+            image: "Size exceeds the maximum value of 1 Megabyte.",
+            upload: "Upload Logo",
+            logo: "No Logo"
           },
           success: "Company registered successfully!",
+          deleteTitle: "Delete Company, ",
           deleteCompany: "All registered company data will be lost, do you really want to delete, ",
-          toast: "Company successfully deleted!"
-          },
+          toast: "Company successfully deleted!",
+          update: "Company successfully updated!",
+          createdAt: "Company successfully created!",
+          edited: "Service edited successfully!",
+          create: "Service created successfully!",
+        firebase: {
+          yes: "Yes",
+          no: "No",
+          title: "Add a service:",
+          cancel: "Cancel",
+          ok: "OK",
+          config: "Firebase Settings",
+          companyId: "Company Id",
+          connected: "Connected",
+          isFull: "Is Full",
+          service: "Service",
+          edit: "Edit",
+          add: "Add Service"
+        },
+      },
 
         menu:{
             title: "Menus",
@@ -747,8 +873,230 @@ const messages = {
           deleteMsg: "Are you sure you want to delete the category?",
           editMsg: "Category edited successfully!",
           addMsg: "Category added successfully!",
-
         },
+      },
+
+      flows: {
+        title: "Flows",
+        buttons:{
+          create: "Create",
+          search: "Search"
+        },
+        grid:{
+          name: "Name",
+          status: "Status",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+          actions: "Actions",
+        },
+        flowsModal:{
+          add: "Create Flow",
+          edit: "Edit Flow",
+          name: "Name",
+          cancel: "Cancel",
+          create: "Create",
+          save: "Save",
+        },
+        confirmation:{
+          title: "Delete Flow",
+          create: "Flow Created Successfully!",
+          edit: "Flow Edited Successfully!",
+          duplicate: "Successfully Duplicated Flow!",
+          delete: "Flow deleted successfully!",
+          confirmDelete: "Are you sure you want to delete this stream?",
+        },
+      },
+
+      integratedImport: {
+        title: "Integrated Import",
+        buttons:{
+          createdImport: "Create Import"
+        },
+        grid:{
+          createdAt: "Create At",
+          name: "Name",
+          method: "Method",
+          registers: "Registration Amount",
+          status: "Status",
+          actions: "Actions"
+        },
+        integratedModal:{
+          add: "Create Import",
+          edited: "Edit Import",
+          name: "Name",
+          method: "Method",
+          url: "URL",
+          autentication: "Autentication",
+          key: "Key",
+          token: "Token",
+          autentic: "Authenticate",
+          in: "In",
+          for: "For",
+          cancel: "Cancel",
+          save: "Save",
+          edit: "Edit",
+        },
+        confirmation: {
+          createAt: "Import successfully added!",
+          updatedAt: "Import edited successfully!",
+          delete: "Import deleted successfully!",
+          confirmDelete: "All data from import will be lost, do you really want to delete?",
+          title: "Delete Import",
+        },
+        status: {
+          awaitingImport: "Waiting for Import",
+          processing: "Processing",
+          awaitingApprove: "Waiting for approval",
+          err: "Error",
+          approve: "Aprove",
+          shooting: "Shooting",
+          finished: "Finished",
+          refused: "Refused",
+        },
+      },
+
+      payments: {
+        title: "Payments",
+        grid: {
+          company: "Company",
+          month: "Month",
+          shotsValue: "Shots Value",
+          monthValue: "Month Value",
+          amounth: "Amounth",
+          amounthPaind: "Amounth Paind",
+          actions: "Actions"
+        },
+        modal:{
+          title: "Price history",
+          date: "Date",
+          value: "Value",
+          shots: "Shots",
+          freeShots: "Free Shots",
+          closed: "Closed",
+        },
+      },
+
+      pricing: {
+        title: "Pricing",
+        buttons: {
+          create: "Create",
+        },
+        grid: {
+          company: "Company",
+          registeredProduct: "Registered Product",
+          status: "Status",
+          gracePeriod: "Grace Period (days)",
+          lackOfShots: "Lack of Shots",
+          customerSince: "Customer Since",
+          actions: "Actions",
+          active: "Active",
+          inactive: "Inactive",
+          defaulter: "Dafauter",
+          blocked: "Blocked",
+        },
+        pricingModal: {
+          created: "Create",
+          edited: "Edit",
+          company: "Company",
+          product: "Product",
+          graceDays: "Grace (days)",
+          lackOfShots: "Lack of Shots",
+          cancel: "Cancel",
+          save: "Save",
+          historic: "Historic",
+          closed: "Closed",
+          createdAt: "Created",
+          updatedAt: "Updated",
+          deletedAt: "Deleted",
+          by: " by ",
+          update: "Updated: ",
+          current: "Current: ",
+        },
+        confirmation:{
+          title: "Delete Pricing",
+          delete: "Pricing Deleted Successfully!",
+          confirmDelete: "Do you really want to delete this pricing?",
+          create: "Pricing created successfully!",
+          edit: "Successfully edited pricing!",
+          titleEdit: "Edit Pricing",
+          confirmEdit: "Are you sure you will edit the pricing?",
+        },
+      },
+
+      product:{
+        title: "Products",
+        buttons:{
+          created: "Created",
+        },
+        grid: {
+          productName: "Product Name",
+          monthValue: "Month Value",
+          tripCostValue: "Trigger Fee",
+          monthlyInterestRate: "Monthly Interest Rate",
+          penaltyMount: "Penalty Mount",
+          actions: "Actions",
+        },
+        productModal: {
+          productName: "Product Name",
+          monthValue: "Month Value",
+          shotsValue: "Shots Value",
+          interestRate: "Interest Rate",
+          penaltyMount: "Penalty Mount",
+          cancel: "Cancel",
+          created: "Created",
+          edited: "Edited",
+          save: "Save",
+        },
+        confirmation: {
+          delete: "Product deleted successfully!",
+          title: "Delete Product",
+          confirmDelete: "All product data will be lost, do you really want to delete?",
+          edited: "Product updated successfully!",
+          created: "Product added successfully!",
+        },
+      },
+
+      registration: {
+        title: "Registration",
+        buttons: {
+          new: "New Menu",
+          search: "Search",
+        },
+        grid: {
+          icon: "Icon",
+          name: "Name",
+          main: "Main",
+          relation: "Relation",
+          createdAt: "Created At",
+          actions: "Actions",
+        },
+        registrationModal: {
+          add: "Add",
+          edit: "Edit",
+          name: "Name",
+          icon: "Icon",
+          main: "Main",
+          relation: "Relation",
+          cancel: "Cancel",
+          created: "Create",
+          save: "Save",
+          yes: "Yes",
+          no: "No",
+          none: "None",
+        },
+        confirmation: {
+          delete: "Record deleted successfully!",
+          title: "Delete Registration",
+          confirmDelete: "All registration data will be lost, do you really want to delete it?",
+          update: "Menu updated successfully!",
+          created: "Menu created successfully!",
+        },
+      },
+
+      locationPreview: {
+        toView: "To View",
+        download: "Download",
+        hello: "Say hello to your new contact!!"
       },
 
       backendErrors: {

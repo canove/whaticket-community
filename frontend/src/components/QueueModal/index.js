@@ -53,15 +53,6 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QueueSchema = Yup.object().shape({
-	name: Yup.string()
-		.min(2, "Too Short!")
-		.max(50, "Too Long!")
-		.required("Required"),
-	color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
-	greetingMessage: Yup.string(),
-});
-
 const QueueModal = ({ open, onClose, queueId }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -71,6 +62,15 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		color: "",
 		greetingMessage: "",
 	};
+
+	const QueueSchema = Yup.object().shape({
+		name: Yup.string()
+			.min(2, "Too Short!")
+			.max(50, "Too Long!")
+			.required("Required"),
+		color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
+		greetingMessage: Yup.string(),
+	});
 
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
@@ -110,7 +110,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 			} else {
 				await api.post("/queue", values);
 			}
-			toast.success("Queue saved successfully");
+			toast.success(i18n.t("queueModal.form.success"));
 			handleClose();
 		} catch (err) {
 			toastError(err);

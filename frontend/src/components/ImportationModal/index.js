@@ -142,10 +142,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 		 try {
             if (integratedImportId) {
                 await api.put(`/integratedImport/${integratedImportId}`, importData);
-                toast.success("Importação editado com sucesso!");
+                toast.success(i18n.t("integratedImport.confirmation.updatedAt"));
             } else {
                 await api.post("/integratedImport/", importData);
-                toast.success("Importação adicionado com sucesso!");
+                toast.success(i18n.t("integratedImport.confirmation.createdAt"));
             }
             } catch (err) {
                 toastError(err);
@@ -163,7 +163,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 				scroll="paper"
 			>
 				<DialogTitle id="form-dialog-title">
-					{ integratedImportId ? 'Editar' : 'Criar' }
+					{ integratedImportId
+                     ? `${i18n.t("integratedImport.integratedModal.edited")}`
+                     : `${i18n.t("integratedImport.integratedModal.add")}`
+                    }
 				</DialogTitle>
 				<DialogContent dividers>
 				<div className={classes.multFieldLine}>
@@ -172,7 +175,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     name="name"
                     variant="outlined"
                     margin="normal"
-                    label={i18n.t("Nome")}
+                    label={i18n.t("integratedImport.integratedModal.name")}
                     fullWidth
 					value={name}
 					onChange={handleNameChange}
@@ -184,9 +187,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                         margin="normal"
                         fullWidth
                     >
-                    <InputLabel id="method-selection-label">Método</InputLabel>
+                    <InputLabel id="method-selection-label">
+                        {i18n.t("integratedImport.integratedModal.method")}
+                    </InputLabel>
                     <Select
-                        label="Empresa"
                         name="method"
                         labelId="method-selection-label"
                         id="method-selection"
@@ -204,14 +208,14 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     name="url"
                     variant="outlined"
                     margin="normal"
-                    label={i18n.t("URL")}
+                    label={i18n.t("integratedImport.integratedModal.url")}
                     fullWidth
 					value={url}
 					onChange={handleUrlChange}
                   />
                 </div>
                <Typography variant="subtitle1" gutterBottom>
-					{i18n.t('Autenticação')}:
+					{i18n.t("integratedImport.integratedModal.autentication")}:
 				</Typography>
                 <div className={classes.multFieldLine}>
                   <TextField
@@ -219,7 +223,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     name="key"
                     variant="outlined"
                     margin="normal"
-                    label={i18n.t("Key")}
+                    label={i18n.t("integratedImport.integratedModal.key")}
                     value={key}
 					onChange={handleKeyChange}
                     fullWidth
@@ -229,19 +233,19 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                     name="token"
                     variant="outlined"
                     margin="normal"
-                    label={i18n.t("Token")}
+                    label={i18n.t("integratedImport.integratedModal.token")}
                     value={token}
 					onChange={handleTokenChange}
                     fullWidth
                   />
                 </div>
                 <Button onClick={handleAuthenticate} color="primary" variant="contained">
-                    Autenticar
+                    {i18n.t("integratedImport.integratedModal.autentic")}
                 </Button>
                  <div className={classes.multFieldLine}>
                   <TextField
                     as={TextField}
-                    label={i18n.t("De")}
+                    label={i18n.t("integratedImport.integratedModal.in")}
                     type="bodyText"
                     onChange={(e) => {
                       handleChangeBodyDe(e);
@@ -257,7 +261,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                   />
                     <TextField
                     as={TextField}
-                    label={i18n.t("Para")}
+                    label={i18n.t("integratedImport.integratedModal.for")}
                     type="bodyText"
                     onChange={(e) => {
                       handleChangeBodyPara(e);
@@ -279,14 +283,17 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Cancelar
+						{i18n.t("integratedImport.integratedModal.cancel")}
 					</Button>
 					<Button
                         onClick={handleSubmit}
 						color="primary"
 						variant="contained"
 					>
-						{ integratedImportId ? 'Editar' : 'Salvar' }
+						{ integratedImportId
+                         ? `${i18n.t("integratedImport.integratedModal.edit")}`
+                         : `${i18n.t("integratedImport.integratedModal.save")}`
+                        }
 					</Button>
 				</DialogActions>
 			</Dialog>

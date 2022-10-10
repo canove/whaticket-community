@@ -219,7 +219,7 @@ const Registration = () => {
   const handleDeleteMenu = async () => {
     try {
       await api.delete(`/menus/${deletingMenu.id}`);
-      toast.success(i18n.t("Cadastro excluído com sucesso!"));
+      toast.success(i18n.t("registration.confirmation.delete"));
     } catch (err) {
       toastError(err);
       }
@@ -324,10 +324,10 @@ const getParent = (id) => {
 
 const getIsParent = (isParent) => {
   if (isParent === true) {
-    return "Sim";
+    return `${i18n.t("registration.registrationModal.yes")}`;
   }
   if (isParent === false) {
-    return "Não";
+    return `${i18n.t("registration.registrationModal.no")}`;
   }
   return isParent;
 }
@@ -344,19 +344,20 @@ const getIsParent = (isParent) => {
         <ConfirmationModal
             title={
             deletingMenu &&
-            `${i18n.t("Todos os dados do cadastro se perderão, deseja realmente excluir?")}`}
+            `${i18n.t("registration.confirmation.title")}`}
             open={confirmModalOpen}
             onClose={setConfirmModalOpen}
             onConfirm={() => handleDeleteMenu(deletingMenu.id)}
         >
+          {i18n.t("registration.confirmation.confirmDelete")}
       </ConfirmationModal>
       <MainHeader>
         <div className={classes.titleStyle}>
-          <Title>{i18n.t("Cadastro")}</Title>
+          <Title>{i18n.t("registration.title")}</Title>
         </div>
         <MainHeaderButtonsWrapper>
           <TextField
-            placeholder={i18n.t("Pesquisar")}
+            placeholder={i18n.t("registration.buttons.search")}
             type="search"
             value={searchParam}
             onChange={handleSearch}
@@ -373,7 +374,7 @@ const getIsParent = (isParent) => {
                 color="primary"
                 onClick={handleRegistrationModal}
            >
-            {i18n.t("Novo Menu")}
+            {i18n.t("registration.buttons.new")}
           </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -385,12 +386,12 @@ const getIsParent = (isParent) => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{i18n.t("Ícone")}</TableCell>
-              <TableCell align="center">{i18n.t("Nome")}</TableCell>
-              <TableCell align="center">{i18n.t("Principal")}</TableCell>
-              <TableCell align="center">{i18n.t("Relação")}</TableCell>
-              <TableCell align="center">{i18n.t("Data Criação")}</TableCell>
-              <TableCell align="center">{i18n.t("Ações")}</TableCell>
+              <TableCell align="center">{i18n.t("registration.grid.icon")}</TableCell>
+              <TableCell align="center">{i18n.t("registration.grid.name")}</TableCell>
+              <TableCell align="center">{i18n.t("registration.grid.main")}</TableCell>
+              <TableCell align="center">{i18n.t("registration.grid.relation")}</TableCell>
+              <TableCell align="center">{i18n.t("registration.grid.createdAt")}</TableCell>
+              <TableCell align="center">{i18n.t("registration.grid.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

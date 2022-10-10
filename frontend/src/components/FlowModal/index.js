@@ -88,10 +88,10 @@ const FlowModal = ({ open, onClose, flowId }) => {
       try {
         if (flowId) {
           await api.put(`/flows/${flowId}`, flowData);
-          toast.success("Fluxo Editado com Sucesso");
+          toast.success(i18n.t("flows.confirmation.edit"));
         } else {
           await api.post(`/flows/`, flowData);
-          toast.success("Fluxo Criado com Sucesso");
+          toast.success(i18n.t("flows.confirmation.create"));
         }
       } catch (err) {
         toastError(err);
@@ -109,13 +109,16 @@ const FlowModal = ({ open, onClose, flowId }) => {
           scroll="paper"
         >
           <DialogTitle id="form-dialog-title">
-            { flowId ? "Editar Fluxo" : "Criar Fluxo" }
+            { flowId
+              ? `${i18n.t("flows.flowsModal.edit")}`
+              : `${i18n.t("flows.flowsModal.add")}`
+            }
           </DialogTitle>
               <DialogContent dividers>
                 <div className={classes.multFieldLine}>
                   <TextField
                     as={TextField}
-                    label={i18n.t("category.categoryModal.name")}
+                    label={i18n.t("flows.flowsModal.name")}
                     autoFocus
                     value={name}
                     name="name"
@@ -132,7 +135,7 @@ const FlowModal = ({ open, onClose, flowId }) => {
                   color="secondary"
                   variant="outlined"
                 >
-                  Cancelar
+                  {i18n.t("flows.flowsModal.cancel")}
                 </Button>
                 <Button
                   type="submit"
@@ -141,7 +144,9 @@ const FlowModal = ({ open, onClose, flowId }) => {
                   className={classes.btnWrapper}
                   onClick={handleSubmit}
                 >
-                   { flowId ? "Salvar" : "Criar" }
+                   { flowId
+                    ? `${i18n.t("flows.flowsModal.save")}`
+                    : `${i18n.t("flows.flowsModal.create")}`}
                 </Button>
               </DialogActions>
           </Dialog>

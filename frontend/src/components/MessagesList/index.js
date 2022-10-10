@@ -31,6 +31,7 @@ import whatsBackground from "../../assets/wa-background.png";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles((theme) => ({
   messagesListWrapper: {
@@ -499,7 +500,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
               target="_blank"
               href={message.mediaUrl}
             >
-              Download
+             {i18n.t("locationPreview.download")}
             </Button>
           </div>
           <Divider />
@@ -683,7 +684,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
       });
       return viewMessagesList;
     } else {
-      return <div>Say hello to your new contact!</div>;
+      return <div>{i18n.t("locationPreview.hello")}</div>;
     }
   };
 
