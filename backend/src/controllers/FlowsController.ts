@@ -10,11 +10,14 @@ import UpdateFlowService from "../services/FlowService/UpdateFlowService";
 interface FlowsData {
   name: string;
   status: string;
+  projectId: string;
+  agentId: string;
+  location: string;
 }
 
 type IndexQuery = {
   searchParam: string;
-}
+};
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
@@ -28,12 +31,15 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
-  const { name, status }: FlowsData = req.body;
+  const { name, status, projectId, agentId, location }: FlowsData = req.body;
 
   const flow = await CreateFlowService({
     name,
     status,
-    companyId
+    companyId,
+    projectId,
+    agentId,
+    location
   });
 
   const io = getIO();

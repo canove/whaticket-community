@@ -4,6 +4,9 @@ import ShowFlowService from "./ShowFlowService";
 interface FlowsData {
   name: string;
   status: string;
+  projectId: string;
+  agentId: string;
+  location: string;
 }
 
 interface Request {
@@ -19,11 +22,14 @@ const UpdateFlowService = async ({
 }: Request): Promise<Flows> => {
   const flow = await ShowFlowService(flowId, companyId);
 
-  const { name, status } = flowData;
+  const { name, status, projectId, agentId, location } = flowData;
 
   await flow.update({
     name,
-    status
+    status,
+    projectId,
+    agentId,
+    location
   });
 
   flow.reload();

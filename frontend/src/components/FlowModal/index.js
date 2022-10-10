@@ -9,6 +9,10 @@ import {
   Button,
   DialogActions,
   TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -50,18 +54,32 @@ const useStyles = makeStyles((theme) => ({
 		},
 		alignItems: "center",
 	},
+
+  selectStyle: {
+    display: "flex",
+    alignItems: "center",
+  }
 }));
 
 const FlowModal = ({ open, onClose, flowId }) => {
     const { i18n } = useTranslation();
     const classes = useStyles();
+
     const [name, setName] = useState("");
+    const [status, setStatus] = useState("active");
+    const [projectId, setProjectId] = useState("");
+    const [agentId, setAgentId] = useState("");
+    const [location, setLocation] = useState("");
 
     useEffect(() => {
       const fetchFlow = async () => {
         try {
           const { data } = await api.get(`/flows/${flowId}`);
             setName(data.name)
+            setStatus(data.status);
+            setProjectId(data.projectId);
+            setAgentId(data.agentId);
+            setLocation(data.location);
         } catch (err) {
           toastError(err);
         }
@@ -73,16 +91,40 @@ const FlowModal = ({ open, onClose, flowId }) => {
 
     const handleClose = () => {
       setName("");
+      setStatus("active");
+      setProjectId("");
+      setAgentId("");
+      setLocation("");
       onClose();
     };
 
-    const handleChangeName = (e) => {
+    const handleNameChange = (e) => {
       setName(e.target.value);
+    };
+
+    const handleStatusChange = (e) => {
+      setStatus(e.target.value);
+    }
+
+    const handleProjectIdChange = (e) => {
+      setProjectId(e.target.value);
+    };
+
+    const handleAgentIdChange = (e) => {
+      setAgentId(e.target.value);
+    };
+
+    const handleLocationChange = (e) => {
+      setLocation(e.target.value);
     };
 
     const handleSubmit = async () => {
       const flowData = {
           name: name,
+          status: status,
+          projectId: projectId,
+          agentId: agentId,
+          location: location
       };
 
       try {
@@ -122,7 +164,66 @@ const FlowModal = ({ open, onClose, flowId }) => {
                     autoFocus
                     value={name}
                     name="name"
-                    onChange={(e) => { handleChangeName(e) }}
+                    onChange={(e) => { handleNameChange(e) }}
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                  />
+                </div>
+                <div className={classes.selectStyle}>
+                    <FormControl
+                      variant="outlined"
+                      margin="normal"
+                      fullWidth
+                    >
+                      <InputLabel id="status-select-label">
+                        Status
+                      </InputLabel>
+                      <Select
+                        labelId="status-select-label"
+                        id="status-select"
+                        value={status}
+                        label="Status"
+                        onChange={handleStatusChange}
+                        style={{width: "100%"}}
+                        variant="outlined"
+                      >
+                        <MenuItem value={"active"}>Ativo</MenuItem>
+                        <MenuItem value={"inactive"}>Inativo</MenuItem>
+                      </Select>
+                  </FormControl>
+                </div>
+                <div className={classes.multFieldLine}>
+                  <TextField
+                    as={TextField}
+                    label="ID do Projeto"
+                    value={projectId}
+                    name="projectId"
+                    onChange={(e) => { handleProjectIdChange(e) }}
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                  />
+                </div>
+                <div className={classes.multFieldLine}>
+                  <TextField
+                    as={TextField}
+                    label="ID do Agente"
+                    value={agentId}
+                    name="agentId"
+                    onChange={(e) => { handleAgentIdChange(e) }}
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                  />
+                </div>
+                <div className={classes.multFieldLine}>
+                  <TextField
+                    as={TextField}
+                    label="Local"
+                    value={location}
+                    name="location"
+                    onChange={(e) => { handleLocationChange(e) }}
                     variant="outlined"
                     margin="dense"
                     fullWidth
