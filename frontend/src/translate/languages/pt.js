@@ -154,6 +154,9 @@ const messages = {
           cancel: "Cancelar",
         },
         success: "WhatsApp salvo com sucesso.",
+        required: "Campo Obrigatório!",
+        short: "Muito Curto!",
+        long: "Muito Longo!",
       },
 
       qrCode: {
@@ -212,41 +215,6 @@ const messages = {
         success: "Contato salvo com sucesso.",
       },
 
-      quickAnswersModal: {
-        title: {
-          add: "Adicionar Resposta Rápida",
-          edit: "Editar Resposta Rápida",
-        },
-        form: {
-          shortcut: "Atalho",
-          message: "Resposta Rápida",
-        },
-        buttons: {
-          okAdd: "Adicionar",
-          okEdit: "Salvar",
-          cancel: "Cancelar",
-        },
-        success: "Resposta Rápida salva com sucesso.",
-      },
-
-      queueModal: {
-        title: {
-          add: "Adicionar fila",
-          edit: "Editar fila",
-        },
-        form: {
-          name: "Nome",
-          color: "Cor",
-          greetingMessage: "Mensagem de saudação",
-          success: "Fila salva com sucesso!",
-        },
-        buttons: {
-          okAdd: "Adicionar",
-          okEdit: "Salvar",
-          cancel: "Cancelar",
-        },
-      },
-
       userModal: {
         title: {
           add: "Adicionar usuário",
@@ -258,6 +226,9 @@ const messages = {
           password: "Senha",
           profile: "Perfil",
           language: "Linguagem",
+          user: "Usuário",
+          admin: "Admin",
+          company: "Empresa",
           languages: {
             pt: "Português",
             en: "Inglês",
@@ -270,6 +241,10 @@ const messages = {
           cancel: "Cancelar",
         },
         success: "Usuário salvo com sucesso.",
+        required: "Campo Obrigatório!",
+        short: "Muito Curto!",
+        long: "Muito Longo!",
+        email: "Email Inválido!",
       },
 
       chat: {
@@ -289,6 +264,7 @@ const messages = {
       tickets: {
         toasts: {
           deleted: "A chamada que você estava foi deletado.",
+          confirmDelete: "Chamada excluida com sucesso!"
         },
         notification: {
           message: "Mensagem de",
@@ -401,9 +377,32 @@ const messages = {
           add: "Adicionar fila",
         },
         confirmationModal: {
-          deleteTitle: "Excluir",
+          deleteTitle: "Excluir ",
           deleteMessage:
             "Você tem certeza? Essa ação não pode ser revertida! As chamadas dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+          delete: "Fila excluida com Sucesso!"
+        },
+      },
+
+      queueModal: {
+        title: {
+          add: "Adicionar fila",
+          edit: "Editar fila",
+        },
+        form: {
+          name: "Nome",
+          color: "Cor",
+          greetingMessage: "Mensagem de saudação",
+          success: "Fila adicionada com Sucesso!",
+          edited: "Fila atualizada com Sucesso!",
+          required: "Campo Obrigatório!",
+          short: "Muito Curto!",
+          long: "Muito Longo!",
+        },
+        buttons: {
+          okAdd: "Adicionar",
+          okEdit: "Salvar",
+          cancel: "Cancelar",
         },
       },
 
@@ -430,6 +429,29 @@ const messages = {
             "Você tem certeza que quer excluir esta Resposta Rápida: ",
           deleteMessage: "Esta ação não pode ser revertida.",
         },
+        yup: {
+          required: "Campo Obrigatório!",
+          short: "Muito Curto!",
+          long: "Muito Longo!",
+        },
+      },
+
+      quickAnswersModal: {
+        title: {
+          add: "Adicionar Resposta Rápida",
+          edit: "Editar Resposta Rápida",
+        },
+        form: {
+          shortcut: "Atalho",
+          message: "Resposta Rápida",
+        },
+        buttons: {
+          okAdd: "Adicionar",
+          okEdit: "Salvar",
+          cancel: "Cancelar",
+        },
+        success: "Resposta Rápida salva com sucesso.",
+        edited: "Resposta rápida atualizada com sucesso!"
       },
 
       importation: {
@@ -472,6 +494,8 @@ const messages = {
           cancel: "Cancelar",
           refuse: "Recusar",
           approve: "Aprovar",
+          previousPage: "Página Anterior",
+          nextPage: "Próxima Página"
         },
       },
 
@@ -848,9 +872,10 @@ const messages = {
           title: "Deletar Template",
           delete: "Deseja realmente excluir, todos os dados da Template serão perdidos!",
           successDelete: "Template Deletada com Sucesso!",
-          successAdd: "Template Adicionada com sucesso!",
+          successAdd: "Template Adicionada com Sucesso!",
           exceeded: "Limite de Parâmetros Excedido!",
-          videoExceeded: "Tamanho do vídeo excede o valor máximo de 10 Megabyte."
+          videoExceeded: "Tamanho do vídeo excede o valor máximo de 10 Megabyte.",
+          edited: "Template atualizada com Sucesso!",
 
         },
         modal: {
@@ -900,6 +925,8 @@ const messages = {
           cancel: "Cancelar",
           name: "Nome",
           description: "Descrição",
+          select: "Selecione uma Descrição",
+          none: "Nenhuma",
         },
         confirmation: {
           delete: "Categoria excluida com sucesso!",
@@ -1131,6 +1158,10 @@ const messages = {
         toView: "Visualizar",
         download: "Baixar",
         hello: "Diga olá ao seu novo contato!"
+      },
+
+      vcardPreview: {
+        toTalk: "Conversar",
       },
 
       backendErrors: {

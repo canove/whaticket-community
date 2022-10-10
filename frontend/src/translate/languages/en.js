@@ -154,7 +154,11 @@ const messages = {
           cancel: "Cancel",
         },
         success: "WhatsApp saved successfully.",
+        required: "Required!",
+        short: "Too short!",
+        long: "Too Long!",
       },
+
       qrCode: {
         message: "Read QrCode to start the session",
       },
@@ -211,41 +215,6 @@ const messages = {
         success: "Contact saved successfully.",
       },
 
-      quickAnswersModal: {
-        title: {
-          add: "Add Quick Reply",
-          edit: "Edit Quick Answer",
-        },
-        form: {
-          shortcut: "Shortcut",
-          message: "Quick Reply",
-        },
-        buttons: {
-          okAdd: "Add",
-          okEdit: "Save",
-          cancel: "Cancel",
-        },
-        success: "Quick Reply saved successfully.",
-      },
-
-      queueModal: {
-        title: {
-          add: "Add queue",
-          edit: "Edit queue",
-        },
-        form: {
-          name: "Name",
-          color: "Color",
-          greetingMessage: "Greeting Message",
-          success: "Queue saved successfully!",
-        },
-        buttons: {
-          okAdd: "Add",
-          okEdit: "Save",
-          cancel: "Cancel",
-        },
-      },
-
       userModal: {
         title: {
           add: "Add user",
@@ -257,6 +226,9 @@ const messages = {
           password: "Password",
           profile: "Profile",
           language: "Language",
+          user: "User",
+          admin: "Admin",
+          company: "Company",
           languages: {
             pt: "Portuguese",
             en: "English",
@@ -269,6 +241,10 @@ const messages = {
           cancel: "Cancel",
         },
         success: "User saved successfully.",
+        required: "Required!",
+        short: "Too Short!",
+        long: "Too Long!",
+        email: "Invalid Email!",
       },
 
       chat: {
@@ -288,6 +264,7 @@ const messages = {
       tickets: {
         toasts: {
           deleted: "The ticket you were on has been deleted.",
+          confirmDelete: "Ticket deleted successfully!"
         },
         notification: {
           message: "Message from",
@@ -402,6 +379,30 @@ const messages = {
           deleteTitle: "Delete",
           deleteMessage:
             "Are you sure? It cannot be reverted! Tickets in this queue will still exist, but will not have any queues assigned.",
+          delete: "Successfully deleted queue!",
+        },
+      },
+
+      queueModal: {
+        title: {
+          add: "Add queue",
+          edit: "Edit queue",
+          delete: "Successfully deleted queue!",
+        },
+        form: {
+          name: "Name",
+          color: "Color",
+          greetingMessage: "Greeting Message",
+          success: "Successfully added queue!",
+          edited: "Queue Updated Successfully!",
+          required: "Required!",
+          short: "Too short!",
+          long: "Too long!",
+        },
+        buttons: {
+          okAdd: "Add",
+          okEdit: "Save",
+          cancel: "Cancel",
         },
       },
 
@@ -427,6 +428,29 @@ const messages = {
           deleteTitle: "Are you sure you want to delete this Quick Reply: ",
           deleteMessage: "This action cannot be undone.",
         },
+        yup: {
+          required: "Required",
+          short: "Too Short!",
+          long: "Too Long!",
+        },
+      },
+
+      quickAnswersModal: {
+        title: {
+          add: "Add Quick Reply",
+          edit: "Edit Quick Answer",
+        },
+        form: {
+          shortcut: "Shortcut",
+          message: "Quick Reply",
+        },
+        buttons: {
+          okAdd: "Add",
+          okEdit: "Save",
+          cancel: "Cancel",
+        },
+        success: "Quick Reply saved successfully.",
+        edited: "Quick reply successfully updated!",
       },
 
       importation: {
@@ -841,9 +865,39 @@ const messages = {
           buttonEdit: "Edit",
         },
         modalConfirm: {
-          delete: "Really want to delete, all Template data will be lost!",
-          successDelete: "Template Deleted Successfully!",
+          title: "Delete Template",
+          delete: "Do you really want to delete, all Template data will be lost!",
+          successDelete: "Successfully Deleted Template!",
           successAdd: "Template Added Successfully!",
+          exceeded: "Parameter Limit Exceeded!",
+          videoExceeded: "Video size exceeds the maximum value of 10 Megabyte.",
+          edited: "Template Updated Successfully!",
+        },
+        modal: {
+          type: "Type",
+          body: "Body",
+          actions: "Actions",
+          name: "Name",
+          addBody: "Add Body",
+          footer: "Footer",
+          cancel: "Cancel",
+          edited: "Edit",
+          created: "Create",
+          save: "Save",
+          selectVar: "Select a Variable",
+          document: "Document",
+          phoneNumber: "Phone Number",
+          ok: "OK",
+          text: "Text",
+          audio: "Áudio",
+          movie: "Vídeo",
+          image: "Image",
+          contact: "Contact",
+          file: "File",
+          load: "Upload",
+          order: "Order",
+          value: "Value",
+          nameContact: "Contact Name",
         },
       },
 
@@ -866,6 +920,8 @@ const messages = {
           cancel: "Cancel",
           name: "Name",
           description: "Description",
+          select: "Select a Description",
+          none: "None",
         },
         confirmation: {
           delete: "Category deleted successfully!",
@@ -1097,6 +1153,10 @@ const messages = {
         toView: "To View",
         download: "Download",
         hello: "Say hello to your new contact!!"
+      },
+
+      vcardPreview: {
+        toTalk: "To Talk",
       },
 
       backendErrors: {

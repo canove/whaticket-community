@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -17,7 +17,7 @@ import HistoryIcon from '@material-ui/icons/History';
 import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { parseISO, format, getMonth } from "date-fns";
+import { parseISO, format } from "date-fns";
 import BillingHistoricModal from "../../components/BillingHistoricModal";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 

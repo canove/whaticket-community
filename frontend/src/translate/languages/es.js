@@ -155,7 +155,11 @@ const messages = {
           cancel: "Cancelar",
         },
         success: "WhatsApp guardado satisfactoriamente.",
+        required: "¡Campo obligatorio!",
+        short: "¡Muy corto!",
+        long: "¡Muy largo!",
       },
+
       qrCode: {
         message: "Lée el código QR para empezar la sesión.",
       },
@@ -213,41 +217,6 @@ const messages = {
         success: "Contacto guardado satisfactoriamente.",
       },
 
-      quickAnswersModal: {
-        title: {
-          add: "Agregar respuesta rápida",
-          edit: "Editar respuesta rápida",
-        },
-        form: {
-          shortcut: "Atajo",
-          message: "Respuesta rápida",
-        },
-        buttons: {
-          okAdd: "Agregar",
-          okEdit: "Guardar",
-          cancel: "Cancelar",
-        },
-        success: "Respuesta rápida guardada correctamente.",
-      },
-
-      queueModal: {
-        title: {
-          add: "Agregar cola",
-          edit: "Editar cola",
-        },
-        form: {
-          name: "Nombre",
-          color: "Color",
-          greetingMessage: "Mensaje de saludo",
-          success: "¡Cola guardada con éxito!",
-        },
-        buttons: {
-          okAdd: "Añadir",
-          okEdit: "Ahorrar",
-          cancel: "Cancelar",
-        },
-      },
-
       userModal: {
         title: {
           add: "Agregar usuario",
@@ -259,6 +228,9 @@ const messages = {
           password: "Contraseña",
           profile: "Perfil",
           language: "Language",
+          user: "Usuario",
+          admin: "Admin",
+          company: "Compañía",
           languages: {
             pt: "Portuguese",
             en: "English",
@@ -271,6 +243,10 @@ const messages = {
           cancel: "Cancelar",
         },
         success: "Usuario guardado satisfactoriamente.",
+        required: "¡Campo obligatorio!",
+        short: "¡Muy corto!",
+        long: "¡Muy largo!",
+        email: "¡Email inválido!",
       },
 
       chat: {
@@ -290,6 +266,7 @@ const messages = {
       tickets: {
         toasts: {
           deleted: "El ticket en el que estabas ha sido borrado.",
+          confirmDelete: "¡Ticket eliminado con éxito!",
         },
         notification: {
           message: "Mensaje de",
@@ -405,6 +382,29 @@ const messages = {
           deleteTitle: "Eliminar",
           deleteMessage:
             "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ninguna cola asignada.",
+          delete: "¡Cola eliminada con éxito!"
+        },
+      },
+
+       queueModal: {
+        title: {
+          add: "Agregar cola",
+          edit: "Editar cola",
+        },
+        form: {
+          name: "Nombre",
+          color: "Color",
+          greetingMessage: "Mensaje de saludo",
+          success: "¡Cola añadida con éxito!",
+          edited: "¡Cola actualizada con éxito!",
+          required: "¡Campo obligatorio!",
+          short:"¡Muy corto!",
+          long: "¡Muy largo!",
+        },
+        buttons: {
+          okAdd: "Añadir",
+          okEdit: "Ahorrar",
+          cancel: "Cancelar",
         },
       },
 
@@ -431,6 +431,29 @@ const messages = {
             "¿Está seguro de que desea eliminar esta respuesta rápida?",
           deleteMessage: "Esta acción no se puede deshacer.",
         },
+        yup: {
+          required: "¡Campo obligatorio!",
+          short: "¡Muy corto!",
+          long: "¡Muy largo!",
+        },
+      },
+
+      quickAnswersModal: {
+        title: {
+          add: "Agregar respuesta rápida",
+          edit: "Editar respuesta rápida",
+        },
+        form: {
+          shortcut: "Atajo",
+          message: "Respuesta rápida",
+        },
+        buttons: {
+          okAdd: "Agregar",
+          okEdit: "Guardar",
+          cancel: "Cancelar",
+        },
+        success: "Respuesta rápida guardada correctamente.",
+        edited: "¡Respuesta rápida actualizada con éxito!",
       },
 
       importation: {
@@ -845,9 +868,39 @@ const messages = {
           buttonEdit: "Editar",
         },
         modalConfirm: {
-          delete: "¡Realmente quiero eliminar, todos los datos de la plantilla se perderán!",
+          title: "Eliminar plantilla",
+          delete: "¿Realmente desea eliminar? ¡Se perderán todos los datos de la plantilla!",
           successDelete: "¡Plantilla eliminada con éxito!",
           successAdd: "¡Plantilla agregada con éxito!",
+          exceeded: "¡Límite de parámetro excedido!",
+          videoExceeded: "El tamaño del video excede el valor máximo de 10 Megabytes.",
+          edited: "¡Plantilla actualizada con éxito!",
+        },
+        modal: {
+          type: "Escribe",
+          body: "Cuerpo",
+          actions: "Acciones",
+          name: "Nombre",
+          addBody: "Agregar al cuerpo",
+          footer: "Zócalo",
+          cancel: "Cancelar",
+          edited: "Editar",
+          created: "Crear",
+          save: "Ahorrar",
+          selectVar: "Seleccione una variable",
+          document: "Documento",
+          phoneNumber: "Número de teléfono",
+          ok: "OK",
+          text: "Texto",
+          audio: "Áudio",
+          movie: "Vídeo",
+          image: "Imagen",
+          contact: "Contacto",
+          file: "Archivo",
+          load: "Para cargar",
+          order: "Ordenar",
+          value: "Valor",
+          nameContact: "Nombre de contacto",
         },
       },
 
@@ -870,6 +923,8 @@ const messages = {
           cancel: "Cancelar",
           name: "Nombre",
           description: "Descripción",
+          select: "Seleccione una descripción",
+          none: "Ninguma",
         },
         confirmation: {
           delete: "¡Categoría eliminada con éxito!",
@@ -877,7 +932,6 @@ const messages = {
           deleteMsg: "¿Está seguro de que desea eliminar la categoría?",
           editMsg: "¡Categoría editada con éxito!",
           addMsg: "¡Categoría agregada con éxito!",
-
         },
       },
 
@@ -1102,6 +1156,10 @@ const messages = {
         toView: "Visualizar",
         download: "Bajar",
         hello: "¡Saluda a tu nuevo contacto!"
+      },
+
+      vcardPreview: {
+        toTalk: "Hablar",
       },
 
       backendErrors: {

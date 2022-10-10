@@ -65,10 +65,10 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
 	const QueueSchema = Yup.object().shape({
 		name: Yup.string()
-			.min(2, "Too Short!")
-			.max(50, "Too Long!")
-			.required("Required"),
-		color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
+			.min(2, `${i18n.t("queueModal.form.short")}`)
+			.max(50, `${i18n.t("queueModal.form.long")}`)
+			.required(`${i18n.t("queueModal.form.required")}`),
+		color: Yup.string().min(3,`${i18n.t("queueModal.form.short")}`).max(9, `${i18n.t("queueModal.form.long")}`).required(),
 		greetingMessage: Yup.string(),
 	});
 
@@ -107,10 +107,12 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		try {
 			if (queueId) {
 				await api.put(`/queue/${queueId}`, values);
+				toast.success(i18n.t("queueModal.form.edited"));
 			} else {
 				await api.post("/queue", values);
+				toast.success(i18n.t("queueModal.form.success"));
 			}
-			toast.success(i18n.t("queueModal.form.success"));
+
 			handleClose();
 		} catch (err) {
 			toastError(err);

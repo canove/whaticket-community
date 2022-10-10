@@ -294,6 +294,7 @@ const RegistersReports = () => {
 						variant="outlined"
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
 						disabled={ pageNumber === 1}
+                        onChange={handlePreviousPage}
 					>
 						{i18n.t("logReport.buttons.previousPage")}
 					</Button>
@@ -306,6 +307,7 @@ const RegistersReports = () => {
 						variant="outlined"
 						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
 						disabled={ !hasMore }
+                        onChange={handleNextPage}
 					>
 						{i18n.t("logReport.buttons.nextPage")}
 					</Button>

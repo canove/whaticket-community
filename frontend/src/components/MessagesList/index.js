@@ -385,6 +385,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
     return () => {
       socket.disconnect();
     };
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]);
 
   const loadMore = () => {

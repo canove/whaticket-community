@@ -46,17 +46,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const QuickAnswerSchema = Yup.object().shape({
-  shortcut: Yup.string()
-    .min(2, "Too Short!")
-    .max(15, "Too Long!")
-    .required("Required"),
-  message: Yup.string()
-    .min(8, "Too Short!")
-    .max(30000, "Too Long!")
-    .required("Required"),
-});
-
 const QuickAnswersModal = ({
   open,
   onClose,
@@ -72,6 +61,17 @@ const QuickAnswersModal = ({
     shortcut: "",
     message: "",
   };
+
+  const QuickAnswerSchema = Yup.object().shape({
+  shortcut: Yup.string()
+    .min(2, `${i18n.t("quickAnswers.yup.short")}`)
+    .max(15, `${i18n.t("quickAnswers.yup.long")}`)
+    .required(`${i18n.t("quickAnswers.yup.required")}`),
+  message: Yup.string()
+    .min(8, `${i18n.t("quickAnswers.yup.short")}`)
+    .max(30000, `${i18n.t("quickAnswers.yup.long")}`)
+    .required(`${i18n.t("quickAnswers.yup.required")}`),
+});
 
   const [quickAnswer, setQuickAnswer] = useState(initialState);
 
@@ -113,15 +113,17 @@ const QuickAnswersModal = ({
     try {
       if (quickAnswerId) {
         await api.put(`/quickAnswers/${quickAnswerId}`, values);
+          toast.success(i18n.t("quickAnswersModal.edited"));
         handleClose();
       } else {
         const { data } = await api.post("/quickAnswers", values);
+          toast.success(i18n.t("quickAnswersModal.success"));
         if (onSave) {
           onSave(data);
         }
         handleClose();
       }
-      toast.success(i18n.t("quickAnswersModal.success"));
+
     } catch (err) {
       toastError(err);
     }

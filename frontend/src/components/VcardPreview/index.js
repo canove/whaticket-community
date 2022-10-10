@@ -10,6 +10,7 @@ import Grid from "@material-ui/core/Grid";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
 import { Button, Divider, } from "@material-ui/core";
+import { i18n } from '../../translate/i18n';
 
 const VcardPreview = ({ contact, numbers }) => {
     const history = useHistory();
@@ -77,7 +78,7 @@ const VcardPreview = ({ contact, numbers }) => {
 							color="primary"
 							onClick={handleNewChat}
 							disabled={!selectedContact.number}
-						>Conversar</Button>
+						>{i18n.t("vcardPreview.toTalk")}</Button>
 					</Grid>
 				</Grid>
 			</div>

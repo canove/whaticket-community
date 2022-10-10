@@ -264,6 +264,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         } else {
             setDisableButton(false);
         }
+// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type, paramsQuantity, video])
 
 	return (
