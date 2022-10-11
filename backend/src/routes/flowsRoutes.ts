@@ -15,12 +15,6 @@ flowsRoutes.get(
   FlowsController.connection
 );
 
-// flowsRoutes.get(
-//   "/flows/connection/:whatsappId",
-//   isAuth,
-//   FlowsController.connection
-// );
-
 flowsRoutes.get("/flows/:flowId", isAuth, FlowsController.show);
 
 flowsRoutes.put("/flows/:flowId", isAuth, FlowsController.update);
