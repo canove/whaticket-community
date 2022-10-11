@@ -4,6 +4,7 @@ import CreateFlowService from "../services/FlowService/CreateFlowService";
 import DeleteFlowService from "../services/FlowService/DeleteFlowService";
 
 import ListFlowsService from "../services/FlowService/ListFlowsService";
+import ShowFlowByConnectionService from "../services/FlowService/ShowFlowByConnectionService";
 import ShowFlowService from "../services/FlowService/ShowFlowService";
 import UpdateFlowService from "../services/FlowService/UpdateFlowService";
 
@@ -49,6 +50,18 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.status(200).json(flow);
+};
+
+export const connection = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { whatsappId } = req.params;
+  const { companyId } = req.user;
+
+  const pricing = await ShowFlowByConnectionService(whatsappId, companyId);
+
+  return res.status(200).json(pricing);
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {

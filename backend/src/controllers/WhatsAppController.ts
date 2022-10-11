@@ -39,6 +39,7 @@ interface WhatsappData {
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
   companyId?: string | number;
+  flowId?: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -60,7 +61,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
-    phoneNumber
+    phoneNumber,
+    flowId
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -93,7 +95,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     facebookToken,
     facebookPhoneNumberId,
     phoneNumber,
-    companyId
+    companyId,
+    flowId
   });
 
   StartWhatsAppSession(whatsapp);

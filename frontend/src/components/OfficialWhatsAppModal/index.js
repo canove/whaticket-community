@@ -14,6 +14,10 @@ import {
 	TextField,
 	Switch,
 	FormControlLabel,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
 } from "@material-ui/core";
 
 import QueueSelect from "../QueueSelect";
@@ -75,6 +79,8 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
     const [isConnectionTested, setIsConnectionTested] = useState(false);
 	const [submitType, setSubmitType] = useState("testConnection");
 	const [lastFormValues, setLastFormValues] = useState();
+	const [flows, setFlows] = useState([]);
+	const [flow, setFlow] = useState("");
 
 	const GetFormValues = () => {
 		const { values } = useFormikContext();
@@ -97,6 +103,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			try {
 				const { data } = await api.get(`whatsapp/${whatsAppId}`);
 				setWhatsApp(data);
+				setFlow(data.flowId);
 
 				const whatsQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(whatsQueueIds);
@@ -104,7 +111,18 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				toastError(err);
 			}
 		};
+
+		const fetchFlows = async () => {
+			try {
+				const { data } = await api.get('flows');
+				setFlows(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
 		fetchSession();
+		fetchFlows();
 	}, [whatsAppId]);
 
 	const handleClose = () => {
@@ -137,7 +155,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	}
 
 	const handleSaveWhatsApp = async values => {
-		const whatsappData = { ...values, queueIds: selectedQueueIds };
+		const whatsappData = { ...values, queueIds: selectedQueueIds, flowId: flow };
 
 		try {
 			if (whatsAppId) {
@@ -151,6 +169,10 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			toastError(err);
 		}
 	};
+
+	const handleFlowChange = (e) => {
+		setFlow(e.target.value);
+	}
 
 	return (
 		<div className={classes.root}>
@@ -304,6 +326,28 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										variant="outlined"
 										margin="dense"
 									/>
+								</div>
+								<div>
+									<FormControl
+										variant="outlined"
+										className={classes.multFieldLine}
+										margin="dense"
+										fullWidth
+									>
+										<InputLabel>Fluxo</InputLabel>
+										<Select
+											value={flow}
+											onChange={(e) => { handleFlowChange(e) }}
+											label="Fluxo"
+										>
+											<MenuItem value={""}>Nenhum</MenuItem>
+											{ flows && flows.map(flow => {
+												return (
+													<MenuItem value={flow.id} key={flow.id}>{flow.name}</MenuItem>
+												)
+											}) }
+										</Select>
+									</FormControl>
 								</div>
 								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
