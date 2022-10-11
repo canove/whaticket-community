@@ -111,7 +111,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	}, [whatsAppId]);
 
 	const handleSaveWhatsApp = async values => {
-		const whatsappData = { ...values, queueIds: selectedQueueIds, flowId: flow };
+		const whatsappData = { ...values, queueIds: selectedQueueIds, flowId: flow ? flow : null };
 
 		try {
 			if (whatsAppId) {

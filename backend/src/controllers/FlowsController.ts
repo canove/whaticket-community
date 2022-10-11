@@ -56,10 +56,15 @@ export const connection = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { whatsappId } = req.params;
+  // const { whatsappId } = req.params;
+  const { connectionName } = req.body;
   const { companyId } = req.user;
 
-  const pricing = await ShowFlowByConnectionService(whatsappId, companyId);
+  const pricing = await ShowFlowByConnectionService(
+    // whatsappId,
+    connectionName,
+    companyId
+  );
 
   return res.status(200).json(pricing);
 };

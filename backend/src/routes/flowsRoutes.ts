@@ -9,11 +9,13 @@ flowsRoutes.get("/flows", isAuth, FlowsController.index);
 
 flowsRoutes.post("/flows", isAuth, FlowsController.store);
 
-flowsRoutes.get(
-  "/flows/connection/:whatsappId",
-  isAuth,
-  FlowsController.connection
-);
+flowsRoutes.get("/flows/connection/", isAuth, FlowsController.connection);
+
+// flowsRoutes.get(
+//   "/flows/connection/:whatsappId",
+//   isAuth,
+//   FlowsController.connection
+// );
 
 flowsRoutes.get("/flows/:flowId", isAuth, FlowsController.show);
 
