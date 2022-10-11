@@ -9,7 +9,11 @@ flowsRoutes.get("/flows", isAuth, FlowsController.index);
 
 flowsRoutes.post("/flows", isAuth, FlowsController.store);
 
-flowsRoutes.get("/flows/connection/", isAuth, FlowsController.connection);
+flowsRoutes.get(
+  "/flows/connection/:connectionName",
+  isAuth,
+  FlowsController.connection
+);
 
 // flowsRoutes.get(
 //   "/flows/connection/:whatsappId",

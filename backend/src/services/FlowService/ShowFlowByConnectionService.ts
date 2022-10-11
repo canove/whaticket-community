@@ -3,7 +3,6 @@ import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 
 const ShowFlowByConnectionService = async (
-  // whatsAppId: string | number,
   connectionName: string,
   companyId: string | number
 ): Promise<Flows> => {

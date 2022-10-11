@@ -72,21 +72,27 @@ const FlowModal = ({ open, onClose, flowId }) => {
     const [location, setLocation] = useState("");
 
     useEffect(() => {
+      setName("");
+      setStatus("active");
+      setProjectId("");
+      setAgentId("");
+      setLocation("");
+
       const fetchFlow = async () => {
         try {
           const { data } = await api.get(`/flows/${flowId}`);
-            setName(data.name)
-            setStatus(data.status);
-            setProjectId(data.projectId);
-            setAgentId(data.agentId);
-            setLocation(data.location);
+          setName(data.name)
+          setStatus(data.status);
+          setProjectId(data.projectId);
+          setAgentId(data.agentId);
+          setLocation(data.location);
         } catch (err) {
           toastError(err);
         }
       };
-        if(flowId){
-          fetchFlow();
-        };
+      if(flowId){
+        fetchFlow();
+      };
     }, [open, flowId]);
 
     const handleClose = () => {
@@ -138,6 +144,7 @@ const FlowModal = ({ open, onClose, flowId }) => {
       } catch (err) {
         toastError(err);
       }
+
       handleClose();
     };
 
