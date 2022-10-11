@@ -171,7 +171,11 @@ const Flows = () => {
 
   const handleCopyFlow = async (flow) => {
     const flowData = {
-      name: `${flow.name} copy`
+      name: `${flow.name} copy`,
+      status: flow.status,
+      projectId: flow.projectId,
+      agentId: flow.agentId,
+      location: flow.location
     }
 
     try {
