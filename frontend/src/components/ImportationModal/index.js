@@ -9,6 +9,7 @@ import {
 	FormControl,
 	InputLabel,
 	MenuItem,
+	Paper,
 	Select,
 	TextField,
     Typography,
@@ -19,6 +20,8 @@ import { green } from "@material-ui/core/colors";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -26,6 +29,13 @@ const useStyles = makeStyles(theme => ({
 		flexWrap: "wrap",
 
 	},
+    mainPaper: {
+        flex: 1,
+        padding: theme.spacing(1),
+        overflowY: "scroll",
+        ...theme.scrollbarStyles,
+      },
+
 	multFieldLine: {
 		display: "flex",
 		"& > *:not(:last-child)": {
@@ -56,30 +66,38 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 	const { i18n } = useTranslation();
 
 	const [name, setName] = useState("");
-    const [method, setSelectedMethod] = useState([]);
+    const [method, setMethod] = useState("");
     const [url, setUrl] = useState("");
     const [key, setKey] = useState("");
     const [token, setToken] = useState("");
-    const [bodyDe, setBodyDe] = useState("");
-    const [bodyPara, setBodyPara] = useState("");
+    const [config, setConfig] = useState("");
+    const [body, setBody] = useState("");
+    const [response, setResponse] = useState("");
 
+    const [relationName, setRelationName] = useState("");
+    const [relationDocumentNumber, setRelationDocumentNumber] = useState("");
+    const [relationTemplate, setRelationTemplate] = useState("");
+
+    const [nameRelation, setNameRelation] = useState("");
+    const [documentNumberRelation, setDocumentNumberRelation] = useState("");
+    const [templateRelation, setTemplateRelation] = useState("");
 
 	useEffect(() => {
 		const fetchProduct = async () => {
 			try {
 				const { data } = await api.get(`/integratedImport/${integratedImportId}`);
 				setName(data.name)
-                setSelectedMethod(data.method)
+                setMethod(data.method)
                 setUrl(data.url)
                 setKey(data.key)
                 setToken(data.token)
-                setBodyDe(data.bodyDe)
-                setBodyPara(data.bodyPara)
-
+                setConfig(data.config || "");
+                setBody(data.body || "");
 			} catch (err) {
 				toastError(err);
 			}
 		}
+
 		if (integratedImportId) {
 			fetchProduct();
 		}
@@ -87,12 +105,12 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 
     const handleClose = () => {
         setName("");
-        setSelectedMethod("");
+        setMethod("");
         setUrl("");
         setKey("");
         setToken("");
-        setBodyDe("");
-        setBodyPara("");
+        setConfig("");
+        setBody("");
         onClose();
 	};
 
@@ -101,31 +119,143 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 	};
 
     const handleMethodChange = (e) => {
-		setSelectedMethod(e.target.value);
+		setMethod(e.target.value);
 	};
 
     const handleUrlChange = (e) => {
         setUrl(e.target.value);
     };
 
-    const handleKeyChange = (e) => {
-        setKey(e.target.value);
-    };
+    const handleConfigChange = (e) => {
+        setConfig(e.target.value);
+    }
 
-    const handleTokenChange = (e) => {
-        setToken(e.target.value)
-    };
+    const handleBodyChange = (e) => {
+        setBody(e.target.value);
+    }
 
-    const handleAuthenticate = () => {
+    const handleResponseChange = (e) => {
+        
+    }
 
-    };
+    const jsonToString = (json) => {
+        try {
+            const responseObj = JSON.parse(json);
+            return responseObj;
+        } catch {
+            return false;
+        }
+    }
 
-    const handleChangeBodyDe = (e) => {
-        setBodyDe(e.target.value)
-    };
+    const handleNameRelationChange = (e) => {
+        setNameRelation(e.target.value);
 
-    const handleChangeBodyPara = (e) => {
-        setBodyPara(e.target.value)
+        const responseObj = jsonToString(response);
+            
+        if (responseObj === false) return;
+
+        if (responseObj[e.target.value]) {
+            setRelationName(JSON.stringify(responseObj[e.target.value]));
+        }
+    }
+
+    const handleDocumentNumberRelationChange = (e) => {
+        setDocumentNumberRelation(e.target.value);
+
+        const responseObj = jsonToString(response);
+            
+        if (responseObj === false) return;
+
+        if (responseObj[e.target.value]) {
+            setRelationDocumentNumber(JSON.stringify(responseObj[e.target.value]));
+        }
+    }
+
+    const handleTemplateRelationChange = (e) => {
+        var string = e.target.value;
+        var last2 = string.slice(-2);
+
+        if (last2 === "..") return;
+
+        setTemplateRelation(e.target.value);
+
+        const responseObj = jsonToString(response);
+        const relation = e.target.value.split(".");
+
+        if (responseObj === false) return;
+
+        const value = handleKeys(relation);
+
+        if (value) {
+            setRelationTemplate(JSON.stringify(value));
+        } else {
+            setRelationTemplate("NOT FOUND");
+        }
+    }
+
+        // const responseObj = jsonToString(response);
+
+        // if (responseObj) {
+        //     let ARRAYNIVEL1 = [];
+        //     let ARRAYNIVEL2 = [];
+
+        //     const NIVEL0 = responseObj;
+        //     console.log(NIVEL0);
+
+        //     const NIVEL1 = NIVEL0["abilities"];
+        //     console.log(NIVEL1);
+
+        //     for (const ITEM of NIVEL1) {
+        //         ARRAYNIVEL1.push(ITEM["ability"]);
+        //     }
+            
+        //     for (const ITEM of ARRAYNIVEL1) {
+        //         ARRAYNIVEL2.push(ITEM["name"]);
+        //     }
+
+        //     console.log(ARRAYNIVEL2)
+        // }
+
+    const handleKeys = (keys) => {
+        let value = jsonToString(response);
+
+        if (!value) return false;
+
+        for (let i = 0; i < keys.length; i++) {
+            if (value === undefined) {
+                return false;
+            }
+
+            if (Array.isArray(value)) {
+                let array = [];
+                
+                for (const item of value) {
+                    array.push(item[keys[i]]);
+                }
+
+                value = array;
+            } else {
+                value = value[keys[i]];
+            }
+        }
+
+        return value;
+    }
+
+    const handleAuthenticate = async () => {
+        if (!url) {
+            toast.error("Adicione uma URL");
+        }
+
+        if (method === "GET") {
+            axios.get(url)
+            .then(resp => {
+                const responseString = JSON.stringify(resp.data, null, 2);
+                setResponse(responseString);
+            });
+        } else {
+            toast.error("Selecione um Método");
+        }
     };
 
 	const handleSubmit = async () => {
@@ -135,8 +265,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
             url: url,
             key: key,
             token: token,
-            bodyDe: bodyDe,
-            bodyPara: bodyPara
+            config: config,
+            body: body
 		};
 
 		 try {
@@ -187,19 +317,20 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                         margin="normal"
                         fullWidth
                     >
-                    <InputLabel id="method-selection-label">
-                        {i18n.t("integratedImport.integratedModal.method")}
-                    </InputLabel>
-                    <Select
-                        name="method"
-                        labelId="method-selection-label"
-                        id="method-selection"
-                        value={method}
-                        onChange={(e) => {handleMethodChange(e)}}
-                    >
-                        <MenuItem value="GET"> {i18n.t('GET')}</MenuItem>
-                        <MenuItem value= "POST">{i18n.t('POST')}</MenuItem>
-                    </Select>
+                        <InputLabel id="method-selection-label">
+                            {i18n.t("integratedImport.integratedModal.method")}
+                        </InputLabel>
+                        <Select
+                            name="method"
+                            labelId="method-selection-label"
+                            id="method-selection"
+                            label="Method"
+                            value={method}
+                            onChange={(e) => { handleMethodChange(e) }}
+                        >
+                            <MenuItem value="GET"> {i18n.t('GET')}</MenuItem>
+                            <MenuItem value= "POST">{i18n.t('POST')}</MenuItem>
+                        </Select>
                     </FormControl>
                 </div>
                 <div className={classes.multFieldLine}>
@@ -214,67 +345,204 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 					onChange={handleUrlChange}
                   />
                 </div>
+                { method === "POST" && 
+                    <div className={classes.multFieldLine}>
+                        <TextField
+                            as={TextField}
+                            label="Body"
+                            type="bodyText"
+                            onChange={(e) => { handleBodyChange(e) }}
+                            value={body}
+                            multiline
+                            minRows={4}
+                            maxLength="1024"
+                            name="body"
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
+                        />
+                    </div>
+                }
                <Typography variant="subtitle1" gutterBottom>
 					{i18n.t("integratedImport.integratedModal.autentication")}:
 				</Typography>
                 <div className={classes.multFieldLine}>
-                  <TextField
-					as={TextField}
-                    name="key"
-                    variant="outlined"
-                    margin="normal"
-                    label={i18n.t("integratedImport.integratedModal.key")}
-                    value={key}
-					onChange={handleKeyChange}
-                    fullWidth
-                  />
-                  <TextField
-					as={TextField}
-                    name="token"
-                    variant="outlined"
-                    margin="normal"
-                    label={i18n.t("integratedImport.integratedModal.token")}
-                    value={token}
-					onChange={handleTokenChange}
-                    fullWidth
-                  />
+                    <TextField
+                        as={TextField}
+                        label="Config"
+                        type="bodyText"
+                        onChange={(e) => { handleConfigChange(e) }}
+                        value={config}
+                        multiline
+                        minRows={4}
+                        maxLength="1024"
+                        name="config"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                    />
                 </div>
-                <Button onClick={handleAuthenticate} color="primary" variant="contained">
+                <Button
+                    onClick={() => { handleAuthenticate() }}
+                    color="primary"
+                    variant="contained"
+                >
                     {i18n.t("integratedImport.integratedModal.autentic")}
                 </Button>
-                 <div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    label={i18n.t("integratedImport.integratedModal.in")}
-                    type="bodyText"
-                    onChange={(e) => {
-                      handleChangeBodyDe(e);
-                    }}
-                    value={bodyDe}
-                    multiline
-                    minRows={8}
-                    maxLength="1024"
-                    name="bodyDe"
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                  />
-                    <TextField
-                    as={TextField}
-                    label={i18n.t("integratedImport.integratedModal.for")}
-                    type="bodyText"
-                    onChange={(e) => {
-                      handleChangeBodyPara(e);
-                    }}
-                    value={bodyPara}
-                    multiline
-                    minRows={8}
-                    maxLength="1024"
-                    name="bodyPara"
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                  />
+                <div className={classes.multFieldLine}>
+                    <Paper
+                        className={classes.mainPaper}
+                        variant="outlined"
+                    >
+                        <Typography>
+                            Response: 
+                        </Typography>
+                        <TextField
+                            as={TextField}
+                            label={i18n.t("integratedImport.integratedModal.in")}
+                            onChange={(e) => { handleResponseChange(e) }}
+                            value={response}
+                            type="bodyText"
+                            multiline
+                            minRows={8}
+                            maxLength="1024"
+                            name="response"
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
+                        />
+                    </Paper>
+                    <Paper
+                        className={classes.mainPaper}
+                        variant="outlined"
+                    >
+                        <Typography>
+                            Relation: 
+                        </Typography>
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                as={TextField}
+                                name="name"
+                                variant="outlined"
+                                margin="normal"
+                                label="name"
+                                fullWidth
+                                disabled
+                                value={relationName}
+                            />
+                            <TextField
+                                as={TextField}
+                                name="nameRelation"
+                                variant="outlined"
+                                margin="normal"
+                                label="Name"
+                                fullWidth
+                                value={nameRelation}
+                                onChange={(e) => { handleNameRelationChange(e) }}
+                            />
+                        </div>
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                as={TextField}
+                                name="documentNumber"
+                                variant="outlined"
+                                margin="normal"
+                                label="documentNumber"
+                                fullWidth
+                                disabled
+                                value={relationDocumentNumber}
+                            />
+                            <TextField
+                                as={TextField}
+                                name="documentNumberRelation"
+                                variant="outlined"
+                                margin="normal"
+                                label="Document Number"
+                                fullWidth
+                                value={documentNumberRelation}
+                                onChange={(e) => { handleDocumentNumberRelationChange(e) }}
+                            />
+                        </div>
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                as={TextField}
+                                name="template"
+                                variant="outlined"
+                                margin="normal"
+                                label="template"
+                                fullWidth
+                                disabled
+                                value={relationTemplate}
+                            />
+                            <TextField
+                                as={TextField}
+                                name="template"
+                                variant="outlined"
+                                margin="normal"
+                                label="Template"
+                                fullWidth
+                                value={templateRelation}
+                                onChange={(e) => { handleTemplateRelationChange(e) }}
+                            />
+                        </div>
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                as={TextField}
+                                name="templateParams"
+                                variant="outlined"
+                                margin="normal"
+                                label="templateParams"
+                                fullWidth
+                                disabled
+                            />
+                            <TextField
+                                as={TextField}
+                                name="templateParams"
+                                variant="outlined"
+                                margin="normal"
+                                label="Template Params"
+                                fullWidth
+                            />
+                        </div>
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                as={TextField}
+                                name="message"
+                                variant="outlined"
+                                margin="normal"
+                                label="message"
+                                fullWidth
+                                disabled
+                            />
+                            <TextField
+                                as={TextField}
+                                name="message"
+                                variant="outlined"
+                                margin="normal"
+                                label="Message"
+                                fullWidth
+                            />
+                        </div>
+                        <div className={classes.multFieldLine}>
+                            <TextField
+                                as={TextField}
+                                name="phoneNumber"
+                                variant="outlined"
+                                margin="normal"
+                                label="phoneNumber"
+                                fullWidth
+                                disabled
+                            />
+                            <TextField
+                                as={TextField}
+                                name="phoneNumber"
+                                variant="outlined"
+                                margin="normal"
+                                label="Phone Number"
+                                fullWidth
+                            />
+                        </div>
+                    </Paper>
                 </div>
 				</DialogContent>
 				<DialogActions>

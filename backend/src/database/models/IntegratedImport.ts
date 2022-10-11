@@ -44,6 +44,12 @@ class IntegratedImport extends Model<IntegratedImport> {
   @Column
   mapping: string;
 
+  @Column
+  config: string;
+
+  @Column
+  body: string;
+
   @CreatedAt
   createdAt: Date;
 
