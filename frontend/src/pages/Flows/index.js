@@ -171,7 +171,11 @@ const Flows = () => {
 
   const handleCopyFlow = async (flow) => {
     const flowData = {
-      name: `${flow.name} copy`
+      name: `${flow.name} copy`,
+      status: flow.status,
+      projectId: flow.projectId,
+      agentId: flow.agentId,
+      location: flow.location
     }
 
     try {
@@ -196,6 +200,18 @@ const Flows = () => {
     }
     setDeletingFlow(null);
   };
+  
+  const getStatus = (status) => {
+    if (status === "active") {
+      return "Ativo";
+    }
+
+    if (status === "inactive") {
+      return "Inativo";
+    }
+
+    return status;
+  }
 
   return (
     <MainContainer>
@@ -244,6 +260,9 @@ const Flows = () => {
             <TableRow>
               <TableCell align="center">{i18n.t("flows.grid.name")}</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.status")}</TableCell>
+              <TableCell align="center">ID do Projeto</TableCell>
+              <TableCell align="center">ID do Agente</TableCell>
+              <TableCell align="center">Local</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.createdAt")}</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.updatedAt")}</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.actions")}</TableCell>
@@ -256,7 +275,10 @@ const Flows = () => {
                   return (
                     <TableRow key={flow.id}>
                       <TableCell align="center">{flow.name}</TableCell>
-                      <TableCell align="center">{flow.status}</TableCell>
+                      <TableCell align="center">{getStatus(flow.status)}</TableCell>
+                      <TableCell align="center">{flow.projectId}</TableCell>
+                      <TableCell align="center">{flow.agentId}</TableCell>
+                      <TableCell align="center">{flow.location}</TableCell>
                       <TableCell align="center">
                         {formatDate(flow.createdAt)}
                       </TableCell>

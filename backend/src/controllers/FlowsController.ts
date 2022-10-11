@@ -4,17 +4,21 @@ import CreateFlowService from "../services/FlowService/CreateFlowService";
 import DeleteFlowService from "../services/FlowService/DeleteFlowService";
 
 import ListFlowsService from "../services/FlowService/ListFlowsService";
+import ShowFlowByConnectionService from "../services/FlowService/ShowFlowByConnectionService";
 import ShowFlowService from "../services/FlowService/ShowFlowService";
 import UpdateFlowService from "../services/FlowService/UpdateFlowService";
 
 interface FlowsData {
   name: string;
   status: string;
+  projectId: string;
+  agentId: string;
+  location: string;
 }
 
 type IndexQuery = {
   searchParam: string;
-}
+};
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
@@ -28,12 +32,15 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
-  const { name, status }: FlowsData = req.body;
+  const { name, status, projectId, agentId, location }: FlowsData = req.body;
 
   const flow = await CreateFlowService({
     name,
     status,
-    companyId
+    companyId,
+    projectId,
+    agentId,
+    location
   });
 
   const io = getIO();
@@ -45,13 +52,25 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(flow);
 };
 
+export const connection = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { connectionName } = req.params;
+  const { companyId } = req.user;
+
+  const flow = await ShowFlowByConnectionService(connectionName, companyId);
+
+  return res.status(200).json(flow);
+};
+
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { flowId } = req.params;
   const { companyId } = req.user;
 
-  const pricing = await ShowFlowService(flowId, companyId);
+  const flow = await ShowFlowService(flowId, companyId);
 
-  return res.status(200).json(pricing);
+  return res.status(200).json(flow);
 };
 
 export const update = async (
