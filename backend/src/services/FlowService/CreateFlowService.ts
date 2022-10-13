@@ -7,6 +7,8 @@ interface Request {
   projectId: string;
   agentId: string;
   location: string;
+  clientEmail: string;
+  privateKey: string;
 }
 
 const CreateFlowService = async ({
@@ -15,7 +17,9 @@ const CreateFlowService = async ({
   companyId,
   projectId,
   agentId,
-  location
+  location,
+  clientEmail,
+  privateKey
 }: Request): Promise<Flows> => {
   const flow = await Flows.create({
     name,
@@ -23,7 +27,9 @@ const CreateFlowService = async ({
     companyId,
     projectId,
     agentId,
-    location
+    location,
+    clientEmail,
+    privateKey
   });
 
   return flow;

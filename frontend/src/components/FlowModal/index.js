@@ -13,6 +13,8 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -70,6 +72,9 @@ const FlowModal = ({ open, onClose, flowId }) => {
     const [projectId, setProjectId] = useState("");
     const [agentId, setAgentId] = useState("");
     const [location, setLocation] = useState("");
+    const [useExternalAccount, setUseExternalAccount] = useState(false);
+    const [clientEmail, setClientEmail] = useState("");
+    const [privateKey, setPrivateKey] = useState("");
 
     useEffect(() => {
       setName("");
@@ -77,6 +82,8 @@ const FlowModal = ({ open, onClose, flowId }) => {
       setProjectId("");
       setAgentId("");
       setLocation("");
+      setClientEmail("");
+      setPrivateKey("");
 
       const fetchFlow = async () => {
         try {
@@ -101,6 +108,8 @@ const FlowModal = ({ open, onClose, flowId }) => {
       setProjectId("");
       setAgentId("");
       setLocation("");
+      setClientEmail("");
+      setPrivateKey("");
       onClose();
     };
 
@@ -124,13 +133,32 @@ const FlowModal = ({ open, onClose, flowId }) => {
       setLocation(e.target.value);
     };
 
+    const handleClientEmailChange = (e) => {
+      setClientEmail(e.target.value);
+    };
+
+    const handlePrivateKeyChange = (e) => {
+      setPrivateKey(e.target.value);
+    };
+
+    const handleUseExternalAccountChange = (e) => {
+      setUseExternalAccount(e.target.checked);
+    }
+
     const handleSubmit = async () => {
+      if (useExternalAccount === true && (!clientEmail || !privateKey)) {
+        toast.error("Email e Chave Privada são obrigatórios!");
+        return false;
+      }
+
       const flowData = {
           name: name,
           status: status,
           projectId: projectId,
           agentId: agentId,
-          location: location
+          location: location,
+          clientEmail: useExternalAccount ? clientEmail : "",
+          privateKey: useExternalAccount ? privateKey : ""
       };
 
       try {
@@ -200,6 +228,47 @@ const FlowModal = ({ open, onClose, flowId }) => {
                       </Select>
                   </FormControl>
                 </div>
+                <div className={classes.multFieldLine}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={useExternalAccount}
+                        onChange={handleUseExternalAccountChange}
+                        name="useExternalAccount"
+                        color="primary"
+                      />
+                    }
+                    label="Usar conta externa"
+                  />
+                </div>
+                { useExternalAccount &&
+                  <>
+                    <div className={classes.multFieldLine}>
+                      <TextField
+                        as={TextField}
+                        label="Email do Cliente"
+                        value={clientEmail}
+                        name="clientEmail"
+                        onChange={(e) => { handleClientEmailChange(e) }}
+                        variant="outlined"
+                        margin="dense"
+                        fullWidth
+                      />
+                    </div>
+                    <div className={classes.multFieldLine}>
+                      <TextField
+                        as={TextField}
+                        label="Chave Privada"
+                        value={privateKey}
+                        name="privateKey"
+                        onChange={(e) => { handlePrivateKeyChange(e) }}
+                        variant="outlined"
+                        margin="dense"
+                        fullWidth
+                      />
+                    </div>
+                  </>
+                }
                 <div className={classes.multFieldLine}>
                   <TextField
                     as={TextField}
