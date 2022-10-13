@@ -4,11 +4,19 @@ import uploadConfig from "../config/upload";
 
 import * as ApiController from "../controllers/ApiController";
 import * as WhatsAppController from "../controllers/WhatsAppController";
+import * as FlowsController from "../controllers/FlowsController";
 import isAuthApi from "../middleware/isAuthApi";
 
 const upload = multer(uploadConfig);
 
 const ApiRoutes = express.Router();
+
+ApiRoutes.get(
+  "/whatsapp/flow/:connectionName",
+  isAuthApi,
+  FlowsController.connection
+);
+
 ApiRoutes.post(
   "/whatsapp/botmessage",
   isAuthApi,
