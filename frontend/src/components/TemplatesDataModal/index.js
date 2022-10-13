@@ -128,11 +128,11 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 
         if (templatesId) {
 				  await api.put(`/TemplatesData/edit/${templatesId}`, formData);
+          toast.success(i18n.t("templatesData.modalConfirm.edited"));
         } else {
           await api.post(`/TemplatesData/create/`, formData);
+          toast.success(i18n.t("templatesData.modalConfirm.successAdd"));
         }
-        toast.success(i18n.t("templatesData.modalConfirm.successAdd"));
-
         setLoading(false);
 			} catch (err) {
 				toastError(err);
@@ -201,7 +201,7 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
         if (typeof value !== 'string') {
           return <TableCell align="center">${value.name}</TableCell>;
         } else {
-          return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} /></TableCell>
+          return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} alt={"upload"}/></TableCell>
         }
       }
 
@@ -209,7 +209,9 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
         if (typeof value !== 'string') {
           return <TableCell align="center">${value.name}</TableCell>;
         } else {
-          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a></TableCell>;
+          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer">
+                    <OndemandVideoIcon fontSize="large"/></a>
+                </TableCell>;
         }
       }
 
@@ -225,7 +227,9 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
         if (typeof value !== 'string') {
           return <TableCell align="center">{value.name}</TableCell>
         } else {
-          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a></TableCell>;
+          return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer">
+                    <DescriptionIcon fontSize="large"/></a>
+                </TableCell>;
         }
       }
 

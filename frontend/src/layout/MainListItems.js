@@ -162,7 +162,7 @@ function ListParentItemLink(props) {
     setOpen((prevOpen) => !prevOpen);
   }
 
-  // <Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error"></Badge>
+  //<Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error"></Badge>
 
   return (
     <List>

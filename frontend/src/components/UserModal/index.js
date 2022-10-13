@@ -31,7 +31,6 @@ import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import { useTranslation } from "react-i18next";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -63,15 +62,6 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const UserSchema = Yup.object().shape({
-	name: Yup.string()
-		.min(2, "Too Short!")
-		.max(50, "Too Long!")
-		.required("Required"),
-	password: Yup.string().min(5, "Too Short!").max(50, "Too Long!"),
-	email: Yup.string().email("Invalid email").required("Required"),
-});
-
 const UserModal = ({ open, onClose, userId }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -82,6 +72,15 @@ const UserModal = ({ open, onClose, userId }) => {
 		password: "",
 		profile: "user",
 	};
+
+	const UserSchema = Yup.object().shape({
+		name: Yup.string()
+			.min(2, `${i18n.t("userModal.short")}`)
+			.max(50, `${i18n.t("userModal.long")}`)
+			.required(`${i18n.t("userModal.required")}`),
+		password: Yup.string().min(5, `${i18n.t("userModal.short")}`).max(50, `${i18n.t("userModal.long")}`),
+		email: Yup.string().email(`${i18n.t("userModal.email")}`).required(`${i18n.t("userModal.required")}`),
+	});
 
 	const { user: loggedInUser } = useContext(AuthContext);
 	const [user, setUser] = useState(initialState);
@@ -99,6 +98,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		if (user.id === loggedInUser.id) {
 			i18n.changeLanguage(language);
 		}
+// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [language]);
 
 	useEffect(() => {
@@ -119,8 +119,8 @@ const UserModal = ({ open, onClose, userId }) => {
 				toastError(err);
 			}
 		};
-
 		fetchUser();
+// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userId, open]);
 
 	useEffect(() => {
@@ -135,6 +135,7 @@ const UserModal = ({ open, onClose, userId }) => {
 			}
 			fetchCompanies();
 		}
+// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const handleClose = () => {
@@ -266,8 +267,8 @@ const UserModal = ({ open, onClose, userId }) => {
 														id="profile-selection"
 														required
 													>
-														<MenuItem value="admin">Admin</MenuItem>
-														<MenuItem value="user">User</MenuItem>
+														<MenuItem value="admin">{i18n.t("userModal.form.admin")}</MenuItem>
+														<MenuItem value="user">{i18n.t("userModal.form.user")}</MenuItem>
 													</Field>
 												</>
 											)}
@@ -287,9 +288,9 @@ const UserModal = ({ open, onClose, userId }) => {
 											value={language}
 											onChange={handleLanguageChange}
 										>
-											<MenuItem value="pt">Português</MenuItem>
-											<MenuItem value="en">Inglês</MenuItem>
-											<MenuItem value="es">Espanhol</MenuItem>
+											<MenuItem value="pt">{i18n.t("userModal.form.languages.pt")}</MenuItem>
+											<MenuItem value="en">{i18n.t("userModal.form.languages.en")}</MenuItem>
+											<MenuItem value="es">{i18n.t("userModal.form.languages.es")}</MenuItem>
 										</Select>
 									</FormControl>
 								</div>
@@ -303,7 +304,7 @@ const UserModal = ({ open, onClose, userId }) => {
 												margin="dense"
 												fullWidth
 											>
-												<InputLabel id="company-selection-label">Empresa</InputLabel>
+												<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
 												<Select
 													label="Empresa"
 													name="company"

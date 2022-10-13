@@ -180,6 +180,7 @@ const reducer = (state, action) => {
 			type: "LOAD_TICKETS",
 			payload: tickets,
 		});
+// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [tickets]);
 
 	useEffect(() => {

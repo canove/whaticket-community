@@ -75,7 +75,7 @@ const TemplateTable = ({ body }) => {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>;
             } else {
-                return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} /></TableCell>
+                return <TableCell align="center"><img style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} alt={"upload"}/></TableCell>
             }
         }
 
@@ -83,7 +83,9 @@ const TemplateTable = ({ body }) => {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>;
             } else {
-                return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a></TableCell>;
+                return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'rel="noopener noreferrer">
+                            <OndemandVideoIcon fontSize="large"/></a>
+                        </TableCell>;
             }
         }
 
@@ -99,7 +101,9 @@ const TemplateTable = ({ body }) => {
             if (typeof value !== 'string') {
                 return <TableCell align="center">{value.name}</TableCell>
             } else {
-                return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a></TableCell>;
+                return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer">
+                            <DescriptionIcon fontSize="large"/></a>
+                        </TableCell>;
             }
         }
 
@@ -107,7 +111,7 @@ const TemplateTable = ({ body }) => {
       }
 
 	return (
-		<TableContainer component={Paper}>
+		<TableContainer component={Paper} className={classes.root}>
             { body &&
                 <Table size="small">
                     <TableHead>

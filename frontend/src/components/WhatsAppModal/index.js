@@ -59,13 +59,6 @@ const useStyles = makeStyles(theme => ({
 	  },
 }));
 
-const SessionSchema = Yup.object().shape({
-	name: Yup.string()
-		.min(2, "Too Short!")
-		.max(50, "Too Long!")
-		.required("Required"),
-});
-
 const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
@@ -76,6 +69,14 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 		isDefault: false,
 		official: false
 	};
+
+	const SessionSchema = Yup.object().shape({
+	name: Yup.string()
+		.min(2, `${i18n.t("whatsappModal.short")}`)
+		.max(50, `${i18n.t("whatsappModal.long")}`)
+		.required(`${i18n.t("whatsappModal.required")}`),
+	});
+
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [flows, setFlows] = useState([]);
