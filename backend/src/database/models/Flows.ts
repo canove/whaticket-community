@@ -38,6 +38,12 @@ class Flows extends Model<Flows> {
   @Column
   location: string;
 
+  @Column
+  clientEmail: string;
+
+  @Column
+  privateKey: string;
+
   @CreatedAt
   createdAt: Date;
 

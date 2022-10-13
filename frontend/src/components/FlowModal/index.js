@@ -84,6 +84,7 @@ const FlowModal = ({ open, onClose, flowId }) => {
       setLocation("");
       setClientEmail("");
       setPrivateKey("");
+      setUseExternalAccount(false);
 
       const fetchFlow = async () => {
         try {
@@ -96,7 +97,7 @@ const FlowModal = ({ open, onClose, flowId }) => {
           setClientEmail(data.clientEmail);
           setPrivateKey(data.privateKey);
 
-          if (clientEmail && privateKey) {
+          if (data.clientEmail && data.privateKey) {
             setUseExternalAccount(true);
           }
         } catch (err) {
@@ -116,6 +117,7 @@ const FlowModal = ({ open, onClose, flowId }) => {
       setLocation("");
       setClientEmail("");
       setPrivateKey("");
+      setUseExternalAccount(false);
       onClose();
     };
 
