@@ -1,6 +1,7 @@
 import Ticket from "../../database/models/Ticket";
 import AppError from "../../errors/AppError";
 import Category from "../../database/models/Category";
+import { CreatedAt } from "sequelize-typescript";
 
 const ResolveService = async (
   CategoryId: string | number
