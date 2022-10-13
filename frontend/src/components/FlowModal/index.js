@@ -93,6 +93,12 @@ const FlowModal = ({ open, onClose, flowId }) => {
           setProjectId(data.projectId);
           setAgentId(data.agentId);
           setLocation(data.location);
+          setClientEmail(data.clientEmail);
+          setPrivateKey(data.privateKey);
+
+          if (clientEmail && privateKey) {
+            setUseExternalAccount(true);
+          }
         } catch (err) {
           toastError(err);
         }
