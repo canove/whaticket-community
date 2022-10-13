@@ -99,6 +99,15 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                 setToken(data.token)
                 setHeader(data.header || "");
                 setBody(data.body || "");
+
+                const mapping = JSON.parse(data.mapping);
+
+                setNameRelation(mapping.name);
+                setDocumentNumberRelation(mapping.documentNumber);
+                setTemplateRelation(mapping.templateParams);
+                setTemplateParamsRelation(mapping.templateParams);
+                setMessageRelation(mapping.message);
+                setPhoneNumberRelation(mapping.phoneNumber)
 			} catch (err) {
 				toastError(err);
 			}
@@ -363,6 +372,15 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
     };
 
 	const handleSubmit = async () => {
+        const mapping = {
+            name: nameRelation,
+            documentNumber: documentNumberRelation,
+            template: templateRelation,
+            templateParams: templateParamsRelation,
+            message: messageRelation,
+            phoneNumber: phoneNumberRelation
+        }
+
 		const importData = {
             name: name,
             method: method,
@@ -370,7 +388,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
             key: key,
             token: token,
             header: header,
-            body: body
+            body: body,
+            mapping: JSON.stringify(mapping)
 		};
 
 		 try {

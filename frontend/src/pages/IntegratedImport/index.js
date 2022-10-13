@@ -223,7 +223,8 @@ const IntegratedImport = () => {
                 onClose={setConfirmCopyModalOpen}
                 onConfirm={() => handleCopyImportation(copingImportation)}
             >
-                Você realmente deseja copiar está importação? Esqueci o resto...
+                Você realmente deseja copiar está importação?
+                Ao realizar está ação, dará inicio a importação dos dados para realizar os disparos, deseja prosseguir?
             </ConfirmationModal>
             <MainHeader>
                 <Title>{i18n.t("integratedImport.title")}</Title>
