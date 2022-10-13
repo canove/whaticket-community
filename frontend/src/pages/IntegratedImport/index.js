@@ -10,6 +10,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { IconButton, TableCell } from "@material-ui/core";
+import { Visibility } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -28,6 +29,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import RegisterFileModal from "../../components/RegisterFileModal";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_IMPORTATION") {
@@ -92,6 +94,8 @@ const IntegratedImport = () => {
     const [deletingImportation, setDeletingImportation] = useState(null);
     const [copyingImportation, setCopyingImportation] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
+    const [selectedIntregratedImportId, setSelectedIntregratedImportId] = useState("");
     const [loading, setLoading] = useState(false);
     const {user} = useContext(AuthContext)
 
@@ -186,6 +190,15 @@ const IntegratedImport = () => {
         }
     }
 
+    const handleOpenRegisterFileModal = (integratedImportId) => {
+        setSelectedIntregratedImportId(integratedImportId)
+        setRegisterFileModalOpen(true);
+      };
+    
+      const handleCloseRegisterFileModal = () => {
+        setRegisterFileModalOpen(false);
+      };
+
     return (
         <MainContainer>
             <ImportationModal
@@ -205,6 +218,13 @@ const IntegratedImport = () => {
             >
                 {i18n.t("integratedImport.confirmation.confirmDelete")}
             </ConfirmationModal>
+            <RegisterFileModal
+                open={registerFileModalOpen}
+                onClose={handleCloseRegisterFileModal}
+                aria-labelledby="form-dialog-title"
+                integratedImportId={selectedIntregratedImportId}
+            >
+            </RegisterFileModal>
             <MainHeader>
                 <Title>{i18n.t("integratedImport.title")}</Title>
                 <MainHeaderButtonsWrapper>
@@ -242,6 +262,14 @@ const IntegratedImport = () => {
                                 <TableCell align="center">{importation.qtdeRegister}</TableCell>
                                 <TableCell align="center">{getStatusById(importation.status)}</TableCell>
                                 <TableCell align="center">
+                                {importation.status === 2 && (
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => handleOpenRegisterFileModal(importation.id)}
+                                    >
+                                        <Visibility />
+                                    </IconButton>
+                                )}
                                 <IconButton
                                     size="small"
                                     onClick={(e) => handleEditImportation(importation)}

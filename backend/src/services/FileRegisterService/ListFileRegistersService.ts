@@ -11,9 +11,14 @@ interface Response {
 const ListFileRegistersService = async ({
   fileId,
   companyId,
+  integratedImportId,
   pageNumber = "1"
 }): Promise<Response> => {
-  const whereCondition = { fileId, companyId };
+  const whereCondition = { 
+    fileId: fileId ? fileId : null,
+    integratedImportId: integratedImportId ? integratedImportId : null,
+    companyId
+  };
 
   const limit = 10;
   const offset = limit * (+pageNumber - 1);
