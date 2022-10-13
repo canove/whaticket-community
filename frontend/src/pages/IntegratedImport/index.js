@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -9,6 +10,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { IconButton, TableCell } from "@material-ui/core";
+import { Visibility } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -27,6 +29,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import RegisterFileModal from "../../components/RegisterFileModal";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_IMPORTATION") {
@@ -89,9 +92,10 @@ const IntegratedImport = () => {
     const [selectedImportation, setSelectedImportation] = useState(null);
     const [importationModalOpen, setImportationModalOpen] = useState(false);
     const [deletingImportation, setDeletingImportation] = useState(null);
+    const [copyingImportation, setCopyingImportation] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-    const [copingImportation, setCopingImportation] = useState(null);
-    const [confirmCopyModalOpen, setConfirmCopyModalOpen] = useState(false);
+    const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
+    const [selectedIntregratedImportId, setSelectedIntregratedImportId] = useState("");
     const [loading, setLoading] = useState(false);
     const {user} = useContext(AuthContext)
 
@@ -115,7 +119,7 @@ const IntegratedImport = () => {
     }, []);
 
     useEffect(() => {
-        const socket = openSocket();
+        const socket = openWorkerSocket();
 
         socket.on(`integratedImport${user.companyId}`, (data) => {
             if (data.action === "update" || data.action === "create") {
@@ -130,15 +134,16 @@ const IntegratedImport = () => {
         return () => {
             socket.disconnect();
         };
-// eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleOpenImportationModal = () => {
+        setCopyingImportation(null);
         setSelectedImportation(null);
         setImportationModalOpen(true);
     };
 
     const handleCloseImportationModal = () => {
+        setCopyingImportation(null);
         setSelectedImportation(null);
         setImportationModalOpen(false);
     };
@@ -147,6 +152,11 @@ const IntegratedImport = () => {
         setSelectedImportation(integratedImport);
         setImportationModalOpen(true);
     };
+
+    const handleCopyImportation = (integratedImport) => {
+        setCopyingImportation(integratedImport);
+        setImportationModalOpen(true);
+    }
 
     const handleDeleteImportation = async (deletingImportation) => {
         try {
@@ -180,24 +190,14 @@ const IntegratedImport = () => {
         }
     }
 
-    const handleCopyImportation = async (integratedImport) => {
-        const integratedImportData = {
-            name: `${integratedImport.name} copy`,
-            method: integratedImport.method,
-            url: integratedImport.url,
-            key: integratedImport.key,
-            token: integratedImport.token,
-            header: integratedImport.header,
-            body: integratedImport.body
-		};
+    const handleOpenRegisterFileModal = (integratedImportId) => {
+        setSelectedIntregratedImportId(integratedImportId)
+        setRegisterFileModalOpen(true);
+      };
     
-        try {
-          await api.post(`/integratedImport/`, integratedImportData);
-          toast.success("Copiado com sucesso!");
-        } catch (err) {
-          toastError(err);
-        }
-      }
+      const handleCloseRegisterFileModal = () => {
+        setRegisterFileModalOpen(false);
+      };
 
     return (
         <MainContainer>
@@ -206,6 +206,7 @@ const IntegratedImport = () => {
                 onClose={handleCloseImportationModal}
                 aria-labelledby="form-dialog-title"
                 integratedImportId={selectedImportation && selectedImportation.id}
+                integratedImportCopy={copyingImportation && copyingImportation}
             />
             <ConfirmationModal
                 title={
@@ -217,14 +218,13 @@ const IntegratedImport = () => {
             >
                 {i18n.t("integratedImport.confirmation.confirmDelete")}
             </ConfirmationModal>
-            <ConfirmationModal
-                title={'Copiar Importação'}
-                open={confirmCopyModalOpen}
-                onClose={setConfirmCopyModalOpen}
-                onConfirm={() => handleCopyImportation(copingImportation)}
+            <RegisterFileModal
+                open={registerFileModalOpen}
+                onClose={handleCloseRegisterFileModal}
+                aria-labelledby="form-dialog-title"
+                integratedImportId={selectedIntregratedImportId}
             >
-                Você realmente deseja copiar está importação? Esqueci o resto...
-            </ConfirmationModal>
+            </RegisterFileModal>
             <MainHeader>
                 <Title>{i18n.t("integratedImport.title")}</Title>
                 <MainHeaderButtonsWrapper>
@@ -262,6 +262,14 @@ const IntegratedImport = () => {
                                 <TableCell align="center">{importation.qtdeRegister}</TableCell>
                                 <TableCell align="center">{getStatusById(importation.status)}</TableCell>
                                 <TableCell align="center">
+                                {importation.status === 2 && (
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => handleOpenRegisterFileModal(importation.id)}
+                                    >
+                                        <Visibility />
+                                    </IconButton>
+                                )}
                                 <IconButton
                                     size="small"
                                     onClick={(e) => handleEditImportation(importation)}
@@ -270,11 +278,8 @@ const IntegratedImport = () => {
                                 </IconButton>
                                 <IconButton
                                     size="small"
-                                    onClick={() => {
-                                        setCopingImportation(importation);
-                                        setConfirmCopyModalOpen(true);
-                                    }}
-                                    >
+                                    onClick={() => handleCopyImportation(importation)}
+                                >
                                     <FileCopyIcon />
                                 </IconButton>
                                 <IconButton

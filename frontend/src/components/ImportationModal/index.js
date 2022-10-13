@@ -22,6 +22,7 @@ import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -61,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ImportationtModal = ({ open, onClose, integratedImportId }) => {
+const ImportationtModal = ({ open, onClose, integratedImportId, integratedImportCopy }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
@@ -73,6 +74,9 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
     const [header, setHeader] = useState("");
     const [body, setBody] = useState("");
     const [response, setResponse] = useState("");
+
+    const [confirmCopyModalOpen, setConfirmCopyModalOpen] = useState(false);
+    const [isCopyting, setIsCopying] = useState(false);
 
     const [relationName, setRelationName] = useState("");
     const [relationDocumentNumber, setRelationDocumentNumber] = useState("");
@@ -99,6 +103,15 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                 setToken(data.token)
                 setHeader(data.header || "");
                 setBody(data.body || "");
+
+                const mapping = JSON.parse(data.mapping);
+
+                setNameRelation(mapping.name);
+                setDocumentNumberRelation(mapping.documentNumber);
+                setTemplateRelation(mapping.templateParams);
+                setTemplateParamsRelation(mapping.templateParams);
+                setMessageRelation(mapping.message);
+                setPhoneNumberRelation(mapping.phoneNumber)
 			} catch (err) {
 				toastError(err);
 			}
@@ -107,7 +120,26 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 		if (integratedImportId) {
 			fetchProduct();
 		}
-	}, [open, integratedImportId])
+
+        if (integratedImportCopy) {
+            setName(`${integratedImportCopy.name} copy`)
+            setMethod(integratedImportCopy.method)
+            setUrl(integratedImportCopy.url)
+            setKey(integratedImportCopy.key)
+            setToken(integratedImportCopy.token)
+            setHeader(integratedImportCopy.header || "");
+            setBody(integratedImportCopy.body || "");
+
+            const mapping = JSON.parse(integratedImportCopy.mapping);
+
+            setNameRelation(mapping.name);
+            setDocumentNumberRelation(mapping.documentNumber);
+            setTemplateRelation(mapping.templateParams);
+            setTemplateParamsRelation(mapping.templateParams);
+            setMessageRelation(mapping.message);
+            setPhoneNumberRelation(mapping.phoneNumber)
+        }
+	}, [open, integratedImportId, integratedImportCopy])
 
     const handleClose = () => {
         setName("");
@@ -118,6 +150,9 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         setHeader("");
         setBody("");
         setResponse("");
+
+        setIsCopying(false);
+        setConfirmCopyModalOpen(false);
 
         setRelationName("");
         setRelationDocumentNumber("");
@@ -132,6 +167,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         setTemplateParamsRelation("");
         setMessageRelation("");
         setPhoneNumberRelation("");
+
         onClose();
 	};
 
@@ -363,6 +399,15 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
     };
 
 	const handleSubmit = async () => {
+        const mapping = {
+            name: nameRelation,
+            documentNumber: documentNumberRelation,
+            template: templateRelation,
+            templateParams: templateParamsRelation,
+            message: messageRelation,
+            phoneNumber: phoneNumberRelation
+        }
+
 		const importData = {
             name: name,
             method: method,
@@ -370,11 +415,15 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
             key: key,
             token: token,
             header: header,
-            body: body
+            body: body,
+            mapping: JSON.stringify(mapping)
 		};
 
 		 try {
-            if (integratedImportId) {
+            if (isCopyting) {
+                await api.post("/integratedImport/", importData);
+                toast.success("Copiado com sucesso!");
+            } else if (integratedImportId) {
                 await api.put(`/integratedImport/${integratedImportId}`, importData);
                 toast.success(i18n.t("integratedImport.confirmation.updatedAt"));
             } else {
@@ -389,6 +438,18 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 
 	return (
 		<div className={classes.root}>
+            <ConfirmationModal
+                title={'Copiar Importação'}
+                open={confirmCopyModalOpen}
+                onClose={setConfirmCopyModalOpen}
+                onConfirm={() => {
+                    setIsCopying(true);
+                    handleSubmit();
+                }}
+            >
+                Você realmente deseja copiar está importação?
+                Ao realizar está ação, dará inicio a importação dos dados para realizar os disparos, deseja prosseguir?
+            </ConfirmationModal>
 			<Dialog
 				open={open}
 				onClose={handleClose}
