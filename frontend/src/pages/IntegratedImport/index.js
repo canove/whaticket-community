@@ -26,6 +26,7 @@ import { DeleteOutline } from "@material-ui/icons";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_IMPORTATION") {
@@ -89,6 +90,8 @@ const IntegratedImport = () => {
     const [importationModalOpen, setImportationModalOpen] = useState(false);
     const [deletingImportation, setDeletingImportation] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [copingImportation, setCopingImportation] = useState(null);
+    const [confirmCopyModalOpen, setConfirmCopyModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const {user} = useContext(AuthContext)
 
@@ -155,27 +158,46 @@ const IntegratedImport = () => {
         setDeletingImportation(null);
     };
 
- const getStatusById = (id) => {
-    if (id === 0) {
-      return `${i18n.t("integratedImport.status.awaitingImport")}`;
-    } else if (id === 1) {
-      return `${i18n.t("integratedImport.status.processing")}`;
-    } else if (id === 2) {
-      return `${i18n.t("integratedImport.status.awaitingApprove")}`;
-    } else if (id === 3) {
-      return `${i18n.t("integratedImport.status.err")}`;
-    } else if (id === 4) {
-      return `${i18n.t("integratedImport.status.approve")}`;
-    } else if (id === 5) {
-      return `${i18n.t("integratedImport.status.shooting")}`;
-    } else if (id === 6) {
-      return `${i18n.t("integratedImport.status.finished")}`;
-    } else if (id === 7) {
-      return `${i18n.t("integratedImport.status.refused")}`;
-    } else {
-      return id;
+    const getStatusById = (id) => {
+        if (id === 0) {
+        return `${i18n.t("integratedImport.status.awaitingImport")}`;
+        } else if (id === 1) {
+        return `${i18n.t("integratedImport.status.processing")}`;
+        } else if (id === 2) {
+        return `${i18n.t("integratedImport.status.awaitingApprove")}`;
+        } else if (id === 3) {
+        return `${i18n.t("integratedImport.status.err")}`;
+        } else if (id === 4) {
+        return `${i18n.t("integratedImport.status.approve")}`;
+        } else if (id === 5) {
+        return `${i18n.t("integratedImport.status.shooting")}`;
+        } else if (id === 6) {
+        return `${i18n.t("integratedImport.status.finished")}`;
+        } else if (id === 7) {
+        return `${i18n.t("integratedImport.status.refused")}`;
+        } else {
+        return id;
+        }
     }
-  }
+
+    const handleCopyImportation = async (integratedImport) => {
+        const integratedImportData = {
+            name: `${integratedImport.name} copy`,
+            method: integratedImport.method,
+            url: integratedImport.url,
+            key: integratedImport.key,
+            token: integratedImport.token,
+            header: integratedImport.header,
+            body: integratedImport.body
+		};
+    
+        try {
+          await api.post(`/integratedImport/`, integratedImportData);
+          toast.success("Copiado com sucesso!");
+        } catch (err) {
+          toastError(err);
+        }
+      }
 
     return (
         <MainContainer>
@@ -194,6 +216,14 @@ const IntegratedImport = () => {
                 onConfirm={() => handleDeleteImportation(deletingImportation.id)}
             >
                 {i18n.t("integratedImport.confirmation.confirmDelete")}
+            </ConfirmationModal>
+            <ConfirmationModal
+                title={'Copiar Importação'}
+                open={confirmCopyModalOpen}
+                onClose={setConfirmCopyModalOpen}
+                onConfirm={() => handleCopyImportation(copingImportation)}
+            >
+                Você realmente deseja copiar está importação? Esqueci o resto...
             </ConfirmationModal>
             <MainHeader>
                 <Title>{i18n.t("integratedImport.title")}</Title>
@@ -237,6 +267,15 @@ const IntegratedImport = () => {
                                     onClick={(e) => handleEditImportation(importation)}
                                 >
                                     <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                        setCopingImportation(importation);
+                                        setConfirmCopyModalOpen(true);
+                                    }}
+                                    >
+                                    <FileCopyIcon />
                                 </IconButton>
                                 <IconButton
                                     size="small"
