@@ -11,6 +11,7 @@ import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService
 import formatBody from "../helpers/Mustache";
 import HistoricService from "../services/TicketServices/HistoricService";
 import ResolveService from "../services/TicketServices/ResolveService";
+import ChangeQueueOrResolveTicketService from "../services/TicketServices/ChangeQueueOrResolveTicket";
 
 type IndexQuery = {
   searchParam: string;
@@ -166,4 +167,18 @@ export const remove = async (
     });
 
   return res.status(200).json({ message: "ticket deleted" });
+};
+
+export const changeQueueOrResolve = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId, queueName } = req.params;
+
+  await ChangeQueueOrResolveTicketService({
+    ticketId,
+    queueName
+  });
+
+  return res.status(200).json({ message: "Ticket atualizado com sucesso!" });
 };
