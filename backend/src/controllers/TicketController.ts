@@ -173,7 +173,7 @@ export const changeQueueOrResolve = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { ticketId, queueName } = req.params;
+  const { ticketId, queueName } = req.body;
 
   await ChangeQueueOrResolveTicketService({
     ticketId,

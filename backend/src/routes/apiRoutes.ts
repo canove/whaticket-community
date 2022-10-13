@@ -13,7 +13,7 @@ const upload = multer(uploadConfig);
 const ApiRoutes = express.Router();
 
 ApiRoutes.get(
-  "/tickets/changeQueueOrResolve",
+  "/tickets/changeQueueOrResolve/",
   isAuthApi,
   TicketController.changeQueueOrResolve
 );
