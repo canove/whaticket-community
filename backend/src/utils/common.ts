@@ -18,4 +18,28 @@ const preparePhoneNumber = (phone:string): string => {
   return phoneNumber;
 }
 
-export { preparePhoneNumber };
+const isValidHttpUrl = (text: string): any => {
+  let url;
+  
+  try {
+    url = new URL(text);
+  } catch (_) {
+    return false;  
+  }
+
+  let isValidUrl = url.protocol === "http:" || url.protocol === "https:";
+  if(isValidUrl) {
+    let urlSplit = url.toString().split('|');
+    if(urlSplit.length > 1) {
+      return {
+        "url": urlSplit[0],
+        "type": urlSplit[1],
+        "fileName": urlSplit[2]
+      }
+    }
+    return null;
+  }
+  return null;
+}
+
+export { preparePhoneNumber, isValidHttpUrl };

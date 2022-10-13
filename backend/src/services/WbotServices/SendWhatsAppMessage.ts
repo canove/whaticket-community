@@ -8,6 +8,7 @@ import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
+import { isValidHttpUrl } from "../../utils/common";
 
 interface Request {
   body: string;
@@ -99,7 +100,21 @@ const SendWhatsAppMessage = async ({
     }
   } else {
     try {
-      const apiUrl = `${process.env.WPPNOF_URL}/sendText`;
+      const { url, type, fileName } = isValidHttpUrl(body);
+
+      let apiUrl = `${process.env.WPPNOF_URL}/sendText`;
+      switch(type) {
+        case 'file':
+          apiUrl = `${process.env.WPPNOF_URL}/sendFile`;
+          break;
+        case 'video':
+          apiUrl = `${process.env.WPPNOF_URL}/sendVideo`;
+          break;
+        case 'image':
+          apiUrl = `${process.env.WPPNOF_URL}/sendImage`;
+          break;
+      }
+
       let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
       
       if (phoneNumber.length > 12){
@@ -112,7 +127,8 @@ const SendWhatsAppMessage = async ({
       const payload = {
         "session": connnection.name,
         "number": phoneNumber,
-        "text": `NO-TYPING ${formatBody(body, ticket.contact)}` 
+        "path": url,
+        "text": fileName != null? fileName :`NO-TYPING ${formatBody(body, ticket.contact)}` 
       };
 
       var result = await axios.post(apiUrl, payload, {
@@ -132,8 +148,8 @@ const SendWhatsAppMessage = async ({
             body: body,
             fromMe: fromMe,
             read: true,
-            mediaUrl: null,
-            mediaType: null,
+            mediaUrl: url,
+            mediaType: type,
             quotedMsgId: null,
             bot: ticket.status == 'inbot',
             companyId
