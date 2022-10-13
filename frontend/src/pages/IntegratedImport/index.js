@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -89,9 +90,8 @@ const IntegratedImport = () => {
     const [selectedImportation, setSelectedImportation] = useState(null);
     const [importationModalOpen, setImportationModalOpen] = useState(false);
     const [deletingImportation, setDeletingImportation] = useState(null);
+    const [copyingImportation, setCopyingImportation] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-    const [copingImportation, setCopingImportation] = useState(null);
-    const [confirmCopyModalOpen, setConfirmCopyModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const {user} = useContext(AuthContext)
 
@@ -115,7 +115,7 @@ const IntegratedImport = () => {
     }, []);
 
     useEffect(() => {
-        const socket = openSocket();
+        const socket = openWorkerSocket();
 
         socket.on(`integratedImport${user.companyId}`, (data) => {
             if (data.action === "update" || data.action === "create") {
@@ -130,15 +130,16 @@ const IntegratedImport = () => {
         return () => {
             socket.disconnect();
         };
-// eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleOpenImportationModal = () => {
+        setCopyingImportation(null);
         setSelectedImportation(null);
         setImportationModalOpen(true);
     };
 
     const handleCloseImportationModal = () => {
+        setCopyingImportation(null);
         setSelectedImportation(null);
         setImportationModalOpen(false);
     };
@@ -147,6 +148,11 @@ const IntegratedImport = () => {
         setSelectedImportation(integratedImport);
         setImportationModalOpen(true);
     };
+
+    const handleCopyImportation = (integratedImport) => {
+        setCopyingImportation(integratedImport);
+        setImportationModalOpen(true);
+    }
 
     const handleDeleteImportation = async (deletingImportation) => {
         try {
@@ -180,25 +186,6 @@ const IntegratedImport = () => {
         }
     }
 
-    const handleCopyImportation = async (integratedImport) => {
-        const integratedImportData = {
-            name: `${integratedImport.name} copy`,
-            method: integratedImport.method,
-            url: integratedImport.url,
-            key: integratedImport.key,
-            token: integratedImport.token,
-            header: integratedImport.header,
-            body: integratedImport.body
-		};
-    
-        try {
-          await api.post(`/integratedImport/`, integratedImportData);
-          toast.success("Copiado com sucesso!");
-        } catch (err) {
-          toastError(err);
-        }
-      }
-
     return (
         <MainContainer>
             <ImportationModal
@@ -206,6 +193,7 @@ const IntegratedImport = () => {
                 onClose={handleCloseImportationModal}
                 aria-labelledby="form-dialog-title"
                 integratedImportId={selectedImportation && selectedImportation.id}
+                integratedImportCopy={copyingImportation && copyingImportation}
             />
             <ConfirmationModal
                 title={
@@ -216,15 +204,6 @@ const IntegratedImport = () => {
                 onConfirm={() => handleDeleteImportation(deletingImportation.id)}
             >
                 {i18n.t("integratedImport.confirmation.confirmDelete")}
-            </ConfirmationModal>
-            <ConfirmationModal
-                title={'Copiar Importação'}
-                open={confirmCopyModalOpen}
-                onClose={setConfirmCopyModalOpen}
-                onConfirm={() => handleCopyImportation(copingImportation)}
-            >
-                Você realmente deseja copiar está importação?
-                Ao realizar está ação, dará inicio a importação dos dados para realizar os disparos, deseja prosseguir?
             </ConfirmationModal>
             <MainHeader>
                 <Title>{i18n.t("integratedImport.title")}</Title>
@@ -271,11 +250,8 @@ const IntegratedImport = () => {
                                 </IconButton>
                                 <IconButton
                                     size="small"
-                                    onClick={() => {
-                                        setCopingImportation(importation);
-                                        setConfirmCopyModalOpen(true);
-                                    }}
-                                    >
+                                    onClick={() => handleCopyImportation(importation)}
+                                >
                                     <FileCopyIcon />
                                 </IconButton>
                                 <IconButton
