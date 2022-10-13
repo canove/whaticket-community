@@ -3,11 +3,10 @@ import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 
 const ShowFlowByConnectionService = async (
-  connectionName: string,
-  companyId: string | number
+  connectionName: string
 ): Promise<Flows> => {
   const whatsapp = await Whatsapp.findOne({
-    where: { name: connectionName, companyId }
+    where: { name: connectionName, deleted: 0 }
   });
 
   if (!whatsapp) {
@@ -15,7 +14,7 @@ const ShowFlowByConnectionService = async (
   }
 
   const flow = await Flows.findOne({
-    where: { id: whatsapp.flowId, companyId },
+    where: { id: whatsapp.flowId }
   });
 
   if (!flow) {

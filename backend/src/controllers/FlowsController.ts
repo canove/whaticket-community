@@ -57,9 +57,8 @@ export const connection = async (
   res: Response
 ): Promise<Response> => {
   const { connectionName } = req.params;
-  const { companyId } = req.user;
 
-  const flow = await ShowFlowByConnectionService(connectionName, companyId);
+  const flow = await ShowFlowByConnectionService(connectionName);
 
   return res.status(200).json(flow);
 };
