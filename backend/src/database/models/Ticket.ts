@@ -87,6 +87,10 @@ class Ticket extends Model<Ticket> {
 
   @BelongsTo(() => Category)
   category: Category;
+
+  @Column
+  finalizedAt: Date;
+
 }
 
 export default Ticket;

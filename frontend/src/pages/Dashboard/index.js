@@ -12,10 +12,11 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { TextField } from "@material-ui/core";
+import { Card, CardContent, InputAdornment, TextField } from "@material-ui/core";
 import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import SearchIcon from "@material-ui/icons/Search";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -53,6 +54,30 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: -10
   },
+
+  root: {
+    width: 200,
+    transform: 'scale(1.2)',
+    marginBlock: 40,
+    padding: theme.spacing(2),
+    display: 'inline-block',
+
+  },
+  title: {
+    width: "100%",
+    display: 'flex',
+    fontSize: 14,
+    padding: theme.spacing(3),
+  },
+
+  search: {
+    width: "40%",
+    display: 'flex',
+    fontSize: 14,
+    marginLeft: 50,
+
+  },
+
 }));
 
 const Dashboard = () => {
@@ -71,6 +96,7 @@ const Dashboard = () => {
   const [files, setFiles] = useState([]);
   const [date, setDate] = useState("");
   const [categoryCount, setCategoryCount] = useState([]);
+  const [searchParam, setSearchParam] = useState("");
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -100,13 +126,13 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const { data } = await api.get(`/registers/list?fileId=${fileId}&date=${date}`);
-        setRegisterCount(data.register.count);
-        setSentCount(data.sent.count);
-        setDeliveredCount(data.delivered.count);
-        setReadCount(data.read.count);
-        setErrorCount(data.error.count);
-        setCategoryCount(data.category);
-        setLoading(false);
+          setRegisterCount(data.register.count);
+          setSentCount(data.sent.count);
+          setDeliveredCount(data.delivered.count);
+          setReadCount(data.read.count);
+          setErrorCount(data.error.count);
+          setCategoryCount(data.category);
+          setLoading(false);
       } catch (err) {
         toastError(err);
       }
@@ -170,6 +196,11 @@ const Dashboard = () => {
     return 12
   };
 
+  const handleSearch = (e) => {
+    setSearchParam(e.target.value.toLowerCase());
+  };
+
+
   return (
     <div>
       <MainHeader>
@@ -192,7 +223,7 @@ const Dashboard = () => {
                   renderInput={(params) =>
                       <TextField
                           {...params}
-                          label={"Arquivo"}
+                          label={i18n.t("dashboard.file")}
                           InputLabelProps={{ required: true}}
                       />
                   }
@@ -209,7 +240,7 @@ const Dashboard = () => {
               <TextField
                 className={classes.selectStyle}
                 onChange={(e) => { setDate(e.target.value) }}
-                label={"Data"}
+                label={i18n.t("dashboard.date")}
                 InputLabelProps={{ shrink: true, required: true }}
                 type="date"
               />
@@ -358,8 +389,6 @@ const Dashboard = () => {
                 </Grid>
               </Paper>
             </Grid>
-
-
           ))}
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
@@ -367,6 +396,54 @@ const Dashboard = () => {
             </Paper>
           </Grid>
         </Grid>
+        <Grid item xs={12} >
+            <Paper className={classes.title}>
+                 <Typography component="h3" variant="h6" color="primary" >
+                  Tempo de Atendimento
+                </Typography>
+                  <Grid>
+                      <TextField
+                        className={classes.search}
+                        placeholder={"Pesquisar"}
+                        type="search"
+                        value={searchParam}
+                        onChange={handleSearch}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchIcon style={{ color: "gray" }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+
+                      <div>
+                        <Card elevation={5} className={classes.root}>
+                          <CardContent>
+                            <Typography align="center" variant="h6" component="h2">Cliente</Typography><br/>
+                            <Typography align="center" variant="h5" component="h2"> 03:00 hrs </Typography>
+                          </CardContent>
+                        </Card>
+                        <Card elevation={5} className={classes.root}>
+                          <CardContent>
+                            <Typography align="center" variant="h6" component="h2">Cliente</Typography><br/>
+                            <Typography align="center" variant="h5" component="h2"> 03:00 hrs </Typography>
+                          </CardContent>
+                        </Card>
+                        <Card elevation={5} className={classes.root}>
+                          <CardContent>
+                            <Typography align="center" variant="h6" component="h2">Cliente</Typography><br/>
+                            <Typography align="center" variant="h5" component="h2"> 03:00 hrs </Typography>
+                          </CardContent>
+                        </Card>
+                      </div>
+                      <Typography component="h3" variant="h6">
+                        Tempo total de Atendimentos: 09:00 hrs.
+                      </Typography>
+
+                  </Grid>
+            </Paper>
+          </Grid>
       </Container>
     </div>
   );
