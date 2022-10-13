@@ -45,7 +45,7 @@ class IntegratedImport extends Model<IntegratedImport> {
   mapping: string;
 
   @Column
-  config: string;
+  header: string;
 
   @Column
   body: string;

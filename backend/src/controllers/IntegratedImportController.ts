@@ -20,7 +20,7 @@ interface IntegratedImportData {
   token: string;
   mapping: string;
   companyId: string | number;
-  config: string;
+  header: string;
   body: string;
 }
 
@@ -41,7 +41,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     url,
     key,
     token,
-    mapping
+    mapping,
+    header,
+    body
   }: IntegratedImportData = req.body;
 
   const { companyId } = req.user;
@@ -55,7 +57,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     key,
     token,
     mapping,
-    companyId
+    companyId,
+    header,
+    body
   });
 
   const io = getIO();

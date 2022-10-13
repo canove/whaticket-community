@@ -70,17 +70,23 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
     const [url, setUrl] = useState("");
     const [key, setKey] = useState("");
     const [token, setToken] = useState("");
-    const [config, setConfig] = useState("");
+    const [header, setHeader] = useState("");
     const [body, setBody] = useState("");
     const [response, setResponse] = useState("");
 
     const [relationName, setRelationName] = useState("");
     const [relationDocumentNumber, setRelationDocumentNumber] = useState("");
     const [relationTemplate, setRelationTemplate] = useState("");
+    const [relationTemplateParams, setRelationTemplateParams] = useState("");
+    const [relationMessage, setRelationMessage] = useState("");
+    const [relationPhoneNumber, setRelationPhoneNumber] = useState("");
 
     const [nameRelation, setNameRelation] = useState("");
     const [documentNumberRelation, setDocumentNumberRelation] = useState("");
     const [templateRelation, setTemplateRelation] = useState("");
+    const [templateParamsRelation, setTemplateParamsRelation] = useState("");
+    const [messageRelation, setMessageRelation] = useState("");
+    const [phoneNumberRelation, setPhoneNumberRelation] = useState("");
 
 	useEffect(() => {
 		const fetchProduct = async () => {
@@ -91,7 +97,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                 setUrl(data.url)
                 setKey(data.key)
                 setToken(data.token)
-                setConfig(data.config || "");
+                setHeader(data.header || "");
                 setBody(data.body || "");
 			} catch (err) {
 				toastError(err);
@@ -109,8 +115,23 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         setUrl("");
         setKey("");
         setToken("");
-        setConfig("");
+        setHeader("");
         setBody("");
+        setResponse("");
+
+        setRelationName("");
+        setRelationDocumentNumber("");
+        setRelationTemplate("");
+        setRelationTemplateParams("");
+        setRelationMessage("");
+        setRelationPhoneNumber("");
+    
+        setNameRelation("");
+        setDocumentNumberRelation("");
+        setTemplateRelation("");
+        setTemplateParamsRelation("");
+        setMessageRelation("");
+        setPhoneNumberRelation("");
         onClose();
 	};
 
@@ -126,8 +147,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         setUrl(e.target.value);
     };
 
-    const handleConfigChange = (e) => {
-        setConfig(e.target.value);
+    const handleHeaderChange = (e) => {
+        setHeader(e.target.value);
     }
 
     const handleBodyChange = (e) => {
@@ -138,36 +159,47 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         
     }
 
-    const jsonToString = (json) => {
-        try {
-            const responseObj = JSON.parse(json);
-            return responseObj;
-        } catch {
-            return false;
-        }
-    }
-
     const handleNameRelationChange = (e) => {
+        var string = e.target.value;
+        var last2 = string.slice(-2);
+
+        if (last2 === "..") return;
+
         setNameRelation(e.target.value);
 
-        const responseObj = jsonToString(response);
-            
+        const responseObj = jsonStringToObj(response);
+        const relation = e.target.value.split(".");
+
         if (responseObj === false) return;
 
-        if (responseObj[e.target.value]) {
-            setRelationName(JSON.stringify(responseObj[e.target.value]));
+        const value = handleKeys(relation);
+
+        if (value) {
+            setRelationName(JSON.stringify(value));
+        } else {
+            setRelationName("NOT FOUND");
         }
     }
 
     const handleDocumentNumberRelationChange = (e) => {
+        var string = e.target.value;
+        var last2 = string.slice(-2);
+
+        if (last2 === "..") return;
+
         setDocumentNumberRelation(e.target.value);
 
-        const responseObj = jsonToString(response);
-            
+        const responseObj = jsonStringToObj(response);
+        const relation = e.target.value.split(".");
+
         if (responseObj === false) return;
 
-        if (responseObj[e.target.value]) {
-            setRelationDocumentNumber(JSON.stringify(responseObj[e.target.value]));
+        const value = handleKeys(relation);
+
+        if (value) {
+            setRelationDocumentNumber(JSON.stringify(value));
+        } else {
+            setRelationDocumentNumber("NOT FOUND");
         }
     }
 
@@ -179,7 +211,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
 
         setTemplateRelation(e.target.value);
 
-        const responseObj = jsonToString(response);
+        const responseObj = jsonStringToObj(response);
         const relation = e.target.value.split(".");
 
         if (responseObj === false) return;
@@ -193,31 +225,74 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         }
     }
 
-        // const responseObj = jsonToString(response);
+    const handleTemplateParamsRelationChange = (e) => {
+        var string = e.target.value;
+        var last2 = string.slice(-2);
 
-        // if (responseObj) {
-        //     let ARRAYNIVEL1 = [];
-        //     let ARRAYNIVEL2 = [];
+        if (last2 === "..") return;
 
-        //     const NIVEL0 = responseObj;
-        //     console.log(NIVEL0);
+        setTemplateParamsRelation(e.target.value);
 
-        //     const NIVEL1 = NIVEL0["abilities"];
-        //     console.log(NIVEL1);
+        const responseObj = jsonStringToObj(response);
+        const relation = e.target.value.split(".");
 
-        //     for (const ITEM of NIVEL1) {
-        //         ARRAYNIVEL1.push(ITEM["ability"]);
-        //     }
-            
-        //     for (const ITEM of ARRAYNIVEL1) {
-        //         ARRAYNIVEL2.push(ITEM["name"]);
-        //     }
+        if (responseObj === false) return;
 
-        //     console.log(ARRAYNIVEL2)
-        // }
+        const value = handleKeys(relation);
+
+        if (value) {
+            setRelationTemplateParams(JSON.stringify(value));
+        } else {
+            setRelationTemplateParams("NOT FOUND");
+        }
+    }
+
+    const handleMessageRelationChange = (e) => {
+        var string = e.target.value;
+        var last2 = string.slice(-2);
+
+        if (last2 === "..") return;
+
+        setMessageRelation(e.target.value);
+
+        const responseObj = jsonStringToObj(response);
+        const relation = e.target.value.split(".");
+
+        if (responseObj === false) return;
+
+        const value = handleKeys(relation);
+
+        if (value) {
+            setRelationMessage(JSON.stringify(value));
+        } else {
+            setRelationMessage("NOT FOUND");
+        }
+    }
+
+    const handlePhoneNumberRelationChange = (e) => {
+        var string = e.target.value;
+        var last2 = string.slice(-2);
+
+        if (last2 === "..") return;
+
+        setPhoneNumberRelation(e.target.value);
+
+        const responseObj = jsonStringToObj(response);
+        const relation = e.target.value.split(".");
+
+        if (responseObj === false) return;
+
+        const value = handleKeys(relation);
+
+        if (value) {
+            setRelationPhoneNumber(JSON.stringify(value));
+        } else {
+            setRelationPhoneNumber("NOT FOUND");
+        }
+    }
 
     const handleKeys = (keys) => {
-        let value = jsonToString(response);
+        let value = jsonStringToObj(response);
 
         if (!value) return false;
 
@@ -242,20 +317,49 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
         return value;
     }
 
+    const jsonStringToObj = (json) => {
+        try {
+            const responseObj = JSON.parse(json);
+            return responseObj;
+        } catch {
+            return false;
+        }
+    }
+
     const handleAuthenticate = async () => {
         if (!url) {
             toast.error("Adicione uma URL");
         }
 
-        if (method === "GET") {
-            axios.get(url)
-            .then(resp => {
-                const responseString = JSON.stringify(resp.data, null, 2);
-                setResponse(responseString);
-            });
-        } else {
-            toast.error("Selecione um Método");
+        let headerJSON = jsonStringToObj(header);
+        let bodyJSON = jsonStringToObj(body);
+
+        if (!headerJSON) {
+            headerJSON = "";
         }
+
+        if (method === "POST" || !bodyJSON) {
+            bodyJSON = "";
+        }
+
+        axios({
+            method: method,
+            url: url,
+            headers: {
+                ...headerJSON
+            },
+            data: {
+                ...bodyJSON
+            }
+        })
+        .then(res => {
+            const responseString = JSON.stringify(res.data, null, 2);
+            setResponse(responseString);
+        })
+        .catch(err => {
+            const responseString = JSON.stringify(err, null, 2);
+            setResponse(responseString);
+        });
     };
 
 	const handleSubmit = async () => {
@@ -265,7 +369,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
             url: url,
             key: key,
             token: token,
-            config: config,
+            header: header,
             body: body
 		};
 
@@ -369,14 +473,14 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                 <div className={classes.multFieldLine}>
                     <TextField
                         as={TextField}
-                        label="Config"
+                        label="Header"
                         type="bodyText"
-                        onChange={(e) => { handleConfigChange(e) }}
-                        value={config}
+                        onChange={(e) => { handleHeaderChange(e) }}
+                        value={header}
                         multiline
                         minRows={4}
                         maxLength="1024"
-                        name="config"
+                        name="header"
                         variant="outlined"
                         margin="normal"
                         fullWidth
@@ -494,6 +598,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                                 label="templateParams"
                                 fullWidth
                                 disabled
+                                value={relationTemplateParams}
                             />
                             <TextField
                                 as={TextField}
@@ -502,6 +607,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                                 margin="normal"
                                 label="Template Params"
                                 fullWidth
+                                value={templateParamsRelation}
+                                onChange={(e) => { handleTemplateParamsRelationChange(e) }}
                             />
                         </div>
                         <div className={classes.multFieldLine}>
@@ -513,6 +620,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                                 label="message"
                                 fullWidth
                                 disabled
+                                value={relationMessage}
                             />
                             <TextField
                                 as={TextField}
@@ -521,6 +629,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                                 margin="normal"
                                 label="Message"
                                 fullWidth
+                                value={messageRelation}
+                                onChange={(e) => { handleMessageRelationChange(e) }}
                             />
                         </div>
                         <div className={classes.multFieldLine}>
@@ -532,6 +642,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                                 label="phoneNumber"
                                 fullWidth
                                 disabled
+                                value={relationPhoneNumber}
                             />
                             <TextField
                                 as={TextField}
@@ -540,6 +651,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId }) => {
                                 margin="normal"
                                 label="Phone Number"
                                 fullWidth
+                                value={phoneNumberRelation}
+                                onChange={(e) => { handlePhoneNumberRelationChange(e) }}
                             />
                         </div>
                     </Paper>
