@@ -1,17 +1,24 @@
 import AppError from "../../errors/AppError";
 import Ticket from "../../database/models/Ticket";
 import Queue from "../../database/models/Queue";
+import Message from "../../database/models/Message";
 
 interface Request {
-  ticketId: string | number;
+  messageId: string | number;
   queueName: string;
 }
 
 const ChangeQueueOrResolveTicketService = async ({
-  ticketId,
+  messageId,
   queueName
 }: Request): Promise<Ticket> => {
-  const ticket = await Ticket.findByPk(ticketId);
+  const message = await Message.findByPk(messageId);
+
+  if (!message) {
+    throw new AppError("ERR_MESSAGE_DO_NOT_EXISTS");
+  }
+
+  const ticket = await Ticket.findByPk(message.ticketId);
 
   if (!ticket) {
     throw new AppError("ERR_TICKET_DO_NOT_EXISTS");
@@ -26,6 +33,7 @@ const ChangeQueueOrResolveTicketService = async ({
     });
 
     ticket.update({
+      status: "pending",
       queueId: queue ? queue.id : null
     });
   } else {
