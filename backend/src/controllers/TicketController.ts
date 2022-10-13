@@ -109,7 +109,7 @@ export const resolve = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { categoryId } = req.params;
+  const { categoryId, createdAt, finalizedAt } = req.params;
 
   const category = await ResolveService(categoryId);
 
