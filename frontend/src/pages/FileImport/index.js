@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
-import openSocket from "../../services/socket-io";
 import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -283,6 +282,7 @@ const FileImport = () => {
     return () => {
       socket.disconnect();
     };
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

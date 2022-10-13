@@ -203,11 +203,11 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
       }
 
       if (body.type === "image") {
-        response.push(<img key={index} style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} />)
+        response.push(<img key={index} style={{display: "block", margin: "auto", maxWidth: "100px"}} src={value} alt={"upload"}/>)
       }
 
       if (body.type === "video") {
-        response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><OndemandVideoIcon fontSize="large"/></a>)
+        response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer"><OndemandVideoIcon fontSize="large"/></a>)
       }
 
       if (body.type === "audio") {
@@ -215,7 +215,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
       }
 
       if (body.type === "file") {
-          response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank'><DescriptionIcon fontSize="large"/></a>);
+          response.push(<a key={index} style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer"><DescriptionIcon fontSize="large"/></a>);
       }
 
       index++;
@@ -289,7 +289,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
               <Button
                 onClick={loadPreviousPage}
               >
-                Página Anterior
+                {i18n.t("importation.registryModal.previousPage")}
               </Button>
             </>
           )}
@@ -298,7 +298,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
               <Button
                 onClick={loadNextPage}
               >
-                Próxima Página
+                {i18n.t("importation.registryModal.nextPage")}
               </Button>
             </>
           )}

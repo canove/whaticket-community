@@ -17,7 +17,7 @@ import { green } from "@material-ui/core/colors";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
-import { i18n } from "../../translate/i18n";
+import i18next from "i18next";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -213,7 +213,7 @@ const UserSchema = Yup.object().shape({
       >
         <DialogTitle id="form-dialog-title">
           {companyId
-            ? `${i18n.t("company.companyModal.titleEdit")}`
+            ? `${i18next.t("company.companyModal.titleEdit")}`
             : `${i18n.t("company.companyModal.titleAdd")}`}
         </DialogTitle>
         <Formik
@@ -241,6 +241,7 @@ const UserSchema = Yup.object().shape({
                     error={touched.alias && Boolean(errors.alias)}
                     helperText={touched.alias && errors.alias}
                     fullWidth
+                    open={textAlias}
                   />
                 </div>
                 <div className={classes.multFieldLine}>

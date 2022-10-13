@@ -352,7 +352,8 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                                           <MenuItem key={menu.id} value={menu.id}>{menu.name}</MenuItem>
                                       );
                                   }
-                              })}
+                                return null
+                                })}
                             </Select>
                         </FormControl>
                     </div>

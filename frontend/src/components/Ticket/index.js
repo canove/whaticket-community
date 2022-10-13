@@ -116,7 +116,7 @@ const Ticket = () => {
       }
 
       if (data.action === "delete") {
-        toast.success("Ticket deleted sucessfully.");
+        toast.success("tickets.toasts.confirmDelete");
         history.push("/tickets");
       }
     });

@@ -117,11 +117,11 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
           scroll="paper"
         >
           <DialogTitle id="form-dialog-title">
-            {i18n.t("Categoria")}
+            {i18n.t("category.title")}
           </DialogTitle>
               <DialogContent dividers>
                 <Typography variant="subtitle1" gutterBottom>
-                    Selecione uma Descrição
+                    {i18n.t("category.categoryModal.select")}
                 </Typography>
 					<div className={classes.multFieldLine}>
 						<Select
@@ -136,7 +136,7 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
 							onClose={handleCloseSelect}
 							style={{width: "100%"}}
 						>
-              <MenuItem value={"Nenhuma"}>Nenhuma</MenuItem>
+              <MenuItem value={"Nenhuma"}>{i18n.t("category.categoryModal.none")}</MenuItem>
 							{description.length > 0 && description.map((category, index) => {
 										return (
 							<MenuItem key={index} value={category.id}>{category.name}</MenuItem>

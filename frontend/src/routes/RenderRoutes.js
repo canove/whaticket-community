@@ -31,7 +31,7 @@ import Category from "../pages/Category";
 import Flows from "../pages/Flows";
 
 const RenderRoutes = () => {
-    const { isAuth, user } = useContext(AuthContext);
+    const { isAuth } = useContext(AuthContext);
     const [menus, setMenus] = useState([]);
 
     useEffect(() => {

@@ -315,7 +315,7 @@ function getIcon(icon) {
 const getParent = (id) => {
   let parentName;
   registrations.forEach((registration) => {
-    if (registration.id == id) {
+    if (registration.id === id) {
       parentName = registration.name;
     }
   })
