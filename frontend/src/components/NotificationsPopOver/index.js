@@ -108,9 +108,10 @@ const NotificationsPopOver = () => {
 		});
 
 		socket.on(`appMessage${user.companyId}`, data => {
+			console.log(data);
 			if (
 				data.action === "create" &&
-				!data.message.read &&
+				(!data.message.read || data.ticket.status === "pending") &&
 				(data.ticket.userId === user?.id || !data.ticket.userId)
 			) {
 				setNotifications(prevState => {

@@ -101,8 +101,9 @@ export const historic = async (
   res: Response
 ): Promise<Response> => {
   const { contactId } = req.params;
+  const { companyId } = req.user;
 
-  const contact = await HistoricService(contactId);
+  const contact = await HistoricService(contactId, companyId);
 
   return res.status(200).json(contact);
 };

@@ -3,7 +3,8 @@ import AppError from "../../errors/AppError";
 import User from "../../database/models/User";
 
 const HistoricService = async (
-  ContactId: string | number
+  ContactId: string | number,
+  companyId: string | number
 ): Promise<Ticket[]> => {
   const tickets = await Ticket.findAll({
     include: [
@@ -16,6 +17,7 @@ const HistoricService = async (
 
     where: {
       contactId: ContactId,
+      companyId,
       status: "closed"
     }
   });
