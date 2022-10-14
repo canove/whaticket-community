@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 
+import axios from "axios";
 import ListIntegratedImportService from "../services/IntegratedImportService/ListIntegratedImportService";
 import CreateIntegratedImportService from "../services/IntegratedImportService/CreateIntegratedImportService";
 import ShowIntegratedImportService from "../services/IntegratedImportService/ShowIntegratedImportService";
@@ -7,6 +8,7 @@ import UpdateIntegratedImportService from "../services/IntegratedImportService/U
 import DeleteIntegratedImportService from "../services/IntegratedImportService/DeleteIntegratedImportService";
 
 import { getIO } from "../libs/socket";
+import AppError from "../errors/AppError";
 
 interface IntegratedImportData {
   name: string;
@@ -18,6 +20,8 @@ interface IntegratedImportData {
   token: string;
   mapping: string;
   companyId: string | number;
+  header: string;
+  body: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -37,7 +41,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     url,
     key,
     token,
-    mapping
+    mapping,
+    header,
+    body
   }: IntegratedImportData = req.body;
 
   const { companyId } = req.user;
@@ -51,7 +57,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     key,
     token,
     mapping,
-    companyId
+    companyId,
+    header,
+    body
   });
 
   const io = getIO();
@@ -61,6 +69,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.status(200).json(integratedImport);
+};
+
+export const auth = async (req: Request, res: Response): Promise<Response> => {
+  return res.status(200).json("OK");
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {

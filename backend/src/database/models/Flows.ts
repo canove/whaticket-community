@@ -29,6 +29,21 @@ class Flows extends Model<Flows> {
   @Column
   status: string;
 
+  @Column
+  projectId: string;
+
+  @Column
+  agentId: string;
+
+  @Column
+  location: string;
+
+  @Column
+  clientEmail: string;
+
+  @Column
+  privateKey: string;
+
   @CreatedAt
   createdAt: Date;
 

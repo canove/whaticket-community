@@ -11,6 +11,8 @@ import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService
 import formatBody from "../helpers/Mustache";
 import HistoricService from "../services/TicketServices/HistoricService";
 import ResolveService from "../services/TicketServices/ResolveService";
+import ChangeQueueOrResolveTicketService from "../services/TicketServices/ChangeQueueOrResolveTicket";
+import IsTicketInBotService from "../services/TicketServices/IsTicketInBotService";
 import AverageService from "../services/TicketServices/AverageService";
 
 type IndexQuery = {
@@ -157,6 +159,40 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
     });
 
   return res.status(200).json({ message: "ticket deleted" });
+};
+
+export const changeQueueOrResolve = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId, queueName } = req.body;
+
+  const ticket = await ChangeQueueOrResolveTicketService({
+    messageId,
+    queueName
+  });
+
+  const io = getIO();
+  io.to(ticket.status)
+    .to("notification")
+    .to(ticket.id.toString())
+    .emit(`ticket${ticket.companyId}`, {
+      action: "update",
+      ticket
+    });
+
+  return res.status(200).json({ message: "Ticket atualizado com sucesso!" });
+};
+
+export const isInBot = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId } = req.body;
+
+  const isTicketInBot = await IsTicketInBotService(messageId);
+
+  return res.status(200).json(isTicketInBot);
 };
 
 export const average = async (req: Request, res: Response): Promise<Response> => {

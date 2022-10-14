@@ -10,7 +10,10 @@ interface IntegratedImportData {
   key: string;
   token: string;
   mapping: string;
+  header: string;
+  body: string;
 }
+
 interface Request {
   importData: IntegratedImportData;
   integratedImportId: number | string;
@@ -27,8 +30,18 @@ const UpdateIntegratedImportService = async ({
     companyId
   );
 
-  const { name, method, qtdeRegister, status, url, key, token, mapping } =
-    importData;
+  const {
+    name,
+    method,
+    qtdeRegister,
+    status,
+    url,
+    key,
+    token,
+    mapping,
+    header,
+    body
+  } = importData;
 
   await integratedImport.update({
     name,
@@ -38,7 +51,9 @@ const UpdateIntegratedImportService = async ({
     url,
     key,
     token,
-    mapping
+    mapping,
+    header,
+    body
   });
 
   return integratedImport;

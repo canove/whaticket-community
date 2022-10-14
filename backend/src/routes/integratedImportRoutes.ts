@@ -5,14 +5,40 @@ import * as IntegratedImportController from "../controllers/IntegratedImportCont
 
 const integratedImportRoutes = Router();
 
-integratedImportRoutes.get("/integratedImport", isAuth, IntegratedImportController.index);
+integratedImportRoutes.get(
+  "/integratedImport",
+  isAuth,
+  IntegratedImportController.index
+);
 
-integratedImportRoutes.post("/integratedImport", isAuth, IntegratedImportController.store);
+integratedImportRoutes.post(
+  "/integratedImport",
+  isAuth,
+  IntegratedImportController.store
+);
 
-integratedImportRoutes.get("/integratedImport/:integratedImportId", isAuth, IntegratedImportController.show);
+integratedImportRoutes.get(
+  "/integratedImport/auth/",
+  isAuth,
+  IntegratedImportController.auth
+);
 
-integratedImportRoutes.put("/integratedImport/:integratedImportId", isAuth, IntegratedImportController.update);
+integratedImportRoutes.get(
+  "/integratedImport/:integratedImportId",
+  isAuth,
+  IntegratedImportController.show
+);
 
-integratedImportRoutes.delete("/integratedImport/:integratedImportId", isAuth, IntegratedImportController.remove);
+integratedImportRoutes.put(
+  "/integratedImport/:integratedImportId",
+  isAuth,
+  IntegratedImportController.update
+);
+
+integratedImportRoutes.delete(
+  "/integratedImport/:integratedImportId",
+  isAuth,
+  IntegratedImportController.remove
+);
 
 export default integratedImportRoutes;

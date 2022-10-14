@@ -3,15 +3,19 @@ import ListFileRegistersService from "../services/FileRegisterService/ListFileRe
 
 type IndexQuery = {
   fileId: number;
+  integratedImportId: number;
   pageNumber: string;
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { fileId, pageNumber } = req.query as unknown as IndexQuery;
+  const { fileId, integratedImportId, pageNumber } =
+    req.query as unknown as IndexQuery;
+
   const { companyId } = req.user;
 
   const { reports, count, hasMore } = await ListFileRegistersService({
     fileId,
+    integratedImportId,
     companyId,
     pageNumber
   });

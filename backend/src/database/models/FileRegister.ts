@@ -14,6 +14,7 @@ import {
 } from "sequelize-typescript";
 import Company from "./Company";
 import File from "./File";
+import IntegratedImport from "./IntegratedImport";
 
 @Table
 class FileRegister extends Model<FileRegister> {
@@ -99,6 +100,10 @@ class FileRegister extends Model<FileRegister> {
   @ForeignKey(() => File)
   @Column
   fileId: number;
+
+  @ForeignKey(() => IntegratedImport)
+  @Column
+  integratedImportId: number;
 }
 
 export default FileRegister;

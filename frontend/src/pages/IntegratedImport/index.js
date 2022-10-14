@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -9,6 +10,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { IconButton, TableCell } from "@material-ui/core";
+import { Visibility } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -26,6 +28,8 @@ import { DeleteOutline } from "@material-ui/icons";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import RegisterFileModal from "../../components/RegisterFileModal";
 
 const reducer = (state, action) => {
     if (action.type === "LOAD_IMPORTATION") {
@@ -88,7 +92,10 @@ const IntegratedImport = () => {
     const [selectedImportation, setSelectedImportation] = useState(null);
     const [importationModalOpen, setImportationModalOpen] = useState(false);
     const [deletingImportation, setDeletingImportation] = useState(null);
+    const [copyingImportation, setCopyingImportation] = useState(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
+    const [selectedIntregratedImportId, setSelectedIntregratedImportId] = useState("");
     const [loading, setLoading] = useState(false);
     const {user} = useContext(AuthContext)
 
@@ -127,15 +134,34 @@ const IntegratedImport = () => {
         return () => {
             socket.disconnect();
         };
-// eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        const socket = openWorkerSocket();
+
+        socket.on(`integratedImport${user.companyId}`, (data) => {
+            if (data.action === "update" || data.action === "create") {
+                dispatch({ type: "UPDATE_IMPORTATION", payload: data.integratedImport });
+            }
+
+            if (data.action === "delete") {
+                dispatch({ type: "DELETE_IMPORTATION", payload: + data.integratedImportId });
+            }
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const handleOpenImportationModal = () => {
+        setCopyingImportation(null);
         setSelectedImportation(null);
         setImportationModalOpen(true);
     };
 
     const handleCloseImportationModal = () => {
+        setCopyingImportation(null);
         setSelectedImportation(null);
         setImportationModalOpen(false);
     };
@@ -144,6 +170,11 @@ const IntegratedImport = () => {
         setSelectedImportation(integratedImport);
         setImportationModalOpen(true);
     };
+
+    const handleCopyImportation = (integratedImport) => {
+        setCopyingImportation(integratedImport);
+        setImportationModalOpen(true);
+    }
 
     const handleDeleteImportation = async (deletingImportation) => {
         try {
@@ -155,27 +186,36 @@ const IntegratedImport = () => {
         setDeletingImportation(null);
     };
 
- const getStatusById = (id) => {
-    if (id === 0) {
-      return `${i18n.t("integratedImport.status.awaitingImport")}`;
-    } else if (id === 1) {
-      return `${i18n.t("integratedImport.status.processing")}`;
-    } else if (id === 2) {
-      return `${i18n.t("integratedImport.status.awaitingApprove")}`;
-    } else if (id === 3) {
-      return `${i18n.t("integratedImport.status.err")}`;
-    } else if (id === 4) {
-      return `${i18n.t("integratedImport.status.approve")}`;
-    } else if (id === 5) {
-      return `${i18n.t("integratedImport.status.shooting")}`;
-    } else if (id === 6) {
-      return `${i18n.t("integratedImport.status.finished")}`;
-    } else if (id === 7) {
-      return `${i18n.t("integratedImport.status.refused")}`;
-    } else {
-      return id;
+    const getStatusById = (id) => {
+        if (id === 0) {
+        return `${i18n.t("integratedImport.status.awaitingImport")}`;
+        } else if (id === 1) {
+        return `${i18n.t("integratedImport.status.processing")}`;
+        } else if (id === 2) {
+        return `${i18n.t("integratedImport.status.awaitingApprove")}`;
+        } else if (id === 3) {
+        return `${i18n.t("integratedImport.status.err")}`;
+        } else if (id === 4) {
+        return `${i18n.t("integratedImport.status.approve")}`;
+        } else if (id === 5) {
+        return `${i18n.t("integratedImport.status.shooting")}`;
+        } else if (id === 6) {
+        return `${i18n.t("integratedImport.status.finished")}`;
+        } else if (id === 7) {
+        return `${i18n.t("integratedImport.status.refused")}`;
+        } else {
+        return id;
+        }
     }
-  }
+
+    const handleOpenRegisterFileModal = (integratedImportId) => {
+        setSelectedIntregratedImportId(integratedImportId)
+        setRegisterFileModalOpen(true);
+      };
+    
+      const handleCloseRegisterFileModal = () => {
+        setRegisterFileModalOpen(false);
+      };
 
     return (
         <MainContainer>
@@ -184,6 +224,7 @@ const IntegratedImport = () => {
                 onClose={handleCloseImportationModal}
                 aria-labelledby="form-dialog-title"
                 integratedImportId={selectedImportation && selectedImportation.id}
+                integratedImportCopy={copyingImportation && copyingImportation}
             />
             <ConfirmationModal
                 title={
@@ -195,6 +236,13 @@ const IntegratedImport = () => {
             >
                 {i18n.t("integratedImport.confirmation.confirmDelete")}
             </ConfirmationModal>
+            <RegisterFileModal
+                open={registerFileModalOpen}
+                onClose={handleCloseRegisterFileModal}
+                aria-labelledby="form-dialog-title"
+                integratedImportId={selectedIntregratedImportId}
+            >
+            </RegisterFileModal>
             <MainHeader>
                 <Title>{i18n.t("integratedImport.title")}</Title>
                 <MainHeaderButtonsWrapper>
@@ -232,11 +280,25 @@ const IntegratedImport = () => {
                                 <TableCell align="center">{importation.qtdeRegister}</TableCell>
                                 <TableCell align="center">{getStatusById(importation.status)}</TableCell>
                                 <TableCell align="center">
+                                {importation.status === 2 && (
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => handleOpenRegisterFileModal(importation.id)}
+                                    >
+                                        <Visibility />
+                                    </IconButton>
+                                )}
                                 <IconButton
                                     size="small"
                                     onClick={(e) => handleEditImportation(importation)}
                                 >
                                     <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleCopyImportation(importation)}
+                                >
+                                    <FileCopyIcon />
                                 </IconButton>
                                 <IconButton
                                     size="small"

@@ -10,15 +10,23 @@ const ListFlowsService = async ({
   companyId,
   searchParam
 }: Request): Promise<Flows[]> => {
-  const flows = await Flows.findAll({
-    where: {
-      companyId,
+  let whereCondition = null;
+
+  whereCondition = { companyId };
+
+  if (searchParam) {
+    whereCondition = {
+      ...whereCondition,
       "$Flows.name$": Sequelize.where(
         Sequelize.fn("LOWER", Sequelize.col("Flows.name")),
         "LIKE",
         `%${searchParam.toLowerCase()}%`
       )
-    }
+    };
+  }
+
+  const flows = await Flows.findAll({
+    where: whereCondition
   });
 
   return flows;

@@ -101,7 +101,7 @@ const reducer = (state, action) => {
   }
 };
 
-const RegisterFileModal = ({ open, onClose, fileId }) => {
+const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
@@ -114,7 +114,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
-  }, [fileId]);
+  }, [fileId, integratedImportId]);
 
   const handleClose = () => {
     onClose();
@@ -132,12 +132,18 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
 
   const updateFileStatus = async (status) => {
     setLoading(true);
+
     try {
-      setLoading(true);
-      await api.put(`/file/update/${fileId}/?status=${status}&userId=${user.id}`);
+      if (fileId) {
+        await api.put(`/file/update/${fileId}/?status=${status}&userId=${user.id}`);
+      }
+      if (integratedImportId) {
+
+      }
       setLoading(false);
     } catch (err) {
       toastError(err);
+      setLoading(false);
     }
   }
 
@@ -147,7 +153,7 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
       try {
         setLoading(true);
         const { data } = await api.get(`/file/listRegister`, {
-          params: { fileId, pageNumber },
+          params: { fileId, integratedImportId, pageNumber },
         });
         dispatch({ type: "LOAD_REPORTS", payload: data.reports });
         setHasMore(data.hasMore);
@@ -156,8 +162,10 @@ const RegisterFileModal = ({ open, onClose, fileId }) => {
         toastError(err);
       }
     };
-    handleFilter();
-  }, [fileId, pageNumber]);
+    if (open) {
+      handleFilter();
+    }
+  }, [open, fileId, integratedImportId, pageNumber]);
 
   useEffect(() => {
     const socket = openSocket();
