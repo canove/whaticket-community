@@ -12,6 +12,9 @@ interface IntegratedImportData {
   mapping: string;
   header: string;
   body: string;
+  templateId: string | number;
+  official: boolean | number;
+  whatsappIds: string | null;
 }
 
 interface Request {
@@ -40,7 +43,10 @@ const UpdateIntegratedImportService = async ({
     token,
     mapping,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   } = importData;
 
   await integratedImport.update({
@@ -53,7 +59,10 @@ const UpdateIntegratedImportService = async ({
     token,
     mapping,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   });
 
   return integratedImport;

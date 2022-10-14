@@ -11,13 +11,15 @@ interface MenuData {
 interface Request {
   menuData?: MenuData;
   menuId: number | string;
+  companyId: number | string;
 }
 
 const UpdateMenuService = async ({
   menuData,
-  menuId
+  menuId,
+  companyId
 }: Request): Promise<Menu | undefined> => {
-  const menu = await ShowMenuService(menuId);
+  const menu = await ShowMenuService(menuId, companyId);
 
   const { name, icon, parentId, isParent } = menuData;
 

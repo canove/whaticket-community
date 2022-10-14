@@ -109,7 +109,6 @@ const Category = () => {
             try {
                 const { data } = await api.get("/category/");
                 dispatch({ type: "LOAD_CATEGORY", payload: data });
-                console.log(data);
                 setLoading(false);
             } catch (err) {
                 toastError(err);
