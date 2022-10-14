@@ -198,7 +198,7 @@ export const isInBot = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { messageId } = req.body;
+  const { messageId } = req.params;
 
   const isTicketInBot = await IsTicketInBotService(messageId);
 
