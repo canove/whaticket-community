@@ -32,12 +32,12 @@ const ChangeQueueOrResolveTicketService = async ({
       }
     });
 
-    ticket.update({
+    await ticket.update({
       status: "pending",
       queueId: queue ? queue.id : null
     });
   } else {
-    ticket.update({
+    await ticket.update({
       status: "closed",
       finalizedAt: new Date()
     });
