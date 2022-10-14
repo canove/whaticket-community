@@ -34,7 +34,7 @@ const UpdateIntegratedImportStatusService = async ({
     return integratedImport;
   }
 
-  await integratedImport.update({ Status: FileStatus.Error });
+  await integratedImport.update({ status: FileStatus.Error });
   return integratedImport;
 };
 
