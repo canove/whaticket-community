@@ -76,7 +76,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
     const [response, setResponse] = useState("");
 
     const [confirmCopyModalOpen, setConfirmCopyModalOpen] = useState(false);
-    const [isCopyting, setIsCopying] = useState(false);
+    const [isCopying, setIsCopying] = useState(false);
 
     const [relationName, setRelationName] = useState("");
     const [relationDocumentNumber, setRelationDocumentNumber] = useState("");
@@ -122,6 +122,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
 		}
 
         if (integratedImportCopy) {
+            setIsCopying(true);
+
             setName(`${integratedImportCopy.name} copy`)
             setMethod(integratedImportCopy.method)
             setUrl(integratedImportCopy.url)
@@ -419,22 +421,52 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
             mapping: JSON.stringify(mapping)
 		};
 
-		 try {
-            if (isCopyting) {
-                await api.post("/integratedImport/", importData);
-                toast.success("Copiado com sucesso!");
-            } else if (integratedImportId) {
-                await api.put(`/integratedImport/${integratedImportId}`, importData);
-                toast.success(i18n.t("integratedImport.confirmation.updatedAt"));
-            } else {
-                await api.post("/integratedImport/", importData);
-                toast.success(i18n.t("integratedImport.confirmation.createdAt"));
+        if (isCopying) {
+            setConfirmCopyModalOpen(true);
+        } else {
+            try {
+                if (integratedImportId) {
+                    await api.put(`/integratedImport/${integratedImportId}`, importData);
+                    toast.success(i18n.t("integratedImport.confirmation.updatedAt"));
+                } else {
+                    await api.post("/integratedImport/", importData);
+                    toast.success(i18n.t("integratedImport.confirmation.createdAt"));
+                }
+                } catch (err) {
+                    toastError(err);
             }
-            } catch (err) {
-                toastError(err);
+            handleClose();
         }
-        handleClose();
 	};
+
+    const handleCopy = async () => {
+        const mapping = {
+            name: nameRelation,
+            documentNumber: documentNumberRelation,
+            template: templateRelation,
+            templateParams: templateParamsRelation,
+            message: messageRelation,
+            phoneNumber: phoneNumberRelation
+        }
+
+		const importData = {
+            name: name,
+            method: method,
+            url: url,
+            key: key,
+            token: token,
+            header: header,
+            body: body,
+            mapping: JSON.stringify(mapping)
+		};
+
+        try {
+            await api.post("/integratedImport/", importData);
+            toast.success("Copiado com sucesso!");
+        } catch (err) {
+            toastError(err);
+        }
+    }
 
 	return (
 		<div className={classes.root}>
@@ -442,10 +474,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
                 title={'Copiar Importação'}
                 open={confirmCopyModalOpen}
                 onClose={setConfirmCopyModalOpen}
-                onConfirm={() => {
-                    setIsCopying(true);
-                    handleSubmit();
-                }}
+                onConfirm={handleCopy}
             >
                 Você realmente deseja copiar está importação?
                 Ao realizar está ação, dará inicio a importação dos dados para realizar os disparos, deseja prosseguir?

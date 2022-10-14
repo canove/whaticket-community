@@ -119,6 +119,24 @@ const IntegratedImport = () => {
     }, []);
 
     useEffect(() => {
+        const socket = openSocket();
+
+        socket.on(`integratedImport${user.companyId}`, (data) => {
+            if (data.action === "update" || data.action === "create") {
+                dispatch({ type: "UPDATE_IMPORTATION", payload: data.integratedImport });
+            }
+
+            if (data.action === "delete") {
+                dispatch({ type: "DELETE_IMPORTATION", payload: + data.integratedImportId });
+            }
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
         const socket = openWorkerSocket();
 
         socket.on(`integratedImport${user.companyId}`, (data) => {
