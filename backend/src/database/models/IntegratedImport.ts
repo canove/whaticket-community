@@ -11,6 +11,8 @@ import {
   ForeignKey
 } from "sequelize-typescript";
 import Company from "./Company";
+import Templates from "./TemplatesData";
+import User from "./User";
 
 @Table
 class IntegratedImport extends Model<IntegratedImport> {
@@ -42,6 +44,12 @@ class IntegratedImport extends Model<IntegratedImport> {
   token: number;
 
   @Column
+  official: boolean;
+
+  @Column
+  whatsappIds: string;
+
+  @Column
   mapping: string;
 
   @Column
@@ -55,6 +63,20 @@ class IntegratedImport extends Model<IntegratedImport> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @Column
+  approvedAt: Date;
+
+  @Column
+  refusedAt: Date;
+
+  @ForeignKey(() => Templates)
+  @Column
+  templateId: number;
+
+  @ForeignKey(() => User)
+  @Column
+  approvedOrRefusedId: number;
 
   @ForeignKey(() => Company)
   @Column

@@ -9,6 +9,7 @@ import DeleteIntegratedImportService from "../services/IntegratedImportService/D
 
 import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
+import UpdateIntegratedImportStatusService from "../services/IntegratedImportService/UpdateIntegratedImportStatusService";
 
 interface IntegratedImportData {
   name: string;
@@ -22,6 +23,13 @@ interface IntegratedImportData {
   companyId: string | number;
   header: string;
   body: string;
+  templateId: string | number;
+  official: boolean | number;
+  whatsappIds: string | null;
+}
+
+type UpdateStatusQuery = {
+  status: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -43,7 +51,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     token,
     mapping,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   }: IntegratedImportData = req.body;
 
   const { companyId } = req.user;
@@ -59,7 +70,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     mapping,
     companyId,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   });
 
   const io = getIO();
@@ -83,6 +97,30 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
     integratedImportId,
     companyId
   );
+
+  return res.status(200).json(integratedImport);
+};
+
+export const updateStatus = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { integratedImportId } = req.params;
+  const { status } = req.query as UpdateStatusQuery;
+  const { companyId, id } = req.user;
+
+  const integratedImport = await UpdateIntegratedImportStatusService({
+    status,
+    userId: id,
+    integratedImportId,
+    companyId
+  });
+
+  const io = getIO();
+  io.emit(`integratedImport${companyId}`, {
+    action: "update",
+    integratedImport
+  });
 
   return res.status(200).json(integratedImport);
 };
