@@ -10,7 +10,7 @@ const DeletePricingService = async (id: string | number): Promise<Pricing> => {
     throw new AppError("ERR_NO_PRICING_FOUND", 404);
   }
 
-  pricing.update({
+  await pricing.update({
     deletedAt: new Date()
   });
 
