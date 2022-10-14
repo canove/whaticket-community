@@ -115,6 +115,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
                 setHeader(data.header || "");
                 setBody(data.body || "");
 
+                setConnectionType(data.official);
+                setTemplate(data.templateId);
+                setConnection(data.whatsappIds.split(","));
+
                 const mapping = JSON.parse(data.mapping);
 
                 setNameRelation(mapping.name);
@@ -165,6 +169,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
             setToken(integratedImportCopy.token)
             setHeader(integratedImportCopy.header || "");
             setBody(integratedImportCopy.body || "");
+
+            setConnectionType(integratedImportCopy.official);
+            setTemplate(integratedImportCopy.templateId);
+            setConnection(integratedImportCopy.whatsappIds.split(","));
 
             const mapping = JSON.parse(integratedImportCopy.mapping);
 
@@ -576,6 +584,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
         } catch (err) {
             toastError(err);
         }
+
+        handleClose();
     }
 
 	return (
