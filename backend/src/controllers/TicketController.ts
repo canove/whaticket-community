@@ -176,10 +176,19 @@ export const changeQueueOrResolve = async (
 ): Promise<Response> => {
   const { messageId, queueName } = req.body;
 
-  await ChangeQueueOrResolveTicketService({
+  const ticket = await ChangeQueueOrResolveTicketService({
     messageId,
     queueName
   });
+
+  const io = getIO();
+  io.to(ticket.status)
+    .to("notification")
+    .to(ticket.id.toString())
+    .emit(`ticket${ticket.companyId}`, {
+      action: "update",
+      ticket
+    });
 
   return res.status(200).json({ message: "Ticket atualizado com sucesso!" });
 };
