@@ -89,7 +89,7 @@ export const update = async (
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
-  const menu = await UpdateMenuService({ menuData, menuId });
+  const menu = await UpdateMenuService({ menuData, menuId, companyId: user.companyId });
 
   const io = getIO();
   io.emit("menu", {
