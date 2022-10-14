@@ -207,7 +207,7 @@ const StatusMessageWhatsappService = async ({
           id: register?.fileId
         }
     })
-    await file.update({ Status: FileStatus.Finished });
+    await file.update({ status: FileStatus.Finished });
     io.emit(`file${file.companyId}`, {
       action: "update",
       file

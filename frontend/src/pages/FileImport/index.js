@@ -386,13 +386,13 @@ const FileImport = () => {
                     </TableCell>
                     <TableCell align="center">{item.QtdeRegister}</TableCell>
                     <TableCell align="center">
-                      {getStatusById(item.Status)}
+                      {getStatusById(item.status)}
                     </TableCell>
                     <TableCell align="center">
                       {getOfficial(item.official)}
                     </TableCell>
                     <TableCell align="center">
-                        {item.Status === 2 && (
+                        {item.status === 2 && (
                           <>
                             <IconButton
                               size="small"
