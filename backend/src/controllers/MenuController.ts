@@ -33,8 +33,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { menuId } = req.params;
+  const { companyId } = req.user;
 
-  const menu = await ShowMenuService(menuId);
+  const menu = await ShowMenuService(menuId, companyId);
 
   return res.status(200).json(menu);
 };
