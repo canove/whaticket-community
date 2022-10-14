@@ -28,7 +28,7 @@ const ChangeQueueOrResolveTicketService = async ({
     const queue = await Queue.findOne({
       where: {
         name: queueName,
-        companyId: ticket.id
+        companyId: ticket.companyId
       }
     });
 
