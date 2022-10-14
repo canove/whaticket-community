@@ -19,4 +19,6 @@ ticketRoutes.get("/tickets/hist/:contactId", isAuth, TicketController.historic);
 
 ticketRoutes.get("/tickets/:categoryId", isAuth, TicketController.resolve);
 
+ticketRoutes.get("/tickets/:time", isAuth, TicketController.average);
+
 export default ticketRoutes;

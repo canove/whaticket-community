@@ -1,28 +1,22 @@
 import Ticket from "../../database/models/Ticket";
 import AppError from "../../errors/AppError";
-import Category from "../../database/models/Category";
+
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
   companyId: number;
 }
 
-const ResolveService = async (
-  CategoryId: string | number,
+const AverageService = async (
+    CreatedAt: Date,
+    FinalizedAt: Date,
 
 ): Promise<Ticket[]> => {
   const tickets = await Ticket.findAll({
-    include: [
-      {
-        model: Category,
-        as: "category",
-        attributes: ["id", "name", "description"]
-      }
-    ],
     where: {
-      categoryId: CategoryId,
-      status: "closed",
-
+        status: "closed",
+        createdAt: CreatedAt,
+        finalizedAt: FinalizedAt,
     }
   });
 
@@ -33,4 +27,4 @@ const ResolveService = async (
   return tickets;
 };
 
-export default ResolveService;
+export default AverageService;
