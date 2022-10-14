@@ -12,6 +12,8 @@ const upload = multer(uploadConfig);
 
 const ApiRoutes = express.Router();
 
+ApiRoutes.post("/tickets/isInBot", isAuthApi, TicketController.isInBot);
+
 ApiRoutes.post(
   "/tickets/changeQueueOrResolve",
   isAuthApi,
@@ -70,11 +72,7 @@ ApiRoutes.get(
   ApiController.dispatcherRegisterProcess
 );
 
-ApiRoutes.get(
-  "/pingConnections",
-  isAuthApi,
-  ApiController.pingConnections
-);
+ApiRoutes.get("/pingConnections", isAuthApi, ApiController.pingConnections);
 
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
 

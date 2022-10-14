@@ -12,6 +12,7 @@ import formatBody from "../helpers/Mustache";
 import HistoricService from "../services/TicketServices/HistoricService";
 import ResolveService from "../services/TicketServices/ResolveService";
 import ChangeQueueOrResolveTicketService from "../services/TicketServices/ChangeQueueOrResolveTicket";
+import IsTicketInBotService from "../services/TicketServices/IsTicketInBotService";
 
 type IndexQuery = {
   searchParam: string;
@@ -181,4 +182,15 @@ export const changeQueueOrResolve = async (
   });
 
   return res.status(200).json({ message: "Ticket atualizado com sucesso!" });
+};
+
+export const isInBot = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId } = req.body;
+
+  const isTicketInBot = await IsTicketInBotService(messageId);
+
+  return res.status(200).json(isTicketInBot);
 };
