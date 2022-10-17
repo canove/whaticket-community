@@ -7,6 +7,8 @@ const ticketRoutes = express.Router();
 
 ticketRoutes.get("/tickets", isAuth, TicketController.index);
 
+ticketRoutes.get("/tickets/time", isAuth, TicketController.average);
+
 ticketRoutes.get("/tickets/:ticketId", isAuth, TicketController.show);
 
 ticketRoutes.post("/tickets", isAuth, TicketController.store);
@@ -19,6 +21,5 @@ ticketRoutes.get("/tickets/hist/:contactId", isAuth, TicketController.historic);
 
 ticketRoutes.get("/tickets/:categoryId", isAuth, TicketController.resolve);
 
-ticketRoutes.get("/tickets/:time", isAuth, TicketController.average);
 
 export default ticketRoutes;

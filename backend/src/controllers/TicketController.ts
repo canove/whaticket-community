@@ -196,11 +196,13 @@ export const isInBot = async (
 };
 
 export const average = async (req: Request, res: Response): Promise<Response> => {
-
-  const { createdAt, finalizedAt }: TicketData = req.body;
+  const { searchParam } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const time = await AverageService(createdAt, finalizedAt);
+  const { averageTimes, totalAverageTime } = await AverageService(
+    searchParam,
+    companyId,
+  );
 
-  return res.status(200).json(time);
+  return res.status(200).json({ averageTimes, totalAverageTime });
 };
