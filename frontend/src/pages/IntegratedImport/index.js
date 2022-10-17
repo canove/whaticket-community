@@ -288,27 +288,31 @@ const IntegratedImport = () => {
                                         <Visibility />
                                     </IconButton>
                                 )}
-                                <IconButton
-                                    size="small"
-                                    onClick={(e) => handleEditImportation(importation)}
-                                >
-                                    <EditIcon />
-                                </IconButton>
+                                {importation.status === 0 && (
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => handleEditImportation(importation)}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                )}
                                 <IconButton
                                     size="small"
                                     onClick={() => handleCopyImportation(importation)}
                                 >
                                     <FileCopyIcon />
                                 </IconButton>
-                                <IconButton
-                                    size="small"
-                                    onClick={(e) => {
-                                    setDeletingImportation(importation);
-                                    setConfirmModalOpen(true);
-                                    }}
-                                >
-                                    <DeleteOutline />
-                                </IconButton>
+                                {importation.status === 0 && (
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                        setDeletingImportation(importation);
+                                        setConfirmModalOpen(true);
+                                        }}
+                                    >
+                                        <DeleteOutline />
+                                    </IconButton>
+                                )}
                                 </TableCell>
                             </TableRow>
                         ))}
