@@ -117,7 +117,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
 
                 setConnectionType(data.official);
                 setTemplate(data.templateId);
-                setConnection(data.whatsappIds.split(","));
+                setConnection(data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]);
 
                 const mapping = JSON.parse(data.mapping);
 
@@ -172,7 +172,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
 
             setConnectionType(integratedImportCopy.official);
             setTemplate(integratedImportCopy.templateId);
-            setConnection(integratedImportCopy.whatsappIds.split(","));
+            setConnection(integratedImportCopy.whatsappIds ? integratedImportCopy.whatsappIds.split(",") : ["Todos"]);
 
             const mapping = JSON.parse(integratedImportCopy.mapping);
 

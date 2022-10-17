@@ -65,7 +65,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     companyId
   });
 
-  const category = await DashboardCategoryService (companyId, date);
+  const category = await DashboardCategoryService(companyId, date);
 
   return res
     .status(200)

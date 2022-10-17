@@ -75,20 +75,21 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
     }, [open]);
 
     const handleUpdateTicketStatus = async (e, status, userId, categoryId) => {
-		try {
-			await api.put(`/tickets/${ticketId}`, {
-				status: status,
-				userId: userId || null,
-                categoryId: categoryId === "Nenhuma" ? null : categoryId
-			});
-			if (status === "open") {
-				history.push(`/tickets/${ticketId}`);
-			} else {
-				history.push("/tickets");
-			}
-		} catch (err) {
-			toastError(err);
-		  }
+      try {
+        await api.put(`/tickets/${ticketId}`, {
+          status: status,
+          userId: userId || null,
+          categoryId: categoryId === "Nenhuma" ? null : categoryId
+        });
+
+        if (status === "open") {
+          history.push(`/tickets/${ticketId}`);
+        } else {
+          history.push("/tickets");
+        }
+      } catch (err) {
+        toastError(err);
+        }
 	  };
 
     const handleClose = () => {
