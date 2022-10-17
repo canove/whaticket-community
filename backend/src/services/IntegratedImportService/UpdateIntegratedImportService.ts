@@ -1,11 +1,12 @@
 import IntegratedImport from "../../database/models/IntegratedImport";
+import AppError from "../../errors/AppError";
 import ShowIntegratedImportService from "./ShowIntegratedImportService";
 
 interface IntegratedImportData {
   name: string;
   method: string;
   qtdeRegister: number;
-  status: number;
+  status: number | string;
   url: string;
   key: string;
   token: string;
