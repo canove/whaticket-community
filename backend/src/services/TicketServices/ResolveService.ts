@@ -1,10 +1,15 @@
 import Ticket from "../../database/models/Ticket";
 import AppError from "../../errors/AppError";
 import Category from "../../database/models/Category";
-import { CreatedAt } from "sequelize-typescript";
+interface Request {
+  searchParam?: string;
+  pageNumber?: string | number;
+  companyId: number;
+}
 
 const ResolveService = async (
-  CategoryId: string | number
+  CategoryId: string | number,
+
 ): Promise<Ticket[]> => {
   const tickets = await Ticket.findAll({
     include: [
@@ -13,12 +18,11 @@ const ResolveService = async (
         as: "category",
         attributes: ["id", "name", "description"]
       }
-
     ],
-
     where: {
       categoryId: CategoryId,
-      status: "closed"
+      status: "closed",
+
     }
   });
 

@@ -1,6 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
 import { Op } from "sequelize";
-import Menu from "../../database/models/Menu";
 import Templates from "../../database/models/TemplatesData";
 
 interface Request {
