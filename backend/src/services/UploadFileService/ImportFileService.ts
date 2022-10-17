@@ -59,10 +59,10 @@ const ImportFileService = async ({ key, createdAt, file }): Promise<void> => {
       totalRegisters += registersToInsert.length;
       await FileRegister.bulkCreate(registersToInsert);
     }
-    await file.update({ QtdeRegister: totalRegisters, Status: FileStatus.WaitingApprove });
+    await file.update({ QtdeRegister: totalRegisters, status: FileStatus.WaitingApprove });
   } catch (e) {
     console.log(e);
-    await file.update({ Status: FileStatus.Error });
+    await file.update({ status: FileStatus.Error });
   }
 };
 

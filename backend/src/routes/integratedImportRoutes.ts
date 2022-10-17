@@ -30,6 +30,12 @@ integratedImportRoutes.get(
 );
 
 integratedImportRoutes.put(
+  "/integratedImport/updateStatus/:integratedImportId",
+  isAuth,
+  IntegratedImportController.updateStatus
+);
+
+integratedImportRoutes.put(
   "/integratedImport/:integratedImportId",
   isAuth,
   IntegratedImportController.update

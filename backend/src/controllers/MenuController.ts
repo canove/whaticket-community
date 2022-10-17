@@ -33,8 +33,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { menuId } = req.params;
+  const { companyId } = req.user;
 
-  const menu = await ShowMenuService(menuId);
+  const menu = await ShowMenuService(menuId, companyId);
 
   return res.status(200).json(menu);
 };
@@ -88,7 +89,7 @@ export const update = async (
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
-  const menu = await UpdateMenuService({ menuData, menuId });
+  const menu = await UpdateMenuService({ menuData, menuId, companyId: user.companyId });
 
   const io = getIO();
   io.emit("menu", {

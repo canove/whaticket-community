@@ -22,7 +22,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
     });
 
     if(containPending.length == 0){
-      await file.update({ Status: FileStatus.Finished });
+      await file.update({ status: FileStatus.Finished });
       return;
     }
 
@@ -347,7 +347,7 @@ const DispatcherRegisterService = async ({ file }): Promise<void> => {
 
   } catch (e) {
     console.log(e);
-    await file.update({ Status: FileStatus.Error });
+    await file.update({ status: FileStatus.Error });
   }
 };
 

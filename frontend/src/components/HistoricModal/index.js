@@ -77,9 +77,11 @@ const handleOpenHistoricModal = async () => {
 			toastError(err);
 		}
 	};
-handleOpenHistoricModal()
-// eslint-disable-next-line react-hooks/exhaustive-deps
-},[])
+  if (ticket) {
+    handleOpenHistoricModal()
+  }
+
+},[open, ticket])
 
 const renderMessage = async (ticketId) => {
 		setLoading(true);
@@ -144,7 +146,7 @@ const handleBack = () =>{
                     {historic && historic.map((hist, index) => {
                     return(
                   <TableRow key={index}>
-                    <TableCell>{hist.user.name}</TableCell>
+                    <TableCell>{hist.user ? hist.user.name : "BOT"}</TableCell>
                     <TableCell>{hist.lastMessage}</TableCell>
                     <TableCell>{hist.status}</TableCell>
                     <TableCell>{format(parseISO(hist.createdAt), "dd/MM/yy HH:mm")}</TableCell>

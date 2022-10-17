@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import {
 	Button,
@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ConfirmationModal from "../ConfirmationModal";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -65,6 +66,7 @@ const useStyles = makeStyles(theme => ({
 const ImportationtModal = ({ open, onClose, integratedImportId, integratedImportCopy }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
+    const { whatsApps } = useContext(WhatsAppsContext);
 
 	const [name, setName] = useState("");
     const [method, setMethod] = useState("");
@@ -74,6 +76,15 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
     const [header, setHeader] = useState("");
     const [body, setBody] = useState("");
     const [response, setResponse] = useState("");
+
+    const [connectionType, setConnectionType] = useState(false);
+    const [useConnectionType, setUseConnectionType] = useState(false);
+    const [openConnectionSelect, setOpenConnectionSelect] = useState(false);
+    const [template, setTemplate] = useState("");
+    const [connection, setConnection] = useState([]);
+
+    const [menus, setMenus] = useState([]);
+    const [templates, setTemplates] = useState([]);
 
     const [confirmCopyModalOpen, setConfirmCopyModalOpen] = useState(false);
     const [isCopying, setIsCopying] = useState(false);
@@ -104,6 +115,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
                 setHeader(data.header || "");
                 setBody(data.body || "");
 
+                setConnectionType(data.official);
+                setTemplate(data.templateId);
+                setConnection(data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]);
+
                 const mapping = JSON.parse(data.mapping);
 
                 setNameRelation(mapping.name);
@@ -116,6 +131,29 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
 				toastError(err);
 			}
 		}
+
+        const fetchTemplates = async () => {
+			try {
+				const { data } = await api.get('/TemplatesData/list/');
+				setTemplates(data.templates);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
+        const fetchMenus = async () => {
+			try {
+				const { data } = await api.get('menus/company');
+				setMenus(data);
+			} catch(err) {
+				toastError(err);
+			}
+		}
+
+        if (open) {
+            fetchMenus();
+            fetchTemplates();
+        }
 
 		if (integratedImportId) {
 			fetchProduct();
@@ -132,6 +170,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
             setHeader(integratedImportCopy.header || "");
             setBody(integratedImportCopy.body || "");
 
+            setConnectionType(integratedImportCopy.official);
+            setTemplate(integratedImportCopy.templateId);
+            setConnection(integratedImportCopy.whatsappIds ? integratedImportCopy.whatsappIds.split(",") : ["Todos"]);
+
             const mapping = JSON.parse(integratedImportCopy.mapping);
 
             setNameRelation(mapping.name);
@@ -143,6 +185,37 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
         }
 	}, [open, integratedImportId, integratedImportCopy])
 
+	useEffect(() => {
+		if (menus) {
+			let offWhats = false;
+			let noOffWhats = false;
+
+			menus.forEach(menu => {
+				if (menu.name === "Official Connections") {
+					offWhats = true;
+				}
+
+				if (menu.name === "Connections") {
+					noOffWhats = true;
+				}
+			})
+
+			if (offWhats && noOffWhats) {
+				setUseConnectionType(true);
+			}
+
+			if (offWhats && !noOffWhats) {
+				setUseConnectionType(false);
+				setConnectionType(true);
+			}
+
+			if (!offWhats && noOffWhats) {
+				setUseConnectionType(false);
+				setConnectionType(false);
+			}
+		}
+	}, [menus]);
+
     const handleClose = () => {
         setName("");
         setMethod("");
@@ -152,6 +225,12 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
         setHeader("");
         setBody("");
         setResponse("");
+
+        setConnectionType(false);
+        setUseConnectionType(false);
+        setOpenConnectionSelect(false);
+        setTemplate("");
+        setConnection([]);
 
         setIsCopying(false);
         setConfirmCopyModalOpen(false);
@@ -329,6 +408,39 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
         }
     }
 
+    const handleConnectionTypeChange = (e) => {
+		setConnectionType(e.target.value);
+	}
+    
+    const handleTemplateChange = (e) => {
+		setTemplate(e.target.value);
+	}
+
+    const handleConnectionChange = (e) => {
+		const {
+			target: { value },
+		} = e;
+
+		if (value.includes('Todos')) {
+			setConnection([]);
+
+			let allConnections = ["Todos"]
+
+			setConnection(allConnections);
+			setOpenConnectionSelect(false);
+		} else {
+			setConnection(typeof value === "string" ? value.split(",") : value);
+		}
+	}
+
+	const handleOpenConnectionSelect = () => {
+		setOpenConnectionSelect(true)
+	};
+
+	const handleCloseConnectionSelect = () => {
+		setOpenConnectionSelect(false)
+	};
+
     const handleKeys = (keys) => {
         let value = jsonStringToObj(response);
 
@@ -418,7 +530,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
             token: token,
             header: header,
             body: body,
-            mapping: JSON.stringify(mapping)
+            mapping: JSON.stringify(mapping),
+            templateId: template,
+            official: connectionType,
+            whatsappIds: connection ? connection.toString() : null
 		};
 
         if (isCopying) {
@@ -446,7 +561,7 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
             template: templateRelation,
             templateParams: templateParamsRelation,
             message: messageRelation,
-            phoneNumber: phoneNumberRelation
+            phoneNumber: phoneNumberRelation,
         }
 
 		const importData = {
@@ -457,7 +572,10 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
             token: token,
             header: header,
             body: body,
-            mapping: JSON.stringify(mapping)
+            mapping: JSON.stringify(mapping),
+            templateId: template,
+            official: connectionType,
+            whatsappIds: connection.toString()
 		};
 
         try {
@@ -466,6 +584,8 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
         } catch (err) {
             toastError(err);
         }
+
+        handleClose();
     }
 
 	return (
@@ -505,6 +625,97 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
 					onChange={handleNameChange}
                   />
                 </div>
+                { useConnectionType &&
+                    <>
+                        <FormControl
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
+                        >
+                            <InputLabel id="connection-type-select-label">
+                                Tipo de Disparo
+                            </InputLabel>
+                            <Select
+                                labelId="connection-type-select-label"
+                                id="connection-type-select"
+                                value={connectionType}
+                                label="Tipo de Disparo"
+                                onChange={handleConnectionTypeChange}
+                                style={{width: "100%"}}
+                                variant="outlined"
+                            >
+                                <MenuItem value={true}>{i18n.t('importModal.form.official')}</MenuItem>
+                                <MenuItem value={false}>{i18n.t('importModal.form.notOfficial')}</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </>
+				}
+				<FormControl
+                    variant="outlined"
+                    margin="normal"
+                    fullWidth
+                >
+                    <InputLabel id="connection-select-label">
+                        Conexões
+                    </InputLabel>
+					<Select
+						variant="outlined"
+						labelId="connection-select-label"
+						id="connection-select"
+						value={connection}
+						label="Conexões"
+						onChange={handleConnectionChange}
+						multiple
+						open={openConnectionSelect}
+						onOpen={handleOpenConnectionSelect}
+						onClose={handleCloseConnectionSelect}
+						style={{width: "100%"}}
+					>
+						<MenuItem value={"Todos"}>{i18n.t('importModal.form.all')}</MenuItem>
+						{whatsApps && whatsApps.map((whats, index) => {
+							if (whats.official === connectionType) {
+								if (connectionType === false && whats.status === "CONNECTED") {
+									return (
+										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+									)
+								} else if (connectionType === true) {
+									return (
+										<MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+									)
+								}
+							} return null
+						})}
+					</Select>
+                </FormControl>
+				{ connectionType === false &&
+                    <>
+                        <FormControl
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        >
+                            <InputLabel id="template-select-label">
+                                Template
+                            </InputLabel>
+                            <Select
+                                variant="outlined"
+                                labelId="template-select-label"
+                                id="template-selec"
+                                value={template}
+                                label="Template"
+                                onChange={(e) => { handleTemplateChange(e) }}
+                                style={{width: "100%"}}
+                            >
+                                <MenuItem value={"Nenhum"}>{i18n.t('importModal.form.none')}</MenuItem>
+                                {templates.length > 0 && templates.map((template, index) => {
+                                    return (
+                                        <MenuItem key={index} value={template.id}>{template.name}</MenuItem>
+                                    )
+                                })}
+                            </Select>
+                        </FormControl>
+                    </>
+				}
                 <div>
                     <FormControl
                         variant="outlined"

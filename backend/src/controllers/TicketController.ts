@@ -101,8 +101,9 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
 
 export const historic = async (req: Request, res: Response): Promise<Response> => {
   const { contactId } = req.params;
+  const { companyId } = req.user;
 
-  const contact = await HistoricService(contactId);
+  const contact = await HistoricService(contactId, companyId);
 
   return res.status(200).json(contact);
 };
@@ -188,7 +189,7 @@ export const isInBot = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { messageId } = req.body;
+  const { messageId } = req.params;
 
   const isTicketInBot = await IsTicketInBotService(messageId);
 

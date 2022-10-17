@@ -1,17 +1,21 @@
 import IntegratedImport from "../../database/models/IntegratedImport";
+import AppError from "../../errors/AppError";
 import ShowIntegratedImportService from "./ShowIntegratedImportService";
 
 interface IntegratedImportData {
   name: string;
   method: string;
   qtdeRegister: number;
-  status: number;
+  status: number | string;
   url: string;
   key: string;
   token: string;
   mapping: string;
   header: string;
   body: string;
+  templateId: string | number;
+  official: boolean | number;
+  whatsappIds: string | null;
 }
 
 interface Request {
@@ -40,7 +44,10 @@ const UpdateIntegratedImportService = async ({
     token,
     mapping,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   } = importData;
 
   await integratedImport.update({
@@ -53,7 +60,10 @@ const UpdateIntegratedImportService = async ({
     token,
     mapping,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   });
 
   return integratedImport;

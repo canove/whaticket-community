@@ -12,7 +12,11 @@ const upload = multer(uploadConfig);
 
 const ApiRoutes = express.Router();
 
-ApiRoutes.post("/tickets/isInBot", isAuthApi, TicketController.isInBot);
+ApiRoutes.get(
+  "/tickets/isInBot/:messageId",
+  isAuthApi,
+  TicketController.isInBot
+);
 
 ApiRoutes.post(
   "/tickets/changeQueueOrResolve",

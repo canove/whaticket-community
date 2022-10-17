@@ -177,7 +177,7 @@ const Dashboard = () => {
       try {
         setLoading(true);
 
-        const { data } = await api.get("file/list?Status=5");
+        const { data } = await api.get('file/list?status=5');
         setFiles(data.reports);
 
         setLoading(false);
@@ -187,7 +187,7 @@ const Dashboard = () => {
       try {
         setLoading(true);
 
-        const { data } = await api.get("file/list?Status=6");
+        const { data } = await api.get('file/list?status=6');
         setFiles(files.concat(data.reports));
         setLoading(false);
       } catch (err) {

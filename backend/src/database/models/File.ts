@@ -39,7 +39,7 @@ class File extends Model<File> {
 
   @Default(0)
   @Column
-  Status: number;
+  status: number;
 
   @CreatedAt
   CreatedAt: Date;

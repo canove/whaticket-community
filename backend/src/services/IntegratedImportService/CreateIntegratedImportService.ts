@@ -12,6 +12,9 @@ interface Request {
   companyId: string | number;
   header: string;
   body: string;
+  templateId: string | number;
+  official: boolean | number;
+  whatsappIds: string | null;
 }
 
 const CreateIntegratedImportService = async ({
@@ -25,8 +28,19 @@ const CreateIntegratedImportService = async ({
   mapping,
   companyId,
   header,
-  body
+  body,
+  templateId,
+  official,
+  whatsappIds
 }: Request): Promise<IntegratedImport> => {
+  if (whatsappIds.includes("Todos")) {
+    whatsappIds = null;
+  }
+
+  if (templateId === "") {
+    templateId = null;
+  }
+
   const integratedImport = await IntegratedImport.create({
     name,
     method,
@@ -38,7 +52,10 @@ const CreateIntegratedImportService = async ({
     mapping,
     companyId,
     header,
-    body
+    body,
+    templateId,
+    official,
+    whatsappIds
   });
 
   return integratedImport;
