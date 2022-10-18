@@ -13,6 +13,7 @@ import HistoricService from "../services/TicketServices/HistoricService";
 import ResolveService from "../services/TicketServices/ResolveService";
 import ChangeQueueOrResolveTicketService from "../services/TicketServices/ChangeQueueOrResolveTicket";
 import IsTicketInBotService from "../services/TicketServices/IsTicketInBotService";
+import AverageService from "../services/TicketServices/AverageService";
 
 type IndexQuery = {
   searchParam: string;
@@ -30,6 +31,8 @@ interface TicketData {
   queueId: number;
   userId: number;
   categoryId: number;
+  createdAt: Date;
+  finalizedAt: Date;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -96,10 +99,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(contact);
 };
 
-export const historic = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const historic = async (req: Request, res: Response): Promise<Response> => {
   const { contactId } = req.params;
   const { companyId } = req.user;
 
@@ -108,21 +108,15 @@ export const historic = async (
   return res.status(200).json(contact);
 };
 
-export const resolve = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  const { categoryId, createdAt, finalizedAt } = req.params;
+export const resolve = async (req: Request, res: Response): Promise<Response> => {
+  const { categoryId } = req.params;
 
   const category = await ResolveService(categoryId);
 
   return res.status(200).json(category);
 };
 
-export const update = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const update = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
   const { companyId } = req.user;
@@ -151,10 +145,7 @@ export const update = async (
   return res.status(200).json(ticket);
 };
 
-export const remove = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const remove = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
 
   const ticket = await DeleteTicketService(ticketId);
@@ -203,4 +194,16 @@ export const isInBot = async (
   const isTicketInBot = await IsTicketInBotService(messageId);
 
   return res.status(200).json(isTicketInBot);
+};
+
+export const average = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam } = req.query as IndexQuery;
+  const { companyId } = req.user;
+
+  const { averageTimes, totalAverageTime } = await AverageService(
+    searchParam,
+    companyId,
+  );
+
+  return res.status(200).json({ averageTimes, totalAverageTime });
 };

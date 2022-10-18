@@ -12,11 +12,17 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import { Card, CardContent, InputAdornment, TextField } from "@material-ui/core";
+import {
+  Card,
+  CardContent,
+  InputAdornment,
+  TextField,
+} from "@material-ui/core";
 import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import SearchIcon from "@material-ui/icons/Search";
+import { format, parseISO } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -48,36 +54,55 @@ const useStyles = makeStyles((theme) => ({
     width: 200,
     flexDirection: "column",
     display: "flex",
-    marginTop: 10
+    marginTop: 10,
   },
   selectStyle: {
     width: "100%",
-    marginTop: -10
+    marginTop: -10,
   },
 
   root: {
     width: 200,
-    transform: 'scale(1.2)',
+    transform: "scale(1.2)",
     marginBlock: 40,
     padding: theme.spacing(2),
-    display: 'inline-block',
-
+    display: "inline-block",
   },
+
   title: {
     width: "100%",
-    display: 'flex',
+    display: "flex",
     fontSize: 14,
     padding: theme.spacing(3),
   },
 
-  search: {
-    width: "40%",
-    display: 'flex',
-    fontSize: 14,
-    marginLeft: 50,
-
+  paperTime: {
+    padding: theme.spacing(2),
+    marginTop: "24px",
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
   },
 
+  search: {
+    width: "20%",
+    display: "flex",
+    fontSize: 14,
+    marginTop: "10px"
+  },
+
+  averageTickets: {
+    display: "flex",
+    marginTop: "10px",
+    width: "100%",
+    justifyContent: "start",
+  },
+
+  averageTicket: {
+    marginLeft: "5px",
+    marginRight: "5px",
+    width: "100%",
+  },
 }));
 
 const Dashboard = () => {
@@ -87,9 +112,9 @@ const Dashboard = () => {
   var userQueueIds = [];
 
   const [loading, setLoading] = useState(false);
-  const [registerCount, setRegisterCount] = useState(0)
-  const [sentCount, setSentCount] = useState(0)
-  const [deliveredCount, setDeliveredCount] = useState(0)
+  const [registerCount, setRegisterCount] = useState(0);
+  const [sentCount, setSentCount] = useState(0);
+  const [deliveredCount, setDeliveredCount] = useState(0);
   const [readCount, setReadCount] = useState(0);
   const [errorCount, setErrorCount] = useState(0);
   const [fileId, setFileId] = useState("");
@@ -97,6 +122,10 @@ const Dashboard = () => {
   const [date, setDate] = useState("");
   const [categoryCount, setCategoryCount] = useState([]);
   const [searchParam, setSearchParam] = useState("");
+  const [tickets, setTickets] = useState([]);
+  const [biggerTickets, setBiggerTickets] = useState([]);
+  const [smallerTickets, setSmallerTickets] = useState([]);
+  const [averageTime, setAverageTime] = useState(0);
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -120,25 +149,27 @@ const Dashboard = () => {
     setFileId("");
   }, [date]);
 
-	useEffect(() => {
-		const handleFilter = async () => {
-			setLoading(true);
+  useEffect(() => {
+    const handleFilter = async () => {
+      setLoading(true);
       try {
         setLoading(true);
-        const { data } = await api.get(`/registers/list?fileId=${fileId}&date=${date}`);
-          setRegisterCount(data.register.count);
-          setSentCount(data.sent.count);
-          setDeliveredCount(data.delivered.count);
-          setReadCount(data.read.count);
-          setErrorCount(data.error.count);
-          setCategoryCount(data.category);
-          setLoading(false);
+        const { data } = await api.get(
+          `/registers/list?fileId=${fileId}&date=${date}`
+        );
+        setRegisterCount(data.register.count);
+        setSentCount(data.sent.count);
+        setDeliveredCount(data.delivered.count);
+        setReadCount(data.read.count);
+        setErrorCount(data.error.count);
+        setCategoryCount(data.category);
+        setLoading(false);
       } catch (err) {
         toastError(err);
       }
-	  };
-		handleFilter();
-	}, [fileId, date]);
+    };
+    handleFilter();
+  }, [fileId, date]);
 
   useEffect(() => {
     const handleFiles = async () => {
@@ -164,42 +195,98 @@ const Dashboard = () => {
       }
     };
     handleFiles();
-// eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSelectOption = (_, newValue) => {
-      if (newValue) {
-          setFileId(newValue.id);
-      } else {
-          setFileId("");
+  useEffect(() => {
+    const fetchAverangeTime = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.get("/tickets/time", {
+          params: { searchParam }
+        });
+        setTickets(data.averageTimes);
+
+        if (data.averageTimes.length >= 6) {
+          setBiggerTickets(data.averageTimes.slice(0, 3));
+
+          const smallerTickets = data.averageTimes.slice(-3);
+          smallerTickets.sort((a, b) => { return a.averageMilliseconds - b.averageMilliseconds } );
+
+          setSmallerTickets(smallerTickets);
+        }
+
+        setAverageTime(data.totalAverageTime);
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+        setLoading(false);
       }
+    };
+
+    fetchAverangeTime();
+  }, [searchParam]);
+
+  const handleSelectOption = (_, newValue) => {
+    if (newValue) {
+      setFileId(newValue.id);
+    } else {
+      setFileId("");
+    }
   };
 
-  const renderOptionLabel = option => {
-      if (option.number) {
-        return `${option.name} - ${option.number}`;
-      } else {
-        return `${option.name}`;
-      }
+  const renderOptionLabel = (option) => {
+    if (option.number) {
+      return `${option.name} - ${option.number}`;
+    } else {
+      return `${option.name}`;
+    }
   };
 
   const getGridSize = () => {
-    if (categoryCount.length === 1){
-      return 12
+    if (categoryCount.length === 1) {
+      return 12;
     }
-    if (categoryCount.length === 2){
-      return 6
+    if (categoryCount.length === 2) {
+      return 6;
     }
-    if (categoryCount.length === 3){
-      return 4
+    if (categoryCount.length === 3) {
+      return 4;
     }
-    return 12
+    return 12;
   };
 
   const handleSearch = (e) => {
     setSearchParam(e.target.value.toLowerCase());
   };
 
+  const formatTime = (milliseconds) => {
+    let seconds = milliseconds / 1000;
+
+    let minutes = Math.floor(seconds / 60);
+    seconds = Math.floor((seconds / 60 - minutes) * 60);
+
+    let hours = Math.floor(minutes / 60);
+    minutes = Math.floor((minutes / 60 - hours) * 60);
+
+    let secondsString = seconds.toString();
+    let minutesString = minutes.toString();
+    let hoursString = hours.toString();
+
+    if (secondsString.length === 1) {
+      secondsString = `0${secondsString}`;
+    }
+
+    if (minutesString.length === 1) {
+      minutesString = `0${minutesString}`;
+    }
+
+    if (hoursString.length === 1) {
+      hoursString = `0${hoursString}`;
+    }
+
+    return `${hoursString}:${minutesString}:${secondsString}`;
+  };
 
   return (
     <div>
@@ -209,37 +296,47 @@ const Dashboard = () => {
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={6}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-            >
-              <Typography style={{display:"inlineBlock"}}  component="h3" variant="h6" color="primary" paragraph>
+            <Paper className={classes.customFixedHeightPaper}>
+              <Typography
+                style={{ display: "inlineBlock" }}
+                component="h3"
+                variant="h6"
+                color="primary"
+                paragraph
+              >
                 {i18n.t("dashboard.file")}
               </Typography>
               <Autocomplete
-                  onChange={(e, newValue) => handleSelectOption(e, newValue)}
-                  className={classes.selectStyle}
-                  options={files}
-                  getOptionLabel={renderOptionLabel}
-                  renderInput={(params) =>
-                      <TextField
-                          {...params}
-                          label={i18n.t("dashboard.file")}
-                          InputLabelProps={{ required: true}}
-                      />
-                  }
+                onChange={(e, newValue) => handleSelectOption(e, newValue)}
+                className={classes.selectStyle}
+                options={files}
+                getOptionLabel={renderOptionLabel}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={i18n.t("dashboard.file")}
+                    InputLabelProps={{ required: true }}
+                  />
+                )}
               />
             </Paper>
           </Grid>
           <Grid item xs={6}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-            >
-              <Typography style={{display:"inlineBlock"}} component="h3" variant="h6" color="primary" paragraph>
+            <Paper className={classes.customFixedHeightPaper}>
+              <Typography
+                style={{ display: "inlineBlock" }}
+                component="h3"
+                variant="h6"
+                color="primary"
+                paragraph
+              >
                 {i18n.t("dashboard.date")}
               </Typography>
               <TextField
                 className={classes.selectStyle}
-                onChange={(e) => { setDate(e.target.value) }}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                }}
                 label={i18n.t("dashboard.date")}
                 InputLabelProps={{ shrink: true, required: true }}
                 type="date"
@@ -317,7 +414,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                 {sentCount}
+                  {sentCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -367,83 +464,130 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          { categoryCount && categoryCount.length > 0 &&
+          {categoryCount && categoryCount.length > 0 && (
             <Grid item xs={12}>
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                  {i18n.t("dashboard.messages.category.title")}
+                {i18n.t("dashboard.messages.category.title")}
               </Typography>
-            </Grid>}
-          { categoryCount && categoryCount.map((category) => (
-
-             <Grid item xs={getGridSize()} key={category.name} >
-              <Paper className={classes.customFixedHeightPaper}
-                style={{ overflow: "hidden" }}
-              >
-                <Typography component="h3" variant="h6" color="primary" paragraph>
-                  {category.name}
-                </Typography>
-                <Grid item>
-                <Typography component="h1" variant="h4">
-                 {category.count}
-                </Typography>
-                </Grid>
-              </Paper>
             </Grid>
-          ))}
+          )}
+          {categoryCount &&
+            categoryCount.map((category) => (
+              <Grid item xs={getGridSize()} key={category.name}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography
+                    component="h3"
+                    variant="h6"
+                    color="primary"
+                    paragraph
+                  >
+                    {category.name}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {category.count}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+            ))}
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart />
             </Paper>
           </Grid>
         </Grid>
-        <Grid item xs={12} >
-            <Paper className={classes.title}>
-                 <Typography component="h3" variant="h6" color="primary" >
-                  Tempo de Atendimento
+        <Grid item xs={12}>
+          <Paper className={classes.paperTime}>
+            <div>
+              <Typography component="h3" variant="h6" color="primary">
+                Tempo de Atendimento
+              </Typography>
+              <TextField
+                className={classes.search}
+                placeholder={"Pesquisar"}
+                type="search"
+                value={searchParam}
+                onChange={handleSearch}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon style={{ color: "gray" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
+            { tickets && tickets.length < 6 &&
+              <div className={classes.averageTickets}>
+                {tickets.map((ticket, index) => (
+                    <Card className={classes.averageTicket} key={index} elevation={5}>
+                      <CardContent>
+                        <Typography align="center" variant="h6" component="h2">
+                          {ticket.user.name}
+                        </Typography>
+                        <br />
+                        <Typography align="center" variant="h5" component="h2">
+                          {formatTime(ticket.averageMilliseconds)}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  ))
+                }
+              </div>
+            }
+            { tickets && tickets.length >= 6 &&
+              <>
+                <Typography align="center" variant="h6" component="h2">
+                  Maiores Tempos Médios
                 </Typography>
-                  <Grid>
-                      <TextField
-                        className={classes.search}
-                        placeholder={"Pesquisar"}
-                        type="search"
-                        value={searchParam}
-                        onChange={handleSearch}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchIcon style={{ color: "gray" }} />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-
-                      <div>
-                        <Card elevation={5} className={classes.root}>
-                          <CardContent>
-                            <Typography align="center" variant="h6" component="h2">Cliente</Typography><br/>
-                            <Typography align="center" variant="h5" component="h2"> 03:00 hrs </Typography>
-                          </CardContent>
-                        </Card>
-                        <Card elevation={5} className={classes.root}>
-                          <CardContent>
-                            <Typography align="center" variant="h6" component="h2">Cliente</Typography><br/>
-                            <Typography align="center" variant="h5" component="h2"> 03:00 hrs </Typography>
-                          </CardContent>
-                        </Card>
-                        <Card elevation={5} className={classes.root}>
-                          <CardContent>
-                            <Typography align="center" variant="h6" component="h2">Cliente</Typography><br/>
-                            <Typography align="center" variant="h5" component="h2"> 03:00 hrs </Typography>
-                          </CardContent>
-                        </Card>
-                      </div>
-                      <Typography component="h3" variant="h6">
-                        Tempo total de Atendimentos: 09:00 hrs.
-                      </Typography>
-
-                  </Grid>
-            </Paper>
-          </Grid>
+                <div className={classes.averageTickets}>
+                  {biggerTickets.map((ticket, index) => (
+                    <Card className={classes.averageTicket} key={index} elevation={5}>
+                      <CardContent>
+                        <Typography align="center" variant="h6" component="h2">
+                          {ticket.user.name}
+                        </Typography>
+                        <br />
+                        <Typography align="center" variant="h5" component="h2">
+                          {formatTime(ticket.averageMilliseconds)}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <Typography align="center" variant="h6" component="h2">
+                  Menores Tempos Médios
+                </Typography>
+                <div className={classes.averageTickets}>
+                  {smallerTickets.map((ticket, index) => (
+                    <Card className={classes.averageTicket} key={index} elevation={5}>
+                      <CardContent>
+                        <Typography align="center" variant="h6" component="h2">
+                          {ticket.user.name}
+                        </Typography>
+                        <br />
+                        <Typography align="center" variant="h5" component="h2">
+                          {formatTime(ticket.averageMilliseconds)}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            }
+            <div style={{ marginTop: "10px" }}>
+              <Typography component="h3" variant="h6">
+                {tickets && tickets.length > 0
+                  ? `Tempo Médio de Atendimentos: ${formatTime(averageTime)}`
+                  : `Sem Tickets Resolvidos`}
+              </Typography>
+            </div>
+          </Paper>
+        </Grid>
       </Container>
     </div>
   );
