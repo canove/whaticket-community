@@ -61,9 +61,6 @@ const NotificationsPopOver = () => {
 	const historyRef = useRef(history);
 
 	useEffect(() => {
-		console.log(user);
-	}, [user])
-	useEffect(() => {
 		soundAlertRef.current = play;
 
 		if (!("Notification" in window)) {
@@ -111,7 +108,6 @@ const NotificationsPopOver = () => {
 		});
 
 		socket.on(`appMessage${user.companyId}`, data => {
-			console.log(data);
 			if (
 				data.action === "create" &&
 				(!data.message.read || data.ticket.status === "pending") &&
