@@ -60,7 +60,8 @@ const FindOrCreateTicketService = async (
         },
         whatsappId,
         contactId: contact.id,
-        companyId
+        companyId,
+        status: { [Op.ne]: "closed" }
       },
       order: [["updatedAt", "DESC"]]
     });

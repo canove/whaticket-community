@@ -90,7 +90,7 @@ const reducer = (state, action) => {
   }
 };
 
-const Flows = () => {
+const DialogFlows = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
@@ -103,44 +103,44 @@ const Flows = () => {
   const [deletingFlow, setDeletingFlow] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-  // useEffect(() => {
-  //   dispatch({ type: "RESET" });
-  // }, [searchParam]);
+  useEffect(() => {
+    dispatch({ type: "RESET" });
+  }, [searchParam]);
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const fetchFlows = async () => {
-  //     try {
-  //       const { data } = await api.get("/flows", {
-  //         params: { searchParam }
-  //       });
-  //       dispatch({ type: "LOAD_FLOW", payload: data });
-  //       setLoading(false);
-  //     } catch (err) {
-  //       toastError(err);
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchFlows();
-  // }, [searchParam]);
+  useEffect(() => {
+    setLoading(true);
+    const fetchFlows = async () => {
+      try {
+        const { data } = await api.get("/flows", {
+          params: { searchParam }
+        });
+        dispatch({ type: "LOAD_FLOW", payload: data });
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+        setLoading(false);
+      }
+    };
+    fetchFlows();
+  }, [searchParam]);
 
-  // useEffect(() => {
-  //   const socket = openSocket();
+  useEffect(() => {
+    const socket = openSocket();
 
-  //   socket.on(`flows${user.companyId}`, (data) => {
-  //     if (data.action === "update" || data.action === "create") {
-  //       dispatch({ type: "UPDATE_FLOW", payload: data.flow });
-  //     }
+    socket.on(`flows${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_FLOW", payload: data.flow });
+      }
 
-  //     if (data.action === "delete") {
-  //       dispatch({ type: "DELETE_FLOW", payload: +data.flowId });
-  //     }
-  //   });
+      if (data.action === "delete") {
+        dispatch({ type: "DELETE_FLOW", payload: +data.flowId });
+      }
+    });
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, [user]);
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   const formatDate = (date) => {
     if (date) {
@@ -172,14 +172,18 @@ const Flows = () => {
   const handleCopyFlow = async (flow) => {
     const flowData = {
       name: `${flow.name} copy`,
+      status: flow.status,
+      projectId: flow.projectId,
+      agentId: flow.agentId,
+      location: flow.location
     }
 
-    // try {
-    //   await api.post(`/flows/`, flowData);
-    //   toast.success(i18n.t("flows.confirmation.duplicate"));
-    // } catch (err) {
-    //   toastError(err);
-    // }
+    try {
+      await api.post(`/flows/`, flowData);
+      toast.success(i18n.t("flows.confirmation.duplicate"));
+    } catch (err) {
+      toastError(err);
+    }
   }
 
   const handleCloseConfirmationModal = () => {
@@ -188,29 +192,35 @@ const Flows = () => {
   };
 
   const handleDeleteFlow = async (flowId) => {
-    // try {
-    //     await api.delete(`/flows/${flowId}`);
-    //     toast.success(i18n.t("flows.confirmation.delete"));
-    // } catch (err) {
-    //     toastError(err);
-    // }
+    try {
+        await api.delete(`/flows/${flowId}`);
+        toast.success(i18n.t("flows.confirmation.delete"));
+    } catch (err) {
+        toastError(err);
+    }
     setDeletingFlow(null);
   };
   
-  // const getStatus = (status) => {
-  //   if (status === "active") {
-  //     return "Ativo";
-  //   }
+  const getStatus = (status) => {
+    if (status === "active") {
+      return "Ativo";
+    }
 
-  //   if (status === "inactive") {
-  //     return "Inativo";
-  //   }
+    if (status === "inactive") {
+      return "Inativo";
+    }
 
-  //   return status;
-  // }
+    return status;
+  }
 
   return (
     <MainContainer>
+      <FlowModal
+        open={flowModalOpen}
+        onClose={handleCloseFlowModal}
+        aria-labelledby="form-dialog-title"
+        flowId={selectedFlow && selectedFlow.id}
+      />
       <ConfirmationModal
         title={i18n.t("flows.confirmation.title")}
         open={confirmModalOpen}
@@ -249,6 +259,10 @@ const Flows = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("flows.grid.name")}</TableCell>
+              <TableCell align="center">{i18n.t("flows.grid.status")}</TableCell>
+              <TableCell align="center">ID do Projeto</TableCell>
+              <TableCell align="center">ID do Agente</TableCell>
+              <TableCell align="center">Local</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.createdAt")}</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.updatedAt")}</TableCell>
               <TableCell align="center">{i18n.t("flows.grid.actions")}</TableCell>
@@ -261,6 +275,10 @@ const Flows = () => {
                   return (
                     <TableRow key={flow.id}>
                       <TableCell align="center">{flow.name}</TableCell>
+                      <TableCell align="center">{getStatus(flow.status)}</TableCell>
+                      <TableCell align="center">{flow.projectId}</TableCell>
+                      <TableCell align="center">{flow.agentId}</TableCell>
+                      <TableCell align="center">{flow.location}</TableCell>
                       <TableCell align="center">
                         {formatDate(flow.createdAt)}
                       </TableCell>
@@ -293,7 +311,7 @@ const Flows = () => {
                     </TableRow>
                   );
                 })}
-              {loading && <TableRowSkeleton columns={4} />}
+              {loading && <TableRowSkeleton columns={5} />}
             </>
           </TableBody>
         </Table>
@@ -302,4 +320,4 @@ const Flows = () => {
   );
 };
 
-export default Flows;
+export default DialogFlows;
