@@ -9,6 +9,7 @@ import {
   Container,
   InputAdornment,
   IconButton,
+  Paper,
 } from '@material-ui/core';
 import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
 import { makeStyles } from "@material-ui/core/styles";
@@ -46,6 +47,17 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  login: {
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  fundo: {
+    padding: 50,
+    height: "100%",
+    alignItems: "center",
+    backgroundImage: `linear-gradient(to top left, rgba(30,144,255,0), rgba(30,144,255,1))`
+  },
 }));
 
 const Login = () => {
@@ -62,82 +74,86 @@ const Login = () => {
   const handlSubmit = (e) => {
     e.preventDefault();
       handleLogin(user);
-  }
+  };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlined />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          {i18n.t("login.title")}
-        </Typography>
-        <form className={classes.form} noValidate onSubmit={handlSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="company"
-            label={i18n.t("login.form.company")}
-            name="company"
-            value={user.company}
-            onChange={handleChangeInput}
-            autoComplete="company"
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label={i18n.t("login.form.email")}
-            name="email"
-            value={user.email}
-            onChange={handleChangeInput}
-            autoComplete="email"
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label={i18n.t("login.form.password")}
-            id="password"
-            value={user.password}
-            onChange={handleChangeInput}
-            autoComplete="current-password"
-            type={showPassword ? 'text' : 'password'}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword((e) => !e)}
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            {i18n.t("login.buttons.submit")}
-          </Button>
-        </form>
-      </div>
-      <Box mt={8}>{/* <Copyright /> */}</Box>
-    </Container>
+    <div className={classes.fundo}>
+        <Container component="main" maxWidth="xs">
+          <Paper elevation={5} className={classes.login}>
+            <CssBaseline />
+            <div className={classes.paper}>
+              <Avatar className={classes.avatar}>
+                <LockOutlined />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                {i18n.t("login.title")}
+              </Typography>
+              <form className={classes.form} noValidate onSubmit={handlSubmit}>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="company"
+                  label={i18n.t("login.form.company")}
+                  name="company"
+                  value={user.company}
+                  onChange={handleChangeInput}
+                  autoComplete="company"
+                  autoFocus
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label={i18n.t("login.form.email")}
+                  name="email"
+                  value={user.email}
+                  onChange={handleChangeInput}
+                  autoComplete="email"
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label={i18n.t("login.form.password")}
+                  id="password"
+                  value={user.password}
+                  onChange={handleChangeInput}
+                  autoComplete="current-password"
+                  type={showPassword ? 'text' : 'password'}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword((e) => !e)}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  {i18n.t("login.buttons.submit")}
+                </Button>
+              </form>
+            </div>
+            <Box mt={8}>{/* <Copyright /> */}</Box>
+          </Paper>
+        </Container>
+    </div>
   );
 };
 
