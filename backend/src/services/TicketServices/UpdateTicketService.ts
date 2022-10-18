@@ -45,6 +45,7 @@ const UpdateTicketService = async ({
     queueId,
     userId,
     categoryId,
+    finalizedAt: status === "closed" ? new Date() : null
   });
 
   await ticket.reload();

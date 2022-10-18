@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Op, Sequelize } from "sequelize";
 import Ticket from "../../database/models/Ticket";
 import User from "../../database/models/User";
