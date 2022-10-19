@@ -1137,7 +1137,7 @@ const messages = {
           name: "Nome",
           icon: "Ícone",
           main: "Pincipal",
-          relation: "Ralação",
+          relation: "Relação",
           cancel: "Cancelar",
           created: "Criar",
           save: "Salvar",

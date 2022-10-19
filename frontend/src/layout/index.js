@@ -27,7 +27,7 @@ import BackdropLoading from "../components/BackdropLoading";
 
 import { IconFlagBR, IconFlagUS, IconFlagES } from 'material-ui-flags';
 
-import brainit from "../assets/brainit500.png";
+import brainit from "../assets/brainit400.png";
 import api from "../services/api";
 import toastError from "../errors/toastError";
 
