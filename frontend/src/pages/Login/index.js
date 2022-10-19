@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 
   },
   fundo: {
-    paddingTop: 150,
+    paddingTop: 100,
     width: "100%",
     height: "100%",
 
@@ -78,7 +78,12 @@ const Login = () => {
       handleLogin(user);
   };
   return (
-    <div className={classes.fundo} style={{ backgroundImage: `url(${background})` }}>
+    <div
+      className={classes.fundo}
+      style={{ backgroundImage: `url(${background})`,
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover" }}
+      >
         <Container component="main" maxWidth="xs">
           <div>
             <Paper elevation={5} className={classes.login}>
