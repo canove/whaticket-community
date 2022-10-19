@@ -27,9 +27,9 @@ export const StartWhatsAppSession = async (
       wh_connect: process.env.WPP_NOF_WEBHOOK_URL
     };
 
-    axios.post(apiUrl, JSON.stringify(payload), {
+    await axios.post(apiUrl, payload, {
       headers: {
-        "x-api-key": process.env.WPP_NOF_API_KEY
+        "api-key": process.env.WPP_NOF_API_KEY
       }
     });
   } catch (err) {

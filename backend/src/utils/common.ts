@@ -18,6 +18,20 @@ const preparePhoneNumber = (phone:string): string => {
   return phoneNumber;
 }
 
+const preparePhoneNumber9Digit = (phone:string): string => {
+  let phoneNumber = phone.replace('+','');
+  let country = phoneNumber.substring(0,2);
+  if(country != '55' && phoneNumber.length < 12) {
+    phoneNumber = '55' + phoneNumber;
+  }
+
+  if (phoneNumber.length < 13){
+    phoneNumber = `${phoneNumber.substring(5, 0)}9${phoneNumber.substring(phoneNumber.length, 5)}`
+  }
+  return phoneNumber;
+}
+
+
 const isValidHttpUrl = (text: string): any => {
   let url;
   
@@ -42,4 +56,4 @@ const isValidHttpUrl = (text: string): any => {
   return null;
 }
 
-export { preparePhoneNumber, isValidHttpUrl };
+export { preparePhoneNumber, preparePhoneNumber9Digit, isValidHttpUrl };

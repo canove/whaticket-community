@@ -1,3 +1,4 @@
+/*eslint-disable */
 import express from "express";
 import multer from "multer";
 import uploadConfig from "../config/upload";
@@ -16,6 +17,12 @@ ApiRoutes.get(
   "/tickets/isInBot/:messageId",
   isAuthApi,
   TicketController.isInBot
+);
+
+ApiRoutes.post(
+  "/tickets/isInBot",
+  isAuthApi,
+  TicketController.isInBotPost
 );
 
 ApiRoutes.post(
