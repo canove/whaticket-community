@@ -16,17 +16,19 @@ interface FlowsData {
   location: string;
   clientEmail: string;
   privateKey: string;
+  type: string;
 }
 
 type IndexQuery = {
   searchParam: string;
+  type: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
-  const { searchParam } = req.query as IndexQuery;
+  const { searchParam, type } = req.query as IndexQuery;
 
-  const flows = await ListFlowsService({ companyId, searchParam });
+  const flows = await ListFlowsService({ companyId, searchParam, type });
 
   return res.status(200).json(flows);
 };
@@ -41,7 +43,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    type
   }: FlowsData = req.body;
 
   const flow = await CreateFlowService({
@@ -52,7 +55,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    type
   });
 
   const io = getIO();

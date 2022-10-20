@@ -63,43 +63,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const FlowModal = ({ open, onClose, flowId }) => {
+const FlowNodeModal = ({ open, onClose, flowId }) => {
     const { i18n } = useTranslation();
     const classes = useStyles();
 
     const [name, setName] = useState("");
     const [status, setStatus] = useState("active");
-    const [projectId, setProjectId] = useState("");
-    const [agentId, setAgentId] = useState("");
-    const [location, setLocation] = useState("");
-    const [useExternalAccount, setUseExternalAccount] = useState(false);
-    const [clientEmail, setClientEmail] = useState("");
-    const [privateKey, setPrivateKey] = useState("");
 
     useEffect(() => {
       setName("");
       setStatus("active");
-      setProjectId("");
-      setAgentId("");
-      setLocation("");
-      setClientEmail("");
-      setPrivateKey("");
-      setUseExternalAccount(false);
 
       const fetchFlow = async () => {
         try {
           const { data } = await api.get(`/flows/${flowId}`);
           setName(data.name)
           setStatus(data.status);
-          setProjectId(data.projectId);
-          setAgentId(data.agentId);
-          setLocation(data.location);
-          setClientEmail(data.clientEmail);
-          setPrivateKey(data.privateKey);
-
-          if (data.clientEmail && data.privateKey) {
-            setUseExternalAccount(true);
-          }
         } catch (err) {
           toastError(err);
         }
@@ -112,12 +91,7 @@ const FlowModal = ({ open, onClose, flowId }) => {
     const handleClose = () => {
       setName("");
       setStatus("active");
-      setProjectId("");
-      setAgentId("");
-      setLocation("");
-      setClientEmail("");
-      setPrivateKey("");
-      setUseExternalAccount(false);
+
       onClose();
     };
 
@@ -129,45 +103,11 @@ const FlowModal = ({ open, onClose, flowId }) => {
       setStatus(e.target.value);
     }
 
-    const handleProjectIdChange = (e) => {
-      setProjectId(e.target.value);
-    };
-
-    const handleAgentIdChange = (e) => {
-      setAgentId(e.target.value);
-    };
-
-    const handleLocationChange = (e) => {
-      setLocation(e.target.value);
-    };
-
-    const handleClientEmailChange = (e) => {
-      setClientEmail(e.target.value);
-    };
-
-    const handlePrivateKeyChange = (e) => {
-      setPrivateKey(e.target.value);
-    };
-
-    const handleUseExternalAccountChange = (e) => {
-      setUseExternalAccount(e.target.checked);
-    }
-
     const handleSubmit = async () => {
-      if (useExternalAccount === true && (!clientEmail || !privateKey)) {
-        toast.error("Email e Chave Privada são obrigatórios!");
-        return false;
-      }
-
       const flowData = {
           name: name,
           status: status,
-          projectId: projectId,
-          agentId: agentId,
-          location: location,
-          clientEmail: useExternalAccount ? clientEmail : "",
-          privateKey: useExternalAccount ? privateKey : "",
-          type: "dialogflow"
+          type: "bits"
       };
 
       try {
@@ -237,83 +177,6 @@ const FlowModal = ({ open, onClose, flowId }) => {
                       </Select>
                   </FormControl>
                 </div>
-                <div className={classes.multFieldLine}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={useExternalAccount}
-                        onChange={handleUseExternalAccountChange}
-                        name="useExternalAccount"
-                        color="primary"
-                      />
-                    }
-                    label="Usar conta externa"
-                  />
-                </div>
-                { useExternalAccount &&
-                  <>
-                    <div className={classes.multFieldLine}>
-                      <TextField
-                        as={TextField}
-                        label="Email do Cliente"
-                        value={clientEmail}
-                        name="clientEmail"
-                        onChange={(e) => { handleClientEmailChange(e) }}
-                        variant="outlined"
-                        margin="dense"
-                        fullWidth
-                      />
-                    </div>
-                    <div className={classes.multFieldLine}>
-                      <TextField
-                        as={TextField}
-                        label="Chave Privada"
-                        value={privateKey}
-                        name="privateKey"
-                        onChange={(e) => { handlePrivateKeyChange(e) }}
-                        variant="outlined"
-                        margin="dense"
-                        fullWidth
-                      />
-                    </div>
-                  </>
-                }
-                <div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    label="ID do Projeto"
-                    value={projectId}
-                    name="projectId"
-                    onChange={(e) => { handleProjectIdChange(e) }}
-                    variant="outlined"
-                    margin="dense"
-                    fullWidth
-                  />
-                </div>
-                <div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    label="ID do Agente"
-                    value={agentId}
-                    name="agentId"
-                    onChange={(e) => { handleAgentIdChange(e) }}
-                    variant="outlined"
-                    margin="dense"
-                    fullWidth
-                  />
-                </div>
-                <div className={classes.multFieldLine}>
-                  <TextField
-                    as={TextField}
-                    label="Local"
-                    value={location}
-                    name="location"
-                    onChange={(e) => { handleLocationChange(e) }}
-                    variant="outlined"
-                    margin="dense"
-                    fullWidth
-                  />
-                </div>
               </DialogContent>
               <DialogActions>
               <Button
@@ -340,4 +203,4 @@ const FlowModal = ({ open, onClose, flowId }) => {
     );
 };
 
-export default FlowModal;
+export default FlowNodeModal;

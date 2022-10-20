@@ -175,7 +175,7 @@ const RenderRoutes = () => {
             }
             <Route 
                 exact
-                path={'/createFlow'}
+                path={'/CreateFlow/:flowId'}
                 component={CreateFlows}
                 isPrivate
             />
