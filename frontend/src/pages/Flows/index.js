@@ -1,6 +1,8 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, forwardRef, useEffect, useReducer, useState } from "react";
 
 import openSocket from "../../services/socket-io";
+
+import { Link as RouterLink } from "react-router-dom";
 
 import {
   Button,
@@ -155,8 +157,9 @@ const Flows = () => {
   };
 
   const handleOpenFlowModal = () => {
-    setFlowModalOpen(true);
-    setSelectedFlow(null);
+    window.open('/createFlow', '_blank', 'noopener,noreferrer');
+    // setFlowModalOpen(true);
+    // setSelectedFlow(null);
   };
 
   const handleCloseFlowModal = () => {

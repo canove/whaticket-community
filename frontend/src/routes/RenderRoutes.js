@@ -30,6 +30,7 @@ import FileImport from "../pages/FileImport";
 import Category from "../pages/Category";
 import DialogFlows from "../pages/DialogFlows";
 import Flows from "../pages/Flows";
+import CreateFlows from "../pages/CreateFlows";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -172,6 +173,12 @@ const RenderRoutes = () => {
                     )
                 })
             }
+            <Route 
+                exact
+                path={'/createFlow'}
+                component={CreateFlows}
+                isPrivate
+            />
         </>
     )
 };
