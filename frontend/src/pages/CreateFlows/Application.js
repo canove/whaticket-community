@@ -4,6 +4,9 @@ import { JSCustomNodeFactory } from './nodes/Custom/JSCustomNodeFactory';
 import { ChatNodeFactory } from './nodes/Chat/ChatNodeFactory';
 import { AdvancedLinkFactory } from './links/AdvancedLink/AdvancedLinkFactory';
 import { AdvancedPortFactory } from './ports/AdvancedPort/AdvancedPortFactory';
+import { StartNodeFactory } from './nodes/Start/StartNodeFactory';
+import { StartNodeModel } from './nodes/Start/StartNodeModel';
+import { AdvancedPortModel } from './ports/AdvancedPort/AdvancedPortModel';
 
 export class Application {
 	constructor() {
@@ -17,6 +20,8 @@ export class Application {
 
 		this.diagramEngine.getNodeFactories().registerFactory(new JSCustomNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new ChatNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new StartNodeFactory());
+
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());
 
@@ -96,7 +101,12 @@ export class Application {
 					}
 				});				
 			}
-		})
+		});
+
+		const start = new StartNodeModel();
+		start.addPort(new AdvancedPortModel(false, "out"));
+		start.setPosition(100, 100);
+		this.activeModel.addAll(start);
 
 		// //!------------- SERIALIZING ------------------
 
@@ -109,11 +119,6 @@ export class Application {
 
 		// const pathfinding = this.diagramEngine.getLinkFactories().getFactory(SRD.PathFindingLinkFactory.NAME);
 
-		// //3-A) create a default node
-		// var node1 = new SRD.DefaultNodeModel('Node 1', 'rgb(0,192,255)');
-		// let port = node1.addOutPort('Out');
-		// node1.setPosition(100, 100);
-
 		// //3-B) create another default node
 		// var node2 = new SRD.DefaultNodeModel('Node 2', 'rgb(192,255,0)');
 		// let port2 = node2.addInPort('In');
@@ -121,8 +126,6 @@ export class Application {
 
 		// // link the ports
 		// let link1 = port.link(port2, pathfinding);
-
-		// this.activeModel.addAll(node1, node2, link1);
 	}
 
 	getActiveDiagram() {

@@ -1,50 +1,23 @@
 import React, { useEffect, useState } from "react";
-import parse from 'html-react-parser';
 
-import { Editor } from "react-draft-wysiwyg";
-import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
-import draftToHtml from 'draftjs-to-html';
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-
-import { PortWidget } from '@projectstorm/react-diagrams';
-
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField } from '@material-ui/core';
 import SettingsIcon from "@material-ui/icons/Settings";
+import { PortWidget } from "@projectstorm/react-diagrams";
 
-import { AdvancedPortModel } from '../../ports/AdvancedPort/AdvancedPortModel';
-
-export class ChatNodeWidget extends React.Component {
+export class StartNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 		  count: 0,
 		  modalOpen: false,
-		  editorState: this.props.node.data.content ? EditorState.createWithContent(convertFromRaw(JSON.parse(this.props.node.data.content))) : EditorState.createEmpty(),
 		};
+		this.url = `${process.env.REACT_APP_BACKEND_URL}flows/start/${this.props.node.options.id}`;
+		this.header = JSON.stringify({"Authorization": "TOKEN"}, null, 2);
+		this.payload = JSON.stringify({"text": "STRING"}, null, 2);
+		this.response = JSON.stringify({"content": "STRING", "type": "text"}, null, 2);
 	}
 
-	onEditorStateChange = async (editorState) => {
-		this.setState({
-		  editorState,
-		});
-
-		const data = convertToRaw(editorState.getCurrentContent());
-
-		this.props.node.data.content = JSON.stringify(data);
-	};
-
 	render() {
-		const { editorState } = this.state;
-
-		const wrapperStyle = {
-			border: "1px solid black",
-		}
-		const editorStyle = {
-			minHeight: '300px',
-			padding: '1rem',
-			cursor: 'text',
-		}
-
 		return (
 			<div>
 				<Dialog
@@ -54,15 +27,66 @@ export class ChatNodeWidget extends React.Component {
 					scroll="paper"
 				>
 				<DialogTitle id="form-dialog-title">
-					Chat
+					Start
 				</DialogTitle>
 				<DialogContent>
-					<Editor
-						wrapperStyle={wrapperStyle}
-						editorStyle={editorStyle}
-						editorState={editorState}
-						onEditorStateChange={this.onEditorStateChange}
+				<div>
+                  <TextField
+					as={TextField}
+                    name="url"
+                    variant="outlined"
+                    margin="normal"
+                    label="URL"
+                    fullWidth
+					value={this.url}
+					onChange={() => { return false }}
+                  />
+                </div>
+				<div>
+					<TextField
+						as={TextField}
+						label="Header"
+						name="header"
+						value={this.header}
+						multiline
+						minRows={4}
+						maxLength="1024"
+						variant="outlined"
+						margin="normal"
+						fullWidth
+						onChange={() => { return false }}
 					/>
+				</div>
+				<div>
+					<TextField
+						as={TextField}
+						label="Payload"
+						name="payload"
+						value={this.payload}
+						multiline
+						minRows={4}
+						maxLength="1024"
+						variant="outlined"
+						margin="normal"
+						fullWidth
+						onChange={() => { return false }}
+					/>
+				</div>
+				<div>
+					<TextField
+						as={TextField}
+						label="Response"
+						name="response"
+						value={this.response}
+						multiline
+						minRows={4}
+						maxLength="1024"
+						variant="outlined"
+						margin="normal"
+						fullWidth
+						onChange={() => { return false }}
+					/>
+				</div>
 				</DialogContent>
 				<DialogActions>
 					<Button
@@ -84,8 +108,8 @@ export class ChatNodeWidget extends React.Component {
 				>
 					<div 
 						style={{
-							backgroundColor: "#25D366",
-							color: "white",
+							backgroundColor: "#98CEFF",
+							color: "black",
 							display: "flex",
 							justifyContent: "space-between"
 						}}
@@ -95,10 +119,11 @@ export class ChatNodeWidget extends React.Component {
 								padding: "10px",
 							}}
 						>
-							Chat
+							Start
 						</Typography>
 						<IconButton
 							onClick={() => {
+								// console.log(this.props.node.parent.parent.options.id);
 								this.setState({ modalOpen: true });
 							}}
 						>
@@ -112,28 +137,20 @@ export class ChatNodeWidget extends React.Component {
 					>
 						<PortWidget
 							style={{
+								backgroundColor: "#70BAFF",
+								border: "2px solid #075E54",
+								borderRadius: "100%",
 								cursor: "pointer",
-								height: "48px",
-								left: "0",
+								height: "16px",
 								position: "absolute",
-								top: "0",
-								width: "8px",
+								right: "-8px",
+								top: "50%",
+								width: "16px",
 							}}
 							engine={this.props.engine}
-							port={this.props.node.getPort('in')}
+							port={this.props.node.getPort('out')}
 						>
 						</PortWidget>
-						<div
-							style={{
-								backgroundColor: "#EEE",
-								border: "1px solid black",
-								margin: "8px",
-								minHeight: "150px",
-								padding: "16px",
-							}}
-						>
-							{ parse(draftToHtml(convertToRaw(editorState.getCurrentContent()))) }
-						</div>
 						{/* { Object.keys(this.props.node.ports).map((port, index) => (
 							<PortWidget
 							key={index}

@@ -20,6 +20,8 @@ import {
   TextField,
 } from "@material-ui/core";
 
+import { Visibility } from "@material-ui/icons";
+
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
@@ -255,11 +257,6 @@ const Flows = () => {
           >
             {i18n.t("flows.buttons.create")}
           </Button>
-          <Button
-            component={forwardRef((itemProps, ref) => (<RouterLink to={`/CreateFlow/23`} ref={ref} {...itemProps} />))}
-          >
-            CLICA AQUI!
-          </Button>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">
@@ -286,6 +283,12 @@ const Flows = () => {
                         {formatDate(flow.updatedAt)}
                       </TableCell>
                       <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          component={forwardRef((itemProps, ref) => (<RouterLink to={`/CreateFlow/${flow.id}`} ref={ref} {...itemProps} />))}
+                        >
+                          <Visibility />
+                        </IconButton>
                         <IconButton
                           size="small"
                           onClick={() => handleEditFlow(flow)}

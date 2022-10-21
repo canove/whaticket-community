@@ -3,16 +3,14 @@ import { DefaultPortModel, NodeModel } from '@projectstorm/react-diagrams';
 /**
  * Example of a custom model using pure javascript
  */
-export class ChatNodeModel extends NodeModel {
+export class StartNodeModel extends NodeModel {
 	constructor(options = {}) {
 		super({
 			...options,
-			type: 'chat-node'
+			type: 'start-node'
 		});
 		this.color = options.color || { options: 'red' };
-		this.data = {
-			content: '',
-		}
+		this.main = true;
 
 		// this.portsOut = [];
         // this.portsIn = [];
@@ -37,13 +35,13 @@ export class ChatNodeModel extends NodeModel {
 		return {
 			...super.serialize(),
 			color: this.color,
-			data: this.data
+			main: this.main
 		};
 	}
 
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
 		this.color = ob.color;
-		this.data = ob.data.data;
+		this.main = ob.data.main;
 	}
 }

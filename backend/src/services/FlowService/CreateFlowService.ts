@@ -38,7 +38,8 @@ const CreateFlowService = async ({
 
   if (type === "bits") {
     await FlowsNodes.create({
-      flowId: flow.id
+      flowId: flow.id,
+      companyId: flow.companyId
     });
   }
 

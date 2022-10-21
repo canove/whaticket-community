@@ -6,6 +6,7 @@ import DeleteFlowService from "../services/FlowService/DeleteFlowService";
 import ListFlowsService from "../services/FlowService/ListFlowsService";
 import ShowFlowByConnectionService from "../services/FlowService/ShowFlowByConnectionService";
 import ShowFlowService from "../services/FlowService/ShowFlowService";
+import StartFlowService from "../services/FlowService/StartFlowService";
 import UpdateFlowService from "../services/FlowService/UpdateFlowService";
 
 interface FlowsData {
@@ -124,4 +125,12 @@ export const remove = async (
   });
 
   return res.status(200).json({ message: "Flow deleted" });
+};
+
+export const start = async (req: Request, res: Response): Promise<Response> => {
+  const { flowNodeId } = req.params;
+
+  const response = await StartFlowService(flowNodeId);
+
+  return res.status(200).json(response);
 };

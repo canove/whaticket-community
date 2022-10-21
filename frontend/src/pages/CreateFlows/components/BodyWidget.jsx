@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import styled from '@emotion/styled';
 
-import { DefaultNodeModel } from '@projectstorm/react-diagrams';
+import { DefaultNodeModel, PortModel } from '@projectstorm/react-diagrams';
 import { CanvasWidget } from '@projectstorm/react-canvas-core';
 
 import { TrayWidget } from './TrayWidget';
@@ -51,9 +51,9 @@ export class BodyWidget extends React.Component {
 				</Header>
 				<Content>
 					<TrayWidget>
-						<TrayItemWidget model={{ type: 'in' }} name="In Node" color="rgb(192,255,0)" />
+						{/* <TrayItemWidget model={{ type: 'in' }} name="In Node" color="rgb(192,255,0)" />
 						<TrayItemWidget model={{ type: 'out' }} name="Out Node" color="rgb(0,192,255)" />
-						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" />
+						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" /> */}
 						<TrayItemWidget model={{ type: 'chat' }} name="Chat" color="rgb(100,255,100)" />
 					</TrayWidget>
 					<Layer
@@ -70,8 +70,8 @@ export class BodyWidget extends React.Component {
 								node.addPort(new AdvancedPortModel(false, 'out'));
 							} else if (data.type === 'chat') {
 								node = new ChatNodeModel('Node ' + (nodesCount + 1), 'rgb(192,255,0)');
-								node.addPort(new AdvancedPortModel(false, 'out-true'));
-								node.addPort(new AdvancedPortModel(false, 'out-false'));
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								// node.addPort(new AdvancedPortModel(false, 'out-false'));
 							} else {
 								node = new DefaultNodeModel('Node ' + (nodesCount + 1), 'rgb(0,192,255)');
 								node.addOutPort('Out');
