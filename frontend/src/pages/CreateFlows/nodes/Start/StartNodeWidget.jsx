@@ -12,7 +12,7 @@ export class StartNodeWidget extends React.Component {
 		  modalOpen: false,
 		};
 		this.url = `${process.env.REACT_APP_BACKEND_URL}flows/start/${this.props.node.options.id}`;
-		this.header = JSON.stringify({"Authorization": "TOKEN"}, null, 2);
+		this.header = JSON.stringify({"Authorization": "Bearer TOKEN"}, null, 2);
 		this.payload = JSON.stringify({"text": "STRING"}, null, 2);
 		this.response = JSON.stringify({"content": "STRING", "type": "text"}, null, 2);
 	}

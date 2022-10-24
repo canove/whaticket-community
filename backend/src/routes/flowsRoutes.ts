@@ -3,6 +3,7 @@ import { Router } from "express";
 import isAuth from "../middleware/isAuth";
 import * as FlowsController from "../controllers/FlowsController";
 import * as FlowsNodesController from "../controllers/FlowsNodesController";
+import isAuthApi from "../middleware/isAuthApi";
 
 const flowsRoutes = Router();
 
@@ -20,7 +21,7 @@ flowsRoutes.delete("/flows/:flowId", isAuth, FlowsController.remove);
 
 // Flows - API
 
-flowsRoutes.post("/flows/start/:flowNodeId", FlowsController.start);
+flowsRoutes.post("/flows/start/:flowNodeId", isAuthApi, FlowsController.start);
 
 // Flows Nodes
 
