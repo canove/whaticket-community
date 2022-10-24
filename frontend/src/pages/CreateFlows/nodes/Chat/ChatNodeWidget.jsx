@@ -79,7 +79,7 @@ export class ChatNodeWidget extends React.Component {
 						backgroundColor: "white",
 						border: "2px solid #075E54",
 						position: "relative",
-						width: "250px",
+						width: "300px",
 					}}
 				>
 					<div 
