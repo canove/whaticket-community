@@ -64,6 +64,7 @@ const HistoricModal = ({ open, onClose, ticket }) => {
     const [hasMore, setHasMore] = useState(false);
     const [messagesList, dispatch] = useReducer(reducer, []);
     const [tickets, setTicket] = useState();
+    const [disableButton, setDisableButton] = useState(true);
 
 useEffect(() => {
 const handleOpenHistoricModal = async () => {
@@ -72,6 +73,7 @@ const handleOpenHistoricModal = async () => {
 			const { data } = await api.get(`/tickets/hist/${ticket.contactId}`);
 			setHistoric(data);
 			setLoading(false);
+      setDisableButton(true);
 		} catch (err) {
 			setLoading(false);
 			toastError(err);
@@ -83,14 +85,16 @@ const handleOpenHistoricModal = async () => {
 
 },[open, ticket])
 
-const renderMessage = async (ticketId) => {
+  const renderMessage = async (ticketId) => {
 		setLoading(true);
+    setDisableButton(true);
 		try {
 			const { data } = await api.get(`/messages/${ticketId}`);
 	      dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
           setHasMore(data.hasMore);
           setLoading(false);
-          setTicket(ticketId)
+          setTicket(ticketId);
+          setDisableButton(false);
 
 		} catch (err) {
 			setLoading(false);
@@ -98,13 +102,13 @@ const renderMessage = async (ticketId) => {
 		}
 	};
 
-const handleClose = () => {
+  const handleClose = () => {
     onClose();
   };
 
-const handleBack = () =>{
-    setTicket("");
-
+  const handleBack = async() =>{
+    await setTicket("");
+    setDisableButton(true);
   };
 
 	return (
@@ -183,7 +187,7 @@ const handleBack = () =>{
               color="primary"
               variant="contained"
               onClick={handleBack}
-              disable={messagesList}
+              disabled={disableButton}
             >
             {i18n.t("historicTicket.historicModal.back")}
             </Button>
