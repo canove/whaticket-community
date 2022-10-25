@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -22,6 +22,8 @@ import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import { InputAdornment, Typography } from "@material-ui/core";
+import PhoneIcon from '@material-ui/icons/Phone';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1),
         overflowY: "scroll",
         ...theme.scrollbarStyles,
+    },
+    search: {
+        paddingTop: 16
     },
 }));
 
@@ -65,44 +70,54 @@ const Reports = () => {
     const [loading, setLoading] = useState(false);
     const [users, dispatchUsers] = useReducer(reducer, []);
     const [reports, setReports] = useState([]);
-    const [disableButton, setDisableButton] = useState(true);
+    const [disableButton, setDisableButton] = useState(false);
     const [userId, setUserId] = useState("");
     const [initialDate, setInitialDate] = useState("");
     const [finalDate, setFinalDate] = useState("");
     const [pdf, setPdf] = useState();
+    const [pageNumber, setPageNumber] = useState(1);
+    const [count, setCount] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [number, setNumber] = useState("");
+    const firstRender = useRef(true);
 
     const filterReports = async () => {
-        setDisableButton(true);
+        setPageNumber(1);
         await fetchReports();
+
+    };
+
+    const downloadPdf = async () => {
+        setDisableButton(true)
         await createPdf();
         setDisableButton(false);
-    }
 
-    const downloadPdf = () => {
-        const linkSource = `data:application/pdf;base64,${pdf}`;
-        const downloadLink = document.createElement("a");
-        const fileName = `report.pdf`;
-        downloadLink.href = linkSource;
-        downloadLink.download = fileName;
-        downloadLink.click();
-    }
+    };
 
     const createPdf = async () => {
-        if (!initialDate || !finalDate || !userId) {
+        if (!initialDate || !finalDate || userId && number){
             toast.error(i18n.t("reports.errors.toastErr"));
         } else {
             try {
-                const { data } = await api.get(`/tickets-export-report-talk?initialDate=${initialDate}&finalDate=${finalDate}&userId=${userId}`);
+                const { data } = await api.get("/tickets-export-report-talk",{
+                params: { initialDate, finalDate, userId, number }});
                 setPdf(data);
+
+                const linkSource = `data:application/pdf;base64,${pdf}`;
+                const downloadLink = document.createElement("a");
+                const fileName = `report.pdf`;
+                downloadLink.href = linkSource;
+                downloadLink.download = fileName;
+                downloadLink.click();
             } catch (err) {
                 toastError(err)
             }
         }
-    }
+    };
 
     useEffect(() => {
         dispatchUsers({ type: "RESET"});
-
+        setPageNumber(1);
     }, []);
 
     useEffect(() => {
@@ -110,8 +125,9 @@ const Reports = () => {
         const delayDebounceFn = setTimeout(() => {
             const fetchUsers = async () => {
                 try {
-                    const { data } = await api.get("/users/");
+                    const { data } = await api.get("/users/")
                     dispatchUsers({ type: "LOAD_USERS", payload: data.users });
+                    setHasMore(data.hasMore);
                     setLoading(false);
                 } catch (err) {
                     toastError(err);
@@ -123,23 +139,44 @@ const Reports = () => {
     }, []);
 
     const fetchReports = async () => {
-        if (initialDate && finalDate && userId) {
+            if (!initialDate || !finalDate || userId && number){
+                toast.error(i18n.t("reports.errors.toastErr"));
+            } else {
             try {
                 setLoading(true);
-                const { data } = await api.get(`report-talk?initialDate=${initialDate}&finalDate=${finalDate}&user=${userId}`);
-                setReports(data);
+                const { data } = await api.get("/report-talk",
+                    {params: { pageNumber, initialDate, finalDate, userId, number }});
+                setReports(data.messages);
+                setCount(data.count);
+                setHasMore(data.hasMore);
                 setLoading(false);
             } catch (err) {
                 toastError(err);
-            }
-        } else {
-            toast.error(i18n.t("reports.errors.toastErr"));
+            }}
+    };
+
+    useEffect(() => {
+        if(firstRender.current === false){
+            fetchReports()
+        } else{
+             firstRender.current = false;
         }
+
+    },[pageNumber])
+
+    const handleNextPage = () => {
+        dispatchUsers({ type: "RESET"});
+        setPageNumber(pageNumber + 1);
+    };
+
+    const handlePreviousPage = () => {
+        dispatchUsers({ type: "RESET"});
+        setPageNumber(pageNumber - 1);
     };
 
     const handleSelectOption = (_, newValue) => {
         if (newValue) {
-            setUserId(newValue.id);
+            setUserId(newValue.id)
         } else {
             setUserId("");
         }
@@ -153,11 +190,42 @@ const Reports = () => {
         }
     };
 
+    const handleSearch = (newValue) => {
+        if (newValue) {
+            setNumber(newValue.target.value)
+        } else {
+            setNumber("");
+        }
+    };
+
+    const isRead = read => {
+        if (read === true) {
+            return "Sim";
+        }
+        if (read === false) {
+            return "Não";
+        }
+        return read;
+    };
+
     return (
         <MainContainer>
             <MainHeader>
                 <Title>{i18n.t("reports.title")}</Title>
                 <MainHeaderButtonsWrapper>
+                    <TextField
+                        className={classes.search}
+                        options={number}
+                        placeholder={"xx(xx)xxxx-xxxx"}
+                        onChange={(e, newValue) => handleSearch(e, newValue)}
+                        InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                            <PhoneIcon style={{ color: "gray" }}/>
+                            </InputAdornment>
+                        ),
+                        }}
+                    />
                     <Autocomplete
                         onChange={(e, newValue) => handleSelectOption(e, newValue)}
                         className={classes.root}
@@ -210,6 +278,7 @@ const Reports = () => {
                         <TableCell align="center">{i18n.t("reports.table.messageId")}</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.messageBody")}</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.read")}</TableCell>
+                        <TableCell align="center">Phone Number</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.mediaURL")}</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.ticketId")}</TableCell>
                         <TableCell align="center">{i18n.t("reports.table.date")}</TableCell>
@@ -217,21 +286,48 @@ const Reports = () => {
                 </TableHead>
                 <TableBody>
                     <>
-                        {reports.map((reportTalk) => (
+                        {reports && reports.map((reportTalk) => (
                             <TableRow key={reportTalk.id}>
                                 <TableCell align="center">{reportTalk.id}</TableCell>
                                 <TableCell align="center">{reportTalk.body}</TableCell>
-                                <TableCell align="center">{reportTalk.read}</TableCell>
+                                <TableCell align="center">{isRead(reportTalk.read)}</TableCell>
+                                <TableCell align="center">{reportTalk.contact.number}</TableCell>
                                 <TableCell align="center">{reportTalk.mediaUrl}</TableCell>
-                                <TableCell align="center">{reportTalk.ticketId}</TableCell>
+                                <TableCell align="center">{reportTalk.ticket.id}</TableCell>
                                 <TableCell align="center">{format(parseISO(reportTalk.createdAt), "dd/MM/yy HH:mm")}</TableCell>
                             </TableRow>
                         ))
                         }
-                        {loading && <TableRowSkeleton columns={6} />}
+                        {loading && <TableRowSkeleton columns={7} />}
                     </>
                 </TableBody>
                 </Table>
+                <div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1}
+                        onChange={handlePreviousPage}
+					>
+						{i18n.t("logReport.buttons.previousPage")}
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 20) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => {
+setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+                        onChange={handleNextPage}
+					>
+						{i18n.t("logReport.buttons.nextPage")}
+					</Button>
+				</div>
             </Paper>
         </MainContainer>
     );

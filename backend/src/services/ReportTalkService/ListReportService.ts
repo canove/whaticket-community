@@ -1,37 +1,90 @@
-import { QueryTypes } from "sequelize";
+import Contact from "../../database/models/Contact";
 import Message from "../../database/models/Message";
-
+import Ticket from "../../database/models/Ticket";
 interface Request {
-  user: number;
-  initialDate: string;
-  finalDate: string;
+  id: number;
+  body: string;
+  mediaUrl: string;
+  read: number | boolean;
+  pageNumber?: boolean | number;
+  companyId?: number;
+  number?: string;
+  userId?: number;
+  ticketId?: number;
+}
+interface Response {
+  messages: Message[];
+  count: number;
+  hasMore: boolean;
 }
 
 const ListReportService = async ({
-  user = 0,
-  initialDate = "",
-  finalDate = ""
-}: Request): Promise<Message[]> => {
-  const messages: Message[] = await Message.sequelize?.query(
-    `${
-      " select " +
-      " msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.`read`" +
-      " from " +
-      " whaticket.Messages as msg " +
-      " inner join " +
-      " whaticket.Tickets as tck on msg.ticketId = tck.id " +
-      " where " +
-      " tck.userId = "
-    }${user} and ` +
-      ` msg.createdAt >= '${initialDate} dd/MM/yy HH:mm' ` +
-      " and " +
-      ` msg.createdAt <= '${finalDate} dd/MM/yy HH:mm' `,
-    {
-      type: QueryTypes.SELECT
+  pageNumber,
+  companyId,
+  number,
+  userId,
+}: Request): Promise<Response> => {
+  let whereCondition = null;
+    if(number) {
+      whereCondition = {
+        number: number
+      }
     }
-  );
 
-  return messages;
+  let whereConditionUser = null;
+    if(userId) {
+      whereConditionUser = {
+        userId: userId
+      }
+    }
+
+  whereConditionUser = {
+    ...whereConditionUser,
+    companyId,
+  }
+
+  let limit = 20;
+  let offset = limit * (+pageNumber - 1);
+
+  if (!pageNumber) {
+    limit = null;
+    offset = null
+  }
+
+  const { count, rows: messages } = await Message.findAndCountAll({
+    attributes: [
+      "id",
+      "body",
+      "mediaUrl",
+      "read",
+      "createdAt",
+    ],
+
+    limit,
+    offset,
+
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: Ticket,
+        as: "ticket",
+        where: whereConditionUser,
+        attributes: ["id", "userId"],
+        required: true
+      },
+      {
+        model: Contact,
+        as: "contact",
+        where: whereCondition,
+        attributes: ["number"],
+        required: true
+      }],
+  });
+
+  const hasMore = count > offset + messages.length;
+
+  return {messages , count, hasMore};
+
 };
 
 export default ListReportService;
