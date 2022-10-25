@@ -10,13 +10,13 @@ import {
 import Company from "./Company";
 
 @Table
-class Setting extends Model<Setting> {
+class FlowsSessions extends Model<FlowsSessions> {
   @PrimaryKey
   @Column
-  key: string;
+  id: string;
 
   @Column
-  value: string;
+  nodeId: string;
 
   @ForeignKey(() => Company)
   @Column
@@ -29,4 +29,4 @@ class Setting extends Model<Setting> {
   updatedAt: Date;
 }
 
-export default Setting;
+export default FlowsSessions;

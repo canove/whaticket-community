@@ -7,6 +7,7 @@ import { AdvancedPortFactory } from './ports/AdvancedPort/AdvancedPortFactory';
 import { StartNodeFactory } from './nodes/Start/StartNodeFactory';
 import { StartNodeModel } from './nodes/Start/StartNodeModel';
 import { AdvancedPortModel } from './ports/AdvancedPort/AdvancedPortModel';
+import { ConditionalNodeFactory } from './nodes/Conditional/ConditionalNodeFactory';
 
 export class Application {
 	constructor() {
@@ -18,9 +19,9 @@ export class Application {
 		this.activeModel = new SRD.DiagramModel();
 		this.diagramEngine.setModel(this.activeModel);
 
-		this.diagramEngine.getNodeFactories().registerFactory(new JSCustomNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new ChatNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new StartNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new ConditionalNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());

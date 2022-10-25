@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import parse from 'html-react-parser';
+import parse, { attributesToProps } from 'html-react-parser';
 
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
@@ -132,8 +132,33 @@ export class ChatNodeWidget extends React.Component {
 								padding: "16px",
 							}}
 						>
-							{ parse(draftToHtml(convertToRaw(editorState.getCurrentContent()))) }
+							{ parse(draftToHtml(convertToRaw(editorState.getCurrentContent())),
+								{
+									replace: domNode => {
+										if (domNode.attribs && domNode.name === 'img') {
+										const props = attributesToProps(domNode.attribs);
+										return <img {...props} draggable="false" />;
+										}
+									}
+								})
+							}
 						</div>
+							<PortWidget
+								style={{
+									backgroundColor: "#25D366",
+									border: "2px solid #075E54",
+									borderRadius: "100%",
+									cursor: "pointer",
+									height: "16px",
+									position: "absolute",
+									right: "-8px",
+									top: "50%",
+									width: "16px",
+								}}
+								engine={this.props.engine}
+								port={this.props.node.getPort('out')}
+							>
+							</PortWidget>
 						{/* { Object.keys(this.props.node.ports).map((port, index) => (
 							<PortWidget
 							key={index}

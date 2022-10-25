@@ -13,6 +13,7 @@ import { DemoCanvasWidget } from './DemoCanvasWidget';
 import { JSCustomNodeModel } from '../nodes/Custom/JSCustomNodeModel';
 import { AdvancedPortModel } from '../ports/AdvancedPort/AdvancedPortModel';
 import { ChatNodeModel } from '../nodes/Chat/ChatNodeModel';
+import { ConditionalNodeModel } from '../nodes/Conditional/ConditionalNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -55,27 +56,31 @@ export class BodyWidget extends React.Component {
 						<TrayItemWidget model={{ type: 'out' }} name="Out Node" color="rgb(0,192,255)" />
 						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" /> */}
 						<TrayItemWidget model={{ type: 'chat' }} name="Chat" color="rgb(100,255,100)" />
+						<TrayItemWidget model={{ type: 'conditional' }} name="Conditional" color="rgb(33,31,126)" />
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
+							try {
+								JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
+							} catch {
+								return;
+							}
+
 							var data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
 							var nodesCount = _.keys(this.props.app.getDiagramEngine().getModel().getNodes()).length;
 
 							var node = null;
-							if (data.type === 'in') {
-								node = new DefaultNodeModel('Node ' + (nodesCount + 1), 'rgb(192,255,0)');
-								node.addInPort('In');
-							} else if (data.type === 'custom') {
-								node = new JSCustomNodeModel('Node ' + (nodesCount + 1), 'rgb(192,255,0)');
-								node.addPort(new AdvancedPortModel(false, 'out'));
-							} else if (data.type === 'chat') {
-								node = new ChatNodeModel('Node ' + (nodesCount + 1), 'rgb(192,255,0)');
+							if (data.type === 'chat') {
+								node = new ChatNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));
-								// node.addPort(new AdvancedPortModel(false, 'out-false'));
-							} else {
-								node = new DefaultNodeModel('Node ' + (nodesCount + 1), 'rgb(0,192,255)');
-								node.addOutPort('Out');
+								node.addPort(new AdvancedPortModel(false, 'out'));
+							} else if (data.type === 'conditional') {
+								node = new ConditionalNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								node.addPort(new AdvancedPortModel(false, 'out-c1'));
+								node.addPort(new AdvancedPortModel(false, 'out-else'));
 							}
+
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);
 							node.setPosition(point);
 							this.props.app.getDiagramEngine().getModel().addNode(node);

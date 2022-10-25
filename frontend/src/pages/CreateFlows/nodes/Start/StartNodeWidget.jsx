@@ -4,18 +4,30 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, 
 import SettingsIcon from "@material-ui/icons/Settings";
 import { PortWidget } from "@projectstorm/react-diagrams";
 
+import toastError from "../../../../errors/toastError";
+import api from "../../../../services/api";
 export class StartNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 		  count: 0,
 		  modalOpen: false,
+		  header: JSON.stringify({"Authorization": `Bearer TOKEN`}, null, 2),
 		};
 		this.url = `${process.env.REACT_APP_BACKEND_URL}flows/start/${this.props.node.options.id}`;
-		this.header = JSON.stringify({"Authorization": "Bearer TOKEN"}, null, 2);
 		this.payload = JSON.stringify({"text": "STRING"}, null, 2);
 		this.response = JSON.stringify({"content": "STRING", "type": "text"}, null, 2);
 	}
+
+	getToken = async () => {
+		try {
+			const { data } = await api.get("/settings");
+			const { value } = data.find(s => s.key === "userApiToken");
+			this.setState({ header: JSON.stringify({"Authorization": `Bearer ${value}`}, null, 2) });
+		} catch (err) {
+			toastError(err);
+		}
+	};
 
 	render() {
 		return (
@@ -47,7 +59,7 @@ export class StartNodeWidget extends React.Component {
 						as={TextField}
 						label="Header"
 						name="header"
-						value={this.header}
+						value={this.state.header}
 						multiline
 						minRows={4}
 						maxLength="1024"
@@ -123,7 +135,7 @@ export class StartNodeWidget extends React.Component {
 						</Typography>
 						<IconButton
 							onClick={() => {
-								// console.log(this.props.node.parent.parent.options.id);
+								this.getToken();
 								this.setState({ modalOpen: true });
 							}}
 						>

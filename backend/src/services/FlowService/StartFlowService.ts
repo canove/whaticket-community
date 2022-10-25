@@ -1,18 +1,126 @@
 /* eslint-disable */
+import { v4 as uuidv4 } from "uuid";
+import { subHours } from "date-fns";
 import { Op } from "sequelize";
 import FlowsNodes from "../../database/models/FlowsNodes";
 import AppError from "../../errors/AppError";
+import FlowsSessions from "../../database/models/FlowsSessions";
 
-const StartFlowService = async (flowNodeId: string): Promise<any> => {
+interface Request {
+  flowNodeId?: string;
+  sessionId?: string;
+  companyId: number;
+  body?: any;
+}
+
+const processNode = (node: any, body: any) => {
+  if (node.type === "start-node") {
+    return {};
+  }
+
+  if (node.type === "chat-node") {
+    const messageJSON = node.data.content;
+    const messageOBJ = JSON.parse(messageJSON);
+
+    return { message: messageOBJ };
+  }
+
+  if (node.type === "conditional-node") {
+    const response = Object.keys(node.conditions).find((conditionId: any) => {
+      const conditionExpression = node.conditions[conditionId];
+
+      const param1 = conditionExpression.param1 ? conditionExpression.param1 : "";
+      const param2 = conditionExpression.param2 ? conditionExpression.param2 : "";
+      const condition = conditionExpression.condition ? conditionExpression.condition : "";
+
+      if (!param1 || !condition) return false;
+
+      const params1 = param1.match(/\{{(.*?)\}}/);
+      let dinamicParam1 = "";
+      if (params1) dinamicParam1 = params1[1];
+      const var1 = dinamicParam1 ? body[dinamicParam1] : param1;
+      
+      if (condition === "exists") return body[dinamicParam1] ? true : false;
+      if (condition === "not_exists") return body[dinamicParam1] ? false : true;
+      
+      if (!param2) return false;
+
+      const params2 = param2.match(/\{{(.*?)\}}/);
+      let dinamicParam2 = "";
+      if (params2) dinamicParam2 = params2[1];
+      const var2 = dinamicParam2 ? body[dinamicParam2] : param2;
+
+      if (condition === "equals") return (var1 == var2);
+      if (condition === "not_equal") return (var1 != var2);
+      if (condition === "greater_than") return (var1 > var2);
+      if (condition === "greater_than_or_equal") return (var1 >= var2);
+      if (condition === "contains") return (var1.indexOf(var2));
+      if (condition === "not_contains") return (!var1.indexOf(var2));
+      if (condition === "less_than") return (var1 < var2);
+      if (condition === "less_than_or_equal") return (var1 <= var2);
+    });
+
+    return { condition: response ? response : "ELSE" };
+  }
+}
+
+const getLink = (name: string, node: any, nodeResponse: any) => {
+  if (node.type === "conditional-node") {
+    const portName = `${name}-${nodeResponse.condition.toLowerCase()}`;
+    for (const port of node.ports) {
+      if (port.name === portName) {
+        return port.links[0];
+      }
+    }
+  }
+
+  for (const port of node.ports) {
+    if (port.name === name) {
+      return port.links[0];
+    }
+  }
+}
+
+const StartFlowService = async ({
+  flowNodeId,
+  sessionId,
+  companyId,
+  body
+}: Request): Promise<any> => {
+  let session = null;
+  let currentNode = null;
+
+  if (sessionId) {
+    session = await FlowsSessions.findOne({
+      where: {
+        updatedAt: {
+          [Op.between]: [+subHours(new Date(), 2), +new Date()]
+        },
+        companyId,
+        id: sessionId
+      }
+    });
+
+    currentNode = session.nodeId;
+  } else {
+    currentNode = flowNodeId;
+  }
+
+  if (currentNode === null) {
+    return {
+      message: "END_OF_THE_FLOW",
+      sessionId: session.id
+    }
+  }
+
   const flowNodes = await FlowsNodes.findOne({
     where: {
       json: {
         [Op.like]: `%${flowNodeId}%`
-      }
+      },
+      companyId
     }
   });
-
-  // SELECT * FROM whaticket.FlowsNodes WHERE json LIKE '%65073c0b-6c5b-4548-ba40-906b44c05581%';
 
   if (!flowNodes) {
     throw new AppError("ERR_NO_FLOW_FOUND", 404);
@@ -27,27 +135,56 @@ const StartFlowService = async (flowNodeId: string): Promise<any> => {
   const links = nodesOBJ.layers[0].models;
   const nodes = nodesOBJ.layers[1].models;
 
-  const firstNode = nodes[flowNodeId];
-  const { ports } = firstNode;
+  const node = nodes[currentNode];
 
-  let link = null;
-
-  for (const port of ports) {
-    if (port.name === "out") {
-      link = port.links[0];
-    }
+  if (!node) {
+    throw new AppError("ERR_NO_NODE", 404);
   }
 
-  const firstLink = links[link];
+  const nodeResponse = processNode(node, body);
 
-  const { target } = firstLink;
+  const linkId = getLink("out", node, nodeResponse);
+  const link = links[linkId];
 
+  if (!link) {
+    await session.update({
+      nodeId: null,
+    });
+
+    return {
+      ...nodeResponse, 
+      sessionId: session.id
+    };
+  }
+
+  const { target } = link;
   const nextNode = nodes[target];
 
-  const messageJSON = nextNode.data.content;
-  const messageOBJ = JSON.parse(messageJSON);
+  if (!session) {
+    session = await FlowsSessions.create({
+      id: uuidv4(),
+      nodeId: nextNode.id,
+      companyId
+    });
+  } else {
+    await session.update({
+      nodeId: nextNode.id,
+    });
+  }
 
-  return { links, nodes, firstNode, firstLink, nextNode, messageOBJ };
+  if (node.type === "conditional-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body
+    });
+  }
+
+  return { 
+    ...nodeResponse, 
+    sessionId: session ? session.id : "END_OF_THE_FLOW"
+  };
 };
 
 export default StartFlowService;
