@@ -2,18 +2,29 @@ import { Request, Response } from "express";
 import ListReportService from "../services/ReportTalkService/ListReportService";
 
 type IndexQuery = {
-  user?: number;
-  initialDate?: string;
-  finalDate?: string;
+  id?: number;
+  body?: string;
+  mediaUrl?: string;
+  read?: number| boolean;
+  pageNumber?: boolean | number;
+  number?: string;
+  userId?: number;
+
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { user, initialDate, finalDate } = req.query as IndexQuery;
-
+  const { id, body, mediaUrl, read, pageNumber, number, userId } = req.query as IndexQuery;
+  const { companyId } = req.user;
   const report = await ListReportService({
-    user,
-    initialDate,
-    finalDate
+    id,
+    body,
+    mediaUrl,
+    read,
+    pageNumber,
+    companyId,
+    number,
+    userId,
+
   });
 
   return res.status(200).json(report);
