@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import FlowsNodes from "../../database/models/FlowsNodes";
 import AppError from "../../errors/AppError";
 import FlowsSessions from "../../database/models/FlowsSessions";
+import axios from "axios";
 
 interface Request {
   flowNodeId?: string;
@@ -13,7 +14,16 @@ interface Request {
   body?: any;
 }
 
-const processNode = (node: any, body: any) => {
+const jsonStringToObj = (json: any) => {
+  try {
+      const responseObj = JSON.parse(json);
+      return responseObj;
+  } catch {
+      return false;
+  }
+}
+
+const processNode = async (node: any, body: any) => {
   if (node.type === "start-node") {
     return {};
   }
@@ -62,11 +72,59 @@ const processNode = (node: any, body: any) => {
 
     return { condition: response ? response : "ELSE" };
   }
+
+  if (node.type === "request-node") {
+    let nodeHeader = jsonStringToObj(node.header);
+    let nodeBody = jsonStringToObj(node.body);
+
+    if (!nodeHeader) {
+      nodeHeader = "";
+    }
+
+    if (node.method === "POST" || !nodeBody) {
+      nodeBody = "";
+    }
+
+    let response: any;
+    let error: any;
+
+    await axios({
+        method: node.method,
+        url: node.url,
+        headers: {
+            ...nodeHeader
+        },
+        data: {
+            ...nodeBody
+        }
+    })
+    .then(res => {
+        response = res.data;
+    })
+    .catch(err => {
+        error = err;
+    });
+
+    if (response) {
+      return { response };
+    } else {
+      return { error };
+    }
+  }
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {
   if (node.type === "conditional-node") {
     const portName = `${name}-${nodeResponse.condition.toLowerCase()}`;
+    for (const port of node.ports) {
+      if (port.name === portName) {
+        return port.links[0];
+      }
+    }
+  }
+
+  if (node.type === "request-node") {
+    const portName = `${name}-${nodeResponse.response ? "2xx" : "err"}`;
     for (const port of node.ports) {
       if (port.name === portName) {
         return port.links[0];
@@ -141,7 +199,7 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODE", 404);
   }
 
-  const nodeResponse = processNode(node, body);
+  const nodeResponse = await processNode(node, body);
 
   const linkId = getLink("out", node, nodeResponse);
   const link = links[linkId];
@@ -178,6 +236,15 @@ const StartFlowService = async ({
       sessionId,
       companyId,
       body
+    });
+  }
+
+  if (node.type === "request-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...nodeResponse.response }
     });
   }
 

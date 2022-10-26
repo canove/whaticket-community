@@ -14,6 +14,7 @@ import { JSCustomNodeModel } from '../nodes/Custom/JSCustomNodeModel';
 import { AdvancedPortModel } from '../ports/AdvancedPort/AdvancedPortModel';
 import { ChatNodeModel } from '../nodes/Chat/ChatNodeModel';
 import { ConditionalNodeModel } from '../nodes/Conditional/ConditionalNodeModel';
+import { RequestNodeModel } from '../nodes/Request/RequestNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -55,8 +56,9 @@ export class BodyWidget extends React.Component {
 						{/* <TrayItemWidget model={{ type: 'in' }} name="In Node" color="rgb(192,255,0)" />
 						<TrayItemWidget model={{ type: 'out' }} name="Out Node" color="rgb(0,192,255)" />
 						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" /> */}
-						<TrayItemWidget model={{ type: 'chat' }} name="Chat" color="rgb(100,255,100)" />
-						<TrayItemWidget model={{ type: 'conditional' }} name="Conditional" color="rgb(33,31,126)" />
+						<TrayItemWidget model={{ type: 'chat' }} name="Chat" color="rgb(100, 255, 100)" />
+						<TrayItemWidget model={{ type: 'conditional' }} name="Conditional" color="rgb(33, 31, 126)" />
+						<TrayItemWidget model={{ type: 'request' }} name="Request" color="rgb(128, 128, 128)" />
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -79,6 +81,11 @@ export class BodyWidget extends React.Component {
 								node.addPort(new AdvancedPortModel(true, 'in'));
 								node.addPort(new AdvancedPortModel(false, 'out-c1'));
 								node.addPort(new AdvancedPortModel(false, 'out-else'));
+							} else if (data.type === 'request') {
+								node = new RequestNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								node.addPort(new AdvancedPortModel(true, 'out-2xx'));
+								node.addPort(new AdvancedPortModel(true, 'out-err'));
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);

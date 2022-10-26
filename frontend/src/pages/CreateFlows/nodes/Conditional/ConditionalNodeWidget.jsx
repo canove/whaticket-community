@@ -316,7 +316,6 @@ export class ConditionalNodeWidget extends React.Component {
 								</PortWidget>
 							);
 						}) }
-						
 						<PortWidget
 							style={{
 								backgroundColor: "#BCBBD8",
