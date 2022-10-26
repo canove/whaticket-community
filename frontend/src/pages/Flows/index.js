@@ -1,11 +1,15 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, forwardRef, useEffect, useReducer, useState } from "react";
 
 import openSocket from "../../services/socket-io";
+
+import { Link as RouterLink } from "react-router-dom";
 
 import {
   Button,
   IconButton,
   InputAdornment,
+  ListItem,
+  ListItemText,
   makeStyles,
   Paper,
   Table,
@@ -15,6 +19,8 @@ import {
   TableRow,
   TextField,
 } from "@material-ui/core";
+
+import { Visibility } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -32,6 +38,7 @@ import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import FlowModal from "../../components/FlowModal";
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import FlowNodeModal from "../../components/FlowNodeModal";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -103,44 +110,44 @@ const Flows = () => {
   const [deletingFlow, setDeletingFlow] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-  // useEffect(() => {
-  //   dispatch({ type: "RESET" });
-  // }, [searchParam]);
+  useEffect(() => {
+    dispatch({ type: "RESET" });
+  }, [searchParam]);
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const fetchFlows = async () => {
-  //     try {
-  //       const { data } = await api.get("/flows", {
-  //         params: { searchParam }
-  //       });
-  //       dispatch({ type: "LOAD_FLOW", payload: data });
-  //       setLoading(false);
-  //     } catch (err) {
-  //       toastError(err);
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchFlows();
-  // }, [searchParam]);
+  useEffect(() => {
+    setLoading(true);
+    const fetchFlows = async () => {
+      try {
+        const { data } = await api.get("/flows", {
+          params: { searchParam, type: "bits" }
+        });
+        dispatch({ type: "LOAD_FLOW", payload: data });
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+        setLoading(false);
+      }
+    };
+    fetchFlows();
+  }, [searchParam]);
 
-  // useEffect(() => {
-  //   const socket = openSocket();
+  useEffect(() => {
+    const socket = openSocket();
 
-  //   socket.on(`flows${user.companyId}`, (data) => {
-  //     if (data.action === "update" || data.action === "create") {
-  //       dispatch({ type: "UPDATE_FLOW", payload: data.flow });
-  //     }
+    socket.on(`flows${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_FLOW", payload: data.flow });
+      }
 
-  //     if (data.action === "delete") {
-  //       dispatch({ type: "DELETE_FLOW", payload: +data.flowId });
-  //     }
-  //   });
+      if (data.action === "delete") {
+        dispatch({ type: "DELETE_FLOW", payload: +data.flowId });
+      }
+    });
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, [user]);
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   const formatDate = (date) => {
     if (date) {
@@ -155,6 +162,7 @@ const Flows = () => {
   };
 
   const handleOpenFlowModal = () => {
+    // window.open('/createFlow', '_blank', 'noopener,noreferrer');
     setFlowModalOpen(true);
     setSelectedFlow(null);
   };
@@ -170,9 +178,10 @@ const Flows = () => {
   };
 
   const handleCopyFlow = async (flow) => {
-    const flowData = {
-      name: `${flow.name} copy`,
-    }
+    // const flowData = {
+    //   name: `${flow.name} copy`,
+    //   type: 'bits'
+    // }
 
     // try {
     //   await api.post(`/flows/`, flowData);
@@ -188,12 +197,12 @@ const Flows = () => {
   };
 
   const handleDeleteFlow = async (flowId) => {
-    // try {
-    //     await api.delete(`/flows/${flowId}`);
-    //     toast.success(i18n.t("flows.confirmation.delete"));
-    // } catch (err) {
-    //     toastError(err);
-    // }
+    try {
+        await api.delete(`/flows/${flowId}`);
+        toast.success(i18n.t("flows.confirmation.delete"));
+    } catch (err) {
+        toastError(err);
+    }
     setDeletingFlow(null);
   };
   
@@ -211,6 +220,12 @@ const Flows = () => {
 
   return (
     <MainContainer>
+      <FlowNodeModal
+        open={flowModalOpen}
+        onClose={handleCloseFlowModal}
+        aria-labelledby="form-dialog-title"
+        flowId={selectedFlow && selectedFlow.id}
+      />
       <ConfirmationModal
         title={i18n.t("flows.confirmation.title")}
         open={confirmModalOpen}
@@ -268,6 +283,12 @@ const Flows = () => {
                         {formatDate(flow.updatedAt)}
                       </TableCell>
                       <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          component={forwardRef((itemProps, ref) => (<RouterLink to={`/CreateFlow/${flow.id}`} ref={ref} {...itemProps} />))}
+                        >
+                          <Visibility />
+                        </IconButton>
                         <IconButton
                           size="small"
                           onClick={() => handleEditFlow(flow)}

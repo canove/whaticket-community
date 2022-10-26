@@ -1,4 +1,5 @@
 import Flows from "../../database/models/Flows";
+import FlowsNodes from "../../database/models/FlowsNodes";
 
 interface Request {
   name: string;
@@ -9,6 +10,7 @@ interface Request {
   location: string;
   clientEmail: string;
   privateKey: string;
+  type: string;
 }
 
 const CreateFlowService = async ({
@@ -19,7 +21,8 @@ const CreateFlowService = async ({
   agentId,
   location,
   clientEmail,
-  privateKey
+  privateKey,
+  type
 }: Request): Promise<Flows> => {
   const flow = await Flows.create({
     name,
@@ -29,8 +32,16 @@ const CreateFlowService = async ({
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    type
   });
+
+  if (type === "bits") {
+    await FlowsNodes.create({
+      flowId: flow.id,
+      companyId: flow.companyId
+    });
+  }
 
   return flow;
 };

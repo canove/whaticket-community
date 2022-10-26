@@ -11,7 +11,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
-  const settings = await ListSettingsService();
+  const { companyId } = req.user;
+
+  const settings = await ListSettingsService(companyId);
 
   return res.status(200).json(settings);
 };
@@ -25,10 +27,12 @@ export const update = async (
   }
   const { settingKey: key } = req.params;
   const { value } = req.body;
+  const { companyId } = req.user;
 
   const setting = await UpdateSettingService({
     key,
-    value
+    value,
+    companyId
   });
 
   const io = getIO();

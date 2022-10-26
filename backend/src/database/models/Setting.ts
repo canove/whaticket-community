@@ -4,8 +4,10 @@ import {
   CreatedAt,
   UpdatedAt,
   Model,
-  PrimaryKey
+  PrimaryKey,
+  ForeignKey
 } from "sequelize-typescript";
+import Company from "./Company";
 
 @Table
 class Setting extends Model<Setting> {
@@ -15,6 +17,10 @@ class Setting extends Model<Setting> {
 
   @Column
   value: string;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @CreatedAt
   createdAt: Date;

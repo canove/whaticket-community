@@ -1,4 +1,5 @@
 import Flows from "../../database/models/Flows";
+import FlowsNodes from "../../database/models/FlowsNodes";
 import AppError from "../../errors/AppError";
 
 const DeleteFlowService = async (
@@ -11,6 +12,14 @@ const DeleteFlowService = async (
 
   if (!flow) {
     throw new AppError("ERR_NO_FLOW_FOUND", 404);
+  }
+
+  if (flow.type === "bits") {
+    const flowNodes = await FlowsNodes.findOne({
+      where: { flowId: flow.id }
+    });
+
+    await flowNodes.destroy();
   }
 
   await flow.destroy();

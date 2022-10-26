@@ -166,7 +166,8 @@ const FlowModal = ({ open, onClose, flowId }) => {
           agentId: agentId,
           location: location,
           clientEmail: useExternalAccount ? clientEmail : "",
-          privateKey: useExternalAccount ? privateKey : ""
+          privateKey: useExternalAccount ? privateKey : "",
+          type: "dialogflow"
       };
 
       try {

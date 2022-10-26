@@ -4,15 +4,24 @@ import Flows from "../../database/models/Flows";
 interface Request {
   companyId: number;
   searchParam: string;
+  type: string;
 }
 
 const ListFlowsService = async ({
   companyId,
-  searchParam
+  searchParam,
+  type
 }: Request): Promise<Flows[]> => {
   let whereCondition = null;
 
   whereCondition = { companyId };
+
+  if (type) {
+    whereCondition = {
+      ...whereCondition,
+      type
+    };
+  }
 
   if (searchParam) {
     whereCondition = {

@@ -7,9 +7,12 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  ForeignKey
+  ForeignKey,
+  BelongsTo,
+  HasMany
 } from "sequelize-typescript";
 import Company from "./Company";
+import FlowsNodes from "./FlowsNodes";
 
 @Table
 class Flows extends Model<Flows> {
@@ -43,6 +46,9 @@ class Flows extends Model<Flows> {
 
   @Column
   privateKey: string;
+
+  @Column
+  type: string;
 
   @CreatedAt
   createdAt: Date;

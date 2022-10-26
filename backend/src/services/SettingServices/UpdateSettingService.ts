@@ -4,14 +4,16 @@ import Setting from "../../database/models/Setting";
 interface Request {
   key: string;
   value: string;
+  companyId: string | number;
 }
 
 const UpdateSettingService = async ({
   key,
-  value
+  value,
+  companyId
 }: Request): Promise<Setting | undefined> => {
   const setting = await Setting.findOne({
-    where: { key }
+    where: { key, companyId }
   });
 
   if (!setting) {

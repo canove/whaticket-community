@@ -112,7 +112,7 @@ const DialogFlows = () => {
     const fetchFlows = async () => {
       try {
         const { data } = await api.get("/flows", {
-          params: { searchParam }
+          params: { searchParam, type: "dialogflow" }
         });
         dispatch({ type: "LOAD_FLOW", payload: data });
         setLoading(false);
@@ -175,7 +175,8 @@ const DialogFlows = () => {
       status: flow.status,
       projectId: flow.projectId,
       agentId: flow.agentId,
-      location: flow.location
+      location: flow.location,
+      type: "dialogflow"
     }
 
     try {

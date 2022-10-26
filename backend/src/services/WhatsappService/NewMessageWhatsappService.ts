@@ -199,7 +199,9 @@ const handleMessage = async (
       whatsapp.id,
       whatsapp.companyId,
       unreadMessages,
-      null,false, bot
+      null,
+      false,
+      bot
     );
 
     if (type !== "text") {

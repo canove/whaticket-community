@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
@@ -12,7 +13,7 @@ import formatBody from "../helpers/Mustache";
 import HistoricService from "../services/TicketServices/HistoricService";
 import ResolveService from "../services/TicketServices/ResolveService";
 import ChangeQueueOrResolveTicketService from "../services/TicketServices/ChangeQueueOrResolveTicket";
-import IsTicketInBotService from "../services/TicketServices/IsTicketInBotService";
+import { IsTicketInBotService, IsTicketInBotPostService} from "../services/TicketServices/IsTicketInBotService";
 import AverageService from "../services/TicketServices/AverageService";
 
 type IndexQuery = {
@@ -166,6 +167,8 @@ export const changeQueueOrResolve = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { messageId, queueName } = req.body;
 
   const ticket = await ChangeQueueOrResolveTicketService({
@@ -189,9 +192,24 @@ export const isInBot = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { messageId } = req.params;
 
   const isTicketInBot = await IsTicketInBotService(messageId);
+
+  return res.status(200).json(isTicketInBot);
+};
+
+export const isInBotPost = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
+  const { session, contactNumber } = req.body;
+
+  const isTicketInBot = await IsTicketInBotPostService(session, contactNumber);
 
   return res.status(200).json(isTicketInBot);
 };

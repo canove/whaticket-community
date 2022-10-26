@@ -46,7 +46,8 @@ const CreateOrUpdateContactService = async ({
       profilePicUrl,
       email,
       isGroup,
-      extraInfo
+      extraInfo,
+      companyId
     });
 
     io.emit(`contact${companyId}`, {

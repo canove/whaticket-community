@@ -26,10 +26,7 @@ const FindOrCreateTicketService = async (
 
   if (ticket) {
     await ticket.update({ unreadMessages });
-    if (
-      !inBot &&
-      !isDispatcher
-    ) {
+    if (!inBot && !isDispatcher && ticket.status != 'open') {
       await ticket.update({ status: "pending" });
     }
   }

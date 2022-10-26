@@ -26,6 +26,8 @@ import BillingControls from "./models/BillingControls";
 import Billings from "./models/Billings";
 import Category from "./models/Category";
 import Flows from "./models/Flows";
+import FlowsNodes from "./models/FlowsNodes";
+import FlowsSessions from "./models/FlowsSessions";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -59,7 +61,9 @@ const models = [
   BillingControls,
   Category,
   Billings,
-  Flows
+  Flows,
+  FlowsNodes,
+  FlowsSessions
 ];
 
 sequelize.addModels(models);

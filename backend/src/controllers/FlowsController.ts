@@ -6,6 +6,7 @@ import DeleteFlowService from "../services/FlowService/DeleteFlowService";
 import ListFlowsService from "../services/FlowService/ListFlowsService";
 import ShowFlowByConnectionService from "../services/FlowService/ShowFlowByConnectionService";
 import ShowFlowService from "../services/FlowService/ShowFlowService";
+import StartFlowService from "../services/FlowService/StartFlowService";
 import UpdateFlowService from "../services/FlowService/UpdateFlowService";
 
 interface FlowsData {
@@ -16,17 +17,19 @@ interface FlowsData {
   location: string;
   clientEmail: string;
   privateKey: string;
+  type: string;
 }
 
 type IndexQuery = {
   searchParam: string;
+  type: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
-  const { searchParam } = req.query as IndexQuery;
+  const { searchParam, type } = req.query as IndexQuery;
 
-  const flows = await ListFlowsService({ companyId, searchParam });
+  const flows = await ListFlowsService({ companyId, searchParam, type });
 
   return res.status(200).json(flows);
 };
@@ -41,7 +44,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    type
   }: FlowsData = req.body;
 
   const flow = await CreateFlowService({
@@ -52,7 +56,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    type
   });
 
   const io = getIO();
@@ -68,6 +73,8 @@ export const connection = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { connectionName } = req.params;
 
   const flow = await ShowFlowByConnectionService(connectionName);
@@ -120,4 +127,23 @@ export const remove = async (
   });
 
   return res.status(200).json({ message: "Flow deleted" });
+};
+
+type StartQuery = {
+  sessionId: string;
+};
+
+export const start = async (req: Request, res: Response): Promise<Response> => {
+  const { flowNodeId } = req.params;
+  const { sessionId } = req.query as StartQuery;
+  const { companyId } = req.user;
+
+  const response = await StartFlowService({
+    flowNodeId,
+    sessionId,
+    companyId,
+    body: req.body
+  });
+
+  return res.status(200).json(response);
 };
