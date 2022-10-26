@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField, MenuItem, Select, InputLabel, FormControl } from '@material-ui/core';
-import SettingsIcon from "@material-ui/icons/Settings";
 import { PortWidget } from "@projectstorm/react-diagrams";
 
+import { Settings, GetApp } from "@material-ui/icons/";
 export class RequestNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
@@ -157,7 +157,7 @@ export class RequestNodeWidget extends React.Component {
 								this.setState({ modalOpen: true });
 							}}
 						>
-							<SettingsIcon />
+							<Settings />
 						</IconButton>
 					</div>
 					<div 
@@ -224,6 +224,16 @@ export class RequestNodeWidget extends React.Component {
 								ERR
 							</div>
 						</PortWidget>
+						<GetApp
+							style={{
+								display: "block",
+								height: "50px",
+								position: "absolute",
+								right: "50%",
+								top: "50%",
+								width: "50px",
+							}}
+						/>  
 					</div>
 				</div>
 			</div>

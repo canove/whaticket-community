@@ -4,10 +4,10 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, 
 import SettingsIcon from "@material-ui/icons/Settings";
 import { PortWidget } from "@projectstorm/react-diagrams";
 
-import toastError from "../../../../errors/toastError";
-import api from "../../../../services/api";
 import { AdvancedPortModel } from "../../ports/AdvancedPort/AdvancedPortModel";
+
 import { DeleteOutline } from "@material-ui/icons";
+import { AccountTree } from '@material-ui/icons/';
 
 const defaultConditions = {
 	"C1": {
@@ -338,6 +338,16 @@ export class ConditionalNodeWidget extends React.Component {
 								ELSE
 							</div>
 						</PortWidget>
+						<AccountTree
+							style={{
+								display: "block",
+								height: "50px",
+								position: "absolute",
+								right: "50%",
+								top: "50%",
+								width: "50px",
+							}}
+						/>  
 					</div>
 				</div>
 			</div>

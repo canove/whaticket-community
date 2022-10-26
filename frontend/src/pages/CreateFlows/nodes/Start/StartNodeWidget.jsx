@@ -6,6 +6,8 @@ import { PortWidget } from "@projectstorm/react-diagrams";
 
 import toastError from "../../../../errors/toastError";
 import api from "../../../../services/api";
+
+import { IoIosRocket } from 'react-icons/io';
 export class StartNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
@@ -115,7 +117,7 @@ export class StartNodeWidget extends React.Component {
 						backgroundColor: "white",
 						border: "2px solid #075E54",
 						position: "relative",
-						width: "250px",
+						width: "200px",
 					}}
 				>
 					<div 
@@ -144,7 +146,7 @@ export class StartNodeWidget extends React.Component {
 					</div>
 					<div 
 						style={{
-							minHeight: "150px",
+							minHeight: "100px",
 						}}
 					>
 						<PortWidget
@@ -163,72 +165,16 @@ export class StartNodeWidget extends React.Component {
 							port={this.props.node.getPort('out')}
 						>
 						</PortWidget>
-						{/* { Object.keys(this.props.node.ports).map((port, index) => (
-							<PortWidget
-							key={index}
+						<IoIosRocket
 							style={{
-								backgroundColor: "black",
-								border: "1px solid white",
-								bottom: `calc(50px * ${index})`,
+								display: "block",
 								height: "50px",
 								position: "absolute",
-								right: "0",
-								width: "75px",
-							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort(port)}
-						>
-							<div style={{
-									backgroundColor: "green",
-									border: "1px solid white",
-									height: "50px",
-									width: "75px",
-								}}
-							>
-								{port}
-							</div>
-						</PortWidget>
-						))} */}
-						{/* <PortWidget
-							style={{
-								bottom: "50px",
-								height: "50px",
-								position: "absolute",
-								right: "0",
+								right: "calc(50% - 25px)",
+								top: "50%",
 								width: "50px",
 							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort('out-true')}
-						>
-							<div style={{
-									backgroundColor: "green",
-									height: "50px",
-									width: "50px",
-								}}
-							>
-								True
-							</div>
-						</PortWidget>
-						<PortWidget
-							style={{
-								bottom: "0",
-								height: "50px",
-								position: "absolute",
-								right: "0",
-								width: "50px",
-							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort('out-false')}
-						>
-							<div style={{
-									backgroundColor: "red",
-									height: "50px",
-									width: "50px",
-								}}
-							>
-								False
-							</div>
-						</PortWidget> */}
+						/>  
 					</div>
 				</div>
 			</div>

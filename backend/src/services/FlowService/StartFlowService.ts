@@ -23,6 +23,41 @@ const jsonStringToObj = (json: any) => {
   }
 }
 
+const handleParams = (body: any, params: any) => {
+  let value = body;
+  let newParams = [];
+
+  for (let i = 0; i < params.length; i++) {
+    let index = params[i].match(/\[(.*?)\]/);
+
+    if (index) {
+      if (params[i].replace(index[0], "")) newParams.push(params[i].replace(index[0], ""));
+      newParams.push(index[1]);
+    } else {
+      newParams.push(params[i]);
+    }
+  }
+
+  for (let i = 0; i < newParams.length; i++) {
+    if (value === undefined) {
+      return false;
+    }
+
+    if (Array.isArray(value)) {
+      //   let array = [];
+      //   for (const item of value) {
+      //     array.push(item[params[i]]);
+      // }
+  
+      value = value[newParams[i]];
+    } else {
+      value = value[newParams[i]];
+    }
+  }
+
+  return value;
+}
+
 const processNode = async (node: any, body: any) => {
   if (node.type === "start-node") {
     return {};
@@ -46,19 +81,37 @@ const processNode = async (node: any, body: any) => {
       if (!param1 || !condition) return false;
 
       const params1 = param1.match(/\{{(.*?)\}}/);
-      let dinamicParam1 = "";
-      if (params1) dinamicParam1 = params1[1];
-      const var1 = dinamicParam1 ? body[dinamicParam1] : param1;
+      let dinamicParam1 = [];
+      if (params1) dinamicParam1 = params1[1].split(".");
+
+      let var1 = param1;
+
+      if (dinamicParam1.length === 1) {
+        var1 = body[dinamicParam1[0]];
+      } else if (dinamicParam1.length >= 2) {
+        var1 = handleParams(body, dinamicParam1);
+      }
+
+      if (!var1) return false;
       
-      if (condition === "exists") return body[dinamicParam1] ? true : false;
-      if (condition === "not_exists") return body[dinamicParam1] ? false : true;
+      // if (condition === "exists") return body[dinamicParam1] ? true : false;
+      // if (condition === "not_exists") return body[dinamicParam1] ? false : true;
       
       if (!param2) return false;
 
       const params2 = param2.match(/\{{(.*?)\}}/);
-      let dinamicParam2 = "";
-      if (params2) dinamicParam2 = params2[1];
-      const var2 = dinamicParam2 ? body[dinamicParam2] : param2;
+      let dinamicParam2 = [];
+      if (params2) dinamicParam2 = params2[1].split(".");
+
+      let var2 = param2;
+
+      if (dinamicParam2.length === 1) {
+        var1 = body[dinamicParam2[0]];
+      } else if (dinamicParam2.length >= 2) {
+        var2 = handleParams(body, dinamicParam2);
+      }
+
+      if (!var1) return false;
 
       if (condition === "equals") return (var1 == var2);
       if (condition === "not_equal") return (var1 != var2);
@@ -244,7 +297,10 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body: { ...nodeResponse.response }
+      body: {
+        ...nodeResponse.response,
+        ...nodeResponse.error
+      }
     });
   }
 

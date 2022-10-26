@@ -16,6 +16,8 @@ import { ChatNodeModel } from '../nodes/Chat/ChatNodeModel';
 import { ConditionalNodeModel } from '../nodes/Conditional/ConditionalNodeModel';
 import { RequestNodeModel } from '../nodes/Request/RequestNodeModel';
 
+import { AccountTree, Chat, GetApp } from '@material-ui/icons/';
+
 export const Body = styled.div`
 	flex-grow: 1;
 	display: flex;
@@ -56,9 +58,9 @@ export class BodyWidget extends React.Component {
 						{/* <TrayItemWidget model={{ type: 'in' }} name="In Node" color="rgb(192,255,0)" />
 						<TrayItemWidget model={{ type: 'out' }} name="Out Node" color="rgb(0,192,255)" />
 						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" /> */}
-						<TrayItemWidget model={{ type: 'chat' }} name="Chat" color="rgb(100, 255, 100)" />
-						<TrayItemWidget model={{ type: 'conditional' }} name="Conditional" color="rgb(33, 31, 126)" />
-						<TrayItemWidget model={{ type: 'request' }} name="Request" color="rgb(128, 128, 128)" />
+						<TrayItemWidget model={{ type: 'chat' }} name="Chat" color="#25D366" icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px" }}/>} />
+						<TrayItemWidget model={{ type: 'conditional' }} name="Conditional" color="#211F7E" icon={<AccountTree style={{ verticalAlign: "middle", marginRight: "5px" }}/>} />
+						<TrayItemWidget model={{ type: 'request' }} name="Request" color="#BFBFBF" icon={<GetApp style={{ verticalAlign: "middle", marginRight: "5px" }}/>} />
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
