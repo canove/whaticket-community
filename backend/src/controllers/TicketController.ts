@@ -167,6 +167,8 @@ export const changeQueueOrResolve = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { messageId, queueName } = req.body;
 
   const ticket = await ChangeQueueOrResolveTicketService({
@@ -190,6 +192,8 @@ export const isInBot = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { messageId } = req.params;
 
   const isTicketInBot = await IsTicketInBotService(messageId);
@@ -201,6 +205,8 @@ export const isInBotPost = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { session, contactNumber } = req.body;
 
   const isTicketInBot = await IsTicketInBotPostService(session, contactNumber);

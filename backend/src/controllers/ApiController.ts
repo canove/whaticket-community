@@ -28,6 +28,8 @@ const createContact = async (newContact: string, companyId: number) => {
 };
 /* eslint-disable */
 export const importDispatcherFileProcess = async (req: Request, res: Response) => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const io = getIO();
 
   const { reports: files } = await ListFileService({ status: FileStatus.WaitingImport, initialDate: null, limiting: 1, companyId: 0 });
@@ -54,6 +56,8 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
 
 /* eslint-disable */
 export const dispatcherRegisterProcess = async (req: Request, res: Response) => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const io = getIO();
   
   const { reports: files } = await ListFileService({ status: FileStatus.WaitingDispatcher, initialDate: null, limiting: 1, companyId: 0 });
@@ -89,11 +93,15 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
 
 /* eslint-disable */
 export const pingConnections = async (req: Request, res: Response) => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   await DispatcherPingService();
   return res.status(200).json('request is processed');
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const newContact: ContactData = req.body;
   const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];

@@ -195,6 +195,8 @@ export const newMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const {
     id,
     fromMe,
@@ -232,6 +234,8 @@ export const messageStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { statusType, msgId, msgWhatsId, errorMessage, messageType } = req.body;
 
   const message = await StatusMessageWhatsappService({
@@ -249,6 +253,8 @@ export const qualityNumber = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { displayPhoneNumber, event, currentLimit } = req.body;
 
   const message = await QualityNumberWhatsappService({
@@ -296,6 +302,8 @@ export const botMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { fromMe, to, body, contactName, session, bot } = req.body;
 
   if (!fromMe) {
@@ -336,6 +344,8 @@ export const nofSessionStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { session, status } = req.body;
   const message = await NOFWhatsappSessionStatusService({
     session,
@@ -349,6 +359,8 @@ export const nofSessionQRUpdate = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { result, session, qrcode } = req.body;
 
   const message = await NOFWhatsappQRCodeService({

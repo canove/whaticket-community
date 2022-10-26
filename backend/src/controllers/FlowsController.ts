@@ -73,6 +73,8 @@ export const connection = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
+
   const { connectionName } = req.params;
 
   const flow = await ShowFlowByConnectionService(connectionName);
