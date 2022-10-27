@@ -21,6 +21,10 @@ export class StartNodeWidget extends React.Component {
 		this.response = JSON.stringify({"content": "STRING", "type": "text"}, null, 2);
 	}
 
+	componentDidMount() { 
+		this.getToken();
+	}
+
 	getToken = async () => {
 		try {
 			const { data } = await api.get("/settings");
@@ -29,6 +33,9 @@ export class StartNodeWidget extends React.Component {
 		} catch (err) {
 			toastError(err);
 		}
+
+		this.props.node.url = this.url;
+		this.props.node.header = this.state.header;
 	};
 
 	render() {
@@ -137,7 +144,6 @@ export class StartNodeWidget extends React.Component {
 						</Typography>
 						<IconButton
 							onClick={() => {
-								this.getToken();
 								this.setState({ modalOpen: true });
 							}}
 						>
@@ -174,7 +180,7 @@ export class StartNodeWidget extends React.Component {
 								top: "50%",
 								width: "50px",
 							}}
-						/>  
+						/> 
 					</div>
 				</div>
 			</div>
