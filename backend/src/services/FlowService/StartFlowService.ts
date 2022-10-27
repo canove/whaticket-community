@@ -215,7 +215,7 @@ const StartFlowService = async ({
 
   if (session && session.nodeId === null) {
     return {
-      message: "END_OF_THE_FLOW",
+      status: "END_OF_THE_FLOW",
       sessionId: sessionId
     }
   }
@@ -260,7 +260,8 @@ const StartFlowService = async ({
 
     return {
       ...nodeResponse, 
-      sessionId: session.id
+      sessionId: session.id,
+      status: "IN_FLOW",
     };
   }
 
@@ -302,16 +303,14 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body: {
-        ...nodeResponse.response,
-        ...nodeResponse.error
-      }
+      body: { ...nodeResponse }
     });
   }
 
   return { 
     ...nodeResponse, 
-    sessionId
+    sessionId,
+    status: "IN_FLOW",
   };
 };
 
