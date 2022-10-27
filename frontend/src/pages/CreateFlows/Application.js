@@ -10,9 +10,12 @@ import { AdvancedPortModel } from './ports/AdvancedPort/AdvancedPortModel';
 import { ConditionalNodeFactory } from './nodes/Conditional/ConditionalNodeFactory';
 import { RequestNodeFactory } from './nodes/Request/RequestNodeFactory';
 
+import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel } from '@projectstorm/react-diagrams';
+import { CustomDeleteItemsAction } from './components/CustomDeleteItemsAction';
+
 export class Application {
 	constructor() {
-		this.diagramEngine = SRD.default();
+		this.diagramEngine = createEngine({ registerDefaultDeleteItemsAction: false });
 		this.newModel();
 	}
 
@@ -130,6 +133,8 @@ export class Application {
 		start.addPort(new AdvancedPortModel(false, "out"));
 		start.setPosition(100, 100);
 		this.activeModel.addAll(start);
+
+		this.diagramEngine.getActionEventBus().registerAction(new CustomDeleteItemsAction());
 
 		// //!------------- SERIALIZING ------------------
 
