@@ -82,7 +82,7 @@ const processNode = async (node: any, body: any) => {
 
       const params1 = param1.match(/\{{(.*?)\}}/);
       let dinamicParam1 = [];
-      if (params1) dinamicParam1 = params1[1].split(".");
+      if (params1) dinamicParam1 = params1[1].trim().split(".");
 
       let var1 = param1;
 
@@ -104,7 +104,7 @@ const processNode = async (node: any, body: any) => {
 
       const params2 = param2.match(/\{{(.*?)\}}/);
       let dinamicParam2 = [];
-      if (params2) dinamicParam2 = params2[1].split(".");
+      if (params2) dinamicParam2 = params2[1].trim().split(".");
 
       let var2 = param2;
 

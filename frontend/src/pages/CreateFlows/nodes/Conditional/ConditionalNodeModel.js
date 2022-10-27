@@ -35,7 +35,7 @@ export class ConditionalNodeModel extends NodeModel {
 	updatePorts() {
 		const ports = this.getPorts();
 
-		Object.keys(ports).find((port: any) => {
+		Object.keys(ports).find((port) => {
 			if (port.includes("in")) {
 				ports[port].options.isIn = true;
 			}

@@ -54,70 +54,76 @@ export class RequestNodeWidget extends React.Component {
 					Request
 				</DialogTitle>
 				<DialogContent>
-				<div>
-                  <TextField
-					as={TextField}
-                    name="url"
-                    variant="outlined"
-                    margin="normal"
-                    label="URL"
-                    fullWidth
-					value={this.state.url}
-					onChange={(e) => { this.handleUrlChange(e) }}
-                  />
-                </div>
-				<FormControl
-					variant="outlined"
-					margin="normal"
-					fullWidth
-				>
-					<InputLabel id="method-select-label">
-						Método
-					</InputLabel>
-					<Select
-						labelId="method-select-label"
-						id="method-select"
-						value={this.state.method}
-						label="Method"
-						onChange={(e) => { this.handleMethodChange(e) }}
-						variant="outlined"
-					>
-						<MenuItem value={"GET"}>{'GET'}</MenuItem>
-						<MenuItem value={"POST"}>{'POST'}</MenuItem>
-					</Select>
-				</FormControl>
-				<div>
+					<div>
 					<TextField
 						as={TextField}
-						label="Header"
-						name="header"
-						value={this.state.header}
-						multiline
-						minRows={4}
-						maxLength="1024"
+						name="url"
+						variant="outlined"
+						margin="normal"
+						label="URL"
+						fullWidth
+						value={this.state.url}
+						onChange={(e) => { this.handleUrlChange(e) }}
+					/>
+					</div>
+					<FormControl
 						variant="outlined"
 						margin="normal"
 						fullWidth
-						onChange={(e) => { this.handleHeaderChange(e) }}
-					/>
-				</div>
-				{ this.state.method === "POST" && 
+					>
+						<InputLabel id="method-select-label">
+							Método
+						</InputLabel>
+						<Select
+							labelId="method-select-label"
+							id="method-select"
+							value={this.state.method}
+							label="Method"
+							onChange={(e) => { this.handleMethodChange(e) }}
+							variant="outlined"
+						>
+							<MenuItem value={"GET"}>{'GET'}</MenuItem>
+							<MenuItem value={"POST"}>{'POST'}</MenuItem>
+						</Select>
+					</FormControl>
 					<div>
 						<TextField
 							as={TextField}
-							label="Body"
-							name="Body"
-							value={this.state.body}
+							label="Header"
+							name="header"
+							value={this.state.header}
 							multiline
 							minRows={4}
 							maxLength="1024"
 							variant="outlined"
 							margin="normal"
 							fullWidth
-							onChange={(e) => { this.handleBodyChange(e) }}
+							onChange={(e) => { this.handleHeaderChange(e) }}
 						/>
 					</div>
-				}
+					{ this.state.method === "POST" && 
+						<div>
+							<TextField
+								as={TextField}
+								label="Body"
+								name="Body"
+								value={this.state.body}
+								multiline
+								minRows={4}
+								maxLength="1024"
+								variant="outlined"
+								margin="normal"
+								fullWidth
+								onChange={(e) => { this.handleBodyChange(e) }}
+							/>
+						</div>
+					}
+					<div>
+						Para usar os parametros da resposta do request, use: {'{{ response. }}'}
+					</div>
+					<div>
+						Para usar os parametros de erro do request, use: {'{{ response. }}'}
+					</div>
 				</DialogContent>
 				<DialogActions>
 					<Button

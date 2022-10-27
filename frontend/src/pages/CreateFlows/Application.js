@@ -52,7 +52,7 @@ export class Application {
 						if (isCreated) {
 							const {sourcePort, targetPort} = link.entity;
 
-							if (targetPort.options.isIn === false) {
+							if (sourcePort !== targetPort && targetPort.options.isIn === false) {
 								this.activeModel.removeLink(link.entity);
 								sourcePort.removeLink(link.entity);
 								targetPort.removeLink(link.entity);
