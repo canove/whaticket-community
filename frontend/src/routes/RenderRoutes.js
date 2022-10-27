@@ -80,9 +80,6 @@ const RenderRoutes = () => {
         if (name === "Quick Answers") {
             return QuickAnswers
         }
-        if (name === "Settings") {
-            return Settings
-        }
         if (name === "Queues") {
             return Queues
         }

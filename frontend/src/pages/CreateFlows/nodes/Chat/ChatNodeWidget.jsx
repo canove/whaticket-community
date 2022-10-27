@@ -143,88 +143,22 @@ export class ChatNodeWidget extends React.Component {
 								})
 							}
 						</div>
-							<PortWidget
-								style={{
-									backgroundColor: "#25D366",
-									border: "2px solid #075E54",
-									borderRadius: "100%",
-									cursor: "pointer",
-									height: "16px",
-									position: "absolute",
-									right: "-8px",
-									top: "50%",
-									width: "16px",
-								}}
-								engine={this.props.engine}
-								port={this.props.node.getPort('out')}
-							>
-							</PortWidget>
-						{/* { Object.keys(this.props.node.ports).map((port, index) => (
-							<PortWidget
-							key={index}
-							style={{
-								backgroundColor: "black",
-								border: "1px solid white",
-								bottom: `calc(50px * ${index})`,
-								height: "50px",
-								position: "absolute",
-								right: "0",
-								width: "75px",
-							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort(port)}
-						>
-							<div style={{
-									backgroundColor: "green",
-									border: "1px solid white",
-									height: "50px",
-									width: "75px",
-								}}
-							>
-								{port}
-							</div>
-						</PortWidget>
-						))} */}
-						{/* <PortWidget
-							style={{
-								bottom: "50px",
-								height: "50px",
-								position: "absolute",
-								right: "0",
-								width: "50px",
-							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort('out-true')}
-						>
-							<div style={{
-									backgroundColor: "green",
-									height: "50px",
-									width: "50px",
-								}}
-							>
-								True
-							</div>
-						</PortWidget>
 						<PortWidget
 							style={{
-								bottom: "0",
-								height: "50px",
+								backgroundColor: "#25D366",
+								border: "2px solid #075E54",
+								borderRadius: "100%",
+								cursor: "pointer",
+								height: "16px",
 								position: "absolute",
-								right: "0",
-								width: "50px",
+								right: "-8px",
+								top: "50%",
+								width: "16px",
 							}}
 							engine={this.props.engine}
-							port={this.props.node.getPort('out-false')}
+							port={this.props.node.getPort('out')}
 						>
-							<div style={{
-									backgroundColor: "red",
-									height: "50px",
-									width: "50px",
-								}}
-							>
-								False
-							</div>
-						</PortWidget> */}
+						</PortWidget>
 					</div>
 				</div>
 			</div>

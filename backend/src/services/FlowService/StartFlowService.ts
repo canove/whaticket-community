@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import FlowsNodes from "../../database/models/FlowsNodes";
 import AppError from "../../errors/AppError";
 import FlowsSessions from "../../database/models/FlowsSessions";
+import axios from "axios";
 
 interface Request {
   flowNodeId?: string;
@@ -13,7 +14,51 @@ interface Request {
   body?: any;
 }
 
-const processNode = (node: any, body: any) => {
+const jsonStringToObj = (json: any) => {
+  try {
+      const responseObj = JSON.parse(json);
+      return responseObj;
+  } catch {
+      return false;
+  }
+}
+
+const handleParams = (body: any, params: any) => {
+  let value = body;
+  let newParams = [];
+
+  for (let i = 0; i < params.length; i++) {
+    let index = params[i].match(/\[(.*?)\]/);
+
+    if (index) {
+      if (params[i].replace(index[0], "")) newParams.push(params[i].replace(index[0], ""));
+      newParams.push(index[1]);
+    } else {
+      newParams.push(params[i]);
+    }
+  }
+
+  for (let i = 0; i < newParams.length; i++) {
+    if (value === undefined) {
+      return false;
+    }
+
+    if (Array.isArray(value)) {
+      //   let array = [];
+      //   for (const item of value) {
+      //     array.push(item[params[i]]);
+      // }
+  
+      value = value[newParams[i]];
+    } else {
+      value = value[newParams[i]];
+    }
+  }
+
+  return value;
+}
+
+const processNode = async (node: any, body: any) => {
   if (node.type === "start-node") {
     return {};
   }
@@ -36,19 +81,40 @@ const processNode = (node: any, body: any) => {
       if (!param1 || !condition) return false;
 
       const params1 = param1.match(/\{{(.*?)\}}/);
-      let dinamicParam1 = "";
-      if (params1) dinamicParam1 = params1[1];
-      const var1 = dinamicParam1 ? body[dinamicParam1] : param1;
-      
-      if (condition === "exists") return body[dinamicParam1] ? true : false;
-      if (condition === "not_exists") return body[dinamicParam1] ? false : true;
+      let dinamicParam1 = [];
+      if (params1) dinamicParam1 = params1[1].split(".");
+
+      let var1 = param1;
+
+      if (dinamicParam1.length === 1) {
+        var1 = body[dinamicParam1[0]];
+
+        if (condition === "exists") return var1 ? true : false;
+        if (condition === "not_exists") return var1 ? false : true;
+      } else if (dinamicParam1.length >= 2) {
+        var1 = handleParams(body, dinamicParam1);
+
+        if (condition === "exists") return var1 ? true : false;
+        if (condition === "not_exists") return var1 ? false : true;
+      }
+
+      if (!var1) return false;
       
       if (!param2) return false;
 
       const params2 = param2.match(/\{{(.*?)\}}/);
-      let dinamicParam2 = "";
-      if (params2) dinamicParam2 = params2[1];
-      const var2 = dinamicParam2 ? body[dinamicParam2] : param2;
+      let dinamicParam2 = [];
+      if (params2) dinamicParam2 = params2[1].split(".");
+
+      let var2 = param2;
+
+      if (dinamicParam2.length === 1) {
+        var1 = body[dinamicParam2[0]];
+      } else if (dinamicParam2.length >= 2) {
+        var2 = handleParams(body, dinamicParam2);
+      }
+
+      if (!var1) return false;
 
       if (condition === "equals") return (var1 == var2);
       if (condition === "not_equal") return (var1 != var2);
@@ -62,11 +128,59 @@ const processNode = (node: any, body: any) => {
 
     return { condition: response ? response : "ELSE" };
   }
+
+  if (node.type === "request-node") {
+    let nodeHeader = jsonStringToObj(node.header);
+    let nodeBody = jsonStringToObj(node.body);
+
+    if (!nodeHeader) {
+      nodeHeader = "";
+    }
+
+    if (node.method === "POST" || !nodeBody) {
+      nodeBody = "";
+    }
+
+    let response: any;
+    let error: any;
+
+    await axios({
+        method: node.method,
+        url: node.url,
+        headers: {
+            ...nodeHeader
+        },
+        data: {
+            ...nodeBody
+        }
+    })
+    .then(res => {
+        response = res.data;
+    })
+    .catch(err => {
+        error = err;
+    });
+
+    if (response) {
+      return { response };
+    } else {
+      return { error };
+    }
+  }
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {
   if (node.type === "conditional-node") {
     const portName = `${name}-${nodeResponse.condition.toLowerCase()}`;
+    for (const port of node.ports) {
+      if (port.name === portName) {
+        return port.links[0];
+      }
+    }
+  }
+
+  if (node.type === "request-node") {
+    const portName = `${name}-${nodeResponse.response ? "2xx" : "err"}`;
     for (const port of node.ports) {
       if (port.name === portName) {
         return port.links[0];
@@ -87,29 +201,22 @@ const StartFlowService = async ({
   companyId,
   body
 }: Request): Promise<any> => {
-  let session = null;
-  let currentNode = null;
+  const session = await FlowsSessions.findOne({
+    where: {
+      updatedAt: {
+        [Op.between]: [+subHours(new Date(), 2), +new Date()]
+      },
+      companyId,
+      id: sessionId
+    }
+  });
 
-  if (sessionId) {
-    session = await FlowsSessions.findOne({
-      where: {
-        updatedAt: {
-          [Op.between]: [+subHours(new Date(), 2), +new Date()]
-        },
-        companyId,
-        id: sessionId
-      }
-    });
+  const currentNode = session ? session.nodeId : flowNodeId;
 
-    currentNode = session.nodeId;
-  } else {
-    currentNode = flowNodeId;
-  }
-
-  if (currentNode === null) {
+  if (session && session.nodeId === null) {
     return {
-      message: "END_OF_THE_FLOW",
-      sessionId: session.id
+      status: "END_OF_THE_FLOW",
+      sessionId: sessionId
     }
   }
 
@@ -141,7 +248,7 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODE", 404);
   }
 
-  const nodeResponse = processNode(node, body);
+  const nodeResponse = await processNode(node, body);
 
   const linkId = getLink("out", node, nodeResponse);
   const link = links[linkId];
@@ -153,7 +260,8 @@ const StartFlowService = async ({
 
     return {
       ...nodeResponse, 
-      sessionId: session.id
+      sessionId: session.id,
+      status: "IN_FLOW",
     };
   }
 
@@ -161,8 +269,8 @@ const StartFlowService = async ({
   const nextNode = nodes[target];
 
   if (!session) {
-    session = await FlowsSessions.create({
-      id: uuidv4(),
+    await FlowsSessions.create({
+      id: sessionId,
       nodeId: nextNode.id,
       companyId
     });
@@ -170,6 +278,15 @@ const StartFlowService = async ({
     await session.update({
       nodeId: nextNode.id,
     });
+  }
+
+  if (node.type === "start-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body,
+    })
   }
 
   if (node.type === "conditional-node") {
@@ -181,9 +298,19 @@ const StartFlowService = async ({
     });
   }
 
+  if (node.type === "request-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...nodeResponse }
+    });
+  }
+
   return { 
     ...nodeResponse, 
-    sessionId: session ? session.id : "END_OF_THE_FLOW"
+    sessionId,
+    status: "IN_FLOW",
   };
 };
 

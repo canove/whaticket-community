@@ -12,24 +12,6 @@ export class ConditionalNodeModel extends NodeModel {
 		this.conditions = null;
 		this.outPortsNumber = 2;
 		this.name = "Conditional";
-
-		// this.portsOut = [];
-        // this.portsIn = [];
-
-		// setup an in and out port
-		// this.addPort(
-		// 	new DefaultPortModel({
-		// 		in: false,
-		// 		name: 'true'
-		// 	})
-		// );
-
-		// this.addPort(
-		// 	new DefaultPortModel({
-		// 		in: false,
-		// 		name: 'false'
-		// 	})
-		// );
 	}
 
 	serialize() {
@@ -46,5 +28,20 @@ export class ConditionalNodeModel extends NodeModel {
 		this.conditions = ob.data.conditions;
 		this.outPortsNumber = ob.data.outPortsNumber;
 		this.name = ob.data.name;
+
+		this.updatePorts();
+	}
+
+	updatePorts() {
+		const ports = this.getPorts();
+
+		Object.keys(ports).find((port: any) => {
+			if (port.includes("in")) {
+				ports[port].options.isIn = true;
+			}
+			if (port.includes("out")) {
+				ports[port].options.isIn = false;
+			}
+		})
 	}
 }
