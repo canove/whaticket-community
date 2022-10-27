@@ -88,14 +88,17 @@ const processNode = async (node: any, body: any) => {
 
       if (dinamicParam1.length === 1) {
         var1 = body[dinamicParam1[0]];
+
+        if (condition === "exists") return var1 ? true : false;
+        if (condition === "not_exists") return var1 ? false : true;
       } else if (dinamicParam1.length >= 2) {
         var1 = handleParams(body, dinamicParam1);
+
+        if (condition === "exists") return var1 ? true : false;
+        if (condition === "not_exists") return var1 ? false : true;
       }
 
       if (!var1) return false;
-      
-      // if (condition === "exists") return body[dinamicParam1] ? true : false;
-      // if (condition === "not_exists") return body[dinamicParam1] ? false : true;
       
       if (!param2) return false;
 
