@@ -13,6 +13,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@mui/icons-material": "^5.8.4",
     "@projectstorm/react-diagrams": "^6.7.4",
+    "@projectstorm/react-diagrams-core": "^6.7.4",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.0.4",
     "@testing-library/user-event": "^12.1.7",
