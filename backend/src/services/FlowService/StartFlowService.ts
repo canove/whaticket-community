@@ -198,29 +198,22 @@ const StartFlowService = async ({
   companyId,
   body
 }: Request): Promise<any> => {
-  let session = null;
-  let currentNode = null;
+  const session = await FlowsSessions.findOne({
+    where: {
+      updatedAt: {
+        [Op.between]: [+subHours(new Date(), 2), +new Date()]
+      },
+      companyId,
+      id: sessionId
+    }
+  });
 
-  if (sessionId) {
-    session = await FlowsSessions.findOne({
-      where: {
-        updatedAt: {
-          [Op.between]: [+subHours(new Date(), 2), +new Date()]
-        },
-        companyId,
-        id: sessionId
-      }
-    });
+  const currentNode = session ? session.nodeId : flowNodeId;
 
-    currentNode = session.nodeId;
-  } else {
-    currentNode = flowNodeId;
-  }
-
-  if (currentNode === null) {
+  if (session && session.nodeId === null) {
     return {
       message: "END_OF_THE_FLOW",
-      sessionId: session.id
+      sessionId: sessionId
     }
   }
 
@@ -272,8 +265,8 @@ const StartFlowService = async ({
   const nextNode = nodes[target];
 
   if (!session) {
-    session = await FlowsSessions.create({
-      id: uuidv4(),
+    await FlowsSessions.create({
+      id: sessionId,
       nodeId: nextNode.id,
       companyId
     });
@@ -281,6 +274,15 @@ const StartFlowService = async ({
     await session.update({
       nodeId: nextNode.id,
     });
+  }
+
+  if (node.type === "start-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body,
+    })
   }
 
   if (node.type === "conditional-node") {
@@ -306,7 +308,7 @@ const StartFlowService = async ({
 
   return { 
     ...nodeResponse, 
-    sessionId: session ? session.id : "END_OF_THE_FLOW"
+    sessionId
   };
 };
 
