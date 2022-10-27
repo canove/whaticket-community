@@ -5,8 +5,8 @@ export const Tray = styled.div`
 	color: white;
 	font-family: Helvetica, Arial;
 	padding: 5px;
-	margin: 0px 10px;
-	border: solid 1px ${(p) => p.color};
+	margin: 5px 10px;
+	border: solid 2px ${(p) => p.color};
 	border-radius: 5px;
 	margin-bottom: 2px;
 	cursor: pointer;
@@ -23,6 +23,7 @@ export class TrayItemWidget extends React.Component {
 				}}
 				className="tray-item"
 			>
+				{this.props.icon}
 				{this.props.name}
 			</Tray>
 		);

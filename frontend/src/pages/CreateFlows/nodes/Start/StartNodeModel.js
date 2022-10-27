@@ -9,39 +9,24 @@ export class StartNodeModel extends NodeModel {
 			...options,
 			type: 'start-node'
 		});
-		this.color = options.color || { options: 'red' };
 		this.main = true;
-
-		// this.portsOut = [];
-        // this.portsIn = [];
-
-		// setup an in and out port
-		// this.addPort(
-		// 	new DefaultPortModel({
-		// 		in: false,
-		// 		name: 'true'
-		// 	})
-		// );
-
-		// this.addPort(
-		// 	new DefaultPortModel({
-		// 		in: false,
-		// 		name: 'false'
-		// 	})
-		// );
+		this.url = "";
+		this.header = "";
 	}
 
 	serialize() {
 		return {
 			...super.serialize(),
-			color: this.color,
-			main: this.main
+			main: this.main,
+			url: this.url,
+			header: this.header,
 		};
 	}
 
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
-		this.color = ob.color;
 		this.main = ob.data.main;
+		this.url = ob.data.url;
+		this.header = ob.data.header;
 	}
 }

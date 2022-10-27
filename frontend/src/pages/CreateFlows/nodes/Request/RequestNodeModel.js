@@ -1,30 +1,36 @@
 import { DefaultPortModel, NodeModel } from '@projectstorm/react-diagrams';
-import { AdvancedPortModel } from '../../ports/AdvancedPort/AdvancedPortModel';
 
 /**
  * Example of a custom model using pure javascript
  */
-export class ChatNodeModel extends NodeModel {
+export class RequestNodeModel extends NodeModel {
 	constructor(options = {}) {
 		super({
 			...options,
-			type: 'chat-node'
+			type: 'request-node'
 		});
-		this.data = {
-			content: '',
-		}
+		this.url = "";
+		this.method = "";
+		this.header = "";
+		this.body = "";
 	}
 
 	serialize() {
 		return {
 			...super.serialize(),
-			data: this.data,
+			url: this.url,
+			method: this.method,
+			header: this.header,
+			body: this.body,
 		};
 	}
 
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
-		this.data = ob.data.data;
+		this.url = ob.data.url;
+		this.method = ob.data.method;
+		this.header = ob.data.header;
+		this.body = ob.data.body;
 
 		this.updatePorts();
 	}
