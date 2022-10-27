@@ -56,7 +56,7 @@ const ShowFlowByConnectionService = async (
       createdAt: flow.createdAt,
       updatedAt: flow.updatedAt,
       url: nodes[firstNodeId].url,
-      header: nodes[firstNodeId].header
+      header: JSON.parse(nodes[firstNodeId].header)
     };
   }
 
