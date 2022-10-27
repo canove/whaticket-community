@@ -31,5 +31,20 @@ export class RequestNodeModel extends NodeModel {
 		this.method = ob.data.method;
 		this.header = ob.data.header;
 		this.body = ob.data.body;
+
+		this.updatePorts();
+	}
+
+	updatePorts() {
+		const ports = this.getPorts();
+
+		Object.keys(ports).find((port: any) => {
+			if (port.includes("in")) {
+				ports[port].options.isIn = true;
+			}
+			if (port.includes("out")) {
+				ports[port].options.isIn = false;
+			}
+		})
 	}
 }

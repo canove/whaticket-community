@@ -19,7 +19,18 @@ const CreateFlows = () => {
   const { flowId } = useParams();
 
   const saveFlow = async () => {
+    const allLinks = app.getActiveDiagram().getLinks();
+		for (const oneLink of allLinks) {
+      oneLink.options.selected = false;
+
+			if (!oneLink.options.selected && !oneLink.targetPort) {
+				app.getActiveDiagram().removeLink(oneLink);
+			}
+		}
+
     const save = JSON.stringify(app.getActiveDiagram().serialize());
+
+    // console.log(save);
 
     try {
       await api.put(`/flowsNodes/${flowId}`, { json: save });

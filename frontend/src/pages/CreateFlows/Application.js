@@ -36,10 +36,24 @@ export class Application {
 		this.activeModel.registerListener({
 			linksUpdated:(event) => {
 				const { link, isCreated } = event;
+
+				const allLinks = this.activeModel.getLinks();
+				for (const oneLink of allLinks) {
+					if (!oneLink.options.selected && !oneLink.targetPort) {
+						this.activeModel.removeLink(oneLink);
+					}
+				}
+
 				link.registerListener({
 					targetPortChanged:(link) => {
 						if (isCreated) {
 							const {sourcePort, targetPort} = link.entity;
+
+							if (targetPort.options.isIn === false) {
+								this.activeModel.removeLink(link.entity);
+								sourcePort.removeLink(link.entity);
+								targetPort.removeLink(link.entity);
+							}
 
 							if (Object.keys(sourcePort.getLinks()).length > 1) {
 								// console.log("Source -> IF")
@@ -100,9 +114,15 @@ export class Application {
 									targetPort.removeLink(link.entity);
 								}
 							}
+
+							if (sourcePort.options.id === targetPort.options.id) {
+								this.activeModel.removeLink(link.entity);
+								sourcePort.removeLink(link.entity);
+								targetPort.removeLink(link.entity);
+							}
 						}
-					}
-				});				
+					},
+				});		
 			}
 		});
 

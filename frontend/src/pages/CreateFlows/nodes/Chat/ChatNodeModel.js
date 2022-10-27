@@ -1,4 +1,5 @@
 import { DefaultPortModel, NodeModel } from '@projectstorm/react-diagrams';
+import { AdvancedPortModel } from '../../ports/AdvancedPort/AdvancedPortModel';
 
 /**
  * Example of a custom model using pure javascript
@@ -9,41 +10,35 @@ export class ChatNodeModel extends NodeModel {
 			...options,
 			type: 'chat-node'
 		});
-		this.color = options.color || { options: 'red' };
 		this.data = {
 			content: '',
 		}
-
-		// this.portsOut = [];
-        // this.portsIn = [];
-
-		// setup an in and out port
-		// this.addPort(
-		// 	new DefaultPortModel({
-		// 		in: false,
-		// 		name: 'true'
-		// 	})
-		// );
-
-		// this.addPort(
-		// 	new DefaultPortModel({
-		// 		in: false,
-		// 		name: 'false'
-		// 	})
-		// );
 	}
 
 	serialize() {
 		return {
 			...super.serialize(),
-			color: this.color,
-			data: this.data
+			data: this.data,
 		};
 	}
 
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
-		this.color = ob.color;
 		this.data = ob.data.data;
+
+		this.updatePorts();
+	}
+
+	updatePorts() {
+		const ports = this.getPorts();
+
+		Object.keys(ports).find((port: any) => {
+			if (port.includes("in")) {
+				ports[port].options.isIn = true;
+			}
+			if (port.includes("out")) {
+				ports[port].options.isIn = false;
+			}
+		})
 	}
 }
