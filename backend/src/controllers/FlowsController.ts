@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 import CreateFlowService from "../services/FlowService/CreateFlowService";
@@ -73,7 +74,6 @@ export const connection = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
 
   const { connectionName } = req.params;
 

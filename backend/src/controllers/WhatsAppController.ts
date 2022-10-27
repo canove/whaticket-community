@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Request, Response } from "express";
 import axios from "axios";
 import { getIO } from "../libs/socket";
@@ -36,6 +37,7 @@ interface WhatsappData {
   isDefault?: boolean;
   official?: boolean;
   facebookToken?: string;
+  facebookBusinessId?: string;
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
   companyId?: string | number;
@@ -61,6 +63,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
+    facebookBusinessId,
     phoneNumber,
     flowId
   }: WhatsappData = req.body;
@@ -73,16 +76,20 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const payload = {
     companyId
   };
-  try {
-    await axios.post(apiUrl, payload, {
-      headers: {
-        "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-        sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
-      }
-    });
-  } catch (err: any) {
-    throw new AppError(err.response.data.message);
+  
+  if(!official) {
+    try {
+      await axios.post(apiUrl, payload, {
+        headers: {
+          "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+        }
+      });
+    } catch (err: any) {
+      throw new AppError(err.response.data.message);
+    }
   }
+ 
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -94,6 +101,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     official,
     facebookToken,
     facebookPhoneNumberId,
+    facebookBusinessId,
     phoneNumber,
     companyId,
     flowId
@@ -195,8 +203,6 @@ export const newMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
-
   const {
     id,
     fromMe,
@@ -234,8 +240,6 @@ export const messageStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
-
   const { statusType, msgId, msgWhatsId, errorMessage, messageType } = req.body;
 
   const message = await StatusMessageWhatsappService({
@@ -253,8 +257,6 @@ export const qualityNumber = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
-
   const { displayPhoneNumber, event, currentLimit } = req.body;
 
   const message = await QualityNumberWhatsappService({
@@ -302,8 +304,6 @@ export const botMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
-
   const { fromMe, to, body, contactName, session, bot } = req.body;
 
   if (!fromMe) {
@@ -344,7 +344,6 @@ export const nofSessionStatus = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
 
   const { session, status } = req.body;
   const message = await NOFWhatsappSessionStatusService({
@@ -359,8 +358,6 @@ export const nofSessionQRUpdate = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.companyId !== 1) return res.json("NO_PERMISSION");
-
   const { result, session, qrcode } = req.body;
 
   const message = await NOFWhatsappQRCodeService({

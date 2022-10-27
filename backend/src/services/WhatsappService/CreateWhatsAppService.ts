@@ -14,6 +14,7 @@ interface Request {
   official?: boolean;
   facebookToken?: string;
   facebookPhoneNumberId?: string;
+  facebookBusinessId?: string;
   phoneNumber?: string;
   companyId?: string | number;
   flowId?: string | number;
@@ -34,6 +35,7 @@ const CreateWhatsAppService = async ({
   official,
   facebookToken,
   facebookPhoneNumberId,
+  facebookBusinessId,
   phoneNumber,
   companyId,
   flowId
@@ -97,6 +99,7 @@ const CreateWhatsAppService = async ({
       official,
       facebookToken,
       facebookPhoneNumberId,
+      facebookBusinessId,
       phoneNumber,
       lastPingDate,
       companyId,
