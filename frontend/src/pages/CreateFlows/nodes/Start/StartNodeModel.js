@@ -28,5 +28,20 @@ export class StartNodeModel extends NodeModel {
 		this.main = ob.data.main;
 		this.url = ob.data.url;
 		this.header = ob.data.header;
+
+		this.updatePorts();
+	}
+
+	updatePorts() {
+		const ports = this.getPorts();
+
+		Object.keys(ports).find((port) => {
+			if (port.includes("in")) {
+				ports[port].options.isIn = true;
+			}
+			if (port.includes("out")) {
+				ports[port].options.isIn = false;
+			}
+		})
 	}
 }

@@ -59,10 +59,6 @@ const handleParams = (body: any, params: any) => {
 }
 
 const processNode = async (node: any, body: any) => {
-  if (node.type === "start-node") {
-    return {};
-  }
-
   if (node.type === "chat-node") {
     const messageJSON = node.data.content;
     const messageOBJ = JSON.parse(messageJSON);
@@ -82,7 +78,7 @@ const processNode = async (node: any, body: any) => {
 
       const params1 = param1.match(/\{{(.*?)\}}/);
       let dinamicParam1 = [];
-      if (params1) dinamicParam1 = params1[1].split(".");
+      if (params1) dinamicParam1 = params1[1].trim().split(".");
 
       let var1 = param1;
 
@@ -104,7 +100,7 @@ const processNode = async (node: any, body: any) => {
 
       const params2 = param2.match(/\{{(.*?)\}}/);
       let dinamicParam2 = [];
-      if (params2) dinamicParam2 = params2[1].split(".");
+      if (params2) dinamicParam2 = params2[1].trim().split(".");
 
       let var2 = param2;
 
@@ -167,6 +163,31 @@ const processNode = async (node: any, body: any) => {
       return { error };
     }
   }
+
+  if (node.type === "save-variable-node") {
+    let variables = jsonStringToObj(node.save);
+
+    if (!variables) return {};
+
+    Object.keys(variables).find((variableName: any) => {
+      const params = variables[variableName].match(/\{{(.*?)\}}/);
+
+      if (!params) {
+        const param = variables[variableName];
+
+        variables[variableName] = param;
+      } else {
+        const treatedParam = params[1].trim().split(".");
+        const param = handleParams(body, treatedParam);
+
+        variables[variableName] = param;
+      }
+    });
+
+    return { variables }
+  }
+
+  return {};
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {
@@ -209,22 +230,14 @@ const StartFlowService = async ({
 
   const session = await FlowsSessions.findOne({
     where: {
-      updatedAt: {
-        [Op.between]: [+subHours(new Date(), 2), +new Date()]
-      },
+      updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
       companyId,
-      id: sessionId
+      id: sessionId,
+      nodeId: { [Op.ne]: null }
     }
   });
 
   const currentNode = session ? session.nodeId : flowNodeId;
-
-  if (session && session.nodeId === null) {
-    return {
-      status: "END_OF_THE_FLOW",
-      sessionId: sessionId
-    }
-  }
 
   const flowNodes = await FlowsNodes.findOne({
     where: {
@@ -243,6 +256,8 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODES", 404);
   }
 
+  const variables = (session && session.variables) ? JSON.parse(session.variables) : {};
+
   const nodesOBJ = JSON.parse(flowNodes.json);
 
   const links = nodesOBJ.layers[0].models;
@@ -254,15 +269,23 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODE", 404);
   }
 
-  const nodeResponse = await processNode(node, body);
+  const nodeResponse = await processNode(node, { ...body, variables });
 
   const linkId = getLink("out", node, nodeResponse);
   const link = links[linkId];
 
   if (!link) {
-    await session.update({
-      nodeId: null,
-    });
+    if (node.type === "end-node") {
+      await session.update({
+        nodeId: null,
+        variables: null
+      });
+  
+      return {
+        status: "END_OF_THE_FLOW",
+        sessionId: sessionId
+      }
+    }
 
     return {
       ...nodeResponse, 
@@ -291,7 +314,7 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body,
+      body: { ...body, variables },
     })
   }
 
@@ -300,7 +323,7 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body
+      body: { ...body, variables }
     });
   }
 
@@ -309,7 +332,22 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body: { ...nodeResponse }
+      body: { ...nodeResponse, ...body, variables }
+    });
+  }
+
+  if (node.type === "save-variable-node") {
+    const variablesOBJ = { ...nodeResponse.variables, ...variables }
+
+    await session.update({
+      variables: JSON.stringify(variablesOBJ),
+    })
+
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...body, variables: { ...variables, ...nodeResponse.variables } }
     });
   }
 
