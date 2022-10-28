@@ -201,6 +201,12 @@ const StartFlowService = async ({
   companyId,
   body
 }: Request): Promise<any> => {
+  if(!sessionId) {
+    return {
+      status: "SESSION_ID_IS_REQUIRED"
+    }
+  }
+
   const session = await FlowsSessions.findOne({
     where: {
       updatedAt: {
