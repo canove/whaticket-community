@@ -117,7 +117,7 @@ export class ChatNodeWidget extends React.Component {
 								left: "0",
 								position: "absolute",
 								top: "0",
-								width: "8px",
+								width: "32px",
 							}}
 							engine={this.props.engine}
 							port={this.props.node.getPort('in')}
@@ -135,9 +135,9 @@ export class ChatNodeWidget extends React.Component {
 							{ parse(draftToHtml(convertToRaw(editorState.getCurrentContent())),
 								{
 									replace: domNode => {
-										if (domNode.attribs && domNode.name === 'img') {
-										const props = attributesToProps(domNode.attribs);
-										return <img {...props} draggable="false" />;
+										if (domNode.attribs && (domNode.name === 'img' || domNode.name === 'iframe')) {
+											const props = attributesToProps(domNode.attribs);
+											return <img {...props} draggable="false" style={{ maxWidth: "200px" }} />;
 										}
 									}
 								})

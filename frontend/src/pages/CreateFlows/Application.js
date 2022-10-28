@@ -12,6 +12,8 @@ import { RequestNodeFactory } from './nodes/Request/RequestNodeFactory';
 
 import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel } from '@projectstorm/react-diagrams';
 import { CustomDeleteItemsAction } from './components/CustomDeleteItemsAction';
+import { SaveVariableNodeFactory } from './nodes/SaveVariable/SaveVariableNodeFactory';
+import { EndNodeFactory } from './nodes/End/EndNodeFactory';
 
 export class Application {
 	constructor() {
@@ -23,10 +25,12 @@ export class Application {
 		this.activeModel = new SRD.DiagramModel();
 		this.diagramEngine.setModel(this.activeModel);
 
-		this.diagramEngine.getNodeFactories().registerFactory(new ChatNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new StartNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new ChatNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new ConditionalNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new RequestNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new SaveVariableNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new EndNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());
@@ -52,7 +56,7 @@ export class Application {
 						if (isCreated) {
 							const {sourcePort, targetPort} = link.entity;
 
-							if (targetPort.options.isIn === false) {
+							if (sourcePort !== targetPort && targetPort.options.isIn === false) {
 								this.activeModel.removeLink(link.entity);
 								sourcePort.removeLink(link.entity);
 								targetPort.removeLink(link.entity);

@@ -5,18 +5,26 @@ import {
   UpdatedAt,
   Model,
   PrimaryKey,
-  ForeignKey
+  ForeignKey,
+  AutoIncrement
 } from "sequelize-typescript";
 import Company from "./Company";
 
 @Table
 class FlowsSessions extends Model<FlowsSessions> {
   @PrimaryKey
+  @AutoIncrement
+  @Column
+  uniqueId: number;
+
   @Column
   id: string;
 
   @Column
   nodeId: string;
+
+  @Column
+  variables: string;
 
   @ForeignKey(() => Company)
   @Column
