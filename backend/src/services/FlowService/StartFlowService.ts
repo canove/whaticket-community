@@ -59,10 +59,6 @@ const handleParams = (body: any, params: any) => {
 }
 
 const processNode = async (node: any, body: any) => {
-  if (node.type === "start-node") {
-    return {};
-  }
-
   if (node.type === "chat-node") {
     const messageJSON = node.data.content;
     const messageOBJ = JSON.parse(messageJSON);
@@ -190,6 +186,8 @@ const processNode = async (node: any, body: any) => {
 
     return { variables }
   }
+
+  return {};
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {
@@ -226,22 +224,14 @@ const StartFlowService = async ({
 }: Request): Promise<any> => {
   const session = await FlowsSessions.findOne({
     where: {
-      updatedAt: {
-        [Op.between]: [+subHours(new Date(), 2), +new Date()]
-      },
+      updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
       companyId,
-      id: sessionId
+      id: sessionId,
+      nodeId: { [Op.ne]: null }
     }
   });
 
   const currentNode = session ? session.nodeId : flowNodeId;
-
-  if (session && session.nodeId === null) {
-    return {
-      status: "END_OF_THE_FLOW",
-      sessionId: sessionId
-    }
-  }
 
   const flowNodes = await FlowsNodes.findOne({
     where: {
@@ -277,9 +267,16 @@ const StartFlowService = async ({
   const link = links[linkId];
 
   if (!link) {
-    await session.update({
-      nodeId: null,
-    });
+    if (node.type === "end-node") {
+      await session.update({
+        nodeId: null,
+      });
+  
+      return {
+        status: "END_OF_THE_FLOW",
+        sessionId: sessionId
+      }
+    }
 
     return {
       ...nodeResponse, 
