@@ -17,8 +17,8 @@ export class StartNodeWidget extends React.Component {
 		  header: JSON.stringify({"Authorization": `Bearer TOKEN`}, null, 2),
 		};
 		this.url = `${process.env.REACT_APP_BACKEND_URL}flows/start/${this.props.node.options.id}`;
-		this.payload = JSON.stringify({"text": "STRING"}, null, 2);
-		this.response = JSON.stringify({"content": "STRING", "type": "text"}, null, 2);
+		this.payload = JSON.stringify({"text": "_____", "sessionId": "_____"}, null, 2);
+		this.response = JSON.stringify({"content": "_____", "type": "text"}, null, 2);
 	}
 
 	componentDidMount() { 
