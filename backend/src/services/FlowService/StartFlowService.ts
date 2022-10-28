@@ -167,6 +167,29 @@ const processNode = async (node: any, body: any) => {
       return { error };
     }
   }
+
+  if (node.type === "save-variable-node") {
+    let variables = jsonStringToObj(node.save);
+
+    if (!variables) return {};
+
+    Object.keys(variables).find((variableName: any) => {
+      const params = variables[variableName].match(/\{{(.*?)\}}/);
+
+      if (!params) {
+        const param = variables[variableName];
+
+        variables[variableName] = param;
+      } else {
+        const treatedParam = params[1].trim().split(".");
+        const param = handleParams(body, treatedParam);
+
+        variables[variableName] = param;
+      }
+    });
+
+    return { variables }
+  }
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {

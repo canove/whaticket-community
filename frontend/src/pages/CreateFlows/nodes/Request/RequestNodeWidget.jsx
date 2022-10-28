@@ -122,7 +122,7 @@ export class RequestNodeWidget extends React.Component {
 						Para usar os parametros da resposta do request, use: {'{{ response. }}'}
 					</div>
 					<div>
-						Para usar os parametros de erro do request, use: {'{{ response. }}'}
+						Para usar os parametros de erro do request, use: {'{{ error. }}'}
 					</div>
 				</DialogContent>
 				<DialogActions>
