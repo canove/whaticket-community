@@ -222,17 +222,6 @@ const StartFlowService = async ({
   companyId,
   body
 }: Request): Promise<any> => {
-  const session = await FlowsSessions.findOne({
-    where: {
-      updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
-      companyId,
-      id: sessionId,
-      nodeId: { [Op.ne]: null }
-    }
-  });
-
-  const currentNode = session ? session.nodeId : flowNodeId;
-
   const flowNodes = await FlowsNodes.findOne({
     where: {
       json: {
@@ -249,6 +238,18 @@ const StartFlowService = async ({
   if (!flowNodes.json) {
     throw new AppError("ERR_NO_NODES", 404);
   }
+
+  const session = await FlowsSessions.findOne({
+    where: {
+      updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
+      companyId,
+      id: sessionId,
+      nodeId: { [Op.ne]: null },
+      flowId: flowNodes.flowId,
+    }
+  });
+
+  const currentNode = session ? session.nodeId : flowNodeId;
 
   const variables = (session && session.variables) ? JSON.parse(session.variables) : {};
 
@@ -295,7 +296,8 @@ const StartFlowService = async ({
     await FlowsSessions.create({
       id: sessionId,
       nodeId: nextNode.id,
-      companyId
+      companyId,
+      flowId: flowNodes.flowId
     });
   } else {
     await session.update({
