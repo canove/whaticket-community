@@ -9,6 +9,7 @@ import {
   AutoIncrement
 } from "sequelize-typescript";
 import Company from "./Company";
+import Flows from "./Flows";
 
 @Table
 class FlowsSessions extends Model<FlowsSessions> {
@@ -29,6 +30,10 @@ class FlowsSessions extends Model<FlowsSessions> {
   @ForeignKey(() => Company)
   @Column
   companyId: number;
+
+  @ForeignKey(() => Flows)
+  @Column
+  flowId: number;
 
   @CreatedAt
   createdAt: Date;
