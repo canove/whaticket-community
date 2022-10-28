@@ -13,6 +13,7 @@ import { RequestNodeFactory } from './nodes/Request/RequestNodeFactory';
 import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel } from '@projectstorm/react-diagrams';
 import { CustomDeleteItemsAction } from './components/CustomDeleteItemsAction';
 import { SaveVariableNodeFactory } from './nodes/SaveVariable/SaveVariableNodeFactory';
+import { EndNodeFactory } from './nodes/End/EndNodeFactory';
 
 export class Application {
 	constructor() {
@@ -29,6 +30,7 @@ export class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new ConditionalNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new RequestNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new SaveVariableNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new EndNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());

@@ -1,71 +1,47 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField, MenuItem, Select, InputLabel, FormControl } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField } from '@material-ui/core';
+import SettingsIcon from "@material-ui/icons/Settings";
 import { PortWidget } from "@projectstorm/react-diagrams";
 
-import { Settings } from "@material-ui/icons/";
-import { IoIosSave } from 'react-icons/io';
+import toastError from "../../../../errors/toastError";
+import api from "../../../../services/api";
 
-const defaultSave = {
-	"variableName": "{{ param }}",
-}
+import { GiStopSign } from 'react-icons/gi';
 
-export class SaveVariableNodeWidget extends React.Component {
+export class EndNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 		  modalOpen: false,
-		  save: props.node.save ? props.node.save : JSON.stringify(defaultSave, null, 4),
 		};
 	}
-
-	handleSaveChange = async (e) => {
-		this.setState({ save: e.target.value });
-		this.props.node.save = e.target.value;
-	};
 
 	render() {
 		return (
 			<div>
-				<Dialog
+				{/* <Dialog
 					open={this.state.modalOpen}
 					maxWidth="sm"
 					fullWidth
 					scroll="paper"
 				>
-				<DialogTitle id="form-dialog-title">
-					Save Variables
-				</DialogTitle>
-				<DialogContent>
-					<div>
-						Para usar os parametros salvos, use: {'{{ variables.variableName }}'}
-					</div>
-					<div>
-						<TextField
-							as={TextField}
-							label="Save"
-							name="Save"
-							value={this.state.save}
-							multiline
-							minRows={16}
-							maxLength="1024"
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							onChange={(e) => { this.handleSaveChange(e) }}
-						/>
-					</div>
-				</DialogContent>
-				<DialogActions>
-					<Button
-						onClick={() => {
-							this.setState({ modalOpen: false });
-						}}
-					>
-						Fechar
-					</Button>
-				</DialogActions>
-			</Dialog>
+					<DialogTitle id="form-dialog-title">
+						End
+					</DialogTitle>
+					<DialogContent>
+					
+					</DialogContent>
+					<DialogActions>
+						<Button
+							onClick={() => {
+								this.setState({ modalOpen: false });
+							}}
+						>
+							Fechar
+						</Button>
+					</DialogActions>
+				</Dialog> */}
 				<div 
 					style={{
 						backgroundColor: "white",
@@ -76,8 +52,8 @@ export class SaveVariableNodeWidget extends React.Component {
 				>
 					<div 
 						style={{
-							backgroundColor: "#A30000",
-							color: "white",
+							backgroundColor: "#98CEFF",
+							color: "black",
 							display: "flex",
 							justifyContent: "space-between"
 						}}
@@ -87,19 +63,19 @@ export class SaveVariableNodeWidget extends React.Component {
 								padding: "10px",
 							}}
 						>
-							Save Variables
+							End
 						</Typography>
-						<IconButton
+						{/* <IconButton
 							onClick={() => {
 								this.setState({ modalOpen: true });
 							}}
 						>
-							<Settings />
-						</IconButton>
+							<SettingsIcon />
+						</IconButton> */}
 					</div>
 					<div 
 						style={{
-							minHeight: "110px",
+							minHeight: "100px",
 						}}
 					>
 						<PortWidget
@@ -115,9 +91,9 @@ export class SaveVariableNodeWidget extends React.Component {
 							port={this.props.node.getPort('in')}
 						>
 						</PortWidget>
-						<PortWidget
+						{/* <PortWidget
 							style={{
-								backgroundColor: "#A30000",
+								backgroundColor: "#70BAFF",
 								border: "2px solid #075E54",
 								borderRadius: "100%",
 								cursor: "pointer",
@@ -130,8 +106,8 @@ export class SaveVariableNodeWidget extends React.Component {
 							engine={this.props.engine}
 							port={this.props.node.getPort('out')}
 						>
-						</PortWidget>
-						<IoIosSave
+						</PortWidget> */}
+						<GiStopSign
 							style={{
 								display: "block",
 								height: "50px",
@@ -140,7 +116,7 @@ export class SaveVariableNodeWidget extends React.Component {
 								top: "50%",
 								width: "50px",
 							}}
-						/>  
+						/> 
 					</div>
 				</div>
 			</div>

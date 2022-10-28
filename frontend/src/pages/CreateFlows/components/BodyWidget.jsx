@@ -16,9 +16,11 @@ import { ChatNodeModel } from '../nodes/Chat/ChatNodeModel';
 import { ConditionalNodeModel } from '../nodes/Conditional/ConditionalNodeModel';
 import { RequestNodeModel } from '../nodes/Request/RequestNodeModel';
 import { SaveVariableNodeModel } from '../nodes/SaveVariable/SaveVariableNodeModel';
+import { EndNodeModel } from '../nodes/End/EndNodeModel';
 
 import { AccountTree, Chat, GetApp } from '@material-ui/icons/';
-import { IoIosSave } from 'react-icons/io'
+import { IoIosSave } from 'react-icons/io';
+import { GiStopSign } from 'react-icons/gi';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -84,6 +86,12 @@ export class BodyWidget extends React.Component {
 							color="#A30000"
 							icon={<IoIosSave style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget 
+							model={{ type: 'end' }}
+							name="End"
+							color="#98CEFF"
+							icon={<GiStopSign style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -115,6 +123,9 @@ export class BodyWidget extends React.Component {
 								node = new SaveVariableNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));
 								node.addPort(new AdvancedPortModel(false, 'out'));
+							} else if (data.type === "end") {
+								node = new EndNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);

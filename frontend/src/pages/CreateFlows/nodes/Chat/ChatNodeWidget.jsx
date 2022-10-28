@@ -117,7 +117,7 @@ export class ChatNodeWidget extends React.Component {
 								left: "0",
 								position: "absolute",
 								top: "0",
-								width: "8px",
+								width: "32px",
 							}}
 							engine={this.props.engine}
 							port={this.props.node.getPort('in')}
