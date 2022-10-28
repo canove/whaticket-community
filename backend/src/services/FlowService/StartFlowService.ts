@@ -250,6 +250,8 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODES", 404);
   }
 
+  const variables = (session && session.variables) ? JSON.parse(session.variables) : {};
+
   const nodesOBJ = JSON.parse(flowNodes.json);
 
   const links = nodesOBJ.layers[0].models;
@@ -261,7 +263,7 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODE", 404);
   }
 
-  const nodeResponse = await processNode(node, body);
+  const nodeResponse = await processNode(node, { ...body, variables });
 
   const linkId = getLink("out", node, nodeResponse);
   const link = links[linkId];
@@ -270,6 +272,7 @@ const StartFlowService = async ({
     if (node.type === "end-node") {
       await session.update({
         nodeId: null,
+        variables: null
       });
   
       return {
@@ -305,7 +308,7 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body,
+      body: { ...body, variables },
     })
   }
 
@@ -314,7 +317,7 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body
+      body: { ...body, variables }
     });
   }
 
@@ -323,7 +326,22 @@ const StartFlowService = async ({
       flowNodeId,
       sessionId,
       companyId,
-      body: { ...nodeResponse }
+      body: { ...nodeResponse, ...body, variables }
+    });
+  }
+
+  if (node.type === "save-variable-node") {
+    const variablesOBJ = { ...nodeResponse.variables, ...variables }
+
+    await session.update({
+      variables: JSON.stringify(variablesOBJ),
+    })
+
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...body, variables: { ...variables, ...nodeResponse.variables } }
     });
   }
 

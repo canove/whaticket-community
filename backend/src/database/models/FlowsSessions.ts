@@ -23,6 +23,9 @@ class FlowsSessions extends Model<FlowsSessions> {
   @Column
   nodeId: string;
 
+  @Column
+  variables: string;
+
   @ForeignKey(() => Company)
   @Column
   companyId: number;
