@@ -81,6 +81,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [flows, setFlows] = useState([]);
 	const [flow, setFlow] = useState("");
+	const [connectionFiles, setConnectionFiles] = useState("");
+	const [connectionFile, setConnectionFile] = useState("");
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -90,7 +92,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				const { data } = await api.get(`whatsapp/${whatsAppId}`);
 				setWhatsApp(data);
 				setFlow(data.flowId);
-
+				setConnectionFile(data.connectionFileId);
 				const whatsQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(whatsQueueIds);
 			} catch (err) {
@@ -107,12 +109,27 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			}
 		}
 
+		const fetchConnectionFiles = async () => {
+			try {
+				const { data } = await api.get('connectionFiles');
+				setConnectionFiles(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
 		fetchSession();
 		fetchFlows();
+		fetchConnectionFiles();
 	}, [whatsAppId]);
 
 	const handleSaveWhatsApp = async values => {
-		const whatsappData = { ...values, queueIds: selectedQueueIds, flowId: flow ? flow : null };
+		const whatsappData = {
+			...values,
+			queueIds: selectedQueueIds,
+			flowId: flow ? flow : null,
+			connectionFileId: connectionFile ? connectionFile : null
+		};
 
 		try {
 			if (whatsAppId) {
@@ -134,6 +151,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 
 	const handleFlowChange = (e) => {
 		setFlow(e.target.value);
+	}
+
+	const handleConnectionFileChange = (e) => {
+		setConnectionFile(e.target.value);
 	}
 
 	return (
@@ -225,6 +246,28 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										variant="outlined"
 										margin="dense"
 									/>
+								</div>
+								<div>
+									<FormControl
+										variant="outlined"
+										className={classes.multFieldLine}
+										margin="dense"
+										fullWidth
+									>
+										<InputLabel>Categoria</InputLabel>
+										<Select
+											value={connectionFile}
+											onChange={(e) => { handleConnectionFileChange(e) }}
+											label="Categoria"
+										>
+											<MenuItem value={""}>Nenhum</MenuItem>
+											{ connectionFiles && connectionFiles.map(connectionFile => {
+												return (
+													<MenuItem value={connectionFile.id} key={connectionFile.id}>{connectionFile.name}</MenuItem>
+												)
+											}) }
+										</Select>
+									</FormControl>
 								</div>
 								<div>
 									<FormControl

@@ -270,18 +270,6 @@ const StartFlowService = async ({
   const link = links[linkId];
 
   if (!link) {
-    if (node.type === "end-node") {
-      await session.update({
-        nodeId: null,
-        variables: null
-      });
-  
-      return {
-        status: "END_OF_THE_FLOW",
-        sessionId: sessionId
-      }
-    }
-
     return {
       ...nodeResponse, 
       sessionId: session.id,
@@ -302,6 +290,13 @@ const StartFlowService = async ({
   } else {
     await session.update({
       nodeId: nextNode.id,
+    });
+  }
+
+  if (nextNode.type === "end-node") {
+    await session.update({
+      nodeId: null,
+      variables: null
     });
   }
 

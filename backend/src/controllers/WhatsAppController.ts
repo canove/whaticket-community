@@ -25,6 +25,7 @@ import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUp
 type ListQuery = {
   pageNumber: string | number;
   official: string | boolean;
+  connectionFileName?: string;
 };
 
 interface WhatsappData {
@@ -40,6 +41,7 @@ interface WhatsappData {
   phoneNumber?: string;
   companyId?: string | number;
   flowId?: string | number;
+  connectionFileId?: string | number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -62,7 +64,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     facebookToken,
     facebookPhoneNumberId,
     phoneNumber,
-    flowId
+    flowId,
+    connectionFileId
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -96,7 +99,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     facebookPhoneNumberId,
     phoneNumber,
     companyId,
-    flowId
+    flowId,
+    connectionFileId
   });
 
   StartWhatsAppSession(whatsapp);
@@ -175,12 +179,13 @@ export const remove = async (
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official, pageNumber } = req.query as ListQuery;
+  const { official, pageNumber, connectionFileName } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { whatsapps, count, hasMore } = await ListOfficialWhatsAppsService({
     companyId,
     official,
+    connectionFileName,
     pageNumber
   });
 

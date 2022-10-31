@@ -1,10 +1,12 @@
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
+import ShowConnectionFileByNameService from "../ConnectionFileService/ShowConnectionFileByNameService";
 
 interface Request {
   companyId: string | number;
   official: string | boolean;
   pageNumber: string | number;
+  connectionFileName?: string;
 }
 
 interface Response {
@@ -16,21 +18,29 @@ interface Response {
 const ListWhatsAppsService = async ({
   companyId,
   official,
+  connectionFileName,
   pageNumber = 1
 }: Request): Promise<Response> => {
-  let isOfficial = "";
-
-  if (official === "true") {
-    isOfficial = "1";
-  } else {
-    isOfficial = "0";
-  }
+  const isOfficial = official === "true";
 
   const limit = 10;
   const offset = limit * (+pageNumber - 1);
 
+  let connectionFile = null;
+  if (connectionFileName && connectionFileName !== "No Category") {
+    connectionFile = await ShowConnectionFileByNameService(
+      connectionFileName,
+      companyId
+    );
+  }
+
   const { count, rows: whatsapps } = await Whatsapp.findAndCountAll({
-    where: { official: isOfficial, companyId, deleted: false },
+    where: {
+      official: isOfficial,
+      companyId,
+      deleted: false,
+      connectionFileId: connectionFile ? connectionFile.id : null
+    },
     limit,
     offset,
     include: [

@@ -10,7 +10,7 @@ import {
   Unique,
   Default,
   BelongsToMany,
-  HasMany,
+  HasMany
 } from "sequelize-typescript";
 import Menu from "./Menu";
 import MenuCompanies from "./MenuCompanies";
