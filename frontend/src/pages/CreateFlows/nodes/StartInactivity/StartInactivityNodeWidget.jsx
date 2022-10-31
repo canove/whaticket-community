@@ -1,28 +1,22 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField, MenuItem, Select, InputLabel, FormControl } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField } from '@material-ui/core';
+import SettingsIcon from "@material-ui/icons/Settings";
 import { PortWidget } from "@projectstorm/react-diagrams";
 
-import { Settings } from "@material-ui/icons/";
-import { IoIosSave } from 'react-icons/io';
+import toastError from "../../../../errors/toastError";
+import api from "../../../../services/api";
 
-const defaultSave = {
-	"variableName": "{{ param }}",
-}
+import { AiOutlineFieldTime } from 'react-icons/ai';
 
-export class SaveVariableNodeWidget extends React.Component {
+export class StartInactivityNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 		  modalOpen: false,
-		  save: props.node.save ? props.node.save : JSON.stringify(defaultSave, null, 4),
+		  inactivityTime: props.node.inactivityTime ? "0" : props.node.inactivityTime
 		};
 	}
-
-	handleSaveChange = async (e) => {
-		this.setState({ save: e.target.value });
-		this.props.node.save = e.target.value;
-	};
 
 	render() {
 		return (
@@ -34,25 +28,22 @@ export class SaveVariableNodeWidget extends React.Component {
 					scroll="paper"
 				>
 				<DialogTitle id="form-dialog-title">
-					Save Variables
+					Start Inactivity
 				</DialogTitle>
 				<DialogContent>
 					<div>
-						Para usar os parametros salvos, use: {'{{ variables.variableName }}'}
-					</div>
-					<div>
 						<TextField
 							as={TextField}
-							label="Save"
-							name="Save"
-							value={this.state.save}
-							multiline
-							minRows={16}
-							maxLength="1024"
+							name="time"
 							variant="outlined"
 							margin="normal"
+							label="Time (minutes)"
 							fullWidth
-							onChange={(e) => { this.handleSaveChange(e) }}
+							value={this.state.inactivityTime}
+							onChange={(e) => {
+								this.setState({ inactivityTime: e.target.value });
+								this.props.node.inactivityTime = e.target.value;
+							}}
 						/>
 					</div>
 				</DialogContent>
@@ -87,19 +78,19 @@ export class SaveVariableNodeWidget extends React.Component {
 								padding: "10px",
 							}}
 						>
-							Save Variables
+							Start Inactivity
 						</Typography>
 						<IconButton
 							onClick={() => {
 								this.setState({ modalOpen: true });
 							}}
 						>
-							<Settings />
+							<SettingsIcon />
 						</IconButton>
 					</div>
 					<div 
 						style={{
-							minHeight: "110px",
+							minHeight: "100px",
 						}}
 					>
 						<PortWidget
@@ -124,14 +115,33 @@ export class SaveVariableNodeWidget extends React.Component {
 								height: "16px",
 								position: "absolute",
 								right: "-8px",
-								top: "50%",
+								top: "40%",
 								width: "16px",
 							}}
 							engine={this.props.engine}
-							port={this.props.node.getPort('out')}
+							port={this.props.node.getPort('out-1')}
 						>
 						</PortWidget>
-						<IoIosSave
+						<PortWidget
+							style={{
+								backgroundColor: "#A30000",
+								border: "2px solid #075E54",
+								borderRadius: "100%",
+								cursor: "pointer",
+								height: "16px",
+								position: "absolute",
+								right: "-8px",
+								top: "80%",
+								width: "16px",
+							}}
+							engine={this.props.engine}
+							port={this.props.node.getPort('out-2')}
+						>
+							{/* <div style={{ display: "flex", minWidth: "80px", backgroundColor: "orange" }}>
+								{ this.state.inactivityTime } min
+							</div> */}
+						</PortWidget>
+						<AiOutlineFieldTime
 							style={{
 								display: "block",
 								height: "50px",
@@ -140,7 +150,7 @@ export class SaveVariableNodeWidget extends React.Component {
 								top: "50%",
 								width: "50px",
 							}}
-						/>  
+						/> 
 					</div>
 				</div>
 			</div>

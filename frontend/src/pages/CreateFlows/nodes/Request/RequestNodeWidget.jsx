@@ -174,7 +174,7 @@ export class RequestNodeWidget extends React.Component {
 						<PortWidget
 							style={{
 								cursor: "pointer",
-								height: "48px",
+								height: "100%",
 								left: "0",
 								position: "absolute",
 								top: "0",
