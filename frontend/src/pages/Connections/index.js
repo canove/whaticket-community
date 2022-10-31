@@ -1,4 +1,6 @@
 import React, { useState, useCallback, useEffect, useReducer, useContext } from "react";
+import { useParams, useHistory } from "react-router-dom";
+
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -17,6 +19,11 @@ import {
 	Tooltip,
 	Typography,
 	CircularProgress,
+	Card,
+	CardContent,
+	CardActionArea,
+	CardMedia,
+	CardActions,
 } from "@material-ui/core";
 import {
 	Edit,
@@ -66,6 +73,23 @@ const useStyles = makeStyles(theme => ({
 	},
 	buttonProgress: {
 		color: green[500],
+	},
+	cardRoot: {
+		maxWidth: 300,
+		minWidth: 300,
+		minHeight: 212,
+		margin: "16px",
+	  },
+	cardMedia: {
+		height: 140,
+	},
+	cardsPaper: {
+		display: "flex",
+		padding: theme.spacing(1),
+		overflowY: "scroll",
+		...theme.scrollbarStyles,
+		flexWrap: "wrap",
+		justifyContent: "start",
 	},
 }));
 
@@ -165,6 +189,14 @@ const Connections = () => {
 	const [hasMore, setHasMore] = useState(false);
 	const { user } = useContext(AuthContext);
 
+	const { connectionFileName } = useParams();
+	const history = useHistory();
+	const [connectionFiles, setConnectionFiles] = useState([]);
+
+	useEffect(() => {
+		console.log(connectionFileName);
+	}, [connectionFileName])
+
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 	}, []);
@@ -174,7 +206,7 @@ const Connections = () => {
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/list/`, {
-					params: { official: false, pageNumber }
+					params: { official: false, pageNumber, connectionFileName }
 				});
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
 				setCount(data.count);
@@ -185,8 +217,24 @@ const Connections = () => {
 				toastError(err);
 			}
 		};
+
 		fetchWhats();
-	}, [pageNumber]);
+	}, [pageNumber, connectionFileName]);
+
+	useEffect(() => {
+		const fetchConnectionFiles = async () => {
+			try {
+				const { data } = await api.get(`/connectionFiles/`);
+				setConnectionFiles(data);
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+				toastError(err);
+			}
+		};
+
+		fetchConnectionFiles();
+	}, [])
 
 	useEffect(() => {
 		const socket = openSocket();
@@ -394,134 +442,173 @@ const Connections = () => {
 	};
 
 	return (
-		<MainContainer>
-			<ConfirmationModal
-				title={confirmModalInfo.title}
-				open={confirmModalOpen}
-				onClose={setConfirmModalOpen}
-				onConfirm={handleSubmitConfirmationModal}
-			>
-				{confirmModalInfo.message}
-			</ConfirmationModal>
-			<QrcodeModal
-				open={qrModalOpen}
-				onClose={handleCloseQrModal}
-				whatsAppId={!whatsAppModalOpen && selectedWhatsApp?.id}
-			/>
-			<WhatsAppModal
-				open={whatsAppModalOpen}
-				onClose={handleCloseWhatsAppModal}
-				whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
-			/>
-			<MainHeader>
-				<Title>{i18n.t("connections.title")}</Title>
-				<MainHeaderButtonsWrapper>
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={handleOpenWhatsAppModal}
+		<>
+			{ !connectionFileName && 
+				<MainContainer>
+					<MainHeader>
+						<Title>Conexões</Title>
+					</MainHeader>
+					<Paper className={classes.cardsPaper} variant="outlined">
+						{ connectionFiles && connectionFiles.map(connectionFile => (
+							<Card key={connectionFile.id} className={classes.cardRoot} onClick={() => { history.push(`/Connections/${connectionFile.name}`); }}>
+								<CardActionArea style={{ height: "100%" }}>
+									{ connectionFile.icon &&
+										<CardMedia
+											className={classes.cardMedia}
+											image={connectionFile.icon}
+										/>
+									}
+									<CardContent>
+										<Typography gutterBottom variant="h5" component="h2" style={{ textAlign: "center" }} >
+											{ connectionFile.name }
+										</Typography>
+									</CardContent>
+								</CardActionArea>
+							</Card>
+						))}
+						<Card className={classes.cardRoot} onClick={() => { history.push('/Connections/No Category'); }}>
+							<CardActionArea style={{ height: "100%" }} >
+								<CardContent>
+									<Typography gutterBottom variant="h5" component="h2" style={{ textAlign: "center" }} >
+										No Category
+									</Typography>
+								</CardContent>
+							</CardActionArea>
+						</Card>
+					</Paper>
+				</MainContainer>
+			}
+			{ connectionFileName && 
+				<MainContainer>
+					<ConfirmationModal
+						title={confirmModalInfo.title}
+						open={confirmModalOpen}
+						onClose={setConfirmModalOpen}
+						onConfirm={handleSubmitConfirmationModal}
 					>
-						{i18n.t("connections.buttons.add")}
-					</Button>
-				</MainHeaderButtonsWrapper>
-			</MainHeader>
-			<Paper className={classes.mainPaper} variant="outlined">
-				<Table size="small">
-					<TableHead>
-						<TableRow>
-							<TableCell align="center">
-								{i18n.t("connections.table.name")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.status")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.session")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.lastUpdate")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.default")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.actions")}
-							</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{loading ? (
-							<TableRowSkeleton columns={6} />
-						) : (
-							<>
-								{whatsApps?.length > 0 &&
-									whatsApps.map(whatsApp => (
-										<TableRow key={whatsApp.id}>
-											<TableCell align="center">{whatsApp.name}</TableCell>
-											<TableCell align="center">
-												{renderStatusToolTips(whatsApp)}
-											</TableCell>
-											<TableCell align="center">
-												{renderActionButtons(whatsApp)}
-											</TableCell>
-											<TableCell align="center">
-												{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
-											</TableCell>
-											<TableCell align="center">
-												{whatsApp.isDefault && (
-													<div className={classes.customTableCell}>
-														<CheckCircle style={{ color: green[500] }} />
-													</div>
-												)}
-											</TableCell>
-											<TableCell align="center">
-												<IconButton
-													size="small"
-													onClick={() => handleEditWhatsApp(whatsApp)}
-												>
-													<Edit />
-												</IconButton>
-
-												<IconButton
-													size="small"
-													onClick={e => {
-														handleOpenConfirmationModal("delete", whatsApp.id);
-													}}
-												>
-													<DeleteOutline />
-												</IconButton>
-											</TableCell>
-										</TableRow>
-									))}
-							</>
-						)}
-					</TableBody>
-				</Table>
-				<div
-					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
-				>
-					<Button
-						variant="outlined"
-						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
-						disabled={ pageNumber === 1}
-					>
-						{i18n.t("connections.buttons.previousPage")}
-					</Button>
-					<Typography
-						style={{ display: "inline-block", fontSize: "1.25rem" }}
-					>
-						{ pageNumber } / { Math.ceil(count / 10) }
-					</Typography>
-					<Button
-						variant="outlined"
-						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
-						disabled={ !hasMore }
-					>
-						{i18n.t("connections.buttons.nextPage")}
-					</Button>
-				</div>
-			</Paper>
-		</MainContainer>
+						{confirmModalInfo.message}
+					</ConfirmationModal>
+					<QrcodeModal
+						open={qrModalOpen}
+						onClose={handleCloseQrModal}
+						whatsAppId={!whatsAppModalOpen && selectedWhatsApp?.id}
+					/>
+					<WhatsAppModal
+						open={whatsAppModalOpen}
+						onClose={handleCloseWhatsAppModal}
+						whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
+					/>
+					<MainHeader>
+						<Title>{i18n.t("connections.title")}</Title>
+						<MainHeaderButtonsWrapper>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={handleOpenWhatsAppModal}
+							>
+								{i18n.t("connections.buttons.add")}
+							</Button>
+						</MainHeaderButtonsWrapper>
+					</MainHeader>
+					<Paper className={classes.mainPaper} variant="outlined">
+						<Table size="small">
+							<TableHead>
+								<TableRow>
+									<TableCell align="center">
+										{i18n.t("connections.table.name")}
+									</TableCell>
+									<TableCell align="center">
+										{i18n.t("connections.table.status")}
+									</TableCell>
+									<TableCell align="center">
+										{i18n.t("connections.table.session")}
+									</TableCell>
+									<TableCell align="center">
+										{i18n.t("connections.table.lastUpdate")}
+									</TableCell>
+									<TableCell align="center">
+										{i18n.t("connections.table.default")}
+									</TableCell>
+									<TableCell align="center">
+										{i18n.t("connections.table.actions")}
+									</TableCell>
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{loading ? (
+									<TableRowSkeleton columns={6} />
+								) : (
+									<>
+										{whatsApps?.length > 0 &&
+											whatsApps.map(whatsApp => (
+												<TableRow key={whatsApp.id}>
+													<TableCell align="center">{whatsApp.name}</TableCell>
+													<TableCell align="center">
+														{renderStatusToolTips(whatsApp)}
+													</TableCell>
+													<TableCell align="center">
+														{renderActionButtons(whatsApp)}
+													</TableCell>
+													<TableCell align="center">
+														{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
+													</TableCell>
+													<TableCell align="center">
+														{whatsApp.isDefault && (
+															<div className={classes.customTableCell}>
+																<CheckCircle style={{ color: green[500] }} />
+															</div>
+														)}
+													</TableCell>
+													<TableCell align="center">
+														<IconButton
+															size="small"
+															onClick={() => handleEditWhatsApp(whatsApp)}
+														>
+															<Edit />
+														</IconButton>
+		
+														<IconButton
+															size="small"
+															onClick={e => {
+																handleOpenConfirmationModal("delete", whatsApp.id);
+															}}
+														>
+															<DeleteOutline />
+														</IconButton>
+													</TableCell>
+												</TableRow>
+											))}
+									</>
+								)}
+							</TableBody>
+						</Table>
+						<div
+							style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+						>
+							<Button
+								variant="outlined"
+								onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+								disabled={ pageNumber === 1}
+							>
+								{i18n.t("connections.buttons.previousPage")}
+							</Button>
+							<Typography
+								style={{ display: "inline-block", fontSize: "1.25rem" }}
+							>
+								{ pageNumber } / { Math.ceil(count / 10) }
+							</Typography>
+							<Button
+								variant="outlined"
+								onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+								disabled={ !hasMore }
+							>
+								{i18n.t("connections.buttons.nextPage")}
+							</Button>
+						</div>
+					</Paper>
+				</MainContainer>
+			}
+		</>
 	);
 };
 
