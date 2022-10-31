@@ -74,7 +74,6 @@ const Templates = () => {
     templateName: "",
 		open: false,
 	};
-  ;
   const [confirmModalInfo, setConfirmModalInfo] = useState(confirmationModalInitialState);
 
   const handleTemplateModal = () => {

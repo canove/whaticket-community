@@ -14,6 +14,7 @@ import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel } from '
 import { CustomDeleteItemsAction } from './components/CustomDeleteItemsAction';
 import { SaveVariableNodeFactory } from './nodes/SaveVariable/SaveVariableNodeFactory';
 import { EndNodeFactory } from './nodes/End/EndNodeFactory';
+import { StartInactivityNodeFactory } from './nodes/StartInactivity/StartInactivityNodeFactory';
 
 export class Application {
 	constructor() {
@@ -31,6 +32,7 @@ export class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new RequestNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new SaveVariableNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new EndNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new StartInactivityNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());

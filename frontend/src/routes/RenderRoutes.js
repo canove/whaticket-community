@@ -31,6 +31,7 @@ import Category from "../pages/Category";
 import DialogFlows from "../pages/DialogFlows";
 import Flows from "../pages/Flows";
 import CreateFlows from "../pages/CreateFlows";
+import ConnectionFiles from "../pages/ConnectionFiles";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -125,6 +126,9 @@ const RenderRoutes = () => {
         if (name === "Flows") {
             return Flows
         }
+        if (name === "Connection Files") {
+            return ConnectionFiles
+        }
     }
 
     return (
@@ -154,6 +158,17 @@ const RenderRoutes = () => {
                                 key={menu.id}
                                 exact
                                 path={`/tickets/:ticketId?`}
+                                component={getComponent(menu.name)}
+                                isPrivate
+                            />
+                        )
+                    }
+                    if (menu.name === "Connections") {
+                        return (
+                            <Route
+                                key={menu.id}
+                                exact
+                                path={`/connections/:connectionFileName?`}
                                 component={getComponent(menu.name)}
                                 isPrivate
                             />

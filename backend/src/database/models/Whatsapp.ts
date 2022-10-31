@@ -76,6 +76,9 @@ class Whatsapp extends Model<Whatsapp> {
   facebookPhoneNumberId: string;
 
   @Column
+  connectionFileId: string;
+
+  @Column
   phoneNumber: string;
 
   @ForeignKey(() => Company)

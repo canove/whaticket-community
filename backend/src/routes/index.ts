@@ -30,6 +30,7 @@ import historicRoutes from "./historicRoutes";
 import billingsRoutes from "./billingsRoutes";
 import categoryRoutes from "./categoryRoutes";
 import flowsRoutes from "./flowsRoutes";
+import connectionFilesRoutes from "./connectionFilesRoutes";
 
 const routes = Router();
 
@@ -58,10 +59,11 @@ routes.use(menuRoutes);
 routes.use(templateDataRoutes);
 routes.use(productRoutes);
 routes.use(pricingRoutes);
-routes.use(integratedImportRoutes)
+routes.use(integratedImportRoutes);
 routes.use(historicRoutes);
 routes.use(billingsRoutes);
 routes.use(categoryRoutes);
 routes.use(flowsRoutes);
+routes.use(connectionFilesRoutes);
 
 export default routes;
