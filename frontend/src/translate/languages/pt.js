@@ -144,7 +144,7 @@ const messages = {
           edit: "Editar WhatsApp",
         },
         form: {
-          name: "Nome",
+          name: "Telefone",
           default: "Padrão",
           farewellMessage: "Mensagem de despedida",
         },

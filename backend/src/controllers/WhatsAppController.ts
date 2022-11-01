@@ -190,7 +190,7 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
   const { official, pageNumber, connectionFileName } = req.query as ListQuery;
   const { companyId } = req.user;
 
-  const { whatsapps, count, hasMore } = await ListOfficialWhatsAppsService({
+  const { whatsapps, count, hasMore, connectionFileId } = await ListOfficialWhatsAppsService({
     companyId,
     official,
     connectionFileName,
@@ -200,7 +200,8 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json({
     whatsapps,
     count,
-    hasMore
+    hasMore,
+    connectionFileId
   });
 };
 

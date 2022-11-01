@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
 	  },
 }));
 
-const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
+const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
@@ -70,11 +70,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 		official: false
 	};
 
+	const cellRegExp = /^(?:\+)[0-9]{2}\s?(?:\()[0-9]{2}(?:\))\s?[0-9]{4,5}(?:-)[0-9]{4}$/;
+
 	const SessionSchema = Yup.object().shape({
-	name: Yup.string()
-		.min(2, `${i18n.t("whatsappModal.short")}`)
-		.max(50, `${i18n.t("whatsappModal.long")}`)
-		.required(`${i18n.t("whatsappModal.required")}`),
+		name: Yup.string().matches(cellRegExp, 'Telefone não valido'),
 	});
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
@@ -118,10 +117,12 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			}
 		}
 
+		setConnectionFile(connectionFileId);	
+
 		fetchSession();
 		fetchFlows();
 		fetchConnectionFiles();
-	}, [whatsAppId]);
+	}, [whatsAppId, connectionFileId, open]);
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = {
@@ -145,8 +146,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	};
 
 	const handleClose = () => {
-		onClose();
+		setFlow("");
+		setConnectionFile("");
 		setWhatsApp(initialState);
+		onClose();
 	};
 
 	const handleFlowChange = (e) => {
@@ -195,6 +198,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
+										placeholder="+55 (XX) 9999-9999"
 										className={classes.textField}
 									/>
 									<FormControlLabel
