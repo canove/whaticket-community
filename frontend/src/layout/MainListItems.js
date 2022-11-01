@@ -451,6 +451,9 @@ const MainListItems = (props) => {
     if (name === "Flows") {
       return i18n.t("mainDrawer.listItems.flows");
     }
+    if (name === "Connection Files") {
+      return i18n.t("mainDrawer.listItems.connectionFiles");
+    }
 
     return name;
   }

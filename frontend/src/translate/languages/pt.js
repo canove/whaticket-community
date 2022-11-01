@@ -346,7 +346,7 @@ const messages = {
           pricing: "Precificação",
           payments: "Pagamentos",
           flows: "Fluxo",
-
+          connectionFiles: "Categorias",
         },
         whatsApp: {
           connections: "Conexões",
