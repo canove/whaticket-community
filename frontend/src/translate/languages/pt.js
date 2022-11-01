@@ -1164,6 +1164,32 @@ const messages = {
         toTalk: "Conversar",
       },
 
+      connectionsFiles: {
+        title: "Categorias",
+        buttons: {
+          create: "Criar",
+        },
+        categories: {
+          noCategory: "Não Categorizado"
+        },
+        table: {
+          icon: "Icone",
+          name: "Nome",
+          createdAt: "Criado em",
+          updatedAt: "Atualizado em",
+          actions: "Ações"
+        },
+        modal: {
+          create: "Criar",
+          edit: "Editar",
+          name: "Nome",
+          file: "Arquivo",
+          removeIcon: "Remover Icone",
+          save: "Salvar",
+          cancel: "Cancelar",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:

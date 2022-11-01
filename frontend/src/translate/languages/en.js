@@ -1159,6 +1159,32 @@ const messages = {
         toTalk: "To Talk",
       },
 
+      connectionsFiles: {
+        title: "Categories",
+        buttons: {
+          create: "Create",
+        },
+        categories: {
+          noCategory: "Not Categorized"
+        },
+        table: {
+          icon: "Icon",
+          name: "Name",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+          actions: "Actions"
+        },
+        modal: {
+          create: "Create",
+          edit: "Edit",
+          name: "Name",
+          file: "File",
+          removeIcon: "Remove Icon",
+          save: "Save",
+          cancel: "Cancel",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",

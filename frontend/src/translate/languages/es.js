@@ -1162,6 +1162,32 @@ const messages = {
         toTalk: "Hablar",
       },
 
+      connectionsFiles: {
+        title: "Categories",
+        buttons: {
+          create: "Create",
+        },
+        categories: {
+          noCategory: "No Categorizado"
+        },
+        table: {
+          icon: "Icon",
+          name: "Name",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+          actions: "Actions"
+        },
+        modal: {
+          create: "Create",
+          edit: "Edit",
+          name: "Name",
+          file: "File",
+          removeIcon: "Remove Icon",
+          save: "Save",
+          cancel: "Cancel",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
