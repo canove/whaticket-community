@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { QueryTypes } from "sequelize";
-import Message from "../database/models/Message";
+import ListReportService from "../services/ReportTalkService/ListReportService";
 
 const fs = require("fs");
 const pdf = require("pdf-creator-node");
@@ -10,6 +9,13 @@ type IndexQuery = {
   userId: number;
   initialDate: string;
   finalDate: string;
+  id: number;
+  body: string;
+  mediaUrl: string;
+  read: number | boolean;
+  companyId?: number;
+  number?: string;
+  ticketId?: number;
 };
 
 type Report = {
@@ -19,35 +25,22 @@ type Report = {
   ticketId: number;
   createdAt: Date;
   read: number | boolean;
+  number: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<void> => {
-  const {
-    userId = "",
-    initialDate = "",
-    finalDate = ""
-  } = req.query as unknown as IndexQuery;
+  const {id, body, mediaUrl, ticketId, read, initialDate, finalDate, number, userId } = req.query as unknown as IndexQuery;
   const { companyId } = req.user;
-
-  const reports: Array<Report> = await Message.sequelize?.query(
-    `
-        select
-	        msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
-        from
-	        whaticket.Messages as msg
-        inner join
-	        whaticket.Tickets as tickets on msg.ticketId = tickets.id
-        where
-	        tickets.userId = ${userId}
-        and
-            msg.createdAt >= '${initialDate} dd/MM/yy HH:mm'
-        and
-	        msg.createdAt <= '${finalDate} dd/MM/yy HH:mm'
-        and
-            tickets.companyId = ${companyId}
-    `,
-    { type: QueryTypes.SELECT }
-  );
+  const response = await ListReportService({
+    id,
+    body,
+    mediaUrl,
+    ticketId,
+    read,
+    companyId,
+    number,
+    userId,
+ });
 
   const checkZero = data => {
     if (data.length == 1) {
@@ -78,19 +71,20 @@ export const index = async (req: Request, res: Response): Promise<void> => {
 
   const getReportData = () => {
     let text = "";
-    reports.forEach((report: Report) => {
+    response.messages.forEach((report) => {
       const { id } = report;
       const { body } = report;
       const read = isRead(report.read);
+      const number = (report.contact.number)
       const mediaUrl = report.mediaUrl ? report.mediaUrl : "";
-      const { ticketId } = report;
+      const ticketId  = report.ticket.id;
       const createdAt = formatDate(report.createdAt);
-
       text += `
                 <tr>
                     <td style="border: 1px solid black">${id}</td>
                     <td style="border: 1px solid black">${body}</td>
                     <td style="border: 1px solid black">${read}</td>
+                    <td style="border: 1px solid black">${number}</td>
                     <td style="border: 1px solid black">${mediaUrl}</td>
                     <td style="border: 1px solid black">${ticketId}</td>
                     <td style="border: 1px solid black">${createdAt}</td>
@@ -112,12 +106,14 @@ export const index = async (req: Request, res: Response): Promise<void> => {
             <h2>User ID: ${userId}</h2>
             <h2>Initial Date: ${initialDate}</h2>
             <h2>Final Date: ${finalDate}</h2>
+            <h2>NUmber: ${number}</h2>
             <table style="border: 1px solid black; border-collapse: collapse;">
                 <thead>
                     <tr>
                         <td style="border: 1px solid black">ID</td>
                         <td style="border: 1px solid black">Body</td>
                         <td style="border: 1px solid black">Read</td>
+                        <td style="border: 1px solid black">Number</td>
                         <td style="border: 1px solid black">Media URL</td>
                         <td style="border: 1px solid black">Ticket ID</td>
                         <td style="border: 1px solid black">Created At</td>
@@ -147,7 +143,7 @@ export const index = async (req: Request, res: Response): Promise<void> => {
   const documento = {
     html,
     data: {
-      reports
+      reports: response.messages
     },
     path: "./src/downloads/output.pdf",
     type: ""
