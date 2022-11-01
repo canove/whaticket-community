@@ -16,6 +16,7 @@ interface WhatsappData {
   queueIds?: number[];
   official?: boolean;
   facebookToken?: string;
+  facebookBusinessId?: string;
   facebookPhoneNumberId?: string;
   phoneNumber?: string;
   flowId?: string | number;
@@ -55,6 +56,7 @@ const UpdateWhatsAppService = async ({
     official,
     facebookToken,
     facebookPhoneNumberId,
+    facebookBusinessId,
     phoneNumber,
     flowId,
     connectionFileId
@@ -97,6 +99,7 @@ const UpdateWhatsAppService = async ({
     official,
     facebookToken,
     facebookPhoneNumberId,
+    facebookBusinessId,
     phoneNumber,
     flowId,
     connectionFileId
