@@ -27,6 +27,9 @@ import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
 import { useTranslation } from "react-i18next";
 
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input/input'
+
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
@@ -70,11 +73,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		official: false
 	};
 
-	const cellRegExp = /^(?:\+)[0-9]{2}\s?(?:\()[0-9]{2}(?:\))\s?[0-9]{4,5}(?:-)[0-9]{4}$/;
-
-	const SessionSchema = Yup.object().shape({
-		name: Yup.string().matches(cellRegExp, 'Telefone não valido'),
-	});
+	const SessionSchema = Yup.object().shape({});
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -82,6 +81,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const [flow, setFlow] = useState("");
 	const [connectionFiles, setConnectionFiles] = useState("");
 	const [connectionFile, setConnectionFile] = useState("");
+	const [phoneNumber, setPhoneNumber] = useState("");
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -129,9 +129,11 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			...values,
 			queueIds: selectedQueueIds,
 			flowId: flow ? flow : null,
-			connectionFileId: connectionFile ? connectionFile : null
+			connectionFileId: connectionFile ? connectionFile : null,
+			name: phoneNumber.replace("+", ""),
 		};
-
+		console.log(whatsappData.name);
+		return;
 		try {
 			if (whatsAppId) {
 				await api.put(`/whatsapp/${whatsAppId}`, whatsappData);
@@ -148,6 +150,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const handleClose = () => {
 		setFlow("");
 		setConnectionFile("");
+		setPhoneNumber("");
 		setWhatsApp(initialState);
 		onClose();
 	};
@@ -159,6 +162,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const handleConnectionFileChange = (e) => {
 		setConnectionFile(e.target.value);
 	}
+
+	const handlePhoneNumberChange = (value) => {
+        setPhoneNumber(value);
+    }
 
 	return (
 		<div className={classes.root}>
@@ -188,7 +195,44 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 					{({ values, touched, errors, isSubmitting }) => (
 						<Form>
 							<DialogContent dividers>
-								<div className={classes.multFieldLine}>
+								<FormControl
+									variant="outlined"
+									margin="dense"
+									fullWidth
+									style={{
+										display: "flex",
+										flexDirection: "row",
+										flexWrap: "wrap",
+									}}
+								>
+									<div
+										style={{
+											border: "1px solid rgba(0, 0, 0, 0.5)",
+											borderRadius: "2%",
+											display: "flex",
+											fontSize: "16px",
+											marginRight: "8px",
+											padding: "16px",
+											textAlign: "center",
+											width: "10%",
+										}}
+									>
+										+55
+									</div>
+									<PhoneInput
+										style={{
+											display: "inline-block",
+											fontSize:"16px",
+											padding: "10px",
+											width: "calc(90% - 8px)",
+										}}
+										country="BR"
+										placeholder="(00) 0000-0000"
+										value={phoneNumber}
+										onChange={handlePhoneNumberChange}
+									/>
+								</FormControl>
+								{/* <div className={classes.multFieldLine}>
 									<Field
 										as={TextField}
 										label={i18n.t("whatsappModal.form.name")}
@@ -212,7 +256,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										}
 										label={i18n.t("whatsappModal.form.default")}
 									/>
-								</div>
+								</div> */}
 								<div>
 									<Field
 										as={TextField}
