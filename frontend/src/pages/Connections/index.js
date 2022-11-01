@@ -470,7 +470,7 @@ const Connections = () => {
 							<CardActionArea style={{ height: "100%" }} >
 								<CardContent>
 									<Typography gutterBottom variant="h5" component="h2" style={{ textAlign: "center" }} >
-										No Category
+										{i18n.t("connectionsFiles.categories.noCategory")}
 									</Typography>
 								</CardContent>
 							</CardActionArea>

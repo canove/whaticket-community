@@ -346,7 +346,7 @@ const messages = {
           pricing: "Precificação",
           payments: "Pagamentos",
           flows: "Fluxo",
-
+          connectionFiles: "Categorias",
         },
         whatsApp: {
           connections: "Conexões",
@@ -1162,6 +1162,32 @@ const messages = {
 
       vcardPreview: {
         toTalk: "Conversar",
+      },
+
+      connectionsFiles: {
+        title: "Categorias",
+        buttons: {
+          create: "Criar",
+        },
+        categories: {
+          noCategory: "Não Categorizado"
+        },
+        table: {
+          icon: "Icone",
+          name: "Nome",
+          createdAt: "Criado em",
+          updatedAt: "Atualizado em",
+          actions: "Ações"
+        },
+        modal: {
+          create: "Criar",
+          edit: "Editar",
+          name: "Nome",
+          file: "Arquivo",
+          removeIcon: "Remover Icone",
+          save: "Salvar",
+          cancel: "Cancelar",
+        },
       },
 
       backendErrors: {

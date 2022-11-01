@@ -121,8 +121,8 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
 			>
 				<DialogTitle id="form-dialog-title">
 					{ connectionFileId
-					 ? `Editar`
-					 : `Criar`
+					 ? `${i18n.t("connectionsFiles.modal.create")}`
+					 : `${i18n.t("connectionsFiles.modal.edit")}`
 					}
 				</DialogTitle>
 				<DialogContent dividers>
@@ -132,7 +132,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
 							name="name"
 							variant="outlined"
 							margin="dense"
-							label="Nome"
+							label={i18n.t("connectionsFiles.modal.name")}
 							fullWidth
 							value={name}
 							onChange={ handleNameChange }
@@ -140,7 +140,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
 					</div>
 					<div className={classes.multFieldLine}>
                         <TextField
-                            label={i18n.t("templatesData.modal.file")}
+                            label={i18n.t("connectionsFiles.modal.file")}
                             variant="outlined"
                             value={icon ? icon.name || icon : ""}
                             fullWidth
@@ -164,7 +164,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
                         component="label"
 						onClick={() => { setIcon("") }}
                     >
-						Remove Icon
+						{i18n.t("connectionsFiles.modal.removeIcon")}
                     </Button>
 				</DialogContent>
 				<DialogActions>
@@ -173,7 +173,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
 						color="secondary"
 						variant="outlined"
 					>
-						Cancelar
+						{i18n.t("connectionsFiles.modal.cancel")}
 					</Button>
 					<Button
                         onClick={handleSubmit}
@@ -181,8 +181,8 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
 						variant="contained"
 					>
 						{ connectionFileId
-						 ? `Salvar`
-						 : `Criar`
+						 ? `${i18n.t("connectionsFiles.modal.save")}`
+						 : `${i18n.t("connectionsFiles.modal.create")}`
 						}
 					</Button>
 				</DialogActions>

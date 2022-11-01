@@ -222,6 +222,12 @@ const StartFlowService = async ({
   companyId,
   body
 }: Request): Promise<any> => {
+  if(!sessionId) {
+    return {
+      status: "SESSION_ID_IS_REQUIRED"
+    }
+  }
+  
   const flowNodes = await FlowsNodes.findOne({
     where: {
       json: {
