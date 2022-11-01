@@ -224,14 +224,14 @@ const ConnectionFiles = () => {
 				connectionFileId={selectedConnectionFile?.id}
 			/>
 			<MainHeader>
-				<Title>Connection Files</Title>
+				<Title>{i18n.t("connectionsFiles.title")}</Title>
 				<MainHeaderButtonsWrapper>
 					<Button
 						variant="contained"
 						color="primary"
 						onClick={handleOpenConnectionFileModal}
 					>
-						Criar
+						{i18n.t("connectionsFiles.buttons.create")}
 					</Button>
 				</MainHeaderButtonsWrapper>
 			</MainHeader>
@@ -240,19 +240,19 @@ const ConnectionFiles = () => {
 					<TableHead>
 						<TableRow>
 							<TableCell align="center">
-								Icone
+								{i18n.t("connectionsFiles.table.icon")}
 							</TableCell>
 							<TableCell align="center">
-								Name
+								{i18n.t("connectionsFiles.table.name")}
 							</TableCell>
 							<TableCell align="center">
-								Created At
+								{i18n.t("connectionsFiles.table.createdAt")}
 							</TableCell>
 							<TableCell align="center">
-								Updated At
+								{i18n.t("connectionsFiles.table.updatedAt")}
 							</TableCell>
 							<TableCell align="center">
-								Actions
+								{i18n.t("connectionsFiles.table.actions")}
 							</TableCell>
 						</TableRow>
 					</TableHead>

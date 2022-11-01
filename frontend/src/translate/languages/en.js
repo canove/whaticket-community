@@ -345,6 +345,7 @@ const messages = {
           pricing: "Pricing",
           payments: "Payments",
           flows: "Flows",
+          connectionFiles: "Categories",
         },
         whatsApp: {
           connections: "Connections",
@@ -1157,6 +1158,32 @@ const messages = {
 
       vcardPreview: {
         toTalk: "To Talk",
+      },
+
+      connectionsFiles: {
+        title: "Categories",
+        buttons: {
+          create: "Create",
+        },
+        categories: {
+          noCategory: "Not Categorized"
+        },
+        table: {
+          icon: "Icon",
+          name: "Name",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+          actions: "Actions"
+        },
+        modal: {
+          create: "Create",
+          edit: "Edit",
+          name: "Name",
+          file: "File",
+          removeIcon: "Remove Icon",
+          save: "Save",
+          cancel: "Cancel",
+        },
       },
 
       backendErrors: {
