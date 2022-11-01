@@ -94,12 +94,12 @@ export class BodyWidget extends React.Component {
 							color="#98CEFF"
 							icon={<GiStopSign style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
-						{/* <TrayItemWidget 
+						<TrayItemWidget 
 							model={{ type: 'start-inactivity' }}
 							name="Start Inactivity"
 							color="#A30000"
 							icon={<AiOutlineFieldTime style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/> */}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {

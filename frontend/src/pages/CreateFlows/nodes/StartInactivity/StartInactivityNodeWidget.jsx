@@ -14,8 +14,15 @@ export class StartInactivityNodeWidget extends React.Component {
 		super(props);
 		this.state = {
 		  modalOpen: false,
-		  inactivityTime: props.node.inactivityTime ? "0" : props.node.inactivityTime
+		  inactivityTime: props.node.inactivityTime ? props.node.inactivityTime : "0"
 		};
+	}
+
+	handleTimeChange = (e) => {
+		const value = e.target.value.replace(/[^0-9]/gi, "");
+
+		this.setState({ inactivityTime: value });
+		this.props.node.inactivityTime = value;
 	}
 
 	render() {
@@ -40,10 +47,7 @@ export class StartInactivityNodeWidget extends React.Component {
 							label="Time (minutes)"
 							fullWidth
 							value={this.state.inactivityTime}
-							onChange={(e) => {
-								this.setState({ inactivityTime: e.target.value });
-								this.props.node.inactivityTime = e.target.value;
-							}}
+							onChange={this.handleTimeChange}
 						/>
 					</div>
 				</DialogContent>
@@ -124,22 +128,26 @@ export class StartInactivityNodeWidget extends React.Component {
 						</PortWidget>
 						<PortWidget
 							style={{
-								backgroundColor: "#A30000",
+								backgroundColor: "white",
 								border: "2px solid #075E54",
-								borderRadius: "100%",
 								cursor: "pointer",
-								height: "16px",
+								height: "auto",
 								position: "absolute",
-								right: "-8px",
-								top: "80%",
-								width: "16px",
+								right: "-2px",
+								top: "70%",
+								width: "64px",
 							}}
 							engine={this.props.engine}
 							port={this.props.node.getPort('out-2')}
 						>
-							{/* <div style={{ display: "flex", minWidth: "80px", backgroundColor: "orange" }}>
+							<div
+								style={{
+									display: "inlineBlock",
+									textAlign: "center",
+								}}
+							>
 								{ this.state.inactivityTime } min
-							</div> */}
+							</div>
 						</PortWidget>
 						<AiOutlineFieldTime
 							style={{
