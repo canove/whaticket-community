@@ -73,7 +73,12 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		official: false
 	};
 
-	const SessionSchema = Yup.object().shape({});
+	const SessionSchema = Yup.object().shape({
+		name: Yup.string()
+			.min(2, `${i18n.t("whatsappModal.short")}`)
+			.max(50, `${i18n.t("whatsappModal.long")}`)
+			.required(`${i18n.t("whatsappModal.required")}`),
+	});
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -81,7 +86,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const [flow, setFlow] = useState("");
 	const [connectionFiles, setConnectionFiles] = useState("");
 	const [connectionFile, setConnectionFile] = useState("");
-	const [phoneNumber, setPhoneNumber] = useState("");
+	// const [phoneNumber, setPhoneNumber] = useState("");
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -130,10 +135,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			queueIds: selectedQueueIds,
 			flowId: flow ? flow : null,
 			connectionFileId: connectionFile ? connectionFile : null,
-			name: phoneNumber.replace("+", ""),
+			// name: phoneNumber.replace("+", ""),
 		};
-		console.log(whatsappData.name);
-		return;
+
 		try {
 			if (whatsAppId) {
 				await api.put(`/whatsapp/${whatsAppId}`, whatsappData);
@@ -150,7 +154,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const handleClose = () => {
 		setFlow("");
 		setConnectionFile("");
-		setPhoneNumber("");
+		// setPhoneNumber("");
 		setWhatsApp(initialState);
 		onClose();
 	};
@@ -163,9 +167,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		setConnectionFile(e.target.value);
 	}
 
-	const handlePhoneNumberChange = (value) => {
-        setPhoneNumber(value);
-    }
+	// const handlePhoneNumberChange = (value) => {
+    //     setPhoneNumber(value);
+    // }
 
 	return (
 		<div className={classes.root}>
@@ -195,7 +199,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 					{({ values, touched, errors, isSubmitting }) => (
 						<Form>
 							<DialogContent dividers>
-								<FormControl
+								{/* <FormControl
 									variant="outlined"
 									margin="dense"
 									fullWidth
@@ -231,8 +235,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										value={phoneNumber}
 										onChange={handlePhoneNumberChange}
 									/>
-								</FormControl>
-								{/* <div className={classes.multFieldLine}>
+								</FormControl> */}
+								<div className={classes.multFieldLine}>
 									<Field
 										as={TextField}
 										label={i18n.t("whatsappModal.form.name")}
@@ -242,7 +246,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
-										placeholder="+55 (XX) 9999-9999"
+										// placeholder="55XX99998888"
 										className={classes.textField}
 									/>
 									<FormControlLabel
@@ -256,7 +260,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										}
 										label={i18n.t("whatsappModal.form.default")}
 									/>
-								</div> */}
+								</div>
 								<div>
 									<Field
 										as={TextField}

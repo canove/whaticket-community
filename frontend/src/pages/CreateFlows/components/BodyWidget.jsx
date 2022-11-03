@@ -23,6 +23,8 @@ import { IoIosSave } from 'react-icons/io';
 import { GiStopSign } from 'react-icons/gi';
 import { AiOutlineFieldTime } from 'react-icons/ai';
 import { StartInactivityNodeModel } from '../nodes/StartInactivity/StartInactivityNodeModel';
+import { TfiHeadphoneAlt } from "react-icons/tfi"
+import { TransferQueueNodeModel } from '../nodes/TransferQueue/TransferQueueNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -100,6 +102,12 @@ export class BodyWidget extends React.Component {
 							color="#A30000"
 							icon={<AiOutlineFieldTime style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget 
+							model={{ type: 'transfer-queue' }}
+							name="Transfer Queue"
+							color="#211F7E"
+							icon={<TfiHeadphoneAlt style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -139,6 +147,10 @@ export class BodyWidget extends React.Component {
 								node.addPort(new AdvancedPortModel(true, 'in'));
 								node.addPort(new AdvancedPortModel(false, 'out-1'));
 								node.addPort(new AdvancedPortModel(false, 'out-2'));
+							} else if (data.type === "transfer-queue") {
+								node = new TransferQueueNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								node.addPort(new AdvancedPortModel(false, 'out'));
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);
