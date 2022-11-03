@@ -15,6 +15,7 @@ import { CustomDeleteItemsAction } from './components/CustomDeleteItemsAction';
 import { SaveVariableNodeFactory } from './nodes/SaveVariable/SaveVariableNodeFactory';
 import { EndNodeFactory } from './nodes/End/EndNodeFactory';
 import { StartInactivityNodeFactory } from './nodes/StartInactivity/StartInactivityNodeFactory';
+import { TransferQueueNodeFactory } from './nodes/TransferQueue/TransferQueueNodeFactory';
 
 export class Application {
 	constructor() {
@@ -33,6 +34,7 @@ export class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new SaveVariableNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new EndNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new StartInactivityNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new TransferQueueNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());

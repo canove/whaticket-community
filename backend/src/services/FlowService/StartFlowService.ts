@@ -6,6 +6,8 @@ import FlowsNodes from "../../database/models/FlowsNodes";
 import AppError from "../../errors/AppError";
 import FlowsSessions from "../../database/models/FlowsSessions";
 import axios from "axios";
+import Contact from "../../database/models/Contact";
+import Ticket from "../../database/models/Ticket";
 
 interface Request {
   flowNodeId?: string;
@@ -43,12 +45,7 @@ const handleParams = (body: any, params: any) => {
       return false;
     }
 
-    if (Array.isArray(value)) {
-      //   let array = [];
-      //   for (const item of value) {
-      //     array.push(item[params[i]]);
-      // }
-  
+    if (Array.isArray(value)) {  
       value = value[newParams[i]];
     } else {
       value = value[newParams[i]];
@@ -58,7 +55,7 @@ const handleParams = (body: any, params: any) => {
   return value;
 }
 
-const processNode = async (node: any, body: any) => {
+const processNode = async (node: any, session: any, body: any) => {
   if (node.type === "chat-node") {
     const messageJSON = node.data.content;
     const messageOBJ = JSON.parse(messageJSON);
@@ -184,7 +181,36 @@ const processNode = async (node: any, body: any) => {
       }
     });
 
+    const variablesOBJ = { ...variables, ...body.variables }
+
+    await session.update({
+      variables: JSON.stringify(variablesOBJ),
+    })
+
     return { variables }
+  }
+
+  if (node.type === "transfer-queue-node") {
+    // const contact = await Contact.findOne({
+    //   where: {
+    //     number: session.id,
+    //     companyId: session.companyId
+    //   }
+    // });
+
+    // const ticket = await Ticket.findOne({
+    //   where: {
+    //     contactId: contact.id,
+    //     companyId: session.companyId
+    //   }
+    // })
+
+    // await ticket.update({
+    //   status: "pending",
+    //   queueId: node.queueId
+    // });
+
+    return { queueId: node.queueId };
   }
 
   return {};
@@ -270,7 +296,7 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODE", 404);
   }
 
-  const nodeResponse = await processNode(node, { ...body, variables });
+  const nodeResponse = await processNode(node, session, { ...body, variables });
 
   const linkId = getLink("out", node, nodeResponse);
   const link = links[linkId];
@@ -334,12 +360,6 @@ const StartFlowService = async ({
   }
 
   if (node.type === "save-variable-node") {
-    const variablesOBJ = { ...nodeResponse.variables, ...variables }
-
-    await session.update({
-      variables: JSON.stringify(variablesOBJ),
-    })
-
     return await StartFlowService({
       flowNodeId,
       sessionId,

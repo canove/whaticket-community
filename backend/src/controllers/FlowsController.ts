@@ -135,7 +135,7 @@ type StartQuery = {
 
 export const start = async (req: Request, res: Response): Promise<Response> => {
   const { flowNodeId } = req.params;
-  const { sessionId } = req.body;
+  const { sessionId } = req.query as StartQuery;
   const { companyId } = req.user;
 
   const response = await StartFlowService({

@@ -192,10 +192,7 @@ const Connections = () => {
 	const { connectionFileName } = useParams();
 	const history = useHistory();
 	const [connectionFiles, setConnectionFiles] = useState([]);
-
-	useEffect(() => {
-		console.log(connectionFileName);
-	}, [connectionFileName])
+	const [connectionFileId, setConnectionFileId] = useState("");
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -211,6 +208,7 @@ const Connections = () => {
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
 				setCount(data.count);
 				setHasMore(data.hasMore);
+				setConnectionFileId(data.connectionFileId ? data.connectionFileId : "");
 				setLoading(false);
 			} catch (err) {
 				setLoading(false);
@@ -218,7 +216,9 @@ const Connections = () => {
 			}
 		};
 
-		fetchWhats();
+		if (connectionFileName) {
+			fetchWhats();
+		}
 	}, [pageNumber, connectionFileName]);
 
 	useEffect(() => {
@@ -497,6 +497,7 @@ const Connections = () => {
 						open={whatsAppModalOpen}
 						onClose={handleCloseWhatsAppModal}
 						whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
+						connectionFileId={connectionFileId}
 					/>
 					<MainHeader>
 						<Title>{i18n.t("connections.title")}</Title>
