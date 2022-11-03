@@ -1,39 +1,40 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField } from '@material-ui/core';
-import SettingsIcon from "@material-ui/icons/Settings";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, TextField, MenuItem, Select, InputLabel, FormControl } from '@material-ui/core';
 import { PortWidget } from "@projectstorm/react-diagrams";
 
-import toastError from "../../../../errors/toastError";
+import { Settings } from "@material-ui/icons/";
+import { TfiHeadphoneAlt } from "react-icons/tfi"
 import api from "../../../../services/api";
+import toastError from "../../../../errors/toastError";
 
-import { AiOutlineFieldTime } from 'react-icons/ai';
-
-export class StartInactivityNodeWidget extends React.Component {
+export class TransferQueueNodeWidget extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 		  modalOpen: false,
-		  inactivityTime: props.node.inactivityTime ? props.node.inactivityTime : "0"
+		  queueId: props.node.queueId ? props.node.queueId : "",
+		  queues: []
 		};
 	}
 
-	isNumeric = (str) => {
-		if (typeof str != "string") return false
-		return !isNaN(str) && !isNaN(parseFloat(str))
+	handleQueueChange = async (e) => {
+		this.setState({ queueId: e.target.value });
+		this.props.node.queueId = e.target.value;
+	};
+
+	componentDidMount() { 
+		this.fetchQueues();
 	}
 
-	handleTimeChange = (e) => {
-		if (e.target.value) {
-			this.setState({ inactivityTime: e.target.value });
-			this.props.node.inactivityTime = e.target.value;
+	fetchQueues = async () => {
+		try {
+			const { data } = await api.get("/queue");
+			this.setState({ queues: data });
+		} catch (err) {
+			toastError(err);
 		}
-
-		if (!e.target.value && this.state.inactivityTime.length === 1) {
-			this.setState({ inactivityTime: "0" });
-			this.props.node.inactivityTime = "0";
-		}
-	}
+	};
 
 	render() {
 		return (
@@ -45,22 +46,30 @@ export class StartInactivityNodeWidget extends React.Component {
 					scroll="paper"
 				>
 				<DialogTitle id="form-dialog-title">
-					Start Inactivity
+					Transfer Queue
 				</DialogTitle>
 				<DialogContent>
-					<div>
-						<TextField
-							as={TextField}
-							name="time"
-							type="number"
+					<FormControl
+						variant="outlined"
+						margin="normal"
+						fullWidth
+					>
+						<InputLabel id="method-select-label">
+							Queues
+						</InputLabel>
+						<Select
+							labelId="method-select-label"
+							id="method-select"
+							value={this.state.queueId}
+							label="Method"
+							onChange={(e) => { this.handleQueueChange(e) }}
 							variant="outlined"
-							margin="normal"
-							label="Time (minutes)"
-							fullWidth
-							value={this.state.inactivityTime}
-							onChange={this.handleTimeChange}
-						/>
-					</div>
+						>
+							{ this.state.queues.map((queue) => (
+								<MenuItem key={queue.id} value={queue.id}>{queue.name}</MenuItem>
+							)) }
+						</Select>
+					</FormControl>
 				</DialogContent>
 				<DialogActions>
 					<Button
@@ -82,7 +91,7 @@ export class StartInactivityNodeWidget extends React.Component {
 				>
 					<div 
 						style={{
-							backgroundColor: "#A30000",
+							backgroundColor: "#211F7E",
 							color: "white",
 							display: "flex",
 							justifyContent: "space-between"
@@ -93,14 +102,14 @@ export class StartInactivityNodeWidget extends React.Component {
 								padding: "10px",
 							}}
 						>
-							Start Inactivity
+							Transfer Queue
 						</Typography>
 						<IconButton
 							onClick={() => {
 								this.setState({ modalOpen: true });
 							}}
 						>
-							<SettingsIcon />
+							<Settings />
 						</IconButton>
 					</div>
 					<div 
@@ -123,44 +132,21 @@ export class StartInactivityNodeWidget extends React.Component {
 						</PortWidget>
 						<PortWidget
 							style={{
-								backgroundColor: "#A30000",
+								backgroundColor: "#211F7E",
 								border: "2px solid #075E54",
 								borderRadius: "100%",
 								cursor: "pointer",
 								height: "16px",
 								position: "absolute",
 								right: "-8px",
-								top: "40%",
+								top: "50%",
 								width: "16px",
 							}}
 							engine={this.props.engine}
-							port={this.props.node.getPort('out-1')}
+							port={this.props.node.getPort('out')}
 						>
 						</PortWidget>
-						<PortWidget
-							style={{
-								backgroundColor: "white",
-								border: "2px solid #075E54",
-								cursor: "pointer",
-								height: "auto",
-								position: "absolute",
-								right: "-2px",
-								top: "70%",
-								width: "64px",
-							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort('out-2')}
-						>
-							<div
-								style={{
-									display: "inlineBlock",
-									textAlign: "center",
-								}}
-							>
-								{ this.state.inactivityTime } min
-							</div>
-						</PortWidget>
-						<AiOutlineFieldTime
+						<TfiHeadphoneAlt
 							style={{
 								display: "block",
 								height: "50px",
@@ -169,7 +155,7 @@ export class StartInactivityNodeWidget extends React.Component {
 								top: "50%",
 								width: "50px",
 							}}
-						/> 
+						/>  
 					</div>
 				</div>
 			</div>

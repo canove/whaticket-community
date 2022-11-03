@@ -27,6 +27,9 @@ import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
 import { useTranslation } from "react-i18next";
 
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input/input'
+
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
@@ -59,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 	  },
 }));
 
-const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
+const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
@@ -71,10 +74,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	};
 
 	const SessionSchema = Yup.object().shape({
-	name: Yup.string()
-		.min(2, `${i18n.t("whatsappModal.short")}`)
-		.max(50, `${i18n.t("whatsappModal.long")}`)
-		.required(`${i18n.t("whatsappModal.required")}`),
+		name: Yup.string()
+			.min(2, `${i18n.t("whatsappModal.short")}`)
+			.max(50, `${i18n.t("whatsappModal.long")}`)
+			.required(`${i18n.t("whatsappModal.required")}`),
 	});
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
@@ -83,6 +86,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const [flow, setFlow] = useState("");
 	const [connectionFiles, setConnectionFiles] = useState("");
 	const [connectionFile, setConnectionFile] = useState("");
+	// const [phoneNumber, setPhoneNumber] = useState("");
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -118,17 +122,20 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 			}
 		}
 
+		setConnectionFile(connectionFileId);	
+
 		fetchSession();
 		fetchFlows();
 		fetchConnectionFiles();
-	}, [whatsAppId]);
+	}, [whatsAppId, connectionFileId, open]);
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = {
 			...values,
 			queueIds: selectedQueueIds,
 			flowId: flow ? flow : null,
-			connectionFileId: connectionFile ? connectionFile : null
+			connectionFileId: connectionFile ? connectionFile : null,
+			// name: phoneNumber.replace("+", ""),
 		};
 
 		try {
@@ -145,8 +152,11 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	};
 
 	const handleClose = () => {
-		onClose();
+		setFlow("");
+		setConnectionFile("");
+		// setPhoneNumber("");
 		setWhatsApp(initialState);
+		onClose();
 	};
 
 	const handleFlowChange = (e) => {
@@ -156,6 +166,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const handleConnectionFileChange = (e) => {
 		setConnectionFile(e.target.value);
 	}
+
+	// const handlePhoneNumberChange = (value) => {
+    //     setPhoneNumber(value);
+    // }
 
 	return (
 		<div className={classes.root}>
@@ -185,6 +199,43 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 					{({ values, touched, errors, isSubmitting }) => (
 						<Form>
 							<DialogContent dividers>
+								{/* <FormControl
+									variant="outlined"
+									margin="dense"
+									fullWidth
+									style={{
+										display: "flex",
+										flexDirection: "row",
+										flexWrap: "wrap",
+									}}
+								>
+									<div
+										style={{
+											border: "1px solid rgba(0, 0, 0, 0.5)",
+											borderRadius: "2%",
+											display: "flex",
+											fontSize: "16px",
+											marginRight: "8px",
+											padding: "16px",
+											textAlign: "center",
+											width: "10%",
+										}}
+									>
+										+55
+									</div>
+									<PhoneInput
+										style={{
+											display: "inline-block",
+											fontSize:"16px",
+											padding: "10px",
+											width: "calc(90% - 8px)",
+										}}
+										country="BR"
+										placeholder="(00) 0000-0000"
+										value={phoneNumber}
+										onChange={handlePhoneNumberChange}
+									/>
+								</FormControl> */}
 								<div className={classes.multFieldLine}>
 									<Field
 										as={TextField}
@@ -195,6 +246,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
+										// placeholder="55XX99998888"
 										className={classes.textField}
 									/>
 									<FormControlLabel

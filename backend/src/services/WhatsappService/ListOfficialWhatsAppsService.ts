@@ -13,6 +13,7 @@ interface Response {
   whatsapps: Whatsapp[];
   count: number;
   hasMore: boolean;
+  connectionFileId: number | null;
 }
 
 const ListWhatsAppsService = async ({
@@ -58,7 +59,8 @@ const ListWhatsAppsService = async ({
   return {
     whatsapps,
     count,
-    hasMore
+    hasMore,
+    connectionFileId: connectionFile ? connectionFile.id : null
   };
 };
 
