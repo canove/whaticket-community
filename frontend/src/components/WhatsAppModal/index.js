@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 	multFieldLine: {
 		display: "flex",
 		"& > *:not(:last-child)": {
-			marginRight: theme.spacing(1),
+			marginRight: theme.spacing(3),
 		},
 	},
 
@@ -70,7 +70,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		greetingMessage: "",
 		farewellMessage: "",
 		isDefault: false,
-		official: false
+		official: false,
+		business: false,
 	};
 
 	const SessionSchema = Yup.object().shape({
@@ -122,7 +123,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			}
 		}
 
-		setConnectionFile(connectionFileId);	
+		setConnectionFile(connectionFileId);
 
 		fetchSession();
 		fetchFlows();
@@ -260,6 +261,17 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										}
 										label={i18n.t("whatsappModal.form.default")}
 									/>
+									<FormControlLabel
+										control={
+											<Field
+												as={Switch}
+												color="primary"
+												name="business"
+												checked={values.business}
+											/>
+										}
+										label={i18n.t("Business")}
+									/>
 								</div>
 								<div>
 									<Field
@@ -312,7 +324,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 											onChange={(e) => { handleConnectionFileChange(e) }}
 											label="Categoria"
 										>
-											<MenuItem value={""}>Nenhum</MenuItem>
+											<MenuItem value={null}>Nenhum</MenuItem>
 											{ connectionFiles && connectionFiles.map(connectionFile => {
 												return (
 													<MenuItem value={connectionFile.id} key={connectionFile.id}>{connectionFile.name}</MenuItem>
@@ -334,7 +346,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 											onChange={(e) => { handleFlowChange(e) }}
 											label="Fluxo"
 										>
-											<MenuItem value={""}>Nenhum</MenuItem>
+											<MenuItem value={null}>Nenhum</MenuItem>
 											{ flows && flows.map(flow => {
 												return (
 													<MenuItem value={flow.id} key={flow.id}>{flow.name}</MenuItem>
