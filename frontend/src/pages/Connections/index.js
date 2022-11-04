@@ -304,6 +304,16 @@ const Connections = () => {
 		setWhatsAppModalOpen(true);
 	};
 
+	const clickOn = click => {
+        if (click === true) {
+            return "Sim";
+        }
+        if (click === false) {
+            return "Não";
+        }
+        return click;
+    };
+
 	const handleOpenConfirmationModal = (action, whatsAppId) => {
 		if (action === "disconnect") {
 			setConfirmModalInfo({
@@ -443,7 +453,7 @@ const Connections = () => {
 
 	return (
 		<>
-			{ !connectionFileName && 
+			{ !connectionFileName &&
 				<MainContainer>
 					<MainHeader>
 						<Title>Conexões</Title>
@@ -478,7 +488,7 @@ const Connections = () => {
 					</Paper>
 				</MainContainer>
 			}
-			{ connectionFileName && 
+			{ connectionFileName &&
 				<MainContainer>
 					<ConfirmationModal
 						title={confirmModalInfo.title}
@@ -528,6 +538,9 @@ const Connections = () => {
 										{i18n.t("connections.table.lastUpdate")}
 									</TableCell>
 									<TableCell align="center">
+										{i18n.t("Business")}
+									</TableCell>
+									<TableCell align="center">
 										{i18n.t("connections.table.default")}
 									</TableCell>
 									<TableCell align="center">
@@ -553,6 +566,7 @@ const Connections = () => {
 													<TableCell align="center">
 														{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
 													</TableCell>
+													<TableCell align="center">{clickOn(whatsApp.business)}</TableCell>
 													<TableCell align="center">
 														{whatsApp.isDefault && (
 															<div className={classes.customTableCell}>
@@ -567,7 +581,7 @@ const Connections = () => {
 														>
 															<Edit />
 														</IconButton>
-		
+
 														<IconButton
 															size="small"
 															onClick={e => {
