@@ -7,6 +7,6 @@ export class AdvancedPortFactory extends AbstractModelFactory {
 	}
 
 	generateModel(event) {
-		return new AdvancedPortModel;
+		return new AdvancedPortModel();
 	}
 }
