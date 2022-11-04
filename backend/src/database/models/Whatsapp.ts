@@ -121,6 +121,11 @@ class Whatsapp extends Model<Whatsapp> {
 
   @BelongsTo(() => Flows)
   flow: Flows;
+
+  @Default(false)
+  @AllowNull
+  @Column
+  business: boolean;
 }
 
 export default Whatsapp;
