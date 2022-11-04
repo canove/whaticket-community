@@ -114,18 +114,18 @@ const ContactTransfer = () => {
 
   useEffect(() => {
 		dispatch({ type: "RESET" });
-	}, [searchParam, company, pageNumber]);
+	}, [searchParam, company, pageNumber, isBusiness]);
 
   useEffect(() => {
     setPageNumber(1);
-  }, [company, searchParam]);
+  }, [company, searchParam, isBusiness]);
 
 	useEffect(() => {
 		const fetchWhats = async () => {
       setLoading(true);
 			try {
 				const { data } = await api.get(`/whatsapp/listAll/`, {
-          params: { searchParam, company, pageNumber }
+          params: { searchParam, company, pageNumber, isBusiness }
         });
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
         setHasMore(data.hasMore);
@@ -145,7 +145,7 @@ const ContactTransfer = () => {
 		};
 
 		fetchWhats();
-	}, [pageNumber, searchParam, company]);
+	}, [pageNumber, searchParam, company, isBusiness]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -277,6 +277,22 @@ const ContactTransfer = () => {
     }
   }
 
+  const handleIsBusinessChangeDiv = (e) => {
+    setIsBusiness(prev => !prev);
+  }
+
+  const getTranslation = (string) => {
+    if (string === true) {
+      return "Sim";
+    }
+
+    if (string === false) {
+      return "Não";
+    }
+
+    return string;
+  }
+
   return (
     <MainContainer>
       <TransferContactModal
@@ -295,12 +311,6 @@ const ContactTransfer = () => {
               alignItems: "end"
             }}
           >
-            <Checkbox
-              color="primary"
-              onChange={(e) => { handleIsBusinessChange(e) }}
-              checked={isBusiness}
-              inputProps={{ 'aria-label': 'is business' }}
-            />
             <TextField
               style={{
                 width: "200px",
@@ -333,6 +343,19 @@ const ContactTransfer = () => {
                 />
               )}
             />
+            <div
+              style={{ marginRight: "10px", border: "1px solid rgba(0, 0, 0, 0.3)", padding: "10px" }}
+              onClick={(e) => { handleIsBusinessChangeDiv(e) }}
+            >
+              <Checkbox
+                style={{ maxHeight: "10px" }}
+                color="primary"
+                onChange={(e) => { handleIsBusinessChange(e) }}
+                checked={isBusiness}
+                inputProps={{ 'aria-label': 'is business' }}
+              />
+              Business
+            </div>
             <Button
               variant="contained"
               color="primary"
@@ -360,6 +383,7 @@ const ContactTransfer = () => {
             </TableCell>
               <TableCell align="center">Números</TableCell>
               <TableCell align="center">Empresa</TableCell>
+              <TableCell align="center">Business</TableCell>
               <TableCell align="center">Ações</TableCell>
             </TableRow>
           </TableHead>
@@ -383,6 +407,7 @@ const ContactTransfer = () => {
                     </TableCell>
                     <TableCell align="center">{whats.name}</TableCell>
                     <TableCell align="center">{whats.company.name}</TableCell>
+                    <TableCell align="center">{getTranslation(whats.business)}</TableCell>
                     <TableCell align="center">
                       <div style={{display:"inline-block", minWidth:"90px"}}>
                         <IconButton

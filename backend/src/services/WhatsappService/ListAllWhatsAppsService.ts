@@ -12,7 +12,8 @@ interface Response {
 const ListAllWhatsAppsService = async ({
   searchParam = "",
   company,
-  pageNumber = "1"
+  pageNumber = "1",
+  isBusiness = "false"
 }): Promise<Response> => {
   let whereCondition = null;
 
@@ -20,6 +21,7 @@ const ListAllWhatsAppsService = async ({
     deleted: false,
     official: false,
     status: "CONNECTED",
+    business: isBusiness === "true"
   }
 
   if (company) {

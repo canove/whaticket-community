@@ -234,17 +234,18 @@ type ListAllQuery = {
   searchParam: string;
   company: string;
   pageNumber: string;
+  isBusiness: string;
 }
 
 export const listAll = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, company, pageNumber } = req.query as ListAllQuery;
+  const { searchParam, company, pageNumber, isBusiness } = req.query as ListAllQuery;
   const { companyId } = req.user;
 
   if (companyId !== 1) {
     throw new AppError("NO PERMISSION!");
   }
 
-  const { whatsapps, count, hasMore } = await ListAllWhatsAppsService({ searchParam, company, pageNumber });
+  const { whatsapps, count, hasMore } = await ListAllWhatsAppsService({ searchParam, company, pageNumber, isBusiness });
 
   return res.status(200).json({
     whatsapps, 
