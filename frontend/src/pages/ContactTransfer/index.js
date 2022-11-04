@@ -105,6 +105,7 @@ const ContactTransfer = () => {
   const [hasMore, setHasMore] = useState(false);
   const [count, setCount] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
+  const [isBusiness, setIsBusiness] = useState(false);
 
   const [allSelected, setAllSelected] = useState(false);
 
@@ -268,9 +269,13 @@ const ContactTransfer = () => {
     setSelectedWhatsapps(newSelected);
   }
 
-  useEffect(() => {
-    console.log(selectedWhatsapps);
-  }, [selectedWhatsapps]);
+  const handleIsBusinessChange = (e) => {
+    if (e.target.checked) {
+      setIsBusiness(true);
+    } else {
+      setIsBusiness(false);
+    }
+  }
 
   return (
     <MainContainer>
@@ -290,6 +295,12 @@ const ContactTransfer = () => {
               alignItems: "end"
             }}
           >
+            <Checkbox
+              color="primary"
+              onChange={(e) => { handleIsBusinessChange(e) }}
+              checked={isBusiness}
+              inputProps={{ 'aria-label': 'is business' }}
+            />
             <TextField
               style={{
                 width: "200px",
