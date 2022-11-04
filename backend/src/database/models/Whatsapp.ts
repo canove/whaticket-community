@@ -85,6 +85,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   companyId: number;
 
+  @BelongsTo(() => Company)
+  company: Company;
+
   @Default(false)
   @AllowNull
   @Column

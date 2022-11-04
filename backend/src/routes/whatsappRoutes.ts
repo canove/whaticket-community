@@ -11,7 +11,11 @@ whatsappRoutes.post("/whatsapp/", isAuth, WhatsAppController.store);
 
 whatsappRoutes.get("/whatsapp/list/", isAuth, WhatsAppController.list);
 
+whatsappRoutes.get("/whatsapp/listAll/", isAuth, WhatsAppController.listAll);
+
 whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
+
+whatsappRoutes.put("/whatsapp/transfer/", isAuth, WhatsAppController.transfer);
 
 whatsappRoutes.put("/whatsapp/:whatsappId", isAuth, WhatsAppController.update);
 

@@ -32,6 +32,7 @@ import DialogFlows from "../pages/DialogFlows";
 import Flows from "../pages/Flows";
 import CreateFlows from "../pages/CreateFlows";
 import ConnectionFiles from "../pages/ConnectionFiles";
+import ContactTransfer from "../pages/ContactTransfer";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -128,6 +129,9 @@ const RenderRoutes = () => {
         }
         if (name === "Connection Files") {
             return ConnectionFiles
+        }
+        if (name === "Contact Transfer") {
+            return ContactTransfer
         }
     }
 

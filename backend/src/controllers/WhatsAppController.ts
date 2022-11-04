@@ -22,6 +22,8 @@ import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTi
 import Contact from "../database/models/Contact";
 import FileRegister from "../database/models/FileRegister";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
+import ListAllWhatsAppsService from "../services/WhatsappService/ListAllWhatsAppsService";
+import TransferWhatsAppService from "../services/WhatsappService/TransferWhatsAppService";
 
 type ListQuery = {
   pageNumber: string | number;
@@ -168,6 +170,24 @@ export const update = async (
   return res.status(200).json(whatsapp);
 };
 
+export const transfer = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const transferData = req.body;
+  const { companyId } = req.user;
+
+  if (companyId !== 1) {
+    throw new AppError("NO PERMISSION");
+  }
+
+  await TransferWhatsAppService({
+    transferData,
+  });
+
+  return res.status(200).json("OK");
+};
+
 export const remove = async (
   req: Request,
   res: Response
@@ -202,6 +222,29 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     count,
     hasMore,
     connectionFileId
+  });
+};
+
+type ListAllQuery = {
+  searchParam: string;
+  company: string;
+  pageNumber: string;
+}
+
+export const listAll = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam, company, pageNumber } = req.query as ListAllQuery;
+  const { companyId } = req.user;
+
+  if (companyId !== 1) {
+    throw new AppError("NO PERMISSION!");
+  }
+
+  const { whatsapps, count, hasMore } = await ListAllWhatsAppsService({ searchParam, company, pageNumber });
+
+  return res.status(200).json({
+    whatsapps, 
+    count, 
+    hasMore
   });
 };
 
