@@ -46,7 +46,8 @@ interface WhatsappData {
   companyId?: string | number;
   flowId?: string | number;
   connectionFileId?: string | number;
-}
+  business?: boolean;
+};
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
@@ -70,7 +71,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     facebookBusinessId,
     phoneNumber,
     flowId,
-    connectionFileId
+    connectionFileId,
+    business,
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -81,7 +83,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const payload = {
     companyId
   };
-  
+
   if(!official) {
     try {
       await axios.post(apiUrl, payload, {
@@ -91,10 +93,12 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         }
       });
     } catch (err: any) {
+        if(!err.response.data["message"]){
+          throw new AppError("Ocorreu um erro ao tentar se comunicar com Firebase!");
+        }
       throw new AppError(err.response.data.message);
     }
   }
- 
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -110,7 +114,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     phoneNumber,
     companyId,
     flowId,
-    connectionFileId
+    connectionFileId,
+    business,
   });
 
   StartWhatsAppSession(whatsapp);
