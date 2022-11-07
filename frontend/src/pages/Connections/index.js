@@ -614,7 +614,7 @@ const Connections = () => {
 										{i18n.t("connections.table.lastUpdate")}
 									</TableCell>
 									<TableCell align="center">
-										Data de Criação
+										{i18n.t("connections.table.createdAt")}
 									</TableCell>
 									<TableCell align="center">
 										{i18n.t("Business")}
