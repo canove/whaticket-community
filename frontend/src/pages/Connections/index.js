@@ -24,6 +24,12 @@ import {
 	CardActionArea,
 	CardMedia,
 	CardActions,
+	InputAdornment,
+	TextField,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
 } from "@material-ui/core";
 import {
 	Edit,
@@ -34,6 +40,8 @@ import {
 	CropFree,
 	DeleteOutline,
 } from "@material-ui/icons";
+
+import SearchIcon from "@material-ui/icons/Search";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -193,17 +201,29 @@ const Connections = () => {
 	const history = useHistory();
 	const [connectionFiles, setConnectionFiles] = useState([]);
 	const [connectionFileId, setConnectionFileId] = useState("");
+	const [searchParam, setSearchParam] = useState("");
+	const [status, setStatus] = useState("");
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
-	}, []);
+	}, [pageNumber, searchParam, status]);
+
+	useEffect(() => {
+		setPageNumber(1);
+	  }, [searchParam, status]);
 
 	useEffect(() => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get(`/whatsapp/list/`, {
-					params: { official: false, pageNumber, connectionFileName }
+					params: {
+						official: false,
+						pageNumber,
+						connectionFileName,
+						searchParam,
+						status
+					}
 				});
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
 				setCount(data.count);
@@ -218,8 +238,11 @@ const Connections = () => {
 
 		if (connectionFileName) {
 			fetchWhats();
+		} else {
+			setSearchParam("");
+			setStatus("");
 		}
-	}, [pageNumber, connectionFileName]);
+	}, [pageNumber, searchParam, connectionFileName, status]);
 
 	useEffect(() => {
 		const fetchConnectionFiles = async () => {
@@ -260,7 +283,6 @@ const Connections = () => {
 		return () => {
 			socket.disconnect();
 		};
-// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleStartWhatsAppSession = async whatsAppId => {
@@ -451,6 +473,14 @@ const Connections = () => {
 		);
 	};
 
+	const handleSearch = (event) => {
+		setSearchParam(event.target.value.toLowerCase());
+	};
+
+	const handleStatusChange = (e) => {
+		setStatus(e.target.value);
+	}
+
 	return (
 		<>
 			{ !connectionFileName &&
@@ -512,13 +542,59 @@ const Connections = () => {
 					<MainHeader>
 						<Title>{i18n.t("connections.title")}</Title>
 						<MainHeaderButtonsWrapper>
-							<Button
-								variant="contained"
-								color="primary"
-								onClick={handleOpenWhatsAppModal}
+							<div
+								style={{
+								display: "flex",
+								flexDirection: "row",
+								flexWrap: "wrap",
+								alignItems: "end"
+								}}
 							>
-								{i18n.t("connections.buttons.add")}
-							</Button>
+								<TextField
+									style={{
+										width: "200px",
+									}}
+									placeholder="Pesquisar Número"
+									type="search"
+									value={searchParam}
+									onChange={handleSearch}
+									InputProps={{
+										startAdornment: (
+										<InputAdornment position="start">
+											<SearchIcon style={{ color: "gray" }} />
+										</InputAdornment>
+										),
+									}}
+								/>
+								<FormControl
+									style={{
+										margin: "0 10px",
+									}}
+								>
+									<InputLabel id="status-select-label">
+										Status
+									</InputLabel>
+									<Select
+										labelId="status-select-label"
+										id="status-select"
+										value={status}
+										label="Status"
+										onChange={handleStatusChange}
+										style={{width: "150px"}}
+									>
+										<MenuItem value={""}>Nenhum</MenuItem>
+										<MenuItem value={"connected"}>Conectado</MenuItem>
+										<MenuItem value={"disconnected"}>Desconectado</MenuItem>
+									</Select>
+								</FormControl>
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={handleOpenWhatsAppModal}
+								>
+									{i18n.t("connections.buttons.add")}
+								</Button>
+							</div>
 						</MainHeaderButtonsWrapper>
 					</MainHeader>
 					<Paper className={classes.mainPaper} variant="outlined">

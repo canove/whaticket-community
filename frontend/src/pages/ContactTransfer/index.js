@@ -32,7 +32,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { TableSortLabel, Typography } from "@material-ui/core";
+import { FormControl, InputLabel, MenuItem, Select, TableSortLabel, Typography } from "@material-ui/core";
 import TransferContactModal from "../../components/TransferContactModal";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
@@ -270,15 +270,7 @@ const ContactTransfer = () => {
   }
 
   const handleIsBusinessChange = (e) => {
-    if (e.target.checked) {
-      setIsBusiness(true);
-    } else {
-      setIsBusiness(false);
-    }
-  }
-
-  const handleIsBusinessChangeDiv = (e) => {
-    setIsBusiness(prev => !prev);
+    setIsBusiness(e.target.value);
   }
 
   const getTranslation = (string) => {
@@ -343,19 +335,27 @@ const ContactTransfer = () => {
                 />
               )}
             />
-            <div
-              style={{ marginRight: "10px", border: "1px solid rgba(0, 0, 0, 0.3)", padding: "10px" }}
-              onClick={(e) => { handleIsBusinessChangeDiv(e) }}
-            >
-              <Checkbox
-                style={{ maxHeight: "10px" }}
-                color="primary"
-                onChange={(e) => { handleIsBusinessChange(e) }}
-                checked={isBusiness}
-                inputProps={{ 'aria-label': 'is business' }}
-              />
-              Business
-            </div>
+            <FormControl
+							style={{
+								margin: "0 10px 0 0",
+							}}
+						>
+							<InputLabel id="status-select-label">
+								Business
+							</InputLabel>
+							<Select
+								labelId="status-select-label"
+								id="status-select"
+								value={isBusiness}
+								label="Status"
+								onChange={handleIsBusinessChange}
+								style={{width: "150px"}}
+							>
+								<MenuItem value={""}>Nenhum</MenuItem>
+								<MenuItem value={"true"}>Sim</MenuItem>
+								<MenuItem value={"false"}>Não</MenuItem>
+							</Select>
+						</FormControl>
             <Button
               variant="contained"
               color="primary"
