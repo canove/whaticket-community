@@ -13,15 +13,34 @@ const ListAllWhatsAppsService = async ({
   searchParam = "",
   company,
   pageNumber = "1",
-  isBusiness = "false"
+  isBusiness = "false",
+  all
 }): Promise<Response> => {
+  if (all) {
+    const { count, rows: whatsapps } = await Whatsapp.findAndCountAll({
+      where: {
+        deleted: false,
+        official: false,
+        status: "CONNECTED",
+      }
+    });
+
+    return { whatsapps, count, hasMore: false };
+  }
+
   let whereCondition = null;
 
   whereCondition = {
     deleted: false,
     official: false,
     status: "CONNECTED",
-    business: isBusiness === "true"
+  }
+
+  if (isBusiness) {
+    whereCondition = {
+      ...whereCondition,
+      business: isBusiness === "true",
+    }
   }
 
   if (company) {

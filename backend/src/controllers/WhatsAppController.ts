@@ -25,12 +25,6 @@ import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUp
 import ListAllWhatsAppsService from "../services/WhatsappService/ListAllWhatsAppsService";
 import TransferWhatsAppService from "../services/WhatsappService/TransferWhatsAppService";
 
-type ListQuery = {
-  pageNumber: string | number;
-  official: string | boolean;
-  connectionFileName?: string;
-};
-
 interface WhatsappData {
   name: string;
   queueIds: number[];
@@ -211,15 +205,25 @@ export const remove = async (
   return res.status(200).json({ message: "Whatsapp deleted." });
 };
 
+type ListQuery = {
+  pageNumber: string | number;
+  official: string | boolean;
+  connectionFileName?: string;
+  searchParam?: string;
+  status?: string;
+};
+
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official, pageNumber, connectionFileName } = req.query as ListQuery;
+  const { official, pageNumber, connectionFileName, searchParam, status } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { whatsapps, count, hasMore, connectionFileId } = await ListOfficialWhatsAppsService({
     companyId,
     official,
     connectionFileName,
-    pageNumber
+    pageNumber,
+    searchParam,
+    status
   });
 
   return res.status(200).json({
@@ -235,17 +239,18 @@ type ListAllQuery = {
   company: string;
   pageNumber: string;
   isBusiness: string;
+  all: string;
 }
 
 export const listAll = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, company, pageNumber, isBusiness } = req.query as ListAllQuery;
+  const { searchParam, company, pageNumber, isBusiness, all } = req.query as ListAllQuery;
   const { companyId } = req.user;
 
   if (companyId !== 1) {
     throw new AppError("NO PERMISSION!");
   }
 
-  const { whatsapps, count, hasMore } = await ListAllWhatsAppsService({ searchParam, company, pageNumber, isBusiness });
+  const { whatsapps, count, hasMore } = await ListAllWhatsAppsService({ searchParam, company, pageNumber, isBusiness, all });
 
   return res.status(200).json({
     whatsapps, 
