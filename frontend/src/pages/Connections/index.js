@@ -614,6 +614,9 @@ const Connections = () => {
 										{i18n.t("connections.table.lastUpdate")}
 									</TableCell>
 									<TableCell align="center">
+										Data de Criação
+									</TableCell>
+									<TableCell align="center">
 										{i18n.t("Business")}
 									</TableCell>
 									<TableCell align="center">
@@ -641,6 +644,9 @@ const Connections = () => {
 													</TableCell>
 													<TableCell align="center">
 														{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
+													</TableCell>
+													<TableCell align="center">
+														{format(parseISO(whatsApp.createdAt), "dd/MM/yy HH:mm")}
 													</TableCell>
 													<TableCell align="center">{clickOn(whatsApp.business)}</TableCell>
 													<TableCell align="center">
