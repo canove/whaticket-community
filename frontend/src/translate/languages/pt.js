@@ -106,6 +106,7 @@ const messages = {
           name: "Nome",
           status: "Status",
           lastUpdate: "Última atualização",
+          createdAt: "Data de criação",
           default: "Padrão",
           actions: "Ações",
           session: "Sessão",

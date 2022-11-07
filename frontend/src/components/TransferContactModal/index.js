@@ -74,7 +74,9 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
     useEffect(() => {
         const fetchWhats = async () => {
             try {
-                const { data } = await api.get("/whatsapp/listAll/");
+                const { data } = await api.get("/whatsapp/listAll/", {
+                    params: { all: true }
+                });
                 setWhatsapps(data.whatsapps);
             } catch (err) {
                 toastError(err);
@@ -92,7 +94,7 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
 
         fetchWhats();
         fetchCompanies();
-
+        console.log(selectedWhatsapps);
         if (selectedWhatsapps) {
             setWhatsappsId(selectedWhatsapps);
         } else {
