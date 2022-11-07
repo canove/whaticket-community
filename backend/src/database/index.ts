@@ -29,6 +29,7 @@ import Flows from "./models/Flows";
 import FlowsNodes from "./models/FlowsNodes";
 import FlowsSessions from "./models/FlowsSessions";
 import ConnectionFiles from "./models/ConnectionFile";
+import ExposedImport from "./models/ExposedImport";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -65,7 +66,8 @@ const models = [
   Flows,
   FlowsNodes,
   FlowsSessions,
-  ConnectionFiles
+  ConnectionFiles,
+  ExposedImport
 ];
 
 sequelize.addModels(models);

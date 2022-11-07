@@ -33,6 +33,7 @@ import Flows from "../pages/Flows";
 import CreateFlows from "../pages/CreateFlows";
 import ConnectionFiles from "../pages/ConnectionFiles";
 import ContactTransfer from "../pages/ContactTransfer";
+import ExposedImport from "../pages/ExposedImport";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -132,6 +133,9 @@ const RenderRoutes = () => {
         }
         if (name === "Contact Transfer") {
             return ContactTransfer
+        }
+        if (name === "Exposed Imports") {
+            return ExposedImport
         }
     }
 
