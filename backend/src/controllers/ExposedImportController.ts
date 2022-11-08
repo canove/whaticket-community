@@ -12,12 +12,17 @@ import StartExposedImportService from "../services/ExposedImportService/StartExp
 import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
 
+type IndexQuery = {
+  pageNumber: string;
+}
+
 export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { pageNumber } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const exposedImports = await ListExposedImportsService(companyId);
+  const { exposedImports, count, hasMore } = await ListExposedImportsService({ companyId, pageNumber });
 
-  return res.status(200).json(exposedImports);
+  return res.status(200).json({ exposedImports, count, hasMore });
 };
 
 interface ExposedImportData {

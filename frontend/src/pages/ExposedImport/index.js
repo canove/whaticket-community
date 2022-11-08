@@ -9,7 +9,7 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { IconButton, TableCell } from "@material-ui/core";
+import { IconButton, TableCell, Typography } from "@material-ui/core";
 import { Visibility } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
@@ -97,16 +97,25 @@ const ExposedImport = () => {
     const [exposedImportModalOpen, setExposedImportModalOpen] = useState(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
+    const [count, setCount] = useState(0);
+    const [hasMore, setHasMore] = useState(false);
+    const [pageNumber, setPageNumber] = useState(1);
+
     useEffect(() => {
         dispatch({ type: "RESET" });
-    }, []);
+    }, [pageNumber]);
 
     useEffect(() => {
         const fetchImports = async () => {
             setLoading(true);
             try {
-                const { data } = await api.get("/exposedImports/");
-                dispatch({ type: "LOAD_EXPOSED_IMPORTS", payload: data });
+                const { data } = await api.get("/exposedImports/", {
+                    params: { pageNumber }
+                });
+                console.log(data);
+                dispatch({ type: "LOAD_EXPOSED_IMPORTS", payload: data.exposedImports });
+                setCount(data.count);
+                setHasMore(data.hasMore);
                 setLoading(false);
             } catch (err) {
                 setLoading(false);
@@ -114,7 +123,7 @@ const ExposedImport = () => {
         }
 
         fetchImports();
-    }, []);
+    }, [pageNumber]);
 
     useEffect(() => {
         const socket = openSocket();
@@ -247,9 +256,32 @@ const ExposedImport = () => {
                         {loading && <TableRowSkeleton columns={5} />}
                     </TableBody>
                 </Table>
-        </Paper>
-    </MainContainer>
-  );
+                <div
+                    style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+                >
+                    <Button
+                        variant="outlined"
+                        onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+                        disabled={ pageNumber === 1}
+                    >
+                        {i18n.t("importation.buttons.previousPage")}
+                    </Button>
+                    <Typography
+                        style={{ display: "inline-block", fontSize: "1.25rem" }}
+                    >
+                        { pageNumber } / { Math.ceil(count / 10) }
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+                        disabled={ !hasMore }
+                    >
+                        {i18n.t("importation.buttons.nextPage")}
+                    </Button>
+                </div>
+            </Paper>
+        </MainContainer>
+    );
 };
 
 export default ExposedImport;
