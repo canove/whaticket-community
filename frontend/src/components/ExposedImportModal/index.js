@@ -132,10 +132,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         try {
             if (exposedImportId) {
                 await api.put(`/exposedImports/${exposedImportId}`, importData);
-                toast.success("Criado com sucesso!");
+                toast.success(i18n.t("exposedImports.modal.editSuccess"));
             } else {
                 await api.post("/exposedImports/", importData);
-                toast.success("Editado com sucesso!");
+                toast.success(i18n.t("exposedImports.modal.createSuccess"));
             }
             } catch (err) {
                 toastError(err);
@@ -235,15 +235,15 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
 			>
 				<DialogTitle id="form-dialog-title">
 					{ exposedImportId
-                     ? `Editar`
-                     : 'Criar'
+                     ? `${i18n.t("exposedImports.modal.edit")}`
+                     : `${i18n.t("exposedImports.modal.create")}`
                     }
 				</DialogTitle>
 				<DialogContent dividers>
                     <div>
                         <TextField
                             as={TextField}
-                            label="Name"
+                            label={i18n.t("exposedImports.modal.name")}
                             value={name}
                             name="name"
                             onChange={(e) => { handleNameChange(e) }}
@@ -292,7 +292,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                                 marginBottom: "0px"
                             }}
                         >
-                            Relações
+                            {i18n.t("exposedImports.modal.relations")}
                         </Typography>
                         <div>
                             <div
@@ -313,7 +313,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                                     variant="outlined"
                                     margin="normal"
                                     fullWidth
-                                    placeholder="Cole seu payload aqui!"
+                                    placeholder={i18n.t("exposedImports.modal.pastePayload")}
                                     onChange={(e) => { setPayload(e.target.value) }}
                                 />
                             </div>
@@ -785,8 +785,8 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
 						variant="contained"
 					>
 						{ exposedImportId
-                         ? 'Salvar'
-                         : 'Criar'
+                         ? `${i18n.t("exposedImports.modal.save")}`
+                         : `${i18n.t("exposedImports.modal.create")}`
                         }
 					</Button>
 				</DialogActions>

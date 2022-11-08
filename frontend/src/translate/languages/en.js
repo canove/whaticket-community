@@ -1187,6 +1187,29 @@ const messages = {
         },
       },
 
+      exposedImports: {
+        title: "Exposed Imports",
+        confirmationModal: "Are you sure that you want to delete this import?",
+        create: "Create Import",
+        grid: {
+          name: "Name",
+          registrationAmount: "Registration Amount",
+          updatedAt: "Updated At",
+          createdAt: "Created At",
+          actions: "Actions",
+        },
+        modal: {
+          createSuccess: "Exposed Import Created",
+          editSuccess: "Exposed Import Saved",
+          create: "Create",
+          edit: "Edit",
+          pastePayload: "Paste your payload here.",
+          name: "Name",
+          save: "Save",
+          relations: "Relations",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",

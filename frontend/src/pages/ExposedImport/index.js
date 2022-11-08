@@ -199,17 +199,17 @@ const ExposedImport = () => {
                 onClose={setConfirmationModalOpen}
                 onConfirm={handleDeleteExposedImport}
             >
-                Você tem certeza que realmente deseja deletar esta importação?
+                {i18n.t("exposedImports.confirmationModal")}
             </ConfirmationModal>
             <MainHeader>
-                <Title>Importação Exposta</Title>
+                <Title>{i18n.t("exposedImports.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <Button
                         onClick={handleOpenExposedImportModal}
                         variant="contained"
                         color="primary"
                     >
-                        Criar Importação
+                        {i18n.t("exposedImports.create")}
                     </Button>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -220,11 +220,11 @@ const ExposedImport = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Nome</TableCell>
-                            <TableCell align="center">Qtde Registers</TableCell>
-                            <TableCell align="center">Updated At</TableCell>
-                            <TableCell align="center">Created At</TableCell>
-                            <TableCell align="center">Actions</TableCell>
+                            <TableCell align="center">{i18n.t("exposedImports.grid.name")}</TableCell>
+                            <TableCell align="center">{i18n.t("exposedImports.grid.registrationAmount")}</TableCell>
+                            <TableCell align="center">{i18n.t("exposedImports.grid.updatedAt")}</TableCell>
+                            <TableCell align="center">{i18n.t("exposedImports.grid.createdAt")}</TableCell>
+                            <TableCell align="center">{i18n.t("exposedImports.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

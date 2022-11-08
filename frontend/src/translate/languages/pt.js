@@ -1191,6 +1191,29 @@ const messages = {
         },
       },
 
+      exposedImports: {
+        title: "Importação Exposta",
+        confirmationModal: "Você tem certeza que deseja deletar esta importação?",
+        create: "Criar importação",
+        grid: {
+          name: "Nome",
+          registrationAmount: "Qtde Registros",
+          updatedAt: "Atualizado em",
+          createdAt: "Criado em",
+          actions: "Ações",
+        },
+        modal: {
+          createSuccess: "Importação Exposta criada com sucesso",
+          editSuccess: "Importação Exposata salva com sucesso",
+          create: "Criar",
+          edit: "Editar",
+          pastePayload: "Cole seu payload aqui.",
+          name: "Nome",
+          save: "Salvar",
+          relations: "Relações",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
