@@ -87,11 +87,11 @@ const ChipsReports = () => {
     return (
         <MainContainer>
             <MainHeader>
-                <Title>Chips Reports</Title>
+                <Title>{i18n.t("chipReports.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <div style={{ display: "flex", alignItems: "end" }}>
                         <TextField
-                            placeholder="Número"
+                            placeholder={i18n.t("chipReports.grid.phoneNumber")}
                             type="search"
                             value={searchParam}
                             onChange={handleSearchParamChange}
@@ -119,10 +119,10 @@ const ChipsReports = () => {
                                 onChange={handleStatusChange}
                                 style={{width: "150px"}}
                             >
-                                <MenuItem value={""}>Nenhum</MenuItem>
-                                <MenuItem value={"connected"}>Conectado</MenuItem>
-                                <MenuItem value={"disconnected"}>Desconectado</MenuItem>
-                                <MenuItem value={"deleted"}>Deletado</MenuItem>
+                                <MenuItem value={""}>{i18n.t("chipReports.status.none")}</MenuItem>
+                                <MenuItem value={"connected"}>{i18n.t("chipReports.status.connected")}</MenuItem>
+                                <MenuItem value={"disconnected"}>{i18n.t("chipReports.status.disconnected")}</MenuItem>
+                                <MenuItem value={"deleted"}>{i18n.t("chipReports.status.deleted")}</MenuItem>
                             </Select>
                         </FormControl>
                     </div>
@@ -135,10 +135,10 @@ const ChipsReports = () => {
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Número</TableCell>
-                            <TableCell align="center">Qtde de Registros</TableCell>
-                            <TableCell align="center">Updated At</TableCell>
-                            <TableCell align="center">Created At</TableCell>
+                            <TableCell align="center">{i18n.t("chipReports.grid.phoneNumber")}</TableCell>
+                            <TableCell align="center">{i18n.t("chipReports.grid.registerAmount")}</TableCell>
+                            <TableCell align="center">{i18n.t("chipReports.grid.createdAt")}</TableCell>
+                            <TableCell align="center">{i18n.t("chipReports.grid.updatedAt")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

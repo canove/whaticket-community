@@ -1211,6 +1211,22 @@ const messages = {
         },
       },
 
+      chipReports: {
+        title: "Chip Reports",
+        status: {
+          none: "None",
+          connected: "Connected",
+          disconnected: "Disconnected",
+          deleted: "Deleted",
+        },
+        grid: {
+          phoneNumber: "Phone Number",
+          registerAmount: "Register Amount",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",

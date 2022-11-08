@@ -1215,6 +1215,22 @@ const messages = {
         },
       },
 
+      chipReports: {
+        title: "Relatório de Chips",
+        status: {
+          none: "Nenhum",
+          connected: "Conectado",
+          disconnected: "Desconectado",
+          deleted: "Deletado",
+        },
+        grid: {
+          phoneNumber: "Número",
+          registerAmount: "Qtde de Registros",
+          createdAt: "Criado em",
+          updatedAt: "Atualizado em",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
