@@ -60,6 +60,7 @@ const TemplateModal = ({ open, onClose }) => {
   const [paramsQuantity, setParamsQuantity] = useState(0);
   const [param, setParam] = useState("");
   const [openParamModal, setOpenParamModal] = useState(false);
+  const [disableButton, setDisableButton] = useState(false);
 
   const handleClose = () => {
     onClose();
@@ -138,15 +139,19 @@ const TemplateModal = ({ open, onClose }) => {
       result += bodyText.split("{{var4}}").length - 1
       result += bodyText.split("{{var5}}").length - 1
 
-      if (paramsQuantity > 3) {
-        toast.error(i18n.t("templates.templateModal.toastErr"));
-      }
-
       setParamsQuantity(result);
     }
     testParams();
 // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyText])
+  }, [bodyText]);
+
+  useEffect(() => {
+    if (paramsQuantity > 3) {
+      setDisableButton(true);
+    } else {
+      setDisableButton(false);
+    }
+  }, [paramsQuantity])
 
   return (
     <div className={classes.root}>
@@ -304,6 +309,14 @@ const TemplateModal = ({ open, onClose }) => {
               </DialogContent>
               <DialogActions>
                 <Button
+                  onClick={handleClose}
+                  color="secondary"
+                  disabled={isSubmitting}
+                  variant="outlined"
+                >
+                  {i18n.t("templates.buttons.cancel")}
+                </Button>
+                <Button
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
@@ -315,18 +328,10 @@ const TemplateModal = ({ open, onClose }) => {
                   type="submit"
                   color="primary"
                   variant="contained"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || disableButton}
                   className={classes.btnWrapper}
                 >
                   {i18n.t("templates.buttons.add")}
-                </Button>
-                <Button
-                  onClick={handleClose}
-                  color="secondary"
-                  disabled={isSubmitting}
-                  variant="outlined"
-                >
-                  {i18n.t("templates.buttons.cancel")}
                 </Button>
               </DialogActions>
             </Form>
