@@ -13,6 +13,8 @@ whatsappRoutes.get("/whatsapp/list/", isAuth, WhatsAppController.list);
 
 whatsappRoutes.get("/whatsapp/listAll/", isAuth, WhatsAppController.listAll);
 
+whatsappRoutes.get("/whatsapp/listReport/", isAuth, WhatsAppController.listReport);
+
 whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
 
 whatsappRoutes.put("/whatsapp/transfer/", isAuth, WhatsAppController.transfer);

@@ -66,6 +66,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     const [video, setVideo] = useState("");
     const [image, setImage] = useState("");
     const [file, setFile] = useState("");
+    const [fileUrl, setFileUrl] = useState("");
 
     const [param, setParam] = useState("");
     const [paramsQuantity, setParamsQuantity] = useState(0);
@@ -101,6 +102,10 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             if (body.type === "file") {
                 setFile(body.value);
             }
+
+            if (body.type === "fileUrl") {
+                setFileUrl(body.value);
+            }
         }
     }, [open, body])
 
@@ -114,6 +119,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setAudio("");
         setVideo("");
         setImage("");
+        setFileUrl("");
         setDisableButton(false);
 
         setOpenParamModal(false);
@@ -176,6 +182,15 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             handleBodiesChange(bodyData, index);
         }
 
+        if (type === "fileUrl") {
+            const bodyData = {
+                type,
+                value: fileUrl
+            }
+
+            handleBodiesChange(bodyData, index);
+        }
+
 		handleClose();
 	};
 
@@ -211,6 +226,10 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 		setFile(e.target.files[0]);
     }
 
+    const handleFileUrlChange = (e) => {
+        setFileUrl(e.target.value);
+    }
+
     const handleParams = () => {
         if (paramsQuantity >= 3) {
              toast.error(i18n.t("templatesData.modalConfirm.exceeded"));
@@ -240,6 +259,11 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             result += text.split("{{name}}").length - 1
             result += text.split("{{documentNumber}}").length - 1
             result += text.split("{{phoneNumber}}").length - 1
+            result += text.split("{{var1}}").length - 1
+            result += text.split("{{var2}}").length - 1
+            result += text.split("{{var3}}").length - 1
+            result += text.split("{{var4}}").length - 1
+            result += text.split("{{var5}}").length - 1
 
             setParamsQuantity(result);
         }
@@ -284,6 +308,11 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                         <MenuItem value={'name'}>{i18n.t("templatesData.modal.name")}</MenuItem>
                         <MenuItem value={'documentNumber'}>{i18n.t("templatesData.modal.document")}</MenuItem>
                         <MenuItem value={'phoneNumber'}>{i18n.t("templatesData.modal.phoneNumber")}</MenuItem>
+                        <MenuItem value={'var1'}>Var 1</MenuItem>
+                        <MenuItem value={'var2'}>Var 2</MenuItem>
+                        <MenuItem value={'var3'}>Var 3</MenuItem>
+                        <MenuItem value={'var4'}>Var 4</MenuItem>
+                        <MenuItem value={'var5'}>Var 5</MenuItem>
                     </Select>
                     </FormControl>
                 </DialogContent>
@@ -334,6 +363,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 <MenuItem value={"image"}>{i18n.t("templatesData.modal.image")}</MenuItem>
                                 <MenuItem value={"contact"}>{i18n.t("templatesData.modal.contact")}</MenuItem>
                                 <MenuItem value={"file"}>{i18n.t("templatesData.modal.file")}</MenuItem>
+                                <MenuItem value={"fileUrl"}>Arquivo URL</MenuItem>
 							</Select>
 						</FormControl>
                     </div>
@@ -490,6 +520,23 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                     accept=".pdf, .xls, .xlsx, .csv, .txt, .doc, .docx, .ppt, .rar, .zip"
                                 />
                             </Button>
+                        </div>
+                    }
+                    { type === "fileUrl" &&
+                        <div className={classes.root}>
+                            <FormControl
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+						    >
+                                <TextField
+                                    label="Arquivo URL"
+                                    variant="outlined"
+                                    value={fileUrl}
+                                    onChange={handleFileUrlChange}
+                                    fullWidth
+                                />
+						    </FormControl>
                         </div>
                     }
 				</DialogContent>

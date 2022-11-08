@@ -7,6 +7,7 @@ type IndexQuery = {
   status?: number;
   initialDate?: string;
   pageNumber?: string;
+  refusedStatus?: number;
 };
 
 type UpdateQuery = {
@@ -15,7 +16,7 @@ type UpdateQuery = {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { status, initialDate, pageNumber } = req.query as IndexQuery;
+  const { status, initialDate, pageNumber, refusedStatus } = req.query as IndexQuery;
 
   const { companyId } = req.user;
 
@@ -23,7 +24,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     status,
     initialDate,
     companyId,
-    pageNumber
+    pageNumber,
+    refusedStatus
   });
 
   return res.status(200).json({ reports, hasMore, count });

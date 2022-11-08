@@ -13,6 +13,7 @@ import {
   Default
 } from "sequelize-typescript";
 import Company from "./Company";
+import ExposedImport from "./ExposedImport";
 import File from "./File";
 import IntegratedImport from "./IntegratedImport";
 
@@ -104,6 +105,30 @@ class FileRegister extends Model<FileRegister> {
   @ForeignKey(() => IntegratedImport)
   @Column
   integratedImportId: number;
+
+  @ForeignKey(() => ExposedImport)
+  @Column
+  exposedImportId: string;
+
+  @AllowNull(true)
+  @Column
+  var1: string;
+
+  @AllowNull(true)
+  @Column
+  var2: string;
+
+  @AllowNull(true)
+  @Column
+  var3: string;
+
+  @AllowNull(true)
+  @Column
+  var4: string;
+
+  @AllowNull(true)
+  @Column
+  var5: string;
 }
 
 export default FileRegister;

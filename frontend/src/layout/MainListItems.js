@@ -454,6 +454,12 @@ const MainListItems = (props) => {
     if (name === "Connection Files") {
       return i18n.t("mainDrawer.listItems.connectionFiles");
     }
+    if (name === "Exposed Imports") {
+      return i18n.t("exposedImports.title");
+    }
+    if (name === "Chips Reports") {
+      return i18n.t("chipReports.title");
+    }
 
     return name;
   }

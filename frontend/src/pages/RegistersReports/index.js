@@ -57,7 +57,9 @@ const RegistersReports = () => {
     useEffect(() => {
         const fetchFiles = async () => {
             try {
-                const { data } = await api.get('file/list');
+                const { data } = await api.get('file/list', {
+                    params: { refusedStatus: 7 }
+                });
                 setFiles(data.reports);
             } catch (err) {
                 toastError(err);
