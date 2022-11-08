@@ -14,6 +14,7 @@ interface Request {
   companyId?: number | string;
   pageNumber?: number | string;
   limiting?: number;
+  refusedStatus?: number;
 }
 
 const ListFileService = async ({
@@ -21,7 +22,8 @@ const ListFileService = async ({
   initialDate,
   companyId,
   pageNumber,
-  limiting
+  limiting,
+  refusedStatus
 }: Request): Promise<Response> => {
   let where = null;
 
@@ -37,6 +39,15 @@ const ListFileService = async ({
     where = {
       status: status
     };
+
+    if (refusedStatus) {
+      where = {
+        status: { 
+          status,
+          [Op.ne]: refusedStatus
+        }
+      }
+    }
   }
 
   if (!status && initialDate !== null && initialDate !== undefined) {
@@ -45,6 +56,13 @@ const ListFileService = async ({
         [Op.gte]: new Date(initialDate)
       }
     };
+  }
+
+  if (refusedStatus || refusedStatus === 0) {
+    where = {
+      ...where,
+      status: { [Op.ne]: refusedStatus }
+    }
   }
 
   where = { ...where };
@@ -78,4 +96,4 @@ const ListFileService = async ({
   }
 };
 
-export default ListFileService
+export default ListFileService;

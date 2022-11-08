@@ -173,28 +173,30 @@ const Dashboard = () => {
   useEffect(() => {
     const handleFiles = async () => {
       setLoading(true);
-      try {
-        setLoading(true);
+      let allFiles = [];
 
+      try {
         const { data } = await api.get('file/list?status=5');
-        setFiles(data.reports);
-
+        allFiles = [...allFiles, ...data.reports];
         setLoading(false);
       } catch (err) {
         toastError(err);
+        setLoading(false);
       }
+
       try {
-        setLoading(true);
-
         const { data } = await api.get('file/list?status=6');
-        setFiles(files.concat(data.reports));
+        allFiles = [...allFiles, ...data.reports];
         setLoading(false);
       } catch (err) {
         toastError(err);
+        setLoading(false);
       }
+
+      setFiles(allFiles);
     };
+
     handleFiles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
