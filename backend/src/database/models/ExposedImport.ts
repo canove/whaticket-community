@@ -22,6 +22,9 @@ class ExposedImport extends Model<ExposedImport> {
   @Column
   mapping: string;
 
+  @Column
+  qtdeRegister: number;
+
   @ForeignKey(() => Company)
   @Column
   companyId: number;

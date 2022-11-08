@@ -212,8 +212,7 @@ const ExposedImport = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">Nome</TableCell>
-                            {/* <TableCell align="center">URL</TableCell> */}
-                            {/* <TableCell align="center">Mapping</TableCell> */}
+                            <TableCell align="center">Qtde Registers</TableCell>
                             <TableCell align="center">Updated At</TableCell>
                             <TableCell align="center">Created At</TableCell>
                             <TableCell align="center">Actions</TableCell>
@@ -223,8 +222,7 @@ const ExposedImport = () => {
                         { exposedImports && exposedImports.map(exposedImport => (
                             <TableRow key={exposedImport.id}>
                                 <TableCell align="center">{exposedImport.name}</TableCell>
-                                {/* <TableCell align="center">URL</TableCell> */}
-                                {/* <TableCell align="center">Mapping</TableCell> */}
+                                <TableCell align="center">{exposedImport.qtdeRegister}</TableCell>
                                 <TableCell align="center">{format(parseISO(exposedImport.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                 <TableCell align="center">{format(parseISO(exposedImport.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                 <TableCell align="center">
@@ -246,7 +244,7 @@ const ExposedImport = () => {
                                 </TableCell>
                             </TableRow>
                         )) }
-                        {loading && <TableRowSkeleton columns={4} />}
+                        {loading && <TableRowSkeleton columns={5} />}
                     </TableBody>
                 </Table>
         </Paper>

@@ -109,7 +109,13 @@ export const start = async (
   const { companyId } = req.user;
   const payload = req.body;
 
-  await StartExposedImportService({ exposedImportId, companyId, payload });
+  const exposedImport = await StartExposedImportService({ exposedImportId, companyId, payload });
 
-  return res.status(200).json({ message: "Importation started", payload });
+  const io = getIO();
+  io.emit(`exposedImport${companyId}`, {
+    action: "update",
+    exposedImport
+  });
+
+  return res.status(200).json({ message: "Importation started" });
 };
