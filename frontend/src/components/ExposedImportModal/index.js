@@ -317,6 +317,14 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                                     onChange={(e) => { setPayload(e.target.value) }}
                                 />
                             </div>
+                            <Typography
+                                style={{
+                                    margin: "10px",
+                                    marginBottom: "0px"
+                                }}
+                            >
+                                {i18n.t("exposedImports.modal.tutorial")} {`{{variável}}`}
+                            </Typography>
                             <div
                                 style={{
                                     display: "flex",

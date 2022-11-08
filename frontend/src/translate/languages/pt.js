@@ -1211,6 +1211,7 @@ const messages = {
           name: "Nome",
           save: "Salvar",
           relations: "Relações",
+          tutorial: "Para usar o payload utilize: ",
         },
       },
 
