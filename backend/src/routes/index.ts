@@ -31,6 +31,7 @@ import billingsRoutes from "./billingsRoutes";
 import categoryRoutes from "./categoryRoutes";
 import flowsRoutes from "./flowsRoutes";
 import connectionFilesRoutes from "./connectionFilesRoutes";
+import exposedImportRoutes from "./exposedImportRoutes";
 
 const routes = Router();
 
@@ -65,5 +66,6 @@ routes.use(billingsRoutes);
 routes.use(categoryRoutes);
 routes.use(flowsRoutes);
 routes.use(connectionFilesRoutes);
+routes.use(exposedImportRoutes);
 
 export default routes;

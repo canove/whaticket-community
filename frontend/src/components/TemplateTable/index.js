@@ -107,6 +107,10 @@ const TemplateTable = ({ body }) => {
             }
         }
 
+        if (body.type === "fileUrl") {
+            return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer"><DescriptionIcon fontSize="large"/></a></TableCell>;
+        }
+
         return "";
       }
 

@@ -1190,6 +1190,46 @@ const messages = {
         },
       },
 
+      exposedImports: {
+        title: "Exposed Imports",
+        confirmationModal: "Are you sure that you want to delete this import?",
+        create: "Create Import",
+        grid: {
+          name: "Name",
+          registrationAmount: "Registration Amount",
+          updatedAt: "Updated At",
+          createdAt: "Created At",
+          actions: "Actions",
+        },
+        modal: {
+          createSuccess: "Exposed Import Created",
+          editSuccess: "Exposed Import Saved",
+          create: "Create",
+          edit: "Edit",
+          pastePayload: "Paste your payload here.",
+          name: "Name",
+          save: "Save",
+          relations: "Relations",
+          tutorial: "To use the payload use: ",
+        },
+      },
+
+      chipReports: {
+        title: "Chip Reports",
+        status: {
+          none: "None",
+          connected: "Connected",
+          disconnected: "Disconnected",
+          deleted: "Deleted",
+        },
+        grid: {
+          phoneNumber: "Phone Number",
+          registerAmount: "Register Amount",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+        },
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
