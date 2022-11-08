@@ -132,6 +132,11 @@ const TemplateModal = ({ open, onClose }) => {
       result += bodyText.split("{{name}}").length - 1
       result += bodyText.split("{{documentNumber}}").length - 1
       result += bodyText.split("{{phoneNumber}}").length - 1
+      result += bodyText.split("{{var1}}").length - 1
+      result += bodyText.split("{{var2}}").length - 1
+      result += bodyText.split("{{var3}}").length - 1
+      result += bodyText.split("{{var4}}").length - 1
+      result += bodyText.split("{{var5}}").length - 1
 
       if (paramsQuantity > 3) {
         toast.error(i18n.t("templates.templateModal.toastErr"));
@@ -160,6 +165,11 @@ const TemplateModal = ({ open, onClose }) => {
                   <MenuItem value={'name'}>{i18n.t("templates.templateModal.name")}</MenuItem>
                   <MenuItem value={'documentNumber'}>{i18n.t("templates.templateModal.document")}</MenuItem>
                   <MenuItem value={'phoneNumber'}>{i18n.t("templates.templateModal.phoneNumber")}</MenuItem>
+                  <MenuItem value={'var1'}>Var 1</MenuItem>
+                  <MenuItem value={'var2'}>Var 2</MenuItem>
+                  <MenuItem value={'var3'}>Var 3</MenuItem>
+                  <MenuItem value={'var4'}>Var 4</MenuItem>
+                  <MenuItem value={'var5'}>Var 5</MenuItem>
                 </Select>
               </FormControl>
           </DialogContent>
