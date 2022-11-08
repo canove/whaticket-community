@@ -96,19 +96,19 @@ const StartExposedImportService = async ({
                 const var5 = getRelationValue(mapping.var5, obj);
 
                 registersToInsert.push({
-                    name,
-                    phoneNumber,
-                    exposedImportId,
-                    documentNumber,
-                    template,
-                    templateParams,
-                    message,
-                    var1,
-                    var2,
-                    var3,
-                    var4,
-                    var5,
-                    companyId
+                    name: name,
+                    phoneNumber: phoneNumber,
+                    exposedImportId: exposedImportId,
+                    documentNumber: documentNumber,
+                    template: template,
+                    templateParams: templateParams,
+                    message: message,
+                    var1: var1,
+                    var2: var2,
+                    var3: var3,
+                    var4: var4,
+                    var5: var5,
+                    companyId: companyId
                 });
                 
                 if (registersToInsert.length >= 500) {
@@ -141,19 +141,19 @@ const StartExposedImportService = async ({
         const var5 = getRelationValue(mapping.var5, payload);
 
         await FileRegister.create({
-            name,
-            phoneNumber,
-            exposedImportId,
-            documentNumber,
-            template,
-            templateParams,
-            message,
-            var1,
-            var2,
-            var3,
-            var4,
-            var5,
-            companyId
+            name: name,
+            phoneNumber: phoneNumber,
+            exposedImportId: exposedImportId,
+            documentNumber: documentNumber,
+            template: template,
+            templateParams: templateParams,
+            message: message,
+            var1: var1,
+            var2: var2,
+            var3: var3,
+            var4: var4,
+            var5: var5,
+            companyId: companyId
         });
 
         await exposedImport.update({ qtdeRegister: totalRegisters + 1 });
