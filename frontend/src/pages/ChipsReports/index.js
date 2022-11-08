@@ -47,15 +47,25 @@ const ChipsReports = () => {
     const [loading, setLoading] = useState(false);
     const [reports, setReports] = useState([]);
     const [searchParam, setSearchParam] = useState("");
+    const [status, setStatus] = useState("");
+    const [hasMore, setHasMore] = useState(false);
+    const [count, setCount] = useState(0);
+    const [pageNumber, setPageNumber] = useState(1);
+
+    useEffect(() => {
+        setPageNumber(1);
+    }, [searchParam, status]);
 
     useEffect(() => {
         setLoading(true);
         const fetchReports = async () => {
             try {
                 const { data } = await api.get('/whatsapp/listReport/', {
-                    params: { searchParam }
+                    params: { searchParam, status, pageNumber }
                 });
                 setReports(data.reports);
+                setHasMore(data.hasMore);
+                setCount(data.count);
                 setLoading(false);
             } catch (err) {
                 toastError(err);
@@ -64,10 +74,14 @@ const ChipsReports = () => {
         }
 
         fetchReports();
-    }, [searchParam]);
+    }, [searchParam, status, pageNumber]);
 
     const handleSearchParamChange = (e) => {
         setSearchParam(e.target.value);
+    }
+
+    const handleStatusChange = (e) => {
+        setStatus(e.target.value);
     }
 
     return (
@@ -75,19 +89,43 @@ const ChipsReports = () => {
             <MainHeader>
                 <Title>Chips Reports</Title>
                 <MainHeaderButtonsWrapper>
-                    <TextField
-                        placeholder="Número"
-                        type="search"
-                        value={searchParam}
-                        onChange={handleSearchParamChange}
-                        InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon style={{ color: "gray" }} />
-                            </InputAdornment>
-                        ),
-                        }}
-                    />
+                    <div style={{ display: "flex", alignItems: "end" }}>
+                        <TextField
+                            placeholder="Número"
+                            type="search"
+                            value={searchParam}
+                            onChange={handleSearchParamChange}
+                            InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon style={{ color: "gray" }} />
+                                </InputAdornment>
+                            ),
+                            }}
+                        />
+                        <FormControl
+                            style={{
+                                margin: "0 10px",
+                            }}
+                        >
+                            <InputLabel id="status-select-label">
+                                Status
+                            </InputLabel>
+                            <Select
+                                labelId="status-select-label"
+                                id="status-select"
+                                value={status}
+                                label="Status"
+                                onChange={handleStatusChange}
+                                style={{width: "150px"}}
+                            >
+                                <MenuItem value={""}>Nenhum</MenuItem>
+                                <MenuItem value={"connected"}>Conectado</MenuItem>
+                                <MenuItem value={"disconnected"}>Desconectado</MenuItem>
+                                <MenuItem value={"deleted"}>Deletado</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
             <Paper
@@ -99,6 +137,8 @@ const ChipsReports = () => {
                         <TableRow>
                             <TableCell align="center">Número</TableCell>
                             <TableCell align="center">Qtde de Registros</TableCell>
+                            <TableCell align="center">Updated At</TableCell>
+                            <TableCell align="center">Created At</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -107,12 +147,37 @@ const ChipsReports = () => {
                                 <TableRow key={report.whatsapp.id}>
                                     <TableCell align="center">{report.whatsapp.name}</TableCell>
                                     <TableCell align="center">{report.qtdeRegisters}</TableCell>
+                                    <TableCell align="center">{format(parseISO(report.whatsapp.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
+                                    <TableCell align="center">{format(parseISO(report.whatsapp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                 </TableRow>
                             ))}
-                            {loading && <TableRowSkeleton columns={2} />}
+                            {loading && <TableRowSkeleton columns={4} />}
                         </>
                     </TableBody>
                 </Table>
+                <div
+					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
+				>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
+						disabled={ pageNumber === 1}
+					>
+						{i18n.t("importation.buttons.previousPage")}
+					</Button>
+					<Typography
+						style={{ display: "inline-block", fontSize: "1.25rem" }}
+					>
+						{ pageNumber } / { Math.ceil(count / 10) }
+					</Typography>
+					<Button
+						variant="outlined"
+						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
+						disabled={ !hasMore }
+					>
+						{i18n.t("importation.buttons.nextPage")}
+					</Button>
+				</div>
             </Paper>
         </MainContainer>
     );

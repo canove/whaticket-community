@@ -262,13 +262,15 @@ export const listAll = async (req: Request, res: Response): Promise<Response> =>
 
 type ListReportQuery = {
   searchParam: string;
+  status: string;
+  pageNumber: string;
 }
 
 export const listReport = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam } = req.query as ListReportQuery;
+  const { searchParam, status, pageNumber } = req.query as ListReportQuery;
   const { companyId } = req.user;
 
-  const { reports, count, hasMore } = await ListReportWhatsAppsService({ searchParam, companyId });
+  const { reports, count, hasMore } = await ListReportWhatsAppsService({ searchParam, companyId, status, pageNumber });
 
   return res.status(200).json({
     reports, 

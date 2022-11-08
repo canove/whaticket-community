@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
+import { Op } from "sequelize";
 import FileRegister from "../../database/models/FileRegister";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
@@ -9,8 +10,10 @@ interface WhatsReports {
 }
 
 interface Request {
-  searchParam: string;
   companyId: number;
+  searchParam?: string;
+  status?: string;
+  pageNumber?: string;
 }
 
 interface Response {
@@ -21,11 +24,17 @@ interface Response {
 
 const ListReportWhatsAppsService = async ({
   searchParam,
-  companyId
+  status,
+  companyId,
+  pageNumber
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
   whereCondition = { companyId, deleted: false };
+
+  if (status === "deleted") whereCondition = { ...whereCondition, deleted: true };
+  if (status === "connected") whereCondition = { ...whereCondition, status: "CONNECTED" }
+  if (status === "disconnected") whereCondition = { ... whereCondition, status: { [Op.ne]: "CONNECTED" } }
 
   if (searchParam) {
     whereCondition = {
@@ -42,12 +51,17 @@ const ListReportWhatsAppsService = async ({
     where: whereCondition,
   });
 
-  const whatsReports = [];
+  let whatsReports = [];
 
-  for (const whats of whatsapps) {
+  const limit = 10;
+  const offset = limit * (+pageNumber - 1);
+
+  for (const whats of whatsapps) {    
     const { count } = await FileRegister.findAndCountAll({
       where: { whatsappId: whats.id }
     });
+
+    if (count === 0) continue;
 
     whatsReports.push({
       whatsapp: whats,
@@ -55,8 +69,11 @@ const ListReportWhatsAppsService = async ({
     });
   }
 
-  const count = 0;
-  const hasMore = false;
+  const count = whatsReports.length;
+
+  whatsReports = whatsReports.slice(offset, offset + limit);
+
+  const hasMore = count > whatsReports.length;
 
   return { reports: whatsReports, count, hasMore };
 };
