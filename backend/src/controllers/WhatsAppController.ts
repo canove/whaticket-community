@@ -24,6 +24,7 @@ import FileRegister from "../database/models/FileRegister";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
 import ListAllWhatsAppsService from "../services/WhatsappService/ListAllWhatsAppsService";
 import TransferWhatsAppService from "../services/WhatsappService/TransferWhatsAppService";
+import ListReportWhatsAppsService from "../services/WhatsappService/ListReportWhatsAppsService";
 
 interface WhatsappData {
   name: string;
@@ -254,6 +255,23 @@ export const listAll = async (req: Request, res: Response): Promise<Response> =>
 
   return res.status(200).json({
     whatsapps, 
+    count, 
+    hasMore
+  });
+};
+
+type ListReportQuery = {
+  searchParam: string;
+}
+
+export const listReport = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam } = req.query as ListReportQuery;
+  const { companyId } = req.user;
+
+  const { reports, count, hasMore } = await ListReportWhatsAppsService({ searchParam, companyId });
+
+  return res.status(200).json({
+    reports, 
     count, 
     hasMore
   });
