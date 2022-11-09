@@ -8,6 +8,7 @@ import FlowsSessions from "../../database/models/FlowsSessions";
 import axios from "axios";
 import Contact from "../../database/models/Contact";
 import Ticket from "../../database/models/Ticket";
+import FileRegister from "../../database/models/FileRegister";
 
 interface Request {
   flowNodeId?: string;
@@ -64,6 +65,8 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   if (node.type === "conditional-node") {
+    if (!node.conditions) return { condition: "ELSE" };
+
     const response = Object.keys(node.conditions).find((conditionId: any) => {
       const conditionExpression = node.conditions[conditionId];
 
@@ -213,6 +216,46 @@ const processNode = async (node: any, session: any, body: any) => {
     return { queueId: node.queueId };
   }
 
+  if (node.type === "database-condition-node") {
+    const fileRegister = await FileRegister.findOne({
+      where: {
+        phoneNumber: session.id,
+        companyId: session.companyId
+      },
+      order: [["updatedAt", "DESC"]]
+    });
+
+    const variable = fileRegister[node.variable];
+
+    if (node.condition === "complete") {
+      return { condition: variable === body.text };
+    }
+
+    if (node.condition === "last") {
+      const variableLast = variable.substring(variable.length - node.charactersNumber);
+      return { condition: variableLast === body.text };
+    }
+
+    if (node.condition === "start") {
+      const variableStart = variable.substring(0, node.charactersNumber);
+      return { condition: variableStart === body.text };
+    }
+  }
+
+  if (node.type === "database-node") {
+    const fileRegister = await FileRegister.findOne({
+      where: {
+        phoneNumber: session.id,
+        companyId: session.companyId
+      },
+      order: [["updatedAt", "DESC"]]
+    });
+
+    const varible = fileRegister[node.variable];
+
+    return { database: varible };
+  }
+
   return {};
 }
 
@@ -228,6 +271,15 @@ const getLink = (name: string, node: any, nodeResponse: any) => {
 
   if (node.type === "request-node") {
     const portName = `${name}-${nodeResponse.response ? "2xx" : "err"}`;
+    for (const port of node.ports) {
+      if (port.name === portName) {
+        return port.links[0];
+      }
+    }
+  }
+
+  if (node.type === "database-condition-node") {
+    const portName = `${name}-${nodeResponse.condition.toString().toLowerCase()}`;
     for (const port of node.ports) {
       if (port.name === portName) {
         return port.links[0];
@@ -365,6 +417,24 @@ const StartFlowService = async ({
       sessionId,
       companyId,
       body: { ...body, variables: { ...variables, ...nodeResponse.variables } }
+    });
+  }
+
+  if (node.type === "database-condition-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...body, variables }
+    });
+  }
+
+  if (node.type === "database-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...body, variables, ...nodeResponse }
     });
   }
 
