@@ -5,6 +5,7 @@ import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSess
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 import TestWhatsAppConnectionService from "../services/WhatsappService/TestWhatsAppConnectionService";
 import { logger } from "../utils/logger";
+import AppError from "../errors/AppError";
 
 type IndexQuery = {
   facebookToken: string;
@@ -39,6 +40,32 @@ const store = async (req: Request, res: Response): Promise<Response> => {
 const update = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
   const { companyId } = req.user;
+
+  // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
+  
+  const whats = await ShowWhatsAppService(whatsappId, companyId);
+
+  const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
+
+  const payload = {
+    companyId
+  };
+
+  if(!whats.official) {
+    try {
+      await axios.post(apiUrl, payload, {
+        headers: {
+          "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+        }
+      });
+    } catch (err: any) {
+        if(!err.response.data["message"]){
+          throw new AppError("Ocorreu um erro ao tentar se comunicar com Firebase!");
+        }
+      throw new AppError(err.response.data.message);
+    }
+  }
 
   const { whatsapp } = await UpdateWhatsAppService({
     whatsappId,
