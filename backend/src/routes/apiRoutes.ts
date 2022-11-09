@@ -5,6 +5,7 @@ import uploadConfig from "../config/upload";
 
 import * as ApiController from "../controllers/ApiController";
 import * as WhatsAppController from "../controllers/WhatsAppController";
+import * as FileRegisterController from "../controllers/FileRegisterController";
 import * as FlowsController from "../controllers/FlowsController";
 import * as TicketController from "../controllers/TicketController";
 import isAuthApi from "../middleware/isAuthApi";
@@ -88,9 +89,9 @@ ApiRoutes.get("/pingConnections", isAuthApi, ApiController.pingConnections);
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
 
 ApiRoutes.get(
-  "/whatsapp/getInfo/:msgWhatsId",
+  "/fileRegisters/getInfo/",
   isAuthApi,
-  WhatsAppController.getInfo
+  FileRegisterController.getInfo
 );
 
 export default ApiRoutes;
