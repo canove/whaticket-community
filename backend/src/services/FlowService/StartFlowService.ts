@@ -226,6 +226,8 @@ const processNode = async (node: any, session: any, body: any) => {
       order: [["updatedAt", "DESC"]]
     });
 
+    if (!fileRegister) return { condition: false };
+
     const variable = fileRegister[node.variable];
 
     if (node.condition === "complete") {
