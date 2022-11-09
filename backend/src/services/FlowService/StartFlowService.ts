@@ -220,7 +220,8 @@ const processNode = async (node: any, session: any, body: any) => {
     const fileRegister = await FileRegister.findOne({
       where: {
         phoneNumber: session.id,
-        companyId: session.companyId
+        companyId: session.companyId,
+        processedAt: { [Op.ne]: null }
       },
       order: [["updatedAt", "DESC"]]
     });
@@ -246,7 +247,8 @@ const processNode = async (node: any, session: any, body: any) => {
     const fileRegister = await FileRegister.findOne({
       where: {
         phoneNumber: session.id,
-        companyId: session.companyId
+        companyId: session.companyId,
+        processedAt: { [Op.ne]: null }
       },
       order: [["updatedAt", "DESC"]]
     });
