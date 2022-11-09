@@ -87,4 +87,10 @@ ApiRoutes.get("/pingConnections", isAuthApi, ApiController.pingConnections);
 
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
 
+ApiRoutes.get(
+  "/whatsapp/getInfo/:msgWhatsId",
+  isAuthApi,
+  WhatsAppController.getInfo
+);
+
 export default ApiRoutes;

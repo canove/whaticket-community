@@ -279,6 +279,21 @@ export const listReport = async (req: Request, res: Response): Promise<Response>
   });
 };
 
+export const getInfo = async (req: Request, res: Response): Promise<Response> => {
+  const { msgWhatsId } = req.params;
+  const { companyId } = req.user;
+
+  // const fileRegisters = FileRegister.findAll({
+  //   where: {
+  //     msgWhatsId
+  //   }
+  // });
+
+  //...
+
+  return res.status(200).json(msgWhatsId);
+}
+
 export const newMessage = async (
   req: Request,
   res: Response
