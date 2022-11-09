@@ -42,6 +42,7 @@ interface WhatsappData {
   flowId?: string | number;
   connectionFileId?: string | number;
   business?: boolean;
+  service?: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -68,6 +69,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     flowId,
     connectionFileId,
     business,
+    service
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -76,7 +78,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
 
   const payload = {
-    companyId
+    companyId,
+    service
   };
 
   if(!official) {
