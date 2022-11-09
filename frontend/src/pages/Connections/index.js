@@ -30,6 +30,10 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogActions,
 } from "@material-ui/core";
 import {
 	Edit,
@@ -204,6 +208,11 @@ const Connections = () => {
 	const [searchParam, setSearchParam] = useState("");
 	const [status, setStatus] = useState("");
 
+	const [service, setService] = useState("");
+	const [services, setServices] = useState([]);
+	const [newQrCodeServiceModalOpen, setNewQrCodeServiceModalOpen] = useState(false);
+	const [selectedWhatsAppId, setSelectedWhatsAppId] = useState("");
+
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 	}, [pageNumber, searchParam, status]);
@@ -256,7 +265,18 @@ const Connections = () => {
 			}
 		};
 
+		const fetchServices = async () => {
+			if (user.companyId !== 1) return;
+			try {
+				const { data } = await api.get(`/firebase/company/${user.companyId}`);
+				setServices(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
 		fetchConnectionFiles();
+		fetchServices();
 	}, [])
 
 	useEffect(() => {
@@ -294,12 +314,41 @@ const Connections = () => {
 	};
 
 	const handleRequestNewQrCode = async whatsAppId => {
+		if (user.companyId === 1) {
+			setSelectedWhatsAppId(whatsAppId);
+			setNewQrCodeServiceModalOpen(true);
+		} else {
+			try {
+				await api.put(`/whatsappsession/${whatsAppId}`);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+	};
+
+	const handleCreateNewQRCodeWithService = async () => {
+		const body = {
+			service
+		}
+
 		try {
-			await api.put(`/whatsappsession/${whatsAppId}`);
+			await api.put(`/whatsappsession/${selectedWhatsAppId}`, body);
 		} catch (err) {
 			toastError(err);
 		}
-	};
+
+		handleNewQrCodeServiceModalClose();
+	}
+
+	const handleNewQrCodeServiceModalClose = () => {
+		setNewQrCodeServiceModalOpen(false);
+		setService("");
+		setSelectedWhatsAppId("");
+	}
+
+	const handleServiceChange = (e) => {
+		setService(e.target.value);
+	}
 
 	const handleOpenWhatsAppModal = () => {
 		setSelectedWhatsApp(null);
@@ -539,6 +588,62 @@ const Connections = () => {
 						whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
 						connectionFileId={connectionFileId}
 					/>
+					<div className={classes.root}>
+						<Dialog
+							open={newQrCodeServiceModalOpen}
+							onClose={handleNewQrCodeServiceModalClose}
+							maxWidth="xs"
+							fullWidth
+							scroll="paper"
+						>
+							<DialogTitle>
+								Selecione um Serviço
+							</DialogTitle>
+							<DialogContent>
+								<div>
+									<FormControl
+										variant="outlined"
+										className={classes.multFieldLine}
+										margin="dense"
+										fullWidth
+									>
+										<InputLabel>Serviço</InputLabel>
+										<Select
+											value={service}
+											onChange={(e) => { handleServiceChange(e) }}
+											label="Serviço"
+										>
+											<MenuItem value={""}>Nenhum</MenuItem>
+											{ services && services.map(service => {
+												if (service.data.isFull || !service.data.connected) return;
+												return (
+													<MenuItem value={service.data.service} key={service.data.service}>{service.data.service}</MenuItem>
+												)
+											}) }
+										</Select>
+									</FormControl>
+								</div>
+							</DialogContent>
+							<DialogActions>
+								<Button
+									onClick={handleNewQrCodeServiceModalClose}
+									color="secondary"
+									variant="outlined"
+								>
+									{i18n.t("whatsappModal.buttons.cancel")}
+								</Button>
+								<Button
+									type="submit"
+									color="primary"
+									variant="contained"
+									className={classes.btnWrapper}
+									onClick={handleCreateNewQRCodeWithService}
+								>
+									Criar QRCode
+								</Button>
+							</DialogActions>
+						</Dialog>
+					</div>
 					<MainHeader>
 						<Title>{i18n.t("connections.title")}</Title>
 						<MainHeaderButtonsWrapper>

@@ -40,6 +40,7 @@ const store = async (req: Request, res: Response): Promise<Response> => {
 const update = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
   const { companyId } = req.user;
+  const { service } = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   
@@ -48,7 +49,8 @@ const update = async (req: Request, res: Response): Promise<Response> => {
   const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
 
   const payload = {
-    companyId
+    companyId,
+    service
   };
 
   if(!whats.official) {
