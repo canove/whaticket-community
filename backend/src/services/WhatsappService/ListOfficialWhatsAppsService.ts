@@ -52,6 +52,11 @@ const ListWhatsAppsService = async ({
       ...whereCondition,
       connectionFileId
     }
+  } else {
+    whereCondition = {
+      ...whereCondition,
+      connectionFileId: { [Op.is]: null }
+    }
   }
 
   if (searchParam) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next";
 
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input/input'
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -88,6 +89,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const [connectionFiles, setConnectionFiles] = useState("");
 	const [connectionFile, setConnectionFile] = useState("");
 	// const [phoneNumber, setPhoneNumber] = useState("");
+	const { user } = useContext(AuthContext);
+	const [service, setService] = useState("");
+	const [services, setServices] = useState([]);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -123,11 +127,22 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			}
 		}
 
+		const fetchServices = async () => {
+			if (user.companyId !== 1) return;
+			try {
+				const { data } = await api.get(`/firebase/company/${user.companyId}`);
+				setServices(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
 		setConnectionFile(connectionFileId);
 
 		fetchSession();
 		fetchFlows();
 		fetchConnectionFiles();
+		fetchServices();
 	}, [whatsAppId, connectionFileId, open]);
 
 	const handleSaveWhatsApp = async values => {
@@ -136,6 +151,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			queueIds: selectedQueueIds,
 			flowId: flow ? flow : null,
 			connectionFileId: connectionFile ? connectionFile : null,
+			service: service ? service : null
 			// name: phoneNumber.replace("+", ""),
 		};
 
@@ -155,6 +171,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	const handleClose = () => {
 		setFlow("");
 		setConnectionFile("");
+		setService("");
 		// setPhoneNumber("");
 		setWhatsApp(initialState);
 		onClose();
@@ -171,6 +188,10 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 	// const handlePhoneNumberChange = (value) => {
     //     setPhoneNumber(value);
     // }
+
+	const handleServiceChange = (e) => {
+		setService(e.target.value);
+	}
 
 	return (
 		<div className={classes.root}>
@@ -311,6 +332,31 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										margin="dense"
 									/>
 								</div>
+								{ (user.companyId === 1 && !whatsAppId) &&
+									<div>
+										<FormControl
+											variant="outlined"
+											className={classes.multFieldLine}
+											margin="dense"
+											fullWidth
+										>
+											<InputLabel>Serviço</InputLabel>
+											<Select
+												value={service}
+												onChange={(e) => { handleServiceChange(e) }}
+												label="Serviço"
+											>
+												<MenuItem value={""}>Nenhum</MenuItem>
+												{ services && services.map(service => {
+													if (service.data.isFull || !service.data.connected) return;
+													return (
+														<MenuItem value={service.data.service} key={service.data.service}>{service.data.service}</MenuItem>
+													)
+												}) }
+											</Select>
+										</FormControl>
+									</div>
+								}
 								<div>
 									<FormControl
 										variant="outlined"
