@@ -125,13 +125,13 @@ export class BodyWidget extends React.Component {
 							name="Start Inactivity"
 							color="#A30000"
 							icon={<AiOutlineFieldTime style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/>
+						/> */}
 						<TrayItemWidget 
 							model={{ type: 'transfer-queue' }}
 							name="Transfer Queue"
 							color="#211F7E"
 							icon={<TfiHeadphoneAlt style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/> */}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -174,7 +174,6 @@ export class BodyWidget extends React.Component {
 							} else if (data.type === "transfer-queue") {
 								node = new TransferQueueNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out'));
 							} else if (data.type === "database-condition") {
 								node = new DatabaseConditionNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));

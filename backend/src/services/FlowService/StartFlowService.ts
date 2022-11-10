@@ -213,7 +213,12 @@ const processNode = async (node: any, session: any, body: any) => {
     //   queueId: node.queueId
     // });
 
-    return { queueId: node.queueId };
+    await session.update({
+      nodeId: null,
+      variables: null
+    });
+
+    return { queueId: node.queueId, type: "TRANSFER_QUEUE" };
   }
 
   if (node.type === "database-condition-node") {
