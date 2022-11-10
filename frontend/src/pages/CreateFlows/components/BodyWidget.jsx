@@ -23,12 +23,14 @@ import { IoIosSave } from 'react-icons/io';
 import { GiStopSign } from 'react-icons/gi';
 import { AiOutlineFieldTime } from 'react-icons/ai';
 import { FaDatabase } from 'react-icons/fa';
+import { AiOutlineMessage } from 'react-icons/ai';
 
 import { StartInactivityNodeModel } from '../nodes/StartInactivity/StartInactivityNodeModel';
 import { TfiHeadphoneAlt } from "react-icons/tfi"
 import { TransferQueueNodeModel } from '../nodes/TransferQueue/TransferQueueNodeModel';
 import { DatabaseConditionNodeModel } from '../nodes/DatabaseCondition/DatabaseConditionNodeModel';
 import { DatabaseNodeModel } from '../nodes/Database/DatabaseNodeModel';
+import { MessageConditionNodeModel } from '../nodes/MessageCondition/MessageConditionNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -112,6 +114,12 @@ export class BodyWidget extends React.Component {
 							color="#BFBFBF" 
 							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
 						/>
+						<TrayItemWidget
+							model={{ type: 'message-condition' }} 
+							name="Message Condition" 
+							color="#211F7E" 
+							icon={<AiOutlineMessage style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
 						{/* <TrayItemWidget 
 							model={{ type: 'start-inactivity' }}
 							name="Start Inactivity"
@@ -176,6 +184,11 @@ export class BodyWidget extends React.Component {
 								node = new DatabaseNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));
 								node.addPort(new AdvancedPortModel(false, 'out'));
+							} else if (data.type === "message-condition") {
+								node = new MessageConditionNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								node.addPort(new AdvancedPortModel(false, 'out-1'));
+								node.addPort(new AdvancedPortModel(false, 'out-else'));
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);

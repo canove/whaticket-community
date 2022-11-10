@@ -260,6 +260,24 @@ const processNode = async (node: any, session: any, body: any) => {
     return { database: varible };
   }
 
+  if (node.type === "message-condition-node") {
+    if (!node.conditions) return { condition: "ELSE" }
+
+    const response = Object.keys(node.conditions).find((conditionId: any) => {
+      const conditionExpression = node.conditions[conditionId];
+
+      if (!conditionExpression) return true;
+
+      const texts = conditionExpression.replaceAll(" ", "").toLowerCase().split(",");
+
+      for (const text of texts) {
+        if (text === body.text.replaceAll(" ", "").toLowerCase()) return true;
+      }
+    });
+
+    return { condition: response ? response : "ELSE" };
+  }
+
   return {};
 }
 
@@ -283,6 +301,15 @@ const getLink = (name: string, node: any, nodeResponse: any) => {
   }
 
   if (node.type === "database-condition-node") {
+    const portName = `${name}-${nodeResponse.condition.toString().toLowerCase()}`;
+    for (const port of node.ports) {
+      if (port.name === portName) {
+        return port.links[0];
+      }
+    }
+  }
+
+  if (node.type === "message-condition-node") {
     const portName = `${name}-${nodeResponse.condition.toString().toLowerCase()}`;
     for (const port of node.ports) {
       if (port.name === portName) {
@@ -439,6 +466,15 @@ const StartFlowService = async ({
       sessionId,
       companyId,
       body: { ...body, variables, ...nodeResponse }
+    });
+  }
+
+  if (node.type === "message-condition-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...body, variables }
     });
   }
 

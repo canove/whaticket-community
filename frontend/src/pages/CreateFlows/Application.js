@@ -18,6 +18,7 @@ import { StartInactivityNodeFactory } from './nodes/StartInactivity/StartInactiv
 import { TransferQueueNodeFactory } from './nodes/TransferQueue/TransferQueueNodeFactory';
 import { DatabaseConditionNodeFactory } from './nodes/DatabaseCondition/DatabaseConditionNodeFactory';
 import { DatabaseNodeFactory } from './nodes/Database/DatabaseNodeFactory';
+import { MessageConditionNodeFactory } from './nodes/MessageCondition/MessageConditionNodeFactory';
 
 export class Application {
 	constructor() {
@@ -39,6 +40,7 @@ export class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new TransferQueueNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new DatabaseConditionNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new DatabaseNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new MessageConditionNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());
