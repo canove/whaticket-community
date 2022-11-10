@@ -26,7 +26,7 @@ export class DatabaseConditionNodeModel extends NodeModel {
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
 		this.variable = ob.data.variable;
-		this.condition = ob.data.conditon;
+		this.condition = ob.data.condition;
 		this.charactersNumber = ob.data.charactersNumber;
 
 		this.updatePorts();
