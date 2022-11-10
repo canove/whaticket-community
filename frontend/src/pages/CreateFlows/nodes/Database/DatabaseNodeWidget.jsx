@@ -16,6 +16,7 @@ export class DatabaseNodeWidget extends React.Component {
 		this.state = {
 		  modalOpen: false,
 		  variable: props.node.variable ? props.node.variable : "",
+		  varType: props.node.varType ? props.node.varType : "text",
 		};
 	}
 
@@ -23,6 +24,12 @@ export class DatabaseNodeWidget extends React.Component {
 		this.setState({ variable: e.target.value });
 
 		this.props.node.variable = e.target.value;
+	}
+
+	handleVarTypeChange = (e) => {
+		this.setState({ varType: e.target.value });
+
+		this.props.node.varType = e.target.value;
 	}
 
 	render() {
@@ -73,8 +80,30 @@ export class DatabaseNodeWidget extends React.Component {
 								<MenuItem value={"var5"}>{'Var 5'}</MenuItem>
 							</Select>
 						</FormControl>
+						<FormControl
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							style={{ margin: "0 5px" }}
+						>
+							<InputLabel id="var-type-select-label">
+								Tipo
+							</InputLabel>
+							<Select
+								labelId="var-type-select-label"
+								id="var-type-select"
+								value={this.state.varType}
+								label="Tipo"
+								onChange={(e) => { this.handleVarTypeChange(e) }}
+								variant="outlined"
+							>
+								<MenuItem value={"text"}>{'Texto'}</MenuItem>
+								<MenuItem value={"url"}>{'URL'}</MenuItem>
+							</Select>
+						</FormControl>
 					</div>
-					Para usar esta variavel use: {'{{database}}'}
+					Para usar esta variavel use: {'{{database.value}}'} <br/>
+					Para usar o tipo use: {'{{database.type}}'}
 				</DialogContent>
 				<DialogActions>
 					<Button

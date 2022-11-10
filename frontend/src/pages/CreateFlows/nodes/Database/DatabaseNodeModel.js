@@ -10,18 +10,21 @@ export class DatabaseNodeModel extends NodeModel {
 			type: 'database-node'
 		});
 		this.variable = "";
+		this.varType = "text";
 	}
 
 	serialize() {
 		return {
 			...super.serialize(),
 			variable: this.variable,
+			varType: this.varType,
 		};
 	}
 
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
 		this.variable = ob.data.variable;
+		this.varType = ob.data.varType;
 
 		this.updatePorts();
 	}

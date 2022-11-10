@@ -255,9 +255,11 @@ const processNode = async (node: any, session: any, body: any) => {
       order: [["updatedAt", "DESC"]]
     });
 
-    const varible = fileRegister[node.variable];
+    if (!fileRegister) return { database: { value: "", type: "text" } };
 
-    return { database: varible };
+    const variable = fileRegister[node.variable] ? fileRegister[node.variable] : "";
+
+    return { database: { value: variable, type: node.varType } };
   }
 
   if (node.type === "message-condition-node") {
