@@ -264,7 +264,16 @@ const processNode = async (node: any, session: any, body: any) => {
 
     const variable = fileRegister[node.variable] ? fileRegister[node.variable] : "";
 
-    return { database: { value: variable, type: node.varType } };
+    return {
+      message: {
+        blocks: [
+          {
+            text: variable,
+            type: node.varType
+          }
+        ]
+      }
+    };
   }
 
   if (node.type === "message-condition-node") {
@@ -467,14 +476,14 @@ const StartFlowService = async ({
     });
   }
 
-  if (node.type === "database-node") {
-    return await StartFlowService({
-      flowNodeId,
-      sessionId,
-      companyId,
-      body: { ...body, variables, ...nodeResponse }
-    });
-  }
+  // if (node.type === "database-node") {
+  //   return await StartFlowService({
+  //     flowNodeId,
+  //     sessionId,
+  //     companyId,
+  //     body: { ...body, variables, ...nodeResponse }
+  //   });
+  // }
 
   if (node.type === "message-condition-node") {
     return await StartFlowService({

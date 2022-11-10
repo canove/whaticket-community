@@ -102,8 +102,8 @@ export class DatabaseNodeWidget extends React.Component {
 							</Select>
 						</FormControl>
 					</div>
-					Para usar esta variavel use: {'{{database.value}}'} <br/>
-					Para usar o tipo use: {'{{database.type}}'}
+					{/* Para usar esta variavel use: {'{{database.value}}'} <br/>
+					Para usar o tipo use: {'{{database.type}}'} */}
 				</DialogContent>
 				<DialogActions>
 					<Button
