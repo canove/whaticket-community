@@ -78,7 +78,7 @@ const ListRegistersService = async ({
       [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NULL")), 'noWhats' ],
     ],
     raw: true
-  })
+  });
 
   return totalAmount;
 };
