@@ -42,8 +42,7 @@ const ListRegistersService = async ({
       ...whereCondition,
       fileId
     }
-  } 
-  else {
+  } else {
     const files = await File.findAll({
       where: { status: 7, companyId }
     });
