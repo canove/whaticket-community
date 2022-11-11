@@ -37,7 +37,8 @@ const TransferWhatsAppService = async ({
     const oldCompanyId = whats.companyId;
 
     await whats.update({
-      companyId: company
+      companyId: company,
+      connectionFileId: null
     });
 
     const whatsapp = await Whatsapp.findOne({

@@ -130,22 +130,6 @@ export class TransferQueueNodeWidget extends React.Component {
 							port={this.props.node.getPort('in')}
 						>
 						</PortWidget>
-						<PortWidget
-							style={{
-								backgroundColor: "#211F7E",
-								border: "2px solid #075E54",
-								borderRadius: "100%",
-								cursor: "pointer",
-								height: "16px",
-								position: "absolute",
-								right: "-8px",
-								top: "50%",
-								width: "16px",
-							}}
-							engine={this.props.engine}
-							port={this.props.node.getPort('out')}
-						>
-						</PortWidget>
 						<TfiHeadphoneAlt
 							style={{
 								display: "block",
@@ -155,7 +139,7 @@ export class TransferQueueNodeWidget extends React.Component {
 								top: "50%",
 								width: "50px",
 							}}
-						/>  
+						/>
 					</div>
 				</div>
 			</div>

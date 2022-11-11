@@ -23,7 +23,7 @@ const CreateFlows = () => {
 		for (const oneLink of allLinks) {
       oneLink.options.selected = false;
 
-			if (!oneLink.options.selected && !oneLink.targetPort) {
+			if (!oneLink.options.selected && (!oneLink.targetPort || !oneLink.sourcePort)) {
 				app.getActiveDiagram().removeLink(oneLink);
 			}
 		}

@@ -417,18 +417,20 @@ const ImportationtModal = ({ open, onClose, integratedImportId, integratedImport
 	}
 
     const handleConnectionChange = (e) => {
-		const {
-			target: { value },
-		} = e;
+		const value = e.target.value;
+        const allIndex = value.indexOf('Todos');
 
-		if (value.includes('Todos')) {
+		if (allIndex !== -1 && allIndex === (value.length - 1)) {
 			setConnection([]);
 
-			let allConnections = ["Todos"]
+			const allConnections = ["Todos"]
 
 			setConnection(allConnections);
 			setOpenConnectionSelect(false);
 		} else {
+            if ((allIndex || allIndex === 0) && allIndex !== -1) {
+				value.splice(allIndex, 1);
+			}
 			setConnection(typeof value === "string" ? value.split(",") : value);
 		}
 	}

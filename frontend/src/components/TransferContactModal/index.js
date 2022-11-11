@@ -94,7 +94,7 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
 
         fetchWhats();
         fetchCompanies();
-        console.log(selectedWhatsapps);
+
         if (selectedWhatsapps) {
             setWhatsappsId(selectedWhatsapps);
         } else {
@@ -119,15 +119,6 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
     };
 
     const handleSubmit = async () => {
-        console.log(whatsapps);
-        console.log(companies);
-        console.log(selectedWhatsapps);
-
-        console.log("-----");
-
-        console.log(whatsappsId);
-        console.log(companyId);
-
         const transferData = {
             whatsapps: whatsappsId,
             company: companyId

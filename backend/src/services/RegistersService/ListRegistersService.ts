@@ -1,150 +1,86 @@
 /*eslint-disable*/
 import FileRegister from "../../database/models/FileRegister";
-import {Op} from "sequelize"
+import { Op, Sequelize } from "sequelize"
 import File from "../../database/models/File";
 import { FileStatus } from "../../enum/FileStatus";
+import sequelize from "../../database";
 
 interface Request {
-  type?: string,
   fileId?: number | string,
   date?: string,
   companyId: number
 }
 
+const getDate = (date: string, option: string) => {
+  if (option === "MORNING") {
+    let morningDate = new Date(`${date} GMT-3`);
+    morningDate.setHours(0, 0, 0, 0);
+    return morningDate;
+  }
+
+  if (option === "NIGHT") {
+    let nightDate = new Date(`${date} GMT-3`);
+    nightDate.setHours(23, 59, 59, 999);
+    return nightDate;
+  }
+}
+
 const ListRegistersService = async ({
-  type,
   fileId,
   date,
   companyId
 }: Request) => {
   let whereCondition = null;
 
-  const getDate = (option: string) => {
-    if (option === "MORNING") {
-      let morningDate = new Date(`${date} GMT-3`);
-      morningDate.setHours(0, 0, 0, 0);
-      return morningDate;
-    }
-
-    if (option === "NIGHT") {
-      let nightDate = new Date(`${date} GMT-3`);
-      nightDate.setHours(23, 59, 59, 999);
-      return nightDate;
-    }
+  whereCondition = {
+    ...whereCondition,
+    companyId
   }
 
   if (fileId) {
-    switch(type) {
-      case 'sent':
-        whereCondition = {
-          sentAt: {[Op.ne]: null},
-          fileId,
-        }
-        break;
-      case 'delivered':
-        whereCondition = {
-          deliveredAt: {[Op.ne]: null},
-          fileId,
-        }
-        break;
-      case 'read':
-        whereCondition = {
-          readAt: {[Op.ne]: null},
-          fileId,
-        }
-        break;
-      case 'error':
-        whereCondition = {
-          errorAt: {[Op.ne]: null},
-          fileId,
-        }
-        break;
-      default:
-        whereCondition = {
-          fileId,
-        }
-        break;
-    }
-  } else if (date) {
-    switch(type) {
-      case 'sent':
-        whereCondition = {
-          sentAt: {[Op.ne]: null},
-          createdAt: {
-            [Op.gte]: getDate("MORNING"),
-            [Op.lte]: getDate("NIGHT"),
-          },
-        }
-        break;
-      case 'delivered':
-        whereCondition = {
-          deliveredAt: {[Op.ne]: null},
-          createdAt: {
-            [Op.gte]: getDate("MORNING"),
-            [Op.lte]: getDate("NIGHT"),
-          },
-        }
-        break;
-      case 'read':
-        whereCondition = {
-          readAt: {[Op.ne]: null},
-          createdAt: {
-            [Op.gte]: getDate("MORNING"),
-            [Op.lte]: getDate("NIGHT"),
-          },
-        }
-        break;
-      case 'error':
-        whereCondition = {
-          errorAt: {[Op.ne]: null},
-          createdAt: {
-            [Op.gte]: getDate("MORNING"),
-            [Op.lte]: getDate("NIGHT"),
-          },
-        }
-        break;
-      default:
-        whereCondition = {
-          createdAt: {
-            [Op.gte]: getDate("MORNING"),
-            [Op.lte]: getDate("NIGHT"),
-          },
-        }
-        break;
+    whereCondition = {
+      ...whereCondition,
+      fileId
     }
   } else {
-    switch(type) {
-      case 'sent':
-        whereCondition = { sentAt: { [Op.ne]: null } }
-        break;
-      case 'delivered':
-        whereCondition = { deliveredAt: { [Op.ne]: null } }
-        break;
-      case 'read':
-        whereCondition = { readAt: { [Op.ne]: null } }
-        break;
-      case 'error':
-        whereCondition = { errorAt: { [Op.ne]: null } }
-        break;
-    }
-  }
-
-  if (!fileId) {
     const files = await File.findAll({
       where: { status: 7, companyId }
     });
 
     if (files.length > 0) {
       const filesArray = files.map(file => file.id);
-      whereCondition = { ...whereCondition, fileId: { [Op.notIn]: filesArray } }
+      whereCondition = {
+        ...whereCondition,
+        fileId: { [Op.notIn]: filesArray }
+      }
     }
   }
 
-  const { count } = await FileRegister.findAndCountAll({
-    where: { ...whereCondition, companyId }
+  if (date) {
+    whereCondition = {
+      ...whereCondition,
+      createdAt: {
+        [Op.gte]: getDate(date, "MORNING"),
+        [Op.lte]: getDate(date, "NIGHT"),
+      },
+    }
+  }
+
+  const totalAmount = await FileRegister.findOne({
+    where: whereCondition,
+    attributes: [
+      [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
+      [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL")), 'sent' ],
+      [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
+      [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
+      [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
+      [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
+      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND msgWhatsId IS NULL")), 'noWhats' ],
+    ],
+    raw: true
   });
 
-  return { count };
+  return totalAmount;
 };
 
 export default ListRegistersService;

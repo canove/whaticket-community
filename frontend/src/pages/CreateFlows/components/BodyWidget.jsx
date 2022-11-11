@@ -22,9 +22,15 @@ import { AccountTree, Chat, GetApp } from '@material-ui/icons/';
 import { IoIosSave } from 'react-icons/io';
 import { GiStopSign } from 'react-icons/gi';
 import { AiOutlineFieldTime } from 'react-icons/ai';
+import { FaDatabase } from 'react-icons/fa';
+import { AiOutlineMessage } from 'react-icons/ai';
+
 import { StartInactivityNodeModel } from '../nodes/StartInactivity/StartInactivityNodeModel';
 import { TfiHeadphoneAlt } from "react-icons/tfi"
 import { TransferQueueNodeModel } from '../nodes/TransferQueue/TransferQueueNodeModel';
+import { DatabaseConditionNodeModel } from '../nodes/DatabaseCondition/DatabaseConditionNodeModel';
+import { DatabaseNodeModel } from '../nodes/Database/DatabaseNodeModel';
+import { MessageConditionNodeModel } from '../nodes/MessageCondition/MessageConditionNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -96,18 +102,36 @@ export class BodyWidget extends React.Component {
 							color="#98CEFF"
 							icon={<GiStopSign style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget
+							model={{ type: 'database-condition' }} 
+							name="Database Condition" 
+							color="#211F7E" 
+							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
+						<TrayItemWidget
+							model={{ type: 'database' }} 
+							name="Database" 
+							color="#BFBFBF" 
+							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
+						<TrayItemWidget
+							model={{ type: 'message-condition' }} 
+							name="Message Condition" 
+							color="#211F7E" 
+							icon={<AiOutlineMessage style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
 						{/* <TrayItemWidget 
 							model={{ type: 'start-inactivity' }}
 							name="Start Inactivity"
 							color="#A30000"
 							icon={<AiOutlineFieldTime style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/>
+						/> */}
 						<TrayItemWidget 
 							model={{ type: 'transfer-queue' }}
 							name="Transfer Queue"
 							color="#211F7E"
 							icon={<TfiHeadphoneAlt style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/> */}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -150,7 +174,20 @@ export class BodyWidget extends React.Component {
 							} else if (data.type === "transfer-queue") {
 								node = new TransferQueueNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));
+							} else if (data.type === "database-condition") {
+								node = new DatabaseConditionNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								node.addPort(new AdvancedPortModel(false, 'out-true'));
+								node.addPort(new AdvancedPortModel(false, 'out-false'));
+							} else if (data.type === "database") {
+								node = new DatabaseNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
 								node.addPort(new AdvancedPortModel(false, 'out'));
+							} else if (data.type === "message-condition") {
+								node = new MessageConditionNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
+								node.addPort(new AdvancedPortModel(false, 'out-1'));
+								node.addPort(new AdvancedPortModel(false, 'out-else'));
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);

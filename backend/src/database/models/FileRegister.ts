@@ -75,6 +75,10 @@ class FileRegister extends Model<FileRegister> {
 
   @AllowNull(true)
   @Column
+  interactionAt: Date;
+
+  @AllowNull(true)
+  @Column
   billingProcessedAt: Date;
 
   @AllowNull(true)

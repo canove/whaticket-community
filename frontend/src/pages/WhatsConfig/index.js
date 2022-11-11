@@ -149,13 +149,15 @@ const WhatsConfig = () => {
 
     // Connection
     const handleChangeConnection = (e) => {
-		const {
-			target: { value },
-		} = e;
+		const value = e.target.value;
+        const allIndex = value.indexOf('all');
 
-		if (value.includes('all')) {
+		if (allIndex !== -1 && allIndex === (value.length - 1)) {
 			setSelectedConnection(['all']);
 		} else {
+            if ((allIndex || allIndex === 0) && allIndex !== -1) {
+				value.splice(allIndex, 1);
+			}
 			setSelectedConnection(typeof value === "string" ? value.split(",") : value);
 		}
 	}

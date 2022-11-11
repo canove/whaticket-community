@@ -26,7 +26,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const getInfo = async (req: Request, res: Response): Promise<Response> => {
-  const { msgWhatsId } = req.body;
+  const { msgWhatsId } = req.query;
 
   const fileRegister = await FileRegister.findOne({
     where: {

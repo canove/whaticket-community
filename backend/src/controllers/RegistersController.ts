@@ -23,53 +23,11 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const { fileId, date } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const report = await ListRegistersService({
-    type: "",
-    fileId,
-    date,
-    companyId
-  });
-
-  const register = await ListRegistersService({
-    type: "register",
-    fileId,
-    date,
-    companyId
-  });
-
-  const sent = await ListRegistersService({
-    type: "sent",
-    fileId,
-    date,
-    companyId
-  });
-
-  const delivered = await ListRegistersService({
-    type: "delivered",
-    fileId,
-    date,
-    companyId
-  });
-
-  const read = await ListRegistersService({
-    type: "read",
-    fileId,
-    date,
-    companyId
-  });
-
-  const error = await ListRegistersService({
-    type: "error",
-    fileId,
-    date,
-    companyId
-  });
+  const reports = await ListRegistersService({ fileId, date, companyId });
 
   const category = await DashboardCategoryService(companyId, date);
 
-  return res
-    .status(200)
-    .json({ report, register, sent, delivered, read, error, category });
+  return res.status(200).json({ reports, category });
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {

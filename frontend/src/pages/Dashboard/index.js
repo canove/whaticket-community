@@ -111,16 +111,22 @@ const Dashboard = () => {
   var userQueueIds = [];
 
   const [loading, setLoading] = useState(false);
+
   const [registerCount, setRegisterCount] = useState(0);
   const [sentCount, setSentCount] = useState(0);
   const [deliveredCount, setDeliveredCount] = useState(0);
   const [readCount, setReadCount] = useState(0);
   const [errorCount, setErrorCount] = useState(0);
-  const [fileId, setFileId] = useState("");
-  const [files, setFiles] = useState([]);
-  const [date, setDate] = useState("");
+  const [interactionCount, setInteractionCount] = useState(0);
+  const [noWhatsCount, setNoWhatsCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState([]);
+
+  const [files, setFiles] = useState([]);
+
+  const [fileId, setFileId] = useState("");
+  const [date, setDate] = useState("");
   const [searchParam, setSearchParam] = useState("");
+
   const [tickets, setTickets] = useState([]);
   const [biggerTickets, setBiggerTickets] = useState([]);
   const [smallerTickets, setSmallerTickets] = useState([]);
@@ -141,27 +147,24 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    setDate("");
-  }, [fileId]);
-
-  useEffect(() => {
-    setFileId("");
-  }, [date]);
-
-  useEffect(() => {
     const handleFilter = async () => {
       setLoading(true);
       try {
         setLoading(true);
-        const { data } = await api.get(
-          `/registers/list?fileId=${fileId}&date=${date}`
-        );
-        setRegisterCount(data.register.count);
-        setSentCount(data.sent.count);
-        setDeliveredCount(data.delivered.count);
-        setReadCount(data.read.count);
-        setErrorCount(data.error.count);
+        const { data } = await api.get('/registers/list', {
+          params: { fileId, date }
+        });
+
+        setRegisterCount(data.reports.total);
+        setSentCount(data.reports.sent || "0");
+        setDeliveredCount(data.reports.delivered || "0");
+        setReadCount(data.reports.read || "0");
+        setErrorCount(data.reports.error || "0");
+        setInteractionCount(data.reports.interaction || "0");
+        setNoWhatsCount(data.reports.noWhats || "0");
+        
         setCategoryCount(data.category);
+
         setLoading(false);
       } catch (err) {
         toastError(err);
@@ -231,6 +234,7 @@ const Dashboard = () => {
   const handleSelectOption = (_, newValue) => {
     if (newValue) {
       setFileId(newValue.id);
+      setDate("");
     } else {
       setFileId("");
     }
@@ -311,6 +315,7 @@ const Dashboard = () => {
                 onChange={(e, newValue) => handleSelectOption(e, newValue)}
                 className={classes.selectStyle}
                 options={files}
+                value={files.find(f => f.id === fileId) || null}
                 getOptionLabel={renderOptionLabel}
                 renderInput={(params) => (
                   <TextField
@@ -337,7 +342,9 @@ const Dashboard = () => {
                 className={classes.selectStyle}
                 onChange={(e) => {
                   setDate(e.target.value);
+                  setFileId("");
                 }}
+                value={date}
                 label={i18n.t("dashboard.date")}
                 InputLabelProps={{ shrink: true, required: true }}
                 type="date"
@@ -435,7 +442,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -450,7 +457,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -461,6 +468,36 @@ const Dashboard = () => {
               <Grid item>
                 <Typography component="h1" variant="h4">
                   {errorCount}
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                Interações
+              </Typography>
+              <Grid item>
+                <Typography component="h1" variant="h4">
+                  {interactionCount}
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                Sem Whatsapp
+              </Typography>
+              <Grid item>
+                <Typography component="h1" variant="h4">
+                  {noWhatsCount}
                 </Typography>
               </Grid>
             </Paper>

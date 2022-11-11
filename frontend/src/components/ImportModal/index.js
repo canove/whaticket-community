@@ -126,24 +126,20 @@ const ImportModal = ({ open, onClose }) => {
 	}
 
 	const handleChangeConnection = (e) => {
-		const {
-			target: { value },
-		} = e;
+		const value = e.target.value;
+		const allIndex = value.indexOf('Todos');
 
-		if (value.includes('Todos')) {
+		if (allIndex !== -1 && allIndex === (value.length - 1)) {
 			setSelectedConnection([]);
 
-			let allConnections = ["Todos"]
-
-			// whatsApps.map((whats => {
-			// 	if (whats.official === selectedType) {
-			// 		allConnections.push(whats.id);
-			// 	}return null
-			// }));
+			const allConnections = ["Todos"]
 
 			setSelectedConnection(allConnections);
 			setOpenSelect(false);
 		} else {
+			if ((allIndex || allIndex === 0) && allIndex !== -1) {
+				value.splice(allIndex, 1);
+			}
 			setSelectedConnection(typeof value === "string" ? value.split(",") : value);
 		}
 	}
