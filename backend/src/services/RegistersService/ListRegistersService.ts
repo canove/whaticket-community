@@ -43,19 +43,19 @@ const ListRegistersService = async ({
       fileId
     }
   } 
-  // else {
-  //   const files = await File.findAll({
-  //     where: { status: 7, companyId }
-  //   });
+  else {
+    const files = await File.findAll({
+      where: { status: 7, companyId }
+    });
 
-  //   if (files.length > 0) {
-  //     const filesArray = files.map(file => file.id);
-  //     whereCondition = {
-  //       ...whereCondition,
-  //       fileId: { [Op.notIn]: filesArray }
-  //     }
-  //   }
-  // }
+    if (files.length > 0) {
+      const filesArray = files.map(file => file.id);
+      whereCondition = {
+        ...whereCondition,
+        fileId: { [Op.notIn]: filesArray }
+      }
+    }
+  }
 
   if (date) {
     whereCondition = {
@@ -75,7 +75,7 @@ const ListRegistersService = async ({
       [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
       [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
       [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
-      // [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
+      [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
       [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NULL")), 'noWhats' ],
     ],
     raw: true
