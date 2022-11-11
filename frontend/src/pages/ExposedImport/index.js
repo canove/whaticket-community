@@ -112,7 +112,6 @@ const ExposedImport = () => {
                 const { data } = await api.get("/exposedImports/", {
                     params: { pageNumber }
                 });
-                console.log(data);
                 dispatch({ type: "LOAD_EXPOSED_IMPORTS", payload: data.exposedImports });
                 setCount(data.count);
                 setHasMore(data.hasMore);
