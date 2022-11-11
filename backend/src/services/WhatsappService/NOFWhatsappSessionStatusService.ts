@@ -39,6 +39,15 @@ const NOFWhatsappSessionStatusService = async ({
     return { success: false };
   }
 
+  var dif = new Date().getTime() - whatsapp.updatedAt.getTime();
+
+  var Seconds_from_T1_to_T2 = dif / 1000;
+  var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+
+  if(whatsapp.status == 'CONNECTED' && Seconds_Between_Dates < 60) {
+    return { success: false };
+  }
+
   switch(status){
     case "isLogged":
     case "connected":
