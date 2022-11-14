@@ -9,6 +9,7 @@ import axios from "axios";
 import Contact from "../../database/models/Contact";
 import Ticket from "../../database/models/Ticket";
 import FileRegister from "../../database/models/FileRegister";
+import Queue from "../../database/models/Queue";
 
 interface Request {
   flowNodeId?: string;
@@ -213,12 +214,20 @@ const processNode = async (node: any, session: any, body: any) => {
     //   queueId: node.queueId
     // });
 
+    const queue = await Queue.findOne({
+      where: { id: node.queueId }
+    });
+
     await session.update({
       nodeId: null,
       variables: null
     });
 
-    return { queueId: node.queueId, type: "TRANSFER_QUEUE" };
+    return {
+      queueName: queue.name,
+      queueId: node.queueId,
+      type: "TRANSFER_QUEUE"
+    };
   }
 
   if (node.type === "database-condition-node") {

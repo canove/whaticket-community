@@ -352,23 +352,27 @@ export const multipleConfig = async (
             name: whatsName
           };
   
-          // try {
-          //   await axios.post(profileNameApiUrl, payload, {
-          //     headers: {
-          //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-          //       sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
-          //     }
-          //   });
-          // } catch (err: any) {
-          //   if (!err.response.data["message"]) {
-          //     console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
-          //   }
-          //   console.log(err.response.data.message);
-          // }
-  
-          await whatsapp.update({
-            whatsName,
-          });
+          try {
+            const result = await axios.post(profileNameApiUrl, payload, {
+              headers: {
+                "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+              }
+            });
+
+            if (result.status == 200) {
+              await whatsapp.update({
+                whatsName,
+              });
+            } else {
+              console.log(`${whatsapp.name} - Erro ao trocar nome`);
+            }
+          } catch (err: any) {
+            if (!err.response.data["message"]) {
+              console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
+            }
+            console.log(err.response.data.message);
+          }
         }
 
         if (fileLink !== whatsapp.whatsImage) {
@@ -377,23 +381,27 @@ export const multipleConfig = async (
             path: fileLink
           };
   
-          // try {
-          //   await axios.post(profileImageApiUrl, payload, {
-          //     headers: {
-          //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-          //       sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
-          //     }
-          //   });
-          // } catch (err: any) {
-          //   if (!err.response.data["message"]) {
-          //     console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
-          //   }
-          //   console.log(err.response.data.message);
-          // }
-  
-          await whatsapp.update({
-            whatsImage: fileLink,
-          });
+          try {
+            const result = await axios.post(profileImageApiUrl, payload, {
+              headers: {
+                "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+              }
+            });
+
+            if (result.status == 200) {
+              await whatsapp.update({
+                whatsImage: fileLink,
+              });
+            } else {
+              console.log(`${whatsapp.name} - Erro ao trocar imagem`);
+            }
+          } catch (err: any) {
+            if (!err.response.data["message"]) {
+              console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
+            }
+            console.log(err.response.data.message);
+          }
         }
       }
     } else {
@@ -403,8 +411,8 @@ export const multipleConfig = async (
         });
       
         if (!whatsapp) {
+          console.log("ERR_NO_WHATSAPP_FOUND");
           continue;
-          // console.log("ERR_NO_WHATSAPP_FOUND");
         }
 
         const session = whatsapp.name;
@@ -415,23 +423,27 @@ export const multipleConfig = async (
             name: whatsName
           };
 
-          // try {
-          //   await axios.post(profileNameApiUrl, payload, {
-          //     headers: {
-          //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-          //       sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
-          //     }
-          //   });
-          // } catch (err: any) {
-          //   if (!err.response.data["message"]) {
-          //     console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
-          //   }
-          //   console.log(err.response.data.message);
-          // }
-  
-          await whatsapp.update({
-            whatsName,
-          });
+          try {
+            const result = await axios.post(profileNameApiUrl, payload, {
+              headers: {
+                "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+              }
+            });
+
+            if (result.status == 200) {
+              await whatsapp.update({
+                whatsName,
+              });
+            } else {
+              console.log(`${whatsapp.name} - Erro ao trocar nome`);
+            }
+          } catch (err: any) {
+            if (!err.response.data["message"]) {
+              console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
+            }
+            console.log(err.response.data.message);
+          }
         }
       }
     }
