@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 
-import axios from "axios";
-
 import ListExposedImportsService from "../services/ExposedImportService/ListExposedImportsService";
 import CreateExposedImportService from "../services/ExposedImportService/CreateExposedImportService";
 import ShowExposedImportService from "../services/ExposedImportService/ShowExposedImportService";
@@ -10,17 +8,19 @@ import DeleteExposedImportService from "../services/ExposedImportService/DeleteE
 import StartExposedImportService from "../services/ExposedImportService/StartExposedImportService";
 
 import { getIO } from "../libs/socket";
-import AppError from "../errors/AppError";
 
 type IndexQuery = {
   pageNumber: string;
-}
+};
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { pageNumber } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const { exposedImports, count, hasMore } = await ListExposedImportsService({ companyId, pageNumber });
+  const { exposedImports, count, hasMore } = await ListExposedImportsService({
+    companyId,
+    pageNumber
+  });
 
   return res.status(200).json({ exposedImports, count, hasMore });
 };
@@ -28,12 +28,18 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 interface ExposedImportData {
   name: string;
   mapping: string;
+  template: string;
+  connections: string[];
+  connectionType: string | boolean;
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const {
     name,
-    mapping
+    mapping,
+    template,
+    connections,
+    connectionType
   }: ExposedImportData = req.body;
 
   const { companyId } = req.user;
@@ -41,7 +47,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const exposedImport = await CreateExposedImportService({
     name,
     mapping,
-    companyId,
+    template,
+    connections,
+    connectionType,
+    companyId
   });
 
   const io = getIO();
@@ -106,15 +115,16 @@ export const remove = async (
   return res.status(200).json({ message: "Importation deleted" });
 };
 
-export const start = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const start = async (req: Request, res: Response): Promise<Response> => {
   const { exposedImportId } = req.params;
   const { companyId } = req.user;
   const payload = req.body;
 
-  const exposedImport = await StartExposedImportService({ exposedImportId, companyId, payload });
+  const exposedImport = await StartExposedImportService({
+    exposedImportId,
+    companyId,
+    payload
+  });
 
   const io = getIO();
   io.emit(`exposedImport${companyId}`, {

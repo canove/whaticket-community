@@ -5,10 +5,10 @@ import {
   UpdatedAt,
   Model,
   PrimaryKey,
-  AutoIncrement,
   ForeignKey
 } from "sequelize-typescript";
 import Company from "./Company";
+import Templates from "./TemplatesData";
 
 @Table
 class ExposedImport extends Model<ExposedImport> {
@@ -23,7 +23,17 @@ class ExposedImport extends Model<ExposedImport> {
   mapping: string;
 
   @Column
+  whatsappIds: string;
+
+  @ForeignKey(() => Templates)
+  @Column
+  templateId: number;
+
+  @Column
   qtdeRegister: number;
+
+  @Column
+  official: boolean;
 
   @ForeignKey(() => Company)
   @Column

@@ -88,12 +88,25 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     const [mapping, setMapping] = useState(initialMapping);
     const [mappingValues, setMappingValues] = useState(initialMapping);
 
+    const [connectionType, setConnectionType] = useState(false);
+    const [useConnectionType, setUseConnectionType] = useState(false);
+    const [openConnectionSelect, setOpenConnectionSelect] = useState(false);
+    const [connections, setConnections] = useState([]);
+
+    const [menus, setMenus] = useState([]);
+    const [templates, setTemplates] = useState([]);
+    const [template, setTemplate] = useState("");
+
 	useEffect(() => {
         const fetchExposedImport = async () => {
             try {
                 const { data } = await api.get(`/exposedImports/${exposedImportId}`);
                 setName(data.name);
                 setMapping(JSON.parse(data.mapping));
+
+                setConnectionType(data.official);
+                setTemplate(data.templateId);
+                setConnections(data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]);
             } catch (err) {
                 toastError(err);
             }
@@ -109,17 +122,79 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
             }
         };
 
+        const fetchTemplates = async () => {
+			try {
+				const { data } = await api.get('/TemplatesData/list/');
+				setTemplates(data.templates);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
+        const fetchMenus = async () => {
+			try {
+				const { data } = await api.get('menus/company');
+				setMenus(data);
+			} catch(err) {
+				toastError(err);
+			}
+		}
+
+        if (open) {
+            fetchMenus();
+            fetchTemplates();
+        }
+
         if (exposedImportId) {
             fetchExposedImport();
             fetchApiToken();
         }
-	}, [open, exposedImportId])
+	}, [open, exposedImportId]);
+
+    useEffect(() => {
+		if (menus) {
+			let offWhats = false;
+			let noOffWhats = false;
+
+			menus.forEach(menu => {
+				if (menu.name === "Official Connections") {
+					offWhats = true;
+				}
+
+				if (menu.name === "Connections") {
+					noOffWhats = true;
+				}
+			})
+
+			if (offWhats && noOffWhats) {
+				setUseConnectionType(true);
+			}
+
+			if (offWhats && !noOffWhats) {
+				setUseConnectionType(false);
+				setConnectionType(true);
+			}
+
+			if (!offWhats && noOffWhats) {
+				setUseConnectionType(false);
+				setConnectionType(false);
+			}
+		}
+	}, [menus]);
 
     const handleClose = () => {
         setName("");
         setPayload("");
+
         setMapping(initialMapping);
         setMappingValues(initialMapping);
+
+        setConnectionType(false);
+        setUseConnectionType(false);
+        setOpenConnectionSelect(false);
+        setTemplate("");
+        setConnections([]);
+
         onClose();
 	};
 
@@ -127,6 +202,9 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         const importData = {
             name,
             mapping: JSON.stringify(mapping),
+            template: template,
+            connections: connections,
+            connectionType
         };
 
         try {
@@ -224,6 +302,42 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         });
     }
 
+    const handleConnectionTypeChange = (e) => {
+		setConnectionType(e.target.value);
+        setConnections([]);
+	}
+    
+    const handleTemplateChange = (e) => {
+		setTemplate(e.target.value);
+	}
+
+    const handleConnectionChange = (e) => {
+		const value = e.target.value;
+        const allIndex = value.indexOf('Todos');
+
+		if (allIndex !== -1 && allIndex === (value.length - 1)) {
+			setConnections([]);
+
+			const allConnections = ["Todos"]
+
+			setConnections(allConnections);
+			setOpenConnectionSelect(false);
+		} else {
+            if ((allIndex || allIndex === 0) && allIndex !== -1) {
+				value.splice(allIndex, 1);
+			}
+			setConnections(typeof value === "string" ? value.split(",") : value);
+		}
+	}
+
+	const handleOpenConnectionSelect = () => {
+		setOpenConnectionSelect(true)
+	};
+
+	const handleCloseConnectionSelect = () => {
+		setOpenConnectionSelect(false)
+	};
+
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -252,6 +366,97 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                             fullWidth
                         />
                     </div>
+                    { useConnectionType &&
+                        <>
+                            <FormControl
+                                variant="outlined"
+                                margin="normal"
+                                fullWidth
+                            >
+                                <InputLabel id="connection-type-select-label">
+                                    Tipo de Disparo
+                                </InputLabel>
+                                <Select
+                                    labelId="connection-type-select-label"
+                                    id="connection-type-select"
+                                    value={connectionType}
+                                    label="Tipo de Disparo"
+                                    onChange={handleConnectionTypeChange}
+                                    style={{width: "100%"}}
+                                    variant="outlined"
+                                >
+                                    <MenuItem value={true}>{i18n.t('importModal.form.official')}</MenuItem>
+                                    <MenuItem value={false}>{i18n.t('importModal.form.notOfficial')}</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </>
+                    }
+                    <FormControl
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                    >
+                        <InputLabel id="connection-select-label">
+                            Conexões
+                        </InputLabel>
+                        <Select
+                            variant="outlined"
+                            labelId="connection-select-label"
+                            id="connection-select"
+                            value={connections}
+                            label="Conexões"
+                            onChange={handleConnectionChange}
+                            multiple
+                            open={openConnectionSelect}
+                            onOpen={handleOpenConnectionSelect}
+                            onClose={handleCloseConnectionSelect}
+                            style={{width: "100%"}}
+                        >
+                            <MenuItem value={"Todos"}>{i18n.t('importModal.form.all')}</MenuItem>
+                            {whatsApps && whatsApps.map((whats, index) => {
+                                if (whats.official === connectionType) {
+                                    if (connectionType === false && whats.status === "CONNECTED") {
+                                        return (
+                                            <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+                                        )
+                                    } else if (connectionType === true) {
+                                        return (
+                                            <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
+                                        )
+                                    }
+                                } return null
+                            })}
+                        </Select>
+                    </FormControl>
+                    { connectionType === false &&
+                        <>
+                            <FormControl
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
+                            >
+                                <InputLabel id="template-select-label">
+                                    Template
+                                </InputLabel>
+                                <Select
+                                    variant="outlined"
+                                    labelId="template-select-label"
+                                    id="template-selec"
+                                    value={template}
+                                    label="Template"
+                                    onChange={(e) => { handleTemplateChange(e) }}
+                                    style={{width: "100%"}}
+                                >
+                                    <MenuItem value={"Nenhum"}>{i18n.t('importModal.form.none')}</MenuItem>
+                                    {templates.length > 0 && templates.map((template, index) => {
+                                        return (
+                                            <MenuItem key={index} value={template.id}>{template.name}</MenuItem>
+                                        )
+                                    })}
+                                </Select>
+                            </FormControl>
+                        </>
+                    }
                     { exposedImportId &&
                         <>
                             <div>
@@ -285,6 +490,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }
                     <Paper
                         variant="outlined"
+                        style={{ marginTop: "10px" }}
                     >
                         <Typography
                             style={{
