@@ -806,14 +806,7 @@ const Connections = () => {
 															</div>
 														)}
 													</TableCell>
-													<TableCell align="center">
-														<IconButton
-															size="small"
-															onClick={() => handleEditWhatsApp(whatsApp)}
-														>
-															<Edit />
-														</IconButton>
-
+													<TableCell align="center">	
 														{ whatsApp.status === "CONNECTED" && 
 															<IconButton
 																size="small"
@@ -822,6 +815,13 @@ const Connections = () => {
 																<SettingsIcon />
 															</IconButton>
 														}
+
+														<IconButton
+															size="small"
+															onClick={() => handleEditWhatsApp(whatsApp)}
+														>
+															<Edit />
+														</IconButton>
 														
 														<IconButton
 															size="small"
