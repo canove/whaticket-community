@@ -129,6 +129,12 @@ class Whatsapp extends Model<Whatsapp> {
   @AllowNull
   @Column
   business: boolean;
+
+  @Column
+  whatsName: string;
+
+  @Column
+  whatsImage: string;
 }
 
 export default Whatsapp;

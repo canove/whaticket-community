@@ -133,12 +133,12 @@ export class BodyWidget extends React.Component {
 							color="#211F7E"
 							icon={<TfiHeadphoneAlt style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
-						{/* <TrayItemWidget
-							model={{ type: 'chat' }}
-							name="Chat"
-							color="#211F7E"
+						<TrayItemWidget
+							model={{ type: 'multiple-messages' }}
+							name="Multiple Messages"
+							color="#25D366"
 							icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/> */}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
