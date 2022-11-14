@@ -768,7 +768,6 @@ const Connections = () => {
 																display: "flex",
 																justifyContent: "center",
 																alignItems: "center",
-																flexDirection: "column"
 															}}
 														>
 															{whatsApp.whatsImage && 
@@ -776,9 +775,9 @@ const Connections = () => {
 																style={{
 																	border: "1px solid rgba(0,0,0,0.5)",
 																	borderRadius: "100%",
-																	heigth: "50px",
-																	marginBottom: "5px",
-																	width: "50px",
+																	heigth: "30px",
+																	marginRight: "5px",
+																	width: "30px",
 																}}
 																src={whatsApp.whatsImage}
 															/>
