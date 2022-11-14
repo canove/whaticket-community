@@ -294,6 +294,70 @@ const processNode = async (node: any, session: any, body: any) => {
     return { condition: response ? response : "ELSE" };
   }
 
+  if (node.type === "multiple-messages-node") {
+    const messages = [];
+
+    const fileRegister = await FileRegister.findOne({
+      where: {
+        phoneNumber: session.id,
+        companyId: session.companyId,
+        processedAt: { [Op.ne]: null }
+      },
+      order: [["updatedAt", "DESC"]]
+    });
+
+    node.messages.map(message => {
+      if (message.messageType === "text") {
+        const newMessage = {
+          blocks: [
+            {
+              text: message.messageContent,
+              type: "text"
+            }
+          ]
+        };
+
+        messages.push(newMessage);
+
+        return;
+      }
+
+      if (message.messageType === "database") {
+        if (!fileRegister) {
+          const newMessage = {
+            blocks: [
+              {
+                text: "",
+                type: "text"
+              }
+            ]
+          };
+  
+          messages.push(newMessage);
+
+          return;
+        }
+    
+        const variable = fileRegister[message.messageContent] ? fileRegister[message.messageContent] : "";
+    
+        const newMessage = {
+          blocks: [
+            {
+              text: variable,
+              type: message.textType
+            }
+          ]
+        };
+
+        messages.push(newMessage);
+
+        return;
+      }
+    });
+
+    return { messages };
+  }
+
   return {};
 }
 
