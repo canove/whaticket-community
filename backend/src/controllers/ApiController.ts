@@ -122,7 +122,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket: contactAndTicket, companyId, fromMe: true });
+    await SendWhatsAppMessage({ body, ticket: contactAndTicket, companyId, fromMe: true, bot: false, whatsMsgId: null });
   }
 
   return res.send();

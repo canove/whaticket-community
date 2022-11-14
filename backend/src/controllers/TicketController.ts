@@ -134,12 +134,13 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
     const { farewellMessage } = whatsapp;
 
     if (farewellMessage) {
-      await SendWhatsAppMessage({
+      /*await SendWhatsAppMessage({
         body: formatBody(farewellMessage, ticket.contact),
         ticket,
         companyId,
-        fromMe: true
-      });
+        fromMe: true,
+        bot: false
+      });*/
     }
   }
 

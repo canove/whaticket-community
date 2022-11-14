@@ -132,5 +132,5 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
     exposedImport
   });
 
-  return res.status(200).json({ message: "Importation started" });
+  return res.status(200).json({ message: "request was received with success" });
 };

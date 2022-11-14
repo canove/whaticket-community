@@ -6,9 +6,8 @@ COPY package.json /app/package.json
 
 COPY .env* ./
 
-RUN npm install -g --force
+RUN npm install --legacy-peer-deps
 RUN npm install react-scripts@3.3.1 -g
-
 RUN react-scripts build
 
 FROM nginx:alpine

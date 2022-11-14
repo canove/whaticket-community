@@ -1,6 +1,7 @@
+import { Op } from "sequelize";
 import { getIO } from "../../libs/socket";
 import Contact from "../../database/models/Contact";
-
+/*eslint-disable */
 interface ExtraInfo {
   name: string;
   value: string;
@@ -30,7 +31,12 @@ const CreateOrUpdateContactService = async ({
   const io = getIO();
   let contact: Contact | null;
 
-  contact = await Contact.findOne({ where: { number } });
+  contact = await Contact.findOne({
+    where: {
+      number: {
+        [Op.like]: `%${number.substr(5, 8)}%`
+     },
+   }});
 
   if (contact) {
     contact.update({ profilePicUrl });
