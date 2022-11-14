@@ -4,6 +4,9 @@ import ShowExposedImportService from "./ShowExposedImportService";
 interface ExposedImportData {
   name: string;
   mapping: string;
+  template: string;
+  connections: string[];
+  connectionType: string | boolean;
 }
 
 interface Request {
@@ -22,14 +25,30 @@ const UpdateExposedImportService = async ({
     companyId
   );
 
-  const {
-    name,
-    mapping,
-  } = exposedImportData;
+  const { name, mapping, template, connections, connectionType } =
+    exposedImportData;
+
+  let whatsappIds = null;
+  let templateId = null;
+
+  if (connections.includes("Todos")) {
+    whatsappIds = null;
+  } else {
+    whatsappIds = connections.join(",");
+  }
+
+  if (template === "" || template === "Nenhum") {
+    templateId = null;
+  } else {
+    templateId = template;
+  }
 
   await exposedImport.update({
     name,
     mapping,
+    templateId,
+    official: connectionType,
+    whatsappIds
   });
 
   return exposedImport;
