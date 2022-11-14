@@ -32,7 +32,7 @@ module.exports = {
         references: { model: "Files", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
-        allowNull: false
+        allowNull: true
       },
       name: {
         type: DataTypes.STRING,
