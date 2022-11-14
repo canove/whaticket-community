@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import ConnectionFiles from "../database/models/ConnectionFile";
 import FileRegister from "../database/models/FileRegister";
+import Whatsapp from "../database/models/Whatsapp";
 import AppError from "../errors/AppError";
 import ListFileRegistersService from "../services/FileRegisterService/ListFileRegistersService";
 
@@ -25,17 +27,32 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json({ reports, count, hasMore });
 };
 
-export const getInfo = async (req: Request, res: Response): Promise<Response> => {
+export const getInfo = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { msgWhatsId } = req.query;
 
   const fileRegister = await FileRegister.findOne({
-    where: {
-      msgWhatsId
-    }
+    where: { msgWhatsId }
   });
 
   if (!fileRegister) {
     throw new AppError("ERR_FILE_REGISTER_DO_NOT_EXISTS");
+  }
+
+  let portfolio = null;
+
+  const whatsapp = await Whatsapp.findOne({
+    where: { id: fileRegister.whatsappId }
+  });
+
+  if (whatsapp && whatsapp.connectionFileId) {
+    const connectionFile = await ConnectionFiles.findOne({
+      where: { id: whatsapp.connectionFileId }
+    });
+
+    portfolio = connectionFile.name;
   }
 
   const response = {
@@ -48,8 +65,9 @@ export const getInfo = async (req: Request, res: Response): Promise<Response> =>
     var2: fileRegister.var2,
     var3: fileRegister.var3,
     var4: fileRegister.var4,
-    var5: fileRegister.var5
-  }
+    var5: fileRegister.var5,
+    portfolio
+  };
 
   return res.status(200).json(response);
-}
+};

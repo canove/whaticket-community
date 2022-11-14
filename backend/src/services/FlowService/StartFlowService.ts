@@ -113,8 +113,8 @@ const processNode = async (node: any, session: any, body: any) => {
 
       if (!var1) return false;
 
-      if (condition === "equals") return (var1 == var2);
-      if (condition === "not_equal") return (var1 != var2);
+      if (condition === "equals") return (var1.toLowerCase() == var2.toLowerCase());
+      if (condition === "not_equal") return (var1.toLowerCase() != var2.toLowerCase());
       if (condition === "greater_than") return (var1 > var2);
       if (condition === "greater_than_or_equal") return (var1 >= var2);
       if (condition === "contains") return (var1.indexOf(var2));
@@ -245,17 +245,17 @@ const processNode = async (node: any, session: any, body: any) => {
     const variable = fileRegister[node.variable];
 
     if (node.condition === "complete") {
-      return { condition: variable === body.text };
+      return { condition: variable.toLowerCase() === body.text.toLowerCase() };
     }
 
     if (node.condition === "last") {
       const variableLast = variable.substring(variable.length - node.charactersNumber);
-      return { condition: variableLast === body.text };
+      return { condition: variableLast.toLowerCase() === body.text.toLowerCase() };
     }
 
     if (node.condition === "start") {
       const variableStart = variable.substring(0, node.charactersNumber);
-      return { condition: variableStart === body.text };
+      return { condition: variableStart.toLowerCase() === body.text.toLowerCase() };
     }
   }
 
