@@ -309,6 +309,137 @@ export const config = async (
   });
 };
 
+export const multipleConfig = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const form = formidable({ multiples: false });
+
+  const { companyId } = req.user;
+
+  const profileNameApiUrl = `${process.env.WPPNOF_URL}/setProfileName`;
+  const profileImageApiUrl= `${process.env.WPPNOF_URL}/setProfilePicture`;
+
+  return form.parse(req, async (err, fields, files) => {
+    if (err) return res.status(500).json("occured an error");
+
+    const { whatsName, whatsImage, whatsappIds } = fields;
+
+    const whatsIds = whatsappIds.split(",");
+
+    if (files.file) {
+      const filePath = files.file.filepath;
+      const buffer = await fs.readFileSync(filePath);
+      const fileName = files.file.originalFilename;
+
+      const fileLink = await uploadToS3(fileName, companyId, buffer);
+
+      for (const whatsId of whatsIds) {
+        const whatsapp = await Whatsapp.findOne({
+          where: { id: whatsId, companyId }
+        });
+      
+        if (!whatsapp) {
+          console.log("ERR_NO_WHATSAPP_FOUND");
+          continue;
+        }
+
+        const session = whatsapp.name;
+
+        if (whatsName !== whatsapp.whatsName) {
+          const payload = {
+            session,
+            name: whatsName
+          };
+  
+          // try {
+          //   await axios.post(profileNameApiUrl, payload, {
+          //     headers: {
+          //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          //       sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+          //     }
+          //   });
+          // } catch (err: any) {
+          //   if (!err.response.data["message"]) {
+          //     console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
+          //   }
+          //   console.log(err.response.data.message);
+          // }
+  
+          await whatsapp.update({
+            whatsName,
+          });
+        }
+
+        if (fileLink !== whatsapp.whatsImage) {
+          const payload = {
+            session,
+            path: fileLink
+          };
+  
+          // try {
+          //   await axios.post(profileImageApiUrl, payload, {
+          //     headers: {
+          //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          //       sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+          //     }
+          //   });
+          // } catch (err: any) {
+          //   if (!err.response.data["message"]) {
+          //     console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
+          //   }
+          //   console.log(err.response.data.message);
+          // }
+  
+          await whatsapp.update({
+            whatsImage: fileLink,
+          });
+        }
+      }
+    } else {
+      for (const whatsId of whatsIds) {
+        const whatsapp = await Whatsapp.findOne({
+          where: { id: whatsId, companyId }
+        });
+      
+        if (!whatsapp) {
+          continue;
+          // console.log("ERR_NO_WHATSAPP_FOUND");
+        }
+
+        const session = whatsapp.name;
+
+        if (whatsName !== whatsapp.whatsName) {
+          const payload = {
+            session,
+            name: whatsName
+          };
+
+          // try {
+          //   await axios.post(profileNameApiUrl, payload, {
+          //     headers: {
+          //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          //       sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
+          //     }
+          //   });
+          // } catch (err: any) {
+          //   if (!err.response.data["message"]) {
+          //     console.log("Ocorreu um erro ao tentar se comunicar com Firebase!");
+          //   }
+          //   console.log(err.response.data.message);
+          // }
+  
+          await whatsapp.update({
+            whatsName,
+          });
+        }
+      }
+    }
+
+    return res.status(200).json("OK");
+  });
+};
+
 export const remove = async (
   req: Request,
   res: Response

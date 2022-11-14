@@ -24,6 +24,12 @@ whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
 whatsappRoutes.put("/whatsapp/transfer/", isAuth, WhatsAppController.transfer);
 
 whatsappRoutes.put(
+  "/whatsapp/config/multiple",
+  isAuth,
+  WhatsAppController.multipleConfig
+);
+
+whatsappRoutes.put(
   "/whatsapp/config/:whatsappId",
   isAuth,
   WhatsAppController.config
