@@ -7,9 +7,9 @@ export class MultipleMessagesNodeModel extends NodeModel {
 	constructor(options = {}) {
 		super({
 			...options,
-			type: 'multiple-message-node'
+			type: 'multiple-messages-node'
 		});
-		this.messages = []
+		this.messages = [{ id: 1, messageType: "text", messageContent: "", textType: "text" }];
 	}
 
 	serialize() {

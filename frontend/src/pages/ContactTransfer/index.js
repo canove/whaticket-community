@@ -35,6 +35,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { FormControl, InputLabel, MenuItem, Select, TableSortLabel, Typography } from "@material-ui/core";
 import TransferContactModal from "../../components/TransferContactModal";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import MultipleWhatsConfigModal from "../../components/MultipleWhatsConfigModal";
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
@@ -108,6 +109,7 @@ const ContactTransfer = () => {
   const [isBusiness, setIsBusiness] = useState(false);
 
   const [allSelected, setAllSelected] = useState(false);
+  const [editWhatsModalOpen, setEditWhatsModalOpen] = useState(false);
 
   const [whatsapps, dispatch] = useReducer(reducer, []);
   const { user } = useContext(AuthContext);
@@ -145,7 +147,7 @@ const ContactTransfer = () => {
 		};
 
 		fetchWhats();
-	}, [pageNumber, searchParam, company, isBusiness]);
+	}, [pageNumber, searchParam, company, isBusiness, editWhatsModalOpen]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -199,7 +201,6 @@ const ContactTransfer = () => {
 
   const handleCloseContactTransferModal = () => {
     setContactTransferModalOpen(false);
-    // setSelectedWhatsapps();
   };
 
   const handleCompanySelectOption = (_, newValue) => {
@@ -285,11 +286,24 @@ const ContactTransfer = () => {
     return string;
   }
 
+  const handleOpenEditWhatsModal = () => {
+		setEditWhatsModalOpen(true);
+	}
+
+	const handleCloseEditWhatsModal = () => {
+		setEditWhatsModalOpen(false);
+	}
+
   return (
     <MainContainer>
       <TransferContactModal
         open={contactTransferModalOpen}
         onClose={handleCloseContactTransferModal}
+        selectedWhatsapps={selectedWhatsapps}
+      />
+      <MultipleWhatsConfigModal
+        open={editWhatsModalOpen}
+        onClose={handleCloseEditWhatsModal}
         selectedWhatsapps={selectedWhatsapps}
       />
       <MainHeader>
@@ -363,6 +377,14 @@ const ContactTransfer = () => {
             >
               Transferir Selecionados
             </Button>
+            <Button
+              style={{ marginLeft: "5px" }}
+              variant="contained"
+              color="primary"
+              onClick={handleOpenEditWhatsModal}
+            >
+              Editar Perfil Selecionados
+            </Button>
           </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -381,6 +403,7 @@ const ContactTransfer = () => {
                 inputProps={{ 'aria-label': 'select all' }}
               />
             </TableCell>
+              <TableCell align="center">Perfil</TableCell>
               <TableCell align="center">Números</TableCell>
               <TableCell align="center">Empresa</TableCell>
               <TableCell align="center">Business</TableCell>
@@ -395,7 +418,6 @@ const ContactTransfer = () => {
                 return (
                   <TableRow
                     key={whats.id}
-                    
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -405,6 +427,29 @@ const ContactTransfer = () => {
                         inputProps={{ 'aria-labelledby': whats.name }}
                       />
                     </TableCell>
+                    <TableCell align="center">
+											<div
+												style={{
+													display: "flex",
+													justifyContent: "center",
+													alignItems: "center",
+												}}
+											>
+												{whats.whatsImage && 
+												<img
+													style={{
+														border: "1px solid rgba(0,0,0,0.5)",
+														borderRadius: "100%",
+														heigth: "30px",
+														marginRight: "5px",
+														width: "30px",
+													}}
+													src={whats.whatsImage}
+												/>
+											}
+												{whats.whatsName}
+											</div>
+										</TableCell>
                     <TableCell align="center">{whats.name}</TableCell>
                     <TableCell align="center">{whats.company.name}</TableCell>
                     <TableCell align="center">{getTranslation(whats.business)}</TableCell>

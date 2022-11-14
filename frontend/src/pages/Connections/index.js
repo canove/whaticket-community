@@ -46,6 +46,7 @@ import {
 } from "@material-ui/icons";
 
 import SearchIcon from "@material-ui/icons/Search";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -60,6 +61,7 @@ import QrcodeModal from "../../components/QrcodeModal";
 import { useTranslation } from 'react-i18next'
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import WhatsConfigModal from "../../components/WhatsConfigModal";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -212,6 +214,8 @@ const Connections = () => {
 	const [services, setServices] = useState([]);
 	const [newQrCodeServiceModalOpen, setNewQrCodeServiceModalOpen] = useState(false);
 	const [selectedWhatsAppId, setSelectedWhatsAppId] = useState("");
+
+	const [editWhatsModalOpen, setEditWhatsModalOpen] = useState(false);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -530,6 +534,16 @@ const Connections = () => {
 		setStatus(e.target.value);
 	}
 
+	const handleOpenEditWhatsModal = (whats) => {
+		setSelectedWhatsApp(whats);
+		setEditWhatsModalOpen(true);
+	}
+
+	const handleCloseEditWhatsModal = () => {
+		setSelectedWhatsApp(null);
+		setEditWhatsModalOpen(false);
+	}
+
 	return (
 		<>
 			{ !connectionFileName &&
@@ -587,6 +601,11 @@ const Connections = () => {
 						onClose={handleCloseWhatsAppModal}
 						whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
 						connectionFileId={connectionFileId}
+					/>
+					<WhatsConfigModal
+						open={editWhatsModalOpen}
+						onClose={handleCloseEditWhatsModal}
+						whatsappId={selectedWhatsApp?.id}
 					/>
 					<div className={classes.root}>
 						<Dialog
@@ -707,6 +726,9 @@ const Connections = () => {
 							<TableHead>
 								<TableRow>
 									<TableCell align="center">
+										Perfil
+									</TableCell>
+									<TableCell align="center">
 										{i18n.t("connections.table.name")}
 									</TableCell>
 									<TableCell align="center">
@@ -740,6 +762,29 @@ const Connections = () => {
 										{whatsApps?.length > 0 &&
 											whatsApps.map(whatsApp => (
 												<TableRow key={whatsApp.id}>
+													<TableCell align="center">
+														<div
+															style={{
+																display: "flex",
+																justifyContent: "center",
+																alignItems: "center",
+															}}
+														>
+															{whatsApp.whatsImage && 
+															<img
+																style={{
+																	border: "1px solid rgba(0,0,0,0.5)",
+																	borderRadius: "100%",
+																	heigth: "30px",
+																	marginRight: "5px",
+																	width: "30px",
+																}}
+																src={whatsApp.whatsImage}
+															/>
+														}
+															{whatsApp.whatsName}
+														</div>
+													</TableCell>
 													<TableCell align="center">{whatsApp.name}</TableCell>
 													<TableCell align="center">
 														{renderStatusToolTips(whatsApp)}
@@ -761,14 +806,23 @@ const Connections = () => {
 															</div>
 														)}
 													</TableCell>
-													<TableCell align="center">
+													<TableCell align="center">	
+														{ whatsApp.status === "CONNECTED" && 
+															<IconButton
+																size="small"
+																onClick={() => handleOpenEditWhatsModal(whatsApp)}
+															>
+																<SettingsIcon />
+															</IconButton>
+														}
+
 														<IconButton
 															size="small"
 															onClick={() => handleEditWhatsApp(whatsApp)}
 														>
 															<Edit />
 														</IconButton>
-
+														
 														<IconButton
 															size="small"
 															onClick={e => {
