@@ -10,6 +10,7 @@ import Contact from "../../database/models/Contact";
 import Ticket from "../../database/models/Ticket";
 import FileRegister from "../../database/models/FileRegister";
 import Queue from "../../database/models/Queue";
+import NodeRegisters from "../../database/models/NodeRegisters";
 
 interface Request {
   flowNodeId?: string;
@@ -231,6 +232,8 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   if (node.type === "database-condition-node") {
+    let condition = false;
+
     const fileRegister = await FileRegister.findOne({
       where: {
         phoneNumber: session.id,
@@ -240,23 +243,33 @@ const processNode = async (node: any, session: any, body: any) => {
       order: [["updatedAt", "DESC"]]
     });
 
-    if (!fileRegister) return { condition: false };
+    if (!fileRegister) return { condition };
 
     const variable = fileRegister[node.variable];
 
     if (node.condition === "complete") {
-      return { condition: variable.toLowerCase() === body.text.toLowerCase() };
+      condition = variable.toLowerCase() === body.text.toLowerCase();
     }
 
     if (node.condition === "last") {
       const variableLast = variable.substring(variable.length - node.charactersNumber);
-      return { condition: variableLast.toLowerCase() === body.text.toLowerCase() };
+      condition = variableLast.toLowerCase() === body.text.toLowerCase();
     }
 
     if (node.condition === "start") {
       const variableStart = variable.substring(0, node.charactersNumber);
-      return { condition: variableStart.toLowerCase() === body.text.toLowerCase() };
+      condition = variableStart.toLowerCase() === body.text.toLowerCase();
     }
+
+    await NodeRegisters.create({
+      phoneNumber: session.id,
+      text: body.text,
+      response: condition.toString(),
+      nodeId: session.nodeId,
+      flowId: session.flowId,
+    });
+
+    return { condition };
   }
 
   if (node.type === "database-node") {
