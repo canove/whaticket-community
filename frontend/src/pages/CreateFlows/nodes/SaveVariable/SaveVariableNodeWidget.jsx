@@ -15,7 +15,7 @@ export class SaveVariableNodeWidget extends React.Component {
 		super(props);
 		this.state = {
 		  modalOpen: false,
-		  save: props.node.save ? props.node.save : JSON.stringify(defaultSave, null, 4),
+		  save: props.node.save ? props.node.save : "",
 		};
 	}
 
@@ -46,6 +46,7 @@ export class SaveVariableNodeWidget extends React.Component {
 							label="Save"
 							name="Save"
 							value={this.state.save}
+							placeholder={JSON.stringify(defaultSave, null, 4)}
 							multiline
 							minRows={16}
 							maxLength="1024"
