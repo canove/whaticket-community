@@ -481,6 +481,10 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODE", 404);
   }
 
+  if (!session && node.type !== "start-node") {
+    throw new AppError("ERR_NO_START_NODE");
+  }
+
   const nodeResponse = await processNode(node, session, { ...body, variables });
 
   const linkId = getLink("out", node, nodeResponse);
