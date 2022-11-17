@@ -32,7 +32,7 @@ const store = async (req: Request, res: Response): Promise<Response> => {
 
   const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
-  StartWhatsAppSession(whatsapp);
+  StartWhatsAppSession(whatsapp, null);
 
   return res.status(200).json({ message: "Starting session." });
 };
@@ -75,7 +75,7 @@ const update = async (req: Request, res: Response): Promise<Response> => {
     companyId
   });
 
-  StartWhatsAppSession(whatsapp);
+  StartWhatsAppSession(whatsapp, service);
 
   return res.status(200).json({ message: "Starting session." });
 };

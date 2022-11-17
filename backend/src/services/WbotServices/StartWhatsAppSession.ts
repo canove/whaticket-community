@@ -6,7 +6,8 @@ import { logger } from "../../utils/logger";
 // import { wbotMessageListener } from "./wbotMessageListener";
 
 export const StartWhatsAppSession = async (
-  whatsapp: Whatsapp
+  whatsapp: Whatsapp,
+  service: string
 ): Promise<void> => {
   await whatsapp.update({ status: "OPENING" });
 
@@ -19,6 +20,7 @@ export const StartWhatsAppSession = async (
   try {
     const apiUrl = `${process.env.WPP_NOF_URL}/start`;
     const payload = {
+      service,
       session: whatsapp.name,
       companyId: whatsapp.companyId,
       wh_status: process.env.WPP_NOF_WEBHOOK_URL,

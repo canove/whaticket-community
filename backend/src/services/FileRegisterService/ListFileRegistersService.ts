@@ -38,6 +38,11 @@ const ListFileRegistersService = async ({
         reg.message = template.text
         .replace("{{name}}", reg.name)
         .replace("{{documentNumber}}", reg.documentNumber)
+        .replace("{{var1}}", reg.var1)
+        .replace("{{var2}}", reg.var2)
+        .replace("{{var3}}", reg.var3)
+        .replace("{{var4}}", reg.var4)
+        .replace("{{var5}}", reg.var5)
         .replace("{{phoneNumber}}", reg.phoneNumber);
       });    
     }
