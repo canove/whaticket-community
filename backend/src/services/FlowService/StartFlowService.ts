@@ -521,6 +521,12 @@ const StartFlowService = async ({
     });
   }
 
+  if (nextNode.type === "jump-node") {
+    await session.update({
+      nodeId: nextNode.jumpNodeId,
+    })
+  }
+
   if (node.type === "start-node") {
     return await StartFlowService({
       flowNodeId,
