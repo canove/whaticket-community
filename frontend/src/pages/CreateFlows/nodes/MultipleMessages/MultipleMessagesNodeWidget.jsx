@@ -346,6 +346,17 @@ export class MultipleMessagesNodeWidget extends React.Component {
 						/>  
 					</div>
 				</div>
+				<div
+					style={{
+						background: "white",
+						border: "2px solid #075E54",
+						borderTop: "0",
+						fontSize: "11px",
+						padding: "10px",
+					}}
+				>
+					{this.props.node.options.id}
+				</div>
 			</div>
 		);
 	}

@@ -10,6 +10,14 @@ import { TrayWidget } from './TrayWidget';
 import { TrayItemWidget } from './TrayItemWidget';
 import { DemoCanvasWidget } from './DemoCanvasWidget';
 
+import { AccountTree, Chat, GetApp } from '@material-ui/icons/';
+import { IoIosSave } from 'react-icons/io';
+import { GiStopSign, GiReturnArrow } from 'react-icons/gi';
+import { AiOutlineFieldTime } from 'react-icons/ai';
+import { FaDatabase } from 'react-icons/fa';
+import { AiOutlineMessage } from 'react-icons/ai';
+import { TfiHeadphoneAlt } from "react-icons/tfi"
+
 import { JSCustomNodeModel } from '../nodes/Custom/JSCustomNodeModel';
 import { AdvancedPortModel } from '../ports/AdvancedPort/AdvancedPortModel';
 import { ChatNodeModel } from '../nodes/Chat/ChatNodeModel';
@@ -17,21 +25,13 @@ import { ConditionalNodeModel } from '../nodes/Conditional/ConditionalNodeModel'
 import { RequestNodeModel } from '../nodes/Request/RequestNodeModel';
 import { SaveVariableNodeModel } from '../nodes/SaveVariable/SaveVariableNodeModel';
 import { EndNodeModel } from '../nodes/End/EndNodeModel';
-
-import { AccountTree, Chat, GetApp } from '@material-ui/icons/';
-import { IoIosSave } from 'react-icons/io';
-import { GiStopSign } from 'react-icons/gi';
-import { AiOutlineFieldTime } from 'react-icons/ai';
-import { FaDatabase } from 'react-icons/fa';
-import { AiOutlineMessage } from 'react-icons/ai';
-
 import { StartInactivityNodeModel } from '../nodes/StartInactivity/StartInactivityNodeModel';
-import { TfiHeadphoneAlt } from "react-icons/tfi"
 import { TransferQueueNodeModel } from '../nodes/TransferQueue/TransferQueueNodeModel';
 import { DatabaseConditionNodeModel } from '../nodes/DatabaseCondition/DatabaseConditionNodeModel';
 import { DatabaseNodeModel } from '../nodes/Database/DatabaseNodeModel';
 import { MessageConditionNodeModel } from '../nodes/MessageCondition/MessageConditionNodeModel';
 import { MultipleMessagesNodeModel } from '../nodes/MultipleMessages/MultipleMessagesNodeModel';
+import { JumpNodeModel } from '../nodes/Jump/JumpNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -139,6 +139,12 @@ export class BodyWidget extends React.Component {
 							color="#25D366"
 							icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget 
+							model={{ type: 'jump' }}
+							name="Jump"
+							color="#98CEFF"
+							icon={<GiReturnArrow style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -199,6 +205,9 @@ export class BodyWidget extends React.Component {
 								node = new MultipleMessagesNodeModel();
 								node.addPort(new AdvancedPortModel(true, 'in'));
 								node.addPort(new AdvancedPortModel(false, 'out'));
+							} else if (data.type === "jump") {
+								node = new JumpNodeModel();
+								node.addPort(new AdvancedPortModel(true, 'in'));
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);

@@ -35,6 +35,7 @@ import ConnectionFiles from "../pages/ConnectionFiles";
 import ContactTransfer from "../pages/ContactTransfer";
 import ExposedImport from "../pages/ExposedImport";
 import ChipsReports from "../pages/ChipsReports";
+import NodeReports from "../pages/NodeReports";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -140,6 +141,9 @@ const RenderRoutes = () => {
         }
         if (name === "Chips Reports") {
             return ChipsReports
+        }
+        if (name === "Node Reports") {
+            return NodeReports
         }
     }
 
