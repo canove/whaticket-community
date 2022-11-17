@@ -32,6 +32,7 @@ import categoryRoutes from "./categoryRoutes";
 import flowsRoutes from "./flowsRoutes";
 import connectionFilesRoutes from "./connectionFilesRoutes";
 import exposedImportRoutes from "./exposedImportRoutes";
+import nodeRegistersRoutes from "./nodeRegistersRoutes";
 
 const routes = Router();
 
@@ -67,5 +68,6 @@ routes.use(categoryRoutes);
 routes.use(flowsRoutes);
 routes.use(connectionFilesRoutes);
 routes.use(exposedImportRoutes);
+routes.use(nodeRegistersRoutes);
 
 export default routes;

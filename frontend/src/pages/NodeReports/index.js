@@ -46,55 +46,128 @@ const NodeReports = () => {
 
     const [loading, setLoading] = useState(false);
     const [reports, setReports] = useState([]);
-    const [searchParam, setSearchParam] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [response, setResponse] = useState("");
     const [hasMore, setHasMore] = useState(false);
     const [count, setCount] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
+    const [flows, setFlows] = useState([]);
+    const [flow, setFlow] = useState("");
+    const [nodeId, setNodeId] = useState("");
+    const [disableCsvButton, setDisableCsvButton] = useState(false);
 
     useEffect(() => {
         setPageNumber(1);
-    }, [searchParam, response]);
+    }, [phoneNumber, response, flow, nodeId]);
 
     useEffect(() => {
-        // setLoading(true);
-        // const fetchReports = async () => {
-        //     try {
-        //         const { data } = await api.get('/nodeRegisters/', {
-        //             params: { searchParam, response, pageNumber }
-        //         });
-        //         setReports(data.reports);
-        //         setHasMore(data.hasMore);
-        //         setCount(data.count);
-        //         setLoading(false);
-        //     } catch (err) {
-        //         toastError(err);
-        //         setLoading(false);
-        //     }
-        // }
+        const fetchReports = async () => {
+            setLoading(true);
+            try {
+                const { data } = await api.get('/nodeRegisters/', {
+                    params: { phoneNumber, response, flow, pageNumber, nodeId }
+                });
+                console.log(data);
+                setReports(data.reports);
+                setHasMore(data.hasMore);
+                setCount(data.count);
+                setLoading(false);
+            } catch (err) {
+                toastError(err);
+                setLoading(false);
+            }
+        }
 
-        // fetchReports();
-    }, [searchParam, response, pageNumber]);
+        fetchReports();
+    }, [phoneNumber, response, pageNumber, flow, nodeId]);
 
-    const handleSearchParamChange = (e) => {
-        setSearchParam(e.target.value);
+    useEffect(() => {
+        const fetchFlows = async () => {
+            try {
+                const { data } = await api.get("/flows", {
+                  params: { type: "bits" }
+                });
+                setFlows(data);
+              } catch (err) {
+                toastError(err);
+              }
+        }
+
+        fetchFlows();
+    });
+
+    const handlePhoneNumberChange = (e) => {
+        setPhoneNumber(e.target.value);
     }
 
     const handleResponseChange = (e) => {
         setResponse(e.target.value);
     }
 
+    const handleFlowChange = (e) => {
+        setFlow(e.target.value);
+    }
+
+    const handleNodeIdChange = (e) => {
+        setNodeId(e.target.value);
+    }
+
+    const createCsvFile = async () => {
+        setDisableCsvButton(true);
+        try {
+            const { data } = await api.get('/nodeRegisters/exportCsv', {
+                params: { phoneNumber, response, flow, nodeId, pageNumber: "0" }
+            });
+            setDisableCsvButton(false);
+            return data;
+        } catch (err) {
+            toastError(err);
+            setDisableCsvButton(false);
+            return false;
+        }
+    }
+
+    const downloadCsv = async () => {
+        const csv = await createCsvFile();
+
+        if (!csv) return;
+
+        const encodedUri = encodeURI(csv);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "report.csv");
+        document.body.appendChild(link);
+
+        link.click();
+    }
+
     return (
         <MainContainer>
             <MainHeader>
-                <Title>Node Reports</Title>
+                <Title>{i18n.t("nodeReports.title")}</Title>
                 <MainHeaderButtonsWrapper>
                     <div style={{ display: "flex", alignItems: "end" }}>
                         <TextField
-                            placeholder="Phone Number"
+                            placeholder={i18n.t("nodeReports.phoneNumber")}
                             type="search"
-                            value={searchParam}
-                            onChange={handleSearchParamChange}
+                            value={phoneNumber}
+                            onChange={handlePhoneNumberChange}
+                            InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon style={{ color: "gray" }} />
+                                </InputAdornment>
+                            ),
+                            }}
+                        />
+                        <TextField
+                            style={{
+                                margin: "0 0 0 10px"
+                            }}
+                            placeholder={i18n.t("nodeReports.nodeId")}
+                            type="search"
+                            value={nodeId}
+                            onChange={handleNodeIdChange}
                             InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -108,22 +181,54 @@ const NodeReports = () => {
                                 margin: "0 10px",
                             }}
                         >
+                            <InputLabel id="flow-select-label">
+                                {i18n.t("nodeReports.flow")}
+                            </InputLabel>
+                            <Select
+                                labelId="flow-select-label"
+                                id="flow-select"
+                                value={flow}
+                                label={i18n.t("nodeReports.flow")}
+                                onChange={handleFlowChange}
+                                style={{width: "150px"}}
+                            >
+                                <MenuItem value={""}>{i18n.t("nodeReports.none")}</MenuItem>
+                                { flows.map(flow => {
+                                    return (
+                                        <MenuItem key={flow.id} value={flow.id}>{flow.name}</MenuItem>
+                                    )
+                                })}
+                            </Select>
+                        </FormControl>
+                        <FormControl
+                            style={{
+                                margin: "0 10px 0 0",
+                            }}
+                        >
                             <InputLabel id="response-select-label">
-                                Response
+                                {i18n.t("nodeReports.response")}
                             </InputLabel>
                             <Select
                                 labelId="response-select-label"
                                 id="response-select"
                                 value={response}
-                                label="Response"
+                                label={i18n.t("nodeReports.response")}
                                 onChange={handleResponseChange}
                                 style={{width: "150px"}}
                             >
-                                <MenuItem value={""}>None</MenuItem>
-                                <MenuItem value={"true"}>True</MenuItem>
-                                <MenuItem value={"false"}>False</MenuItem>
+                                <MenuItem value={""}>{i18n.t("nodeReports.none")}</MenuItem>
+                                <MenuItem value={"true"}>{i18n.t("nodeReports.true")}</MenuItem>
+                                <MenuItem value={"false"}>{i18n.t("nodeReports.false")}</MenuItem>
                             </Select>
                         </FormControl>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={downloadCsv}
+                            disabled={disableCsvButton}
+                        >
+                            {i18n.t("nodeReports.exportCsv")}
+                        </Button>
                     </div>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -134,23 +239,23 @@ const NodeReports = () => {
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Phone Number</TableCell>
-                            <TableCell align="center">Text</TableCell>
-                            <TableCell align="center">Response</TableCell>
-                            <TableCell align="center">Node ID</TableCell>
-                            <TableCell align="center">Flow ID</TableCell>
-                            <TableCell align="center">CreatedAt</TableCell>
+                            <TableCell align="center">{i18n.t("nodeReports.phoneNumber")}</TableCell>
+                            <TableCell align="center">{i18n.t("nodeReports.text")}</TableCell>
+                            <TableCell align="center">{i18n.t("nodeReports.response")}</TableCell>
+                            <TableCell align="center">{i18n.t("nodeReports.nodeId")}</TableCell>
+                            <TableCell align="center">{i18n.t("nodeReports.flow")}</TableCell>
+                            <TableCell align="center">{i18n.t("nodeReports.createdAt")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <>
                             {reports && reports.map(report => (
-                                <TableRow key={report.whatsapp.id}>
+                                <TableRow key={report.id}>
                                     <TableCell align="center">{report.phoneNumber}</TableCell>
                                     <TableCell align="center">{report.text}</TableCell>
                                     <TableCell align="center">{report.response}</TableCell>
                                     <TableCell align="center">{report.nodeId}</TableCell>
-                                    <TableCell align="center">{report.flowId}</TableCell>
+                                    <TableCell align="center">{report.flow.name}</TableCell>
                                     <TableCell align="center">{format(parseISO(report.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                 </TableRow>
                             ))}

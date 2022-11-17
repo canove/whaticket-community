@@ -461,7 +461,7 @@ const MainListItems = (props) => {
       return i18n.t("chipReports.title");
     }
     if (name === "Node Reports") {
-      return "Node Reports";
+      return i18n.t("nodeReports.title");
     }
 
     return name;

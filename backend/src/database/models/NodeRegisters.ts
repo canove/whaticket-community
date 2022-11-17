@@ -6,9 +6,10 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  AllowNull,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
+import Company from "./Company";
 import Flows from "./Flows";
 
 @Table
@@ -33,6 +34,13 @@ class NodeRegisters extends Model<NodeRegisters> {
   @ForeignKey(() => Flows)
   @Column
   flowId: number;
+
+  @BelongsTo(() => Flows)
+  flow: Flows;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @CreatedAt
   createdAt: Date;
