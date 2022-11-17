@@ -460,6 +460,9 @@ const MainListItems = (props) => {
     if (name === "Chips Reports") {
       return i18n.t("chipReports.title");
     }
+    if (name === "Node Reports") {
+      return i18n.t("nodeReports.title");
+    }
 
     return name;
   }

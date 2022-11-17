@@ -1227,6 +1227,20 @@ const messages = {
         },
       },
 
+      nodeReports: {
+        title: "Node Reports",
+        phoneNumber: "Phone Number",
+        text: "Text",
+        response: "Response",
+        nodeId: "Node Id",
+        flow: "Flow",
+        createdAt: "Created At",
+        none: "None",
+        true: "True",
+        false: "False",
+        exportCsv: "Export CSV",
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
