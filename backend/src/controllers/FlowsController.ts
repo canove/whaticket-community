@@ -129,13 +129,9 @@ export const remove = async (
   return res.status(200).json({ message: "Flow deleted" });
 };
 
-type StartQuery = {
-  sessionId: string;
-};
-
 export const start = async (req: Request, res: Response): Promise<Response> => {
   const { flowNodeId } = req.params;
-  const { sessionId } = req.body as StartQuery;
+  const { sessionId } = req.body;
   const { companyId } = req.user;
 
   const response = await StartFlowService({

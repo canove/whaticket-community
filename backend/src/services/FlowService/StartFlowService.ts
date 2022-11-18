@@ -380,6 +380,14 @@ const processNode = async (node: any, session: any, body: any) => {
     return { messages };
   }
 
+  if (node.type === "jump-node") {
+    await session.update({
+      nodeId: node.jumpNodeId,
+    });
+
+    return {};
+  }
+
   return {};
 }
 
