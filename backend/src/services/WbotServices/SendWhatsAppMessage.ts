@@ -12,10 +12,13 @@ import { isValidHttpUrl } from "../../utils/common";
 
 interface Request {
   body: string;
+  whatsMsgId: string;
   ticket: Ticket;
   quotedMsg?: Message;
   fromMe: boolean;
   companyId: number;
+  bot: boolean;
+  contactId?: number;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -23,6 +26,9 @@ const SendWhatsAppMessage = async ({
   ticket,
   companyId,
   fromMe,
+  bot,
+  contactId,
+  whatsMsgId,
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -41,7 +47,7 @@ const SendWhatsAppMessage = async ({
   });
 
   const contact = await Contact.findOne({ where: {
-    id: message[0].contactId
+    id: contactId > 0 ? contactId: message[0].contactId
   }});
 
   const messageSended = await FileRegister.findOne({
@@ -128,21 +134,27 @@ const SendWhatsAppMessage = async ({
         "session": connnection.name,
         "number": phoneNumber,
         "path": url,
-        "text": fileName != null? fileName :`NO-TYPING ${formatBody(body, ticket.contact)}` 
+        "text": fileName != null? fileName :`${formatBody(body, ticket.contact)}` 
       };
 
-      var result = await axios.post(apiUrl, payload, {
-        headers: {
-          "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-          "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+      let ack = 3;
+      if(whatsMsgId == '' || whatsMsgId == null) {
+        const sendWhats = await axios.post(apiUrl, payload, {
+          headers: {
+            "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+            "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+          }
+        });
+        if(sendWhats.status == 200) {
+          ack = 0;
+          whatsMsgId = sendWhats.data.data.id;
         }
-      });
+      }
 
-      if(result.status == 200){
-          const msgWhatsId = result.data.data.id;
-          
+      if(whatsMsgId != '' && whatsMsgId != null) {          
           const messageData = {
-            id: msgWhatsId,
+            id: whatsMsgId,
+            ack,
             ticketId: ticket.id,
             contactId: undefined,
             body: body,
@@ -151,7 +163,7 @@ const SendWhatsAppMessage = async ({
             mediaUrl: url,
             mediaType: type,
             quotedMsgId: null,
-            bot: ticket.status == 'inbot',
+            bot: (ticket.status == 'inbot' || bot),
             companyId
           };
         

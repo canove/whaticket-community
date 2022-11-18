@@ -50,7 +50,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true });
+    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null });
   }
 
   SetTicketMessagesAsRead(ticket);

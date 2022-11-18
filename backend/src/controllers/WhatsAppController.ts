@@ -120,7 +120,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     business,
   });
 
-  StartWhatsAppSession(whatsapp);
+  StartWhatsAppSession(whatsapp, null);
 
   const io = getIO();
   io.emit(`whatsapp${companyId}`, {
@@ -648,7 +648,7 @@ export const botMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { fromMe, to, body, contactName, session, bot } = req.body;
+  const { fromMe, to, body, contactName, session, bot, id } = req.body;
 
   if (!fromMe) {
     const message = await newMessage(req, res);
@@ -678,7 +678,10 @@ export const botMessage = async (
     body,
     ticket,
     companyId: ticket.companyId,
-    fromMe
+    fromMe,
+    bot,
+    contactId: contact.id,
+    whatsMsgId: id
   });
 
   return res.status(200).json("success");

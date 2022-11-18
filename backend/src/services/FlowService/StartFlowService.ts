@@ -236,11 +236,11 @@ const processNode = async (node: any, session: any, body: any) => {
 
     const fileRegister = await FileRegister.findOne({
       where: {
-        phoneNumber: session.id,
+        phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
-      order: [["updatedAt", "DESC"]]
+      order: [["createdAt", "DESC"]]
     });
 
     if (!fileRegister) return { condition };
@@ -275,7 +275,7 @@ const processNode = async (node: any, session: any, body: any) => {
   if (node.type === "database-node") {
     const fileRegister = await FileRegister.findOne({
       where: {
-        phoneNumber: session.id,
+        phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
@@ -380,6 +380,14 @@ const processNode = async (node: any, session: any, body: any) => {
     return { messages };
   }
 
+  if (node.type === "jump-node") {
+    await session.update({
+      nodeId: node.jumpNodeId,
+    });
+
+    return {};
+  }
+
   return {};
 }
 
@@ -460,13 +468,13 @@ const StartFlowService = async ({
     where: {
       updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
       companyId,
-      id: sessionId,
+      id:  { [Op.like]: `%${sessionId.substr(6,8)}%` },
       nodeId: { [Op.ne]: null },
       flowId: flowNodes.flowId,
     }
   });
 
-  const currentNode = session ? session.nodeId : flowNodeId;
+  const currentNode = session?.nodeId ? session.nodeId : flowNodeId;
 
   const variables = (session && session.variables) ? JSON.parse(session.variables) : {};
 
