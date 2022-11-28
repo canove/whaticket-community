@@ -8,19 +8,16 @@ import { logger } from "../utils/logger";
 import AppError from "../errors/AppError";
 
 type IndexQuery = {
-  facebookToken: string;
-  facebookPhoneNumberId: string;
-  facebookBusinessId: string;
+  facebookAccessToken: string;
+  whatsappAccountId: string;
 };
 
 const index = async (req: Request, res: Response): Promise<Response> => {
-  const { facebookToken, facebookPhoneNumberId, facebookBusinessId } =
-    req.query as IndexQuery;
+  const { facebookAccessToken, whatsappAccountId } = req.query as IndexQuery;
 
   const response = await TestWhatsAppConnectionService({
-    facebookToken,
-    facebookPhoneNumberId,
-    facebookBusinessId
+    facebookAccessToken,
+    whatsappAccountId,
   });
 
   return res.status(200).json(response);

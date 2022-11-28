@@ -13,15 +13,14 @@ const ListTemplateService = async ({
 }: Request): Promise<AxiosResponse> => {
   const whatsApp = await ShowWhatsAppService(whatsAppId, companyId);
 
-  const { facebookBusinessId } = whatsApp;
-  const { facebookToken } = whatsApp;
+  const { facebookAccessToken, whatsappAccountId } = whatsApp;
 
   try {
-    const response = await axios.get(
-      `https://graph.facebook.com/v13.0/${facebookBusinessId}/message_templates?access_token=${facebookToken}&language=pt_BR`
+    const { data } = await axios.get(
+      `https://graph.facebook.com/v13.0/${whatsappAccountId}/message_templates?access_token=${facebookAccessToken}&language=pt_BR`
     );
 
-    return response.data.data;
+    return data.data;
   } catch (err: any) {
     throw new AppError(err.message);
   }

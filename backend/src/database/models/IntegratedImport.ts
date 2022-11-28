@@ -13,6 +13,7 @@ import {
 import Company from "./Company";
 import Templates from "./TemplatesData";
 import User from "./User";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class IntegratedImport extends Model<IntegratedImport> {
@@ -48,6 +49,10 @@ class IntegratedImport extends Model<IntegratedImport> {
 
   @Column
   whatsappIds: string;
+
+  @ForeignKey(() => Whatsapp)
+  @Column
+  officialConnectionId: number;
 
   @Column
   mapping: string;

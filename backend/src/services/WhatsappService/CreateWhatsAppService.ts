@@ -21,6 +21,8 @@ interface Request {
   flowId?: string | number;
   connectionFileId?: string | number;
   business?: boolean;
+  facebookAccessToken?: string;
+  whatsappAccountId?: string;
 }
 
 interface Response {
@@ -36,6 +38,8 @@ const CreateWhatsAppService = async ({
   farewellMessage,
   isDefault = false,
   official,
+  facebookAccessToken,
+  whatsappAccountId,
   facebookToken,
   facebookPhoneNumberId,
   facebookBusinessId,
@@ -112,6 +116,8 @@ const CreateWhatsAppService = async ({
       connectionFileId,
       faBusinessTime,
       business,
+      facebookAccessToken,
+      whatsappAccountId
     },
     { include: ["queues"] }
   );

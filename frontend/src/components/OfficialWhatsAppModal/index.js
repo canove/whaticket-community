@@ -60,41 +60,21 @@ const SessionSchema = Yup.object().shape({
 		.required("Required"),
 });
 
-const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
+const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
 		name: "",
 		greetingMessage: "",
 		farewellMessage: "",
-		isDefault: false,
-		facebookToken: "",
-		facebookPhoneNumberId: "",
-		phoneNumber: "",
-		facebookBusinessId: "",
 		official: true,
 	};
+
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
-    const [isConnectionTested, setIsConnectionTested] = useState(false);
-	const [submitType, setSubmitType] = useState("testConnection");
-	const [lastFormValues, setLastFormValues] = useState();
+
 	const [flows, setFlows] = useState([]);
 	const [flow, setFlow] = useState("");
-
-	const GetFormValues = () => {
-		const { values } = useFormikContext();
-
-		useEffect(() => {
-			if (!(values === lastFormValues)) {
-				setIsConnectionTested(false);
-			}
-
-			setLastFormValues(values);
-		}, [values]);
-
-		return null;
-	};
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -127,35 +107,18 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 
 	const handleClose = () => {
 		onClose();
-		setIsConnectionTested(false);
 		setWhatsApp(initialState);
+		setFlow("");
+		setSelectedQueueIds([]);
 	};
 
-    const handleConnectionTest = (e) => {
-		setSubmitType("testConnection");
-    }
-
-	const handleSubmit = () => {
-		setSubmitType("submit");
-	}
-
-	const testConnection = async (values) => {
-		const facebookToken = values.facebookToken;
-		const facebookPhoneNumberId = values.facebookPhoneNumberId;
-		const facebookBusinessId = values.facebookBusinessId;
-
-		try {
-			const response = await api.get(`/whatsappsession/testConnection/`, {
-				params: { facebookToken, facebookPhoneNumberId, facebookBusinessId },
-			});
-			setIsConnectionTested(response);
-		} catch (err) {
-			toastError(err);
-		}
-	}
-
 	const handleSaveWhatsApp = async values => {
-		const whatsappData = { ...values, queueIds: selectedQueueIds, flowId: flow ? flow : null };
+		const whatsappData = {
+			...values,
+			queueIds: selectedQueueIds,
+			flowId: flow ? flow : null,
+			officialConnectionId: connectionId ? connectionId : null
+		};
 
 		try {
 			if (whatsAppId) {
@@ -193,13 +156,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 					enableReinitialize={true}
 					validationSchema={SessionSchema}
 					onSubmit={(values, actions) => {
-						if (submitType === "testConnection") {
-							testConnection(values);
-						}
-
-						if (submitType === "submit") {
-							handleSaveWhatsApp(values);
-						}
+						handleSaveWhatsApp(values);
 
 						setTimeout(() => {
 							actions.setSubmitting(false);
@@ -212,7 +169,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								<div className={classes.multFieldLine}>
 									<Field
 										as={TextField}
-										label={i18n.t("whatsappModal.form.name")}
+										label={i18n.t("officialPages.officialContacts.phoneNumber")}
 										autoFocus
 										name="name"
 										error={touched.name && Boolean(errors.name)}
@@ -220,75 +177,9 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										variant="outlined"
 										margin="dense"
 										className={classes.textField}
-									/>
-									<FormControlLabel
-										control={
-											<Field
-												as={Switch}
-												color="primary"
-												name="isDefault"
-												checked={values.isDefault}
-											/>
-										}
-										label={i18n.t("whatsappModal.form.default")}
+										fullWidth
 									/>
 								</div>
-                                <div className={classes.textQuickAnswerContainer}>
-                                    <Field
-                                        as={TextField}
-                                        label={i18n.t("officialWhatsappModal.title.labelNumber")}
-                                        name="phoneNumber"
-                                        error={touched.phoneNumber && Boolean(errors.phoneNumber)}
-                                        helperText={touched.phoneNumber && errors.phoneNumber}
-                                        variant="outlined"
-                                        margin="dense"
-                                        className={classes.textField}
-                                        fullWidth
-										required
-                                    />
-                                </div>
-                                <div className={classes.textQuickAnswerContainer}>
-                                    <Field
-                                        as={TextField}
-                                        label={i18n.t("officialWhatsappModal.title.labelToken")}
-                                        name="facebookToken"
-                                        error={touched.facebookToken && Boolean(errors.facebookToken)}
-                                        helperText={touched.facebookToken && errors.facebookToken}
-                                        variant="outlined"
-                                        margin="dense"
-                                        className={classes.textField}
-                                        fullWidth
-										required
-                                    />
-                                </div>
-                                <div className={classes.textQuickAnswerContainer}>
-                                    <Field
-                                        as={TextField}
-                                        label={i18n.t("officialWhatsappModal.title.labelId")}
-                                        name="facebookPhoneNumberId"
-                                        error={touched.facebookPhoneNumberId && Boolean(errors.facebookPhoneNumberId)}
-                                        helperText={touched.facebookPhoneNumberId && errors.facebookPhoneNumberId}
-                                        variant="outlined"
-                                        margin="dense"
-                                        className={classes.textField}
-                                        fullWidth
-										required
-                                    />
-                                </div>
-								<div className={classes.textQuickAnswerContainer}>
-                                    <Field
-                                        as={TextField}
-                                        label={i18n.t("officialWhatsappModal.title.labelBusiness")}
-                                        name="facebookBusinessId"
-                                        error={touched.facebookBusinessId && Boolean(errors.facebookBusinessId)}
-                                        helperText={touched.facebookBusinessId && errors.facebookBusinessId}
-                                        variant="outlined"
-                                        margin="dense"
-                                        className={classes.textField}
-                                        fullWidth
-										required
-                                    />
-                                </div>
 								<div>
 									<Field
 										as={TextField}
@@ -363,28 +254,18 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId }) => {
 								>
 									{i18n.t("officialWhatsappModal.buttons.cancel")}
 								</Button>
-                                <Button
-                                    type="submit"
-									color="primary"
-									disabled={isSubmitting}
-									variant="contained"
-									className={classes.btnWrapper}
-                                    onClick={handleConnectionTest}
-                                >
-                                    {i18n.t("officialWhatsappModal.buttons.testConnection")}
-                                </Button>
 								<Button
 									type="submit"
 									color="primary"
-									disabled={!isConnectionTested}
 									variant="contained"
 									className={classes.btnWrapper}
-									onClick={handleSubmit}
 								>
-									{i18n.t("officialWhatsappModal.buttons.add")}
+									{ whatsAppId 
+										? "Editar" 
+										: i18n.t("officialWhatsappModal.buttons.add")
+									}
 								</Button>
 							</DialogActions>
-							<GetFormValues />
 						</Form>
 					)}
 				</Formik>

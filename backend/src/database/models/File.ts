@@ -15,6 +15,7 @@ import {
 import Company from "./Company";
 import Templates from "./TemplatesData";
 import User from "./User";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class File extends Model<File> {
@@ -57,6 +58,10 @@ class File extends Model<File> {
 
   @Column
   approvedAt: Date;
+
+  @ForeignKey(() => Whatsapp)
+  @Column
+  officialConnectionId: number;
 
   @Column
   refusedAt: Date;

@@ -135,6 +135,12 @@ class Whatsapp extends Model<Whatsapp> {
 
   @Column
   whatsImage: string;
+
+  @Column
+  facebookAccessToken: string;
+
+  @Column
+  whatsappAccountId: string;
 }
 
 export default Whatsapp;

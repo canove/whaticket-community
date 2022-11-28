@@ -13,7 +13,7 @@ const ShowWhatsAppService = async (
         model: Queue,
         as: "queues",
         attributes: ["id", "name", "color", "greetingMessage"]
-      }
+      },
     ],
     order: [["queues", "name", "ASC"]]
   });

@@ -178,10 +178,10 @@ const Templates = () => {
               onChange={handleChange}
             >
               {whatsApps &&
-                whatsApps.map((whats, index) => {
+                whatsApps.map((whats) => {
                   if (whats.official === true) {
                     return (
-                      <MenuItem key={index} value={whats.id}>
+                      <MenuItem key={whats.id} value={whats.id}>
                         {whats.name}
                       </MenuItem>
                     );

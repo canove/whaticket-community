@@ -47,6 +47,8 @@ interface WhatsappData {
   connectionFileId?: string | number;
   business?: boolean;
   service?: string;
+  facebookAccessToken?: string;
+  whatsappAccountId?: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -73,7 +75,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     flowId,
     connectionFileId,
     business,
-    service
+    service,
+    facebookAccessToken,
+    whatsappAccountId,
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -110,6 +114,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     farewellMessage,
     queueIds,
     official,
+    facebookAccessToken,
+    whatsappAccountId,
     facebookToken,
     facebookPhoneNumberId,
     facebookBusinessId,
@@ -476,10 +482,12 @@ type ListQuery = {
   connectionFileName?: string;
   searchParam?: string;
   status?: string;
+  connectionName?: string;
+  limit?: string;
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official, pageNumber, connectionFileName, searchParam, status } = req.query as ListQuery;
+  const { official, pageNumber, connectionFileName, searchParam, status, connectionName, limit } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { whatsapps, count, hasMore, connectionFileId } = await ListOfficialWhatsAppsService({
@@ -488,7 +496,9 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     connectionFileName,
     pageNumber,
     searchParam,
-    status
+    status,
+    connectionName,
+    limit
   });
 
   return res.status(200).json({

@@ -1241,6 +1241,32 @@ const messages = {
         exportCsv: "Export CSV",
       },
 
+      officialPages: {
+        officialContacts: {
+          title: "Contacts",
+          search: "Search",
+          phoneNumber: "Phone Number",
+          connection: "Connection",
+          updatedAt: "Last Update",
+          createdAt: "Created At",
+          actions: "Actions",
+        },
+        officialModal: {
+          add: "Create",
+          edit: "Edit",
+          save: "Save",
+          phoneNumber: "Phone Number",
+          createToast: "Connection created!",
+          saveToast: "Connection saved.",
+          name: "Name",
+          facebookAccessToken: "Facebook Access Token",
+          whatsappAccountId: "Whatsapp Account Id",
+          testButton: "Test",
+          cancelButton: "Cancel",
+        },
+        addConnection: "Add Connection",
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",

@@ -2,39 +2,27 @@ import axios from "axios";
 import AppError from "../../errors/AppError";
 
 interface Request {
-  facebookToken: string;
-  facebookPhoneNumberId: string;
-  facebookBusinessId: string;
+  facebookAccessToken: string;
+  whatsappAccountId: string;
 }
 
 const TestWhatsAppConnectionService = async ({
-  facebookToken,
-  facebookPhoneNumberId,
-  facebookBusinessId
-}: Request): Promise<string> => {
+  facebookAccessToken,
+  whatsappAccountId,
+}: Request): Promise<boolean> => {
   try {
     const response = await axios.get(
-      `https://graph.facebook.com/v13.0/${facebookBusinessId}/phone_numbers?access_token=${facebookToken}`
+      `https://graph.facebook.com/v15.0/${whatsappAccountId}/phone_numbers?access_token=${facebookAccessToken}`
     );
 
-    const phoneNumbers = response.data.data;
-
-    let phoneNumberExists = false;
-    phoneNumbers.every((phoneNumber: { id: number | string }) => {
-      if (phoneNumber.id === facebookPhoneNumberId) {
-        phoneNumberExists = true;
-        return false;
-      }
+    if (response.status === 200) {
       return true;
-    });
-
-    if (phoneNumberExists) {
-      return "Success!";
     }
 
-    throw new AppError("Error!");
+    return false;
   } catch (err: any) {
-    throw new AppError(err.message);
+    return false;
+    // throw new AppError(err.message);
   }
 };
 

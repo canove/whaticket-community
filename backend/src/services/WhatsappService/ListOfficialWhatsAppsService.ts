@@ -11,6 +11,8 @@ interface Request {
   connectionFileName?: string;
   searchParam?: string;
   status?: string;
+  connectionName?: string;
+  limit?: string;
 }
 
 interface Response {
@@ -26,7 +28,9 @@ const ListWhatsAppsService = async ({
   connectionFileName,
   pageNumber = 1,
   searchParam = "",
-  status
+  status,
+  connectionName,
+  limit = "10",
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -36,8 +40,7 @@ const ListWhatsAppsService = async ({
     deleted: false,
   }
 
-  const limit = 10;
-  const offset = limit * (+pageNumber - 1);
+  const offset = +limit * (+pageNumber - 1);
 
   let connectionFileId = null;
   if (connectionFileName && connectionFileName !== "No Category") {
@@ -77,16 +80,23 @@ const ListWhatsAppsService = async ({
     }
   }
 
+  if (connectionName && connectionName !== "All") {
+    whereCondition = {
+      ...whereCondition,
+      name: connectionName,
+    }
+  }
+
   const { count, rows: whatsapps } = await Whatsapp.findAndCountAll({
     where: whereCondition,
-    limit,
-    offset,
+    limit: +limit > 0 ? +limit : null,
+    offset: +limit > 0 ? offset : null,
     include: [
       {
         model: Queue,
         as: "queues",
         attributes: ["id", "name", "color", "greetingMessage"]
-      }
+      },
     ],
     order: [["status", "DESC"]]
   });
@@ -97,7 +107,7 @@ const ListWhatsAppsService = async ({
     whatsapps,
     count,
     hasMore,
-    connectionFileId
+    connectionFileId,
   };
 };
 

@@ -8,6 +8,7 @@ interface Request {
   connections: string[];
   companyId: number;
   connectionType: string | boolean;
+  officialConnectionId: string | number;
 }
 
 const CreateExposedImportService = async ({
@@ -16,7 +17,8 @@ const CreateExposedImportService = async ({
   template,
   connections,
   connectionType,
-  companyId
+  companyId,
+  officialConnectionId
 }: Request): Promise<ExposedImport> => {
   let whatsappIds = null;
 
@@ -37,7 +39,8 @@ const CreateExposedImportService = async ({
     templateId: template,
     whatsappIds,
     official: connectionType,
-    companyId
+    companyId,
+    officialConnectionId
   });
 
   return exposedImport;
