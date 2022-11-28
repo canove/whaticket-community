@@ -17,9 +17,14 @@ interface Request {
 }
 
 interface Response {
-  reports: WhatsReports[];
+  reports: FileRegister[];
   count: number;
   hasMore: boolean;
+}
+
+interface ReportData {
+  count: number | number[];
+  rows: FileRegister[]
 }
 
 const ListReportWhatsAppsService = async ({
@@ -28,54 +33,51 @@ const ListReportWhatsAppsService = async ({
   companyId,
   pageNumber
 }: Request): Promise<Response> => {
-  let whereCondition = null;
+  let whatsCondition = null;
 
-  whereCondition = { companyId, deleted: false };
+  whatsCondition = {
+    id: Sequelize.literal('FileRegister.whatsappId'),
+    deleted: false
+  };
 
-  if (status === "deleted") whereCondition = { ...whereCondition, deleted: true };
-  if (status === "connected") whereCondition = { ...whereCondition, status: "CONNECTED" }
-  if (status === "disconnected") whereCondition = { ... whereCondition, status: { [Op.ne]: "CONNECTED" } }
+  if (status === "deleted") whatsCondition = { ...whatsCondition, deleted: true };
+  if (status === "connected") whatsCondition = { ...whatsCondition, status: "CONNECTED" }
+  if (status === "disconnected") whatsCondition = { ... whatsCondition, status: { [Op.ne]: "CONNECTED" } }
 
   if (searchParam) {
-    whereCondition = {
-      ...whereCondition,
-      "$Whatsapp.name$": Sequelize.where(
-        Sequelize.fn("LOWER", Sequelize.col("Whatsapp.name")),
-        "LIKE",
-        `%${searchParam.toLowerCase()}%`
-      )
+    whatsCondition = {
+      ...whatsCondition,
+      name: { [Op.like]: `%searchParam.toLowerCase()%` }
     }
   }
-
-  const whatsapps = await Whatsapp.findAll({
-    where: whereCondition,
-  });
-
-  let whatsReports = [];
 
   const limit = 10;
   const offset = limit * (+pageNumber - 1);
 
-  for (const whats of whatsapps) {    
-    const { count } = await FileRegister.findAndCountAll({
-      where: { whatsappId: whats.id }
-    });
+  const { count, rows: whatsReports }: ReportData = await FileRegister.findAndCountAll({
+    where: { whatsappId: { [Op.ne]: null }, companyId },
+    attributes: [
+      "whatsappId",
+      [Sequelize.fn("COUNT", Sequelize.col("whatsappId")), "qtdeRegisters"],
+    ],
+    include: [{
+      model: Whatsapp,
+      attributes: ["name", "createdAt", "updatedAt"],
+      where: whatsCondition
+    }],
+    group: "whatsappId",
+    raw: true
+  });
 
-    if (count === 0) continue;
+  const countNumber =  Array.isArray(count) ? count.length : count;
 
-    whatsReports.push({
-      whatsapp: whats,
-      qtdeRegisters: count
-    });
-  }
+  const hasMore = countNumber > offset + whatsReports.length;
 
-  const count = whatsReports.length;
-
-  whatsReports = whatsReports.slice(offset, offset + limit);
-
-  const hasMore = count > whatsReports.length;
-
-  return { reports: whatsReports, count, hasMore };
+  return {
+    reports: whatsReports,
+    count: countNumber,
+    hasMore
+  };
 };
 
 export default ListReportWhatsAppsService;
