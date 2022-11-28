@@ -25,7 +25,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
-app.use("/public", express.static(uploadConfig.directory));
+app.use("/public", express.static(uploadConfig.directory) as express.RequestHandler);
 app.use(routes);
 
 app.use(Sentry.Handlers.errorHandler());
