@@ -94,4 +94,6 @@ ApiRoutes.get(
   FileRegisterController.getInfo
 );
 
+ApiRoutes.get("/tickets/inticket", isAuthApi, TicketController.containTicket);
+
 export default ApiRoutes;
