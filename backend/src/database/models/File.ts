@@ -13,8 +13,10 @@ import {
   Default
 } from "sequelize-typescript";
 import Company from "./Company";
+import OfficialWhatsapp from "./OfficialWhatsapp";
 import Templates from "./TemplatesData";
 import User from "./User";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class File extends Model<File> {
@@ -57,6 +59,10 @@ class File extends Model<File> {
 
   @Column
   approvedAt: Date;
+
+  @ForeignKey(() => OfficialWhatsapp)
+  @Column
+  officialConnectionId: number;
 
   @Column
   refusedAt: Date;

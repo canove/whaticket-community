@@ -463,6 +463,9 @@ const MainListItems = (props) => {
     if (name === "Node Reports") {
       return i18n.t("nodeReports.title");
     }
+    if (name === "Whats Contacts") {
+      return i18n.t("officialPages.officialContacts.title")
+    }
 
     return name;
   }

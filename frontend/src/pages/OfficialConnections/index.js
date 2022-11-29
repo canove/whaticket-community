@@ -31,6 +31,7 @@ import { format, parseISO } from "date-fns";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import OfficialConnectionModal from "../../components/OfficialConnectionModal";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -140,12 +141,10 @@ const OfficialConnections = () => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
-				const { data } = await api.get(`/whatsapp/list/`, {
-					params: { official: true, pageNumber }
-				});
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
-				setCount(data.count);
-				setHasMore(data.hasMore);
+				const { data } = await api.get('/officialWhatsapps');
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+				// setCount(data.count);
+				// setHasMore(data.hasMore);
 				setLoading(false);
 			} catch (err) {
 				toastError(err);
@@ -153,34 +152,26 @@ const OfficialConnections = () => {
 			}
 		};
 		fetchWhats();
-// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [pageNumber]);
 
 	useEffect(() => {
 		const socket = openSocket();
 
-		socket.on(`whatsapp${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
+		socket.on(`officialWhatsapp${user.companyId}`, data => {
+			if (data.action === "update" || data.action === "create") {
+				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.officialWhatsapp });
 			}
 		});
 
-		socket.on(`whatsapp${user.companyId}`, data => {
+		socket.on(`officialWhatsapp${user.companyId}`, data => {
 			if (data.action === "delete") {
-				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-			}
-		});
-
-		socket.on(`whatsappSession${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_SESSION", payload: data.session });
+				dispatch({ type: "DELETE_WHATSAPPS", payload: data.officialWhatsappId });
 			}
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleOpenWhatsAppModal = () => {
@@ -233,10 +224,10 @@ const OfficialConnections = () => {
 			>
 				{confirmModalInfo.message}
 			</ConfirmationModal>
-			<OfficialWhatsAppModal
+			<OfficialConnectionModal
 				open={whatsAppModalOpen}
 				onClose={handleCloseWhatsAppModal}
-				whatsAppId={selectedWhatsApp?.id}
+				connectionId={selectedWhatsApp?.id}
 			/>
 			<MainHeader>
 				<Title>{i18n.t('officialConnections.title')}</Title>
@@ -246,7 +237,7 @@ const OfficialConnections = () => {
 						color="primary"
 						onClick={handleOpenWhatsAppModal}
 					>
-						{i18n.t("connections.buttons.add")}
+						{i18n.t("officialPages.addConnection")}
 					</Button>
 				</MainHeaderButtonsWrapper>
 			</MainHeader>
@@ -258,19 +249,7 @@ const OfficialConnections = () => {
 								{i18n.t("connections.table.name")}
 							</TableCell>
 							<TableCell align="center">
-								{i18n.t("connections.table.quality")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.limit")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.session")}
-							</TableCell>
-							<TableCell align="center">
 								{i18n.t("connections.table.lastUpdate")}
-							</TableCell>
-							<TableCell align="center">
-								{i18n.t("connections.table.default")}
 							</TableCell>
 							<TableCell align="center">
 								{i18n.t("connections.table.actions")}
@@ -286,20 +265,8 @@ const OfficialConnections = () => {
 									whatsApps.map(whatsApp => (
 										<TableRow key={whatsApp.id}>
 											<TableCell align="center">{whatsApp.name}</TableCell>
-											<TableCell align="center">{whatsApp.quality}</TableCell>
-											<TableCell align="center">{whatsApp.tierLimit}</TableCell>
-											<TableCell align="center">
-												{i18n.t("connections.table.session")}
-											</TableCell>
 											<TableCell align="center">
 												{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
-											</TableCell>
-											<TableCell align="center">
-												{whatsApp.isDefault && (
-													<div className={classes.customTableCell}>
-														<CheckCircle style={{ color: green[500] }} />
-													</div>
-												)}
 											</TableCell>
 											<TableCell align="center">
 												<IconButton
@@ -308,7 +275,7 @@ const OfficialConnections = () => {
 												>
 													<Edit />
 												</IconButton>
-
+{/* 
 												<IconButton
 													size="small"
 													onClick={e => {
@@ -316,7 +283,7 @@ const OfficialConnections = () => {
 													}}
 												>
 													<DeleteOutline />
-												</IconButton>
+												</IconButton> */}
 											</TableCell>
 										</TableRow>
 									))}

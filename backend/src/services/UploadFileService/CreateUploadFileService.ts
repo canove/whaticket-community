@@ -11,6 +11,7 @@ interface Request {
   filePath: string;
   companyId: number;
   templateId?: number;
+  officialConnectionId: string | number;
 }
 
 const CreateUploadFileService = async ({
@@ -20,7 +21,8 @@ const CreateUploadFileService = async ({
   whatsappIds,
   filePath,
   companyId,
-  templateId = null
+  templateId = null,
+  officialConnectionId = null,
 }: Request): Promise<File> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
@@ -51,7 +53,8 @@ const CreateUploadFileService = async ({
     whatsappIds,
     status: 0,
     companyId,
-    templateId
+    templateId,
+    officialConnectionId
   });
 
   return file;

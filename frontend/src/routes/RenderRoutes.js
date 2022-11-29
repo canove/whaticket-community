@@ -36,6 +36,8 @@ import ContactTransfer from "../pages/ContactTransfer";
 import ExposedImport from "../pages/ExposedImport";
 import ChipsReports from "../pages/ChipsReports";
 import NodeReports from "../pages/NodeReports";
+import OfficialContacts from "../pages/OfficialContacts";
+import OfficialTemplates from "../pages/OfficialTemplates";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -145,6 +147,12 @@ const RenderRoutes = () => {
         if (name === "Node Reports") {
             return NodeReports
         }
+        if (name === "Whats Contacts") {
+            return OfficialContacts
+        }
+        if (name === "Official Templates") {
+            return OfficialTemplates
+        }
     }
 
     return (
@@ -185,6 +193,17 @@ const RenderRoutes = () => {
                                 key={menu.id}
                                 exact
                                 path={`/connections/:connectionFileName?`}
+                                component={getComponent(menu.name)}
+                                isPrivate
+                            />
+                        )
+                    }
+                    if (menu.name === "Whats Contacts") {
+                        return (
+                            <Route
+                                key={menu.id}
+                                exact
+                                path={`/WhatsContacts/:connectionName?`}
                                 component={getComponent(menu.name)}
                                 isPrivate
                             />

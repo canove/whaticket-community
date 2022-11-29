@@ -1245,6 +1245,32 @@ const messages = {
         exportCsv: "Exportar CSV",
       },
 
+      officialPages: {
+        officialContacts: {
+          title: "Contatos",
+          search: "Pesquisar",
+          phoneNumber: "Telefone",
+          connection: "Conexão",
+          updatedAt: "Ultima Atualização",
+          createdAt: "Criado em",
+          actions: "Ações",
+        },
+        officialModal: {
+          add: "Criar",
+          edit: "Editar",
+          save: "Salvar",
+          phoneNumber: "Telefone",
+          createToast: "Conexão criada com sucesso!",
+          saveToast: "Conexão salva com sucesso.",
+          name: "Nome",
+          facebookAccessToken: "Token de Acesso do Facebook",
+          whatsappAccountId: "ID da Conta do Whatsapp",
+          testButton: "Testar",
+          cancelButton: "Cancelar",
+        },
+        addConnection: "Adicionar Conexão",
+      },
+
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:

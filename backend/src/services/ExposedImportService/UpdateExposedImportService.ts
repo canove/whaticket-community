@@ -7,6 +7,7 @@ interface ExposedImportData {
   template: string;
   connections: string[];
   connectionType: string | boolean;
+  officialConnectionId: string | number;
 }
 
 interface Request {
@@ -25,8 +26,7 @@ const UpdateExposedImportService = async ({
     companyId
   );
 
-  const { name, mapping, template, connections, connectionType } =
-    exposedImportData;
+  const { name, mapping, template, connections, connectionType, officialConnectionId } = exposedImportData;
 
   let whatsappIds = null;
   let templateId = null;
@@ -48,7 +48,8 @@ const UpdateExposedImportService = async ({
     mapping,
     templateId,
     official: connectionType,
-    whatsappIds
+    whatsappIds,
+    officialConnectionId
   });
 
   return exposedImport;

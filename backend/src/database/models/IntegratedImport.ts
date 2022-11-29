@@ -11,8 +11,10 @@ import {
   ForeignKey
 } from "sequelize-typescript";
 import Company from "./Company";
+import OfficialWhatsapp from "./OfficialWhatsapp";
 import Templates from "./TemplatesData";
 import User from "./User";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class IntegratedImport extends Model<IntegratedImport> {
@@ -48,6 +50,10 @@ class IntegratedImport extends Model<IntegratedImport> {
 
   @Column
   whatsappIds: string;
+
+  @ForeignKey(() => OfficialWhatsapp)
+  @Column
+  officialConnectionId: number;
 
   @Column
   mapping: string;

@@ -22,6 +22,8 @@ interface WhatsappData {
   flowId?: string | number;
   connectionFileId?: string | number;
   business?: boolean;
+  facebookAccessToken?: string,
+  whatsappAccountId?: string
 }
 
 interface Request {
@@ -62,6 +64,8 @@ const UpdateWhatsAppService = async ({
     flowId,
     connectionFileId,
     business,
+    facebookAccessToken,
+    whatsappAccountId
   } = whatsappData;
 
   try {
@@ -70,7 +74,7 @@ const UpdateWhatsAppService = async ({
     throw new AppError(err.message);
   }
 
-  if (queueIds.length > 1 && !greetingMessage) {
+  if (!official && queueIds.length > 1 && !greetingMessage) {
     throw new AppError("ERR_WAPP_GREETING_REQUIRED");
   }
 
@@ -106,6 +110,8 @@ const UpdateWhatsAppService = async ({
     flowId,
     connectionFileId,
     business,
+    facebookAccessToken,
+    whatsappAccountId
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);

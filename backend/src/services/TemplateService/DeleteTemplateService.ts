@@ -15,12 +15,11 @@ const DeleteTemplateService = async ({
 }: Request): Promise<AxiosResponse> => {
   const whatsApp = await ShowWhatsAppService(whatsAppId, companyId);
 
-  const { facebookBusinessId } = whatsApp;
-  const { facebookToken } = whatsApp;
+  const { whatsappAccountId, facebookAccessToken } = whatsApp;
 
   try {
     const response = await axios.delete(
-      `https://graph.facebook.com/v13.0/${facebookBusinessId}/message_templates?name=${templateName}&access_token=${facebookToken}`
+      `https://graph.facebook.com/v13.0/${whatsappAccountId}/message_templates?name=${templateName}&access_token=${facebookAccessToken}`
     );
 
     return response.data;

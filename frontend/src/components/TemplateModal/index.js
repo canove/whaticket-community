@@ -57,15 +57,16 @@ const TemplateModal = ({ open, onClose }) => {
   const { whatsApps } = useContext(WhatsAppsContext);
   const [category, setCategory] = useState("");
   const [bodyText, setBodyText] = useState("");
-  const [paramsQuantity, setParamsQuantity] = useState(0);
   const [param, setParam] = useState("");
   const [openParamModal, setOpenParamModal] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
+  const [paramsQuantity, setParamsQuantity] = useState(0);
 
   const handleClose = () => {
     onClose();
     setTemplate(initialState);
     setCategory("");
+    setBodyText("");
     setConnectionName([]);
   };
 
@@ -101,21 +102,21 @@ const TemplateModal = ({ open, onClose }) => {
   };
 
   const handleParams = () => {
-    if (paramsQuantity >= 3) {
-      toast.error(i18n.t("templates.templateModal.toastErr"));
-    } else {
-      setBodyText(prevText => prevText + "{{" + param + "}}")
-    }
+    // if (paramsQuantity >= 3) {
+    //   toast.error(i18n.t("templates.templateModal.toastErr"));
+    // } else {
+    //   setBodyText((prevText) => prevText + "{{" + param + "}}");
+    // }
 
     handleCloseParamModal();
   };
 
   const handleChangeBodyText = (e) => {
     setBodyText(e.target.value);
-  }
+  };
 
   const handleChangeParam = (e) => {
-    setParam(e.target.value)
+    setParam(e.target.value);
   };
 
   const handleOpenParamModal = () => {
@@ -127,63 +128,85 @@ const TemplateModal = ({ open, onClose }) => {
     setOpenParamModal(false);
   };
 
-  useEffect(() => {
-    const testParams = () => {
-      let result = 0;
-      result += bodyText.split("{{name}}").length - 1
-      result += bodyText.split("{{documentNumber}}").length - 1
-      result += bodyText.split("{{phoneNumber}}").length - 1
-      result += bodyText.split("{{var1}}").length - 1
-      result += bodyText.split("{{var2}}").length - 1
-      result += bodyText.split("{{var3}}").length - 1
-      result += bodyText.split("{{var4}}").length - 1
-      result += bodyText.split("{{var5}}").length - 1
+  // useEffect(() => {
+  //   // const testParams = () => {
+  //   //   let result = 0;
+  //   //   result += bodyText.split("{{name}}").length - 1;
+  //   //   result += bodyText.split("{{documentNumber}}").length - 1;
+  //   //   result += bodyText.split("{{phoneNumber}}").length - 1;
+  //   //   result += bodyText.split("{{var1}}").length - 1;
+  //   //   result += bodyText.split("{{var2}}").length - 1;
+  //   //   result += bodyText.split("{{var3}}").length - 1;
+  //   //   result += bodyText.split("{{var4}}").length - 1;
+  //   //   result += bodyText.split("{{var5}}").length - 1;
 
-      setParamsQuantity(result);
-    }
-    testParams();
-// eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyText]);
+  //   //   setParamsQuantity(result);
+  //   // };
+  //   // testParams();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   // const delayDebounceFn = setTimeout(() => {
+  //   //   const testParams = async () => {
+  //   //     const parameters = bodyText.match(/\{{(.*?)\}}/g) || [];
+  //   //     const parametersQuantity = parameters.length;
 
-  useEffect(() => {
-    if (paramsQuantity > 3) {
-      setDisableButton(true);
-    } else {
-      setDisableButton(false);
-    }
-  }, [paramsQuantity])
+  //   //     // for (let i = 0; i < parametersQuantity; i++) {
+  //   //     //   setBodyText((prevText) => {
+  //   //     //     return prevText.replace(parameters[i], `{{${i+1}}}`);
+  //   //     //   });
+  //   //     // }
+  //   //   };
+  //   //   testParams();
+  //   // }, 1000);
+  //   // return () => clearTimeout(delayDebounceFn);
+  // }, [bodyText]);
+
+  // useEffect(() => {
+  //   if (paramsQuantity > 3) {
+  //     setDisableButton(true);
+  //   } else {
+  //     setDisableButton(false);
+  //   }
+  // }, [paramsQuantity]);
 
   return (
     <div className={classes.root}>
       <div>
         <Dialog open={openParamModal} onClose={handleCloseParamModal}>
-          <DialogTitle>{i18n.t("templates.templateModal.selectVar")}</DialogTitle>
+          <DialogTitle>
+            {i18n.t("templates.templateModal.selectVar")}
+          </DialogTitle>
           <DialogContent>
-              <FormControl className={classes.multFieldLine}>
-                <Select
-                  variant="outlined"
-                  id="demo-dialog-select"
-                  value={param}
-                  onChange={handleChangeParam}
-                  style={{width: "100%"}}
-                >
-                  <MenuItem value={'name'}>{i18n.t("templates.templateModal.name")}</MenuItem>
-                  <MenuItem value={'documentNumber'}>{i18n.t("templates.templateModal.document")}</MenuItem>
-                  <MenuItem value={'phoneNumber'}>{i18n.t("templates.templateModal.phoneNumber")}</MenuItem>
-                  <MenuItem value={'var1'}>Var 1</MenuItem>
-                  <MenuItem value={'var2'}>Var 2</MenuItem>
-                  <MenuItem value={'var3'}>Var 3</MenuItem>
-                  <MenuItem value={'var4'}>Var 4</MenuItem>
-                  <MenuItem value={'var5'}>Var 5</MenuItem>
-                </Select>
-              </FormControl>
+            <FormControl className={classes.multFieldLine}>
+              <Select
+                variant="outlined"
+                id="demo-dialog-select"
+                value={param}
+                onChange={handleChangeParam}
+                style={{ width: "100%" }}
+              >
+                <MenuItem value={"name"}>
+                  {i18n.t("templates.templateModal.name")}
+                </MenuItem>
+                <MenuItem value={"documentNumber"}>
+                  {i18n.t("templates.templateModal.document")}
+                </MenuItem>
+                <MenuItem value={"phoneNumber"}>
+                  {i18n.t("templates.templateModal.phoneNumber")}
+                </MenuItem>
+                <MenuItem value={"var1"}>Var 1</MenuItem>
+                <MenuItem value={"var2"}>Var 2</MenuItem>
+                <MenuItem value={"var3"}>Var 3</MenuItem>
+                <MenuItem value={"var4"}>Var 4</MenuItem>
+                <MenuItem value={"var5"}>Var 5</MenuItem>
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseParamModal} color="primary">
-             {i18n.t("templates.templateModal.cancel")}
+              {i18n.t("templates.templateModal.cancel")}
             </Button>
             <Button onClick={handleParams} color="primary">
-             {i18n.t("templates.templateModal.ok")}
+              {i18n.t("templates.templateModal.ok")}
             </Button>
           </DialogActions>
         </Dialog>
@@ -223,28 +246,29 @@ const TemplateModal = ({ open, onClose }) => {
                     className={classes.textField}
                   />
                 </div>
-                <div>
-                  <MainHeaderButtonsWrapper>
-                    <div className={classes.root}>
-                      <InputLabel id="category-select-label">
-                        {i18n.t("templates.templateModal.category")}
-                      </InputLabel>
-                      <Select
-                        labelId="category-select-label"
-                        id="category-select"
-                        value={category}
-                        onChange={handleCategoryChange}
-                        fullWidth
-                      >
-                        <MenuItem value={"transicional"}>
-                          {i18n.t("templates.templateModal.transactional")}
-                        </MenuItem>
-                        <MenuItem value={"marketing"}>
-                          {i18n.t("templates.templateModal.marketing")}
-                        </MenuItem>
-                      </Select>
-                    </div>
-                    <FormControl className={classes.multFieldLine}>
+                <div style={{ marginTop: "5px" }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="category-select-label">
+                      {i18n.t("templates.templateModal.category")}
+                    </InputLabel>
+                    <Select
+                      labelId="category-select-label"
+                      id="category-select"
+                      label={i18n.t("templates.templateModal.category")}
+                      value={category}
+                      onChange={handleCategoryChange}
+                      fullWidth
+                    >
+                      <MenuItem value={"transicional"}>
+                        {i18n.t("templates.templateModal.transactional")}
+                      </MenuItem>
+                      <MenuItem value={"marketing"}>
+                        {i18n.t("templates.templateModal.marketing")}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                {/* <FormControl className={classes.multFieldLine}>
                       <InputLabel id="multiple-official-connections-label">
                         {i18n.t("templates.templateModal.connection")}
                       </InputLabel>
@@ -267,9 +291,7 @@ const TemplateModal = ({ open, onClose }) => {
                             return null;
                           })}
                       </Select>
-                    </FormControl>
-                  </MainHeaderButtonsWrapper>
-                </div>
+                    </FormControl> */}
                 <div>
                   <Field
                     as={TextField}
@@ -289,6 +311,9 @@ const TemplateModal = ({ open, onClose }) => {
                     variant="outlined"
                     margin="dense"
                   />
+                </div>
+                <div>
+                  <Button onClick={() => {}}>Adicionar Parametro</Button>
                 </div>
                 <div>
                   <Field
@@ -316,14 +341,14 @@ const TemplateModal = ({ open, onClose }) => {
                 >
                   {i18n.t("templates.buttons.cancel")}
                 </Button>
-                <Button
+                {/* <Button
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
                   onClick={handleOpenParamModal}
                 >
                   {"{{ }}"}
-                </Button>
+                </Button> */}
                 <Button
                   type="submit"
                   color="primary"
