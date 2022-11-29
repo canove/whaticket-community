@@ -100,6 +100,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 			...values,
 			officialConnectionId: connectionId ? connectionId : null,
 			name: phoneNumber ? phoneNumber.display_phone_number : "",
+			facebookPhoneNumberId: phoneNumber ? phoneNumber.id : null,
 		};
 
 		try {
