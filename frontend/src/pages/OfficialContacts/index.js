@@ -401,14 +401,14 @@ const OfficialContacts = () => {
 									<TableCell align="center">
 										Ultima Atualização
 									</TableCell>
-									{/* <TableCell align="center">
+									<TableCell align="center">
 										{i18n.t("officialPages.officialContacts.actions")}
-									</TableCell> */}
+									</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								{loading ? (
-									<TableRowSkeleton columns={3} />
+									<TableRowSkeleton columns={4} />
 								) : (
 									<>
 										{whatsApps?.length > 0 &&
@@ -419,14 +419,14 @@ const OfficialContacts = () => {
 															<TableCell align="center">{whatsApp.name}</TableCell>
 															<TableCell align="center">{connectionName}</TableCell>
 															<TableCell align="center">{format(parseISO(whatsApp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
-															{/* <TableCell align="center">
+															<TableCell align="center">
 																<IconButton
 																	size="small"
 																	onClick={() => handleEditWhatsApp(whatsApp)}
 																>
 																	<Edit />
 																</IconButton>
-															</TableCell> */}
+															</TableCell>
 														</TableRow>
 													)
 												}

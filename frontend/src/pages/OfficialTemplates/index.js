@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Templates = () => {
+const OfficialTemplates = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
@@ -192,7 +192,7 @@ const Templates = () => {
               alignItems: "end",
             }}
           >
-            {/* <Autocomplete
+            <Autocomplete
               onChange={(e, newValue) => {
                 handleConnectionChange(e, newValue);
               }}
@@ -206,7 +206,7 @@ const Templates = () => {
               renderInput={(params) => (
                 <TextField {...params} label="Número" />
               )}
-            /> */}
+            />
             {/* <FormControl
               style={{
                 marginRight: "10px",
@@ -306,4 +306,4 @@ const Templates = () => {
   );
 };
 
-export default Templates;
+export default OfficialTemplates;

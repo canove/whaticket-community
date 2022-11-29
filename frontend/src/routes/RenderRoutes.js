@@ -37,6 +37,7 @@ import ExposedImport from "../pages/ExposedImport";
 import ChipsReports from "../pages/ChipsReports";
 import NodeReports from "../pages/NodeReports";
 import OfficialContacts from "../pages/OfficialContacts";
+import OfficialTemplates from "../pages/OfficialTemplates";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -148,6 +149,9 @@ const RenderRoutes = () => {
         }
         if (name === "Whats Contacts") {
             return OfficialContacts
+        }
+        if (name === "Official Templates") {
+            return OfficialTemplates
         }
     }
 

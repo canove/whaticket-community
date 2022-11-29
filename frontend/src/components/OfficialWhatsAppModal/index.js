@@ -70,6 +70,8 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 	};
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
+	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
+
 	const [isConnectionTested, setIsConnectionTested] = useState(false);
 	const [phoneNumber, setPhoneNumber] = useState(null);
 
@@ -80,7 +82,11 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 			try {
 				const { data } = await api.get(`whatsapp/${whatsAppId}`);
 				setWhatsApp(data);
+
+				const whatsQueueIds = data.queues?.map(queue => queue.id);
+				setSelectedQueueIds(whatsQueueIds);
 			} catch (err) {
+				console.log(err);
 				toastError(err);
 			}
 		};
@@ -92,12 +98,14 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 		setIsConnectionTested(false);
 		setPhoneNumber(null);
 		setWhatsApp(initialState);
+		setSelectedQueueIds([]);
 		onClose();
 	};
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = {
 			...values,
+			queueIds: selectedQueueIds,
 			officialConnectionId: connectionId ? connectionId : null,
 			name: phoneNumber ? phoneNumber.display_phone_number.replaceAll("+", "").replaceAll("-", "").replaceAll(" ", "") : "",
 			facebookPhoneNumberId: phoneNumber ? phoneNumber.id : null,
@@ -154,7 +162,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 					enableReinitialize={true}
 					validationSchema={SessionSchema}
 				>
-					{({ values, touched, errors, isSubmitting }) => (
+					{({ values, touched, errors, isSubmitting, handleChange }) => (
 						<Form>
 							<DialogContent dividers>
 								<div className={classes.multFieldLine}>
@@ -169,6 +177,10 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 										margin="dense"
 										className={classes.textField}
 										fullWidth
+										onChange={(e) => {
+											setIsConnectionTested(false);
+											handleChange(e);
+										}}
 									/>
 								</div>
 								{ isConnectionTested &&
@@ -214,6 +226,10 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 										</div>
 									</>
 								}
+								<QueueSelect
+									selectedQueueIds={selectedQueueIds}
+									onChange={selectedIds => setSelectedQueueIds(selectedIds)}
+								/>
 							</DialogContent>
 							<DialogActions>
 								<Button

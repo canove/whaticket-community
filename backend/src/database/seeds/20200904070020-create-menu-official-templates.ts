@@ -10,8 +10,8 @@ module.exports = {
       "Menus",
       [
         {
-          name: "Whats Contacts",
-          icon: "ContactPhoneOutlinedIcon",
+          name: "Official Templates",
+          icon: "DvrIcon",
           parentId: parent[0][0].id,
           isParent: false,
           createdAt: new Date(),
