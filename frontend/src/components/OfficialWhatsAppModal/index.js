@@ -99,7 +99,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 		const whatsappData = {
 			...values,
 			officialConnectionId: connectionId ? connectionId : null,
-			name: phoneNumber ? phoneNumber.display_phone_number : "",
+			name: phoneNumber ? phoneNumber.display_phone_number.replaceAll("+", "").replaceAll("-", "").replaceAll(" ", "") : "",
 			facebookPhoneNumberId: phoneNumber ? phoneNumber.id : null,
 		};
 
