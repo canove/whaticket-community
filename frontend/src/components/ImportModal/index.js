@@ -88,22 +88,6 @@ const ImportModal = ({ open, onClose }) => {
   const [offConnection, setOffConnection] = useState(null);
   const [offPhoneNumbers, setOffPhoneNumbers] = useState([]);
 
-  useEffect(() => {
-    const fetchPhoneNumbers = async () => {
-      try {
-        const { data } = await api.get("/officialWhatsapps", {
-          params: { connectionId: offConnection },
-        });
-
-        setOffPhoneNumbers(data.phoneNumbers);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    if (offConnection) fetchPhoneNumbers();
-  }, [offConnection]);
-
   const handleClose = () => {
     onClose();
     setFile();
@@ -202,16 +186,7 @@ const ImportModal = ({ open, onClose }) => {
         toastError(err);
       }
     };
-    const fetchOffConnections = async () => {
-      try {
-        const { data } = await api.get('/whatsapp/list', {
-					params: { official: true, limit: "-1" }
-				});
-        setOffConnections(data.whatsapps);
-      } catch (err) {
-        toastError(err);
-      }
-    };
+
     const fetchTemplates = async () => {
       try {
         const { data } = await api.get("/TemplatesData/list/");
@@ -220,10 +195,39 @@ const ImportModal = ({ open, onClose }) => {
         toastError(err);
       }
     };
+
+    const fetchPhoneNumbers = async () => {
+      try {
+        const { data } = await api.get("/officialWhatsapps");
+        setOffPhoneNumbers(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    fetchPhoneNumbers();
     fetchTemplates();
-    fetchOffConnections();
     fetchMenus();
   }, [open]);
+
+  useEffect(() => {
+    const fetchOffConnections = async () => {
+      try {
+        const { data } = await api.get('/whatsapp/list', {
+					params: {
+            official: true,
+            limit: "-1",
+            officialWhatsappId: offConnection ?? null
+          }
+				});
+        setOffConnections(data.whatsapps);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    fetchOffConnections();
+  }, [open, offConnection])
 
   const handleOffConnectionChange = (e) => {
     setOffConnection(e.target.value);
@@ -306,7 +310,7 @@ const ImportModal = ({ open, onClose }) => {
                 style={{ width: "100%" }}
                 variant="outlined"
               >
-                {offConnections.map((offConnection) => (
+                {offPhoneNumbers.map((offConnection) => (
                   <MenuItem key={offConnection.id} value={offConnection.id}>
                     {offConnection.name}
                   </MenuItem>
@@ -338,14 +342,11 @@ const ImportModal = ({ open, onClose }) => {
                 <MenuItem value={"Todos"}>
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
-                {offPhoneNumbers &&
-                  offPhoneNumbers.map((phoneNumber) => {
-                    return (
-                      <MenuItem key={phoneNumber.id} value={phoneNumber.id}>
-                        {phoneNumber.display_phone_number}
-                      </MenuItem>
-                    );
-                  })}
+                {offConnections.map((offConnection) => (
+                  <MenuItem key={offConnection.id} value={offConnection.id}>
+                    {offConnection.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           )}

@@ -13,6 +13,7 @@ interface Request {
   status?: string;
   connectionName?: string;
   limit?: string;
+  officialWhatsappId?: string;
 }
 
 interface Response {
@@ -31,6 +32,7 @@ const ListWhatsAppsService = async ({
   status,
   connectionName,
   limit = "10",
+  officialWhatsappId
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -80,10 +82,10 @@ const ListWhatsAppsService = async ({
     }
   }
 
-  if (connectionName && connectionName !== "All") {
+  if (officialWhatsappId) {
     whereCondition = {
       ...whereCondition,
-      name: connectionName,
+      officialWhatsappId: officialWhatsappId,
     }
   }
 

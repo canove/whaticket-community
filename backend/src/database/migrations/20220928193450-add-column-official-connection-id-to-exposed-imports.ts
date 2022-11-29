@@ -2,15 +2,15 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   up: (queryInterface: QueryInterface) => {
-    return queryInterface.addColumn("Files", "officialConnectionId", {
+    return queryInterface.addColumn("ExposedImports", "officialConnectionId", {
       type: DataTypes.INTEGER,
-      references: { model: "Whatsapps", key: "id" },
+      references: { model: "OfficialWhatsapps", key: "id" },
       onUpdate: "CASCADE",
       onDelete: "SET NULL"
     });
   },
 
   down: (queryInterface: QueryInterface) => {
-    return queryInterface.removeColumn("Files", "officialConnectionId");
+    return queryInterface.removeColumn("ExposedImports", "officialConnectionId");
   }
 };

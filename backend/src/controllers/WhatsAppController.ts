@@ -487,10 +487,11 @@ type ListQuery = {
   status?: string;
   connectionName?: string;
   limit?: string;
+  officialWhatsappId?: string;
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official, pageNumber, connectionFileName, searchParam, status, connectionName, limit } = req.query as ListQuery;
+  const { official, pageNumber, connectionFileName, searchParam, status, connectionName, limit, officialWhatsappId } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { whatsapps, count, hasMore, connectionFileId } = await ListOfficialWhatsAppsService({
@@ -501,7 +502,8 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     searchParam,
     status,
     connectionName,
-    limit
+    limit,
+    officialWhatsappId
   });
 
   return res.status(200).json({
