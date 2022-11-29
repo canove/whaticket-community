@@ -21,6 +21,9 @@ interface Request {
   flowId?: string | number;
   connectionFileId?: string | number;
   business?: boolean;
+  facebookAccessToken?: string;
+  whatsappAccountId?: string;
+  officialConnectionId?: string;
 }
 
 interface Response {
@@ -36,6 +39,8 @@ const CreateWhatsAppService = async ({
   farewellMessage,
   isDefault = false,
   official,
+  facebookAccessToken,
+  whatsappAccountId,
   facebookToken,
   facebookPhoneNumberId,
   facebookBusinessId,
@@ -44,6 +49,7 @@ const CreateWhatsAppService = async ({
   flowId,
   connectionFileId,
   business = false,
+  officialConnectionId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -60,7 +66,7 @@ const CreateWhatsAppService = async ({
           return !nameExists;
         }
       ),
-    isDefault: Yup.boolean().required()
+    // isDefault: Yup.boolean().required()
   });
 
   try {
@@ -112,6 +118,9 @@ const CreateWhatsAppService = async ({
       connectionFileId,
       faBusinessTime,
       business,
+      facebookAccessToken,
+      whatsappAccountId,
+      officialWhatsappId: parseInt(officialConnectionId)
     },
     { include: ["queues"] }
   );

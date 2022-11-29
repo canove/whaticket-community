@@ -144,11 +144,11 @@ const ChipsReports = () => {
                     <TableBody>
                         <>
                             {reports && reports.map(report => (
-                                <TableRow key={report.whatsapp.id}>
-                                    <TableCell align="center">{report.whatsapp.name}</TableCell>
+                                <TableRow key={report.whatsappId}>
+                                    <TableCell align="center">{report["whatsapp.name"]}</TableCell>
                                     <TableCell align="center">{report.qtdeRegisters}</TableCell>
-                                    <TableCell align="center">{format(parseISO(report.whatsapp.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
-                                    <TableCell align="center">{format(parseISO(report.whatsapp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
+                                    <TableCell align="center">{format(parseISO(report["whatsapp.createdAt"]), "dd/MM/yyyy HH:mm")}</TableCell>
+                                    <TableCell align="center">{format(parseISO(report["whatsapp.updatedAt"]), "dd/MM/yyyy HH:mm")}</TableCell>
                                 </TableRow>
                             ))}
                             {loading && <TableRowSkeleton columns={4} />}

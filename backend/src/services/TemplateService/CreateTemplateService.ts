@@ -25,8 +25,7 @@ const CreateTemplateService = async ({
     if (!whatsApp) {
       throw new AppError(`ERR_NO_WHATSAPP_WITH_ID_${whatsAppId}`, 404);
     }
-    const { facebookBusinessId } = whatsApp;
-    const { facebookToken } = whatsApp;
+    const { facebookAccessToken, whatsappAccountId } = whatsApp;
 
     if (category === "transicional") {
       category = "TRANSACTIONAL";
@@ -38,7 +37,7 @@ const CreateTemplateService = async ({
 
     try {
       const response = await axios.post(
-        `https://graph.facebook.com/v13.0/${facebookBusinessId}/message_templates?name=${templateName}&language=pt_BR&category=${category}&access_token=${facebookToken}`,
+        `https://graph.facebook.com/v13.0/${whatsappAccountId}/message_templates?name=${templateName}&language=pt_BR&category=${category}&access_token=${facebookAccessToken}`,
         {
           components: [
             {

@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import AppError from "../../errors/AppError";
+import ShowOfficialWhatsappService from "../OfficialWhatsappServices/ShowOfficialWhatsappService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 
 interface Request {
@@ -12,16 +13,17 @@ const ListTemplateService = async ({
   companyId
 }: Request): Promise<AxiosResponse> => {
   const whatsApp = await ShowWhatsAppService(whatsAppId, companyId);
+  const officialWhatsapp = await ShowOfficialWhatsappService(whatsApp.officialWhatsappId, companyId);
 
-  const { facebookBusinessId } = whatsApp;
-  const { facebookToken } = whatsApp;
+  const { whatsappAccountId } = whatsApp;
+  const { facebookAccessToken } = officialWhatsapp;
 
   try {
-    const response = await axios.get(
-      `https://graph.facebook.com/v13.0/${facebookBusinessId}/message_templates?access_token=${facebookToken}&language=pt_BR`
+    const { data } = await axios.get(
+      `https://graph.facebook.com/v13.0/${whatsappAccountId}/message_templates?access_token=${facebookAccessToken}&language=pt_BR`
     );
 
-    return response.data.data;
+    return data.data;
   } catch (err: any) {
     throw new AppError(err.message);
   }

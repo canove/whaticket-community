@@ -23,11 +23,11 @@ const UpdateTemplateService = async ({
 }: TemplateData): Promise<AxiosResponse> => {
   const whatsApp = await ShowWhatsAppService(whatsAppId, companyId);
 
-  const { facebookToken } = whatsApp;
+  const { facebookAccessToken } = whatsApp;
 
   try {
     const response = await axios.post(
-      `https://graph.facebook.com/v13.0/${templateId}?name=${templateName}&language=pt_BR&category=${category}&access_token=${facebookToken}`,
+      `https://graph.facebook.com/v13.0/${templateId}?name=${templateName}&language=pt_BR&category=${category}&access_token=${facebookAccessToken}`,
       {
         components: [
           {

@@ -33,6 +33,7 @@ import flowsRoutes from "./flowsRoutes";
 import connectionFilesRoutes from "./connectionFilesRoutes";
 import exposedImportRoutes from "./exposedImportRoutes";
 import nodeRegistersRoutes from "./nodeRegistersRoutes";
+import officialWhatsappRoutes from "./officialWhatsappRoutes";
 
 const routes = Router();
 
@@ -69,5 +70,6 @@ routes.use(flowsRoutes);
 routes.use(connectionFilesRoutes);
 routes.use(exposedImportRoutes);
 routes.use(nodeRegistersRoutes);
+routes.use(officialWhatsappRoutes);
 
 export default routes;
