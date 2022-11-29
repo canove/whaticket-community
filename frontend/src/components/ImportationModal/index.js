@@ -163,12 +163,10 @@ const ImportationtModal = ({
       }
     };
 
-    const fetchOffConnections = async () => {
+    const fetchPhoneNumbers = async () => {
       try {
-        const { data } = await api.get('/whatsapp/list', {
-					params: { official: true, limit: "-1" }
-				});
-        setOffConnections(data.whatsapps);
+        const { data } = await api.get("/officialWhatsapps");
+        setOffPhoneNumbers(data);
       } catch (err) {
         toastError(err);
       }
@@ -177,7 +175,7 @@ const ImportationtModal = ({
     if (open) {
       fetchMenus();
       fetchTemplates();
-      fetchOffConnections();
+      fetchPhoneNumbers();
     }
 
     if (integratedImportId) {
@@ -215,20 +213,23 @@ const ImportationtModal = ({
   }, [open, integratedImportId, integratedImportCopy]);
 
   useEffect(() => {
-    const fetchPhoneNumbers = async () => {
+    const fetchOffConnections = async () => {
       try {
-        const { data } = await api.get("/officialWhatsapps/", {
-          params: { connectionId: offConnection },
+        const { data } = await api.get("/whatsapp/list", {
+          params: {
+            official: true,
+            limit: "-1",
+            officialWhatsappId: offConnection ?? null,
+          },
         });
-
-        setOffPhoneNumbers(data.phoneNumbers);
+        setOffConnections(data.whatsapps);
       } catch (err) {
         toastError(err);
       }
     };
 
-    if (offConnection) fetchPhoneNumbers();
-  }, [offConnection]);
+    fetchOffConnections();
+  }, [open, offConnection]);
 
   useEffect(() => {
     if (menus) {
@@ -720,7 +721,7 @@ const ImportationtModal = ({
                 style={{ width: "100%" }}
                 variant="outlined"
               >
-                {offConnections.map((offConnection) => (
+                {offPhoneNumbers.map((offConnection) => (
                   <MenuItem key={offConnection.id} value={offConnection.id}>
                     {offConnection.name}
                   </MenuItem>
@@ -749,23 +750,18 @@ const ImportationtModal = ({
                 <MenuItem value={"Todos"}>
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
-                {offPhoneNumbers &&
-                  offPhoneNumbers.map((phoneNumber) => {
-                    return (
-                      <MenuItem key={phoneNumber.id} value={phoneNumber.id}>
-                        {phoneNumber.display_phone_number}
-                      </MenuItem>
-                    );
-                  })}
+                {offConnections.map((offConnection) => (
+                  <MenuItem key={offConnection.id} value={offConnection.id}>
+                    {offConnection.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           )}
-          { connectionType === false &&
+          {connectionType === false && (
             <FormControl variant="outlined" margin="normal" fullWidth>
-                <InputLabel id="connection-select-label">
-                {"Conexões"}
-                </InputLabel>
-                <Select
+              <InputLabel id="connection-select-label">{"Conexões"}</InputLabel>
+              <Select
                 variant="outlined"
                 labelId="connection-select-label"
                 id="connection-select"
@@ -777,23 +773,27 @@ const ImportationtModal = ({
                 onOpen={handleOpenConnectionSelect}
                 onClose={handleCloseConnectionSelect}
                 style={{ width: "100%" }}
-                >
+              >
                 <MenuItem value={"Todos"}>
-                    {i18n.t("importModal.form.all")}
+                  {i18n.t("importModal.form.all")}
                 </MenuItem>
                 {whatsApps &&
-                    whatsApps.map((whats) => {
-                    if (whats.official === connectionType && whats.status === "CONNECTED") {
-                        return (
-                            <MenuItem key={whats.id} value={whats.id}>
-                            {whats.name}
-                            </MenuItem>
-                        );
-                    } return null;
-                    })}
-                </Select>
+                  whatsApps.map((whats) => {
+                    if (
+                      whats.official === connectionType &&
+                      whats.status === "CONNECTED"
+                    ) {
+                      return (
+                        <MenuItem key={whats.id} value={whats.id}>
+                          {whats.name}
+                        </MenuItem>
+                      );
+                    }
+                    return null;
+                  })}
+              </Select>
             </FormControl>
-          }
+          )}
           {connectionType === false && (
             <>
               <FormControl variant="outlined" margin="normal" fullWidth>
