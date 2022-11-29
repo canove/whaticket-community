@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import AppError from "../../errors/AppError";
+import ShowOfficialWhatsappService from "../OfficialWhatsappServices/ShowOfficialWhatsappService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 
 interface Request {
@@ -12,8 +13,10 @@ const ListTemplateService = async ({
   companyId
 }: Request): Promise<AxiosResponse> => {
   const whatsApp = await ShowWhatsAppService(whatsAppId, companyId);
+  const officialWhatsapp = await ShowOfficialWhatsappService(whatsApp.officialWhatsappId, companyId);
 
-  const { facebookAccessToken, whatsappAccountId } = whatsApp;
+  const { whatsappAccountId } = whatsApp;
+  const { facebookAccessToken } = officialWhatsapp;
 
   try {
     const { data } = await axios.get(
