@@ -31,6 +31,7 @@ import FlowsSessions from "./models/FlowsSessions";
 import ConnectionFiles from "./models/ConnectionFile";
 import ExposedImport from "./models/ExposedImport";
 import NodeRegisters from "./models/NodeRegisters";
+import OfficialWhatsapp from "./models/OfficialWhatsapp";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -69,7 +70,8 @@ const models = [
   FlowsSessions,
   ConnectionFiles,
   ExposedImport,
-  NodeRegisters
+  NodeRegisters,
+  OfficialWhatsapp
 ];
 
 sequelize.addModels(models);

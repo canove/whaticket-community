@@ -49,6 +49,7 @@ interface WhatsappData {
   service?: string;
   facebookAccessToken?: string;
   whatsappAccountId?: string;
+  officialConnectionId?: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -78,6 +79,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     service,
     facebookAccessToken,
     whatsappAccountId,
+    officialConnectionId
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -124,9 +126,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     flowId,
     connectionFileId,
     business,
+    officialConnectionId
   });
 
-  StartWhatsAppSession(whatsapp, null);
+  if (!official) StartWhatsAppSession(whatsapp, null);
 
   const io = getIO();
   io.emit(`whatsapp${companyId}`, {

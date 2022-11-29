@@ -141,12 +141,10 @@ const OfficialConnections = () => {
 		setLoading(true);
 		const fetchWhats = async () => {
 			try {
-				const { data } = await api.get('/whatsapp/list', {
-					params: { official: true, pageNumber }
-				});
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
-				setCount(data.count);
-				setHasMore(data.hasMore);
+				const { data } = await api.get('/officialWhatsapps');
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+				// setCount(data.count);
+				// setHasMore(data.hasMore);
 				setLoading(false);
 			} catch (err) {
 				toastError(err);
@@ -159,15 +157,15 @@ const OfficialConnections = () => {
 	useEffect(() => {
 		const socket = openSocket();
 
-		socket.on(`whatsapp${user.companyId}`, data => {
+		socket.on(`officialWhatsapp${user.companyId}`, data => {
 			if (data.action === "update" || data.action === "create") {
-				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.offWhatsapp });
+				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.officialWhatsapp });
 			}
 		});
 
-		socket.on(`whatsapp${user.companyId}`, data => {
+		socket.on(`officialWhatsapp${user.companyId}`, data => {
 			if (data.action === "delete") {
-				dispatch({ type: "DELETE_WHATSAPPS", payload: data.offWhatsappId });
+				dispatch({ type: "DELETE_WHATSAPPS", payload: data.officialWhatsappId });
 			}
 		});
 

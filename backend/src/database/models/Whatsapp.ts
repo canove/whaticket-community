@@ -17,6 +17,7 @@ import {
 } from "sequelize-typescript";
 import Company from "./Company";
 import Flows from "./Flows";
+import OfficialWhatsapp from "./OfficialWhatsapp";
 import Queue from "./Queue";
 import Ticket from "./Ticket";
 import WhatsappQueue from "./WhatsappQueue";
@@ -124,6 +125,10 @@ class Whatsapp extends Model<Whatsapp> {
 
   @BelongsTo(() => Flows)
   flow: Flows;
+
+  @ForeignKey(() => OfficialWhatsapp)
+  @Column
+  officialWhatsappId: number;
 
   @Default(false)
   @AllowNull

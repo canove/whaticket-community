@@ -55,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
 			marginRight: theme.spacing(1),
 		},
 		alignItems: "center",
+    overflow: "hidden"
 	},
 
   selectStyle: {
@@ -69,16 +70,16 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
 
     const [name, setName] = useState("");
     const [facebookAccessToken, setFacebookAccessToken] = useState("");
-    const [whatsappAccountId, setWhatsappAccountId] = useState("");
+    // const [whatsappAccountId, setWhatsappAccountId] = useState("");
     const [isConnectionTested, setIsConnectionTested] = useState(false);
 
     useEffect(() => {
       const fetchConnection = async () => {
         try {
-          const { data } = await api.get(`/whatsapp/${connectionId}`);
+          const { data } = await api.get(`/officialWhatsapps/${connectionId}`);
           setName(data.name)
           setFacebookAccessToken(data.facebookAccessToken);
-          setWhatsappAccountId(data.whatsappAccountId);
+          // setWhatsappAccountId(data.whatsappAccountId);
         } catch (err) {
           toastError(err);
         }
@@ -86,14 +87,14 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
       if (connectionId) fetchConnection();
     }, [open, connectionId]);
 
-    useEffect(() => {
-      setIsConnectionTested(false);
-    }, [facebookAccessToken, whatsappAccountId]);
+    // useEffect(() => {
+    //   setIsConnectionTested(false);
+    // }, [facebookAccessToken, whatsappAccountId]);
 
     const handleClose = () => {
       setName("");
       setFacebookAccessToken("");
-      setWhatsappAccountId("");
+      // setWhatsappAccountId("");
       setIsConnectionTested(false);
 
       onClose();
@@ -107,24 +108,24 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
       setFacebookAccessToken(e.target.value);
     };
 
-    const handleWhatsappAccountIdChange = (e) => {
-      setWhatsappAccountId(e.target.value);
-    }
+    // const handleWhatsappAccountIdChange = (e) => {
+    //   setWhatsappAccountId(e.target.value);
+    // }
 
     const handleSubmit = async () => {
       const connectionData = {
           name: name,
           facebookAccessToken: facebookAccessToken,
-          whatsappAccountId: whatsappAccountId,
-          official: true,
+          // whatsappAccountId: whatsappAccountId,
+          // official: true,
       };
 
       try {
         if (connectionId) {
-          await api.put(`/whatsapp/${connectionId}`, { name: name });
+          await api.put(`/officialWhatsapps/${connectionId}`, { name: name });
           toast.success(i18n.t("officialPages.officialModal.saveToast"));
         } else {
-          await api.post(`/whatsapp/`, connectionData);
+          await api.post(`/officialWhatsapps/`, connectionData);
           toast.success(i18n.t("officialPages.officialModal.createToast"));
         }
       } catch (err) {
@@ -135,20 +136,21 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
     };
 
     const handleConnectionTest = async () => {
-      try {
-        const { data } = await api.get('/whatsappsession/testConnection', {
-          params: { facebookAccessToken, whatsappAccountId }
-        });
-        if (data) {
-          setIsConnectionTested(true);
-        } else {
-          setIsConnectionTested(false);
-          toast.error("ERR_CONNECTION_NOT_AVAILABLE");
-        }
-      } catch (err) {
-        setIsConnectionTested(false);
-        toastError(err);
-      }
+      setIsConnectionTested(true);
+      // try {
+      //   const { data } = await api.get('/whatsappsession/testConnection', {
+      //     params: { facebookAccessToken, whatsappAccountId }
+      //   });
+      //   if (data) {
+      //     setIsConnectionTested(true);
+      //   } else {
+      //     setIsConnectionTested(false);
+      //     toast.error("ERR_CONNECTION_NOT_AVAILABLE");
+      //   }
+      // } catch (err) {
+      //   setIsConnectionTested(false);
+      //   toastError(err);
+      // }
     }
 
     return (
@@ -191,7 +193,7 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
                     disabled={connectionId ? true : false}
                   />
                 </div>
-                <div className={classes.multFieldLine}>
+                {/* <div className={classes.multFieldLine}>
                   <TextField
                     as={TextField}
                     label={i18n.t("officialPages.officialModal.whatsappAccountId")}
@@ -202,7 +204,7 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
                     fullWidth
                     disabled={connectionId ? true : false}
                   />
-                </div>
+                </div> */}
               </DialogContent>
               <DialogActions>
                 <Button
@@ -212,19 +214,18 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
                 >
                   {i18n.t("officialPages.officialModal.cancelButton")}
                 </Button>
-                <Button
+                {/* <Button
                   onClick={handleConnectionTest}
                   color="primary"
                   variant="contained"
                 >
                   {i18n.t("officialPages.officialModal.testButton")}
-                </Button>
+                </Button> */}
                 <Button
                   type="submit"
                   color="primary"
                   variant="contained"
                   className={classes.btnWrapper}
-                  disabled={!isConnectionTested && !connectionId}
                   onClick={handleSubmit}
                 >
                    { connectionId

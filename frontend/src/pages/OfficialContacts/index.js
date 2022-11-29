@@ -207,19 +207,30 @@ const OfficialContacts = () => {
 
 	useEffect(() => {
 		setPageNumber(1);
-	  }, [searchParam]);
+	}, [searchParam]);
+
+	 useEffect(() => {
+		setLoading(true);
+		const fetchWhats = async () => {
+			try {
+				const { data } = await api.get('/officialWhatsapps');
+				setConnections(data);
+				setLoading(false);
+			} catch (err) {
+				toastError(err);
+				setLoading(false);
+			}
+		};
+
+		fetchWhats();
+	}, []);
 
     useEffect(() => {
         const fetchWhats = async () => {
-            setLoading(true);
             try {
-                const { data } = await api.get('/officialWhatsapps/', {
-					params: { connectionName }
-				});
-                dispatch({ type: "LOAD_WHATSAPPS", payload: data.phoneNumbers });
-                setLoading(false);
+                const { data } = await api.get(`/officialWhatsapps/name/${connectionName}`);
+				setConnectionId(data.id);
             } catch (err) {
-                setLoading(false);
                 toastError(err);
             }
         }
@@ -229,50 +240,44 @@ const OfficialContacts = () => {
 
 	useEffect(() => {
 		setLoading(true);
-		const fetchWhats = async () => {
+		const fetchPhoneNumbers = async () => {
 			try {
-				const { data } = await api.get('/whatsapp/list', {
-					params: { official: true, limit: "-1" }
+				const { data } = await api.get('/whatsapp/list/', {
+					params: {
+						official: true,
+						connectionId
+					}
 				});
-				setConnections(data.whatsapps);
+				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
 				setLoading(false);
 			} catch (err) {
 				toastError(err);
 				setLoading(false);
 			}
+		}
+
+		if (connectionId) fetchPhoneNumbers();
+	}, [connectionId]);
+
+    useEffect(() => {
+		const socket = openSocket();
+
+		socket.on(`officialwhatsapp${user.companyId}`, data => {
+			if (data.action === "update") {
+				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
+			}
+		});
+
+		socket.on(`officialwhatsapp${user.companyId}`, data => {
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
+			}
+		});
+
+		return () => {
+			socket.disconnect();
 		};
-		fetchWhats();
-	}, []);
-
-    // useEffect(() => {
-	// 	const socket = openSocket();
-
-	// 	socket.on(`whatsapp${user.companyId}`, data => {
-	// 		if (data.action === "update") {
-	// 			dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-	// 		}
-	// 	});
-
-	// 	socket.on(`whatsapp${user.companyId}`, data => {
-	// 		if (data.action === "delete") {
-	// 			dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-	// 		}
-	// 	});
-
-	// 	socket.on(`whatsappSession${user.companyId}`, data => {
-	// 		if (data.action === "update") {
-	// 			dispatch({ type: "UPDATE_SESSION", payload: data.session });
-	// 		}
-	// 	});
-
-	// 	return () => {
-	// 		socket.disconnect();
-	// 	};
-	// }, [user]);
-
-    const handleSearch = (e) => {
-        setSearchParam(e.target.value);
-    }
+	}, [user]);
 
     const handleCloseWhatsAppModal = () => {
         setSelectedWhatsApp(null);
@@ -373,6 +378,14 @@ const OfficialContacts = () => {
 									{i18n.t("connections.buttons.add")}
 								</Button>
 							</div> */}
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={handleOpenWhatsAppModal}
+                                // disabled={connectionName === "All"}
+							>
+								{i18n.t("connections.buttons.add")}
+							</Button>
 						</MainHeaderButtonsWrapper>
 					</MainHeader>
 					<Paper className={classes.mainPaper} variant="outlined">
@@ -380,16 +393,13 @@ const OfficialContacts = () => {
 							<TableHead>
 								<TableRow>
 									<TableCell align="center">
-										Nome {/* {i18n.t("officialPages.officialContacts.name")} */}
-									</TableCell>
-									<TableCell align="center">
 										{i18n.t("officialPages.officialContacts.phoneNumber")}
 									</TableCell>
 									<TableCell align="center">
-										Qualidade {/* {i18n.t("officialPages.officialContacts.quality")} */}
+										{i18n.t("officialPages.officialContacts.connection")}
 									</TableCell>
 									<TableCell align="center">
-										{i18n.t("officialPages.officialContacts.connection")}
+										Ultima Atualização
 									</TableCell>
 									{/* <TableCell align="center">
 										{i18n.t("officialPages.officialContacts.actions")}
@@ -398,26 +408,30 @@ const OfficialContacts = () => {
 							</TableHead>
 							<TableBody>
 								{loading ? (
-									<TableRowSkeleton columns={4} />
+									<TableRowSkeleton columns={3} />
 								) : (
 									<>
 										{whatsApps?.length > 0 &&
-											whatsApps.map(whatsApp => (
-												<TableRow key={whatsApp.id}>
-													<TableCell align="center">{whatsApp.verified_name}</TableCell>
-													<TableCell align="center">{whatsApp.display_phone_number}</TableCell>
-													<TableCell align="center">{getQuality(whatsApp.quality_rating)}</TableCell>
-													<TableCell align="center">{connectionName}</TableCell>
-													{/* <TableCell align="center">
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={() => handleEditWhatsApp(whatsApp)}
-                                                        >
-                                                            <Edit />
-                                                        </IconButton>
-                                                    </TableCell> */}
-												</TableRow>
-											))}
+											whatsApps.map(whatsApp => {
+												if (whatsApp.official && whatsApp.officialWhatsappId === connectionId) {
+													return (
+														<TableRow key={whatsApp.id}>
+															<TableCell align="center">{whatsApp.name}</TableCell>
+															<TableCell align="center">{connectionName}</TableCell>
+															<TableCell align="center">{format(parseISO(whatsApp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
+															{/* <TableCell align="center">
+																<IconButton
+																	size="small"
+																	onClick={() => handleEditWhatsApp(whatsApp)}
+																>
+																	<Edit />
+																</IconButton>
+															</TableCell> */}
+														</TableRow>
+													)
+												}
+											}
+										)}
 									</>
 								)}
 							</TableBody>
