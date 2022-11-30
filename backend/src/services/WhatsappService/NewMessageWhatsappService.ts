@@ -38,7 +38,7 @@ const GetWhatsappByIdentification = async (
 ): Promise<Whatsapp> => {
   const whatsapp = await Whatsapp.findOne({
     where: {
-      facebookBusinessId: identification
+      whatsappAccountId: identification
     }
   });
 

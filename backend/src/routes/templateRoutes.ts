@@ -6,10 +6,22 @@ import * as TemplateController from "../controllers/TemplateController";
 const templateRoutes = express.Router();
 
 templateRoutes.get(
-  "/whatsappTemplate/list/:whatsAppId",
+  "/whatsappTemplate/",
   isAuth,
   TemplateController.index
 );
+
+templateRoutes.get(
+  "/whatsappTemplate/list/:whatsAppId",
+  isAuth,
+  TemplateController.list
+);
+
+templateRoutes.post(
+  "/whatsappTemplate/bind/",
+  isAuth,
+  TemplateController.bind
+)
 
 templateRoutes.post(
   "/whatsappTemplate/create/",

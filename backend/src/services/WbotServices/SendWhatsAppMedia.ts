@@ -10,6 +10,7 @@ import FileRegister from "../../database/models/FileRegister";
 import axios from "axios";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import AWS from "aws-sdk";
+import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
 interface Request {
   media: Express.Multer.File;
@@ -58,6 +59,10 @@ const SendWhatsAppMedia = async ({
       throw new AppError("ERR_SENDING_WAPP_MSG");
   
     if (connnection?.official) {
+      const offConnection = await OfficialWhatsapp.findOne({
+        where: { id: connnection.officialWhatsappId }
+      });
+
       try {
         const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
         const payload = {
@@ -73,7 +78,7 @@ const SendWhatsAppMedia = async ({
   
         var result = await axios.post(apiUrl, payload, {
           headers: {
-            "Authorization": `Bearer ${connnection.facebookToken}`
+            "Authorization": `Bearer ${offConnection.facebookAccessToken}`
           }
         });
         if(result.status == 200){
