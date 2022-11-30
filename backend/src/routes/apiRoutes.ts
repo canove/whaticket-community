@@ -8,6 +8,7 @@ import * as WhatsAppController from "../controllers/WhatsAppController";
 import * as FileRegisterController from "../controllers/FileRegisterController";
 import * as FlowsController from "../controllers/FlowsController";
 import * as TicketController from "../controllers/TicketController";
+import * as TemplateController from "../controllers/TemplateController";
 import isAuthApi from "../middleware/isAuthApi";
 
 const upload = multer(uploadConfig);
@@ -93,5 +94,13 @@ ApiRoutes.get(
   isAuthApi,
   FileRegisterController.getInfo
 );
+
+ApiRoutes.post(
+  "/officialTemplates/updateStatus",
+  isAuthApi,
+  TemplateController.updateStatus
+);
+
+ApiRoutes.get("/tickets/inticket", isAuthApi, TicketController.containTicket);
 
 export default ApiRoutes;

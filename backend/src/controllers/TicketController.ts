@@ -1,4 +1,5 @@
 /*eslint-disable*/
+import { Op } from "sequelize";
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
@@ -15,6 +16,10 @@ import ResolveService from "../services/TicketServices/ResolveService";
 import ChangeQueueOrResolveTicketService from "../services/TicketServices/ChangeQueueOrResolveTicket";
 import { IsTicketInBotService, IsTicketInBotPostService} from "../services/TicketServices/IsTicketInBotService";
 import AverageService from "../services/TicketServices/AverageService";
+import Whatsapp from "../database/models/Whatsapp";
+import Contact from "../database/models/Contact";
+import { preparePhoneNumber, preparePhoneNumber9Digit } from "../utils/common";
+import Ticket from "../database/models/Ticket";
 
 type IndexQuery = {
   searchParam: string;
@@ -24,6 +29,8 @@ type IndexQuery = {
   showAll: string;
   withUnreadMessages: string;
   queueIds: string;
+  phone: string,
+  session: string
 };
 
 interface TicketData {
@@ -69,6 +76,54 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.status(200).json({ tickets, count, hasMore });
+};
+
+export const containTicket = async (req: Request, res: Response): Promise<Response> => {
+  const {
+    phone,
+    session,
+  } = req.query as IndexQuery;
+
+    let whatsapp = await Whatsapp.findOne({
+      where:{
+        name: session,
+        status: 'CONNECTED'
+      }
+    })
+
+    if(!whatsapp ) {
+      whatsapp = await Whatsapp.findOne({
+        where:{
+          name: session,
+          official: true
+        }
+      })
+    }
+
+    const contact = await Contact.findOne({
+      where: {
+        number: {
+          [Op.or] : [
+            {[Op.like]: `%${preparePhoneNumber(phone)}%` },
+            {[Op.like]: `%${preparePhoneNumber9Digit(phone)}%` }
+          ]
+        }
+     }});
+
+     const ticket = await Ticket.findOne({
+      where: {
+        contactId: contact.id,
+        companyId: whatsapp.companyId,
+        status: {
+          [Op.or]: [
+            "pending",
+            "open"
+          ]
+        }
+      }
+     });
+
+  return res.status(200).json(ticket);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {

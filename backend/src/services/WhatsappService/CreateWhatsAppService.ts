@@ -120,7 +120,7 @@ const CreateWhatsAppService = async ({
       business,
       facebookAccessToken,
       whatsappAccountId,
-      officialWhatsappId: parseInt(officialConnectionId)
+      officialWhatsappId: officialConnectionId
     },
     { include: ["queues"] }
   );

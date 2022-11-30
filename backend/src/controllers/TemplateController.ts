@@ -1,48 +1,75 @@
 import { Request, Response } from "express";
 import ListTemplateService from "../services/TemplateService/ListTemplateService";
+import ListMetaTemplateService from "../services/TemplateService/ListMetaTemplateService";
 import CreateTemplateService from "../services/TemplateService/CreateTemplateService";
 import UpdateTemplateService from "../services/TemplateService/UpdateTemplateService";
 import DeleteTemplateService from "../services/TemplateService/DeleteTemplateService";
+import { getIO } from "../libs/socket";
+import BindTemplateService from "../services/TemplateService/BindTemplateService";
+import OfficialTemplatesStatus from "../database/models/OfficialTemplatesStatus";
+import AppError from "../errors/AppError";
 
 interface TemplateData {
-  templateName: string;
-  category: string;
-  whatsAppsId: string[] | number[];
-  bodyText: string;
+  name: string;
   footerText: string;
-  templateId: string | number;
+  category: string;
+  bodyText: string;
+  mapping: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const templates = await ListTemplateService({ companyId });
+
+  return res.status(200).json(templates);
+};
+
+export const list = async (req: Request, res: Response): Promise<Response> => {
   const { whatsAppId } = req.params;
   const { companyId } = req.user;
 
-  const response = await ListTemplateService({ whatsAppId, companyId });
+  const response = await ListMetaTemplateService({ whatsAppId, companyId });
+
+  return res.status(200).json(response);
+};
+
+export const bind = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+
+  const response = await BindTemplateService({ data: req.body, companyId });
 
   return res.status(200).json(response);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const {
-    templateName,
+    name,
+    footerText,
     category,
-    whatsAppsId,
     bodyText,
-    footerText
+    mapping,
   }: TemplateData = req.body;
 
   const { companyId } = req.user;
 
-  const response = await CreateTemplateService({
-    templateName,
-    category,
-    whatsAppsId,
-    bodyText,
+  const template = await CreateTemplateService({
+    name,
     footerText,
+    category,
+    bodyText,
+    mapping,
     companyId
   });
 
-  return res.status(200).json(response);
+  const io = getIO();
+  io.emit(`officialTemplate${companyId}`, {
+    action: "create",
+    template
+  });
+
+  return res.status(200).json(template);
 };
 
 export const update = async (
@@ -71,6 +98,26 @@ export const update = async (
   });
 
   return res.status(200).json(response);
+};
+
+export const updateStatus = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { id, status, reason } = req.body;
+
+  const template = await OfficialTemplatesStatus.findOne({
+    where: { facebookTemplateId: id }
+  });
+
+  if (!template) throw new AppError("ERR_NO_TEMPLATE_FOUND");
+
+  await template.update({
+    status: status,
+    reason: reason ? reason : null,
+  });
+
+  return res.status(200).json("OK");
 };
 
 export const remove = async (

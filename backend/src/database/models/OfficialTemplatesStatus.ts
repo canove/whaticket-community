@@ -20,7 +20,7 @@ import OfficialTemplates from "./OfficialTemplates";
 import Whatsapp from "./Whatsapp";
 
 @Table
-class OfficialTemplateStatus extends Model<OfficialTemplateStatus> {
+class OfficialTemplatesStatus extends Model<OfficialTemplatesStatus> {
   @PrimaryKey
   @AutoIncrement
   @Column
@@ -30,11 +30,14 @@ class OfficialTemplateStatus extends Model<OfficialTemplateStatus> {
   status: string;
 
   @Column
+  reason: string;
+
+  @Column
   facebookTemplateId: string;
 
   @ForeignKey(() => OfficialTemplates)
   @Column
-  officialTemplatesId: number;
+  officialTemplateId: number;
 
   @ForeignKey(() => Whatsapp)
   @Column
@@ -55,4 +58,4 @@ class OfficialTemplateStatus extends Model<OfficialTemplateStatus> {
   updatedAt: Date;
 }
 
-export default OfficialTemplateStatus;
+export default OfficialTemplatesStatus;

@@ -345,7 +345,7 @@ export const multipleConfig = async (
 
       for (const whatsId of whatsIds) {
         const whatsapp = await Whatsapp.findOne({
-          where: { id: whatsId, companyId }
+          where: { id: whatsId }
         });
       
         if (!whatsapp) {
