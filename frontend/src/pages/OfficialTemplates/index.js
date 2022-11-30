@@ -198,10 +198,8 @@ const OfficialTemplates = () => {
               }}
               disablePortal
               id="combo-box-companies"
-              options={whatsApps.map((whats) =>
-                whats.official ? whats : null
-              )}
-              getOptionLabel={(option) => option.name}
+              options={whatsApps.filter((whats) => whats.official)}
+              getOptionLabel={(option) => option ? option.name : ""}
               style={{ marginRight: "10px", width: "200px" }}
               renderInput={(params) => (
                 <TextField {...params} label="Número" />

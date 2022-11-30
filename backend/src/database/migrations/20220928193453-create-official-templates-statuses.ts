@@ -2,7 +2,7 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   up: (queryInterface: QueryInterface) => {
-    return queryInterface.createTable("OfficialTemplatesStatus", {
+    return queryInterface.createTable("OfficialTemplatesStatuses", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -21,7 +21,7 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL"
       },
-      officialTemplatesId: {
+      officialTemplateId: {
         type: DataTypes.INTEGER,
         references: { model: "OfficialTemplates", key: "id" },
         onUpdate: "CASCADE",

@@ -32,6 +32,8 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import PhoneIcon from '@material-ui/icons/Phone';
+import BindTemplateModal from "../../components/BindTemplateModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,24 +63,29 @@ const useStyles = makeStyles((theme) => ({
 const Templates = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
-  const [templateModalOpen, setTemplateModalOpen] = useState(false);
-  const [connection, setConnection] = useState("");
-  const { whatsApps } = useContext(WhatsAppsContext);
-  const [templates, setTemplates] = useState([]);
+
   const [loading, setLoading] = useState(false);
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(true);
-  const confirmationModalInitialState = {
-    action: "",
-    title: "",
-    message: "",
-    whatsAppId: "",
-    templateName: "",
-    open: false,
-  };
-  const [confirmModalInfo, setConfirmModalInfo] = useState(
-    confirmationModalInitialState
-  );
+  const [templates, setTemplates] = useState([]);
+
+  const [selectedTemplate, setSelectedTemplate] = useState(true); 
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [bindTemplateModalOpen, setBindTemplateModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.get('/whatsappTemplate/');
+        setTemplates(data);
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+        setLoading(false);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
 
   const handleTemplateModal = () => {
     setSelectedTemplate(null);
@@ -90,80 +97,15 @@ const Templates = () => {
     setTemplateModalOpen(false);
   };
 
-  const handleChange = (e) => {
-    setConnection(e.target.value);
-  };
+  const handleOpenBindTemplateModal = (template) => {
+    setSelectedTemplate(template);
+    setBindTemplateModalOpen(true);
+  }
 
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const { data } = await api.get(
-          `/whatsappTemplate/list/${connection.id}`
-        );
-        setTemplates(data);
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-    };
-    if (connection) {
-      setLoading(true);
-      fetchTemplates();
-    } else {
-      setTemplates([]);
-    }
-  }, [connection]);
-
-  const getComponent = (components, type) => {
-    let text = "";
-
-    components.every((component) => {
-      if (component.type === type) {
-        text = component.text;
-        return false;
-      }
-      return true;
-    });
-
-    return text;
-  };
-  const handleOpenConfirmationModal = (action, whatsAppId, templateName) => {
-    if (action === "delete") {
-      setConfirmModalInfo({
-        action: action,
-        title: i18n.t("connections.confirmationModal.deleteTitle"),
-        message: i18n.t("connections.confirmationModal.deleteMessage"),
-        whatsAppId: whatsAppId,
-        templateName: templateName,
-      });
-    }
-
-    setConfirmModalOpen(true);
-  };
-
-  const handleSubmitConfirmationModal = async () => {
-    if (confirmModalInfo.action === "delete") {
-      try {
-        await api.delete(
-          `/whatsappTemplate/delete/${confirmModalInfo.whatsAppId}/${confirmModalInfo.templateName}`
-        );
-        toast.success(i18n.t("templates.templateModal.delete"));
-      } catch (err) {
-        toastError(err);
-      }
-    }
-
-    setConfirmModalInfo(confirmationModalInitialState);
-  };
-
-  const handleConnectionChange = (_, connection) => {
-    if (connection) {
-      setConnection(connection);
-    } else {
-      setConnection(null);
-    }
-  };
+  const handleCloseBindTemplateModal = (template) => {
+    setSelectedTemplate(null);
+    setBindTemplateModalOpen(false);
+  }
 
   return (
     <MainContainer>
@@ -172,15 +114,13 @@ const Templates = () => {
         onClose={handleCloseTemplateModal}
         aria-labelledby="form-dialog-title"
         templateName={selectedTemplate && selectedTemplate.name}
-      ></TemplateModal>
-      <ConfirmationModal
-        title={confirmModalInfo.title}
-        open={confirmModalOpen}
-        onClose={setConfirmModalOpen}
-        onConfirm={handleSubmitConfirmationModal}
-      >
-        {confirmModalInfo.message}
-      </ConfirmationModal>
+      />
+      <BindTemplateModal 
+        open={bindTemplateModalOpen}
+        onClose={handleCloseBindTemplateModal}
+        aria-labelledby="form-dialog-title"
+        template={selectedTemplate}
+      />
       <MainHeader>
         <Title>{i18n.t("templates.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -192,56 +132,13 @@ const Templates = () => {
               alignItems: "end",
             }}
           >
-            {/* <Autocomplete
-              onChange={(e, newValue) => {
-                handleConnectionChange(e, newValue);
-              }}
-              disablePortal
-              id="combo-box-companies"
-              options={whatsApps.map((whats) =>
-                whats.official ? whats : null
-              )}
-              getOptionLabel={(option) => option.name}
-              style={{ marginRight: "10px", width: "200px" }}
-              renderInput={(params) => (
-                <TextField {...params} label="Número" />
-              )}
-            /> */}
-            {/* <FormControl
-              style={{
-                marginRight: "10px",
-                width: "200px",
-              }}
-            >
-              <InputLabel id="demo-official-connections-label">
-                {i18n.t("templates.buttons.connection")}
-              </InputLabel>
-              <Select
-                labelId="demo-official-connections-label"
-                id="demo-official-connections"
-                value={connection}
-                onChange={handleChange}
-              >
-                {whatsApps &&
-                  whatsApps.map((whats) => {
-                    if (whats.official === true) {
-                      return (
-                        <MenuItem key={whats.id} value={whats.id}>
-                          {whats.name}
-                        </MenuItem>
-                      );
-                    }
-                    return null;
-                  })}
-              </Select>
-            </FormControl> */}
-            {/* <Button
+            <Button
               variant="contained"
               color="primary"
               onClick={handleTemplateModal}
             >
               {i18n.t("templates.buttons.newTemplate")}
-            </Button> */}
+            </Button>
           </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -250,19 +147,16 @@ const Templates = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">
-                {i18n.t("templates.table.name")}
+                Nome
               </TableCell>
               <TableCell align="center">
-                {i18n.t("templates.table.preview")}
+                Categoria
               </TableCell>
               <TableCell align="center">
-                {i18n.t("templates.table.category")}
+                Body
               </TableCell>
               <TableCell align="center">
-                {i18n.t("templates.table.language")}
-              </TableCell>
-              <TableCell align="center">
-                {i18n.t("templates.table.status")}
+                Footer
               </TableCell>
               <TableCell align="center">
                 {i18n.t("templates.table.action")}
@@ -275,29 +169,20 @@ const Templates = () => {
                 templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
-                    <TableCell align="center">
-                      {getComponent(template.components, "BODY")}
-                    </TableCell>
                     <TableCell align="center">{template.category}</TableCell>
-                    <TableCell align="center">{template.language}</TableCell>
-                    <TableCell align="center">{template.status}</TableCell>
+                    <TableCell align="center">{template.body}</TableCell>
+                    <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">
                       <IconButton
                         size="small"
-                        onClick={(e) => {
-                          handleOpenConfirmationModal(
-                            "delete",
-                            connection,
-                            template.name
-                          );
-                        }}
+                        onClick={() => handleOpenBindTemplateModal(template)}
                       >
-                        <DeleteOutline />
+                        <PhoneIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
-              {loading && <TableRowSkeleton columns={6} />}
+              {loading && <TableRowSkeleton columns={5} />}
             </>
           </TableBody>
         </Table>

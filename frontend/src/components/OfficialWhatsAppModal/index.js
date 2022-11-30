@@ -71,6 +71,8 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
+	const [flows, setFlows] = useState([]);
+	const [flow, setFlow] = useState("");
 
 	const [isConnectionTested, setIsConnectionTested] = useState(false);
 	const [phoneNumber, setPhoneNumber] = useState(null);
@@ -82,6 +84,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 			try {
 				const { data } = await api.get(`whatsapp/${whatsAppId}`);
 				setWhatsApp(data);
+				setFlow(data.flowId ?? "");
 
 				const whatsQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(whatsQueueIds);
@@ -91,6 +94,16 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 			}
 		};
 
+		const fetchFlows = async () => {
+			try {
+				const { data } = await api.get('flows');
+				setFlows(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
+		fetchFlows();
 		fetchSession();
 	}, [whatsAppId]);
 
@@ -99,6 +112,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 		setPhoneNumber(null);
 		setWhatsApp(initialState);
 		setSelectedQueueIds([]);
+		setFlow("");
 		onClose();
 	};
 
@@ -109,6 +123,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 			officialConnectionId: connectionId ? connectionId : null,
 			name: phoneNumber ? phoneNumber.display_phone_number.replaceAll("+", "").replaceAll("-", "").replaceAll(" ", "") : "",
 			facebookPhoneNumberId: phoneNumber ? phoneNumber.id : null,
+			flowId: flow ? flow : null,
 		};
 
 		try {
@@ -141,6 +156,9 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 			setIsConnectionTested(false);
 			toastError(err);
 		}
+	}
+	const handleFlowChange = (e) => {
+		setFlow(e.target.value);
 	}
 
 	return (
@@ -193,7 +211,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 												name="name"
 												variant="outlined"
 												margin="dense"
-												value={phoneNumber.verified_name ?? ""}
+												value={phoneNumber ? phoneNumber.verified_name : ""}
 												fullWidth
 												disabled
 											/>
@@ -206,7 +224,7 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 												name="phoneNumber"
 												variant="outlined"
 												margin="dense"
-												value={phoneNumber.display_phone_number ?? ""}
+												value={phoneNumber ? phoneNumber.display_phone_number : ""}
 												fullWidth
 												disabled
 											/>
@@ -219,13 +237,35 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 												name="qualityRating"
 												variant="outlined"
 												margin="dense"
-												value={phoneNumber.quality_rating ?? ""}
+												value={phoneNumber ? phoneNumber.quality_rating : ""}
 												fullWidth
 												disabled
 											/>
 										</div>
 									</>
 								}
+								<div>
+									<FormControl
+										variant="outlined"
+										className={classes.multFieldLine}
+										margin="dense"
+										fullWidth
+									>
+										<InputLabel>Fluxo</InputLabel>
+										<Select
+											value={flow}
+											onChange={(e) => { handleFlowChange(e) }}
+											label="Fluxo"
+										>
+											<MenuItem value={""}>Nenhum</MenuItem>
+											{ flows && flows.map(flow => {
+												return (
+													<MenuItem value={flow.id} key={flow.id}>{flow.name}</MenuItem>
+												)
+											}) }
+										</Select>
+									</FormControl>
+								</div>
 								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
 									onChange={selectedIds => setSelectedQueueIds(selectedIds)}
