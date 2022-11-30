@@ -101,4 +101,6 @@ ApiRoutes.post(
   TemplateController.updateStatus
 );
 
+ApiRoutes.get("/tickets/inticket", isAuthApi, TicketController.containTicket);
+
 export default ApiRoutes;

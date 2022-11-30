@@ -140,7 +140,7 @@ const SendWhatsAppMessage = async ({
         "session": connnection.name,
         "number": phoneNumber,
         "path": url,
-        "text": fileName != null? fileName :`${formatBody(body, ticket.contact)}` 
+        "text": fileName != null? fileName :`${formatBody(body, ticket.contact)} NO-TYPING` 
       };
 
       let ack = 3;

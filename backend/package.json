@@ -44,7 +44,6 @@
     "pdf-to-base64": "^1.0.3",
     "pg": "^8.4.1",
     "pino": "^6.9.0",
-    "pino-pretty": "^4.3.0",
     "qrcode-terminal": "^0.12.0",
     "random-words": "^1.2.0",
     "reflect-metadata": "^0.1.13",
