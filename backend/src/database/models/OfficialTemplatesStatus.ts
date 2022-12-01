@@ -43,6 +43,9 @@ class OfficialTemplatesStatus extends Model<OfficialTemplatesStatus> {
   @Column
   whatsappId: number;
 
+  @BelongsTo(() => Whatsapp)
+  whatsapp: Whatsapp;
+
   @ForeignKey(() => Company)
   @Column
   companyId: number;

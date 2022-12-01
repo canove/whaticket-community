@@ -8,6 +8,7 @@ import {
   ForeignKey
 } from "sequelize-typescript";
 import Company from "./Company";
+import OfficialTemplates from "./OfficialTemplates";
 import OfficialWhatsapp from "./OfficialWhatsapp";
 import Templates from "./TemplatesData";
 import Whatsapp from "./Whatsapp";
@@ -44,6 +45,10 @@ class ExposedImport extends Model<ExposedImport> {
   @ForeignKey(() => OfficialWhatsapp)
   @Column
   officialConnectionId: number;
+
+  @ForeignKey(() => OfficialTemplates)
+  @Column
+  officialTemplatesId: number;
 
   @Column
   deletedAt: Date;

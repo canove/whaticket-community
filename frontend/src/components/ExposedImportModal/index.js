@@ -100,6 +100,9 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   const [offConnection, setOffConnection] = useState(null);
   const [offPhoneNumbers, setOffPhoneNumbers] = useState([]);
 
+  const [offTemplates, setOffTemplates] = useState([]);
+  const [selectedOffTemplate, setSelectedOffTemplate] = useState("");
+
   useEffect(() => {
     const fetchExposedImport = async () => {
       try {
@@ -109,6 +112,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
 
         setConnectionType(data.official);
         setTemplate(data.templateId);
+        setSelectedOffTemplate(data.officialTemplatesId);
         setOffConnection(data.officialConnectionId);
         setConnections(
           data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]
@@ -155,10 +159,20 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       }
     };
 
+    const fetchOffTemplates = async () => {
+      try {
+        const { data } = await api.get("/whatsappTemplate/");
+        setOffTemplates(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
     if (open) {
       fetchMenus();
       fetchTemplates();
       fetchPhoneNumbers();
+      fetchOffTemplates();
     }
 
     if (exposedImportId) {
@@ -170,21 +184,19 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   useEffect(() => {
     const fetchOffConnections = async () => {
       try {
-        const { data } = await api.get("/whatsapp/list", {
+        const { data } = await api.get("/whatsappTemplate/getWhatsapps", {
           params: {
-            official: true,
-            limit: "-1",
-            officialWhatsappId: offConnection ?? null,
+            templateId: selectedOffTemplate,
           },
         });
-        setOffConnections(data.whatsapps);
+        setOffConnections(data);
       } catch (err) {
         toastError(err);
       }
     };
 
-    fetchOffConnections();
-  }, [open, offConnection]);
+    if (selectedOffTemplate !== "Nenhum") fetchOffConnections();
+  }, [selectedOffTemplate]);
 
   useEffect(() => {
     if (menus) {
@@ -230,6 +242,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     setTemplate("");
     setConnections([]);
     setOffConnection("");
+    setSelectedOffTemplate("");
 
     onClose();
   };
@@ -242,6 +255,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       connections: connections,
       connectionType,
       officialConnectionId: offConnection ? offConnection : null,
+      officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null
     };
 
     try {
@@ -460,6 +474,31 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
           )}
           {connectionType === true && offConnection && (
             <FormControl variant="outlined" margin="normal" fullWidth>
+            <Typography variant="subtitle1" gutterBottom>
+              Templates
+            </Typography>
+            <Select
+              variant="outlined"
+              labelId="off-template-select-label"
+              id="off-template-select"
+              value={selectedOffTemplate}
+              // label={"Números"}
+              onChange={(e) => setSelectedOffTemplate(e.target.value)}
+              style={{ width: "100%" }}
+            >
+              <MenuItem value={""}>
+                Nenhum
+              </MenuItem>
+              {offTemplates.map((offTemplate) => (
+                <MenuItem key={offTemplate.id} value={offTemplate.id}>
+                  {offTemplate.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          )}
+          {connectionType === true && offConnection && selectedOffTemplate && (
+            <FormControl variant="outlined" margin="normal" fullWidth>
               <InputLabel id="off-phone-numbers-select-label">
                 Números
               </InputLabel>
@@ -480,8 +519,8 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
                 {offConnections.map((offConnection) => (
-                  <MenuItem key={offConnection.id} value={offConnection.id}>
-                    {offConnection.name}
+                  <MenuItem key={offConnection.whatsappId} value={offConnection.whatsappId}>
+                    {offConnection["whatsapp.name"]}
                   </MenuItem>
                 ))}
               </Select>
