@@ -2,7 +2,8 @@ import * as Yup from "yup";
 import * as Sentry from "@sentry/node";
 import { promisify } from "util";
 import { writeFile } from "fs";
-
+import fs from "fs";
+import AWS from "aws-sdk";
 import AppError from "../../errors/AppError";
 import Contact from "../../database/models/Contact";
 import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
@@ -216,7 +217,7 @@ const handleMessage = async (
         file,
         isGroup,
         bot
-      }, ticket, contact);
+      }, ticket, contact, whatsapp);
     } else {
       await verifyMessage(
         {
@@ -254,11 +255,39 @@ const verifyMediaMessage = async (
     bot: boolean;
   },
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  whatsapp: Whatsapp
 ): Promise<void> => {
   
-  const company = await Company.findByPk(ticket.companyId);
-  //const mediaUrl = await upoloadToS3(msg.body, msg.file, msg.type, company.name);
+  if (whatsapp.official) {
+    // const path = require('path');
+    // const http = require('http');
+
+    // const media = await axios.get(`https://graph.facebook.com/v15.0/${MEDIA_ID}`);
+
+    // DOWNLOAD FILE USING LINK
+    // const file = fs.createWriteStream("./src/downloads/FILE");
+    // const request = http.get(LINK, function(response) {
+    //   response.pipe(file);
+    //   file.on("finish", () => {
+    //       file.close();
+    //   });
+    // });
+
+    // const company = await Company.findByPk(ticket.companyId);
+
+    // const blob = fs.readFileSync(path);
+    // const file = path.basename(path);
+
+    // const mediaUrl = await upoloadToS3(blob, file, type, companyId);
+
+    // DELETE FILE
+    // fs.unlink("./src/downloads/FILE", (err: Error) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+    // });
+  }
 
   const messageData = {
     id: msg.id,
@@ -276,4 +305,36 @@ const verifyMediaMessage = async (
   await ticket.update({ lastMessage: msg.file });
   await CreateMessageService({ messageData });
 };
+
+// const upoloadToS3 = async (blob, file, type, companyId): Promise<string> => {
+//   try {
+//     const s3 = new AWS.S3({
+//       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+//     })
+//     const dt = new Date();
+//     const fileName = `${dt.getTime()}_${file}`;
+//     let ext = file.split('.').pop();
+
+//     const params = {
+//         Bucket: process.env.AWS_S3_BUCKET,
+//         Key: `${companyId}/${dt.getFullYear()}/${(dt.getMonth()+1).toString().padStart(2,'0')}/${dt.getDate().toString().padStart(2,'0')}/${fileName}`,
+//         Body: blob,
+//         ContentEncoding: 'base64',
+//         ContentType: `${type}/${ext}`
+//     }
+
+//     var result = await new Promise<string>((resolve) => {
+//       s3.upload(params, (err, data) => {
+//         resolve(data.Location)
+//       })
+//     });
+
+//     return result;    
+//   }catch(err){
+//       console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',err)
+//       console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',JSON.stringify(err))
+//   }   
+// };
+
 export default NewMessageWhatsappService;
