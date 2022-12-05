@@ -110,7 +110,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         setName(data.name);
         setMapping(JSON.parse(data.mapping));
 
-        setConnectionType(data.official);
+        setConnectionType(data.official ?? connectionType);
         setTemplate(data.templateId);
         setSelectedOffTemplate(data.officialTemplatesId);
         setOffConnection(data.officialConnectionId);
