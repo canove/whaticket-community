@@ -81,7 +81,15 @@ const SendWhatsAppMedia = async ({
       try {
         const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
 
+        let typePayload = null;
+
         if (type != "image" && type != "audio" && type != "video" && type != "sticker") type = "document";
+
+        if (type === "document") {
+          typePayload = { link, caption: media.originalname }
+        } else {
+          typePayload = { link };
+        }
 
         const payload = {
           "messaging_product": "whatsapp",
@@ -89,10 +97,7 @@ const SendWhatsAppMedia = async ({
           "recipient_type": "individual",
           "to": !messageSended?.phoneNumber ? contact.number : messageSended?.phoneNumber,
           type,
-          [type]: {
-            link,
-            caption: type === "document" ? media.originalname : null
-          }
+          [type]: typePayload
         };
 
         // const payload = {

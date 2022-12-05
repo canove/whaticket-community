@@ -14,6 +14,8 @@ import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateConta
 import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import Company from "../../database/models/Company";
+import axios from "axios";
+import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 /*eslint-disable*/
 interface Request {
   id: string;
@@ -242,6 +244,19 @@ const handleMessage = async (
 
 const writeFileAsync = promisify(writeFile);
 
+interface MetaMedia {
+  url: string;
+  mime_type: string;
+  sha256: string;
+  file_size: number;
+  id: string;
+  messaging_product: string;
+}
+
+interface MediaData {
+  data: MetaMedia;
+}
+
 const verifyMediaMessage = async (
   msg: {
     id: string;
@@ -257,36 +272,47 @@ const verifyMediaMessage = async (
   ticket: Ticket,
   contact: Contact,
   whatsapp: Whatsapp
-): Promise<void> => {
-  
-  if (whatsapp.official) {
-    // const path = require('path');
-    // const http = require('http');
+): Promise<void> => {  
+  let type = msg.body;
+  let mediaUrl = msg.type;
 
-    // const media = await axios.get(`https://graph.facebook.com/v15.0/${MEDIA_ID}`);
+  if (whatsapp.official) {
+    const path = require('path');
+    const https = require('https');
+
+    const officialWhatsapp = await OfficialWhatsapp.findOne({
+      where: { id: whatsapp.officialWhatsappId }
+    });
+
+    const { data }: MediaData = await axios.get(`https://graph.facebook.com/v15.0/${msg.body}`, {
+      headers: {
+        "Authorization": `Bearer ${officialWhatsapp.facebookAccessToken}`,
+      }
+    });
+
+    type = data.mime_type.split("/")[0];
+    const fileType = data.mime_type.split("/")[1];
 
     // DOWNLOAD FILE USING LINK
-    // const file = fs.createWriteStream("./src/downloads/FILE");
-    // const request = http.get(LINK, function(response) {
-    //   response.pipe(file);
-    //   file.on("finish", () => {
-    //       file.close();
-    //   });
-    // });
+    const files = fs.createWriteStream(`./src/downloads/${data.id}.${fileType}`);
+    await https.get(data.url, function(response) {
+      response.pipe(files);
+      files.on("finish", () => {
+        files.close();
+      });
+    });
 
-    // const company = await Company.findByPk(ticket.companyId);
+    const blob = await fs.readFileSync(`./src/downloads/${data.id}.${fileType}`);
+    const file = await path.basename(`./src/downloads/${data.id}.${fileType}`);
 
-    // const blob = fs.readFileSync(path);
-    // const file = path.basename(path);
-
-    // const mediaUrl = await upoloadToS3(blob, file, type, companyId);
+    mediaUrl = await uploadToS3(blob, file, type, ticket.companyId);
 
     // DELETE FILE
-    // fs.unlink("./src/downloads/FILE", (err: Error) => {
-    //   if (err) {
-    //     throw err;
-    //   }
-    // });
+    fs.unlink(`./src/downloads/${data.id}.${fileType}`, (err: Error) => {
+      if (err) {
+        throw err;
+      }
+    });
   }
 
   const messageData = {
@@ -297,8 +323,8 @@ const verifyMediaMessage = async (
     body: "",
     fromMe: msg.fromMe,
     read: msg.fromMe,
-    mediaUrl: msg.body,
-    mediaType: msg.type,
+    mediaUrl: mediaUrl,
+    mediaType: type,
     companyId: ticket.companyId
   };
 
@@ -306,35 +332,35 @@ const verifyMediaMessage = async (
   await CreateMessageService({ messageData });
 };
 
-// const upoloadToS3 = async (blob, file, type, companyId): Promise<string> => {
-//   try {
-//     const s3 = new AWS.S3({
-//       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-//     })
-//     const dt = new Date();
-//     const fileName = `${dt.getTime()}_${file}`;
-//     let ext = file.split('.').pop();
+const uploadToS3 = async (blob, file, type, companyId): Promise<string> => {
+  try {
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    })
+    const dt = new Date();
+    const fileName = `${dt.getTime()}_${file}`;
+    let ext = file.split('.').pop();
 
-//     const params = {
-//         Bucket: process.env.AWS_S3_BUCKET,
-//         Key: `${companyId}/${dt.getFullYear()}/${(dt.getMonth()+1).toString().padStart(2,'0')}/${dt.getDate().toString().padStart(2,'0')}/${fileName}`,
-//         Body: blob,
-//         ContentEncoding: 'base64',
-//         ContentType: `${type}/${ext}`
-//     }
+    const params = {
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: `${companyId}/${dt.getFullYear()}/${(dt.getMonth()+1).toString().padStart(2,'0')}/${dt.getDate().toString().padStart(2,'0')}/${fileName}`,
+        Body: blob,
+        ContentEncoding: 'base64',
+        ContentType: `${type}/${ext}`
+    }
 
-//     var result = await new Promise<string>((resolve) => {
-//       s3.upload(params, (err, data) => {
-//         resolve(data.Location)
-//       })
-//     });
+    var result = await new Promise<string>((resolve) => {
+      s3.upload(params, (err, data) => {
+        resolve(data.Location)
+      })
+    });
 
-//     return result;    
-//   }catch(err){
-//       console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',err)
-//       console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',JSON.stringify(err))
-//   }   
-// };
+    return result;    
+  }catch(err){
+      console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',err)
+      console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',JSON.stringify(err))
+  }   
+};
 
 export default NewMessageWhatsappService;
