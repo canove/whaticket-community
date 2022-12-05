@@ -195,7 +195,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       }
     };
 
-    if (selectedOffTemplate !== "Nenhum") fetchOffConnections();
+    if (selectedOffTemplate && selectedOffTemplate !== "Nenhum") fetchOffConnections();
   }, [selectedOffTemplate]);
 
   useEffect(() => {
@@ -474,12 +474,13 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
           )}
           {connectionType === true && offConnection && (
             <FormControl variant="outlined" margin="normal" fullWidth>
-            <Typography variant="subtitle1" gutterBottom>
-              Templates
-            </Typography>
+              <InputLabel id="off-template-select-label">
+                Templates
+              </InputLabel>
             <Select
               variant="outlined"
               labelId="off-template-select-label"
+              label="Templates"
               id="off-template-select"
               value={selectedOffTemplate}
               // label={"Números"}

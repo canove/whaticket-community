@@ -7,9 +7,9 @@ import UpdateSettingService from "../services/SettingServices/UpdateSettingServi
 import ListSettingsService from "../services/SettingServices/ListSettingsService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  if (req.user.profile !== "admin") {
-    throw new AppError("ERR_NO_PERMISSION", 403);
-  }
+  // if (req.user.profile !== "admin") {
+  //   throw new AppError("ERR_NO_PERMISSION", 403);
+  // }
 
   const { companyId } = req.user;
 

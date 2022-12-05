@@ -148,7 +148,7 @@ const ImportModal = ({ open, onClose }) => {
       }
     };
 
-    if (selectedOffTemplate !== "Nenhum") fetchOffConnections();
+    if (selectedOffTemplate && selectedOffTemplate !== "Nenhum") fetchOffConnections();
   }, [open, selectedOffTemplate]);
 
   const handleClose = () => {

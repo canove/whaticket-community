@@ -240,7 +240,7 @@ const ImportationtModal = ({
       }
     };
 
-    if (selectedOffTemplate !== "Nenhum") fetchOffConnections();
+    if (selectedOffTemplate && selectedOffTemplate !== "Nenhum") fetchOffConnections();
   }, [selectedOffTemplate]);
 
   useEffect(() => {
@@ -595,7 +595,7 @@ const ImportationtModal = ({
       header: header,
       body: body,
       mapping: JSON.stringify(mapping),
-      templateId: template,
+      templateId: template ? template : null,
       official: connectionType,
       whatsappIds: connection ? connection.toString() : null,
       officialConnectionId: offConnection ? offConnection : null,
@@ -639,7 +639,7 @@ const ImportationtModal = ({
       header: header,
       body: body,
       mapping: JSON.stringify(mapping),
-      templateId: template,
+      templateId: template ? template : null,
       official: connectionType,
       whatsappIds: connection.toString(),
       officialConnectionId: offConnection ? offConnection : null,
@@ -747,12 +747,13 @@ const ImportationtModal = ({
           )}
           {connectionType === true && offConnection && (
             <FormControl variant="outlined" margin="normal" fullWidth>
-              <Typography variant="subtitle1" gutterBottom>
-                Templates
-              </Typography>
+              <InputLabel id="off-template-select-label">
+              Templates
+              </InputLabel>
               <Select
                 variant="outlined"
                 labelId="off-template-select-label"
+                label="Templates"
                 id="off-template-select"
                 value={selectedOffTemplate}
                 // label={"Números"}
