@@ -267,7 +267,8 @@ const processNode = async (node: any, session: any, body: any) => {
       response: condition.toString(),
       nodeId: session.nodeId,
       flowId: session.flowId,
-      companyId: session.companyId
+      companyId: session.companyId,
+      type: node.type
     });
 
     return { condition };
