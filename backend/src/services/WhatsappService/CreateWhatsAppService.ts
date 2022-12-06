@@ -98,7 +98,6 @@ const CreateWhatsAppService = async ({
     throw new AppError("ERRO!");
   }
   const lastPingDate = new Date();
-  lastPingDate.setDate(lastPingDate.getDate() + 2);
 
   const whatsapp = await Whatsapp.create(
     {
