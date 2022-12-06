@@ -1247,7 +1247,7 @@ const messages = {
 
       officialPages: {
         officialContacts: {
-          title: "Contatos",
+          title: "Telefones",
           search: "Pesquisar",
           phoneNumber: "Telefone",
           connection: "Conexão",

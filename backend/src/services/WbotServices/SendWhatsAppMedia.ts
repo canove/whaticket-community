@@ -11,6 +11,7 @@ import axios from "axios";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import AWS from "aws-sdk";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
+import ShowCompanyService from "../CompanyService/ShowCompanyService";
 
 interface Request {
   media: Express.Multer.File;
@@ -63,24 +64,59 @@ const SendWhatsAppMedia = async ({
         where: { id: connnection.officialWhatsappId }
       });
 
+      let link = "";
+      let type = media.mimetype.split('/')[0];
+
+      try {
+        let path = require('path');
+
+        const blob = fs.readFileSync(media.path);
+        const file = path.basename(media.path);
+
+        link = await upoloadToS3(blob, file, type, companyId);
+      } catch (err) {
+        throw new AppError("ERR_UPLOADING_MEDIA");
+      };
+
       try {
         const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
+
+        let typePayload = null;
+
+        if (type != "image" && type != "audio" && type != "video" && type != "sticker") type = "document";
+
+        if (type === "document") {
+          typePayload = { link, caption: media.originalname }
+        } else {
+          typePayload = { link };
+        }
+
         const payload = {
           "messaging_product": "whatsapp",
           "preview_url": false,
           "recipient_type": "individual",
-          "to": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
-          "type": "text",
-          "text": {
-            "body": formatBody(body, ticket.contact)
-          }
+          "to": !messageSended?.phoneNumber ? contact.number : messageSended?.phoneNumber,
+          type,
+          [type]: typePayload
         };
+
+        // const payload = {
+        //   "messaging_product": "whatsapp",
+        //   "preview_url": false,
+        //   "recipient_type": "individual",
+        //   "to": !messageSended?.phoneNumber ? contact.number : messageSended?.phoneNumber,
+        //   "type": "text",
+        //   "text": {
+        //     "body": formatBody(body, ticket.contact)
+        //   }
+        // };
   
         var result = await axios.post(apiUrl, payload, {
           headers: {
             "Authorization": `Bearer ${offConnection.facebookAccessToken}`
           }
         });
+
         if(result.status == 200){
             const msgWhatsId = result.data.messages[0].id;
             
@@ -91,8 +127,8 @@ const SendWhatsAppMedia = async ({
               body: body,
               fromMe: true,
               read: true,
-              mediaUrl: null,
-              mediaType: null,
+              mediaUrl: link,
+              mediaType: type,
               quotedMsgId: null,
               bot: ticket.status == 'inbot',
               companyId
@@ -207,6 +243,5 @@ const upoloadToS3 = async (blob, file, type, companyId ): Promise<string> => {
       console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',JSON.stringify(err))
   }   
 };
-
 
 export default SendWhatsAppMedia;

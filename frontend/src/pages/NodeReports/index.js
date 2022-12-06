@@ -193,6 +193,7 @@ const NodeReports = () => {
                                 style={{width: "150px"}}
                             >
                                 <MenuItem value={""}>{i18n.t("nodeReports.none")}</MenuItem>
+                                <MenuItem value={"no_flow"}>Sem Fluxo</MenuItem>
                                 { flows.map(flow => {
                                     return (
                                         <MenuItem key={flow.id} value={flow.id}>{flow.name}</MenuItem>
@@ -255,7 +256,7 @@ const NodeReports = () => {
                                     <TableCell align="center">{report.text}</TableCell>
                                     <TableCell align="center">{report.response}</TableCell>
                                     <TableCell align="center">{report.nodeId}</TableCell>
-                                    <TableCell align="center">{report.flow.name}</TableCell>
+                                    <TableCell align="center">{report.flow ? report.flow.name : "FLUXO NÃO ENCONTRADO"}</TableCell>
                                     <TableCell align="center">{format(parseISO(report.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                 </TableRow>
                             ))}

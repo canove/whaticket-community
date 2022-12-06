@@ -16,6 +16,7 @@ interface Request {
   official: boolean | number;
   whatsappIds: string | null;
   officialConnectionId: string | number;
+  officialTemplatesId: string | number;
 }
 
 const CreateIntegratedImportService = async ({
@@ -33,7 +34,8 @@ const CreateIntegratedImportService = async ({
   templateId,
   official,
   whatsappIds,
-  officialConnectionId
+  officialConnectionId,
+  officialTemplatesId
 }: Request): Promise<IntegratedImport> => {
   if (whatsappIds.includes("Todos")) {
     whatsappIds = null;
@@ -58,7 +60,8 @@ const CreateIntegratedImportService = async ({
     templateId,
     official,
     whatsappIds,
-    officialConnectionId
+    officialConnectionId,
+    officialTemplatesId
   });
 
   return integratedImport;

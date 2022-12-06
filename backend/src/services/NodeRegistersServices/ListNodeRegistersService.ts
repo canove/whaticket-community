@@ -45,7 +45,7 @@ const ListNodeRegistersService = async ({
   if (flow) {
     whereCondition = {
       ...whereCondition,
-      flowId: flow
+      flowId: flow === "no_flow" ? null : flow
     };
   }
 

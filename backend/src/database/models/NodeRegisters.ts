@@ -31,6 +31,9 @@ class NodeRegisters extends Model<NodeRegisters> {
   @Column
   nodeId: string;
 
+  @Column
+  type: string;
+
   @ForeignKey(() => Flows)
   @Column
   flowId: number;

@@ -17,6 +17,7 @@ interface IntegratedImportData {
   official: boolean | number;
   whatsappIds: string | null;
   officialConnectionId: string | number;
+  officialTemplatesId: string | number;
 }
 
 interface Request {
@@ -49,7 +50,8 @@ const UpdateIntegratedImportService = async ({
     templateId,
     official,
     whatsappIds,
-    officialConnectionId
+    officialConnectionId,
+    officialTemplatesId
   } = importData;
 
   await integratedImport.update({
@@ -66,7 +68,8 @@ const UpdateIntegratedImportService = async ({
     templateId,
     official,
     whatsappIds,
-    officialConnectionId
+    officialConnectionId,
+    officialTemplatesId
   });
 
   return integratedImport;

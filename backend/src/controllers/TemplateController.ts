@@ -4,6 +4,7 @@ import ListMetaTemplateService from "../services/TemplateService/ListMetaTemplat
 import CreateTemplateService from "../services/TemplateService/CreateTemplateService";
 import UpdateTemplateService from "../services/TemplateService/UpdateTemplateService";
 import DeleteTemplateService from "../services/TemplateService/DeleteTemplateService";
+import GetWhatsappsTemplateService from "../services/TemplateService/GetWhatsappsTemplateService";
 import { getIO } from "../libs/socket";
 import BindTemplateService from "../services/TemplateService/BindTemplateService";
 import OfficialTemplatesStatus from "../database/models/OfficialTemplatesStatus";
@@ -23,6 +24,19 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const templates = await ListTemplateService({ companyId });
 
   return res.status(200).json(templates);
+};
+
+type TemplateQuery = {
+  templateId: string | number;
+}
+
+export const getWhatsapps = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+  const { templateId } = req.query as TemplateQuery;
+
+  const whatsapps = await GetWhatsappsTemplateService({ companyId, templateId });
+
+  return res.status(200).json(whatsapps);
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {

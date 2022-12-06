@@ -27,6 +27,7 @@ interface IntegratedImportData {
   official: boolean | number;
   whatsappIds: string | null;
   officialConnectionId: string | number;
+  officialTemplatesId: string | number;
 }
 
 type UpdateStatusQuery = {
@@ -56,7 +57,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     templateId,
     official,
     whatsappIds,
-    officialConnectionId
+    officialConnectionId,
+    officialTemplatesId
   }: IntegratedImportData = req.body;
 
   const { companyId } = req.user;
@@ -76,7 +78,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     templateId,
     official,
     whatsappIds,
-    officialConnectionId
+    officialConnectionId,
+    officialTemplatesId
   });
 
   const io = getIO();
