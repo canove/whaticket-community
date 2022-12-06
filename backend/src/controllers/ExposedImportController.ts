@@ -31,6 +31,7 @@ interface ExposedImportData {
   template: string;
   connections: string[];
   connectionType: string | boolean;
+  officialTemplatesId: string | number;
   officialConnectionId: string | number;
 }
 
@@ -41,7 +42,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     template,
     connections,
     connectionType,
-    officialConnectionId
+    officialTemplatesId,
+    officialConnectionId,
   }: ExposedImportData = req.body;
 
   const { companyId } = req.user;
@@ -52,6 +54,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     template,
     connections,
     connectionType,
+    officialTemplatesId,
     officialConnectionId,
     companyId,
   });

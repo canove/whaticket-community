@@ -47,7 +47,7 @@ const ListReportWhatsAppsService = async ({
   if (searchParam) {
     whatsCondition = {
       ...whatsCondition,
-      name: { [Op.like]: `%searchParam.toLowerCase()%` }
+      name: { [Op.like]: `%${searchParam.toLowerCase()}%` }
     }
   }
 

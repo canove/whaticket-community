@@ -75,7 +75,7 @@ export const exportCsv = async (
       flow: flowData
     } = report;
     const createdAt = formatDate(report.createdAt);
-    const flowName = flowData.name;
+    const flowName = flowData ? flowData.name : "FLUXO NÃO ENCONTRADO";
 
     const columns = [];
 

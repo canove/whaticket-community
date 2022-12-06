@@ -1243,7 +1243,7 @@ const messages = {
 
       officialPages: {
         officialContacts: {
-          title: "Contacts",
+          title: "Phone Numbers",
           search: "Search",
           phoneNumber: "Phone Number",
           connection: "Connection",

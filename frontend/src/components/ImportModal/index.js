@@ -88,12 +88,76 @@ const ImportModal = ({ open, onClose }) => {
   const [offConnection, setOffConnection] = useState(null);
   const [offPhoneNumbers, setOffPhoneNumbers] = useState([]);
 
+  const [offTemplates, setOffTemplates] = useState([]);
+  const [selectedOffTemplate, setSelectedOffTemplate] = useState("Nenhum");
+
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const { data } = await api.get("menus/company");
+        setMenus(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    const fetchTemplates = async () => {
+      try {
+        const { data } = await api.get("/TemplatesData/list/");
+        setTemplates(data.templates);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    const fetchPhoneNumbers = async () => {
+      try {
+        const { data } = await api.get("/officialWhatsapps");
+        setOffPhoneNumbers(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    const fetchOffTemplates = async () => {
+      try {
+        const { data } = await api.get("/whatsappTemplate/");
+        setOffTemplates(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    fetchPhoneNumbers();
+    fetchOffTemplates();
+    fetchTemplates();
+    fetchMenus();
+  }, [open]);
+
+  useEffect(() => {
+    const fetchOffConnections = async () => {
+      try {
+        const { data } = await api.get("/whatsappTemplate/getWhatsapps", {
+          params: {
+            templateId: selectedOffTemplate,
+          },
+        });
+        setOffConnections(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
+    if (selectedOffTemplate && selectedOffTemplate !== "Nenhum") fetchOffConnections();
+  }, [open, selectedOffTemplate]);
+
   const handleClose = () => {
     onClose();
     setFile();
     setOffConnection("");
     setSelectedConnection([]);
     setSelectedTemplate("Nenhum");
+    setSelectedOffTemplate("Nenhum");
   };
 
   const handleFile = (e) => {
@@ -126,6 +190,9 @@ const ImportModal = ({ open, onClose }) => {
         }
         if (offConnection) {
           formData.set("officialConnectionId", offConnection);
+        }
+        if (selectedOffTemplate !== "Nenhum") {
+          formData.set("offTemplateId", selectedOffTemplate);
         }
 
         await api.post("file/upload", formData);
@@ -176,59 +243,7 @@ const ImportModal = ({ open, onClose }) => {
   const handleCloseSelect = () => {
     setOpenSelect(false);
   };
-
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        const { data } = await api.get("menus/company");
-        setMenus(data);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    const fetchTemplates = async () => {
-      try {
-        const { data } = await api.get("/TemplatesData/list/");
-        setTemplates(data.templates);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    const fetchPhoneNumbers = async () => {
-      try {
-        const { data } = await api.get("/officialWhatsapps");
-        setOffPhoneNumbers(data);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    fetchPhoneNumbers();
-    fetchTemplates();
-    fetchMenus();
-  }, [open]);
-
-  useEffect(() => {
-    const fetchOffConnections = async () => {
-      try {
-        const { data } = await api.get('/whatsapp/list', {
-					params: {
-            official: true,
-            limit: "-1",
-            officialWhatsappId: offConnection ?? null
-          }
-				});
-        setOffConnections(data.whatsapps);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    fetchOffConnections();
-  }, [open, offConnection])
-
+  
   const handleOffConnectionChange = (e) => {
     setOffConnection(e.target.value);
     setSelectedConnection([]);
@@ -318,11 +333,36 @@ const ImportModal = ({ open, onClose }) => {
               </Select>
             </FormControl>
           )}
-		  {selectedType === true && offConnection && (
+          {selectedType === true && offConnection && (
             <FormControl variant="outlined" margin="normal" fullWidth>
-				<Typography variant="subtitle1" gutterBottom>
-					Números
-				</Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Templates
+            </Typography>
+            <Select
+              variant="outlined"
+              labelId="off-template-select-label"
+              id="off-template-select"
+              value={selectedOffTemplate}
+              // label={"Números"}
+              onChange={(e) => setSelectedOffTemplate(e.target.value)}
+              style={{ width: "100%" }}
+            >
+              <MenuItem value={"Nenhum"}>
+                Nenhum
+              </MenuItem>
+              {offTemplates.map((offTemplate) => (
+                <MenuItem key={offTemplate.id} value={offTemplate.id}>
+                  {offTemplate.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          )}
+          {selectedType === true && offConnection && selectedOffTemplate != "Nenhum" && (
+            <FormControl variant="outlined" margin="normal" fullWidth>
+              <Typography variant="subtitle1" gutterBottom>
+                Números
+              </Typography>
               {/* <InputLabel id="off-phone-numbers-select-label">
                 Números
               </InputLabel> */}
@@ -343,49 +383,53 @@ const ImportModal = ({ open, onClose }) => {
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
                 {offConnections.map((offConnection) => (
-                  <MenuItem key={offConnection.id} value={offConnection.id}>
-                    {offConnection.name}
+                  <MenuItem key={offConnection.whatsappId} value={offConnection.whatsappId}>
+                    {offConnection["whatsapp.name"]}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           )}
-		  { selectedType === false &&
-		  	<>
-				<Typography variant="subtitle1" gutterBottom>
-					{i18n.t("importModal.form.connection")}
-				</Typography>
-				<div className={classes.multFieldLine}>
-					<Select
-					variant="outlined"
-					labelId="type-select-label"
-					id="type-select"
-					value={selectedConnection}
-					label="Type"
-					onChange={handleChangeConnection}
-					multiple
-					open={openSelect}
-					onOpen={handleOpenSelect}
-					onClose={handleCloseSelect}
-					style={{ width: "100%" }}
-					>
-					<MenuItem value={"Todos"}>
-						{i18n.t("importModal.form.all")}
-					</MenuItem>
-					{whatsApps &&
-						whatsApps.map((whats) => {
-						if (whats.official === selectedType && whats.status === "CONNECTED") {
-							return (
-								<MenuItem key={whats.id} value={whats.id}>
-								{whats.name}
-								</MenuItem>
-							);
-						} return null;
-						})}
-					</Select>
-				</div>
-			</>
-		  }
+          {selectedType === false && (
+            <>
+              <Typography variant="subtitle1" gutterBottom>
+                {i18n.t("importModal.form.connection")}
+              </Typography>
+              <div className={classes.multFieldLine}>
+                <Select
+                  variant="outlined"
+                  labelId="type-select-label"
+                  id="type-select"
+                  value={selectedConnection}
+                  label="Type"
+                  onChange={handleChangeConnection}
+                  multiple
+                  open={openSelect}
+                  onOpen={handleOpenSelect}
+                  onClose={handleCloseSelect}
+                  style={{ width: "100%" }}
+                >
+                  <MenuItem value={"Todos"}>
+                    {i18n.t("importModal.form.all")}
+                  </MenuItem>
+                  {whatsApps &&
+                    whatsApps.map((whats) => {
+                      if (
+                        whats.official === selectedType &&
+                        whats.status === "CONNECTED"
+                      ) {
+                        return (
+                          <MenuItem key={whats.id} value={whats.id}>
+                            {whats.name}
+                          </MenuItem>
+                        );
+                      }
+                      return null;
+                    })}
+                </Select>
+              </div>
+            </>
+          )}
           {selectedType === false && (
             <Typography variant="subtitle1" gutterBottom>
               {i18n.t("importModal.form.template")}

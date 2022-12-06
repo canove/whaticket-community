@@ -111,6 +111,9 @@ const ImportationtModal = ({
   const [offConnection, setOffConnection] = useState(null);
   const [offPhoneNumbers, setOffPhoneNumbers] = useState([]);
 
+  const [offTemplates, setOffTemplates] = useState([]);
+  const [selectedOffTemplate, setSelectedOffTemplate] = useState("");
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -131,6 +134,7 @@ const ImportationtModal = ({
           data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]
         );
         setOffConnection(data.officialConnectionId);
+        setSelectedOffTemplate(data.officialTemplatesId);
 
         const mapping = JSON.parse(data.mapping);
 
@@ -172,10 +176,20 @@ const ImportationtModal = ({
       }
     };
 
+    const fetchOffTemplates = async () => {
+      try {
+        const { data } = await api.get("/whatsappTemplate/");
+        setOffTemplates(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
     if (open) {
       fetchMenus();
       fetchTemplates();
       fetchPhoneNumbers();
+      fetchOffTemplates();
     }
 
     if (integratedImportId) {
@@ -215,21 +229,19 @@ const ImportationtModal = ({
   useEffect(() => {
     const fetchOffConnections = async () => {
       try {
-        const { data } = await api.get("/whatsapp/list", {
+        const { data } = await api.get("/whatsappTemplate/getWhatsapps", {
           params: {
-            official: true,
-            limit: "-1",
-            officialWhatsappId: offConnection ?? null,
+            templateId: selectedOffTemplate,
           },
         });
-        setOffConnections(data.whatsapps);
+        setOffConnections(data);
       } catch (err) {
         toastError(err);
       }
     };
 
-    fetchOffConnections();
-  }, [open, offConnection]);
+    if (selectedOffTemplate && selectedOffTemplate !== "Nenhum") fetchOffConnections();
+  }, [selectedOffTemplate]);
 
   useEffect(() => {
     if (menus) {
@@ -296,6 +308,7 @@ const ImportationtModal = ({
     setPhoneNumberRelation("");
 
     setOffConnection("");
+    setSelectedOffTemplate("");
 
     onClose();
   };
@@ -582,9 +595,11 @@ const ImportationtModal = ({
       header: header,
       body: body,
       mapping: JSON.stringify(mapping),
-      templateId: template,
+      templateId: template ? template : null,
       official: connectionType,
       whatsappIds: connection ? connection.toString() : null,
+      officialConnectionId: offConnection ? offConnection : null,
+      officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
     };
 
     if (isCopying) {
@@ -624,10 +639,11 @@ const ImportationtModal = ({
       header: header,
       body: body,
       mapping: JSON.stringify(mapping),
-      templateId: template,
+      templateId: template ? template : null,
       official: connectionType,
       whatsappIds: connection.toString(),
       officialConnectionId: offConnection ? offConnection : null,
+      officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
     };
 
     try {
@@ -731,6 +747,30 @@ const ImportationtModal = ({
           )}
           {connectionType === true && offConnection && (
             <FormControl variant="outlined" margin="normal" fullWidth>
+              <InputLabel id="off-template-select-label">
+              Templates
+              </InputLabel>
+              <Select
+                variant="outlined"
+                labelId="off-template-select-label"
+                label="Templates"
+                id="off-template-select"
+                value={selectedOffTemplate}
+                // label={"Números"}
+                onChange={(e) => setSelectedOffTemplate(e.target.value)}
+                style={{ width: "100%" }}
+              >
+                <MenuItem value={""}>Nenhum</MenuItem>
+                {offTemplates.map((offTemplate) => (
+                  <MenuItem key={offTemplate.id} value={offTemplate.id}>
+                    {offTemplate.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+          {connectionType === true && offConnection && selectedOffTemplate && (
+            <FormControl variant="outlined" margin="normal" fullWidth>
               <InputLabel id="off-phone-numbers-select-label">
                 Números
               </InputLabel>
@@ -751,8 +791,11 @@ const ImportationtModal = ({
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
                 {offConnections.map((offConnection) => (
-                  <MenuItem key={offConnection.id} value={offConnection.id}>
-                    {offConnection.name}
+                  <MenuItem
+                    key={offConnection.whatsappId}
+                    value={offConnection.whatsappId}
+                  >
+                    {offConnection["whatsapp.name"]}
                   </MenuItem>
                 ))}
               </Select>

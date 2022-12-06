@@ -6,8 +6,14 @@ const ShowUserService = async (
   id: string | number,
   companyId: string | number
 ): Promise<User> => {
+  let whereCondition = null;
+
+  whereCondition = { id }
+
+  if (companyId !== 1) whereCondition = { ...whereCondition, companyId }
+
   const user = await User.findOne({
-    where: { id, companyId },
+    where: whereCondition,
     attributes: [
       "name",
       "id",
@@ -22,6 +28,7 @@ const ShowUserService = async (
     ],
     order: [[{ model: Queue, as: "queues" }, "name", "asc"]]
   });
+
   if (!user) {
     throw new AppError("ERR_NO_USER_FOUND", 404);
   }
