@@ -1268,6 +1268,8 @@ const messages = {
       },
 
       backendErrors: {
+        ERR_SESSION_ENDED:
+          "As the last message was sent more than 24 hours ago, this session has been terminated.",
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
         ERR_NO_DEF_WAPP_FOUND:

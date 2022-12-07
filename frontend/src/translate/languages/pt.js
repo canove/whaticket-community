@@ -1272,6 +1272,8 @@ const messages = {
       },
 
       backendErrors: {
+        ERR_SESSION_ENDED:
+          "Como a última mensagem foi enviada hà mais de 24H, esta sessão foi encerrada.",
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
           "Nenhum WhatsApp padrão encontrado. Verifique a página de conexões.",
