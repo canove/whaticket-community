@@ -19,6 +19,7 @@ import {
   TableRow,
   IconButton,
   TableBody,
+  Typography,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -29,6 +30,7 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
 import DescriptionIcon from '@material-ui/icons/Description';
+import TemplateButtonsTable from "../TemplateButtonsTable";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -72,13 +74,14 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
     const { i18n } = useTranslation();
     const classes = useStyles();
 
+    const [loading, setLoading] = useState(false);
     const [name, setName] = useState("");
     const [footer, setFooter] = useState("");
+
     const [bodies, setBodies] = useState([]);
     const [selectedBody, setSelectedBody] = useState(null);
     const [selectedBodyIndex, setSelectedBodyIndex] = useState("");
     const [bodyModalOpen, setBodyModalOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
       const fetchTemplates = async () => {
@@ -116,14 +119,14 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 				formData.set("name", name);
 				formData.set("footer", footer);
 
-        let index = 0;
+        let bodyIndex = 0;
         for (const body of bodies) {
           if ((body.type === "audio" || body.type === "video" || body.type === "image" || body.type === "file") && (typeof body.value !== 'string')) {
-            formData.append("file", body.value, `${body.value.name}/${body.type}/${index}`);
+            formData.append("file", body.value, `${body.value.name}/${body.type}/${bodyIndex}`);
           } else {
-            formData.append("bodies", `${JSON.stringify(body)}${index}`);
+            formData.append("bodies", `${JSON.stringify(body)}${bodyIndex}`);
           }
-          index++;
+          bodyIndex++;
         }
 
         if (templatesId) {
@@ -235,6 +238,15 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
 
       if (body.type === "fileUrl") {
         return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer"><DescriptionIcon fontSize="large"/></a></TableCell>;
+      }
+
+      if (body.type === "buttons") {
+        return (
+          <TableCell align="center">
+            <Typography>{value}</Typography>
+            <TemplateButtonsTable buttons={body.buttons} />
+          </TableCell>
+        );
       }
 
       return "";

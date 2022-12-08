@@ -33,6 +33,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import TemplateTable from "../../components/TemplateTable";
+import TemplateButtonsTable from "../../components/TemplateButtonsTable";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_TEMPLATES") {
@@ -157,8 +158,7 @@ const TemplatesData = () => {
     return () => {
       socket.disconnect();
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   const handleTemplateModal = () => {
     setSelectedTemplates(null);
@@ -271,7 +271,7 @@ const TemplatesData = () => {
                   <TableRow key={template.id}>
                     <TableCell align="center">{template.name}</TableCell>
                     <TableCell align="center">
-                      <TemplateTable body={template.text} />
+                      { template.text !== "[]" && <TemplateTable body={template.text} /> }
                     </TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">

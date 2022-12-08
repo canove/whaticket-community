@@ -856,6 +856,7 @@ const messages = {
           createdAt: "Created At",
           updateAt: "Update At",
           actions: "Actions",
+          buttons: "Buttons",
         },
         templateModal: {
           add: "Add Template",
@@ -900,6 +901,14 @@ const messages = {
           order: "Order",
           value: "Value",
           nameContact: "Contact Name",
+          addButton: "Add Button",
+        },
+        buttomModal: {
+          save: "Save",
+          create: "Create",
+          cancel: "Cancel",
+          text: "Text",
+          edit: "Edit"
         },
       },
 

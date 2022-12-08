@@ -46,7 +46,7 @@ const ListTemplateDataService = async ({
       "text",
       "footer",
       "createdAt",
-      "updatedAt"
+      "updatedAt",
     ],
     order: [["createdAt", "DESC"]],
 

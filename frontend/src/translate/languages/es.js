@@ -859,6 +859,7 @@ const messages = {
           createdAt: "Fecha de Creación",
           updateAt: "Editado en",
           actions: "Comportamiento",
+          buttons: "Buttons",
         },
         templateModal: {
           add: "Agregar Plantilla",
@@ -903,6 +904,14 @@ const messages = {
           order: "Ordenar",
           value: "Valor",
           nameContact: "Nombre de contacto",
+          addButton: "Add Button",
+        },
+        buttomModal: {
+          save: "Save",
+          create: "Create",
+          cancel: "Cancel",
+          text: "Text",
+          edit: "Edit"
         },
       },
 
