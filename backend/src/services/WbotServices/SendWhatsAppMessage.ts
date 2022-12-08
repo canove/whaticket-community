@@ -48,11 +48,21 @@ const SendWhatsAppMessage = async ({
     limit: 1
   });
 
-  if (message[0].createdAt) {
-    const today = new Date();
-    const lastMessage = new Date(message[0].createdAt);
+  const lastMessage = await Message.findAll({
+    where: {
+      ticketId: ticket.id,
+    },
+    order: [
+      ['createdAt', 'DESC'],
+    ],
+    limit: 1
+  });
 
-    const diff = lastMessage.getTime() - today.getTime();
+  if (lastMessage[0].createdAt) {
+    const today = new Date();
+    const lastMessageDate = new Date(message[0].createdAt);
+
+    const diff = lastMessageDate.getTime() - today.getTime();
 
     if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
   }
