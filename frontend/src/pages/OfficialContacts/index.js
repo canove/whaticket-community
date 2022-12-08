@@ -4,6 +4,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green, yellow, red } from "@material-ui/core/colors";
@@ -279,6 +280,20 @@ const OfficialContacts = () => {
 		};
 	}, [user]);
 
+	useEffect(() => {
+        const socket = openWorkerSocket();
+
+        socket.on(`officialwhatsapp${user.companyId}`, (data) => {
+            if (data.action === "update") {
+                dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
+            }
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [user]);
+
     const handleCloseWhatsAppModal = () => {
         setSelectedWhatsApp(null);
         setWhatsAppModalOpen(false);
@@ -421,7 +436,7 @@ const OfficialContacts = () => {
 														<TableRow key={whatsApp.id}>
 															<TableCell align="center">{whatsApp.name}</TableCell>
 															<TableCell align="center">{connectionName}</TableCell>
-															<TableCell align="center">{whatsApp.usedLimit}/</TableCell>
+															<TableCell align="center">{whatsApp.usedLimit} / X</TableCell>
 															<TableCell align="center">{format(parseISO(whatsApp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
 															<TableCell align="center">
 																<IconButton
