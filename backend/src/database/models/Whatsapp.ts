@@ -142,6 +142,12 @@ class Whatsapp extends Model<Whatsapp> {
   whatsImage: string;
 
   @Column
+  usedLimit: number;
+
+  @Column
+  extraInfo: string;
+
+  @Column
   facebookAccessToken: string;
 
   @Column

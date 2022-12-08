@@ -399,6 +399,9 @@ const OfficialContacts = () => {
 										{i18n.t("officialPages.officialContacts.connection")}
 									</TableCell>
 									<TableCell align="center">
+										Limite Usado
+									</TableCell>
+									<TableCell align="center">
 										Ultima Atualização
 									</TableCell>
 									<TableCell align="center">
@@ -418,6 +421,7 @@ const OfficialContacts = () => {
 														<TableRow key={whatsApp.id}>
 															<TableCell align="center">{whatsApp.name}</TableCell>
 															<TableCell align="center">{connectionName}</TableCell>
+															<TableCell align="center">{whatsApp.usedLimit}/</TableCell>
 															<TableCell align="center">{format(parseISO(whatsApp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
 															<TableCell align="center">
 																<IconButton
