@@ -39,7 +39,6 @@ class Templates extends Model<Templates> {
 
   @UpdatedAt
   updatedAt: Date;
-
 }
 
 export default Templates;

@@ -9,6 +9,7 @@ import {
     TableBody,
     TableContainer,
     Paper,
+    Typography,
 } from '@material-ui/core';
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -16,6 +17,7 @@ import { green } from "@material-ui/core/colors";
 
 import OndemandVideoIcon from '@material-ui/icons/OndemandVideo';
 import DescriptionIcon from '@material-ui/icons/Description';
+import TemplateButtonsTable from "../TemplateButtonsTable";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -54,10 +56,10 @@ const TemplateTable = ({ body }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
-    const [bodyObject, setBodyObject] = useState(null);
+    const [bodyObject, setBodyObject] = useState([]);
 
     useEffect(() => {
-        setBodyObject(JSON.parse(body))
+        if (body) setBodyObject(JSON.parse(body))
     }, [body])
 
     const Body = ({ body }) => {
@@ -110,6 +112,15 @@ const TemplateTable = ({ body }) => {
         if (body.type === "fileUrl") {
             return <TableCell align="center"><a style={{display: "block", margin: "auto"}} href={value} target='_blank' rel="noopener noreferrer"><DescriptionIcon fontSize="large"/></a></TableCell>;
         }
+
+        if (body.type === "buttons") {
+            return (
+              <TableCell align="center">
+                <Typography>{value}</Typography>
+                <TemplateButtonsTable buttons={body.buttons} />
+              </TableCell>
+            );
+          }
 
         return "";
       }

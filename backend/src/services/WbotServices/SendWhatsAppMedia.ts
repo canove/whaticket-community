@@ -44,6 +44,24 @@ const SendWhatsAppMedia = async ({
       limit: 1
     });
   
+    const lastMessage = await Message.findAll({
+      where: {
+        ticketId: ticket.id,
+      },
+      order: [
+        ['createdAt', 'DESC'],
+      ],
+      limit: 1
+    });
+  
+    if (lastMessage[0].createdAt) {
+      const today = new Date();
+      const lastMessageDate = new Date(message[0].createdAt);
+  
+      const diff = lastMessageDate.getTime() - today.getTime();
+  
+      if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
+    }
 
     const contact = await Contact.findOne({ where: {
       id: message[0].contactId

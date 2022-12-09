@@ -859,6 +859,7 @@ const messages = {
           createdAt: "Fecha de Creación",
           updateAt: "Editado en",
           actions: "Comportamiento",
+          buttons: "Buttons",
         },
         templateModal: {
           add: "Agregar Plantilla",
@@ -903,6 +904,14 @@ const messages = {
           order: "Ordenar",
           value: "Valor",
           nameContact: "Nombre de contacto",
+          addButton: "Add Button",
+        },
+        buttomModal: {
+          save: "Save",
+          create: "Create",
+          cancel: "Cancel",
+          text: "Text",
+          edit: "Edit"
         },
       },
 
@@ -1271,6 +1280,8 @@ const messages = {
       },
 
       backendErrors: {
+        ERR_SESSION_ENDED:
+          "As the last message was sent more than 24 hours ago, this session has been terminated.",
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
         ERR_NO_DEF_WAPP_FOUND:

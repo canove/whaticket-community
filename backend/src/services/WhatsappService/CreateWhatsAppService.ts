@@ -98,7 +98,6 @@ const CreateWhatsAppService = async ({
     throw new AppError("ERRO!");
   }
   const lastPingDate = new Date();
-  lastPingDate.setDate(lastPingDate.getDate() + 2);
 
   const whatsapp = await Whatsapp.create(
     {
@@ -120,7 +119,8 @@ const CreateWhatsAppService = async ({
       business,
       facebookAccessToken,
       whatsappAccountId,
-      officialWhatsappId: officialConnectionId
+      officialWhatsappId: officialConnectionId,
+      usedLimit: official ? 0 : null
     },
     { include: ["queues"] }
   );

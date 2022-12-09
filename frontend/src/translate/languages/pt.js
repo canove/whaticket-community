@@ -844,7 +844,7 @@ const messages = {
         },
       },
 
-      templatesData:{
+      templatesData: {
         title: "Templates Data",
         buttons: {
           connection: "Conexões",
@@ -859,6 +859,7 @@ const messages = {
           createdAt: "Data da Criação",
           updateAt: "Editado em",
           actions: "Ações",
+          buttons: "Botões",
         },
         templateModal: {
           add: "Adicionar Template",
@@ -877,7 +878,6 @@ const messages = {
           exceeded: "Limite de Parâmetros Excedido!",
           videoExceeded: "Tamanho do vídeo excede o valor máximo de 10 Megabyte.",
           edited: "Template atualizada com Sucesso!",
-
         },
         modal: {
           type: "Tipo",
@@ -904,6 +904,14 @@ const messages = {
           order: "Ordem",
           value: "Valor",
           nameContact: "Nome do Contato",
+          addButton: "Adicionar Botão",
+        },
+        buttomModal: {
+          save: "Salvar",
+          create: "Criar",
+          cancel: "Cancelar",
+          text: "Texto",
+          edit: "Editar"
         },
       },
 
@@ -1272,6 +1280,8 @@ const messages = {
       },
 
       backendErrors: {
+        ERR_SESSION_ENDED:
+          "Como a última mensagem foi enviada hà mais de 24H, esta sessão foi encerrada.",
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
           "Nenhum WhatsApp padrão encontrado. Verifique a página de conexões.",

@@ -13,6 +13,14 @@ import {
 	MenuItem,
 	FormControl,
 	TextField,
+    Paper,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    IconButton,
+    TableBody,
 } from '@material-ui/core';
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -20,6 +28,10 @@ import { green } from "@material-ui/core/colors";
 
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input/input'
+import TemplateButton from "../TemplateButton";
+
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -74,6 +86,11 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 
     const [disableButton, setDisableButton] = useState(false);
 
+    const [buttons, setButtons] = useState([]);
+    const [selectedButton, setSelectedButton] = useState(null);
+    const [selectedButtonIndex, setSelectedButtonIndex] = useState("");
+    const [buttonModalOpen, setButtonModalOpen] = useState(false);
+
     useEffect(() => {
         if (body) {
             setType(body.type);
@@ -106,6 +123,11 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             if (body.type === "fileUrl") {
                 setFileUrl(body.value);
             }
+
+            if (body.type === "buttons") {
+                setText(body.value);
+                setButtons(body.buttons);
+            }
         }
     }, [open, body])
 
@@ -120,7 +142,13 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setVideo("");
         setImage("");
         setFileUrl("");
+        
         setDisableButton(false);
+
+        setButtons([]);
+        setSelectedButton(null);
+        setSelectedButtonIndex("");
+        setButtonModalOpen(false);
 
         setOpenParamModal(false);
         setParamsQuantity(0);
@@ -186,6 +214,16 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
             const bodyData = {
                 type,
                 value: fileUrl
+            }
+
+            handleBodiesChange(bodyData, index);
+        }
+
+        if (type === "buttons") {
+            const bodyData = {
+                type,
+                value: text,
+                buttons: buttons,
             }
 
             handleBodiesChange(bodyData, index);
@@ -271,7 +309,7 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     }, [text])
 
     useEffect(() => {
-        if (type === "text") {
+        if (type === "text" || type === "buttons") {
             if (paramsQuantity > 3) {
                 toast.error(i18n.t("templatesData.modalConfirm.exceeded"));
                 setDisableButton(true);
@@ -288,11 +326,55 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         } else {
             setDisableButton(false);
         }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [type, paramsQuantity, video])
+    }, [type, paramsQuantity, video]);
+
+    const handleOpenButtonModal = () => {
+        setButtonModalOpen(true);
+      }
+  
+      const handleCloseButtonModal = () => {
+        setSelectedButton(null);
+        setSelectedButtonIndex("");
+        setButtonModalOpen(false);
+      }
+  
+      const handleEditButtonModal = (button, index) => {
+        setSelectedButton(button);
+        setSelectedButtonIndex(index);
+        setButtonModalOpen(true);
+      }
+  
+      const handleButtonsChange = (button, index) => {
+        let array = [...buttons];
+
+        array = array.map((bt, index) => ({text: bt.text, id: index+1}));
+
+        if (index || index === 0) {
+          array[index] = { text: button, id: index+1 };
+          setButtons(array);
+        } else {
+          array.push({ text: button, id: array.length+1 });
+          setButtons(array);
+        }
+      }
+  
+      const handleDeleteButtonModal = (button, index) => {
+        const array = [...buttons];
+        array.splice(index, 1);
+  
+        setButtons(array);
+      }
 
 	return (
 		<div className={classes.root}>
+            <TemplateButton
+                open={buttonModalOpen}
+                onClose={handleCloseButtonModal}
+                aria-labelledby="form-dialog-title"
+                button={selectedButton}
+                index={selectedButtonIndex}
+                handleButtonsChange={handleButtonsChange}
+            />
             <div>
                 <Dialog open={openParamModal} onClose={handleCloseParamModal}>
                 <DialogTitle>{i18n.t("templatesData.modal.selectVar")}</DialogTitle>
@@ -364,10 +446,11 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 <MenuItem value={"contact"}>{i18n.t("templatesData.modal.contact")}</MenuItem>
                                 <MenuItem value={"file"}>{i18n.t("templatesData.modal.file")}</MenuItem>
                                 <MenuItem value={"fileUrl"}>Arquivo URL</MenuItem>
+                                <MenuItem value={'buttons'}>Botões</MenuItem>
 							</Select>
 						</FormControl>
                     </div>
-                    { type === "text" &&
+                    { (type === "text" || type === "buttons") &&
                         <div className={classes.root}>
                             <FormControl
                                 variant="outlined"
@@ -538,6 +621,58 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                 />
 						    </FormControl>
                         </div>
+                    }
+                    { type === "buttons" &&
+                        <div className={classes.root}>
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                fullWidth
+                                style={{ margin: "5px" }}
+                                onClick={handleOpenButtonModal}
+                            >
+                                {i18n.t("templatesData.modal.addButton")}
+                            </Button>
+                        </div>
+                    }
+                    { type === "buttons" && buttons.length > 0 &&
+                        <Paper className={classes.mainPaper} variant="outlined">
+                        <TableContainer>
+                          <Table>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell align="center">{i18n.t("templatesData.modal.text")}</TableCell>
+                                <TableCell align="center">{i18n.t("templatesData.modal.actions")}</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              <>
+                                {buttons && buttons.map((button, index) => {
+                                  return (
+                                    <TableRow key={index}>
+                                      <TableCell align="center">{button.text}</TableCell>
+                                      <TableCell align="center">
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleEditButtonModal(button, index)}
+                                        >
+                                          <EditIcon />
+                                        </IconButton>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleDeleteButtonModal(button, index)}
+                                        >
+                                          <DeleteOutlineIcon />
+                                        </IconButton>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                  })}
+                              </>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Paper>
                     }
 				</DialogContent>
 				<DialogActions>
