@@ -466,7 +466,7 @@ const ContactTransfer = () => {
                   </TableRow>
                 )
               })}
-              {loading && <TableRowSkeleton columns={3} />}
+              {loading && <TableRowSkeleton columns={6} />}
             </>
           </TableBody>
         </Table>

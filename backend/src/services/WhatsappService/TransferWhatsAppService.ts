@@ -57,7 +57,7 @@ const TransferWhatsAppService = async ({
           attributes: ["id", "name"]
         }
       ],
-      order: [["status", "DESC"]]
+      // order: [["status", "DESC"]]
     });
 
     const io = getIO();
