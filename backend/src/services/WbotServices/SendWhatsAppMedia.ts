@@ -104,7 +104,7 @@ const SendWhatsAppMedia = async ({
         if (type != "image" && type != "audio" && type != "video" && type != "sticker") type = "document";
 
         if (type === "document") {
-          typePayload = { link, caption: media.originalname }
+          typePayload = { link, caption: media.originalname, filename: media.originalname }
         } else {
           typePayload = { link };
         }

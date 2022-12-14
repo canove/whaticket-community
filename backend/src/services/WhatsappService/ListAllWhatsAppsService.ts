@@ -78,7 +78,7 @@ const ListAllWhatsAppsService = async ({
         attributes: ["id", "name"]
       }
     ],
-    order: [["status", "DESC"]],
+    // order: [["status", "DESC"]],
     limit,
     offset
   });

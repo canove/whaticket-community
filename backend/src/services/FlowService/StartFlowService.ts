@@ -11,6 +11,7 @@ import Ticket from "../../database/models/Ticket";
 import FileRegister from "../../database/models/FileRegister";
 import Queue from "../../database/models/Queue";
 import NodeRegisters from "../../database/models/NodeRegisters";
+import { preparePhoneNumber9Digit } from "../../utils/common";
 
 interface Request {
   flowNodeId?: string;
@@ -319,29 +320,28 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   if (node.type === "multiple-messages-node") {
-    const messages = [];
+    const blocks = [];
 
-    const fileRegister = await FileRegister.findOne({
+    let fileRegister = await FileRegister.findOne({
       where: {
-        phoneNumber: session.id,
+        [Op.or]: [
+          { phoneNumber: session.id } ,
+          { phoneNumber: preparePhoneNumber9Digit(session.id) }
+        ],
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
       order: [["updatedAt", "DESC"]]
     });
 
-    node.messages.map(message => {
+    node.messages.forEach(message => {
       if (message.messageType === "text") {
         const newMessage = {
-          blocks: [
-            {
-              text: message.messageContent,
-              type: "text"
-            }
-          ]
+          text: message.messageContent,
+          type: "text"
         };
 
-        messages.push(newMessage);
+        blocks.push(newMessage);
 
         return;
       }
@@ -349,15 +349,11 @@ const processNode = async (node: any, session: any, body: any) => {
       if (message.messageType === "database") {
         if (!fileRegister) {
           const newMessage = {
-            blocks: [
-              {
-                text: "",
-                type: "text"
-              }
-            ]
+            text: "",
+            type: "text"
           };
   
-          messages.push(newMessage);
+          blocks.push(newMessage);
 
           return;
         }
@@ -365,21 +361,19 @@ const processNode = async (node: any, session: any, body: any) => {
         const variable = fileRegister[message.messageContent] ? fileRegister[message.messageContent] : "";
     
         const newMessage = {
-          blocks: [
-            {
-              text: variable,
-              type: message.textType
-            }
-          ]
+          text: variable,
+          type: message.textType
         };
 
-        messages.push(newMessage);
+        blocks.push(newMessage);
 
         return;
       }
     });
 
-    return { messages };
+    const message = { blocks };
+  
+    return { message };
   }
 
   if (node.type === "jump-node") {
