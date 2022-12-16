@@ -114,7 +114,7 @@ const SendWhatsAppMessage = async ({
           filename: fileName
         }
       } else {
-        typePayload = { body: formatBody(body, reg) };
+        typePayload = { body: formatBody(body, reg).replace(/&@x2F;/g, '/') };
       }
 
       const payload = {
@@ -191,7 +191,7 @@ const SendWhatsAppMessage = async ({
         "session": connnection.name,
         "number": phoneNumber,
         "path": url,
-        "text": fileName != null? fileName :`${formatBody(body, ticket.contact)} NO-TYPING` 
+        "text": fileName != null ? fileName : `${formatBody(body, reg)} NO-TYPING` 
       };
 
       let ack = 3;
