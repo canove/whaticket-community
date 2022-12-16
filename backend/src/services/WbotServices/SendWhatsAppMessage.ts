@@ -114,7 +114,8 @@ const SendWhatsAppMessage = async ({
           filename: fileName
         }
       } else {
-        typePayload = { body: formatBody(body, reg).replace(/&@x2F;/g, '/') };
+        const newBody = formatBody(body, reg);
+        typePayload = { body: newBody.replace(/&#x2F;/g, '/') };
       }
 
       const payload = {
@@ -125,11 +126,6 @@ const SendWhatsAppMessage = async ({
         "type": cation ? "document" : "text",
         [cation ? "document" : "text"]: typePayload
       };
-
-        // "type": "text",
-        // "text": {
-        //   "body": formatBody(body, ticket.contact)
-        // }
 
       var result = await axios.post(apiUrl, payload, {
         headers: {
