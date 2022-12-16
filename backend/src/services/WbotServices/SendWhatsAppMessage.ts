@@ -20,6 +20,7 @@ interface Request {
   companyId: number;
   bot: boolean;
   contactId?: number;
+  cation?: string;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -30,6 +31,7 @@ const SendWhatsAppMessage = async ({
   bot,
   contactId,
   whatsMsgId,
+  cation
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -85,19 +87,37 @@ const SendWhatsAppMessage = async ({
     const offConnection = await OfficialWhatsapp.findOne({
       where: { id: connnection.officialWhatsappId }
     });
-  
+
     try {
       const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
+
+      const { url, type, fileName } = isValidHttpUrl(body);
+
+      let typePayload = null;
+
+      if (type === "document") {
+        typePayload = {
+          link: url,
+          caption: cation ?? "",
+          filename: fileName
+        }
+      } else {
+        typePayload = { body: formatBody(body, ticket.contact) };
+      }
+
       const payload = {
         "messaging_product": "whatsapp",
         "preview_url": false,
         "recipient_type": "individual",
         "to": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
-        "type": "text",
-        "text": {
-          "body": formatBody(body, ticket.contact)
-        }
+        "type": type,
+        [type]: typePayload
       };
+
+        // "type": "text",
+        // "text": {
+        //   "body": formatBody(body, ticket.contact)
+        // }
 
       var result = await axios.post(apiUrl, payload, {
         headers: {
