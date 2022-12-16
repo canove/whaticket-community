@@ -95,7 +95,7 @@ const SendWhatsAppMessage = async ({
 
       let typePayload = null;
 
-      if (type === "document") {
+      if (cation) {
         typePayload = {
           link: url,
           caption: cation ?? "",
