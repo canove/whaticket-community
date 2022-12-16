@@ -10,6 +10,7 @@ import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
 import { isValidHttpUrl, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
+import { Op } from "sequelize";
 
 interface Request {
   body: string;
@@ -60,6 +61,17 @@ const SendWhatsAppMessage = async ({
       companyId: companyId
     }
   });
+
+  const reg = await FileRegister.findOne({
+    where: { 
+        companyId: companyId,
+        phoneNumber : {
+            [Op.like]: `%${contact.number.substr(5,8)}%`
+        },
+        whatsappId: connnection.id
+    },
+    order: [['createdAt', 'DESC']]
+  });
   
   if(!messageSended && !contact)
     throw new AppError("ERR_SENDING_WAPP_MSG");
@@ -98,11 +110,11 @@ const SendWhatsAppMessage = async ({
       if (cation) {
         typePayload = {
           link: url,
-          caption: cation ?? "",
+          caption: cation ? formatBody(cation, reg) : "",
           filename: fileName
         }
       } else {
-        typePayload = { body: formatBody(body, ticket.contact) };
+        typePayload = { body: formatBody(body, reg) };
       }
 
       const payload = {
