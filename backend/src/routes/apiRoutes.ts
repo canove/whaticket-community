@@ -85,7 +85,8 @@ ApiRoutes.get(
   ApiController.dispatcherRegisterProcess
 );
 
-ApiRoutes.get("/pingConnections", isAuthApi, ApiController.pingConnections);
+ApiRoutes.post("/sendMessage", isAuthApi, ApiController.sendMessageApi);
+ApiRoutes.post("/checkIfPingConversation", isAuthApi, ApiController.checkIfPingConnectionApi);
 
 ApiRoutes.post("/send", isAuthApi, upload.array("medias"), ApiController.index);
 
