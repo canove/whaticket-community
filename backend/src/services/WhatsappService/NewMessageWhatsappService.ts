@@ -16,6 +16,7 @@ import FileRegister from "../../database/models/FileRegister";
 import Company from "../../database/models/Company";
 import axios from "axios";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
+import { removePhoneNumber9Digit } from "../../utils/common";
 /*eslint-disable*/
 interface Request {
   id: string;
@@ -193,6 +194,19 @@ const handleMessage = async (
     if (session) {
       whatsapp = await GetWhatsappBySession(session);
     }
+
+    //checar se é mesnagem de PING se for nao adicionar
+    let receiverWhatsapp =  await GetWhatsappBySession(removePhoneNumber9Digit(to));
+    let fromWhatsapp =  await GetWhatsappBySession(removePhoneNumber9Digit(from));
+    if(!fromWhatsapp) {
+      fromWhatsapp = await GetWhatsappBySession(from);
+    }
+    if(!receiverWhatsapp) {
+      receiverWhatsapp = await GetWhatsappBySession(to);
+    }
+
+    if (receiverWhatsapp && fromWhatsapp) throw "number identification is a whatsapp dispatcher";
+    //
     
     // eslint-disable-next-line no-throw-literal
     if (!whatsapp) throw "number identification not found";

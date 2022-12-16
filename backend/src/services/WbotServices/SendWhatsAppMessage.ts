@@ -8,7 +8,7 @@ import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
-import { isValidHttpUrl } from "../../utils/common";
+import { isValidHttpUrl, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
 interface Request {
@@ -48,25 +48,6 @@ const SendWhatsAppMessage = async ({
     limit: 1
   });
 
-  const lastMessage = await Message.findAll({
-    where: {
-      ticketId: ticket.id,
-    },
-    order: [
-      ['createdAt', 'DESC'],
-    ],
-    limit: 1
-  });
-
-  if (lastMessage[0].createdAt) {
-    const today = new Date();
-    const lastMessageDate = new Date(message[0].createdAt);
-
-    const diff = lastMessageDate.getTime() - today.getTime();
-
-    if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
-  }
-
   const contact = await Contact.findOne({ where: {
     id: contactId > 0 ? contactId: message[0].contactId
   }});
@@ -82,6 +63,25 @@ const SendWhatsAppMessage = async ({
     throw new AppError("ERR_SENDING_WAPP_MSG");
 
   if (connnection?.official) {
+    const lastMessage = await Message.findAll({
+      where: {
+        ticketId: ticket.id,
+      },
+      order: [
+        ['createdAt', 'DESC'],
+      ],
+      limit: 1
+    });
+  
+    if (lastMessage[0].createdAt) {
+      const today = new Date();
+      const lastMessageDate = new Date(message[0].createdAt);
+  
+      const diff = lastMessageDate.getTime() - today.getTime();
+  
+      if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
+    }
+
     const offConnection = await OfficialWhatsapp.findOne({
       where: { id: connnection.officialWhatsappId }
     });
@@ -146,7 +146,7 @@ const SendWhatsAppMessage = async ({
           break;
       }
 
-      let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
+      let phoneNumber =  removePhoneNumber9Digit(!messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber);
       
       if (phoneNumber.length > 12){
         let firstNumber = phoneNumber.substring(6,5);

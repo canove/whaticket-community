@@ -9,8 +9,8 @@ import ListFileService from "../services/FileService/ListFileService";
 import { FileStatus } from "../enum/FileStatus";
 import ImportFileService from "../services/UploadFileService/ImportFileService";
 import DispatcherRegisterService from "../services/UploadFileService/DispatcherRegisterService";
+import MessageAPi from "../services/UploadFileService/SendMessageService";
 import { getIO } from "../libs/socket";
-import DispatcherPingService from "../services/UploadFileService/DispatcherPingService";
 
 type MessageData = {
   body: string;
@@ -87,10 +87,12 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
   return res.status(200).json('request is processed');
 };
 
-/* eslint-disable */
-export const pingConnections = async (req: Request, res: Response) => {
-  await DispatcherPingService();
-  return res.status(200).json('request is processed');
+export const sendMessageApi = async (req: Request, res: Response) => {
+  return await MessageAPi.SendMessage(req, res);
+};
+
+export const checkIfPingConnectionApi = async (req: Request, res: Response) => {
+  return await MessageAPi.CheckIfPingConnection(req, res);
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
