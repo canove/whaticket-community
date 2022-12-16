@@ -362,7 +362,8 @@ const processNode = async (node: any, session: any, body: any) => {
     
         const newMessage = {
           text: variable,
-          type: message.textType
+          type: message.textType,
+          cation: message.cation
         };
 
         blocks.push(newMessage);

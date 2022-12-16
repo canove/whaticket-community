@@ -663,7 +663,7 @@ export const botMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { fromMe, to, body, contactName, session, bot, id } = req.body;
+  const { fromMe, to, body, cation, contactName, session, bot, id } = req.body;
 
   if (!fromMe) {
     const message = await newMessage(req, res);
@@ -696,7 +696,8 @@ export const botMessage = async (
     fromMe,
     bot,
     contactId: contact.id,
-    whatsMsgId: id
+    whatsMsgId: id,
+    cation
   });
 
   return res.status(200).json("success");

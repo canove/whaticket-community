@@ -18,7 +18,7 @@ import { IsTicketInBotService, IsTicketInBotPostService} from "../services/Ticke
 import AverageService from "../services/TicketServices/AverageService";
 import Whatsapp from "../database/models/Whatsapp";
 import Contact from "../database/models/Contact";
-import { preparePhoneNumber, preparePhoneNumber9Digit } from "../utils/common";
+import { preparePhoneNumber, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../utils/common";
 import Ticket from "../database/models/Ticket";
 
 type IndexQuery = {
@@ -105,10 +105,15 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
         number: {
           [Op.or] : [
             {[Op.like]: `%${preparePhoneNumber(phone)}%` },
+            {[Op.like]: `%${removePhoneNumber9Digit(phone)}%` },
             {[Op.like]: `%${preparePhoneNumber9Digit(phone)}%` }
           ]
         }
      }});
+
+     if(!contact) {
+      return res.status(200).json(true);
+     }
 
      const ticket = await Ticket.findOne({
       where: {

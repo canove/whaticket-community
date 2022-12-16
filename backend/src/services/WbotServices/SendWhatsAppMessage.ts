@@ -8,7 +8,7 @@ import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
-import { isValidHttpUrl } from "../../utils/common";
+import { isValidHttpUrl, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
 interface Request {
@@ -20,6 +20,7 @@ interface Request {
   companyId: number;
   bot: boolean;
   contactId?: number;
+  cation?: string;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -30,6 +31,7 @@ const SendWhatsAppMessage = async ({
   bot,
   contactId,
   whatsMsgId,
+  cation
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -48,25 +50,6 @@ const SendWhatsAppMessage = async ({
     limit: 1
   });
 
-  const lastMessage = await Message.findAll({
-    where: {
-      ticketId: ticket.id,
-    },
-    order: [
-      ['createdAt', 'DESC'],
-    ],
-    limit: 1
-  });
-
-  if (lastMessage[0].createdAt) {
-    const today = new Date();
-    const lastMessageDate = new Date(message[0].createdAt);
-
-    const diff = lastMessageDate.getTime() - today.getTime();
-
-    if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
-  }
-
   const contact = await Contact.findOne({ where: {
     id: contactId > 0 ? contactId: message[0].contactId
   }});
@@ -82,22 +65,59 @@ const SendWhatsAppMessage = async ({
     throw new AppError("ERR_SENDING_WAPP_MSG");
 
   if (connnection?.official) {
+    const lastMessage = await Message.findAll({
+      where: {
+        ticketId: ticket.id,
+      },
+      order: [
+        ['createdAt', 'DESC'],
+      ],
+      limit: 1
+    });
+  
+    if (lastMessage[0].createdAt) {
+      const today = new Date();
+      const lastMessageDate = new Date(message[0].createdAt);
+  
+      const diff = lastMessageDate.getTime() - today.getTime();
+  
+      if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
+    }
+
     const offConnection = await OfficialWhatsapp.findOne({
       where: { id: connnection.officialWhatsappId }
     });
-  
+
     try {
       const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
+
+      const { url, type, fileName } = isValidHttpUrl(body);
+
+      let typePayload = null;
+
+      if (cation) {
+        typePayload = {
+          link: url,
+          caption: cation ?? "",
+          filename: fileName
+        }
+      } else {
+        typePayload = { body: formatBody(body, ticket.contact) };
+      }
+
       const payload = {
         "messaging_product": "whatsapp",
         "preview_url": false,
         "recipient_type": "individual",
         "to": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
-        "type": "text",
-        "text": {
-          "body": formatBody(body, ticket.contact)
-        }
+        "type": cation ? "document" : "text",
+        [cation ? "document" : "text"]: typePayload
       };
+
+        // "type": "text",
+        // "text": {
+        //   "body": formatBody(body, ticket.contact)
+        // }
 
       var result = await axios.post(apiUrl, payload, {
         headers: {
@@ -146,7 +166,7 @@ const SendWhatsAppMessage = async ({
           break;
       }
 
-      let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
+      let phoneNumber =  removePhoneNumber9Digit(!messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber);
       
       if (phoneNumber.length > 12){
         let firstNumber = phoneNumber.substring(6,5);
