@@ -110,8 +110,8 @@ const SendWhatsAppMessage = async ({
         "preview_url": false,
         "recipient_type": "individual",
         "to": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
-        "type": type,
-        [type]: typePayload
+        "type": cation ? "document" : "text",
+        [cation ? "document" : "text"]: typePayload
       };
 
         // "type": "text",
