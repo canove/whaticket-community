@@ -287,8 +287,8 @@ const verifyMediaMessage = async (
   contact: Contact,
   whatsapp: Whatsapp
 ): Promise<void> => {  
-  let type = msg.body;
-  let mediaUrl = msg.type;
+  let type = msg.type;
+  let mediaUrl = msg.body;
 
   if (whatsapp.official) {
     const path = require('path');
@@ -307,14 +307,16 @@ const verifyMediaMessage = async (
     type = data.mime_type.split("/")[0];
     const fileType = data.mime_type.split("/")[1];
 
-    // DOWNLOAD FILE USING LINK
-    const files = fs.createWriteStream(`./src/downloads/${data.id}.${fileType}`);
-    await https.get(data.url, function(response) {
-      response.pipe(files);
-      files.on("finish", () => {
-        files.close();
-      });
+    const response = await axios({
+      method: 'get',
+      url: data.url,
+      responseType: 'stream',
+      headers: {
+        "Authorization": `Bearer ${officialWhatsapp.facebookAccessToken}`,
+      }
     });
+
+    await response.data.pipe(fs.createWriteStream(`./src/downloads/${data.id}.${fileType}`));
 
     const blob = await fs.readFileSync(`./src/downloads/${data.id}.${fileType}`);
     const file = await path.basename(`./src/downloads/${data.id}.${fileType}`);
