@@ -17,6 +17,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
+    TextField,
     Typography
 } from "@material-ui/core";
 import toastError from "../../errors/toastError";
@@ -37,6 +38,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const getCurrentDate = () => {
+    const date = new Date();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const currentDate = `${year}-${month}-${day}`;
+
+    return currentDate;
+}
+
 const RegistersReports = () => {
     const classes = useStyles();
     const { i18n } = useTranslation();
@@ -53,6 +64,8 @@ const RegistersReports = () => {
     const [pageNumber, setPageNumber] = useState(1);
 	const [count, setCount] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
+    const [initialDate, setInitialDate] = useState(getCurrentDate());
+    const [finalDate, setFinalDate] = useState(getCurrentDate());
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -78,7 +91,13 @@ const RegistersReports = () => {
         const createCsvFile = async () => {
             try {
                 const { data } = await api.get(`/registers/exportCsv`, {
-                    params: { statuses, fileIds, pageNumber: "ALL" }
+                    params: {
+                        statuses,
+                        fileIds,
+                        pageNumber: "ALL",
+                        initialDate,
+                        finalDate
+                    }
                 });
                 setCsv(data);
                 setDisableCsvButton(false);
@@ -88,13 +107,19 @@ const RegistersReports = () => {
             }
         }
         createCsvFile();
-    }, [fileIds, statuses])
+    }, [fileIds, statuses, initialDate, finalDate])
 
     useEffect(() => {
         const createPdfFile = async () => {
             try {
                 const { data } = await api.get(`/registers/exportPdf`, {
-                    params: { statuses, fileIds, pageNumber: "ALL" }
+                    params: {
+                        statuses,
+                        fileIds,
+                        pageNumber: "ALL",
+                        initialDate,
+                        finalDate
+                    }
                 });
                 setPdf(data);
                 setDisablePdfButton(false);
@@ -104,14 +129,20 @@ const RegistersReports = () => {
             }
         }
         createPdfFile();
-    }, [fileIds, statuses])
+    }, [fileIds, statuses, initialDate, finalDate])
 
     useEffect(() => {
         setLoading(true);
         const fetchRegisters = async () => {
             try {
                const { data } = await api.get(`registers/listReport/`, {
-                params: { statuses, fileIds, pageNumber }
+                params: {
+                    statuses,
+                    fileIds,
+                    pageNumber,
+                    initialDate,
+                    finalDate
+                }
                });
                setRegisters(data.registers);
                setCount(data.count);
@@ -123,7 +154,7 @@ const RegistersReports = () => {
             }
         }
         fetchRegisters();
-    }, [fileIds, statuses, pageNumber]);
+    }, [fileIds, statuses, pageNumber, initialDate, finalDate]);
 
     const handleFileSelectChange = (e) => {
         const {
@@ -201,7 +232,23 @@ const RegistersReports = () => {
             <MainHeader>
                 <Title>{i18n.t("logReport.title")}</Title>
                 <MainHeaderButtonsWrapper>
-                    <FormControl className={classes.root}>
+                    <div style={{ display: "flex" }}>
+                        <TextField
+                            onChange={(e) => { setInitialDate(e.target.value) }}
+                            label={i18n.t("reports.form.initialDate")}
+                            InputLabelProps={{ shrink: true, required: true }}
+                            type="date"
+                            value={initialDate}
+                        />
+                        <TextField
+                            style={{ marginLeft: "8px" }}
+                            onChange={(e) => { setFinalDate(e.target.value) }}
+                            label={i18n.t("reports.form.finalDate")}
+                            InputLabelProps={{ shrink: true, required: true }}
+                            type="date"
+                            value={finalDate}
+                        />
+                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
                         <InputLabel id="file-select-label">{i18n.t("logReport.select.file")}</InputLabel>
                         <Select
                             className={classes.select}
@@ -221,7 +268,7 @@ const RegistersReports = () => {
                             })}
                         </Select>
                     </FormControl>
-                    <FormControl className={classes.root}>
+                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
                         <InputLabel id="status-select-label">{i18n.t("logReport.select.status")}</InputLabel>
                         <Select
                             className={classes.select}
@@ -239,6 +286,7 @@ const RegistersReports = () => {
                         </Select>
                     </FormControl>
                     <Button
+                        style={{ marginLeft: "8px" }}
                         variant="contained"
                         color="primary"
                         onClick={downloadPdf}
@@ -247,6 +295,7 @@ const RegistersReports = () => {
                         {i18n.t("logReport.buttons.exportPdf")}
                     </Button>
                     <Button
+                        style={{ marginLeft: "8px" }}
                         variant="contained"
                         color="primary"
                         onClick={downloadCsv}
@@ -254,6 +303,7 @@ const RegistersReports = () => {
                     >
                         {i18n.t("logReport.buttons.exportCsv")}
                     </Button>
+                    </div>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
             <Paper
@@ -269,6 +319,7 @@ const RegistersReports = () => {
                             <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.read")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.errors")}</TableCell>
+                            <TableCell align="center">Processado</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -282,10 +333,11 @@ const RegistersReports = () => {
                                         <TableCell align="center">{formatDate(register.deliveredAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.readAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.errorAt)}</TableCell>
+                                        <TableCell align="center">{formatDate(register.processedAt)}</TableCell>
                                     </TableRow>
                                 )
                             }))}
-                            {loading && <TableRowSkeleton columns={6} />}
+                            {loading && <TableRowSkeleton columns={7} />}
                         </>
                     </TableBody>
                 </Table>
