@@ -36,6 +36,12 @@ templateRoutes.post(
 );
 
 templateRoutes.post(
+  "/whatsappTemplate/createOfficialTemplate/",
+  isAuth,
+  TemplateController.createOfficialTemplate
+);
+
+templateRoutes.post(
   "/whatsappTemplate/edit/",
   isAuth,
   TemplateController.update

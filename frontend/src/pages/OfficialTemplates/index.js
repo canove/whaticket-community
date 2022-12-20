@@ -28,10 +28,12 @@ import {
 import TemplateModal from "../../components/TemplateModal";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { DeleteOutline } from "@material-ui/icons";
+import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import CopyOfficialTemplateModal from "../../components/CopyOfficialTemplateModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,7 +69,7 @@ const OfficialTemplates = () => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const confirmationModalInitialState = {
     action: "",
     title: "",
@@ -80,18 +82,14 @@ const OfficialTemplates = () => {
     confirmationModalInitialState
   );
 
-  const handleTemplateModal = () => {
-    setSelectedTemplate(null);
+  const handleTemplateModalOpen = (template) => {
+    setSelectedTemplate(template);
     setTemplateModalOpen(true);
   };
 
   const handleCloseTemplateModal = () => {
     setSelectedTemplate(null);
     setTemplateModalOpen(false);
-  };
-
-  const handleChange = (e) => {
-    setConnection(e.target.value);
   };
 
   useEffect(() => {
@@ -167,12 +165,13 @@ const OfficialTemplates = () => {
 
   return (
     <MainContainer>
-      <TemplateModal
+      <CopyOfficialTemplateModal
         open={templateModalOpen}
         onClose={handleCloseTemplateModal}
         aria-labelledby="form-dialog-title"
-        templateName={selectedTemplate && selectedTemplate.name}
-      ></TemplateModal>
+        officialTemplate={selectedTemplate}
+        connection={connection}
+      />
       <ConfirmationModal
         title={confirmModalInfo.title}
         open={confirmModalOpen}
@@ -199,11 +198,9 @@ const OfficialTemplates = () => {
               disablePortal
               id="combo-box-companies"
               options={whatsApps.filter((whats) => whats.official)}
-              getOptionLabel={(option) => option ? option.name : ""}
+              getOptionLabel={(option) => (option ? option.name : "")}
               style={{ marginRight: "10px", width: "200px" }}
-              renderInput={(params) => (
-                <TextField {...params} label="Número" />
-              )}
+              renderInput={(params) => <TextField {...params} label="Número" />}
             />
             {/* <FormControl
               style={{
@@ -280,18 +277,30 @@ const OfficialTemplates = () => {
                     <TableCell align="center">{template.language}</TableCell>
                     <TableCell align="center">{template.status}</TableCell>
                     <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          handleOpenConfirmationModal(
-                            "delete",
-                            connection,
-                            template.name
-                          );
-                        }}
-                      >
-                        <DeleteOutline />
-                      </IconButton>
+                      <div style={{ display: "flex", flexWrap: "nowrap" }}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            handleOpenConfirmationModal(
+                              "delete",
+                              connection,
+                              template.name
+                            );
+                          }}
+                        >
+                          <DeleteOutline />
+                        </IconButton>
+                        { (template.language === "pt_BR" && template.status === "APPROVED") && 
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              handleTemplateModalOpen(template);
+                            }}
+                          >
+                            <SyncAltIcon />
+                          </IconButton>
+                        }
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

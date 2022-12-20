@@ -5,6 +5,7 @@ import CreateTemplateService from "../services/TemplateService/CreateTemplateSer
 import UpdateTemplateService from "../services/TemplateService/UpdateTemplateService";
 import DeleteTemplateService from "../services/TemplateService/DeleteTemplateService";
 import GetWhatsappsTemplateService from "../services/TemplateService/GetWhatsappsTemplateService";
+import CreateOfficialTemplateService from "../services/TemplateService/CreateOfficialTemplateService";
 import { getIO } from "../libs/socket";
 import BindTemplateService from "../services/TemplateService/BindTemplateService";
 import OfficialTemplatesStatus from "../database/models/OfficialTemplatesStatus";
@@ -74,6 +75,28 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     category,
     bodyText,
     mapping,
+    companyId
+  });
+
+  const io = getIO();
+  io.emit(`officialTemplate${companyId}`, {
+    action: "create",
+    template
+  });
+
+  return res.status(200).json(template);
+};
+
+export const createOfficialTemplate = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const { officialTemplate, mapping, headerVar, whatsappId } = req.body;
+
+  const template = await CreateOfficialTemplateService({
+    officialTemplate,
+    mapping,
+    headerVar,
+    whatsappId,
     companyId
   });
 
