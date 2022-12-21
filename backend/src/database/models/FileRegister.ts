@@ -63,6 +63,10 @@ class FileRegister extends Model<FileRegister> {
   errorMessage: string;
 
   @AllowNull(true)
+  @Column
+  haveWhatsapp: boolean;
+
+  @AllowNull(true)
   @ForeignKey(() => Whatsapp)
   @Column
   whatsappId: number;

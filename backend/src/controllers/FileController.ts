@@ -54,3 +54,26 @@ export const update = async (
 
   return res.status(200).json(file);
 };
+
+export const testWhatsapp = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { fileId } = req.params;
+  const { companyId, id } = req.user;
+
+  const file = await UpdateFileService({
+    status: "8",
+    userId: id,
+    fileId,
+    companyId
+  });
+
+  const io = getIO();
+  io.emit(`file${companyId}`, {
+    action: "update",
+    file
+  });
+
+  return res.status(200).json(file);
+};

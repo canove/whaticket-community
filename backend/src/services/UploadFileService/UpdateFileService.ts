@@ -31,6 +31,11 @@ const UpdateFileService = async ({
     return file;
   }
 
+  if (status === "8") {
+    await file.update({ status: FileStatus.TestingWhatsapp });
+    return file;
+  }
+
   await file.update({ status: FileStatus.Error });
   return file;
 };
