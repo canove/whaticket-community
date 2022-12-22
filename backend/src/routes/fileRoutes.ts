@@ -9,6 +9,8 @@ const fileRoutes = Router();
 
 fileRoutes.get("/file/list", isAuth, FileController.store);
 
+fileRoutes.put("/file/testWhatsapps/:fileId", isAuth, FileController.testWhatsapp);
+
 fileRoutes.post("/file/upload", isAuth, UploadFileController.store);
 
 fileRoutes.get("/file/listRegister", isAuth, FileRegisterController.store);

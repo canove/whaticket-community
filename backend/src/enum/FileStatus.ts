@@ -7,5 +7,6 @@ export enum FileStatus {
   WaitingDispatcher = 4,
   Sending = 5,
   Finished = 6,
-  Refused = 7
+  Refused = 7,
+  TestingWhatsapp = 8,
 }
