@@ -33,6 +33,9 @@ class OfficialTemplates extends Model<OfficialTemplates> {
   @Column
   mapping: string;
 
+  @Column
+  header: string;
+
   @ForeignKey(() => Company)
   @Column
   companyId: number;

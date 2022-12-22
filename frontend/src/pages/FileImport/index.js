@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useReducer, useState } from "react";
+import openSocket from "../../services/socket-io";
 import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -24,9 +25,11 @@ import api from "../../services/api";
 import { parseISO, format } from "date-fns";
 import { IconButton, Typography } from "@material-ui/core";
 import { Visibility } from "@material-ui/icons";
+import WhatsAppIcon from '@material-ui/icons/WhatsApp';
 import RegisterFileModal from "../../components/RegisterFileModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ConfirmationModal from "../../components/ConfirmationModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -101,6 +104,9 @@ const FileImport = () => {
   const [registerFileModalOpen, setRegisterFileModalOpen] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState("");
 
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [testingFile, setTestingFile] = useState(null);
+
   const { user } = useContext(AuthContext);
   const [users, dispatchUsers] = useReducer(reducer, []);
   const [imports, dispatchImports] = useReducer(reducer, []);
@@ -169,6 +175,8 @@ const FileImport = () => {
       return "6";
     } else if (status === `${i18n.t("importation.form.refused")}`) {
       return "7";
+    } else if (status === `Validando Números`) {
+      return "8";
     } else {
       return status;
     }
@@ -191,6 +199,8 @@ const FileImport = () => {
       return `${i18n.t("importation.form.finished")}`;
     } else if (id === 7) {
       return `${i18n.t("importation.form.refused")}`;
+    } else if (id === 8) {
+      return `Validando Números`;
     } else {
       return id;
     }
@@ -256,19 +266,29 @@ const FileImport = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const socket = openSocket();
+  const handleTestFileWhatsapps = async (fileId) => {
+    try {
+      await api.put(`/file/testWhatsapps/${fileId}`);
+    } catch (err) {
+      toastError(err);
+    }
 
-  //   socket.on(`file${user.companyId}`, (data) => {
-  //     if (data.action === "update" || data.action === "create") {
-  //       dispatchImports({ type: "UPDATE_FILES", payload: data.file });
-  //     }
-  //   });
+    setTestingFile(null);
+  }
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
+  useEffect(() => {
+    const socket = openSocket();
+
+    socket.on(`file${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatchImports({ type: "UPDATE_FILES", payload: data.file });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     const socket = openWorkerSocket();
@@ -282,8 +302,7 @@ const FileImport = () => {
     return () => {
       socket.disconnect();
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   return (
     <MainContainer>
@@ -300,6 +319,19 @@ const FileImport = () => {
         fileId={selectedFileId}
       >
       </RegisterFileModal>
+      <ConfirmationModal
+        title={
+          testingFile &&
+          `Verificar whatsapps do arquivo: ${
+            testingFile.name
+          }?`
+        }
+        open={confirmModalOpen}
+        onClose={setConfirmModalOpen}
+        onConfirm={() => { handleTestFileWhatsapps(testingFile.id) }}
+      >
+        Você tem certeza que deseja remover os números que não tem whatsapp desse arquivo? Essa ação não poderá ser desfeita.
+      </ConfirmationModal>
       <MainHeader>
         <Title>{i18n.t("importation.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -314,6 +346,7 @@ const FileImport = () => {
               `${i18n.t("importation.form.shooting")}`,
               `${i18n.t("importation.form.finished")}`,
               `${i18n.t("importation.form.refused")}`,
+              `Validando Números`,
             ]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
@@ -399,6 +432,15 @@ const FileImport = () => {
                               onClick={() => handleOpenRegisterFileModal(item.id)}
                             >
                               <Visibility />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setConfirmModalOpen(true);
+                                setTestingFile(item);
+                              }}
+                            >
+                              <WhatsAppIcon />
                             </IconButton>
                           </>
                         )}

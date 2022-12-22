@@ -1,11 +1,14 @@
 import { Op } from "sequelize";
 import FileRegister from "../../database/models/FileRegister";
+import { subHours } from "date-fns";
 
 interface Request {
   statuses?: Array<any>;
   fileIds?: Array<any>;
   pageNumber?: string | number;
   companyId: number;
+  initialDate: string;
+  finalDate: string;
 }
 
 interface Response {
@@ -18,7 +21,9 @@ const ListReportRegistersService = async ({
   statuses,
   fileIds,
   pageNumber = "1",
-  companyId
+  companyId,
+  initialDate,
+  finalDate
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -55,6 +60,20 @@ const ListReportRegistersService = async ({
     return array;
   };
 
+  const getDate = (date, option) => {
+    if (option === "MORNING") {
+        const morningDate = new Date(`${date} GMT-3`);
+        morningDate.setHours(0, 0, 0, 0);
+        return morningDate;
+    }
+    if (option === "NIGHT") {
+        const nightDate = new Date(`${date} GMT-3`);
+        nightDate.setHours(23, 59, 59, 999);
+        return nightDate;
+    }
+    return null;
+};
+
   if (statuses) {
     whereCondition = {
       ...whereCondition,
@@ -71,6 +90,12 @@ const ListReportRegistersService = async ({
 
     return { registers, count, hasMore };
   }
+
+  whereCondition = {
+    ...whereCondition,
+    processedAt: { [Op.between]: [getDate(initialDate, "MORNING"), getDate(finalDate, "NIGHT")] }
+  }
+
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
