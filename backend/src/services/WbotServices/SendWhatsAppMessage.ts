@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import axios from "axios";
 import AppError from "../../errors/AppError";
 import Message from "../../database/models/Message";
@@ -8,9 +9,8 @@ import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
-import { isValidHttpUrl, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
+import { isValidHttpUrl, removePhoneNumber9Digit } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
-import { Op } from "sequelize";
 
 interface Request {
   body: string;
@@ -114,7 +114,8 @@ const SendWhatsAppMessage = async ({
           filename: fileName
         }
       } else {
-        typePayload = { body: formatBody(body, reg) };
+        const newBody = formatBody(body, reg);
+        typePayload = { body: newBody.replace(/&#x2F;/g, '/') };
       }
 
       const payload = {
@@ -125,11 +126,6 @@ const SendWhatsAppMessage = async ({
         "type": cation ? "document" : "text",
         [cation ? "document" : "text"]: typePayload
       };
-
-        // "type": "text",
-        // "text": {
-        //   "body": formatBody(body, ticket.contact)
-        // }
 
       var result = await axios.post(apiUrl, payload, {
         headers: {
