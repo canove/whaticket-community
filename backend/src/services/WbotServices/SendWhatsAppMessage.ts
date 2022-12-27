@@ -172,6 +172,9 @@ const SendWhatsAppMessage = async ({
         case 'image':
           apiUrl = `${process.env.WPPNOF_URL}/sendImage`;
           break;
+        case 'buttons':
+          apiUrl = `${process.env.WPPNOF_URL}/send-buttons`;
+          break;
       }
 
       let phoneNumber =  removePhoneNumber9Digit(!messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber);
@@ -187,7 +190,7 @@ const SendWhatsAppMessage = async ({
         "session": connnection.name,
         "number": phoneNumber,
         "path": url,
-        "text": fileName != null ? fileName : `${formatBody(body, reg)} NO-TYPING` 
+        "text": fileName != null ? fileName : `${formatBody(body, reg)} NO-TYPING`,
       };
 
       let ack = 3;

@@ -125,6 +125,16 @@ const processNode = async (node: any, session: any, body: any) => {
       if (condition === "less_than_or_equal") return (var1 <= var2);
     });
 
+    await NodeRegisters.create({
+      phoneNumber: session.id,
+      text: body.text,
+      response: response ? response.toString() : "ELSE",
+      nodeId: session.nodeId,
+      flowId: session.flowId,
+      companyId: session.companyId,
+      type: node.type
+    });
+
     return { condition: response ? response : "ELSE" };
   }
 

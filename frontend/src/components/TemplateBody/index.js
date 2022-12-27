@@ -347,13 +347,13 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
       const handleButtonsChange = (button, index) => {
         let array = [...buttons];
 
-        array = array.map((bt, index) => ({text: bt.text, id: index+1}));
+        array = array.map((bt, index) => ({ text: bt.text, id: (1+index).toString() }));
 
         if (index || index === 0) {
-          array[index] = { text: button, id: index+1 };
+          array[index] = { text: button, id: (1+index).toString() };
           setButtons(array);
         } else {
-          array.push({ text: button, id: array.length+1 });
+          array.push({ text: button, id: (1+array.length).toString() });
           setButtons(array);
         }
       }
