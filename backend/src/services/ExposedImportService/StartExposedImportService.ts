@@ -3,6 +3,7 @@
 import { Op } from "sequelize";
 import ExposedImport from "../../database/models/ExposedImport";
 import FileRegister from "../../database/models/FileRegister";
+import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 
 interface Request {
@@ -96,6 +97,16 @@ const StartExposedImportService = async ({
         const var3 = getRelationValue(mapping.var3, obj);
         const var4 = getRelationValue(mapping.var4, obj);
         const var5 = getRelationValue(mapping.var5, obj);
+        const whatsappName = getRelationValue(mapping.phoneNumberFrom, obj);
+        let whatsappId = null;
+
+        if (whatsappName) {
+          const whatsapp = await Whatsapp.findOne({
+            where: { name: whatsappName, companyId, official: true, deleted: false }
+          });
+
+          whatsappId = whatsapp ? whatsapp.id : null;
+        }
 
         registersToInsert.push({
           name,
@@ -110,7 +121,8 @@ const StartExposedImportService = async ({
           var3,
           var4,
           var5,
-          companyId
+          companyId,
+          whatsappId
         });
 
         if (registersToInsert.length >= 500) {
@@ -141,6 +153,16 @@ const StartExposedImportService = async ({
     const var3 = getRelationValue(mapping.var3, payload);
     const var4 = getRelationValue(mapping.var4, payload);
     const var5 = getRelationValue(mapping.var5, payload);
+    const whatsappName = getRelationValue(mapping.phoneNumberFrom, payload);
+    let whatsappId = null;
+
+    if (whatsappName) {
+      const whatsapp = await Whatsapp.findOne({
+        where: { name: whatsappName, companyId, official: true, deleted: false }
+      });
+
+      whatsappId = whatsapp ? whatsapp.id : null;
+    }
 
     await FileRegister.create({
       name,
@@ -155,7 +177,8 @@ const StartExposedImportService = async ({
       var3,
       var4,
       var5,
-      companyId
+      companyId,
+      whatsappId
     });
 
     await exposedImport.update({ qtdeRegister: totalRegisters + 1 });

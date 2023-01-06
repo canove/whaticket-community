@@ -53,15 +53,6 @@ const SendWhatsAppMedia = async ({
       ],
       limit: 1
     });
-  
-    if (lastMessage[0].createdAt) {
-      const today = new Date();
-      const lastMessageDate = new Date(message[0].createdAt);
-  
-      const diff = lastMessageDate.getTime() - today.getTime();
-  
-      if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
-    }
 
     const contact = await Contact.findOne({ where: {
       id: message[0].contactId
@@ -78,6 +69,15 @@ const SendWhatsAppMedia = async ({
       throw new AppError("ERR_SENDING_WAPP_MSG");
   
     if (connnection?.official) {
+      if (lastMessage[0] && lastMessage[0].createdAt) {
+        const today = new Date();
+        const lastMessageDate = new Date(lastMessage[0].createdAt);
+    
+        const diff = lastMessageDate.getTime() - today.getTime();
+    
+        if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
+      }
+      
       const offConnection = await OfficialWhatsapp.findOne({
         where: { id: connnection.officialWhatsappId }
       });
