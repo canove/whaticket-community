@@ -62,7 +62,7 @@ export const IsTicketInBotPostService = async (session: string, contactNumber: s
   switch (ticket[ticket.length-1].status) {
     case "open":
     case "pending":
-    case "dispatcher":
+    //case "dispatcher":
       return false;
     default:
       return true;
