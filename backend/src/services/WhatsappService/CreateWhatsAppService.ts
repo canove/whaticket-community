@@ -24,6 +24,9 @@ interface Request {
   facebookAccessToken?: string;
   whatsappAccountId?: string;
   officialConnectionId?: string;
+  messageCallbackUrl?: string;
+  statusCallbackUrl?: string;
+  callbackAuthorization?: string;
 }
 
 interface Response {
@@ -49,7 +52,10 @@ const CreateWhatsAppService = async ({
   flowId,
   connectionFileId,
   business = false,
-  officialConnectionId
+  officialConnectionId,
+  messageCallbackUrl,
+  statusCallbackUrl,
+  callbackAuthorization
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -120,7 +126,10 @@ const CreateWhatsAppService = async ({
       facebookAccessToken,
       whatsappAccountId,
       officialWhatsappId: officialConnectionId,
-      usedLimit: official ? 0 : null
+      usedLimit: official ? 0 : null,
+      messageCallbackUrl,
+      statusCallbackUrl,
+      callbackAuthorization
     },
     { include: ["queues"] }
   );

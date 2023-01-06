@@ -177,6 +177,8 @@ const FileImport = () => {
       return "7";
     } else if (status === `Validando Números`) {
       return "8";
+    } else if (status === `Processando Números`) { 
+      return "9";
     } else {
       return status;
     }
@@ -201,6 +203,8 @@ const FileImport = () => {
       return `${i18n.t("importation.form.refused")}`;
     } else if (id === 8) {
       return `Validando Números`;
+    } else if (id === 9) {
+      return `Processando Números`;
     } else {
       return id;
     }
@@ -347,6 +351,7 @@ const FileImport = () => {
               `${i18n.t("importation.form.finished")}`,
               `${i18n.t("importation.form.refused")}`,
               `Validando Números`,
+              `Processando Números`
             ]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}

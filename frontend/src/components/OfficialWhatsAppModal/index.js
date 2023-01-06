@@ -66,7 +66,10 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 
 	const initialState = {
 		whatsappAccountId: "",
-		official: true
+		official: true,
+		messageCallbackUrl: "",
+		statusCallbackUrl: "",
+		callbackAuthorization: ""
 	};
 
 	const [whatsApp, setWhatsApp] = useState(initialState);
@@ -199,6 +202,45 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 											setIsConnectionTested(false);
 											handleChange(e);
 										}}
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label="Message Callback URL"
+										name="messageCallbackUrl"
+										error={touched.messageCallbackUrl && Boolean(errors.messageCallbackUrl)}
+										helperText={touched.messageCallbackUrl && errors.messageCallbackUrl}
+										variant="outlined"
+										margin="dense"
+										className={classes.textField}
+										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label="Status Callback URL"
+										name="statusCallbackUrl"
+										error={touched.statusCallbackUrl && Boolean(errors.statusCallbackUrl)}
+										helperText={touched.statusCallbackUrl && errors.statusCallbackUrl}
+										variant="outlined"
+										margin="dense"
+										className={classes.textField}
+										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label="Callback Authorization"
+										name="callbackAuthorization"
+										error={touched.callbackAuthorization && Boolean(errors.callbackAuthorization)}
+										helperText={touched.callbackAuthorization && errors.callbackAuthorization}
+										variant="outlined"
+										margin="dense"
+										className={classes.textField}
+										fullWidth
 									/>
 								</div>
 								{ isConnectionTested &&

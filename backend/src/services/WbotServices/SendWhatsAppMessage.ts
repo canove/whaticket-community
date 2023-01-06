@@ -52,7 +52,7 @@ const SendWhatsAppMessage = async ({
   });
 
   const contact = await Contact.findOne({ where: {
-    id: contactId > 0 ? contactId: message[0].contactId
+    id: contactId > 0 ? contactId : message[0] ? message[0].contactId : ticket.contactId
   }});
 
   const messageSended = await FileRegister.findOne({
@@ -87,9 +87,9 @@ const SendWhatsAppMessage = async ({
       limit: 1
     });
   
-    if (lastMessage[0].createdAt) {
+    if (lastMessage[0] && lastMessage[0].createdAt) {
       const today = new Date();
-      const lastMessageDate = new Date(message[0].createdAt);
+      const lastMessageDate = new Date(lastMessage[0].createdAt);
   
       const diff = lastMessageDate.getTime() - today.getTime();
   
@@ -171,6 +171,9 @@ const SendWhatsAppMessage = async ({
           break;
         case 'image':
           apiUrl = `${process.env.WPPNOF_URL}/sendImage`;
+          break;
+        case 'buttons':
+          apiUrl = `${process.env.WPPNOF_URL}/send-buttons`;
           break;
       }
 
