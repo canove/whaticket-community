@@ -29,6 +29,7 @@ import ListAllWhatsAppsService from "../services/WhatsappService/ListAllWhatsApp
 import TransferWhatsAppService from "../services/WhatsappService/TransferWhatsAppService";
 import ListReportWhatsAppsService from "../services/WhatsappService/ListReportWhatsAppsService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
+import { Op } from "sequelize";
 
 interface WhatsappData {
   name: string;
@@ -50,6 +51,9 @@ interface WhatsappData {
   facebookAccessToken?: string;
   whatsappAccountId?: string;
   officialConnectionId?: string;
+  messageCallbackUrl?: string;
+  statusCallbackUrl?: string;
+  callbackAuthorization?: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -79,7 +83,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     service,
     facebookAccessToken,
     whatsappAccountId,
-    officialConnectionId
+    officialConnectionId,
+    messageCallbackUrl,
+    statusCallbackUrl,
+    callbackAuthorization
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -126,7 +133,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     flowId,
     connectionFileId,
     business,
-    officialConnectionId
+    officialConnectionId,
+    messageCallbackUrl,
+    statusCallbackUrl,
+    callbackAuthorization
   });
 
   if (!official) StartWhatsAppSession(whatsapp, null);
@@ -731,6 +741,29 @@ export const nofSessionQRUpdate = async (
 
   return res.status(200).json(message);
 };
+
+export const getCallbackUrl = async (req: Request, res: Response): Promise<Response> => {
+  const { session } = req.query;
+
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      [Op.or]: [
+        { name: session },
+        { facebookPhoneNumberId: session }
+      ]
+    }
+  });
+
+  if (!whatsapp) return null;
+
+  const callback = {
+    messageCallbackUrl: whatsapp.messageCallbackUrl,
+    statusCallbackUrl: whatsapp.statusCallbackUrl,
+    callbackAuthorization: whatsapp.callbackAuthorization
+  };
+
+  return res.status(200).json(callback);
+}
 
 const uploadToS3 = async (name, companyId, buffer) => {
   const companyData = await ShowCompanyService(companyId);

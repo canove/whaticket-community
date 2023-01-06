@@ -152,6 +152,15 @@ class Whatsapp extends Model<Whatsapp> {
 
   @Column
   whatsappAccountId: string;
+
+  @Column
+  messageCallbackUrl: string;
+
+  @Column
+  statusCallbackUrl: string;
+
+  @Column
+  callbackAuthorization: string;
 }
 
 export default Whatsapp;

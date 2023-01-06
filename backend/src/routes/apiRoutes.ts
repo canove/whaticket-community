@@ -104,4 +104,6 @@ ApiRoutes.post(
 
 ApiRoutes.get("/tickets/inticket", isAuthApi, TicketController.containTicket);
 
+ApiRoutes.get("/whatsapp/getCallback/", isAuthApi, WhatsAppController.getCallbackUrl)
+
 export default ApiRoutes;

@@ -24,6 +24,9 @@ interface WhatsappData {
   business?: boolean;
   facebookAccessToken?: string,
   whatsappAccountId?: string
+  messageCallbackUrl?: string;
+  statusCallbackUrl?: string;
+  callbackAuthorization?: string;
 }
 
 interface Request {
@@ -65,7 +68,10 @@ const UpdateWhatsAppService = async ({
     connectionFileId,
     business,
     facebookAccessToken,
-    whatsappAccountId
+    whatsappAccountId,
+    messageCallbackUrl,
+    statusCallbackUrl,
+    callbackAuthorization
   } = whatsappData;
 
   try {
@@ -111,7 +117,10 @@ const UpdateWhatsAppService = async ({
     connectionFileId,
     business,
     facebookAccessToken,
-    whatsappAccountId
+    whatsappAccountId,
+    messageCallbackUrl,
+    statusCallbackUrl,
+    callbackAuthorization
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
