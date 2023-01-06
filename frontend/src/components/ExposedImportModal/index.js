@@ -83,6 +83,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     var3: "",
     var4: "",
     var5: "",
+    phoneNumberFrom: "",
   };
   const [mapping, setMapping] = useState(initialMapping);
   const [mappingValues, setMappingValues] = useState(initialMapping);
@@ -108,7 +109,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       try {
         const { data } = await api.get(`/exposedImports/${exposedImportId}`);
         setName(data.name);
-        setMapping(JSON.parse(data.mapping));
+        setMapping({ ...initialMapping, ...JSON.parse(data.mapping) });
 
         setConnectionType(data.official ?? connectionType);
         setTemplate(data.templateId);
@@ -286,6 +287,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       handleRelationChange(mapping.var3, "var3");
       handleRelationChange(mapping.var4, "var4");
       handleRelationChange(mapping.var5, "var5");
+      handleRelationChange(mapping.phoneNumberFrom, "phoneNumberFrom");
     }
   }, [payload]);
 
@@ -1139,6 +1141,49 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     fullWidth
                     onChange={(e) => {
                       handleRelationChange(e.target.value, "var5");
+                    }}
+                  />
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{
+                    width: "50%",
+                    margin: "0 5px 5px 10px",
+                  }}
+                >
+                  <TextField
+                    as={TextField}
+                    label="Número para Disparo"
+                    value={mappingValues.phoneNumberFrom}
+                    name="phoneNumberFrom"
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    disabled
+                  />
+                </div>
+                <div
+                  style={{
+                    width: "50%",
+                    margin: "0 10px 5px 5px",
+                  }}
+                >
+                  <TextField
+                    as={TextField}
+                    label="Número para Disparo Relation"
+                    value={mapping.phoneNumberFrom}
+                    name="phoneNumberFromRelation"
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    onChange={(e) => {
+                      handleRelationChange(e.target.value, "phoneNumberFrom");
                     }}
                   />
                 </div>
