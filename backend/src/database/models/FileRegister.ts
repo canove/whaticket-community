@@ -16,6 +16,7 @@ import Company from "./Company";
 import ExposedImport from "./ExposedImport";
 import File from "./File";
 import IntegratedImport from "./IntegratedImport";
+import Message from "./Message";
 import Whatsapp from "./Whatsapp";
 
 @Table
@@ -51,8 +52,12 @@ class FileRegister extends Model<FileRegister> {
   message: string;
 
   @AllowNull(true)
+  @ForeignKey(() => Message)
   @Column
   msgWhatsId: string;
+
+  @BelongsTo(() => Message)
+  messageData: Message;
 
   @AllowNull(true)
   @Column

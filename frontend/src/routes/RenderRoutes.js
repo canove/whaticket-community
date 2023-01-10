@@ -38,6 +38,7 @@ import ChipsReports from "../pages/ChipsReports";
 import NodeReports from "../pages/NodeReports";
 import OfficialContacts from "../pages/OfficialContacts";
 import OfficialTemplates from "../pages/OfficialTemplates";
+import OfficialWhatsappReport from "../pages/OfficialWhatsappReport";
 
 const RenderRoutes = () => {
     const { isAuth } = useContext(AuthContext);
@@ -152,6 +153,9 @@ const RenderRoutes = () => {
         }
         if (name === "Official Templates") {
             return OfficialTemplates
+        }
+        if (name === "Official Whatsapp Report") {
+            return OfficialWhatsappReport
         }
     }
 
