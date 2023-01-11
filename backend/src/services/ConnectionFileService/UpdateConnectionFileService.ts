@@ -38,6 +38,7 @@ const UpdateConnectionFileService = async ({
     companyId
   );
 
+  console.log("update connectionFile connectionFileService 41");
   await connectionFile.update({
     name,
     icon

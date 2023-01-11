@@ -58,7 +58,7 @@ const UpdateCompanyService = async ({
   } catch (err) {
     throw new AppError(err.message);
   }
-
+  console.log("update company companyService 61");
   await company.update({
     name,
     id,

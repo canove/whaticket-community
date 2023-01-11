@@ -68,7 +68,7 @@ const ChangeQueueOrResolveTicketService = async ({
         companyId: ticket.companyId
       }
     });
-
+    console.log("update ticket changequeueorresolve 71");
     await ticket.update({
       status: "pending",
       queueId: queue ? queue.id : null
@@ -85,6 +85,7 @@ const ChangeQueueOrResolveTicketService = async ({
         contact: message.ticket.contact
       });
   } else {
+    console.log("update ticket changequeueorresolve 88");
     await ticket.update({
       status: "closed",
       finalizedAt: new Date()

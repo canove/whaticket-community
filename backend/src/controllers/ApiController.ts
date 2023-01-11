@@ -33,6 +33,7 @@ export const importDispatcherFileProcess = async (req: Request, res: Response) =
   const { reports: files } = await ListFileService({ status: FileStatus.WaitingImport, initialDate: null, limiting: 1, companyId: 0 });
   if (files) {
     files.forEach(async (file) => {
+      console.log('update file apicontroller 37')
       await file.update({ status: FileStatus.Processing });
 
       io.emit(`file${file.companyId}`, {
@@ -66,6 +67,7 @@ export const dispatcherRegisterProcess = async (req: Request, res: Response) => 
   } else {
     if (files?.length > 0) {
       files.forEach(async (file) => {
+        console.log('update file apicontroller 70')
         await file.update({ status: FileStatus.Sending });
 
         io.emit(`file${file.companyId}`, {

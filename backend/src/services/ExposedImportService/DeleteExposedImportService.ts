@@ -13,6 +13,7 @@ const DeleteExposedImportService = async (
     throw new AppError("ERR_NO_IMPORT_FOUND", 404);
   }
 
+  console.log("update exposedImport exposedImportService 16");
   await exposedImport.update({
     deletedAt: new Date()
   })

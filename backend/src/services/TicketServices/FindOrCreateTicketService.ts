@@ -25,8 +25,10 @@ const FindOrCreateTicketService = async (
   });
 
   if (ticket) {
+    console.log("update ticket findOrCreateticketService 28");
     await ticket.update({ unreadMessages });
     if (!inBot && !isDispatcher && ticket.status != 'open') {
+      console.log("update ticket findOrCreateticketService 31");
       await ticket.update({ status: "pending" });
     }
   }
@@ -41,6 +43,7 @@ const FindOrCreateTicketService = async (
     });
 
     if (ticket) {
+      console.log("update ticket findOrCreateticketService 46");
       await ticket.update({
         status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
         userId: null,
@@ -64,6 +67,7 @@ const FindOrCreateTicketService = async (
     });
 
     if (ticket) {
+      console.log("update ticket findOrCreateticketService 70");
       await ticket.update({
         status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
         userId: null,

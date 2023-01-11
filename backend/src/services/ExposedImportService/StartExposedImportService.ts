@@ -49,6 +49,9 @@ const getDinamicValue = (path: any, payload: any) => {
 const getRelationValue = (newValue: any, payload: any) => {
   let value = newValue;
 
+  if(!value)
+    return '';
+
   while (value.match(/\{{(.*?)\}}/)) {
     const param = value.match(/\{{(.*?)\}}/);
 
@@ -139,7 +142,7 @@ const StartExposedImportService = async ({
       totalRegisters += registersToInsert.length;
       await FileRegister.bulkCreate(registersToInsert);
     }
-
+    console.log("update exposedImport exposedImportService 145");
     await exposedImport.update({ qtdeRegister: totalRegisters });
   } else {
     const name = getRelationValue(mapping.name, payload);
@@ -180,7 +183,7 @@ const StartExposedImportService = async ({
       companyId,
       whatsappId
     });
-
+    console.log("update exposedImport exposedImportService 186");
     await exposedImport.update({ qtdeRegister: totalRegisters + 1 });
   }
 

@@ -39,6 +39,7 @@ const CreateOrUpdateContactService = async ({
    }});
 
   if (contact) {
+    console.log("update contact contactService 42");
     contact.update({ profilePicUrl });
 
     io.emit(`contact${companyId}`, {

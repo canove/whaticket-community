@@ -40,6 +40,7 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
       });
 
       if(reg) {
+        console.log("update fileregister sendMessageservice 43");
           await reg.update({interactionAt: new Date()})
       }
       let linkeNumber = contactNumber.substr(7,8);
@@ -150,6 +151,7 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
       }
   
       if (payload.length > 0) {
+        console.log("update greetingmessageControl sendMessageservice 154");
           await messageToSend.update({sendAt: new Date()})
           /*await axios.post(apiUrl, payload, { headers: {
               "x-api-key": process.env.WPP_OFFICIAL_API_KEY
