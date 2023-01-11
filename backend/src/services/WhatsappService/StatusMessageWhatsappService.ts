@@ -200,7 +200,7 @@ const StatusMessageWhatsappService = async ({
     }
   });
   
-  if (registersCount == 0) {
+  if (registersCount == 0 && register?.fileId) {
     const io = getIO();
     const file = await File.findOne({
         where: {

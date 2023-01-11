@@ -38,9 +38,10 @@ import ChipsReports from "../pages/ChipsReports";
 import NodeReports from "../pages/NodeReports";
 import OfficialContacts from "../pages/OfficialContacts";
 import OfficialTemplates from "../pages/OfficialTemplates";
+import OfficialWhatsappReport from "../pages/OfficialWhatsappReport";
 
 const RenderRoutes = () => {
-    const { isAuth } = useContext(AuthContext);
+    const { isAuth, user } = useContext(AuthContext);
     const [menus, setMenus] = useState([]);
 
     useEffect(() => {
@@ -153,6 +154,9 @@ const RenderRoutes = () => {
         if (name === "Official Templates") {
             return OfficialTemplates
         }
+        if (name === "Official Whatsapp Report") {
+            return OfficialWhatsappReport
+        }
     }
 
     return (
@@ -165,59 +169,84 @@ const RenderRoutes = () => {
             }
             {isAuth &&
                 menus && menus.map(menu => {
-                    if (menu.name === "Dashboard") {
+                    if (user.profile === "admin") {
+                        if (menu.name === "Dashboard") {
+                            return (
+                                <Route
+                                    key={menu.id}
+                                    exact
+                                    path={`/`}
+                                    component={getComponent(menu.name)}
+                                    isPrivate
+                                />
+                            )
+                        }
+                        if (menu.name === "Tickets") {
+                            return (
+                                <Route
+                                    key={menu.id}
+                                    exact
+                                    path={`/tickets/:ticketId?`}
+                                    component={getComponent(menu.name)}
+                                    isPrivate
+                                />
+                            )
+                        }
+                        if (menu.name === "Connections") {
+                            return (
+                                <Route
+                                    key={menu.id}
+                                    exact
+                                    path={`/connections/:connectionFileName?`}
+                                    component={getComponent(menu.name)}
+                                    isPrivate
+                                />
+                            )
+                        }
+                        if (menu.name === "Whats Contacts") {
+                            return (
+                                <Route
+                                    key={menu.id}
+                                    exact
+                                    path={`/WhatsContacts/:connectionName?`}
+                                    component={getComponent(menu.name)}
+                                    isPrivate
+                                />
+                            )
+                        }
                         return (
                             <Route
                                 key={menu.id}
                                 exact
-                                path={`/`}
+                                path={`/${menu.name.replaceAll(" ", "")}`}
                                 component={getComponent(menu.name)}
                                 isPrivate
                             />
                         )
+                    } else {
+                        if (menu.name === "Dashboard") {
+                            return (
+                                <Route
+                                    key={menu.id}
+                                    exact
+                                    path={`/`}
+                                    component={getComponent(menu.name)}
+                                    isPrivate
+                                />
+                            )
+                        }
+                        if (menu.name === "Tickets") {
+                            return (
+                                <Route
+                                    key={menu.id}
+                                    exact
+                                    path={`/tickets/:ticketId?`}
+                                    component={getComponent(menu.name)}
+                                    isPrivate
+                                />
+                            )
+                        }
                     }
-                    if (menu.name === "Tickets") {
-                        return (
-                            <Route
-                                key={menu.id}
-                                exact
-                                path={`/tickets/:ticketId?`}
-                                component={getComponent(menu.name)}
-                                isPrivate
-                            />
-                        )
-                    }
-                    if (menu.name === "Connections") {
-                        return (
-                            <Route
-                                key={menu.id}
-                                exact
-                                path={`/connections/:connectionFileName?`}
-                                component={getComponent(menu.name)}
-                                isPrivate
-                            />
-                        )
-                    }
-                    if (menu.name === "Whats Contacts") {
-                        return (
-                            <Route
-                                key={menu.id}
-                                exact
-                                path={`/WhatsContacts/:connectionName?`}
-                                component={getComponent(menu.name)}
-                                isPrivate
-                            />
-                        )
-                    }
-                    return (
-                        <Route
-                            key={menu.id}
-                            exact
-                            path={`/${menu.name.replaceAll(" ", "")}`}
-                            component={getComponent(menu.name)}
-                            isPrivate
-                        />
-                    )
                 })
             }
             <Route 

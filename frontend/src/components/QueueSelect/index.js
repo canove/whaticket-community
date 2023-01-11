@@ -36,7 +36,13 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	}, []);
 
 	const handleChange = e => {
-		onChange(e.target.value);
+		let array = e.target.value;
+
+		if (array.length > 0) {
+			array = [e.target.value[array.length - 1]]
+		}
+
+		onChange(array);
 	};
 
 	return (

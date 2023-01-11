@@ -24,6 +24,7 @@
     "draft-js": "^0.11.7",
     "draftjs-to-html": "^0.9.1",
     "emoji-mart": "^3.0.1",
+    "file-saver": "^2.0.5",
     "formik": "^2.2.0",
     "html-react-parser": "^3.0.4",
     "i18next": "^19.9.2",
@@ -52,6 +53,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "socket.io-client": "^3.0.5",
     "use-sound": "^2.0.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.1/xlsx-0.19.1.tgz",
     "yup": "^0.32.8"
   },
   "scripts": {

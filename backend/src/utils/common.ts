@@ -26,7 +26,7 @@ const preparePhoneNumber9Digit = (phone:string): string => {
   }
 
   if (phoneNumber.length < 13){
-    phoneNumber = `${phoneNumber.substring(5, 0)}9${phoneNumber.substring(phoneNumber.length, 5)}`
+    phoneNumber = `${phoneNumber.substring(4, 0)}9${phoneNumber.substring(phoneNumber.length, 4)}`
   }
   return phoneNumber;
 }
