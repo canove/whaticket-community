@@ -164,7 +164,8 @@ const SendWhatsAppMedia = async ({
     } else {
       try {
         let path = require('path');
-        const apiUrl = `${process.env.WPPNOF_URL}/${ path.extname(media.path) == '.mp3'? 'sendAudio64':'sendFile64'}`;
+        // const apiUrl = `${process.env.WPPNOF_URL}/${ path.extname(media.path) == '.mp3'? 'sendAudio64':'sendFile64'}`;
+        const apiUrl = `${process.env.WPPNOF_URL}/sendFile64`;
         let phoneNumber = !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber;
         
         if (phoneNumber.length > 12){
@@ -181,7 +182,7 @@ const SendWhatsAppMedia = async ({
         const payload = {
           "session": connnection.name,
           "number": phoneNumber,
-          "text": "",//(body == '' || body == null?'':formatBody(body, ticket.contact)),
+          "text": media.originalname,//(body == '' || body == null?'':formatBody(body, ticket.contact)),
           "path": `data:${media.mimetype};base64,${base64file}`
         };
   
