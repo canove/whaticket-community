@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import axios from "axios";
 import AppError from "../../errors/AppError";
 import Message from "../../database/models/Message";
@@ -8,9 +9,8 @@ import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
-import { isValidHttpUrl, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
+import { isValidHttpUrl, removePhoneNumber9Digit } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
-import { Op } from "sequelize";
 
 interface Request {
   body: string;
@@ -190,7 +190,7 @@ const SendWhatsAppMessage = async ({
         "session": connnection.name,
         "number": phoneNumber,
         "path": url,
-        "text": fileName != null ? fileName : `${formatBody(body, reg)} NO-TYPING`,
+        "text": fileName != null? fileName :`${formatBody(body, reg)} NO-TYPING` 
       };
 
       let ack = 3;

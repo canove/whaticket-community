@@ -102,6 +102,7 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
 
     const contact = await Contact.findOne({
       where: {
+        companyId: whatsapp.companyId,
         number: {
           [Op.or] : [
             {[Op.like]: `%${preparePhoneNumber(phone)}%` },
@@ -112,7 +113,7 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
      }});
 
      if(!contact) {
-      return res.status(200).json(true);
+      return res.status(200).json(null);
      }
 
      const ticket = await Ticket.findOne({
