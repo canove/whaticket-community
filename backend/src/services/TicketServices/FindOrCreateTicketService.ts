@@ -1,7 +1,9 @@
 import { subHours } from "date-fns";
 import { Op } from "sequelize";
 import Contact from "../../database/models/Contact";
+import Queue from "../../database/models/Queue";
 import Ticket from "../../database/models/Ticket";
+import Whatsapp from "../../database/models/Whatsapp";
 import ShowTicketService from "./ShowTicketService";
 /*eslint-disable */
 const FindOrCreateTicketService = async (
@@ -77,13 +79,25 @@ const FindOrCreateTicketService = async (
   }
 
   if (!ticket) {
+    const whatsapp = await Whatsapp.findOne({
+      where: { id: whatsappId, deleted: false, companyId },
+      include: [
+        {
+          model: Queue,
+          as: "queues",
+          attributes: ["id"]
+        }
+      ],
+    });
+
     ticket = await Ticket.create({
       contactId: groupContact ? groupContact.id : contact.id,
       status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
       isGroup: !!groupContact,
       unreadMessages,
       whatsappId,
-      companyId
+      companyId,
+      queueId: (whatsapp && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : null
     });
   }
 

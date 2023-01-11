@@ -34,6 +34,7 @@ import connectionFilesRoutes from "./connectionFilesRoutes";
 import exposedImportRoutes from "./exposedImportRoutes";
 import nodeRegistersRoutes from "./nodeRegistersRoutes";
 import officialWhatsappRoutes from "./officialWhatsappRoutes";
+import officialWhatsappReportRoutes from "./officialWhatsappReportRoutes"
 
 const routes = Router();
 
@@ -71,5 +72,6 @@ routes.use(connectionFilesRoutes);
 routes.use(exposedImportRoutes);
 routes.use(nodeRegistersRoutes);
 routes.use(officialWhatsappRoutes);
+routes.use(officialWhatsappReportRoutes)
 
 export default routes;

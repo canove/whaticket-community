@@ -203,7 +203,7 @@ const SendWhatsAppMessage = async ({
         });
         if(sendWhats.status == 200) {
           ack = 0;
-          whatsMsgId = sendWhats.data.data.id;
+          whatsMsgId = (typeof sendWhats.data.data.id === "object") ? sendWhats.data.data.id._serialized : sendWhats.data.data.id;
         }
       }
 

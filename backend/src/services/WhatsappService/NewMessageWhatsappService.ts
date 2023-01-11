@@ -329,6 +329,8 @@ const verifyMediaMessage = async (
         throw err;
       }
     });
+  } else {
+    fs.writeFileSync(`public/${msg.file}`, mediaUrl, { encoding: 'base64' });
   }
 
   const messageData = {
@@ -339,7 +341,7 @@ const verifyMediaMessage = async (
     body: "",
     fromMe: msg.fromMe,
     read: msg.fromMe,
-    mediaUrl: mediaUrl,
+    mediaUrl: whatsapp.official ? mediaUrl : `public/${msg.file}`,
     mediaType: type,
     companyId: ticket.companyId
   };
