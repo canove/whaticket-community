@@ -473,40 +473,67 @@ const MainListItems = (props) => {
   return (
     <div onClick={drawerClose}>
       { menus && menus.map(menu => {
-        if (menu.name === "Dashboard") {
-          return (
-            <ListItemLink
-              key={menu.id}
-              to={`/`}
-              primary={getTranslation(menu.name)}
-              icon={menu.icon}
-              drawerOpen={drawerOpen}
-            />
-          )
+        if (user.profile === "admin") {
+          if (menu.name === "Dashboard") {
+            return (
+              <ListItemLink
+                key={menu.id}
+                to={`/`}
+                primary={getTranslation(menu.name)}
+                icon={menu.icon}
+                drawerOpen={drawerOpen}
+              />
+            )
+          }
+  
+          if (menu.isParent) {
+            return (
+              <ListParentItemLink
+                key={menu.id}
+                icon={menu.icon}
+                primary={getTranslation(menu.name)}
+                children={menu.children}
+                translation={getTranslation}
+                drawerOpen={drawerOpen}
+              />
+            )
+          } else {
+            return (
+              <ListItemLink
+                key={menu.id}
+                to={`/${(menu.name).replaceAll(" ", "")}`}
+                primary={getTranslation(menu.name)}
+                icon={menu.icon}
+                drawerOpen={drawerOpen}
+              />
+            )
+          }
+        } else {
+          if (menu.name === "Dashboard") {
+            return (
+              <ListItemLink
+                key={menu.id}
+                to={`/`}
+                primary={getTranslation(menu.name)}
+                icon={menu.icon}
+                drawerOpen={drawerOpen}
+              />
+            )
+          }
+
+          if (menu.name === "Tickets") {
+            return (
+              <ListItemLink
+                key={menu.id}
+                to={`/${(menu.name).replaceAll(" ", "")}`}
+                primary={getTranslation(menu.name)}
+                icon={menu.icon}
+                drawerOpen={drawerOpen}
+              />
+            )
+          }
         }
 
-        if (menu.isParent) {
-          return (
-            <ListParentItemLink
-              key={menu.id}
-              icon={menu.icon}
-              primary={getTranslation(menu.name)}
-              children={menu.children}
-              translation={getTranslation}
-              drawerOpen={drawerOpen}
-            />
-          )
-        } else {
-          return (
-            <ListItemLink
-              key={menu.id}
-              to={`/${(menu.name).replaceAll(" ", "")}`}
-              primary={getTranslation(menu.name)}
-              icon={menu.icon}
-              drawerOpen={drawerOpen}
-            />
-          )
-        }
       })}
     </div>
   );

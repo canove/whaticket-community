@@ -71,7 +71,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit(`user${companyId}`, {
+  io.emit(`user${userCompanyId}`, {
     action: "create",
     user
   });
