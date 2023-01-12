@@ -67,7 +67,6 @@ const NodeReports = () => {
                 const { data } = await api.get('/nodeRegisters/', {
                     params: { phoneNumber, response, flow, pageNumber, nodeId }
                 });
-                console.log(data);
                 setReports(data.reports);
                 setHasMore(data.hasMore);
                 setCount(data.count);

@@ -39,6 +39,7 @@ import NodeReports from "../pages/NodeReports";
 import OfficialContacts from "../pages/OfficialContacts";
 import OfficialTemplates from "../pages/OfficialTemplates";
 import OfficialWhatsappReport from "../pages/OfficialWhatsappReport";
+import Profiles from "../pages/Profiles";
 
 const RenderRoutes = () => {
     const { isAuth, user } = useContext(AuthContext);
@@ -156,6 +157,9 @@ const RenderRoutes = () => {
         }
         if (name === "Official Whatsapp Report") {
             return OfficialWhatsappReport
+        }
+        if (name === "Profiles") {
+            return Profiles
         }
     }
 
