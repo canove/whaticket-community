@@ -110,10 +110,9 @@ const TicketsManager = () => {
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
   useEffect(() => {
-    if (user.profile.toUpperCase() === "ADMIN") {
-      setShowAllTickets(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // if (user.profile.toUpperCase() === "ADMIN") {
+    //   setShowAllTickets(true);
+    // }
   }, []);
 
   useEffect(() => {
@@ -212,7 +211,7 @@ const TicketsManager = () => {
               {i18n.t("ticketsManager.buttons.newTicket")}
             </Button>
             <Can
-              role={user.profile}
+              role={user.profiles}
               perform="tickets-manager:showall"
               yes={() => (
                 <FormControlLabel

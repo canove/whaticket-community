@@ -34,6 +34,7 @@ const UpdateUserLanguageService = async ({
     name: user.name,
     email: user.email,
     profile: user.profile,
+    profileId: user.profileId,
     queues: user.queues,
     lang: user.lang,
     companyId: user.companyId,

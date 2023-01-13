@@ -323,7 +323,7 @@ const Contacts = () => {
                       <EditIcon />
                     </IconButton>
                     <Can
-                      role={user.profile}
+                      role={user.profiles}
                       perform="contacts-page:deleteContact"
                       yes={() => (
                         <IconButton

@@ -20,7 +20,7 @@ interface PricingData {
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -32,7 +32,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -66,7 +66,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -83,7 +83,7 @@ export const update = async (
 ): Promise<Response> => {
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -115,7 +115,7 @@ export const remove = async (
 ): Promise<Response> => {
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 

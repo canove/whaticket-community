@@ -30,17 +30,17 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, queueIds, companyId } = req.body;
+  const { email, password, name, profile, profileId, queueIds, companyId } = req.body;
   const userCompanyId = req.user.companyId;
 
-  if (
-    req.url === "/signup" &&
-    (await CheckSettingsHelper("userCreation")) === "disabled"
-  ) {
-    throw new AppError("ERR_USER_CREATION_DISABLED", 403);
-  } else if (req.url !== "/signup" && req.user.profile !== "admin") {
-    throw new AppError("ERR_NO_PERMISSION", 403);
-  }
+  // if (
+  //   req.url === "/signup" &&
+  //   (await CheckSettingsHelper("userCreation")) === "disabled"
+  // ) {
+  //   throw new AppError("ERR_USER_CREATION_DISABLED", 403);
+  // } else if (req.url !== "/signup" && req.user.profile !== 1) {
+  //   throw new AppError("ERR_NO_PERMISSION", 403);
+  // }
 
   if (userCompanyId === 1) {
     const user = await CreateUserService({
@@ -48,6 +48,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       password,
       name,
       profile,
+      profileId,
       queueIds,
       companyId: companyId || userCompanyId
     });
@@ -66,6 +67,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     password,
     name,
     profile,
+    profileId: profileId ? profileId : req.user.profile,
     queueIds,
     companyId: userCompanyId
   });
@@ -92,9 +94,9 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.profile !== "admin") {
-    throw new AppError("ERR_NO_PERMISSION", 403);
-  }
+  // if (req.user.profile !== 1) {
+  //   throw new AppError("ERR_NO_PERMISSION", 403);
+  // }
 
   const { userId } = req.params;
   const userData = req.body;
@@ -141,7 +143,7 @@ export const remove = async (
   const { userId } = req.params;
   const { companyId } = req.user;
 
-  if (req.user.profile !== "admin") {
+  if (req.user.profile !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 

@@ -71,6 +71,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		email: "",
 		password: "",
 		profile: "user",
+		profileId: ""
 	};
 
 	const UserSchema = Yup.object().shape({
@@ -89,6 +90,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [language, setLanguage] = useState('');
 	const [companies, setCompanies] = useState([]);
 	const [selectedCompany, setSelectedCompany] = useState();
+	const [profiles, setProfiles] = useState([]);
 
 	const handleLanguageChange = (e) => {
 		setLanguage(e.target.value);
@@ -98,8 +100,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		if (user.id === loggedInUser.id) {
 			i18n.changeLanguage(language);
 		}
-// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [language]);
+	}, [language, user, loggedInUser]);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -120,7 +121,6 @@ const UserModal = ({ open, onClose, userId }) => {
 			}
 		};
 		fetchUser();
-// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userId, open]);
 
 	useEffect(() => {
@@ -135,8 +135,21 @@ const UserModal = ({ open, onClose, userId }) => {
 			}
 			fetchCompanies();
 		}
-// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [loggedInUser]);
+
+	useEffect(() => {
+		const fetchProfiles = async () => {
+			try {
+				const { data } = await api.get('/profile/', {
+					params: { limit: "-1" }
+				});
+				setProfiles(data.profiles);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+		fetchProfiles();
+	}, []);
 
 	const handleClose = () => {
 		onClose();
@@ -251,24 +264,24 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 									>
 										<Can
-											role={loggedInUser.profile}
+											role={loggedInUser.profiles}
 											perform="user-modal:editProfile"
 											yes={() => (
 												<>
 													<InputLabel id="profile-selection-input-label">
 														{i18n.t("userModal.form.profile")}
 													</InputLabel>
-
 													<Field
 														as={Select}
 														label={i18n.t("userModal.form.profile")}
-														name="profile"
+														name="profileId"
 														labelId="profile-selection-label"
 														id="profile-selection"
 														required
 													>
-														<MenuItem value="admin">{i18n.t("userModal.form.admin")}</MenuItem>
-														<MenuItem value="user">{i18n.t("userModal.form.user")}</MenuItem>
+														{profiles && profiles.map(profile => (
+															<MenuItem key={profile.id} value={profile.id}>{profile.name}</MenuItem>
+														))}
 													</Field>
 												</>
 											)}
@@ -295,7 +308,7 @@ const UserModal = ({ open, onClose, userId }) => {
 									</FormControl>
 								</div>
 								<Can
-									role={`${loggedInUser.profile}${loggedInUser.companyId}`}
+									role={loggedInUser.profiles}
 									perform="user-modal:editCompany"
 									yes={() => (
 										<div>
@@ -324,7 +337,7 @@ const UserModal = ({ open, onClose, userId }) => {
 									)}
 								/>
 								<Can
-									role={loggedInUser.profile}
+									role={loggedInUser.profiles}
 									perform="user-modal:editQueues"
 									yes={() => (
 										<QueueSelect

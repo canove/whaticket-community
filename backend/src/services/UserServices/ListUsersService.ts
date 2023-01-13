@@ -1,5 +1,6 @@
 import { Sequelize, Op } from "sequelize";
 import Company from "../../database/models/Company";
+import Profiles from "../../database/models/Profiles";
 import Queue from "../../database/models/Queue";
 import User from "../../database/models/User";
 
@@ -47,12 +48,13 @@ const ListUsersService = async ({
 
   const { count, rows: users } = await User.findAndCountAll({
     where: whereCondition,
-    attributes: ["name", "id", "email", "profile", "createdAt"],
+    attributes: ["name", "id", "email", "profileId", "createdAt"],
     limit,
     offset,
     order: [["createdAt", "DESC"]],
     include: [
-      { model: Company, as: "company", attributes: ["name"], required: true }
+      { model: Company, as: "company", attributes: ["name"], required: true },
+      { model: Profiles, as: "profiles", attributes: ["id", "name", "permissions", "menus"] }
     ],
     raw: true
   });
