@@ -20,6 +20,7 @@ import Ticket from "./Ticket";
 import Queue from "./Queue";
 import UserQueue from "./UserQueue";
 import Company from "./Company";
+import Profiles from "./Profiles";
 
 @Table
 class User extends Model<User> {
@@ -70,6 +71,13 @@ class User extends Model<User> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @ForeignKey(() => Profiles)
+  @Column
+  profileId: number;
+
+  @BelongsTo(() => Profiles)
+  profiles: Profiles;
 
   @BeforeUpdate
   @BeforeCreate

@@ -28,6 +28,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import { useTranslation } from "react-i18next";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import ProfileModal from "../../components/ProfileModal";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const reducer = (state, action) => {
-  if (action.type === "LOAD_CATEGORY") {
+  if (action.type === "LOAD_PROFILE") {
     const categories = action.payload;
     const newCategory = [];
 
@@ -60,7 +61,7 @@ const reducer = (state, action) => {
     return [...state, ...newCategory];
   }
 
-  if (action.type === "UPDATE_CATEGORY") {
+  if (action.type === "UPDATE_PROFILE") {
     const category = action.payload;
     const categoryIndex = state.findIndex((u) => u.id === category.id);
 
@@ -72,7 +73,7 @@ const reducer = (state, action) => {
     }
   }
 
-  if (action.type === "DELETE_CATEGORY") {
+  if (action.type === "DELETE_PROFILE") {
     const categoryId = action.payload;
     const categoryIndex = state.findIndex((q) => q.id === categoryId);
     if (categoryIndex !== -1) {
@@ -90,109 +91,107 @@ const Profiles = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
 
-  const [categories, dispatch] = useReducer(reducer, []);
+  const [profiles, dispatch] = useReducer(reducer, []);
   const [loading, setLoading] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState(null);
-  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [deletingProfile, setDeletingProfile] = useState(null);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext);
 
-     useEffect(() => {
-        dispatch({ type: "RESET" });
-    }, []);
+  useEffect(() => {
+    dispatch({ type: "RESET" });
+  }, []);
 
-    useEffect(() => {
-        // setLoading(true); 
-        // const fetchCategory = async () => {
-        //     try {
-        //         const { data } = await api.get("/category/");
-        //         dispatch({ type: "LOAD_CATEGORY", payload: data });
-        //         setLoading(false);
-        //     } catch (err) {
-        //         toastError(err);
-        //         setLoading(false);
-        //     }
-        // };
-        // fetchCategory();
-    }, []);
+  useEffect(() => {
+    setLoading(true);
+    const fetchProfiles = async () => {
+      try {
+        const { data } = await api.get("/profile/");
+        dispatch({ type: "LOAD_PROFILE", payload: data.profiles });
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+        setLoading(false);
+      }
+    };
+    fetchProfiles();
+  }, []);
 
-//     useEffect(() => {
-//       const socket = openSocket();
+  useEffect(() => {
+    const socket = openSocket();
 
-//       socket.on(`category${user.companyId}`, (data) => {
-//         if (data.action === "update" || data.action === "create") {
-//           dispatch({ type: "UPDATE_CATEGORY", payload: data.category });
-//         }
+    socket.on(`profile${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_PROFILE", payload: data.profile });
+      }
 
-//         if (data.action === "delete") {
-//           dispatch({ type: "DELETE_CATEGORY", payload: + data.categoryId });
-//         }
-//       });
+      if (data.action === "delete") {
+        dispatch({ type: "DELETE_PROFILE", payload: +data.profileId });
+      }
+    });
 
-//       return () => {
-//         socket.disconnect();
-//       };
-// // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, []);
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
-  const handleOpenCategoryModal = () => {
-    setCategoryModalOpen(true);
-    setSelectedCategory(null);
+  const handleOpenProfileModal = () => {
+    setProfileModalOpen(true);
+    setSelectedProfile(null);
   };
 
-  const handleCloseCategoryModal = () => {
-    setCategoryModalOpen(false);
-    setSelectedCategory(null);
+  const handleCloseProfileModal = () => {
+    setProfileModalOpen(false);
+    setSelectedProfile(null);
   };
 
-  const handleEditCategory = (category) => {
-    setSelectedCategory(category);
-    setCategoryModalOpen(true);
+  const handleEditProfile = (profile) => {
+    setSelectedProfile(profile);
+    setProfileModalOpen(true);
   };
 
   const handleCloseConfirmationModal = () => {
     setConfirmModalOpen(false);
-    setSelectedCategory(null);
+    setSelectedProfile(null);
   };
 
-  const handleDeleteCategory = async (categoryId) => {
+  const handleDeleteProfile = async (profileId) => {
     try {
-        await api.delete(`/category/${categoryId}`);
-        toast.success(i18n.t("category.confirmation.delete"));
+      await api.delete(`/profile/${profileId}`);
+      toast.success("Perfil deletado com sucesso!");
     } catch (err) {
-        toastError(err);
+      toastError(err);
     }
-    setDeletingCategory(null);
+    setDeletingProfile(null);
   };
 
   return (
     <MainContainer>
-      {/* <CategoryModal
-        open={categoryModalOpen}
-        onClose={handleCloseCategoryModal}
+      <ProfileModal
+        open={profileModalOpen}
+        onClose={handleCloseProfileModal}
         aria-labelledby="form-dialog-title"
-        categoryId={selectedCategory && selectedCategory.id}
+        profileId={selectedProfile && selectedProfile.id}
       />
       <ConfirmationModal
-        title={
-          deletingCategory &&
-          `${i18n.t("category.confirmation.deleteTitle")}`
-        }
+        title={"Deletar Perfil"}
         open={confirmModalOpen}
         onClose={handleCloseConfirmationModal}
-        onConfirm={() => handleDeleteCategory(deletingCategory.id)}
+        onConfirm={() => handleDeleteProfile(deletingProfile.id)}
       >
-        {i18n.t("category.confirmation.deleteMsg")}
-      </ConfirmationModal> */}
+        {
+          "Você tem certeza que deseja deletar este perfil? Está ação não poderá ser desfeita."
+        }
+      </ConfirmationModal>
       <MainHeader>
         <Title>Profiles</Title>
         <MainHeaderButtonsWrapper>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleOpenCategoryModal}
+            onClick={handleOpenProfileModal}
           >
             Criar Perfil
           </Button>
@@ -202,39 +201,50 @@ const Profiles = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{i18n.t("category.grid.name")}</TableCell>
-              {/* <TableCell align="center">{i18n.t("category.grid.description")}</TableCell> */}
-              <TableCell align="center">{i18n.t("category.grid.createdAt")}</TableCell>
-              <TableCell align="center">{i18n.t("category.grid.action")}</TableCell>
+              <TableCell align="center">{"Nome"}</TableCell>
+              {/* <TableCell align="center">{"Permissões"}</TableCell>
+              <TableCell align="center">{"Menus"}</TableCell> */}
+              <TableCell align="center">{"Criado em"}</TableCell>
+              <TableCell align="center">{"Ações"}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <>
-              {/* {categories && categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell align="center">{category.name}</TableCell>
-                  <TableCell align="center">{category.description}</TableCell>
-                  <TableCell align="center">{format(parseISO(category.createdAt), "dd/MM/yy HH:mm")}</TableCell>
-                  <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditCategory(category)}
-                    >
-                      <Edit />
-                    </IconButton>
+              {profiles &&
+                profiles.map((profile) => (
+                  <TableRow key={profile.id}>
+                    <TableCell align="center">{profile.name}</TableCell>
+                    {/* <TableCell align="center">
+                      {"profile.permissions"}
+                    </TableCell>
+                    <TableCell align="center">{"profile.menus"}</TableCell> */}
+                    <TableCell align="center">
+                      {format(parseISO(profile.createdAt), "dd/MM/yy HH:mm")}
+                    </TableCell>
+                    <TableCell align="center">
+                      {profile.companyId && (
+                        <>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditProfile(profile)}
+                          >
+                            <Edit />
+                          </IconButton>
 
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        setDeletingCategory(category);
-                        setConfirmModalOpen(true);
-                      }}
-                    >
-                      <DeleteOutline />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))} */}
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setDeletingProfile(profile);
+                              setConfirmModalOpen(true);
+                            }}
+                          >
+                            <DeleteOutline />
+                          </IconButton>
+                        </>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
               {loading && <TableRowSkeleton columns={3} />}
             </>
           </TableBody>

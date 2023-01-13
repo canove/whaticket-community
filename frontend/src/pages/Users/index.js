@@ -253,7 +253,7 @@ const Users = () => {
                 <TableRow key={user.id}>
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
-                  <TableCell align="center">{user.profile}</TableCell>
+                  <TableCell align="center">{user["profiles.name"] || user.profiles.name}</TableCell>
                   <TableCell align="center">{user["company.name"] || user.company.name}</TableCell>
                   <TableCell align="center">
                     <IconButton

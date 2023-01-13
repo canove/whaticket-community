@@ -9,7 +9,7 @@ import AppError from "../errors/AppError";
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -22,7 +22,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { user } = req;
   const { billingId } = req.params;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -38,7 +38,7 @@ export const historic = async (
   const { user } = req;
   const { billingId } = req.params;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 

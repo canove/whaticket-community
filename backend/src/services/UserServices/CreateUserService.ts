@@ -11,6 +11,7 @@ interface Request {
   name: string;
   queueIds?: number[];
   profile?: string;
+  profileId?: string;
   companyId: number | string;
 }
 
@@ -27,6 +28,7 @@ const CreateUserService = async ({
   name,
   queueIds = [],
   profile = "admin",
+  profileId,
   companyId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
@@ -60,6 +62,7 @@ const CreateUserService = async ({
       password,
       name,
       profile,
+      profileId,
       companyId
     },
     { include: ["queues"] }

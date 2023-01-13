@@ -34,6 +34,7 @@ import NodeRegisters from "./models/NodeRegisters";
 import OfficialWhatsapp from "./models/OfficialWhatsapp";
 import OfficialTemplates from "./models/OfficialTemplates";
 import OfficialTemplatesStatus from "./models/OfficialTemplatesStatus";
+import Profiles from "./models/Profiles";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -75,7 +76,8 @@ const models = [
   NodeRegisters,
   OfficialWhatsapp,
   OfficialTemplates,
-  OfficialTemplatesStatus
+  OfficialTemplatesStatus,
+  Profiles
 ];
 
 sequelize.addModels(models);

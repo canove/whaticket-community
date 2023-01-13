@@ -19,47 +19,44 @@ import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import EqualizerIcon from "@material-ui/icons/Equalizer";
 import ChatIcon from "@material-ui/icons/Chat";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import ApartmentIcon from '@material-ui/icons/Apartment';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import MenuIcon from '@material-ui/icons/Menu';
-import BallotIcon from '@material-ui/icons/Ballot';
-import ArchiveIcon from '@material-ui/icons/Archive';
-import LanguageIcon from '@material-ui/icons/Language';
-import CategoryIcon from '@material-ui/icons/Category';
-import TimelineIcon from '@material-ui/icons/Timeline';
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-import PaymentIcon from '@material-ui/icons/Payment';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import ApartmentIcon from "@material-ui/icons/Apartment";
+import ListAltIcon from "@material-ui/icons/ListAlt";
+import MenuIcon from "@material-ui/icons/Menu";
+import BallotIcon from "@material-ui/icons/Ballot";
+import ArchiveIcon from "@material-ui/icons/Archive";
+import LanguageIcon from "@material-ui/icons/Language";
+import CategoryIcon from "@material-ui/icons/Category";
+import TimelineIcon from "@material-ui/icons/Timeline";
+import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
+import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
+import PaymentIcon from "@material-ui/icons/Payment";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
 
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import List from "@material-ui/core/List";
 import Collapse from "@material-ui/core/Collapse";
 import api from "../services/api";
 import toastError from "../errors/toastError";
 import { AuthContext } from "../context/Auth/AuthContext";
 
-
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
+    width: "100%",
     maxWidth: 360,
-
   },
   nested: {
     padding: 15,
-    width: '100%',
+    width: "100%",
     paddingLeft: theme.spacing(4),
   },
   open: {
     backgroundColor: "lightgray",
-  }
-}
-));
+  },
+}));
 
 function getIcon(icon, isParent) {
   let color = "";
@@ -70,89 +67,70 @@ function getIcon(icon, isParent) {
 
   if (icon === "DashboardOutlinedIcon") {
     return <DashboardOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "WhatsAppIcon") {
+  } else if (icon === "WhatsAppIcon") {
     return <WhatsAppIcon style={{ color }} />;
-  }
-  else if (icon === "SyncAltIcon") {
+  } else if (icon === "SyncAltIcon") {
     return <SyncAltIcon style={{ color }} />;
-  }
-  else if (icon === "SettingsOutlinedIcon") {
+  } else if (icon === "SettingsOutlinedIcon") {
     return <SettingsOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "DvrIcon") {
+  } else if (icon === "DvrIcon") {
     return <DvrIcon style={{ color }} />;
-  }
-  else if (icon === "ChatIcon") {
+  } else if (icon === "ChatIcon") {
     return <ChatIcon style={{ color }} />;
-  }
-  else if (icon === "ContactPhoneOutlinedIcon") {
+  } else if (icon === "ContactPhoneOutlinedIcon") {
     return <ContactPhoneOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "QuestionAnswerOutlinedIcon") {
+  } else if (icon === "QuestionAnswerOutlinedIcon") {
     return <QuestionAnswerOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "ImportExportOutlinedIcon") {
+  } else if (icon === "ImportExportOutlinedIcon") {
     return <ImportExportOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "AccountCircleIcon") {
+  } else if (icon === "AccountCircleIcon") {
     return <AccountCircleIcon style={{ color }} />;
-  }
-  else if (icon === "PeopleAltOutlinedIcon") {
+  } else if (icon === "PeopleAltOutlinedIcon") {
     return <PeopleAltOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "AccountTreeOutlinedIcon") {
+  } else if (icon === "AccountTreeOutlinedIcon") {
     return <AccountTreeOutlinedIcon style={{ color }} />;
-  }
-  else if (icon === "EqualizerIcon") {
+  } else if (icon === "EqualizerIcon") {
     return <EqualizerIcon style={{ color }} />;
-  }
-  else if (icon === "AssessmentOutlinedIcon") {
-    return <AssessmentOutlinedIcon style={{ color }} />
-  }
-  else if (icon === "ApartmentIcon") {
+  } else if (icon === "AssessmentOutlinedIcon") {
+    return <AssessmentOutlinedIcon style={{ color }} />;
+  } else if (icon === "ApartmentIcon") {
     return <ApartmentIcon style={{ color }} />;
-  }
-  else if (icon === "ListAltIcon") {
-    return <ListAltIcon style={{ color }} />
-  }
-  else if (icon === "MenuIcon") {
-    return <MenuIcon style={{ color }} />
-  }
-  else if (icon === "BallotIcon") {
-    return <BallotIcon style={{ color }} />
-  }
-  else if (icon === "ArchiveIcon") {
-    return <ArchiveIcon style={{ color }} />
-  }
-  else if (icon === "LanguageIcon") {
-    return <LanguageIcon style={{ color }} />
-  }
-  else if (icon === "CategoryIcon") {
-    return <CategoryIcon style={{ color }} />
-  }
-  else if (icon === "TimelineIcon") {
-    return <TimelineIcon style={{ color }} />
-  }
-  else if (icon === "AttachMoneyIcon") {
-        return <AttachMoneyIcon style={{ color }} />
-  }
-  else if (icon === "MonetizationOnIcon") {
-        return <MonetizationOnIcon style={{ color }} />
-  }
-  else if (icon === "PaymentIcon") {
-        return <PaymentIcon style={{ color }} />
-  }
-  else if (icon === "ShoppingCartIcon") {
-        return <ShoppingCartIcon style={{ color }} />
-  }
-  else {
+  } else if (icon === "ListAltIcon") {
+    return <ListAltIcon style={{ color }} />;
+  } else if (icon === "MenuIcon") {
+    return <MenuIcon style={{ color }} />;
+  } else if (icon === "BallotIcon") {
+    return <BallotIcon style={{ color }} />;
+  } else if (icon === "ArchiveIcon") {
+    return <ArchiveIcon style={{ color }} />;
+  } else if (icon === "LanguageIcon") {
+    return <LanguageIcon style={{ color }} />;
+  } else if (icon === "CategoryIcon") {
+    return <CategoryIcon style={{ color }} />;
+  } else if (icon === "TimelineIcon") {
+    return <TimelineIcon style={{ color }} />;
+  } else if (icon === "AttachMoneyIcon") {
+    return <AttachMoneyIcon style={{ color }} />;
+  } else if (icon === "MonetizationOnIcon") {
+    return <MonetizationOnIcon style={{ color }} />;
+  } else if (icon === "PaymentIcon") {
+    return <PaymentIcon style={{ color }} />;
+  } else if (icon === "ShoppingCartIcon") {
+    return <ShoppingCartIcon style={{ color }} />;
+  } else {
     return null;
   }
 }
 
 function ListParentItemLink(props) {
-  const { icon, primary, connectionWarning, children, translation, drawerOpen } = props;
+  const {
+    icon,
+    primary,
+    connectionWarning,
+    children,
+    translation,
+    drawerOpen,
+  } = props;
 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
@@ -160,55 +138,67 @@ function ListParentItemLink(props) {
 
   const handleClick = () => {
     setOpen((prevOpen) => !prevOpen);
-  }
+  };
 
   //<Badge overlap="rectangular" badgeContent={connectionWarning ? "!" : 0} color="error"></Badge>
 
   return (
     <List>
       <li>
-        <ListItem button open={open} onClick={handleClick} className={classes.root}>
+        <ListItem
+          button
+          open={open}
+          onClick={handleClick}
+          className={classes.root}
+        >
           {renderedIcon ? <ListItemIcon>{renderedIcon}</ListItemIcon> : null}
           <ListItemText primary={primary} />
-          {open ? < KeyboardArrowDownIcon fontSize="large" /> : <ArrowForwardIosIcon fontSize="small" />}
+          {open ? (
+            <KeyboardArrowDownIcon fontSize="large" />
+          ) : (
+            <ArrowForwardIosIcon fontSize="small" />
+          )}
         </ListItem>
       </li>
       <Collapse component="li" in={open} timeout="auto" unmountOnExit>
-        <List disablePadding className={drawerOpen ? classes.nested : ""} >
-          { children && children.map(child => {
-            if (child.isParent) {
-              return (
-                <ListParentItemLink
-                  key={child.id}
-                  icon={child.icon}
-                  primary={translation(child.name)}
-                  children={child.children}
-                  translation={translation}
-                  drawerOpen={drawerOpen}
-                />
-              )
-            } else {
-              return (
-                <ListItemLink
-                  key={child.id}
-                  to={`/${(child.name).replaceAll(" ", "")}`}
-                  primary={translation(child.name)}
-                  icon={child.icon}
-                  drawerOpen={drawerOpen}
-                />
-              )
-            }
-          }) }
+        <List disablePadding className={drawerOpen ? classes.nested : ""}>
+          {children &&
+            children.map((child) => {
+              if (child.isParent) {
+                return (
+                  <ListParentItemLink
+                    key={child.id}
+                    icon={child.icon}
+                    primary={translation(child.name)}
+                    children={child.children}
+                    translation={translation}
+                    drawerOpen={drawerOpen}
+                  />
+                );
+              } else {
+                return (
+                  <ListItemLink
+                    key={child.id}
+                    to={`/${child.name.replaceAll(" ", "")}`}
+                    primary={translation(child.name)}
+                    icon={child.icon}
+                    drawerOpen={drawerOpen}
+                  />
+                );
+              }
+            })}
         </List>
       </Collapse>
     </List>
-  )
+  );
 }
 
 function ListItemLink(props) {
   const { icon, to, primary, className, drawerOpen, ...other } = props;
 
-  const renderLink = forwardRef((itemProps, ref) => (<RouterLink to={to} ref={ref} {...itemProps} />))
+  const renderLink = forwardRef((itemProps, ref) => (
+    <RouterLink to={to} ref={ref} {...itemProps} />
+  ));
 
   const renderedIcon = getIcon(icon, false);
 
@@ -239,7 +229,7 @@ const MainListItems = (props) => {
       } catch (err) {
         toastError(err);
       }
-    }
+    };
 
     const fetchMenus = async () => {
       try {
@@ -268,7 +258,10 @@ const MainListItems = (props) => {
         }
 
         for (const parent of parentMenus) {
-          if (parent.parentId && parentMenusIds.indexOf(parent.parentId) === -1) {
+          if (
+            parent.parentId &&
+            parentMenusIds.indexOf(parent.parentId) === -1
+          ) {
             parentMenusIds.push(parent.parentId);
 
             const parentMenu = await getParentMenu(parent.parentId);
@@ -298,7 +291,7 @@ const MainListItems = (props) => {
       } catch (err) {
         toastError(err);
       }
-    }
+    };
 
     fetchMenus();
   }, [user]);
@@ -315,7 +308,8 @@ const MainListItems = (props) => {
               whats.status === "TIMEOUT" ||
               whats.status === "OPENING"
             );
-          } return null
+          }
+          return null;
         });
         if (offlineWhats.length > 0) {
           setConnectionWarning(true);
@@ -464,7 +458,7 @@ const MainListItems = (props) => {
       return i18n.t("nodeReports.title");
     }
     if (name === "Whats Contacts") {
-      return i18n.t("officialPages.officialContacts.title")
+      return i18n.t("officialPages.officialContacts.title");
     }
 
     return name;
@@ -472,8 +466,8 @@ const MainListItems = (props) => {
 
   return (
     <div onClick={drawerClose}>
-      { menus && menus.map(menu => {
-        if (user.profile === "admin") {
+      {menus &&
+        menus.map((menu) => {
           if (menu.name === "Dashboard") {
             return (
               <ListItemLink
@@ -483,9 +477,9 @@ const MainListItems = (props) => {
                 icon={menu.icon}
                 drawerOpen={drawerOpen}
               />
-            )
+            );
           }
-  
+
           if (menu.isParent) {
             return (
               <ListParentItemLink
@@ -496,45 +490,19 @@ const MainListItems = (props) => {
                 translation={getTranslation}
                 drawerOpen={drawerOpen}
               />
-            )
+            );
           } else {
             return (
               <ListItemLink
                 key={menu.id}
-                to={`/${(menu.name).replaceAll(" ", "")}`}
+                to={`/${menu.name.replaceAll(" ", "")}`}
                 primary={getTranslation(menu.name)}
                 icon={menu.icon}
                 drawerOpen={drawerOpen}
               />
-            )
+            );
           }
-        } else {
-          if (menu.name === "Dashboard") {
-            return (
-              <ListItemLink
-                key={menu.id}
-                to={`/`}
-                primary={getTranslation(menu.name)}
-                icon={menu.icon}
-                drawerOpen={drawerOpen}
-              />
-            )
-          }
-
-          if (menu.name === "Tickets") {
-            return (
-              <ListItemLink
-                key={menu.id}
-                to={`/${(menu.name).replaceAll(" ", "")}`}
-                primary={getTranslation(menu.name)}
-                icon={menu.icon}
-                drawerOpen={drawerOpen}
-              />
-            )
-          }
-        }
-
-      })}
+        })}
     </div>
   );
 };

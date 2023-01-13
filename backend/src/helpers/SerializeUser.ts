@@ -11,6 +11,7 @@ interface SerializedUser {
   queues: Queue[];
   companyId: number;
   company?: Company;
+  profileId: number;
 }
 
 export const SerializeUser = (user: User): SerializedUser => {
@@ -21,6 +22,7 @@ export const SerializeUser = (user: User): SerializedUser => {
     profile: user.profile,
     lang: user.lang,
     queues: user.queues,
-    companyId: user.companyId
+    companyId: user.companyId,
+    profileId: user.profileId
   };
 };
