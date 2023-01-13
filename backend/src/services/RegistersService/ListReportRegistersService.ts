@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import FileRegister from "../../database/models/FileRegister";
 import { subHours } from "date-fns";
 
@@ -9,6 +9,8 @@ interface Request {
   companyId: number;
   initialDate: string;
   finalDate: string;
+  name: string;
+  phoneNumber: string;
 }
 
 interface Response {
@@ -23,11 +25,35 @@ const ListReportRegistersService = async ({
   pageNumber = "1",
   companyId,
   initialDate,
-  finalDate
+  finalDate,
+  name = "",
+  phoneNumber = ""
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
   whereCondition = { companyId };
+
+  if (name) {
+    whereCondition = {
+      ...whereCondition,
+      "$FileRegister.name$": Sequelize.where(
+        Sequelize.fn("LOWER", Sequelize.col("FileRegister.name")),
+        "LIKE",
+        `%${name.toLowerCase()}%`
+      )
+    }
+  }
+
+  if (phoneNumber) {
+    whereCondition = {
+      ...whereCondition,
+      "$FileRegister.phoneNumber$": Sequelize.where(
+        Sequelize.fn("LOWER", Sequelize.col("FileRegister.phoneNumber")),
+        "LIKE",
+        `%${phoneNumber.toLowerCase()}%`
+      )
+    }
+  }
 
   if (fileIds) {
     whereCondition = {
