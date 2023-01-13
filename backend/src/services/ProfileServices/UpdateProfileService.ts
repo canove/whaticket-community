@@ -26,7 +26,8 @@ const UpdateProfileService = async ({
 
   const profileWithSameName = await Profiles.findOne({
     where: {
-      companyId: { [Op.or]: [companyId, null] },
+      companyId: { [Op.or]: [companyId, null], 
+      id: { [Op.ne]: profileId } },
       name: name
     }
   });
