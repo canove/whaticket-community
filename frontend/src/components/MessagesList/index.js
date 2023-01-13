@@ -480,11 +480,39 @@ const MessagesList = ({ ticketId, isGroup }) => {
   else if (message.mediaType === "image") {
       return <ModalImageCors imageUrl={message.mediaUrl} />;
     } else if (message.mediaType === "audio") {
-      return <ModalAudioCors audioUrl={message.mediaUrl} />;
+      return (
+        <audio controls>
+					<source src={message.mediaUrl} type="audio/ogg"></source>
+				</audio>
+      );
+      // return <ModalAudioCors audioUrl={message.mediaUrl} />;
     } else if (message.mediaType === "video") {
-      return <ModalVideoCors videoUrl={message.mediaUrl} />
+      return (
+        <video
+					className={classes.messageMedia}
+					src={message.mediaUrl}
+					controls
+				/>
+      );
+      // return <ModalVideoCors videoUrl={message.mediaUrl} />;
     } else {
-      return <ModalMediaCors mediaUrl={message.mediaUrl} />;
+      return (
+        <>
+          <div className={classes.downloadMedia}>
+            <Button
+              startIcon={<GetApp />}
+              color="primary"
+              variant="outlined"
+              target="_blank"
+              href={message.mediaUrl}
+            >
+             {i18n.t("locationPreview.download")}
+            </Button>
+          </div>
+          <Divider />
+        </>
+      )
+      // return <ModalMediaCors mediaUrl={message.mediaUrl} />;
     }
   };
 
