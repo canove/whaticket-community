@@ -200,7 +200,7 @@ const SendWhatsAppMedia = async ({
         });
   
         if(result.status == 200){
-            const msgWhatsId = result.data.data.id;
+            const msgWhatsId = (typeof result.data.data.id === "object") ? result.data.data.id._serialized : result.data.data.id;
             
             const messageData = {
               id: msgWhatsId,
