@@ -9,6 +9,7 @@ interface UserData {
   password?: string;
   name?: string;
   profile?: string;
+  profileId?: string;
   lang?: string;
   queueIds?: number[];
   companyId?: string | number;
@@ -39,7 +40,7 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, name, lang, queueIds = [] } = userData;
+  const { email, password, profile, profileId, name, lang, queueIds = [] } = userData;
   let { companyId } = userData;
 
   if (userCompanyId !== 1) {
@@ -58,6 +59,7 @@ const UpdateUserService = async ({
     email,
     password,
     profile,
+    profileId,
     lang,
     name,
     companyId
@@ -74,6 +76,7 @@ const UpdateUserService = async ({
     name: user.name,
     email: user.email,
     profile: user.profile,
+    profileId: user.profileId,
     queues: user.queues,
     companyId: user.companyId,
     company

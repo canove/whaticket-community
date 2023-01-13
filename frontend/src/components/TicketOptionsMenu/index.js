@@ -70,7 +70,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 					{i18n.t("ticketOptionsMenu.transfer")}
 				</MenuItem>
 				<Can
-					role={user.profile}
+					role={user.profiles}
 					perform="ticket-options:deleteTicket"
 					yes={() => (
 						<MenuItem onClick={handleOpenConfirmationModal}>

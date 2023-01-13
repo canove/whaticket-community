@@ -18,7 +18,7 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (req.user.profile !== "admin") {
+  if (req.user.profile !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
   const { settingKey: key } = req.params;

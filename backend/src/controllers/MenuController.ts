@@ -19,7 +19,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -44,9 +44,9 @@ export const showCompany = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { companyId } = req.user;
+  const { id, companyId } = req.user;
 
-  const menus = await ShowCompanyMenuService(companyId);
+  const menus = await ShowCompanyMenuService(companyId, id);
 
   return res.status(200).json(menus);
 };
@@ -56,7 +56,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -85,7 +85,7 @@ export const update = async (
 
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -108,7 +108,7 @@ export const remove = async (
 
   const { user } = req;
 
-  if (user.profile !== "admin" || user.companyId !== 1) {
+  if (user.profile !== 1 || user.companyId !== 1) {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 

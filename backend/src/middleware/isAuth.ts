@@ -7,7 +7,7 @@ import authConfig from "../config/auth";
 interface TokenPayload {
   id: string;
   username: string;
-  profile: string;
+  profile: number;
   iat: number;
   exp: number;
   companyId: number;

@@ -57,7 +57,7 @@ const ListTicketsService = async ({
   ];
 
   if (showAll === "true") {
-    whereCondition = { queueId: { [Op.or]: [queueIds, null] }, companyId };
+    whereCondition = { companyId }; // queueId: { [Op.or]: [queueIds, null] },
   }
 
   if (status) {

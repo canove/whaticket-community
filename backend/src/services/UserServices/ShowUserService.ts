@@ -1,6 +1,7 @@
 import User from "../../database/models/User";
 import AppError from "../../errors/AppError";
 import Queue from "../../database/models/Queue";
+import Profiles from "../../database/models/Profiles";
 
 const ShowUserService = async (
   id: string | number,
@@ -19,12 +20,14 @@ const ShowUserService = async (
       "id",
       "email",
       "profile",
+      "profileId",
       "tokenVersion",
       "lang",
       "companyId"
     ],
     include: [
-      { model: Queue, as: "queues", attributes: ["id", "name", "color"] }
+      { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
+      { model: Profiles, as: "profiles", attributes: ["id", "name", "permissions", "menus"] }
     ],
     order: [[{ model: Queue, as: "queues" }, "name", "asc"]]
   });
