@@ -48,21 +48,26 @@ const OfficialWhatsappReport = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [count, setCount] = useState(0);
   const [creatingXLSX, setCreatingXLSX] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const filterReports = async () => {
+    setLoading(true);
+
+    try {
+      const { data } = await api.get("/officialWhatsappReports", {
+        params: { pageNumber, limit: "10" },
+      });
+      setReports(data.reports);
+      setCount(data.count);
+    } catch (err) {
+      toastError(err);
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const { data } = await api.get("/officialWhatsappReports", {
-          params: { pageNumber, limit: "10" }
-        });
-        setReports(data.reports);
-        setCount(data.count);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    fetchReports();
+    if (count > 0) filterReports();
   }, [pageNumber]);
 
   const createExcel = async () => {
@@ -104,11 +109,11 @@ const OfficialWhatsappReport = () => {
       ],
     ];
 
-    let reports = []
+    let reports = [];
 
     try {
       const { data } = await api.get("/officialWhatsappReports", {
-        params: { pageNumber, limit: "-1" }
+        params: { pageNumber, limit: "-1" },
       });
 
       reports = data.reports;
@@ -118,29 +123,43 @@ const OfficialWhatsappReport = () => {
       return;
     }
 
-    reports.forEach(report => {
+    reports.forEach((report) => {
+      const create_at_session = report.create_at_session
+        ? format(parseISO(report.create_at_session), "dd/MM/yy HH:mm")
+        : "";
+      const update_at_session = report.update_at_session
+        ? format(parseISO(report.update_at_session), "dd/MM/yy HH:mm")
+        : "";
+
+      const create_at_message = report.create_at_message
+        ? format(parseISO(report.create_at_message), "dd/MM/yy HH:mm")
+        : "";
+      const update_at_message = report.update_at_message
+        ? format(parseISO(report.update_at_message), "dd/MM/yy HH:mm")
+        : "";
+
       const row = [
-        report.msgWhatsId,
-        report.whatsapp.name,
-        report.phoneNumber,
-        "MOBILE",
-        format(parseISO(report.createdAt), "dd/MM/yy HH:mm"),
-        format(parseISO(report.updatedAt), "dd/MM/yy HH:mm"),
-        report.id,
-        getStatus(report),
-        "direction",
-        "session",
-        report.messageData.body,
-        format(parseISO(report.messageData.createdAt), "dd/MM/yy HH:mm"),
-        format(parseISO(report.messageData.updatedAt), "dd/MM/yy HH:mm"),
-        report.messageData.mediaType,
-        report.messageData.mediaUrl,
+        report.id_session,
+        report.phone_number,
+        report.client_phone_number,
+        report.destination_number_type,
+        create_at_session,
+        update_at_session,
+        report.external_id,
+        report.status,
+        report.direction,
+        report.session,
+        report.content,
+        create_at_message,
+        update_at_message,
+        report.type,
+        report.media_link,
         report.var1,
         report.var2,
         report.var3,
         report.var4,
-        report.var5
-      ]
+        report.var5,
+      ];
 
       ws_data.push(row);
     });
@@ -160,7 +179,10 @@ const OfficialWhatsappReport = () => {
 
     for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff; //convert to octet
 
-    saveAs(new Blob([buf], { type: "application/octet-stream" }), "report.xlsx");
+    saveAs(
+      new Blob([buf], { type: "application/octet-stream" }),
+      "report.xlsx"
+    );
 
     setCreatingXLSX(false);
   };
@@ -238,15 +260,6 @@ const OfficialWhatsappReport = () => {
   //   setTicketId(newValue);
   // };
 
-  const getStatus = (report) => {
-    if (report.errorAt) return "FAILED";
-    if (report.sentAt) return "SENT";
-    if (report.deliveredAt) return "DELIVERED";
-    if (report.readAt) return "READ";
-
-    return "";
-  };
-
   return (
     <MainContainer>
       <MainHeader>
@@ -279,6 +292,14 @@ const OfficialWhatsappReport = () => {
           >
             {i18n.t("reportsTicket.buttons.exportPdf")}
           </Button> */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={filterReports}
+            disabled={loading}
+          >
+            Filtrar
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -316,69 +337,57 @@ const OfficialWhatsappReport = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {/*
-                "msgWhatsId":"wamid.HBgMNTU0MTk4ODg2MzE5FQIAERgSODI4NjE4QkVBNUU1ODhEMEEyAA==",         # id_session
-                "var1":null,                                                                           # wallet_number / wallet / job_id / contaCartao
-                "var2":"",                                                                             # wallet_number / wallet / job_id / contaCartao
-                "var3":"",                                                                             # wallet_number / wallet / job_id / contaCartao
-                "var4":"",                                                                             # wallet_number / wallet / job_id / contaCartao
-                "var5":"",                                                                             # wallet_number / wallet / job_id / contaCartao
-                "whatsappId":999,
-                "phoneNumber":"41998886319",                                                           # client_phone_number
-                "createdAt":"2022-12-19T15:01:21.000Z",                                                # create_at_session
-                "updatedAt":"2022-12-19T15:01:21.000Z",                                                # update_at_session
-                "id":1,                                                                                # external_id
-                "readAt":"2022-12-19T15:01:21.000Z",                                                   # status: read
-                "deliveredAt":"2022-12-19T15:01:21.000Z",                                              # status: delivered
-                "sentAt":"2022-12-19T15:01:21.000Z",                                                   # status: sent
-                "errorAt":null,                                                                        # status: failed
-                "whatsapp.name":"5511965577444",                                                       # phone_number
-                "messageData.body":"Olá {{name}}, aqui é a Tati da Tricard.",                          # content
-                "messageData.createdAt":"2022-12-20T17:09:30.267Z",                                    # create_at_message
-                "messageData.updatedAt":"2022-12-16T17:09:30.267Z",                                    # update_at_message
-                "messageData.mediaType":null,                                                          # type
-                "messageData.mediaUrl":null,                                                           # media_link
-                "messageData.ticketId":5
-            */}
             <>
               {reports &&
                 reports.map((report) => (
-                  <TableRow key={report.id}>
-                    <TableCell align="center">{report.msgWhatsId}</TableCell>
-                    <TableCell align="center">{report.whatsapp.name}</TableCell>
-                    <TableCell align="center">{report.phoneNumber}</TableCell>
-                    <TableCell align="center">{"MOBILE"}</TableCell>
+                  <TableRow key={report.id_session}>
+                    <TableCell align="center">{report.id_session}</TableCell>
+                    <TableCell align="center">{report.phone_number}</TableCell>
                     <TableCell align="center">
-                      {format(parseISO(report.createdAt), "dd/MM/yy HH:mm")}
+                      {report.client_phone_number}
                     </TableCell>
                     <TableCell align="center">
-                      {format(parseISO(report.updatedAt), "dd/MM/yy HH:mm")}
-                    </TableCell>
-                    <TableCell align="center">{report.id}</TableCell>
-                    <TableCell align="center">{getStatus(report)}</TableCell>
-                    <TableCell align="center">{"direction"}</TableCell>
-                    <TableCell align="center">{"session"}</TableCell>
-                    <TableCell align="center">
-                      {report.messageData.body}
+                      {report.destination_number_type}
                     </TableCell>
                     <TableCell align="center">
-                      {format(
-                        parseISO(report.messageData.createdAt),
-                        "dd/MM/yy HH:mm"
-                      )}
+                      {report.create_at_session
+                        ? format(
+                            parseISO(report.create_at_session),
+                            "dd/MM/yy HH:mm"
+                          )
+                        : ""}
                     </TableCell>
                     <TableCell align="center">
-                      {format(
-                        parseISO(report.messageData.updatedAt),
-                        "dd/MM/yy HH:mm"
-                      )}
+                      {report.update_at_session
+                        ? format(
+                            parseISO(report.update_at_session),
+                            "dd/MM/yy HH:mm"
+                          )
+                        : ""}
+                    </TableCell>
+                    <TableCell align="center">{report.external_id}</TableCell>
+                    <TableCell align="center">{report.status}</TableCell>
+                    <TableCell align="center">{report.direction}</TableCell>
+                    <TableCell align="center">{report.session}</TableCell>
+                    <TableCell align="center">{report.content}</TableCell>
+                    <TableCell align="center">
+                      {report.create_at_message
+                        ? format(
+                            parseISO(report.create_at_message),
+                            "dd/MM/yy HH:mm"
+                          )
+                        : ""}
                     </TableCell>
                     <TableCell align="center">
-                      {report.messageData.mediaType}
+                      {report.update_at_message
+                        ? format(
+                            parseISO(report.update_at_message),
+                            "dd/MM/yy HH:mm"
+                          )
+                        : ""}
                     </TableCell>
-                    <TableCell align="center">
-                      {report.messageData.mediaUrl}
-                    </TableCell>
+                    <TableCell align="center">{report.type}</TableCell>
+                    <TableCell align="center">{report.media_link}</TableCell>
                     <TableCell align="center">{report.var1}</TableCell>
                     <TableCell align="center">{report.var2}</TableCell>
                     <TableCell align="center">{report.var3}</TableCell>
@@ -386,33 +395,39 @@ const OfficialWhatsappReport = () => {
                     <TableCell align="center">{report.var5}</TableCell>
                   </TableRow>
                 ))}
-              {/* {loading && <TableRowSkeleton columns={4} />} */}
+              {loading && <TableRowSkeleton columns={20} />}
             </>
           </TableBody>
         </Table>
         <div
-					style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}
-				>
-					<Button
-						variant="outlined"
-						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber - 1) }}
-						disabled={ pageNumber === 1}
-					>
-						{i18n.t("officialConnections.previousPage")}
-					</Button>
-					<Typography
-						style={{ display: "inline-block", fontSize: "1.25rem" }}
-					>
-						{ pageNumber } / { Math.ceil(count / 10) }
-					</Typography>
-					<Button
-						variant="outlined"
-						onClick={() => { setPageNumber(prevPageNumber => prevPageNumber + 1) }}
-						disabled={ pageNumber >= Math.ceil(count / 10) }
-					>
-						{i18n.t("officialConnections.nextPage")}
-					</Button>
-				</div>
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            paddingTop: "1rem",
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setPageNumber((prevPageNumber) => prevPageNumber - 1);
+            }}
+            disabled={pageNumber === 1}
+          >
+            {i18n.t("officialConnections.previousPage")}
+          </Button>
+          <Typography style={{ display: "inline-block", fontSize: "1.25rem" }}>
+            {pageNumber} / {Math.ceil(count / 10)}
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setPageNumber((prevPageNumber) => prevPageNumber + 1);
+            }}
+            disabled={pageNumber >= Math.ceil(count / 10)}
+          >
+            {i18n.t("officialConnections.nextPage")}
+          </Button>
+        </div>
       </Paper>
     </MainContainer>
   );
