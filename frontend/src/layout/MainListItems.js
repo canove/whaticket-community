@@ -460,6 +460,9 @@ const MainListItems = (props) => {
     if (name === "Whats Contacts") {
       return i18n.t("officialPages.officialContacts.title");
     }
+    if (name === "Official Whatsapp Report") {
+      return i18n.t("sessionReports.title");
+    }
 
     return name;
   }

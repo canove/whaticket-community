@@ -47,6 +47,8 @@ const getDinamicValue = (path: any, payload: any) => {
 };
 
 const getRelationValue = (newValue: any, payload: any) => {
+  if (!newValue) return "";
+
   let value = newValue;
 
   if(!value)
