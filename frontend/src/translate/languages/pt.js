@@ -946,6 +946,10 @@ const messages = {
         },
       },
 
+      sessionReports: {
+        title: "Relatório de Sessão"
+      },
+
       flows: {
         title: "Fluxos",
         buttons:{

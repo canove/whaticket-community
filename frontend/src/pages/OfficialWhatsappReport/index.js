@@ -263,7 +263,7 @@ const OfficialWhatsappReport = () => {
   return (
     <MainContainer>
       <MainHeader>
-        <Title>Relatório de Whatsapp Oficial</Title>
+        <Title>{i18n.t("sessionReports.title")}</Title>
         <MainHeaderButtonsWrapper>
           {/* <Autocomplete
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
