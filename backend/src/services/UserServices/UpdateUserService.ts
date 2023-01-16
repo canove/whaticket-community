@@ -2,6 +2,7 @@ import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
+import ShowProfileService from "../ProfileServices/ShowProfileService";
 import ShowUserService from "./ShowUserService";
 
 interface UserData {
@@ -70,6 +71,7 @@ const UpdateUserService = async ({
   await user.reload();
 
   const company = await ShowCompanyService(companyId);
+  const profiles = await ShowProfileService(profileId, companyId);
 
   const serializedUser = {
     id: user.id,
@@ -79,7 +81,8 @@ const UpdateUserService = async ({
     profileId: user.profileId,
     queues: user.queues,
     companyId: user.companyId,
-    company
+    company,
+    profiles
   };
 
   return serializedUser;

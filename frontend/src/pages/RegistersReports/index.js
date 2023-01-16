@@ -66,6 +66,8 @@ const RegistersReports = () => {
 	const [hasMore, setHasMore] = useState(false);
     const [initialDate, setInitialDate] = useState(getCurrentDate());
     const [finalDate, setFinalDate] = useState(getCurrentDate());
+    const [name, setName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -85,7 +87,7 @@ const RegistersReports = () => {
         setPageNumber(1);
         setDisablePdfButton(true);
         setDisableCsvButton(true);
-    }, [fileIds, statuses])
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber])
 
     useEffect(() => {
         const createCsvFile = async () => {
@@ -107,7 +109,7 @@ const RegistersReports = () => {
             }
         }
         createCsvFile();
-    }, [fileIds, statuses, initialDate, finalDate])
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber])
 
     useEffect(() => {
         const createPdfFile = async () => {
@@ -129,7 +131,7 @@ const RegistersReports = () => {
             }
         }
         createPdfFile();
-    }, [fileIds, statuses, initialDate, finalDate])
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber])
 
     useEffect(() => {
         setLoading(true);
@@ -141,7 +143,9 @@ const RegistersReports = () => {
                     fileIds,
                     pageNumber,
                     initialDate,
-                    finalDate
+                    finalDate,
+                    name,
+                    phoneNumber
                 }
                });
                setRegisters(data.registers);
@@ -154,7 +158,7 @@ const RegistersReports = () => {
             }
         }
         fetchRegisters();
-    }, [fileIds, statuses, pageNumber, initialDate, finalDate]);
+    }, [fileIds, statuses, pageNumber, initialDate, finalDate, name, phoneNumber]);
 
     const handleFileSelectChange = (e) => {
         const {
@@ -232,8 +236,36 @@ const RegistersReports = () => {
             <MainHeader>
                 <Title>{i18n.t("logReport.title")}</Title>
                 <MainHeaderButtonsWrapper>
-                    <div style={{ display: "flex" }}>
+                    <div style={{ display: "flex", alignItems: "flex-end" }}>
                         <TextField
+                            placeholder={"Telefone"}
+                            type="search"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            // InputProps={{
+                            // startAdornment: (
+                            //     <InputAdornment position="start">
+                            //         <SearchIcon style={{ color: "gray" }} />
+                            //     </InputAdornment>
+                            // ),
+                            // }}
+                        />
+                        <TextField
+                            style={{ marginLeft: "8px" }}
+                            placeholder={"Nome"}
+                            type="search"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            // InputProps={{
+                            // startAdornment: (
+                            //     <InputAdornment position="start">
+                            //         <SearchIcon style={{ color: "gray" }} />
+                            //     </InputAdornment>
+                            // ),
+                            // }}
+                        />
+                        <TextField
+                            style={{ marginLeft: "8px" }}
                             onChange={(e) => { setInitialDate(e.target.value) }}
                             label={i18n.t("reports.form.initialDate")}
                             InputLabelProps={{ shrink: true, required: true }}
@@ -248,61 +280,63 @@ const RegistersReports = () => {
                             type="date"
                             value={finalDate}
                         />
-                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
-                        <InputLabel id="file-select-label">{i18n.t("logReport.select.file")}</InputLabel>
-                        <Select
-                            className={classes.select}
-                            labelId="file-select-label"
-                            id="file-select"
-                            value={fileIds}
-                            onChange={handleFileSelectChange}
-                            multiple
+                        <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
+                            <InputLabel id="file-select-label">{i18n.t("logReport.select.file")}</InputLabel>
+                            <Select
+                                className={classes.select}
+                                labelId="file-select-label"
+                                id="file-select"
+                                value={fileIds}
+                                onChange={handleFileSelectChange}
+                                multiple
+                            >
+                                <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
+                                {files && files.map((file, index) => {
+                                    return (
+                                        <MenuItem key={index} value={file.id}>
+                                            {file.name}
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Select>
+                        </FormControl>
+                        <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
+                            <InputLabel id="status-select-label">{i18n.t("logReport.select.status")}</InputLabel>
+                            <Select
+                                className={classes.select}
+                                labelId="status-select-label"
+                                id="status-select"
+                                value={statuses}
+                                onChange={handleStatusSelectChange}
+                                multiple
+                            >
+                                <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
+                                <MenuItem value={"sent"}>{i18n.t("logReport.select.sent")}</MenuItem>
+                                <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
+                                <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
+                                <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                        <Button
+                            style={{ marginLeft: "8px" }}
+                            variant="contained"
+                            color="primary"
+                            onClick={downloadPdf}
+                            disabled={disablePdfButton}
                         >
-                            <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
-                            {files && files.map((file, index) => {
-                                return (
-                                    <MenuItem key={index} value={file.id}>
-                                        {file.name}
-                                    </MenuItem>
-                                );
-                            })}
-                        </Select>
-                    </FormControl>
-                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
-                        <InputLabel id="status-select-label">{i18n.t("logReport.select.status")}</InputLabel>
-                        <Select
-                            className={classes.select}
-                            labelId="status-select-label"
-                            id="status-select"
-                            value={statuses}
-                            onChange={handleStatusSelectChange}
-                            multiple
+                            {i18n.t("logReport.buttons.exportPdf")}
+                        </Button>
+                        <Button
+                            style={{ marginLeft: "8px" }}
+                            variant="contained"
+                            color="primary"
+                            onClick={downloadCsv}
+                            disabled={disableCsvButton}
                         >
-                            <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
-                            <MenuItem value={"sent"}>{i18n.t("logReport.select.sent")}</MenuItem>
-                            <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
-                            <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
-                            <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Button
-                        style={{ marginLeft: "8px" }}
-                        variant="contained"
-                        color="primary"
-                        onClick={downloadPdf}
-                        disabled={disablePdfButton}
-                    >
-                        {i18n.t("logReport.buttons.exportPdf")}
-                    </Button>
-                    <Button
-                        style={{ marginLeft: "8px" }}
-                        variant="contained"
-                        color="primary"
-                        onClick={downloadCsv}
-                        disabled={disableCsvButton}
-                    >
-                        {i18n.t("logReport.buttons.exportCsv")}
-                    </Button>
+                            {i18n.t("logReport.buttons.exportCsv")}
+                        </Button>
                     </div>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -314,6 +348,7 @@ const RegistersReports = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">{i18n.t("logReport.grid.name")}</TableCell>
+                            <TableCell align="center">{"Telefone"}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.status")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.sent")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
@@ -328,6 +363,7 @@ const RegistersReports = () => {
                                 return (
                                     <TableRow key={index}>
                                         <TableCell align="center">{register.name}</TableCell>
+                                        <TableCell align="center">{register.phoneNumber}</TableCell>
                                         <TableCell align="center">{getStatus(register)}</TableCell>
                                         <TableCell align="center">{formatDate(register.sentAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.deliveredAt)}</TableCell>
@@ -337,7 +373,7 @@ const RegistersReports = () => {
                                     </TableRow>
                                 )
                             }))}
-                            {loading && <TableRowSkeleton columns={7} />}
+                            {loading && <TableRowSkeleton columns={8} />}
                         </>
                     </TableBody>
                 </Table>

@@ -13,12 +13,14 @@ type IndexQuery = {
   date?: string;
 };
 
-type Query = {
+type ListQuery = {
   statuses: Array<any>;
   fileIds: Array<any>;
   pageNumber: number | string;
   initialDate: string;
   finalDate: string;
+  name: string;
+  phoneNumber: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -33,7 +35,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate } = req.query as Query;
+  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers, count, hasMore } = await ListReportRegistersService({
@@ -42,14 +44,16 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     pageNumber,
     companyId,
     initialDate,
-    finalDate
+    finalDate,
+    name,
+    phoneNumber
   });
 
   return res.json({ registers, count, hasMore });
 };
 
 export const exportPdf = async (req: Request, res: Response): Promise<void> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate } = req.query as Query;
+  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
@@ -58,7 +62,9 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
     pageNumber,
     companyId,
     initialDate,
-    finalDate
+    finalDate,
+    name,
+    phoneNumber
   });
 
   const checkZero = data => {
@@ -186,7 +192,7 @@ export const exportCsv = async (
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate } = req.query as Query;
+  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
@@ -195,7 +201,9 @@ export const exportCsv = async (
     pageNumber,
     companyId,
     initialDate,
-    finalDate
+    finalDate,
+    name, 
+    phoneNumber
   });
 
   const checkZero = data => {
