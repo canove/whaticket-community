@@ -2,6 +2,31 @@ import FileRegister from "../../database/models/FileRegister";
 import Message from "../../database/models/Message";
 import Ticket from "../../database/models/Ticket";
 import Whatsapp from "../../database/models/Whatsapp";
+import { subHours } from "date-fns";
+import { Op } from "sequelize";
+
+interface OfficialReport {
+  id_session: string;
+  content: string;
+  type: string;
+  media_link: string;
+  create_at_message: string;
+  update_at_message: string;
+  external_id: string;
+  client_phone_number: string;
+  var1: string;
+  var2: string;
+  var3: string;
+  var4: string;
+  var5: string;
+  create_at_session: string;
+  update_at_session: string;
+  phone_number: string;
+  status: string;
+  direction: string;
+  session: string;
+  destination_number_type: string;
+}
 
 interface Request {
   companyId: number;
@@ -10,7 +35,7 @@ interface Request {
 }
 
 interface Response {
-  reports: FileRegister[];
+  reports: OfficialReport[];
   count: number;
 }
 
@@ -19,69 +44,138 @@ const ListOfficialWhatsappService = async ({
   limit = "10",
   pageNumber = "1"
 }: Request): Promise<Response> => {
+  let reports = [];
+  
   const offset = +limit * (+pageNumber - 1);
 
-  const { count, rows: reports } = await FileRegister.findAndCountAll({
-    where: { companyId },
-    attributes: [
-      "msgWhatsId",
-      "var1",
-      "var2",
-      "var3",
-      "var4",
-      "var5",
-      "whatsappId",
-      "phoneNumber",
-      "createdAt",
-      "updatedAt",
-      "id",
-      "readAt",
-      "deliveredAt",
-      "sentAt",
-      "errorAt"
-    ],
+  const { count, rows: messages } = await Message.findAndCountAll({
     include: [
       {
-        model: Whatsapp,
-        as: "whatsapp",
-        attributes: ["name"],
-        required: true
-      },
-      {
-        model: Message,
-        as: "messageData",
-        attributes: [
-          "body",
-          "createdAt",
-          "updatedAt",
-          "mediaType",
-          "mediaUrl",
-          "ticketId"
-        ],
-        required: true
+        model: Ticket,
+        as: "ticket",
+        attributes: ["id"],
+        where: { companyId }
       }
     ],
     limit: +limit > 0 ? +limit : null,
     offset: +limit > 0 ? offset : null,
   });
 
-//   for (const report of reports) {
-//     const myLastMessage = await Message.findOne({
-//         where: { ticketId: report.messageData.ticketId, fromMe: true },
-//         order: [["createdAt", "DESC"]],
-//     });
+  for (const message of messages) {
+    let report = null;
 
-//     const clientLastMessage = await Message.findOne({
-//         where: { ticketId: report.messageData.ticketId, fromMe: false },
-//         order: [["createdAt", "DESC"]],
-//     })
+    let direction = "incoming";
+    let session = "inbound";
 
-//     const in24Hours = (myLastMessage.createdAt.getTime() - clientLastMessage.createdAt.getTime()) < 86400000;
+    const id_session = message.id;
+    const content = message.body;
+    const type = message.mediaType;
+    const media_link = message.mediaUrl;
+    const create_at_message = message.createdAt;
+    const update_at_message = message.updatedAt;
 
-//     console.log(in24Hours);
-//   }
+    report = {
+      id_session,
+      content,
+      type,
+      media_link,
+      create_at_message,
+      update_at_message
+    };
 
-  return { reports, count };
+    const messageIn24Hours = await Message.findOne({
+      where: {
+        id: { [Op.ne]: message.id },
+        createdAt: { [Op.between]: [+subHours(new Date(), 24), +new Date()] }
+      }
+    });
+
+    if (messageIn24Hours) {
+      session = "messages";
+    }
+
+    const fileRegister = await FileRegister.findOne({
+      attributes: [
+        "msgWhatsId",
+        "var1",
+        "var2",
+        "var3",
+        "var4",
+        "var5",
+        "whatsappId",
+        "phoneNumber",
+        "createdAt",
+        "updatedAt",
+        "id",
+        "readAt",
+        "deliveredAt",
+        "sentAt",
+        "errorAt"
+      ],
+      include: [
+        {
+          model: Whatsapp,
+          as: "whatsapp",
+          attributes: ["name"],
+          required: true
+        },
+      ],
+      where: { msgWhatsId: message.id }
+    });
+
+    if (fileRegister) {
+      direction = "outgoing_template";
+      session = "outbound";
+
+      const external_id = fileRegister.id;
+      const client_phone_number = fileRegister.phoneNumber;
+      const var1 = fileRegister.var1;
+      const var2 = fileRegister.var2;
+      const var3 = fileRegister.var3;
+      const var4 = fileRegister.var4;
+      const var5 = fileRegister.var5;
+      const create_at_session = fileRegister.createdAt;
+      const update_at_session = fileRegister.updatedAt;
+      
+      const phone_number = fileRegister.whatsapp.name;
+      const status = getStatus(fileRegister);
+
+      report = {
+        ...report,
+        external_id,
+        client_phone_number,
+        var1,
+        var2,
+        var3,
+        var4,
+        var5,
+        create_at_session,
+        update_at_session,
+        status,
+        phone_number
+      }
+    };
+
+    report = {
+      ...report,
+      direction,
+      session,
+      destination_number_type: "MOBILE"
+    }
+
+    reports.push(report);
+  }
+
+  return { count, reports };
+};
+
+const getStatus = (fileRegister) => {
+  if (fileRegister.errorAt) return "failed";
+  if (fileRegister.sentAt) return "sent";
+  if (fileRegister.deliveredAt) return "delivered";
+  if (fileRegister.readAt) return "read";
+
+  return "";
 };
 
 export default ListOfficialWhatsappService;

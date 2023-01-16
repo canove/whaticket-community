@@ -117,9 +117,11 @@ const ListReportRegistersService = async ({
     return { registers, count, hasMore };
   }
 
-  whereCondition = {
-    ...whereCondition,
-    processedAt: { [Op.between]: [getDate(initialDate, "MORNING"), getDate(finalDate, "NIGHT")] }
+  if (initialDate && finalDate) {
+    whereCondition = {
+      ...whereCondition,
+      processedAt: { [Op.between]: [getDate(initialDate, "MORNING"), getDate(finalDate, "NIGHT")] }
+    }
   }
 
   const limit = 20;
