@@ -307,35 +307,31 @@ const UserModal = ({ open, onClose, userId }) => {
 										</Select>
 									</FormControl>
 								</div>
-								<Can
-									role={loggedInUser.profiles}
-									perform="user-modal:editCompany"
-									yes={() => (
-										<div>
-											<FormControl
-												variant="outlined"
-												margin="dense"
-												fullWidth
+								{ loggedInUser.companyId === 1 &&
+									<div>
+										<FormControl
+											variant="outlined"
+											margin="dense"
+											fullWidth
+										>
+											<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
+											<Select
+												label="Empresa"
+												name="company"
+												labelId="company-selection-label"
+												id="company-selection"
+												value={selectedCompany}
+												onChange={(e) => {handleCompanyChange(e)}}
 											>
-												<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
-												<Select
-													label="Empresa"
-													name="company"
-													labelId="company-selection-label"
-													id="company-selection"
-													value={selectedCompany}
-													onChange={(e) => {handleCompanyChange(e)}}
-												>
-													{ companies && companies.map(company => {
-														return (
-															<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
-														)
-													}) }
-												</Select>
-											</FormControl>
-										</div>
-									)}
-								/>
+												{ companies && companies.map(company => {
+													return (
+														<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
+													)
+												}) }
+											</Select>
+										</FormControl>
+									</div>
+								}
 								<Can
 									role={loggedInUser.profiles}
 									perform="user-modal:editQueues"

@@ -58,9 +58,7 @@ const RegistersReports = () => {
     const [statuses, setStatuses] = useState([]);
     const [registers, setRegisters] = useState([]);
     const [pdf, setPdf] = useState("");
-    const [disablePdfButton, setDisablePdfButton] = useState(true);
     const [csv, setCsv] = useState("");
-    const [disableCsvButton, setDisableCsvButton] = useState(true);
     const [pageNumber, setPageNumber] = useState(1);
 	const [count, setCount] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
@@ -68,6 +66,8 @@ const RegistersReports = () => {
     const [finalDate, setFinalDate] = useState(getCurrentDate());
     const [name, setName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [creatingCSV, setCreatingCSV] = useState(false);
+    const [creatingPDF, setCreatingPDF] = useState(false);
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -85,59 +85,63 @@ const RegistersReports = () => {
 
     useEffect(() => {
         setPageNumber(1);
-        setDisablePdfButton(true);
-        setDisableCsvButton(true);
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber])
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber]);
 
     useEffect(() => {
-        const createCsvFile = async () => {
-            try {
-                const { data } = await api.get(`/registers/exportCsv`, {
-                    params: {
-                        statuses,
-                        fileIds,
-                        pageNumber: "ALL",
-                        initialDate,
-                        finalDate
-                    }
-                });
-                setCsv(data);
-                setDisableCsvButton(false);
-            } catch (err) {
-                toastError(err);
-                setDisableCsvButton(true);
-            }
+        if (count > 0) filterReport();
+    }, [pageNumber]);
+
+    const createCSV = async () => {
+        setCreatingCSV(true);
+
+        try {
+            const { data } = await api.get(`/registers/exportCsv`, {
+                params: {
+                    statuses,
+                    fileIds,
+                    pageNumber: "ALL",
+                    initialDate,
+                    finalDate
+                }
+            });
+            setCsv(data);
+        } catch (err) {
+            toastError(err);
         }
-        createCsvFile();
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber])
 
-    useEffect(() => {
-        const createPdfFile = async () => {
-            try {
-                const { data } = await api.get(`/registers/exportPdf`, {
-                    params: {
-                        statuses,
-                        fileIds,
-                        pageNumber: "ALL",
-                        initialDate,
-                        finalDate
-                    }
-                });
-                setPdf(data);
-                setDisablePdfButton(false);
-            } catch (err) {
-                toastError(err);
-                setDisablePdfButton(true);
-            }
+        await downloadCsv();
+        
+        setCreatingCSV(false);
+    }
+
+    const createPDF = async () => {
+        setCreatingPDF(true);
+
+        try {
+            const { data } = await api.get(`/registers/exportPdf`, {
+                params: {
+                    statuses,
+                    fileIds,
+                    pageNumber: "ALL",
+                    initialDate,
+                    finalDate
+                }
+            });
+            setPdf(data);
+        } catch (err) {
+            toastError(err);
         }
-        createPdfFile();
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber])
 
-    useEffect(() => {
+        await downloadPdf();
+
+        setCreatingPDF(false);
+    }
+
+    const filterReport = async () => {
         setLoading(true);
-        const fetchRegisters = async () => {
-            try {
-               const { data } = await api.get(`registers/listReport/`, {
+
+        try {
+            const { data } = await api.get('registers/listReport/', {
                 params: {
                     statuses,
                     fileIds,
@@ -147,18 +151,16 @@ const RegistersReports = () => {
                     name,
                     phoneNumber
                 }
-               });
-               setRegisters(data.registers);
-               setCount(data.count);
-               setHasMore(data.hasMore);
-               setLoading(false);
-            } catch (err) {
-                toastError(err);
-                setLoading(false);
-            }
+            });
+            setRegisters(data.registers);
+            setCount(data.count);
+            setHasMore(data.hasMore);
+        } catch (err) {
+            toastError(err);
         }
-        fetchRegisters();
-    }, [fileIds, statuses, pageNumber, initialDate, finalDate, name, phoneNumber]);
+
+        setLoading(false);
+    }
 
     const handleFileSelectChange = (e) => {
         const {
@@ -212,7 +214,7 @@ const RegistersReports = () => {
         return '';
     }
 
-    const downloadPdf = () => {
+    const downloadPdf = async () => {
         const linkSource = `data:application/pdf;base64,${pdf}`;
         const downloadLink = document.createElement("a");
         const fileName = `report.pdf`;
@@ -323,8 +325,17 @@ const RegistersReports = () => {
                             style={{ marginLeft: "8px" }}
                             variant="contained"
                             color="primary"
-                            onClick={downloadPdf}
-                            disabled={disablePdfButton}
+                            onClick={filterReport}
+                            disabled={loading}
+                        >
+                            {"Filtrar"}
+                        </Button>
+                        <Button
+                            style={{ marginLeft: "8px" }}
+                            variant="contained"
+                            color="primary"
+                            onClick={createPDF}
+                            disabled={creatingPDF}
                         >
                             {i18n.t("logReport.buttons.exportPdf")}
                         </Button>
@@ -332,8 +343,8 @@ const RegistersReports = () => {
                             style={{ marginLeft: "8px" }}
                             variant="contained"
                             color="primary"
-                            onClick={downloadCsv}
-                            disabled={disableCsvButton}
+                            onClick={createCSV}
+                            disabled={creatingCSV}
                         >
                             {i18n.t("logReport.buttons.exportCsv")}
                         </Button>
