@@ -22,6 +22,7 @@ interface Request {
   bot: boolean;
   contactId?: number;
   cation?: string;
+  type?: string;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -32,7 +33,8 @@ const SendWhatsAppMessage = async ({
   bot,
   contactId,
   whatsMsgId,
-  cation
+  cation,
+  type
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -103,16 +105,21 @@ const SendWhatsAppMessage = async ({
     try {
       const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
 
-      const { url, type, fileName } = isValidHttpUrl(body);
+      const { url, fileName } = isValidHttpUrl(body);
 
       let typePayload = null;
 
-      if (cation) {
+      let defaultType = "text";
+
+      if (cation || (type && type !== "text")) {
+        defaultType = type ? type : "document";
+
         typePayload = {
           link: url,
-          caption: cation ? formatBody(cation, reg) : "",
-          filename: fileName
+          caption: cation ? formatBody(cation, reg) : ""
         }
+
+        if (type === "document") typePayload = { ...typePayload, filename: fileName }
       } else {
         const newBody = formatBody(body, reg);
         typePayload = { body: newBody.replace(/&#x2F;/g, '/') };
@@ -122,9 +129,9 @@ const SendWhatsAppMessage = async ({
         "messaging_product": "whatsapp",
         "preview_url": false,
         "recipient_type": "individual",
-        "to": !messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber,
-        "type": cation ? "document" : "text",
-        [cation ? "document" : "text"]: typePayload
+        "to": !messageSended?.phoneNumber ? contact.number : messageSended?.phoneNumber,
+        "type": defaultType,
+        [defaultType]: typePayload
       };
 
       var result = await axios.post(apiUrl, payload, {
