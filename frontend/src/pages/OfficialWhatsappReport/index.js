@@ -49,13 +49,15 @@ const OfficialWhatsappReport = () => {
   const [count, setCount] = useState(0);
   const [creatingXLSX, setCreatingXLSX] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [clientPhoneNumber, setClientPhoneNumber] = useState("");
 
   const filterReports = async () => {
     setLoading(true);
 
     try {
       const { data } = await api.get("/officialWhatsappReports", {
-        params: { pageNumber, limit: "10" },
+        params: { pageNumber, limit: "10", phoneNumber, clientPhoneNumber },
       });
       setReports(data.reports);
       setCount(data.count);
@@ -292,6 +294,19 @@ const OfficialWhatsappReport = () => {
           >
             {i18n.t("reportsTicket.buttons.exportPdf")}
           </Button> */}
+          <TextField
+              placeholder={"Telefone"}
+              type="search"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          <TextField
+              style={{ marginLeft: "8px" }}
+              placeholder={"Telefone do Cliente"}
+              type="search"
+              value={clientPhoneNumber}
+              onChange={(e) => setClientPhoneNumber(e.target.value)}
+          />
           <Button
             variant="contained"
             color="primary"
