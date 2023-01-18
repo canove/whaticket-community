@@ -8,9 +8,11 @@ import {
   PrimaryKey,
   Default,
   BelongsTo,
-  ForeignKey
+  ForeignKey,
+  HasOne
 } from "sequelize-typescript";
 import Contact from "./Contact";
+import FileRegister from "./FileRegister";
 import Ticket from "./Ticket";
 
 @Table
@@ -72,6 +74,12 @@ class Message extends Model<Message> {
 
   @BelongsTo(() => Contact, "contactId")
   contact: Contact;
+
+  @HasOne(() => FileRegister, "msgWhatsId")
+  fileRegister: FileRegister
+
+  // Para Relatório
+  lastMessage: string;
 }
 
 export default Message;

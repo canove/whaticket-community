@@ -7,13 +7,15 @@ import ListOfficialWhatsappReportsService from "../services/OfficialWhatsappServ
 type IndexQuery = {
     pageNumber: string;
     limit: string;
+    phoneNumber: string;
+    clientPhoneNumber: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-    const { pageNumber, limit } = req.query as IndexQuery;
+    const { pageNumber, limit, phoneNumber, clientPhoneNumber } = req.query as IndexQuery;
     const { companyId } = req.user;
   
-    const reports = await ListOfficialWhatsappReportsService({ companyId, pageNumber, limit });
+    const reports = await ListOfficialWhatsappReportsService({ companyId, pageNumber, limit, phoneNumber, clientPhoneNumber });
   
     return res.status(200).json(reports);
 }
