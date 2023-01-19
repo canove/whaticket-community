@@ -119,7 +119,7 @@ const SendWhatsAppMessage = async ({
           caption: cation ? formatBody(cation, reg) : ""
         }
 
-        if (type === "document") typePayload = { ...typePayload, filename: fileName }
+        if (defaultType === "document" && fileName) typePayload = { ...typePayload, filename: fileName }
       } else {
         const newBody = formatBody(body, reg);
         typePayload = { body: newBody.replace(/&#x2F;/g, '/') };
