@@ -267,7 +267,7 @@ export const config = async (
           }
           throw new AppError(err.response.data.message);
         }
-
+        console.log('update whatsapp whatsappcontroller 270')
         await whatsapp.update({
           whatsName,
         });
@@ -292,7 +292,7 @@ export const config = async (
           }
           throw new AppError(err.response.data.message);
         }
-
+        console.log('update whatsapp whatsappcontroller 295')
         await whatsapp.update({
           whatsImage: fileLink,
         });
@@ -317,7 +317,7 @@ export const config = async (
           }
           throw new AppError(err.response.data.message);
         }
-
+        console.log('update whatsapp whatsappcontroller 320')
         await whatsapp.update({
           whatsName,
         });
@@ -380,6 +380,7 @@ export const multipleConfig = async (
             });
 
             if (result.status == 200) {
+              console.log('update whatsapp whatsappcontroller 383')
               await whatsapp.update({
                 whatsName,
               });
@@ -409,6 +410,7 @@ export const multipleConfig = async (
             });
 
             if (result.status == 200) {
+              console.log('update whatsapp whatsappcontroller 413')
               await whatsapp.update({
                 whatsImage: fileLink,
               });
@@ -451,6 +453,7 @@ export const multipleConfig = async (
             });
 
             if (result.status == 200) {
+              console.log('update whatsapp whatsappcontroller 456')
               await whatsapp.update({
                 whatsName,
               });

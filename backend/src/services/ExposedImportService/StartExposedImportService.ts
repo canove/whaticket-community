@@ -5,6 +5,7 @@ import ExposedImport from "../../database/models/ExposedImport";
 import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
+import { preparePhoneNumber, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
 
 interface Request {
   exposedImportId: string;
@@ -43,6 +44,8 @@ const getDinamicValue = (path: any, payload: any) => {
     }
   }
 
+
+
   return value || "";
 };
 
@@ -50,6 +53,9 @@ const getRelationValue = (newValue: any, payload: any) => {
   if (!newValue) return "";
 
   let value = newValue;
+
+  if(!value)
+    return '';
 
   while (value.match(/\{{(.*?)\}}/)) {
     const param = value.match(/\{{(.*?)\}}/);
@@ -61,6 +67,8 @@ const getRelationValue = (newValue: any, payload: any) => {
 
   return value;
 };
+
+let numberDispatcher = {};
 
 const StartExposedImportService = async ({
   exposedImportId,
@@ -80,8 +88,17 @@ const StartExposedImportService = async ({
   }
 
   const mapping = JSON.parse(exposedImport.mapping);
+  const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
+
+  if(numberDispatcher[phoneNumber]) {
+    throw new AppError("DUPLICATED_NUMBER", 403);
+  }
+
+  numberDispatcher[phoneNumber] = [];
 
   let totalRegisters = exposedImport.qtdeRegister;
+  var today = new Date();
+  today.setHours(today.getHours() - 4);
 
   if (Array.isArray(payload)) {
     let registersToInsert = [];
@@ -89,7 +106,28 @@ const StartExposedImportService = async ({
     for (const obj of payload) {
       try {
         const name = getRelationValue(mapping.name, obj);
-        const phoneNumber = getRelationValue(mapping.phoneNumber, obj);
+
+        const register = await FileRegister.findOne({
+          where: {
+            companyId: companyId,
+            createdAt: {
+              [Op.gte]: today
+            },
+            phoneNumber: {
+              [Op.or] : [
+                {[Op.like]: `%${phoneNumber}%` },
+                {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
+                {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
+                {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
+              ]
+            }
+         }});
+
+         
+         if(register) {
+          continue;
+         }
+
         const documentNumber = getRelationValue(mapping.documentNumber, obj);
         const template = getRelationValue(mapping.template, obj);
         const templateParams = getRelationValue(mapping.templateParams, obj);
@@ -141,11 +179,33 @@ const StartExposedImportService = async ({
       totalRegisters += registersToInsert.length;
       await FileRegister.bulkCreate(registersToInsert);
     }
-
+    console.log("update exposedImport exposedImportService 145");
     await exposedImport.update({ qtdeRegister: totalRegisters });
   } else {
     const name = getRelationValue(mapping.name, payload);
-    const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
+    const register = await FileRegister.findAll({
+      where: {
+        companyId: companyId,
+        createdAt: {
+          [Op.gte]: today
+        },
+        phoneNumber: {
+          [Op.or] : [
+            {[Op.like]: `%${phoneNumber}%` },
+            {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
+            {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
+            {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
+          ]
+        },
+     },
+     order: [["createdAt", "DESC"]] 
+    });
+
+     if(register.length > 0) {
+      delete numberDispatcher[phoneNumber];
+      throw new AppError("DUPLICATED_NUMBER", 403);
+     }
+
     const documentNumber = getRelationValue(mapping.documentNumber, payload);
     const template = getRelationValue(mapping.template, payload);
     const templateParams = getRelationValue(mapping.templateParams, payload);
@@ -182,11 +242,13 @@ const StartExposedImportService = async ({
       companyId,
       whatsappId
     });
-
+    console.log("update exposedImport exposedImportService 186");
     await exposedImport.update({ qtdeRegister: totalRegisters + 1 });
   }
 
   exposedImport.reload();
+
+  delete numberDispatcher[phoneNumber];
 
   return exposedImport;
 };

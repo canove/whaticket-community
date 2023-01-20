@@ -20,6 +20,7 @@ const UpdateFlowNodesService = async ({
 
   const { json } = flowNodesData;
 
+  console.log("update flowNode flowNodeService 23");
   await flowNode.update({
     json
   });

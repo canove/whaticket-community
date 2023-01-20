@@ -40,7 +40,7 @@ const QualityNumberWhatsappService = async ({
   if (!whatsapp) {
     return { success: false };
   }
-
+  console.log("update whatsapp qualitynumber 43");
   await whatsapp.update({
     tierLimit: currentLimit,
     quality: event

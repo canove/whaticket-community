@@ -12,7 +12,7 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
       }
     }
   );
-
+  console.log('update ticket ticketMessageAsRead 15')
   await ticket.update({ unreadMessages: 0 });
 
   const io = getIO();

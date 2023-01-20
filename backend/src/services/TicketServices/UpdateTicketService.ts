@@ -39,7 +39,7 @@ const UpdateTicketService = async ({
   if (oldStatus === "closed") {
     await CheckContactOpenTickets(ticket.contact.id);
   }
-
+  console.log("update ticket updateticketservice 43");
   await ticket.update({
     status,
     queueId,

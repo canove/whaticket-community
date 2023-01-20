@@ -20,6 +20,7 @@ const UpdateCategoryService = async ({
 
   const { name, description } = categoryData;
 
+  console.log("update category categoryService 23");
   await category.update({
     name,
     description

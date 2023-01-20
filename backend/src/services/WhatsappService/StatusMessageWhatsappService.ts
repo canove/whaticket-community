@@ -69,6 +69,7 @@ const StatusMessageWhatsappService = async ({
     });
 
    if(msgRegister) {
+    console.log("update Message statusmessageservice 71");
     switch(statusType){
       case "sent":
         await msgRegister?.update({ ack: 1 });
@@ -99,6 +100,7 @@ const StatusMessageWhatsappService = async ({
     return { success: false };
   }
 
+  console.log("update FileRegister statusmessageservice 103");
   switch(statusType){
     case "sent":
       await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId });

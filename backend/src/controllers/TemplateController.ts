@@ -149,6 +149,7 @@ export const updateStatus = async (
 
   if (!template) throw new AppError("ERR_NO_TEMPLATE_FOUND");
 
+  console.log('update template tempolatecontroller 152')
   await template.update({
     status: status,
     reason: reason ? reason : null,
