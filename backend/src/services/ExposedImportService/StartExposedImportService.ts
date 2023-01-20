@@ -13,12 +13,12 @@ interface Request {
   payload: any;
 }
 
-const jsonStringToObj = (jsonString: any) => {
+const objToString = (obj: any) => {
   try {
-    const responseObj = JSON.parse(jsonString);
-    return responseObj;
+    const string = JSON.stringify(obj);
+    return string;
   } catch {
-    return false;
+    return "";
   }
 };
 
@@ -44,9 +44,7 @@ const getDinamicValue = (path: any, payload: any) => {
     }
   }
 
-
-
-  return value || "";
+  return (value && typeof value === "string") ? value : objToString(value);
 };
 
 const getRelationValue = (newValue: any, payload: any) => {
@@ -98,7 +96,7 @@ const StartExposedImportService = async ({
     for (const obj of payload) {
       try {
         const name = getRelationValue(mapping.name, obj);
-        const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
+        const phoneNumber = getRelationValue(mapping.phoneNumber, obj);
         const documentNumber = getRelationValue(mapping.documentNumber, obj);
         const template = getRelationValue(mapping.template, obj);
         const templateParams = getRelationValue(mapping.templateParams, obj);

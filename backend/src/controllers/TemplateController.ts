@@ -90,14 +90,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const createOfficialTemplate = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
-  const { officialTemplate, mapping, headerVar, whatsappId } = req.body;
+  const { officialTemplate, mapping, headerVar, whatsappId, documentName } = req.body;
 
   const template = await CreateOfficialTemplateService({
     officialTemplate,
     mapping,
     headerVar,
     whatsappId,
-    companyId
+    companyId,
+    documentName
   });
 
   const io = getIO();

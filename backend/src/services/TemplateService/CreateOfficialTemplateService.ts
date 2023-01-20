@@ -24,6 +24,7 @@ interface TemplateData {
   headerVar: string;
   whatsappId: string;
   companyId: string | number;
+  documentName?: string
 }
 
 const CreateOfficialTemplateService = async ({
@@ -31,7 +32,8 @@ const CreateOfficialTemplateService = async ({
   mapping,
   headerVar,
   whatsappId,
-  companyId
+  companyId,
+  documentName
 }: TemplateData): Promise<OfficialTemplates> => {
   const getTemplateComponent = (components, type, item) => {
     const component = components.find(component => component.type === type);
@@ -50,7 +52,8 @@ const CreateOfficialTemplateService = async ({
   if (headerFormat && headerVar) {
     headerObj = {
       format: headerFormat,
-      link: headerVar
+      link: headerVar,
+      documentName: (headerFormat === "DOCUMENT" && documentName) ? documentName : null
     };
   }
 
