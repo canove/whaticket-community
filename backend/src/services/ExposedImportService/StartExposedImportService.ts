@@ -88,14 +88,6 @@ const StartExposedImportService = async ({
   }
 
   const mapping = JSON.parse(exposedImport.mapping);
-  const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
-
-  if(numberDispatcher[phoneNumber]) {
-    throw new AppError("DUPLICATED_NUMBER", 403);
-  }
-
-  numberDispatcher[phoneNumber] = [];
-
   let totalRegisters = exposedImport.qtdeRegister;
   var today = new Date();
   today.setHours(today.getHours() - 4);
@@ -106,28 +98,7 @@ const StartExposedImportService = async ({
     for (const obj of payload) {
       try {
         const name = getRelationValue(mapping.name, obj);
-
-        const register = await FileRegister.findOne({
-          where: {
-            companyId: companyId,
-            createdAt: {
-              [Op.gte]: today
-            },
-            phoneNumber: {
-              [Op.or] : [
-                {[Op.like]: `%${phoneNumber}%` },
-                {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
-                {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
-                {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
-              ]
-            }
-         }});
-
-         
-         if(register) {
-          continue;
-         }
-
+        const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
         const documentNumber = getRelationValue(mapping.documentNumber, obj);
         const template = getRelationValue(mapping.template, obj);
         const templateParams = getRelationValue(mapping.templateParams, obj);
@@ -183,28 +154,40 @@ const StartExposedImportService = async ({
     await exposedImport.update({ qtdeRegister: totalRegisters });
   } else {
     const name = getRelationValue(mapping.name, payload);
-    const register = await FileRegister.findAll({
-      where: {
-        companyId: companyId,
-        createdAt: {
-          [Op.gte]: today
-        },
-        phoneNumber: {
-          [Op.or] : [
-            {[Op.like]: `%${phoneNumber}%` },
-            {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
-            {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
-            {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
-          ]
-        },
-     },
-     order: [["createdAt", "DESC"]] 
-    });
+    const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
 
-     if(register.length > 0) {
-      delete numberDispatcher[phoneNumber];
+    if(numberDispatcher[phoneNumber]) {
       throw new AppError("DUPLICATED_NUMBER", 403);
-     }
+    }
+  
+    numberDispatcher[phoneNumber] = [];
+
+    const validDuplicated = getRelationValue("checkDuplicated", payload);
+
+    if(payload.checkDuplicated == undefined || validDuplicated === true) {
+      const register = await FileRegister.findAll({
+        where: {
+          companyId: companyId,
+          createdAt: {
+            [Op.gte]: today
+          },
+          phoneNumber: {
+            [Op.or] : [
+              {[Op.like]: `%${phoneNumber}%` },
+              {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
+              {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
+              {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
+            ]
+          },
+       },
+       order: [["createdAt", "DESC"]] 
+      });
+  
+       if(register.length > 0) {
+        delete numberDispatcher[phoneNumber];
+        throw new AppError("DUPLICATED_NUMBER", 403);
+       }
+    }
 
     const documentNumber = getRelationValue(mapping.documentNumber, payload);
     const template = getRelationValue(mapping.template, payload);
@@ -244,11 +227,10 @@ const StartExposedImportService = async ({
     });
     console.log("update exposedImport exposedImportService 186");
     await exposedImport.update({ qtdeRegister: totalRegisters + 1 });
+    delete numberDispatcher[phoneNumber];
   }
 
   exposedImport.reload();
-
-  delete numberDispatcher[phoneNumber];
 
   return exposedImport;
 };
