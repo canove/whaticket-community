@@ -1,4 +1,5 @@
 import Company from "../database/models/Company";
+import Profiles from "../database/models/Profiles";
 import Queue from "../database/models/Queue";
 import User from "../database/models/User";
 
@@ -12,6 +13,7 @@ interface SerializedUser {
   companyId: number;
   company?: Company;
   profileId: number;
+  profiles?: Profiles;
 }
 
 export const SerializeUser = (user: User): SerializedUser => {
