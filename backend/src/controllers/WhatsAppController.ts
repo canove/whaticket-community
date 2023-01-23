@@ -717,6 +717,53 @@ export const botMessage = async (
   return res.status(200).json("success");
 };
 
+export const botMessageCustomer = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { companyId } = req.user;
+  const { fromMe, to, body, cation, contactName, session, bot, id, type } = req.body;
+
+  if (!fromMe) {
+    const message = await newMessage(req, res);
+    return message;
+  }
+
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      name: session,
+      deleted: false,
+      companyId
+    }
+  });
+
+  const contact = await verifyContact(contactName, to, whatsapp.companyId);
+
+  const ticket = await FindOrCreateTicketService(
+    contact,
+    whatsapp.id,
+    whatsapp.companyId,
+    0,
+    null,
+    false,
+    bot
+  );
+
+  await SendWhatsAppMessage({
+    body,
+    ticket,
+    companyId: ticket.companyId,
+    fromMe,
+    bot,
+    contactId: contact.id,
+    whatsMsgId: id,
+    cation,
+    type
+  });
+
+  return res.status(200).json("success");
+};
+
 export const nofSessionStatus = async (
   req: Request,
   res: Response

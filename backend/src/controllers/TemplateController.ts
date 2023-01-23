@@ -10,6 +10,7 @@ import { getIO } from "../libs/socket";
 import BindTemplateService from "../services/TemplateService/BindTemplateService";
 import OfficialTemplatesStatus from "../database/models/OfficialTemplatesStatus";
 import AppError from "../errors/AppError";
+import OfficialTemplates from "../database/models/OfficialTemplates";
 
 interface TemplateData {
   name: string;
@@ -157,6 +158,48 @@ export const updateStatus = async (
   });
 
   return res.status(200).json("OK");
+};
+
+export const getParams = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { templateName } = req.query;
+  const { companyId } = req.user;
+
+  const template = await  OfficialTemplates.findOne({
+    where: {
+      companyId,
+      name: templateName
+    }
+  });
+
+  if (!template) throw new AppError("NO_TEMPLATE_FOUND");
+
+  let mapping = null;
+  if (template.mapping) {
+    let map = JSON.parse(template.mapping);
+
+    mapping = {};
+
+    Object.keys(map).map(key => {
+      const item = map[key];
+
+      mapping = {
+        ...mapping,
+        [item]: key
+      }
+    });
+  }
+
+  const response = {
+    header: template.header ? JSON.parse(template.header) : null,
+    body: template.body,
+    footer: template.footer,
+    mapping: mapping
+  }
+
+  return res.status(200).json(response);
 };
 
 export const remove = async (

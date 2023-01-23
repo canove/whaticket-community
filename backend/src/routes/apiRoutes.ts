@@ -10,6 +10,7 @@ import * as FlowsController from "../controllers/FlowsController";
 import * as TicketController from "../controllers/TicketController";
 import * as TemplateController from "../controllers/TemplateController";
 import isAuthApi from "../middleware/isAuthApi";
+import isAuth from "../middleware/isAuth";
 
 const upload = multer(uploadConfig);
 
@@ -44,6 +45,13 @@ ApiRoutes.post(
   isAuthApi,
   WhatsAppController.botMessage
 );
+
+ApiRoutes.post(
+  "/whatsapp/botmessagecustomer",
+  isAuthApi,
+  WhatsAppController.botMessageCustomer
+);
+
 ApiRoutes.post(
   "/whatsapp/nof/sessionstatus",
   isAuthApi,
@@ -98,12 +106,18 @@ ApiRoutes.get(
 
 ApiRoutes.post(
   "/officialTemplates/updateStatus",
-  isAuthApi,
+  isAuth,
   TemplateController.updateStatus
 );
 
 ApiRoutes.get("/tickets/inticket", isAuthApi, TicketController.containTicket);
 
-ApiRoutes.get("/whatsapp/getCallback/", isAuthApi, WhatsAppController.getCallbackUrl)
+ApiRoutes.get("/whatsapp/getCallback/", isAuthApi, WhatsAppController.getCallbackUrl);
+
+ApiRoutes.get(
+  "/officialTemplates/:templateName",
+  isAuthApi,
+  TemplateController.getParams
+);
 
 export default ApiRoutes;
