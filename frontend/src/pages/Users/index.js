@@ -128,6 +128,7 @@ const Users = () => {
     const socket = openSocket();
 
     socket.on(`user${user.companyId}`, (data) => {
+      console.log(data);
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_USERS", payload: data.user });
       }
