@@ -10,6 +10,7 @@ import { getIO } from "../libs/socket";
 import BindTemplateService from "../services/TemplateService/BindTemplateService";
 import OfficialTemplatesStatus from "../database/models/OfficialTemplatesStatus";
 import AppError from "../errors/AppError";
+import OfficialTemplates from "../database/models/OfficialTemplates";
 
 interface TemplateData {
   name: string;
@@ -90,14 +91,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const createOfficialTemplate = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
-  const { officialTemplate, mapping, headerVar, whatsappId } = req.body;
+  const { officialTemplate, mapping, headerVar, whatsappId, documentName } = req.body;
 
   const template = await CreateOfficialTemplateService({
     officialTemplate,
     mapping,
     headerVar,
     whatsappId,
-    companyId
+    companyId,
+    documentName
   });
 
   const io = getIO();
@@ -149,12 +151,55 @@ export const updateStatus = async (
 
   if (!template) throw new AppError("ERR_NO_TEMPLATE_FOUND");
 
+  console.log('update template tempolatecontroller 152')
   await template.update({
     status: status,
     reason: reason ? reason : null,
   });
 
   return res.status(200).json("OK");
+};
+
+export const getParams = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { templateName } = req.query;
+  const { companyId } = req.user;
+
+  const template = await  OfficialTemplates.findOne({
+    where: {
+      companyId,
+      name: templateName
+    }
+  });
+
+  if (!template) throw new AppError("NO_TEMPLATE_FOUND");
+
+  let mapping = null;
+  if (template.mapping) {
+    let map = JSON.parse(template.mapping);
+
+    mapping = {};
+
+    Object.keys(map).map(key => {
+      const item = map[key];
+
+      mapping = {
+        ...mapping,
+        [item]: key
+      }
+    });
+  }
+
+  const response = {
+    header: template.header ? JSON.parse(template.header) : null,
+    body: template.body,
+    footer: template.footer,
+    mapping: mapping
+  }
+
+  return res.status(200).json(response);
 };
 
 export const remove = async (

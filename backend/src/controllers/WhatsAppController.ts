@@ -267,7 +267,7 @@ export const config = async (
           }
           throw new AppError(err.response.data.message);
         }
-
+        console.log('update whatsapp whatsappcontroller 270')
         await whatsapp.update({
           whatsName,
         });
@@ -292,7 +292,7 @@ export const config = async (
           }
           throw new AppError(err.response.data.message);
         }
-
+        console.log('update whatsapp whatsappcontroller 295')
         await whatsapp.update({
           whatsImage: fileLink,
         });
@@ -317,7 +317,7 @@ export const config = async (
           }
           throw new AppError(err.response.data.message);
         }
-
+        console.log('update whatsapp whatsappcontroller 320')
         await whatsapp.update({
           whatsName,
         });
@@ -380,6 +380,7 @@ export const multipleConfig = async (
             });
 
             if (result.status == 200) {
+              console.log('update whatsapp whatsappcontroller 383')
               await whatsapp.update({
                 whatsName,
               });
@@ -409,6 +410,7 @@ export const multipleConfig = async (
             });
 
             if (result.status == 200) {
+              console.log('update whatsapp whatsappcontroller 413')
               await whatsapp.update({
                 whatsImage: fileLink,
               });
@@ -451,6 +453,7 @@ export const multipleConfig = async (
             });
 
             if (result.status == 200) {
+              console.log('update whatsapp whatsappcontroller 456')
               await whatsapp.update({
                 whatsName,
               });
@@ -684,6 +687,53 @@ export const botMessage = async (
     where: {
       name: session,
       deleted: false
+    }
+  });
+
+  const contact = await verifyContact(contactName, to, whatsapp.companyId);
+
+  const ticket = await FindOrCreateTicketService(
+    contact,
+    whatsapp.id,
+    whatsapp.companyId,
+    0,
+    null,
+    false,
+    bot
+  );
+
+  await SendWhatsAppMessage({
+    body,
+    ticket,
+    companyId: ticket.companyId,
+    fromMe,
+    bot,
+    contactId: contact.id,
+    whatsMsgId: id,
+    cation,
+    type
+  });
+
+  return res.status(200).json("success");
+};
+
+export const botMessageCustomer = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { companyId } = req.user;
+  const { fromMe, to, body, cation, contactName, session, bot, id, type } = req.body;
+
+  if (!fromMe) {
+    const message = await newMessage(req, res);
+    return message;
+  }
+
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      name: session,
+      deleted: false,
+      companyId
     }
   });
 

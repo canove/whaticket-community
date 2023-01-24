@@ -12,6 +12,7 @@ import FileRegister from "../../database/models/FileRegister";
 import Queue from "../../database/models/Queue";
 import NodeRegisters from "../../database/models/NodeRegisters";
 import { preparePhoneNumber9Digit } from "../../utils/common";
+import { ca } from "date-fns/locale";
 
 interface Request {
   flowNodeId?: string;
@@ -199,6 +200,7 @@ const processNode = async (node: any, session: any, body: any) => {
 
     const variablesOBJ = { ...variables, ...body.variables }
 
+    console.log("update session startFlowService 202");
     await session.update({
       variables: JSON.stringify(variablesOBJ),
     })
@@ -229,7 +231,7 @@ const processNode = async (node: any, session: any, body: any) => {
     const queue = await Queue.findOne({
       where: { id: node.queueId }
     });
-
+    console.log("update session startFlowService 233");
     await session.update({
       nodeId: null,
       variables: null
@@ -388,6 +390,7 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   if (node.type === "jump-node") {
+    console.log("update session startFlowService 393");
     await session.update({
       nodeId: node.jumpNodeId,
     });
@@ -471,6 +474,25 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODES", 404);
   }
 
+  try {
+    let regs = await FileRegister.findAll({
+        where: { 
+            companyId: companyId,
+            phoneNumber : {
+                [Op.like]: `%${sessionId.substr(5,8)}%`
+            }
+        },
+        order: [['createdAt', 'DESC']]
+    });
+
+    if(regs.length > 0) {
+      console.log("update fileregister startflow 489");
+      for(const reg of regs) {
+        await reg.update({interactionAt: new Date()})
+      }
+    }
+  } catch (err) { console.log('ocorreu um erro ao tentar salvar a data de interacao ', sessionId)}
+
   const session = await FlowsSessions.findOne({
     where: {
       updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
@@ -524,12 +546,14 @@ const StartFlowService = async ({
       flowId: flowNodes.flowId
     });
   } else {
+    console.log("update session startFlowService 529");
     await session.update({
       nodeId: nextNode.id,
     });
   }
 
   if (nextNode.type === "end-node") {
+    console.log("update session startFlowService 536");
     await session.update({
       nodeId: null,
       variables: null
@@ -537,6 +561,7 @@ const StartFlowService = async ({
   }
 
   if (nextNode.type === "jump-node") {
+    console.log("update session startFlowService 544");
     await session.update({
       nodeId: nextNode.jumpNodeId,
     })

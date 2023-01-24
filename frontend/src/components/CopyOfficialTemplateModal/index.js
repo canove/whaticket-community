@@ -63,6 +63,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
   const [parameters, setParameters] = useState([]);
   const [mapping, setMapping] = useState({});
   const [headerVar, setHeaderVar] = useState("");
+  const [documentName, setDocumentName] = useState("");
 
   useEffect(() => {
     if (officialTemplate) {
@@ -106,6 +107,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
       officialTemplate,
       mapping,
       headerVar,
+      documentName,
       whatsappId: connection.id
     }
 
@@ -125,6 +127,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
     setMapping({});
     setParameters([])
     setHeaderVar("");
+    setDocumentName("");
   };
 
   const handleMappingChange = (e, param) => {
@@ -164,6 +167,10 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
       name: "Var 5",
       value: "var5"
     },
+    {
+      name: "Custom Param",
+      value: "custom"
+    }
   ];
 
   return (
@@ -202,6 +209,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                     fullWidth
                     className={classes.textField}
                     disabled
+                    InputLabelProps={{ shrink: true }}
                   />
                 </div>
                 <div className={classes.multFieldLine}>
@@ -217,6 +225,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                     fullWidth
                     className={classes.textField}
                     disabled
+                    InputLabelProps={{ shrink: true }}
                   />
                   <Field
                     as={TextField}
@@ -230,9 +239,10 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                     fullWidth
                     className={classes.textField}
                     disabled
+                    InputLabelProps={{ shrink: true }}
                   />
                 </div>
-                { values.headerFormat &&
+                { template.headerFormat &&
                   <div>
                     <FormControl
                         fullWidth 
@@ -246,7 +256,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                           labelId="param-type-select-label"
                           id="param-type-select"
                           label={"Header Var"}
-                          value={headerVar}
+                          value={paramTypes.some(paramType => paramType.value === headerVar) ? headerVar : "custom"}
                           onChange={(e) => setHeaderVar(e.target.value)}
                           fullWidth
                         >
@@ -256,6 +266,60 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                           ))}
                         </Select>
                       </FormControl>
+                      { (headerVar === "custom" || !paramTypes.some(paramType => paramType.value === headerVar)) && 
+                        <Field
+                          as={TextField}
+                          label={"Custom Param"}
+                          autoFocus
+                          variant="outlined"
+                          margin="dense"
+                          fullWidth
+                          name="customParam"
+                          value={headerVar}
+                          className={classes.textField}
+                          onChange={(e) => setHeaderVar(e.target.value)}
+                        />
+                      }
+                      { template.headerFormat === "DOCUMENT" &&
+                        <div>
+                        <FormControl
+                            fullWidth 
+                            variant="outlined" 
+                            style={{ marginTop: "5px", marginBottom: "5px" }}
+                          >
+                            <InputLabel id="param-type-select-label">
+                              {"Document Name"}
+                            </InputLabel>
+                            <Select
+                              labelId="param-type-select-label"
+                              id="param-type-select"
+                              label={"Document Name"}
+                              value={paramTypes.some(paramType => paramType.value === documentName) ? documentName : "custom"}
+                              onChange={(e) => setDocumentName(e.target.value)}
+                              fullWidth
+                            >
+                              <MenuItem value={""} disabled>Parametros:</MenuItem>
+                              { paramTypes.map(paramType => (
+                                <MenuItem key={paramType.value} value={paramType.value}>{paramType.name}</MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          { (documentName === "custom" || !paramTypes.some(paramType => paramType.value === documentName)) && 
+                            <Field
+                              as={TextField}
+                              label={"Custom Param"}
+                              autoFocus
+                              variant="outlined"
+                              margin="dense"
+                              fullWidth
+                              name="customParam"
+                              value={documentName}
+                              className={classes.textField}
+                              onChange={(e) => setDocumentName(e.target.value)}
+                            />
+                          }
+                        </div>
+                      }
                   </div>
                 }
                 <div>
@@ -273,13 +337,14 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                     variant="outlined"
                     margin="dense"
                     disabled
+                    InputLabelProps={{ shrink: true }}
                   />
                 </div>
                 <div>
-                  { parameters.map((param, index) => {
+                { parameters.map((param, index) => {
                     return (
+                      <div key={index}>
                       <FormControl
-                        key={index} 
                         fullWidth 
                         variant="outlined" 
                         style={{ marginTop: "10px" }}
@@ -291,7 +356,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                           labelId="param-type-select-label"
                           id="param-type-select"
                           label={param}
-                          value={mapping[param] || ""}
+                          value={paramTypes.some(paramType => paramType.value === mapping[param]) ? mapping[param] || "" : "custom"}
                           onChange={(e) => handleMappingChange(e, param)}
                           fullWidth
                         >
@@ -301,6 +366,24 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                           ))}
                         </Select>
                       </FormControl>
+                      { (mapping[param] === "custom" || !paramTypes.some(paramType => paramType.value === mapping[param])) && 
+                        <Field
+                          as={TextField}
+                          label={"Custom Param"}
+                          autoFocus
+                          variant="outlined"
+                          margin="dense"
+                          fullWidth
+                          name="customParam"
+                          value={mapping[param] || ""}
+                          className={classes.textField}
+                          onChange={(e) => {
+                            setValues({ customParam: e.target.value })
+                            handleMappingChange(e, param)
+                          }}
+                        />
+                      }
+                      </div>
                     );
                   })}
                 </div>
@@ -319,6 +402,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                     variant="outlined"
                     margin="dense"
                     disabled
+                    InputLabelProps={{ shrink: true }}
                   />
                 </div>
                 {/* <div className={classes.multFieldLine}>

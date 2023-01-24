@@ -5,6 +5,7 @@ import ExposedImport from "../../database/models/ExposedImport";
 import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
+import { preparePhoneNumber, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
 
 interface Request {
   exposedImportId: string;
@@ -12,12 +13,12 @@ interface Request {
   payload: any;
 }
 
-const jsonStringToObj = (jsonString: any) => {
+const objToString = (obj: any) => {
   try {
-    const responseObj = JSON.parse(jsonString);
-    return responseObj;
+    const string = JSON.stringify(obj);
+    return string;
   } catch {
-    return false;
+    return "";
   }
 };
 
@@ -43,13 +44,16 @@ const getDinamicValue = (path: any, payload: any) => {
     }
   }
 
-  return value || "";
+  return (value && typeof value === "string") ? value : objToString(value);
 };
 
 const getRelationValue = (newValue: any, payload: any) => {
   if (!newValue) return "";
 
   let value = newValue;
+
+  if(!value)
+    return '';
 
   while (value.match(/\{{(.*?)\}}/)) {
     const param = value.match(/\{{(.*?)\}}/);
@@ -61,6 +65,8 @@ const getRelationValue = (newValue: any, payload: any) => {
 
   return value;
 };
+
+let numberDispatcher = {};
 
 const StartExposedImportService = async ({
   exposedImportId,
@@ -80,8 +86,9 @@ const StartExposedImportService = async ({
   }
 
   const mapping = JSON.parse(exposedImport.mapping);
-
   let totalRegisters = exposedImport.qtdeRegister;
+  var today = new Date();
+  today.setHours(today.getHours() - 4);
 
   if (Array.isArray(payload)) {
     let registersToInsert = [];
@@ -141,11 +148,45 @@ const StartExposedImportService = async ({
       totalRegisters += registersToInsert.length;
       await FileRegister.bulkCreate(registersToInsert);
     }
-
+    console.log("update exposedImport exposedImportService 145");
     await exposedImport.update({ qtdeRegister: totalRegisters });
   } else {
     const name = getRelationValue(mapping.name, payload);
     const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
+
+    if(numberDispatcher[phoneNumber]) {
+      throw new AppError("DUPLICATED_NUMBER", 403);
+    }
+  
+    numberDispatcher[phoneNumber] = [];
+
+    const validDuplicated = getRelationValue("checkDuplicated", payload);
+
+    if(payload.checkDuplicated == undefined || validDuplicated === true) {
+      const register = await FileRegister.findAll({
+        where: {
+          companyId: companyId,
+          createdAt: {
+            [Op.gte]: today
+          },
+          phoneNumber: {
+            [Op.or] : [
+              {[Op.like]: `%${phoneNumber}%` },
+              {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
+              {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
+              {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
+            ]
+          },
+       },
+       order: [["createdAt", "DESC"]] 
+      });
+  
+       if(register.length > 0) {
+        delete numberDispatcher[phoneNumber];
+        throw new AppError("DUPLICATED_NUMBER", 403);
+       }
+    }
+
     const documentNumber = getRelationValue(mapping.documentNumber, payload);
     const template = getRelationValue(mapping.template, payload);
     const templateParams = getRelationValue(mapping.templateParams, payload);
@@ -182,8 +223,9 @@ const StartExposedImportService = async ({
       companyId,
       whatsappId
     });
-
+    console.log("update exposedImport exposedImportService 186");
     await exposedImport.update({ qtdeRegister: totalRegisters + 1 });
+    delete numberDispatcher[phoneNumber];
   }
 
   exposedImport.reload();

@@ -50,14 +50,14 @@ const TemplateModal = ({ open, onClose }) => {
   const { i18n } = useTranslation();
   const classes = useStyles();
 
-  const initialState = {
-    name: "",
-    footerText: "",
-  };
+  const initialState = {};
+
   const [template, setTemplate] = useState(initialState);
 
+  const [name, setName] = useState("");
   const [category, setCategory] = useState("transactional");
   const [bodyText, setBodyText] = useState("");
+  const [footerText, setFooterText] = useState("");
 
   const [paramsQuantity, setParamsQuantity] = useState(0);
   const [parameters, setParameters] = useState([]);
@@ -90,8 +90,10 @@ const TemplateModal = ({ open, onClose }) => {
   const handleSubmit = async (values) => {
     const templateData = {
       ...values,
+      name,
       category,
       bodyText,
+      footerText,
       mapping: JSON.stringify(mapping),
     };
 
@@ -110,9 +112,11 @@ const TemplateModal = ({ open, onClose }) => {
     setTemplate(initialState);
     setCategory("transactional");
     setBodyText("");
+    setName("");
     setParamsQuantity(0);
     setMapping({});
     setParameters([])
+    setFooterText("");
   };
   
   const handleCategoryChange = (e) => {
@@ -166,6 +170,10 @@ const TemplateModal = ({ open, onClose }) => {
       name: "Var 5",
       value: "var5"
     },
+    {
+      name: "Custom Param",
+      value: "custom"
+    }
   ];
 
   return (
@@ -196,15 +204,13 @@ const TemplateModal = ({ open, onClose }) => {
                     as={TextField}
                     label={i18n.t("templates.templateModal.name")}
                     autoFocus
-                    name="name"
-                    error={touched.name && Boolean(errors.name)}
-                    helperText={touched.name && errors.name}
+                    value={name}
                     variant="outlined"
                     margin="dense"
                     fullWidth
                     className={classes.textField}
                     onChange={(e) => {
-                      setValues({ name: e.target.value.toLowerCase().replaceAll(" ", "_") })
+                      setName(e.target.value.toLowerCase().replaceAll(" ", "_"));
                     }}
                   />
                 </div>
@@ -258,8 +264,8 @@ const TemplateModal = ({ open, onClose }) => {
                 <div>
                   { parameters.map((param, index) => {
                     return (
+                      <div key={index}>
                       <FormControl
-                        key={index} 
                         fullWidth 
                         variant="outlined" 
                         style={{ marginTop: "10px" }}
@@ -271,7 +277,7 @@ const TemplateModal = ({ open, onClose }) => {
                           labelId="param-type-select-label"
                           id="param-type-select"
                           label={param}
-                          value={mapping[param] || ""}
+                          value={paramTypes.some(paramType => paramType.value === mapping[param]) ? mapping[param] || "" : "custom"}
                           onChange={(e) => handleMappingChange(e, param)}
                           fullWidth
                         >
@@ -281,6 +287,24 @@ const TemplateModal = ({ open, onClose }) => {
                           ))}
                         </Select>
                       </FormControl>
+                      { (mapping[param] === "custom" || !paramTypes.some(paramType => paramType.value === mapping[param])) && 
+                        <Field
+                          as={TextField}
+                          label={"Custom Param"}
+                          autoFocus
+                          variant="outlined"
+                          margin="dense"
+                          fullWidth
+                          name="customParam"
+                          value={mapping[param] || ""}
+                          className={classes.textField}
+                          onChange={(e) => {
+                            setValues({ customParam: e.target.value })
+                            handleMappingChange(e, param)
+                          }}
+                        />
+                      }
+                      </div>
                     );
                   })}
                 </div>
@@ -288,17 +312,16 @@ const TemplateModal = ({ open, onClose }) => {
                   <Field
                     as={TextField}
                     label={i18n.t("templates.templateModal.footer")}
-                    type="footerText"
                     multiline
                     minRows={2}
                     fullWidth
                     maxLength="60"
-                    name="footerText"
-                    error={touched.footerText && Boolean(errors.footerText)}
-                    helperText={touched.footerText && errors.footerText}
                     variant="outlined"
                     margin="dense"
-                    onChange={(e) => handleChange(e)}
+                    value={footerText}
+                    onChange={(e) => {
+                      setFooterText(e.target.value);
+                    }}
                   />
                 </div>
               </DialogContent>

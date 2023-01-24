@@ -34,6 +34,7 @@ const UpdateFlowService = async ({
     privateKey
   } = flowData;
 
+  console.log("update fow flowService 37");
   await flow.update({
     name,
     status,

@@ -53,7 +53,7 @@ const UpdateContactService = async ({
       })
     );
   }
-
+  console.log("update contact UpdateContact 56");
   await contact.update({
     name,
     number,

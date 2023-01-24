@@ -43,7 +43,7 @@ const UpdateExposedImportService = async ({
   } else {
     templateId = template;
   }
-
+  console.log("update exposedImport exposedImportService 46");
   await exposedImport.update({
     name,
     mapping,

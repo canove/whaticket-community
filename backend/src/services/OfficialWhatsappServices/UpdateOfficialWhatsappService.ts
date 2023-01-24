@@ -14,6 +14,7 @@ const UpdateOfficialWhatsappService = async ({
 }: Request): Promise<OfficialWhatsapp> => {
   const officialWhatsapp = await ShowOfficialWhatsappService(officialWhatsappId, companyId);
 
+  console.log("update officialWhatsapp officialWhatsappService 17");
   await officialWhatsapp.update({
     name
   });
