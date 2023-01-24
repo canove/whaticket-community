@@ -15,6 +15,7 @@ import {
   FormControl,
   FormControlLabel,
   Checkbox,
+  Box,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -67,14 +68,19 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
     const { i18n } = useTranslation();
     const classes = useStyles();
 
+    //                   dom   seg   ter   qua   qui   sex   sab
+    // const initialDays = [false,false,false,false,false,false,false]
+
     const [name, setName] = useState("");
     const [status, setStatus] = useState("active");
+    // const [useAutoFlow, setUseAutoFlow] = useState(false);
+    // const [days, setDays] = useState(initialDays);
+    // const [hours, setHours] = useState("");
+    // const [crons, setCrons] = useState([]);
 
     useEffect(() => {
-      setName("");
-      setStatus("active");
-
       const fetchFlow = async () => {
+        if (!flowId) return;
         try {
           const { data } = await api.get(`/flows/${flowId}`);
           setName(data.name)
@@ -83,14 +89,24 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
           toastError(err);
         }
       };
-      if(flowId){
-        fetchFlow();
-      };
+      fetchFlow();
     }, [open, flowId]);
+
+    // useEffect(() => {
+    //   if (useAutoFlow) createCron();
+    // }, [useAutoFlow, days, hours]);
+
+    // useEffect(() => {
+    //   readCrons(crons);
+    // }, [crons]);
 
     const handleClose = () => {
       setName("");
       setStatus("active");
+      // setDays(initialDays);
+      // setHours("");
+      // setCrons([]);
+      // setUseAutoFlow(false);
 
       onClose();
     };
@@ -102,6 +118,68 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
     const handleStatusChange = (e) => {
       setStatus(e.target.value);
     }
+
+    // const handleDayChange = (e, day) => {
+    //   if (day === "dom") setDays([e.target.checked, days[1], days[2], days[3], days[4], days[5], days[6]]);
+    //   if (day === "seg") setDays([days[0], e.target.checked, days[2], days[3], days[4], days[5], days[6]]);
+    //   if (day === "ter") setDays([days[0], days[1], e.target.checked, days[3], days[4], days[5], days[6]]);
+    //   if (day === "qua") setDays([days[0], days[1], days[2], e.target.checked, days[4], days[5], days[6]]);
+    //   if (day === "qui") setDays([days[0], days[1], days[2], days[3], e.target.checked, days[5], days[6]]);
+    //   if (day === "sex") setDays([days[0], days[1], days[2], days[3], days[4], e.target.checked, days[6]]);
+    //   if (day === "sab") setDays([days[0], days[1], days[2], days[3], days[4], days[5], e.target.checked]);
+    // }
+
+    // const createCron = () => {
+    //   if (!useAutoFlow || !hours || !days.includes(true)) {
+    //     setCrons([]);
+    //     return;
+    //   }
+
+    //   const hourList = hours.split(",");
+
+    //   const crons = hourList.map(hour => {
+    //     let cron = "";
+    //     let [h, m] = hour.split(":");
+
+    //     if (!h || !m) return null;
+
+    //     cron = `${m} ${h} * * `;
+
+    //     let selectedDays = []
+    //     days.forEach((value, index) => { if (value) selectedDays.push(index) });
+    //     let daysString = selectedDays.toString();
+    //     cron += daysString;
+
+    //     return cron;
+    //   });
+
+    //   if (crons.includes(undefined) || crons.includes(null)) {
+    //     setCrons([]);
+    //     return;
+    //   };
+
+    //   setCrons(crons);
+    // }
+
+    // const readCrons = (crons) => {
+    //   let daysList = [];
+    //   const hoursList = [];
+
+    //   for (const cron of crons) {
+    //     const cronItems = cron.split(" ");
+    //     const minutes = cronItems[0];
+    //     const hour = cronItems[1];
+    //     const days = cronItems[4];
+
+    //     const time = `${hour}:${minutes}`;
+
+    //     hoursList.push(time);
+    //     daysList = days.split(",");
+    //   }
+
+    //   console.log(daysList);
+    //   console.log(hoursList.toString());
+    // }
 
     const handleSubmit = async () => {
       const flowData = {
@@ -177,6 +255,63 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
                       </Select>
                   </FormControl>
                 </div>
+                {/* <div>
+                  <FormControlLabel
+                    label="Fluxo automático"
+                    control={
+                      <Checkbox
+                        checked={useAutoFlow}
+                        indeterminate={useAutoFlow === false}
+                        onChange={() => setUseAutoFlow(prevAutoFlow => !prevAutoFlow)}
+                        color="primary"
+                      />
+                    }
+                  />
+                  { useAutoFlow &&
+                    <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
+                      <FormControlLabel
+                        label="Segunda"
+                        control={<Checkbox color="primary" checked={days[1]} onChange={(e) => { handleDayChange(e, "seg") }} />}
+                      />
+                      <FormControlLabel
+                        label="Terça"
+                        control={<Checkbox color="primary" checked={days[2]} onChange={(e) => { handleDayChange(e, "ter") }} />}
+                      />
+                      <FormControlLabel
+                        label="Quarta"
+                        control={<Checkbox color="primary" checked={days[3]} onChange={(e) => { handleDayChange(e, "qua") }} />}
+                      />
+                      <FormControlLabel
+                        label="Quinta"
+                        control={<Checkbox color="primary" checked={days[4]} onChange={(e) => { handleDayChange(e, "qui") }} />}
+                      />
+                      <FormControlLabel
+                        label="Sexta"
+                        control={<Checkbox color="primary" checked={days[5]} onChange={(e) => { handleDayChange(e, "sex") }} />}
+                      />
+                      <FormControlLabel
+                        label="Sábado"
+                        control={<Checkbox color="primary" checked={days[6]} onChange={(e) => { handleDayChange(e, "sab") }} />}
+                      />
+                      <FormControlLabel
+                        label="Domingo"
+                        control={<Checkbox color="primary" checked={days[0]} onChange={(e) => { handleDayChange(e, "dom") }} />}
+                      />
+                      <TextField
+                        as={TextField}
+                        label={"Horários"}
+                        placeholder={"09:30,16:50,22:30"}
+                        autoFocus
+                        value={hours}
+                        name="hours"
+                        onChange={(e) => { setHours(e.target.value) }}
+                        variant="outlined"
+                        margin="dense"
+                        fullWidth
+                      />
+                    </Box>
+                  }
+                </div> */}
               </DialogContent>
               <DialogActions>
               <Button
@@ -192,6 +327,7 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
                   variant="contained"
                   className={classes.btnWrapper}
                   onClick={handleSubmit}
+                  // disabled={useAutoFlow && crons.length === 0}
                 >
                    { flowId
                     ? `${i18n.t("flows.flowsModal.save")}`
