@@ -9,6 +9,7 @@ import * as FileRegisterController from "../controllers/FileRegisterController";
 import * as FlowsController from "../controllers/FlowsController";
 import * as TicketController from "../controllers/TicketController";
 import * as TemplateController from "../controllers/TemplateController";
+import * as MessageController from "../controllers/MessageController";
 import isAuthApi from "../middleware/isAuthApi";
 import isAuth from "../middleware/isAuth";
 
@@ -118,6 +119,12 @@ ApiRoutes.get(
   "/officialTemplates/:templateName",
   isAuthApi,
   TemplateController.getParams
+);
+
+ApiRoutes.get(
+  "/getMessages/:msgWhatsId",
+  isAuthApi,
+  MessageController.getMessages
 );
 
 export default ApiRoutes;

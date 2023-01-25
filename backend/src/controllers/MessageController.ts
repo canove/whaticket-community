@@ -7,6 +7,7 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
+import AppError from "../errors/AppError";
 
 type IndexQuery = {
   pageNumber: string;
@@ -56,4 +57,35 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   SetTicketMessagesAsRead(ticket);
 
   return res.send();
+};
+
+export const getMessages = async (req: Request, res: Response): Promise<Response> => {
+  const { msgWhatsId } = req.params;
+  const { companyId } = req.user;
+
+  const message = await Message.findOne({
+    where: { id: msgWhatsId },
+    attributes: ["ticketId"]
+  });
+
+  const ticket = await ShowTicketService(message.ticketId, companyId);
+
+  if (!ticket) {
+    throw new AppError("ERR_NO_TICKET_FOUND", 404);
+  }
+
+  const messages = await Message.findAll({
+    where: { ticketId: message.ticketId },
+    include: [
+      "contact",
+      {
+        model: Message,
+        as: "quotedMsg",
+        include: ["contact"]
+      }
+    ],
+    order: [["createdAt", "DESC"]]
+  });
+
+  return res.json({ messages: messages.reverse() });
 };
