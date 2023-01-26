@@ -120,8 +120,8 @@ const processNode = async (node: any, session: any, body: any) => {
       if (condition === "not_equal") return (var1.toLowerCase() != var2.toLowerCase());
       if (condition === "greater_than") return (var1 > var2);
       if (condition === "greater_than_or_equal") return (var1 >= var2);
-      if (condition === "contains") return (var1.indexOf(var2));
-      if (condition === "not_contains") return (!var1.indexOf(var2));
+      if (condition === "contains") return (var1.toLowerCase().includes(var2.toLowerCase()));
+      if (condition === "not_contains") return (!var1.toLowerCase().includes(var2.toLowerCase()));
       if (condition === "less_than") return (var1 < var2);
       if (condition === "less_than_or_equal") return (var1 <= var2);
     });
@@ -321,10 +321,10 @@ const processNode = async (node: any, session: any, body: any) => {
 
       if (!conditionExpression) return true;
 
-      const texts = conditionExpression.replaceAll(" ", "").toLowerCase().split(",");
+      const texts = conditionExpression.replace(/ /g, '').toLowerCase().split(",");
 
       for (const text of texts) {
-        if (text === body.text.replaceAll(" ", "").toLowerCase()) return true;
+        if (text === body.text.replace(/ /g, '').toLowerCase()) return true;
       }
     });
 
