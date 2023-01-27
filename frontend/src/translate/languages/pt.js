@@ -57,6 +57,14 @@ const messages = {
           category: {
             title: "Atendimento por Categoria",
           },
+          queue: {
+            title: "Na File"
+          },
+          averageDeliveryTime: {
+            title: "Tempo de Entrega Médio",
+            noConfig: "Configurações Desativadas",
+            noConnectedWhatsapps: "Sem Números Conectado"
+          }
         },
       },
 

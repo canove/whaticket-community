@@ -58,6 +58,14 @@ const messages = {
           category: {
             title: "Servicio por Categoría"
           },
+          queue: {
+            title: "In Queue"
+          },
+          averageDeliveryTime: {
+            title: "Average Delivery Time",
+            noConfig: "Disabled Settings",
+            noConnectedWhatsapps: "No Connected Whatsapps"
+          }
         }
       },
 
