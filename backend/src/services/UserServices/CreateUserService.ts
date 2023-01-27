@@ -4,6 +4,8 @@ import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../database/models/User";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
+import ShowProfileService from "../ProfileServices/ShowProfileService";
+import Profiles from "../../database/models/Profiles";
 
 interface Request {
   email: string;
@@ -76,7 +78,9 @@ const CreateUserService = async ({
 
   if (companyId) {
     const company = await ShowCompanyService(companyId);
-    serializedUser = { ...serializedUser, company };
+    const profiles = await ShowProfileService(`${user.profileId}`, companyId);
+
+    serializedUser = { ...serializedUser, company, profiles };
   }
 
   return serializedUser;

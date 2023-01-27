@@ -1,4 +1,10 @@
-import React, { useContext, forwardRef, useEffect, useReducer, useState } from "react";
+import React, {
+  useContext,
+  forwardRef,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 
 import openSocket from "../../services/socket-io";
 
@@ -37,7 +43,7 @@ import { useTranslation } from "react-i18next";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import FlowModal from "../../components/FlowModal";
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 import FlowNodeModal from "../../components/FlowNodeModal";
 
 const useStyles = makeStyles((theme) => ({
@@ -119,7 +125,7 @@ const Flows = () => {
     const fetchFlows = async () => {
       try {
         const { data } = await api.get("/flows", {
-          params: { searchParam, type: "bits" }
+          params: { searchParam, type: "bits" },
         });
         dispatch({ type: "LOAD_FLOW", payload: data });
         setLoading(false);
@@ -182,14 +188,13 @@ const Flows = () => {
     //   name: `${flow.name} copy`,
     //   type: 'bits'
     // }
-
     // try {
     //   await api.post(`/flows/`, flowData);
     //   toast.success(i18n.t("flows.confirmation.duplicate"));
     // } catch (err) {
     //   toastError(err);
     // }
-  }
+  };
 
   const handleCloseConfirmationModal = () => {
     setConfirmModalOpen(false);
@@ -198,14 +203,14 @@ const Flows = () => {
 
   const handleDeleteFlow = async (flowId) => {
     try {
-        await api.delete(`/flows/${flowId}`);
-        toast.success(i18n.t("flows.confirmation.delete"));
+      await api.delete(`/flows/${flowId}`);
+      toast.success(i18n.t("flows.confirmation.delete"));
     } catch (err) {
-        toastError(err);
+      toastError(err);
     }
     setDeletingFlow(null);
   };
-  
+
   // const getStatus = (status) => {
   //   if (status === "active") {
   //     return "Ativo";
@@ -264,9 +269,15 @@ const Flows = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("flows.grid.name")}</TableCell>
-              <TableCell align="center">{i18n.t("flows.grid.createdAt")}</TableCell>
-              <TableCell align="center">{i18n.t("flows.grid.updatedAt")}</TableCell>
-              <TableCell align="center">{i18n.t("flows.grid.actions")}</TableCell>
+              <TableCell align="center">
+                {i18n.t("flows.grid.createdAt")}
+              </TableCell>
+              <TableCell align="center">
+                {i18n.t("flows.grid.updatedAt")}
+              </TableCell>
+              <TableCell align="center">
+                {i18n.t("flows.grid.actions")}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -285,7 +296,13 @@ const Flows = () => {
                       <TableCell align="center">
                         <IconButton
                           size="small"
-                          component={forwardRef((itemProps, ref) => (<RouterLink to={`/CreateFlow/${flow.id}`} ref={ref} {...itemProps} />))}
+                          component={forwardRef((itemProps, ref) => (
+                            <RouterLink
+                              to={`/CreateFlow/${flow.id}`}
+                              ref={ref}
+                              {...itemProps}
+                            />
+                          ))}
                         >
                           <Visibility />
                         </IconButton>
