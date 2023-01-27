@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import DashboardCategoryService from "../services/CategoryServices/DashboardCategoryService";
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
 import ListReportRegistersService from "../services/RegistersService/ListReportRegistersService";
+import CountConnectedWhatsAppsService from "../services/WhatsappService/CountConnectedWhatsAppsService";
 
 const fs = require("fs");
 const pdf = require("pdf-creator-node");
@@ -31,7 +32,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const category = await DashboardCategoryService(companyId, date);
 
-  return res.status(200).json({ reports, category });
+  const whatsappCount = await CountConnectedWhatsAppsService(companyId);
+
+  return res.status(200).json({ reports, category, whatsappCount });
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {

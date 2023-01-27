@@ -13,8 +13,11 @@ import Chart from "./Chart";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import {
+  Button,
   Card,
   CardContent,
+  CircularProgress,
+  IconButton,
   InputAdornment,
   TextField,
 } from "@material-ui/core";
@@ -22,6 +25,8 @@ import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import SearchIcon from "@material-ui/icons/Search";
+import { GrUpdate } from "react-icons/gr"
+import { green } from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -59,6 +64,12 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: -10,
   },
+  circleLoading: {
+    opacity: "70%",
+    position: "absolute",
+    top: "-40%",
+    left: "2rem",
+  },
 
   root: {
     width: 200,
@@ -87,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     width: "20%",
     display: "flex",
     fontSize: 14,
-    marginTop: "10px"
+    marginTop: "10px",
   },
 
   averageTickets: {
@@ -132,6 +143,11 @@ const Dashboard = () => {
   const [smallerTickets, setSmallerTickets] = useState([]);
   const [averageTime, setAverageTime] = useState(0);
 
+  const [config, setConfig] = useState(null);
+  const [connectedWhatsappCount, setConnectedWhatsappCount] = useState(0);
+
+  const [updatingPage, setUpdatingPage] = useState(false);
+
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
   }
@@ -146,90 +162,115 @@ const Dashboard = () => {
     return count;
   };
 
-  useEffect(() => {
-    const handleFilter = async () => {
+  const handleFilter = async () => {
+    setLoading(true);
+    try {
       setLoading(true);
-      try {
-        setLoading(true);
-        const { data } = await api.get('/registers/list', {
-          params: { fileId, date }
+      const { data } = await api.get("/registers/list", {
+        params: { fileId, date },
+      });
+
+      setRegisterCount(data.reports.total);
+      setSentCount(data.reports.sent || "0");
+      setDeliveredCount(data.reports.delivered || "0");
+      setReadCount(data.reports.read || "0");
+      setErrorCount(data.reports.error || "0");
+      setInteractionCount(data.reports.interaction || "0");
+      setNoWhatsCount(data.reports.noWhats || "0");
+
+      setCategoryCount(data.category);
+      setConnectedWhatsappCount(data.whatsappCount);
+
+      setLoading(false);
+    } catch (err) {
+      toastError(err);
+    }
+  };
+
+  const fetchConfig = async () => {
+    try {
+        const { data } = await api.get('/whatsconfig/');
+        setConfig(data && data.length > 0 ? data[0] : null);
+    } catch (err) {
+        toastError(err);
+    }
+  }
+
+  const handleFiles = async () => {
+    setLoading(true);
+    let allFiles = [];
+
+    try {
+      const { data } = await api.get("file/list?status=5");
+      allFiles = [...allFiles, ...data.reports];
+      setLoading(false);
+    } catch (err) {
+      toastError(err);
+      setLoading(false);
+    }
+
+    try {
+      const { data } = await api.get("file/list?status=6");
+      allFiles = [...allFiles, ...data.reports];
+      setLoading(false);
+    } catch (err) {
+      toastError(err);
+      setLoading(false);
+    }
+
+    setFiles(allFiles);
+  };
+
+  const fetchAverangeTime = async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/tickets/time", {
+        params: { searchParam },
+      });
+      setTickets(data.averageTimes);
+
+      if (data.averageTimes.length >= 6) {
+        setBiggerTickets(data.averageTimes.slice(0, 3));
+
+        const smallerTickets = data.averageTimes.slice(-3);
+        smallerTickets.sort((a, b) => {
+          return a.averageMilliseconds - b.averageMilliseconds;
         });
 
-        setRegisterCount(data.reports.total);
-        setSentCount(data.reports.sent || "0");
-        setDeliveredCount(data.reports.delivered || "0");
-        setReadCount(data.reports.read || "0");
-        setErrorCount(data.reports.error || "0");
-        setInteractionCount(data.reports.interaction || "0");
-        setNoWhatsCount(data.reports.noWhats || "0");
-        
-        setCategoryCount(data.category);
-
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
+        setSmallerTickets(smallerTickets);
       }
-    };
+
+      setAverageTime(data.totalAverageTime);
+      setLoading(false);
+    } catch (err) {
+      toastError(err);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     handleFilter();
   }, [fileId, date]);
 
   useEffect(() => {
-    const handleFiles = async () => {
-      setLoading(true);
-      let allFiles = [];
+    fetchAverangeTime();
+  }, [searchParam]);
 
-      try {
-        const { data } = await api.get('file/list?status=5');
-        allFiles = [...allFiles, ...data.reports];
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-
-      try {
-        const { data } = await api.get('file/list?status=6');
-        allFiles = [...allFiles, ...data.reports];
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-
-      setFiles(allFiles);
-    };
-
+  useEffect(() => {
+    fetchConfig();
     handleFiles();
   }, []);
 
-  useEffect(() => {
-    const fetchAverangeTime = async () => {
-      setLoading(true);
-      try {
-        const { data } = await api.get("/tickets/time", {
-          params: { searchParam }
-        });
-        setTickets(data.averageTimes);
+  const updatePage = async () => {
+    setUpdatingPage(true);
 
-        if (data.averageTimes.length >= 6) {
-          setBiggerTickets(data.averageTimes.slice(0, 3));
+    await handleFilter();
+    await handleFiles();
+    await fetchAverangeTime();
+    await fetchConfig();
 
-          const smallerTickets = data.averageTimes.slice(-3);
-          smallerTickets.sort((a, b) => { return a.averageMilliseconds - b.averageMilliseconds } );
-
-          setSmallerTickets(smallerTickets);
-        }
-
-        setAverageTime(data.totalAverageTime);
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-    };
-
-    fetchAverangeTime();
-  }, [searchParam]);
+    setUpdatingPage(false);
+  }
 
   const handleSelectOption = (_, newValue) => {
     if (newValue) {
@@ -293,10 +334,50 @@ const Dashboard = () => {
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
 
+  const getQueueCount = () => {
+    const queueCount = parseInt(registerCount) - (parseInt(sentCount) + parseInt(noWhatsCount));
+
+    return queueCount;
+  }
+
+  const getAverageDeliveryTime = () => {
+    if (!config || !config.active) return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
+
+    const queueCount = getQueueCount();
+
+    if (queueCount > 0 && connectedWhatsappCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
+    if (queueCount === 0 && connectedWhatsappCount === 0) return "00:00:00";
+
+    const averageDeliveryTimeMinutes = (queueCount / connectedWhatsappCount) * config.triggerInterval;
+    const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
+    const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
+
+    return averageDeliveryTime;
+  }
+
   return (
     <div>
       <MainHeader>
         <Title>{i18n.t("dashboard.title")}</Title>
+        <div 
+          style={{
+            marginLeft: "10px",
+            marginRight: 0
+          }}
+        >
+          <IconButton
+						size="small"
+						onClick={updatePage}
+            disabled={updatingPage}
+					>
+						<GrUpdate />
+            { updatingPage &&
+              <div>
+                <CircularProgress className={classes.circleLoading} />
+              </div>
+            }
+					</IconButton>
+          </div>
       </MainHeader>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
@@ -315,7 +396,7 @@ const Dashboard = () => {
                 onChange={(e, newValue) => handleSelectOption(e, newValue)}
                 className={classes.selectStyle}
                 options={files}
-                value={files.find(f => f.id === fileId) || null}
+                value={files.find((f) => f.id === fileId) || null}
                 getOptionLabel={renderOptionLabel}
                 renderInput={(params) => (
                   <TextField
@@ -393,6 +474,36 @@ const Dashboard = () => {
               <Grid item>
                 <Typography component="h1" variant="h4">
                   {GetTickets("closed", "true", "false")}
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                {i18n.t("dashboard.messages.queue.title")}
+              </Typography>
+              <Grid item>
+                <Typography component="h1" variant="h4">
+                  {getQueueCount()}
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                {i18n.t("dashboard.messages.averageDeliveryTime.title")}
+              </Typography>
+              <Grid item>
+                <Typography component="h1" variant="h4">
+                  {getAverageDeliveryTime()}
                 </Typography>
               </Grid>
             </Paper>
@@ -559,32 +670,39 @@ const Dashboard = () => {
                 }}
               />
             </div>
-            { tickets && tickets.length < 6 &&
+            {tickets && tickets.length < 6 && (
               <div className={classes.averageTickets}>
                 {tickets.map((ticket, index) => (
-                    <Card className={classes.averageTicket} key={index} elevation={5}>
-                      <CardContent>
-                        <Typography align="center" variant="h6" component="h2">
-                          {ticket.user.name}
-                        </Typography>
-                        <br />
-                        <Typography align="center" variant="h5" component="h2">
-                          {formatTime(ticket.averageMilliseconds)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))
-                }
+                  <Card
+                    className={classes.averageTicket}
+                    key={index}
+                    elevation={5}
+                  >
+                    <CardContent>
+                      <Typography align="center" variant="h6" component="h2">
+                        {ticket.user.name}
+                      </Typography>
+                      <br />
+                      <Typography align="center" variant="h5" component="h2">
+                        {formatTime(ticket.averageMilliseconds)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            }
-            { tickets && tickets.length >= 6 &&
+            )}
+            {tickets && tickets.length >= 6 && (
               <>
                 <Typography align="center" variant="h6" component="h2">
                   Maiores Tempos Médios
                 </Typography>
                 <div className={classes.averageTickets}>
                   {biggerTickets.map((ticket, index) => (
-                    <Card className={classes.averageTicket} key={index} elevation={5}>
+                    <Card
+                      className={classes.averageTicket}
+                      key={index}
+                      elevation={5}
+                    >
                       <CardContent>
                         <Typography align="center" variant="h6" component="h2">
                           {ticket.user.name}
@@ -602,7 +720,11 @@ const Dashboard = () => {
                 </Typography>
                 <div className={classes.averageTickets}>
                   {smallerTickets.map((ticket, index) => (
-                    <Card className={classes.averageTicket} key={index} elevation={5}>
+                    <Card
+                      className={classes.averageTicket}
+                      key={index}
+                      elevation={5}
+                    >
                       <CardContent>
                         <Typography align="center" variant="h6" component="h2">
                           {ticket.user.name}
@@ -616,7 +738,7 @@ const Dashboard = () => {
                   ))}
                 </div>
               </>
-            }
+            )}
             <div style={{ marginTop: "10px" }}>
               <Typography component="h3" variant="h6">
                 {tickets && tickets.length > 0
