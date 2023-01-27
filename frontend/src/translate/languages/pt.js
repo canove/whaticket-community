@@ -58,7 +58,7 @@ const messages = {
             title: "Atendimento por Categoria",
           },
           queue: {
-            title: "Na File"
+            title: "Na Fila"
           },
           averageDeliveryTime: {
             title: "Tempo de Entrega Médio",
