@@ -243,8 +243,9 @@ const ConnectionFiles = () => {
 								{i18n.t("connectionsFiles.table.icon")}
 							</TableCell>
 							<TableCell align="center">
-								{i18n.t("connectionsFiles.table.name")}
+								{}
 							</TableCell>
+							<TableCell align="center">{i18n.t("connectionsFiles.table.triggerInterval")}</TableCell>
 							<TableCell align="center">
 								{i18n.t("connectionsFiles.table.createdAt")}
 							</TableCell>
@@ -263,6 +264,7 @@ const ConnectionFiles = () => {
 									<img src={connectionFile.icon} style={{ maxWidth: "50px" }} />
 								</TableCell>
 								<TableCell align="center">{connectionFile.name}</TableCell>
+								<TableCell align="center">{connectionFile.triggerInterval ? connectionFile.triggerInterval : i18n.t("connectionsFiles.table.disabled")}</TableCell>
 								<TableCell align="center">
 									{ format(parseISO(connectionFile.createdAt), "dd/MM/yy HH:mm") }
 								</TableCell>

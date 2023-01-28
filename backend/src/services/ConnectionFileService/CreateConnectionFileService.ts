@@ -5,12 +5,14 @@ interface Request {
   name: string;
   icon: string;
   companyId: number;
+  triggerInterval: string;
 }
 
 const CreateConnectionFileService = async ({
   name,
   icon,
-  companyId
+  companyId,
+  triggerInterval
 }: Request): Promise<ConnectionFiles> => {
   const exists = await ConnectionFiles.findOne({
     where: { name, companyId }
@@ -23,7 +25,8 @@ const CreateConnectionFileService = async ({
   const connectionFile = await ConnectionFiles.create({
     name,
     icon,
-    companyId
+    companyId,
+    triggerInterval: triggerInterval === "null" ? null : triggerInterval
   });
 
   return connectionFile;
