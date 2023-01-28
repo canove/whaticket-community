@@ -6,7 +6,8 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  ForeignKey
+  ForeignKey,
+  AllowNull
 } from "sequelize-typescript";
 import Company from "./Company";
 
@@ -22,6 +23,10 @@ class ConnectionFiles extends Model<ConnectionFiles> {
 
   @Column
   icon: string;
+
+  @AllowNull(true)
+  @Column
+  triggerInterval: number;
 
   @ForeignKey(() => Company)
   @Column

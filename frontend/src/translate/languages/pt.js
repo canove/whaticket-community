@@ -1198,7 +1198,9 @@ const messages = {
           name: "Nome",
           createdAt: "Criado em",
           updatedAt: "Atualizado em",
-          actions: "Ações"
+          actions: "Ações",
+          triggerInterval: "Intervalo para Disparo (min)",
+          disabled: "Desativado"
         },
         modal: {
           create: "Criar",
@@ -1208,6 +1210,8 @@ const messages = {
           removeIcon: "Remover Icone",
           save: "Salvar",
           cancel: "Cancelar",
+          useTriggerInterval: "Usar Intervalo para Disparo",
+          minutes: "Minutos"
         },
       },
 

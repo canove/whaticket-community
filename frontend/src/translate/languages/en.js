@@ -1195,7 +1195,9 @@ const messages = {
           name: "Name",
           createdAt: "Created At",
           updatedAt: "Updated At",
-          actions: "Actions"
+          actions: "Actions",
+          triggerInterval: "Trigger Interval (min)",
+          disabled: "Disabled"
         },
         modal: {
           create: "Create",
@@ -1205,6 +1207,8 @@ const messages = {
           removeIcon: "Remove Icon",
           save: "Save",
           cancel: "Cancel",
+          useTriggerInterval: "Use Trigger Interval",
+          minutes: "Minutes"
         },
       },
 
