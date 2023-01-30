@@ -144,7 +144,7 @@ const Dashboard = () => {
   const [averageTime, setAverageTime] = useState(0);
 
   const [config, setConfig] = useState(null);
-  const [connectedWhatsappCount, setConnectedWhatsappCount] = useState(0);
+  const [connectedWhatsapps, setConnectedWhatsapps] = useState([]);
 
   const [updatingPage, setUpdatingPage] = useState(false);
 
@@ -179,7 +179,7 @@ const Dashboard = () => {
       setNoWhatsCount(data.reports.noWhats || "0");
 
       setCategoryCount(data.category);
-      setConnectedWhatsappCount(data.whatsappCount);
+      setConnectedWhatsapps(data.connectedWhatsapps);
 
       setLoading(false);
     } catch (err) {
@@ -345,10 +345,28 @@ const Dashboard = () => {
 
     const queueCount = getQueueCount();
 
-    if (queueCount > 0 && connectedWhatsappCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
-    if (queueCount === 0 && connectedWhatsappCount === 0) return "00:00:00";
+    let triggerIntervalCount = 0;
+    let connectedWhatsappsCount = 0;
 
-    const averageDeliveryTimeMinutes = (queueCount / connectedWhatsappCount) * config.triggerInterval;
+    let totalTriggerInterval = 0;
+
+    connectedWhatsapps.forEach(whats => {
+      connectedWhatsappsCount += 1;
+      triggerIntervalCount += 1;
+
+      if (whats.connectionFile && whats.connectionFile.triggerInterval) {
+        totalTriggerInterval += whats.connectionFile.triggerInterval;
+      } else {
+        totalTriggerInterval += config.triggerInterval;
+      }
+    });
+
+    if (queueCount > 0 && connectedWhatsappsCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
+    if (queueCount === 0 && connectedWhatsappsCount === 0) return "00:00:00";
+
+    const triggerInterval = totalTriggerInterval / triggerIntervalCount;
+
+    const averageDeliveryTimeMinutes = (queueCount / connectedWhatsappsCount) * triggerInterval;
     const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
     const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
 
