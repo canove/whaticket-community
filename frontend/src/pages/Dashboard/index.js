@@ -27,6 +27,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import SearchIcon from "@material-ui/icons/Search";
 import { GrUpdate } from "react-icons/gr"
 import { green } from "@material-ui/core/colors";
+import RegisterChart from "./RegisterChart";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -660,6 +661,11 @@ const Dashboard = () => {
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart />
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper className={classes.fixedHeightPaper}>
+              <RegisterChart />
             </Paper>
           </Grid>
         </Grid>
