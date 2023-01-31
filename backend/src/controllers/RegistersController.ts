@@ -1,4 +1,7 @@
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { Request, Response } from "express";
+import { Op } from "sequelize";
+import FileRegister from "../database/models/FileRegister";
 import DashboardCategoryService from "../services/CategoryServices/DashboardCategoryService";
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
 import ListReportRegistersService from "../services/RegistersService/ListReportRegistersService";
@@ -35,6 +38,29 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
 
   return res.status(200).json({ reports, category, connectedWhatsapps });
+};
+
+export const chart = async (req: Request, res: Response): Promise<Response> => {
+  const { date } = req.query as IndexQuery;
+  const { companyId } = req.user;
+
+  let whereCondition = null;
+
+  if (date) {
+    whereCondition = {
+      createdAt: {
+        [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
+      },
+      companyId
+    };
+  }
+
+  const reports = await FileRegister.findAll({
+    where: whereCondition,
+    attributes: ["createdAt"]
+  });
+
+  return res.status(200).json({ reports });
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {

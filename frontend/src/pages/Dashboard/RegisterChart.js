@@ -8,19 +8,21 @@ import {
 	YAxis,
 	Label,
 	ResponsiveContainer,
+	Tooltip
 } from "recharts";
 import { startOfHour, parseISO, format } from "date-fns";
 
 import Title from "./Title";
-import useTickets from "../../hooks/useTickets";
 import { useTranslation } from "react-i18next";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
 
-const Chart = () => {
+const RegisterChart = () => {
 	const theme = useTheme();
 	const { i18n } = useTranslation();
 
 	const date = useRef(new Date().toISOString());
-	const { tickets } = useTickets({ date: date.current });
+	const [registers, setRegisters] = useState([]);
 
 	const [chartData, setChartData] = useState([
 		{ time: "08:00", amount: 0 },
@@ -38,24 +40,40 @@ const Chart = () => {
 	]);
 
 	useEffect(() => {
-		setChartData(prevState => {
-			let aux = [...prevState];
+		const fetchRegisters = async () => {
+			try {
+				const { data } = await api.get("/registers/chart", {
+					params: { date: date.current },
+				})
+				setRegisters(data.reports);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+		fetchRegisters();
+	}, []);
 
-			aux.forEach(a => {
-				tickets.forEach(ticket => {
-					format(startOfHour(parseISO(ticket.createdAt)), "HH:mm") === a.time &&
-						a.amount++;
+	useEffect(() => {
+		if (registers) {
+			setChartData(prevState => {
+				let aux = [...prevState];
+	
+				aux.forEach(a => {
+					registers.forEach(reg => {
+						format(startOfHour(parseISO(reg.createdAt)), "HH:mm") === a.time &&
+							a.amount++;
+					});
 				});
+	
+				return aux;
 			});
-
-			return aux;
-		});
-	}, [tickets]);
+		}
+	}, [registers]);
 
 	return (
 		<React.Fragment>
 			<Title>
-				{`${i18n.t("dashboard.charts.perDay.title")}${tickets.length}`}
+				{`Disparos por dia: ${registers.length}`}
 			</Title>
 			<ResponsiveContainer>
 				<BarChart
@@ -82,9 +100,10 @@ const Chart = () => {
 							position="left"
 							style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
 						>
-							{i18n.t("dashboard.charts.perDay.calls")}
+							Disparos
 						</Label>
 					</YAxis>
+					<Tooltip />
 					<Bar dataKey="amount" fill={theme.palette.primary.main} />
 				</BarChart>
 			</ResponsiveContainer>
@@ -92,4 +111,4 @@ const Chart = () => {
 	);
 };
 
-export default Chart;
+export default RegisterChart;
