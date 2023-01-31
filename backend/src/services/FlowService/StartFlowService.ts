@@ -294,7 +294,7 @@ const processNode = async (node: any, session: any, body: any) => {
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
-      order: [["updatedAt", "DESC"]]
+      order: [["createdAt", "DESC"]]
     });
 
     if (!fileRegister) return { database: { value: "", type: "text" } };
@@ -343,7 +343,7 @@ const processNode = async (node: any, session: any, body: any) => {
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
-      order: [["updatedAt", "DESC"]]
+      order: [["createdAt", "DESC"]]
     });
 
     node.messages.forEach(message => {
