@@ -72,11 +72,7 @@ export const getMessages = async (req: Request, res: Response): Promise<Response
     throw new AppError("ERR_NO_MESSAGE_FOUND", 404);
   }
 
-  const ticket = await ShowTicketService(message.ticketId, companyId);
-
-  if (!ticket) {
-    throw new AppError("ERR_NO_TICKET_FOUND", 404);
-  }
+  await ShowTicketService(message.ticketId, companyId);
 
   const messages = await Message.findAll({
     where: { ticketId: message.ticketId },
