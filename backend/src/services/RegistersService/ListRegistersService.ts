@@ -70,12 +70,12 @@ const ListRegistersService = async ({
     where: whereCondition,
     attributes: [
       [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
-      [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL")), 'sent' ],
+      [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
       [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
       [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
       [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
       [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
-      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND msgWhatsId IS NULL")), 'noWhats' ],
+      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND haveWhatsapp = 0")), 'noWhats' ],
     ],
     raw: true
   });

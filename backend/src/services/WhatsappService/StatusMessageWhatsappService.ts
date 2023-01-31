@@ -12,7 +12,8 @@ import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateConta
 import Templates from "../../database/models/TemplatesData";
 import Ticket from "../../database/models/Ticket";
 import { preparePhoneNumber } from "../../utils/common";
-
+import ExposedImport from "../../database/models/ExposedImport";
+import  crypto  from "crypto";
 interface Request {
   msgId: number;
   statusType: string;
@@ -108,10 +109,15 @@ const StatusMessageWhatsappService = async ({
       const message = await Message.findByPk(msgWhatsId);
         if(!message) {
           const file = await File.findByPk(register.fileId);
+          const exposed = await ExposedImport.findByPk(register.exposedImportId);
           let template = null;
-          if(file.templateId) {
+          if(file && file.templateId) {
             template = await Templates.findByPk(file.templateId);
           }
+          if(exposed && exposed.templateId) {
+            template = await Templates.findByPk(exposed.templateId);
+          }
+
           let messageTxt = register.message;
           let mediaUrl = null;
 
@@ -149,7 +155,7 @@ const StatusMessageWhatsappService = async ({
           const contactData = {
             name: `${register.name}`,
             number: register.phoneNumber,
-            companyId: file.companyId,
+            companyId: (file?file.companyId:exposed.companyId),
             profilePicUrl: null,
             isGroup: false
           };
@@ -166,7 +172,7 @@ const StatusMessageWhatsappService = async ({
           );
           /*CRIA A MENSAGEM NO CHAT*/
           const messageData = {
-            id: msgWhatsId,
+            id: msgWhatsId?msgWhatsId:crypto.randomBytes(16).toString('hex'),
             ticketId: createTicket.id,
             bot: createTicket.status == 'inbot',
             contactId: undefined,
@@ -177,13 +183,19 @@ const StatusMessageWhatsappService = async ({
             mediaUrl: mediaUrl,
             mediaType: messageType,
             quotedMsgId: null,
-            companyId: file.companyId
+            companyId: (file?file.companyId:exposed.companyId)
           };
         
           await CreateMessageService({ messageData });
         }
         /*FIM*/
       break;
+    case "unwhats":
+        await register?.update({ haveWhatsapp: false });
+        break;
+    case "retry":
+          await register?.update({ processedAt: null, msgWhatsId: null });
+          break;
     case "delivered":
       await register?.update({ deliveredAt: new Date() });
       break;
