@@ -60,13 +60,17 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const getMessages = async (req: Request, res: Response): Promise<Response> => {
-  const { msgWhatsId } = req.params;
+  const { msgWhatsId } = req.query;
   const { companyId } = req.user;
 
   const message = await Message.findOne({
     where: { id: msgWhatsId },
     attributes: ["ticketId"]
   });
+
+  if (!message) {
+    throw new AppError("ERR_NO_MESSAGE_FOUND", 404);
+  }
 
   const ticket = await ShowTicketService(message.ticketId, companyId);
 

@@ -130,6 +130,7 @@ const Dashboard = () => {
   const [errorCount, setErrorCount] = useState(0);
   const [interactionCount, setInteractionCount] = useState(0);
   const [noWhatsCount, setNoWhatsCount] = useState(0);
+  const [queueCount, setQueueCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState([]);
 
   const [files, setFiles] = useState([]);
@@ -177,6 +178,7 @@ const Dashboard = () => {
       setErrorCount(data.reports.error || "0");
       setInteractionCount(data.reports.interaction || "0");
       setNoWhatsCount(data.reports.noWhats || "0");
+      setQueueCount(data.reports.queue || "0");
 
       setCategoryCount(data.category);
       setConnectedWhatsapps(data.connectedWhatsapps);
@@ -334,16 +336,8 @@ const Dashboard = () => {
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
 
-  const getQueueCount = () => {
-    const queueCount = parseInt(registerCount) - (parseInt(sentCount) + parseInt(noWhatsCount));
-
-    return queueCount;
-  }
-
   const getAverageDeliveryTime = () => {
     if (!config || !config.active) return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
-
-    const queueCount = getQueueCount();
 
     let triggerIntervalCount = 0;
     let connectedWhatsappsCount = 0;
@@ -361,12 +355,14 @@ const Dashboard = () => {
       }
     });
 
-    if (queueCount > 0 && connectedWhatsappsCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
-    if (queueCount === 0 && connectedWhatsappsCount === 0) return "00:00:00";
+    let queueCountInt = parseInt(queueCount);
+
+    if (queueCountInt > 0 && connectedWhatsappsCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
+    if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
 
     const triggerInterval = totalTriggerInterval / triggerIntervalCount;
 
-    const averageDeliveryTimeMinutes = (queueCount / connectedWhatsappsCount) * triggerInterval;
+    const averageDeliveryTimeMinutes = (queueCountInt / connectedWhatsappsCount) * triggerInterval;
     const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
     const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
 
@@ -506,7 +502,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {getQueueCount()}
+                  {queueCount}
                 </Typography>
               </Grid>
             </Paper>
