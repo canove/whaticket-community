@@ -122,7 +122,7 @@ ApiRoutes.get(
 );
 
 ApiRoutes.get(
-  "/getMessages/:msgWhatsId",
+  "/getMessages/",
   isAuthApi,
   MessageController.getMessages
 );
