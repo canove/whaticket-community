@@ -13,8 +13,10 @@ const pdf2base64 = require("pdf-to-base64");
 
 type IndexQuery = {
   type?: string;
-  fileId?: number | string;
+  fileId?: string;
   date?: string;
+  initialDate?: string;
+  finalDate?: string;
 };
 
 type ListQuery = {
@@ -28,10 +30,10 @@ type ListQuery = {
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { fileId, date } = req.query as IndexQuery;
+  const { fileId, date, initialDate, finalDate } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const reports = await ListRegistersService({ fileId, date, companyId });
+  const reports = await ListRegistersService({ fileId, date, companyId, initialDate, finalDate });
 
   const category = await DashboardCategoryService(companyId, date);
 

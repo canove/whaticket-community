@@ -25,9 +25,11 @@ import Title from "../../components/Title";
 import MainHeader from "../../components/MainHeader";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import SearchIcon from "@material-ui/icons/Search";
-import { GrUpdate } from "react-icons/gr"
+import { GrUpdate } from "react-icons/gr";
 import { green } from "@material-ui/core/colors";
 import RegisterChart from "./RegisterChart";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -63,6 +65,11 @@ const useStyles = makeStyles((theme) => ({
   },
   selectStyle: {
     width: "100%",
+    marginTop: -10,
+  },
+  dateStyle: {
+    display: "inline-block",
+    width: "40%",
     marginTop: -10,
   },
   circleLoading: {
@@ -134,11 +141,13 @@ const Dashboard = () => {
   const [queueCount, setQueueCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState([]);
 
-  const [files, setFiles] = useState([]);
+  // const [files, setFiles] = useState([]);
 
   const [fileId, setFileId] = useState("");
   const [date, setDate] = useState("");
   const [searchParam, setSearchParam] = useState("");
+  const [initialDate, setInitialDate] = useState("");
+  const [finalDate, setFinalDate] = useState("");
 
   const [tickets, setTickets] = useState([]);
   const [biggerTickets, setBiggerTickets] = useState([]);
@@ -165,11 +174,23 @@ const Dashboard = () => {
   };
 
   const handleFilter = async () => {
+    if (initialDate && finalDate) {
+      const i = new Date(+startOfDay(parseISO(initialDate)));
+      const f = new Date(+endOfDay(parseISO(finalDate)));
+
+      const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+
+      if (f.getTime() - i.getTime() >= thirtyDays) {
+        toast.error(i18n.t("dashboard.moreThanThirtyDaysError"))
+      }
+    }
+
     setLoading(true);
     try {
       setLoading(true);
+
       const { data } = await api.get("/registers/list", {
-        params: { fileId, date },
+        params: { fileId, date, initialDate, finalDate },
       });
 
       setRegisterCount(data.reports.total);
@@ -192,37 +213,37 @@ const Dashboard = () => {
 
   const fetchConfig = async () => {
     try {
-        const { data } = await api.get('/whatsconfig/');
-        setConfig(data && data.length > 0 ? data[0] : null);
-    } catch (err) {
-        toastError(err);
-    }
-  }
-
-  const handleFiles = async () => {
-    setLoading(true);
-    let allFiles = [];
-
-    try {
-      const { data } = await api.get("file/list?status=5");
-      allFiles = [...allFiles, ...data.reports];
-      setLoading(false);
+      const { data } = await api.get("/whatsconfig/");
+      setConfig(data && data.length > 0 ? data[0] : null);
     } catch (err) {
       toastError(err);
-      setLoading(false);
     }
-
-    try {
-      const { data } = await api.get("file/list?status=6");
-      allFiles = [...allFiles, ...data.reports];
-      setLoading(false);
-    } catch (err) {
-      toastError(err);
-      setLoading(false);
-    }
-
-    setFiles(allFiles);
   };
+
+  // const handleFiles = async () => {
+  //   setLoading(true);
+  //   let allFiles = [];
+
+  //   try {
+  //     const { data } = await api.get("file/list?status=5");
+  //     allFiles = [...allFiles, ...data.reports];
+  //     setLoading(false);
+  //   } catch (err) {
+  //     toastError(err);
+  //     setLoading(false);
+  //   }
+
+  //   try {
+  //     const { data } = await api.get("file/list?status=6");
+  //     allFiles = [...allFiles, ...data.reports];
+  //     setLoading(false);
+  //   } catch (err) {
+  //     toastError(err);
+  //     setLoading(false);
+  //   }
+
+  //   setFiles(allFiles);
+  // };
 
   const fetchAverangeTime = async () => {
     setLoading(true);
@@ -253,7 +274,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     handleFilter();
-  }, [fileId, date]);
+  }, [fileId, date, initialDate, finalDate]);
 
   useEffect(() => {
     fetchAverangeTime();
@@ -261,36 +282,36 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchConfig();
-    handleFiles();
+    // handleFiles();
   }, []);
 
   const updatePage = async () => {
     setUpdatingPage(true);
 
     await handleFilter();
-    await handleFiles();
+    // await handleFiles();
     await fetchAverangeTime();
     await fetchConfig();
 
     setUpdatingPage(false);
-  }
-
-  const handleSelectOption = (_, newValue) => {
-    if (newValue) {
-      setFileId(newValue.id);
-      setDate("");
-    } else {
-      setFileId("");
-    }
   };
 
-  const renderOptionLabel = (option) => {
-    if (option.number) {
-      return `${option.name} - ${option.number}`;
-    } else {
-      return `${option.name}`;
-    }
-  };
+  // const handleSelectOption = (_, newValue) => {
+  //   if (newValue) {
+  //     setFileId(newValue.id);
+  //     setDate("");
+  //   } else {
+  //     setFileId("");
+  //   }
+  // };
+
+  // const renderOptionLabel = (option) => {
+  //   if (option.number) {
+  //     return `${option.name} - ${option.number}`;
+  //   } else {
+  //     return `${option.name}`;
+  //   }
+  // };
 
   const getGridSize = () => {
     if (categoryCount.length === 1) {
@@ -338,14 +359,15 @@ const Dashboard = () => {
   };
 
   const getAverageDeliveryTime = () => {
-    if (!config || !config.active) return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
+    if (!config || !config.active)
+      return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
 
     let triggerIntervalCount = 0;
     let connectedWhatsappsCount = 0;
 
     let totalTriggerInterval = 0;
 
-    connectedWhatsapps.forEach(whats => {
+    connectedWhatsapps.forEach((whats) => {
       connectedWhatsappsCount += 1;
       triggerIntervalCount += 1;
 
@@ -358,45 +380,45 @@ const Dashboard = () => {
 
     let queueCountInt = parseInt(queueCount);
 
-    if (queueCountInt > 0 && connectedWhatsappsCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
+    if (queueCountInt > 0 && connectedWhatsappsCount === 0)
+      return i18n.t(
+        "dashboard.messages.averageDeliveryTime.noConnectedWhatsapps"
+      );
     if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
 
     const triggerInterval = totalTriggerInterval / triggerIntervalCount;
 
-    const averageDeliveryTimeMinutes = (queueCountInt / connectedWhatsappsCount) * triggerInterval;
+    const averageDeliveryTimeMinutes =
+      (queueCountInt / connectedWhatsappsCount) * triggerInterval;
     const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
     const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
 
     return averageDeliveryTime;
-  }
+  };
 
   return (
     <div>
       <MainHeader>
         <Title>{i18n.t("dashboard.title")}</Title>
-        <div 
+        <div
           style={{
             marginLeft: "10px",
-            marginRight: 0
+            marginRight: 0,
           }}
         >
-          <IconButton
-						size="small"
-						onClick={updatePage}
-            disabled={updatingPage}
-					>
-						<GrUpdate />
-            { updatingPage &&
+          <IconButton size="small" onClick={updatePage} disabled={updatingPage}>
+            <GrUpdate />
+            {updatingPage && (
               <div>
                 <CircularProgress className={classes.circleLoading} />
               </div>
-            }
-					</IconButton>
-          </div>
+            )}
+          </IconButton>
+        </div>
       </MainHeader>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
-          <Grid item xs={6}>
+          {/* <Grid item xs={6}>
             <Paper className={classes.customFixedHeightPaper}>
               <Typography
                 style={{ display: "inlineBlock" }}
@@ -422,6 +444,32 @@ const Dashboard = () => {
                 )}
               />
             </Paper>
+          </Grid> */}
+          <Grid item xs={6}>
+            <Paper className={classes.customFixedHeightPaper}>
+              <Typography
+                style={{ display: "inlineBlock" }}
+                component="h3"
+                variant="h6"
+                color="primary"
+                paragraph
+              >
+                {i18n.t("dashboard.dateTitle")}
+              </Typography>
+              <TextField
+                className={classes.selectStyle}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setFileId("");
+                  setInitialDate("");
+                  setFinalDate("");
+                }}
+                value={date}
+                label={i18n.t("dashboard.date")}
+                InputLabelProps={{ shrink: true, required: true }}
+                type="date"
+              />
+            </Paper>
           </Grid>
           <Grid item xs={6}>
             <Paper className={classes.customFixedHeightPaper}>
@@ -432,19 +480,34 @@ const Dashboard = () => {
                 color="primary"
                 paragraph
               >
-                {i18n.t("dashboard.date")}
+                {i18n.t("dashboard.periodTitle")}
               </Typography>
-              <TextField
-                className={classes.selectStyle}
-                onChange={(e) => {
-                  setDate(e.target.value);
-                  setFileId("");
-                }}
-                value={date}
-                label={i18n.t("dashboard.date")}
-                InputLabelProps={{ shrink: true, required: true }}
-                type="date"
-              />
+              <div>
+                <TextField
+                  className={classes.dateStyle}
+                  onChange={(e) => {
+                    setInitialDate(e.target.value);
+                    setDate("");
+                    setFileId("");
+                  }}
+                  value={initialDate}
+                  label={i18n.t("dashboard.initialDate")}
+                  InputLabelProps={{ shrink: true, required: true }}
+                  type="date"
+                />
+                <TextField
+                  className={classes.dateStyle}
+                  onChange={(e) => {
+                    setFinalDate(e.target.value);
+                    setDate("");
+                    setFileId("");
+                  }}
+                  value={finalDate}
+                  label={i18n.t("dashboard.finalDate")}
+                  InputLabelProps={{ shrink: true, required: true }}
+                  type="date"
+                />
+              </div>
             </Paper>
           </Grid>
           <Grid item xs={4}>
