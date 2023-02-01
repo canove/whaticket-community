@@ -24,6 +24,11 @@ const messages = {
       title: "Dashboard",
       file: "File",
       date: "Date",
+      initialDate: "Initial Date",
+      finalDate: "Final Date",
+      dateTitle: "Filter by Day",
+      periodTitle: "Filter by Period (Max: 30 days)",
+      moreThanThirtyDaysError: "Maximum period of 30 days.",
         charts: {
           perDay: {
             title: "Tickets today: ",

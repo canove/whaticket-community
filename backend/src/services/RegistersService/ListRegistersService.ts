@@ -4,31 +4,22 @@ import { Op, Sequelize } from "sequelize"
 import File from "../../database/models/File";
 import { FileStatus } from "../../enum/FileStatus";
 import sequelize from "../../database";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 
 interface Request {
-  fileId?: number | string,
-  date?: string,
+  fileId?: string;
+  date?: string;
+  initialDate?: string;
+  finalDate?: string;
   companyId: number
-}
-
-const getDate = (date: string, option: string) => {
-  if (option === "MORNING") {
-    let morningDate = new Date(`${date} GMT-3`);
-    morningDate.setHours(0, 0, 0, 0);
-    return morningDate;
-  }
-
-  if (option === "NIGHT") {
-    let nightDate = new Date(`${date} GMT-3`);
-    nightDate.setHours(23, 59, 59, 999);
-    return nightDate;
-  }
 }
 
 const ListRegistersService = async ({
   fileId,
   date,
-  companyId
+  companyId, 
+  initialDate, 
+  finalDate
 }: Request) => {
   let whereCondition = null;
 
@@ -60,9 +51,24 @@ const ListRegistersService = async ({
     whereCondition = {
       ...whereCondition,
       createdAt: {
-        [Op.gte]: getDate(date, "MORNING"),
-        [Op.lte]: getDate(date, "NIGHT"),
+        [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       },
+    }
+  }
+
+  if (initialDate && finalDate) {
+    const i = new Date(+startOfDay(parseISO(initialDate)));
+    const f = new Date(+endOfDay(parseISO(finalDate)));
+
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+
+    if (!(f.getTime() - i.getTime() >= thirtyDays)) {
+      whereCondition = {
+        ...whereCondition,
+        createdAt: {
+          [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+        },
+      };
     }
   }
 

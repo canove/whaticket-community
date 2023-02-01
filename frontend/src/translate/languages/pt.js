@@ -23,6 +23,11 @@ const messages = {
         title: "Dashboard",
         file: " Arquivo",
         date: "Data",
+        initialDate: "Data inicial",
+        finalDate: "Data final",
+        dateTitle: "Filtro por dia",
+        periodTitle: "Filtro por Período (Máx: 30 dias)",
+        moreThanThirtyDaysError: "Período máximo de 30 dias.",
         charts: {
           perDay: {
             title: "Chamadas hoje: ",
