@@ -60,7 +60,7 @@ const ListRegistersService = async ({
     const i = new Date(+startOfDay(parseISO(initialDate)));
     const f = new Date(+endOfDay(parseISO(finalDate)));
 
-    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+    const thirtyDays = 31 * 24 * 60 * 60 * 1000; // dia * horas * minutos * segundos * milisegundos
 
     if (!(f.getTime() - i.getTime() >= thirtyDays)) {
       whereCondition = {
