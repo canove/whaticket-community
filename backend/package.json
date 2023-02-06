@@ -48,6 +48,7 @@
     "pino-pretty": "5.1.2",
     "qrcode-terminal": "0.12.0",
     "random-words": "1.2.0",
+    "redis": "^4.6.4",
     "reflect-metadata": "^0.1.13",
     "sequelize": "5.22.3",
     "sequelize-cli": "5.5.1",

@@ -6,6 +6,7 @@ import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 import { preparePhoneNumber, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
+import { createClient } from 'redis';
 
 interface Request {
   exposedImportId: string;
@@ -85,6 +86,17 @@ const StartExposedImportService = async ({
     throw new AppError("ERR_NO_IMPORT_FOUND", 404);
   }
 
+  const client = createClient({
+    url: process.env.REDIS_URL
+  });
+
+  try {
+    client.on('error', err => console.log('Redis Client Error', err));
+    await client.connect();
+  } catch (err) {
+    console.log(err);
+  }
+
   const mapping = JSON.parse(exposedImport.mapping);
   let totalRegisters = exposedImport.qtdeRegister;
   var today = new Date();
@@ -117,7 +129,7 @@ const StartExposedImportService = async ({
           whatsappId = whatsapp ? whatsapp.id : null;
         }
 
-        registersToInsert.push({
+        const register = {
           name,
           phoneNumber,
           exposedImportId,
@@ -132,6 +144,12 @@ const StartExposedImportService = async ({
           var5,
           companyId,
           whatsappId
+        };
+
+        registersToInsert.push(register);
+
+        await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register), {
+          EX: 10
         });
 
         if (registersToInsert.length >= 500) {
@@ -207,7 +225,7 @@ const StartExposedImportService = async ({
       whatsappId = whatsapp ? whatsapp.id : null;
     }
 
-    await FileRegister.create({
+    const register = {
       name,
       phoneNumber,
       exposedImportId,
@@ -222,11 +240,17 @@ const StartExposedImportService = async ({
       var5,
       companyId,
       whatsappId
-    });
+    }
+
+    await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register));
+
+    await FileRegister.create(register);
     console.log("update exposedImport exposedImportService 186");
     await exposedImport.update({ qtdeRegister: totalRegisters + 1 });
     delete numberDispatcher[phoneNumber];
   }
+
+  await client.disconnect();
 
   exposedImport.reload();
 
