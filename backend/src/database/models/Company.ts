@@ -10,11 +10,17 @@ import {
   Unique,
   Default,
   BelongsToMany,
-  HasMany
+  HasMany,
+  HasOne
 } from "sequelize-typescript";
+import BillingControls from "./BillingControls";
+import FileRegister from "./FileRegister";
 import Menu from "./Menu";
 import MenuCompanies from "./MenuCompanies";
+import Pricing from "./Pricing";
 import User from "./User";
+import Whatsapp from "./Whatsapp";
+import WhatsappsConfig from "./WhatsappsConfig";
 
 @Table
 class Company extends Model<Company> {
@@ -66,6 +72,21 @@ class Company extends Model<Company> {
 
   @HasMany(() => User)
   users: User[];
+
+  @HasMany(() => FileRegister, "companyId")
+  fileRegisters: FileRegister[];
+
+  @HasMany(() => Whatsapp, "companyId")
+  whatsapps: Whatsapp[];
+
+  @HasMany(() => BillingControls, "companyId")
+  billingControls: BillingControls[];
+
+  @HasOne(() => WhatsappsConfig, "companyId")
+  config: WhatsappsConfig;
+
+  @HasOne(() => Pricing, "companyId")
+  pricing: Pricing;
 }
 
 export default Company;

@@ -40,6 +40,7 @@ import OfficialContacts from "../pages/OfficialContacts";
 import OfficialTemplates from "../pages/OfficialTemplates";
 import OfficialWhatsappReport from "../pages/OfficialWhatsappReport";
 import Profiles from "../pages/Profiles";
+import Operations from "../pages/Operations";
 
 const RenderRoutes = () => {
   const { isAuth, user } = useContext(AuthContext);
@@ -160,6 +161,9 @@ const RenderRoutes = () => {
     }
     if (name === "Profiles") {
       return Profiles;
+    }
+    if (name === "Operations") {
+      return Operations;
     }
   };
 
