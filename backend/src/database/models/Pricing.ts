@@ -33,6 +33,9 @@ class Pricing extends Model<Pricing> {
   @Column
   productId: number;
 
+  @BelongsTo(() => Product)
+  product: Product;
+
   @Column
   usedGraceTriggers: number;
 
@@ -47,9 +50,6 @@ class Pricing extends Model<Pricing> {
 
   @BelongsTo(() => Company)
   company: Company;
-
-  @BelongsTo(() => Product)
-  product: Product;
 }
 
 export default Pricing;

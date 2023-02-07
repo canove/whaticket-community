@@ -131,10 +131,9 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
     }
 
 	const formatToBRL = (quantity) => {
-        let BRL = 'R$';
         let money = quantity.toFixed(2);
 
-        return `${BRL} ${money}`.replace('.', ',');
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
     }
 
 	return (

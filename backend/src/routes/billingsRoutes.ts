@@ -7,6 +7,8 @@ const billingsRoutes = Router();
 
 billingsRoutes.get("/billings/", isAuth, BillingsController.index);
 
+billingsRoutes.get("/billings/dashboard", isAuth, BillingsController.dashboard);
+
 billingsRoutes.get("/billings/:billingId", isAuth, BillingsController.show);
 
 billingsRoutes.get(

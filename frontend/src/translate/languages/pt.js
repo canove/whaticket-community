@@ -994,6 +994,22 @@ const messages = {
         },
       },
 
+      operations: {
+        title: "Operações",
+        companies: "Empresas",
+        initialDate: "Data Inicial",
+        finalDate: "Data Final",
+        filter: "Filtrar",
+        table: {
+          name: "Nome da Empresa",
+          qtdeImports: "Qtde de Importados",
+          qtdeProcessed: "Qtde de Processados",
+          inQueue: "Na Fila",
+          averageDeliveryTime: "Tempo Médio da Fila",
+          expectedMonthValue: "Valor Previsto"
+        }
+      },
+
       integratedImport: {
         title: "Importação Integrada",
         buttons:{
