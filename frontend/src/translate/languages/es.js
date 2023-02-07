@@ -994,6 +994,22 @@ const messages = {
         },
       },
 
+      operations: {
+        title: "Operations",
+        companies: "Companies",
+        initialDate: "Initial Date",
+        finalDate: "Final Date",
+        filter: "Filter",
+        table: {
+          name: "Company Name",
+          qtdeImports: "Quantity of Imports",
+          qtdeProcessed: "Quantity of Processed",
+          inQueue: "In Queue",
+          averageDeliveryTime: "Average Delivery Time",
+          expectedMonthValue: "Expected Value"
+        }
+      },
+      
       integratedImport: {
         title: "Importación Integrada",
         buttons:{

@@ -17,8 +17,12 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
 } from "@material-ui/core";
 import Title from "../../components/Title";
@@ -49,6 +53,15 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: 120,
+  },
+  customFixedHeightBilling: {
+    padding: theme.spacing(2),
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+    height: 120,
+    border: "none",
+    boxShadow: "none"
   },
   customFixedHeightPaperLg: {
     padding: theme.spacing(2),
@@ -159,6 +172,13 @@ const Dashboard = () => {
 
   const [updatingPage, setUpdatingPage] = useState(false);
 
+  const [billingTotalMonthValue, setBillingTotalMonthValue] = useState(0);
+  const [lastMonthTotalValue, setLastMonthTotalValue] = useState(0);
+  const [expectedTotalMonthValue, setExpectedTotalMonthValue] = useState(0);
+
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [companies, setCompanies] = useState([]);
+
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
   }
@@ -219,6 +239,19 @@ const Dashboard = () => {
       toastError(err);
     }
   };
+
+  const fetchBilling = async () => {
+    try {
+      const { data } = await api.get("/billings/dashboard", {
+        params: { selectedCompany }
+      });
+      setBillingTotalMonthValue(data.monthTotalValue);
+      setLastMonthTotalValue(data.lastMonthTotalValue);
+      setExpectedTotalMonthValue(data.expectedTotalMonthValue);
+    } catch (err) {
+      toastError(err);
+    }
+  }
 
   // const handleFiles = async () => {
   //   setLoading(true);
@@ -285,6 +318,24 @@ const Dashboard = () => {
     // handleFiles();
   }, []);
 
+  useEffect(() => {
+    fetchBilling();
+  }, [selectedCompany]);
+
+  useEffect(() => {
+		if (user.companyId === 1) {
+			const fetchCompanies = async () => {
+				try {
+					const { data } = await api.get(`/company/`);
+					setCompanies(data.companies);
+				} catch (err) {
+					toastError(err);
+				}
+			}
+			fetchCompanies();
+		}
+	}, [user]);
+
   const updatePage = async () => {
     setUpdatingPage(true);
 
@@ -292,6 +343,7 @@ const Dashboard = () => {
     // await handleFiles();
     await fetchAverangeTime();
     await fetchConfig();
+    await fetchBilling();
 
     setUpdatingPage(false);
   };
@@ -395,6 +447,12 @@ const Dashboard = () => {
 
     return averageDeliveryTime;
   };
+
+  const formatToBRL = (quantity) => {
+    let money = quantity.toFixed(2);
+
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
+}
 
   return (
     <div>
@@ -721,6 +779,108 @@ const Dashboard = () => {
                 </Paper>
               </Grid>
             ))}
+          { user.companyId === 1 && 
+            <Grid item xs={12}>
+              <Paper className={classes.paperTime}>
+                <Typography component="h3" variant="h6" color="primary">
+                  Custos
+                </Typography>
+                <FormControl
+									variant="outlined"
+									margin="dense"
+									fullWidth
+								>
+									<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
+									<Select
+										label="Empresa"
+										name="company"
+										labelId="company-selection-label"
+										id="company-selection"
+										value={selectedCompany}
+										onChange={(e) => { setSelectedCompany(e.target.value) }}
+									>
+                    <MenuItem value={null}>{""}</MenuItem>
+										{ companies && companies.map(company => {
+											return (
+												<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
+											)
+										}) }
+									</Select>
+								</FormControl>
+                <Grid item>
+                  <Typography component="h2" variant="h6">
+                    Custo Mês Corrente: {formatToBRL(billingTotalMonthValue)}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography component="h2" variant="h6">
+                  Custo Previsto: {formatToBRL(expectedTotalMonthValue)}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography component="h2" variant="h6">
+                    Ultimo Mês: {formatToBRL(lastMonthTotalValue)}
+                  </Typography>
+                </Grid>
+              </Paper>
+            </Grid>
+          }
+          { user.companyId !== 1 && user.email === 'r64bits@gmail.com' &&
+            <Grid item xs={12}>
+              <Paper className={classes.paperTime}>
+                <Typography component="h3" variant="h6" color="primary">
+                  Custos
+                </Typography>
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly" }}>
+                  <Grid item xs={3}>
+                    <Paper
+                      className={classes.customFixedHeightBilling}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <Typography component="h3" variant="h6" color="primary" paragraph>
+                        Custo Mês Corrente
+                      </Typography>
+                      <Grid item>
+                        <Typography component="h1" variant="h4">
+                        {formatToBRL(billingTotalMonthValue)}
+                        </Typography>
+                      </Grid>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Paper
+                      className={classes.customFixedHeightBilling}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <Typography component="h3" variant="h6" color="primary" paragraph>
+                        Custo Previsto
+                      </Typography>
+                      <Grid item>
+                        <Typography component="h1" variant="h4">
+                        {formatToBRL(expectedTotalMonthValue)}
+                        </Typography>
+                      </Grid>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Paper
+                      className={classes.customFixedHeightBilling}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <Typography component="h3" variant="h6" color="primary" paragraph>
+                        Ultimo Mês
+                      </Typography>
+                      <Grid item>
+                        <Typography component="h1" variant="h4">
+                        {formatToBRL(lastMonthTotalValue)}
+                        </Typography>
+                      </Grid>
+                    </Paper>
+                  </Grid>
+                </div>
+              </Paper>
+            </Grid>
+          }
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart />
