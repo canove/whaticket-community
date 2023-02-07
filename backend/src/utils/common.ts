@@ -39,7 +39,12 @@ const removePhoneNumber9Digit = (phone:string): string => {
   }
 
   if (phoneNumber.length == 13){
-    phoneNumber = `${phoneNumber.substring(0, 4)}${phoneNumber.substring(5, phoneNumber.length)}`
+    switch(phoneNumber.substring(5, 6)) {
+      case '9':
+      case '8':
+      case '7':
+        phoneNumber = `${phoneNumber.substring(0, 4)}${phoneNumber.substring(5, phoneNumber.length)}`
+    }
   }
   return phoneNumber;
 }
