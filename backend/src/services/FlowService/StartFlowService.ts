@@ -13,6 +13,7 @@ import Queue from "../../database/models/Queue";
 import NodeRegisters from "../../database/models/NodeRegisters";
 import { preparePhoneNumber9Digit } from "../../utils/common";
 import { ca } from "date-fns/locale";
+import { createClient } from 'redis';
 
 interface Request {
   flowNodeId?: string;
@@ -246,19 +247,46 @@ const processNode = async (node: any, session: any, body: any) => {
 
   if (node.type === "database-condition-node") {
     let condition = false;
+    let client = null;
+    let value = null;
 
-    const fileRegister = await FileRegister.findOne({
-      where: {
-        phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
-        companyId: session.companyId,
-        processedAt: { [Op.ne]: null }
-      },
-      order: [["createdAt", "DESC"]]
-    });
+    try {
+      client = createClient({
+        url: process.env.REDIS_URL
+      });
+    } catch (err) {
+      console.log(err);
+    }
 
-    if (!fileRegister) return { condition };
+    if (client) {
+      try {
+        client.on('error', err => console.log('Redis Client Error', err));
+        await client.connect();
+  
+        const valueRedis = await client.get(`${session.id}-${session.companyId}`);
+  
+        if (valueRedis) value = JSON.parse(valueRedis);
+      } catch (err) {
+        console.log(err);
+      }
 
-    const variable = fileRegister[node.variable];
+      await client.disconnect();
+    }
+
+    if (!value) {
+      value = await FileRegister.findOne({
+        where: {
+          phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+    }
+
+    if (!value) return { condition };
+
+    const variable = value[node.variable];
 
     if (node.condition === "complete") {
       condition = variable.toLowerCase() === body.text.toLowerCase();
@@ -288,18 +316,46 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   if (node.type === "database-node") {
-    const fileRegister = await FileRegister.findOne({
-      where: {
-        phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
-        companyId: session.companyId,
-        processedAt: { [Op.ne]: null }
-      },
-      order: [["createdAt", "DESC"]]
-    });
+    let value = null;
+    let client = null;
 
-    if (!fileRegister) return { database: { value: "", type: "text" } };
+    try {
+      client = createClient({
+        url: process.env.REDIS_URL
+      });
+    } catch (err) {
+      console.log(err);
+    }
 
-    const variable = fileRegister[node.variable] ? fileRegister[node.variable] : "";
+    if (client) {
+      try {
+        client.on('error', err => console.log('Redis Client Error', err));
+        await client.connect();
+  
+        const valueRedis = await client.get(`${session.id}-${session.companyId}`);
+        
+        if (valueRedis) value = JSON.parse(valueRedis);
+      } catch (err) {
+        console.log(err);
+      }
+  
+      await client.disconnect();
+    }
+
+    if (!value) {
+      value = await FileRegister.findOne({
+        where: {
+          phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+    }
+
+    if (!value) return { database: { value: "", type: "text" } };
+
+    const variable = value[node.variable] ? value[node.variable] : "";
 
     return {
       message: {
@@ -334,17 +390,45 @@ const processNode = async (node: any, session: any, body: any) => {
   if (node.type === "multiple-messages-node") {
     const blocks = [];
 
-    let fileRegister = await FileRegister.findOne({
-      where: {
-        [Op.or]: [
-          { phoneNumber: session.id } ,
-          { phoneNumber: preparePhoneNumber9Digit(session.id) }
-        ],
-        companyId: session.companyId,
-        processedAt: { [Op.ne]: null }
-      },
-      order: [["createdAt", "DESC"]]
-    });
+    let value = null;
+    let client = null;
+
+    try {
+      client = createClient({
+        url: process.env.REDIS_URL
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+    if (client) {
+      try {
+        client.on('error', err => console.log('Redis Client Error', err));
+        await client.connect();
+  
+        const valueRedis = await client.get(`${session.id}-${session.companyId}`);
+        
+        if (valueRedis) value = JSON.parse(valueRedis);
+      } catch (err) {
+        console.log(err);
+      }
+  
+      await client.disconnect();
+    }
+
+    if (!value) {
+      value = await FileRegister.findOne({
+        where: {
+          [Op.or]: [
+            { phoneNumber: session.id } ,
+            { phoneNumber: preparePhoneNumber9Digit(session.id) }
+          ],
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+    }
 
     node.messages.forEach(message => {
       if (message.messageType === "text") {
@@ -359,7 +443,7 @@ const processNode = async (node: any, session: any, body: any) => {
       }
 
       if (message.messageType === "database") {
-        if (!fileRegister) {
+        if (!value) {
           const newMessage = {
             text: "",
             type: "text"
@@ -370,7 +454,7 @@ const processNode = async (node: any, session: any, body: any) => {
           return;
         }
     
-        const variable = fileRegister[message.messageContent] ? fileRegister[message.messageContent] : "";
+        const variable = value[message.messageContent] ? value[message.messageContent] : "";
     
         const newMessage = {
           text: variable,

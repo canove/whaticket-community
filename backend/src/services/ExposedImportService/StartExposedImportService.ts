@@ -86,15 +86,23 @@ const StartExposedImportService = async ({
     throw new AppError("ERR_NO_IMPORT_FOUND", 404);
   }
 
-  const client = createClient({
-    url: process.env.REDIS_URL
-  });
+  let client = null;
 
   try {
-    client.on('error', err => console.log('Redis Client Error', err));
-    await client.connect();
+    client = createClient({
+      url: process.env.REDIS_URL
+    });
   } catch (err) {
     console.log(err);
+  }
+
+  if (client) {
+    try {
+      client.on('error', err => console.log('Redis Client Error', err));
+      await client.connect();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const mapping = JSON.parse(exposedImport.mapping);
@@ -148,9 +156,15 @@ const StartExposedImportService = async ({
 
         registersToInsert.push(register);
 
-        await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register), {
-          EX: 10
-        });
+        if (client) {
+          try {
+            await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register), {
+              EX: parseInt(process.env.REDIS_SAVE_TIME)
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        }
 
         if (registersToInsert.length >= 500) {
           await FileRegister.bulkCreate(registersToInsert);
@@ -242,7 +256,13 @@ const StartExposedImportService = async ({
       whatsappId
     }
 
-    await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register));
+    if (client) {
+      try {
+        await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register));
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     await FileRegister.create(register);
     console.log("update exposedImport exposedImportService 186");
@@ -250,7 +270,7 @@ const StartExposedImportService = async ({
     delete numberDispatcher[phoneNumber];
   }
 
-  await client.disconnect();
+  if (client) await client.disconnect();
 
   exposedImport.reload();
 
