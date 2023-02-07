@@ -255,7 +255,7 @@ const processNode = async (node: any, session: any, body: any) => {
         url: process.env.REDIS_URL
       });
     } catch (err) {
-      console.log(err);
+      console.log("REDIS", err);
     }
 
     if (client) {
@@ -267,7 +267,7 @@ const processNode = async (node: any, session: any, body: any) => {
   
         if (valueRedis) value = JSON.parse(valueRedis);
       } catch (err) {
-        console.log(err);
+        console.log("REDIS", err);
       }
 
       await client.disconnect();
@@ -324,7 +324,7 @@ const processNode = async (node: any, session: any, body: any) => {
         url: process.env.REDIS_URL
       });
     } catch (err) {
-      console.log(err);
+      console.log("REDIS", err);
     }
 
     if (client) {
@@ -336,7 +336,7 @@ const processNode = async (node: any, session: any, body: any) => {
         
         if (valueRedis) value = JSON.parse(valueRedis);
       } catch (err) {
-        console.log(err);
+        console.log("REDIS", err);
       }
   
       await client.disconnect();
@@ -398,7 +398,7 @@ const processNode = async (node: any, session: any, body: any) => {
         url: process.env.REDIS_URL
       });
     } catch (err) {
-      console.log(err);
+      console.log("REDIS", err);
     }
 
     if (client) {
@@ -410,7 +410,7 @@ const processNode = async (node: any, session: any, body: any) => {
         
         if (valueRedis) value = JSON.parse(valueRedis);
       } catch (err) {
-        console.log(err);
+        console.log("REDIS", err);
       }
   
       await client.disconnect();
@@ -559,22 +559,13 @@ const StartFlowService = async ({
   }
 
   try {
-    let regs = await FileRegister.findAll({
-        where: { 
-            companyId: companyId,
-            phoneNumber : {
-                [Op.like]: `%${sessionId.substr(5,8)}%`
-            }
-        },
-        order: [['createdAt', 'DESC']]
-    });
-
-    if(regs.length > 0) {
-      console.log("update fileregister startflow 489");
-      for(const reg of regs) {
-        await reg.update({interactionAt: new Date()})
+    await FileRegister.update({ interactionAt: new Date() }, { 
+      where: { 
+        companyId: companyId,
+        phoneNumber: sessionId,
+        interactionAt: null
       }
-    }
+    });
   } catch (err) { console.log('ocorreu um erro ao tentar salvar a data de interacao ', sessionId)}
 
   const session = await FlowsSessions.findOne({

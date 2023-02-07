@@ -93,7 +93,7 @@ const StartExposedImportService = async ({
       url: process.env.REDIS_URL
     });
   } catch (err) {
-    console.log(err);
+    console.log("REDIS", err);
   }
 
   if (client) {
@@ -101,7 +101,7 @@ const StartExposedImportService = async ({
       client.on('error', err => console.log('Redis Client Error', err));
       await client.connect();
     } catch (err) {
-      console.log(err);
+      console.log("REDIS", err);
     }
   }
 
@@ -162,7 +162,7 @@ const StartExposedImportService = async ({
               EX: parseInt(process.env.REDIS_SAVE_TIME)
             });
           } catch (err) {
-            console.log(err);
+            console.log("REDIS", err);
           }
         }
 
@@ -258,9 +258,11 @@ const StartExposedImportService = async ({
 
     if (client) {
       try {
-        await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register));
+        await client.set(`${phoneNumber}-${companyId}`, JSON.stringify(register), {
+          EX: parseInt(process.env.REDIS_SAVE_TIME)
+        });
       } catch (err) {
-        console.log(err);
+        console.log("REDIS", err);
       }
     }
 
