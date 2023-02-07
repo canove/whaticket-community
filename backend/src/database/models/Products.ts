@@ -32,6 +32,12 @@ class Product extends Model<Product> {
   @Column
   penaltyMount: number;
 
+  @Column
+  receivedMessageFee: number;
+
+  @Column
+  sentMessageFee: number;
+
   @CreatedAt
   createdAt: Date;
 

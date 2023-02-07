@@ -78,6 +78,9 @@ class Message extends Model<Message> {
   @HasOne(() => FileRegister, "msgWhatsId")
   fileRegister: FileRegister
 
+  @Column
+  billingProcessedAt: Date
+
   // Para Relatório
   lastMessage: string;
 }
