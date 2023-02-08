@@ -38,6 +38,18 @@ class BillingControls extends Model<BillingControls> {
   @Column
   usedGraceTriggers: number;
 
+  @Column
+  sentMessageFee: number;
+
+  @Column
+  sentMessageQuantity: number;
+
+  @Column
+  receivedMessageFee: number;
+
+  @Column
+  receivedMessageQuantity: number;
+
   @CreatedAt
   createdAt: Date;
 

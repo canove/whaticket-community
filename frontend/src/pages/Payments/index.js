@@ -58,15 +58,13 @@ const Payments = () => {
         let money = quantity.toFixed(2);
 
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
-        // return money.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        // return `R$ ${money}`.replace('.', ',');
     }
 
     const getMonth = (date) => {
         const meses = [ 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         let month = format(parseISO(date), "MM");
 
-        month = parseInt(month)
+        month = parseInt(month);
 
         return meses[month-1];
     }
@@ -102,6 +100,8 @@ const Payments = () => {
                             <TableCell align="center">{i18n.t("payments.grid.company")}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.month")}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.shotsValue")}</TableCell>
+                            <TableCell align="center">{"Valor Total das Mensagens Recebidas"}</TableCell>
+                            <TableCell align="center">{"Valor Total das Mensagens Enviadas"}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.monthValue")}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.amounth")}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.amounthPaind")}</TableCell>
@@ -115,6 +115,8 @@ const Payments = () => {
                                     <TableCell align="center">{billing.company.name}</TableCell>
                                     <TableCell align="center">{getMonth(billing.createdAt)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalTriggerValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalReceivedMessageValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalSentMessageValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalMonthValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalValue)}</TableCell>
                                     <TableCell align="center">{i18n.t("payments.grid.amounthPaind")}</TableCell>
@@ -129,7 +131,7 @@ const Payments = () => {
                                 </TableRow>
                             )
                         })}
-                        {loading && <TableRowSkeleton columns={7} />}
+                        {loading && <TableRowSkeleton columns={9} />}
                     </TableBody>
                 </Table>
         </Paper>

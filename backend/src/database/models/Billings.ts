@@ -32,6 +32,12 @@ class Billings extends Model<Billings> {
   @Column
   totalMonthValue: number;
 
+  @Column
+  totalSentMessageValue: number;
+
+  @Column
+  totalReceivedMessageValue: number;
+
   @CreatedAt
   createdAt: Date;
 

@@ -89,31 +89,60 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 	}, [open, billingId])
 
 	useEffect(() => {
-		const dates = [];
-		const daily = [];
+		const loadHistoric = () => {
+			if (!billingsHistoric) return;
 
-		billingsHistoric.forEach(historic => {
-			const date = format(parseISO(historic.createdAt), "dd/MM/yyyy");
-			if (dates.indexOf(date) === -1) {
-				dates.push(date);
-				daily.push({
-					...historic,
-					totalValue: historic.triggerFee * (historic.quantity - historic.usedGraceTriggers),
-					totalTrigger: historic.quantity,
-					totalGraceTriggers: historic.usedGraceTriggers
-				})
-			} else {
-				const index = dates.indexOf(date);
-				daily[index] = {
-					...daily[index],
-					totalValue: daily[index].totalValue + (historic.triggerFee * (historic.quantity - historic.usedGraceTriggers)),
-					totalTrigger: daily[index].totalTrigger + historic.quantity,
-					totalGraceTriggers: daily[index].totalGraceTriggers + historic.usedGraceTriggers
+			const dates = [];
+			const daily = [];
+
+			for (const historic of billingsHistoric) {
+				const date = format(parseISO(historic.createdAt), "dd/MM/yyyy");
+
+				if (dates.indexOf(date) === -1) {
+					dates.push(date);
+
+					const triggerValue = historic.triggerFee * (historic.quantity - historic.usedGraceTriggers);
+					const sentMessageValue = historic.sentMessageFee * historic.sentMessageQuantity;
+					const receivedMessageValue = historic.receivedMessageFee * historic.receivedMessageQuantity;
+
+					const totalValue = triggerValue + sentMessageValue + receivedMessageValue;
+
+					const info = {
+						...historic,
+						totalValue: totalValue,
+						totalTrigger: historic.quantity,
+						totalSentMessage: historic.sentMessageQuantity,
+						totalReceivedMessage: historic.receivedMessageQuantity,
+						totalGraceTriggers: historic.usedGraceTriggers
+					}
+
+					daily.push(info);
+				} else {
+					const index = dates.indexOf(date);
+
+					const triggerValue = historic.triggerFee * (historic.quantity - historic.usedGraceTriggers);
+					const sentMessageValue = historic.sentMessageFee * historic.sentMessageQuantity;
+					const receivedMessageValue = historic.receivedMessageFee * historic.receivedMessageQuantity;
+
+					const totalValue = daily[index].totalValue + triggerValue + sentMessageValue + receivedMessageValue;
+
+					const info = {
+						...daily[index],
+						totalValue: totalValue,
+						totalTrigger: daily[index].totalTrigger + historic.quantity,
+						totalSentMessage: daily[index].totalSentMessage + historic.sentMessageQuantity,
+						totalReceivedMessage: daily[index].totalReceivedMessage + historic.receivedMessageQuantity,
+						totalGraceTriggers: daily[index].totalGraceTriggers + historic.usedGraceTriggers
+					}
+
+					daily[index] = info;
 				}
 			}
-		})
 
-		setDailyBillings(daily);
+			setDailyBillings(daily);
+		}
+
+		loadHistoric();
 	}, [billingsHistoric])
 
 	const handleClose = () => {
@@ -157,6 +186,8 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 									<TableCell align="center">{i18n.t("payments.modal.value")}</TableCell>
 									<TableCell align="center">{i18n.t("payments.modal.shots")}</TableCell>
 									<TableCell align="center">{i18n.t("payments.modal.freeShots")}</TableCell>
+									<TableCell align="center">{"Mensagens Recebidas"}</TableCell>
+									<TableCell align="center">{"Mensagens Enviadas"}</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -167,6 +198,8 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 											<TableCell align="center">{formatToBRL(dailyBilling.totalValue)}</TableCell>
 											<TableCell align="center">{dailyBilling.totalTrigger}</TableCell>
 											<TableCell align="center">{dailyBilling.totalGraceTriggers}</TableCell>
+											<TableCell align="center">{dailyBilling.totalReceivedMessage}</TableCell>
+											<TableCell align="center">{dailyBilling.totalSentMessage}</TableCell>
 										</TableRow>
 									)
 								})}
@@ -175,8 +208,15 @@ const BillingHistoricModal = ({ open, onClose, billingId }) => {
 					</TableContainer>
 					{billing &&
 						<>
-							<Typography style={{ marginTop: "10px" }}>Total: {formatToBRL(billing.totalTriggerValue)} [Disparos] + {formatToBRL(billing.totalMonthValue)} [Mensalidade]</Typography>
-							<Typography>Total: {formatToBRL(billing.totalTriggerValue + billing.totalMonthValue)}</Typography>
+							<Typography style={{ marginTop: "10px" }}>
+								Disparos: {formatToBRL(billing.totalTriggerValue)} <br />
+								Mensagens Recebidas: {formatToBRL(billing.totalReceivedMessageValue)} <br />
+								Mensagens Enviadas: {formatToBRL(billing.totalSentMessageValue)} <br />
+								Mensalidade: {formatToBRL(billing.totalMonthValue)}
+							</Typography>
+							<Typography>
+								Total: {formatToBRL(billing.totalValue)}
+							</Typography>
 						</>
 					}
 				</DialogContent>

@@ -156,12 +156,19 @@ const Products = () => {
         setDeletingProduct(null);
     };
 
-    function formatReal(num) {
-        var p = num.toFixed(2).split(".");
-        return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
-            return num + (num !== "-" && i && !(i % 3) ? "." : "") + acc;
-        }, "") + "," + p[1];
-    };
+    const formatToBRL = (quantity) => {
+        if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
+
+        let money = quantity.toFixed(2);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
+    }
+
+    // function formatReal(num) {
+    //     var p = num.toFixed(2).split(".");
+    //     return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
+    //         return num + (num !== "-" && i && !(i % 3) ? "." : "") + acc;
+    //     }, "") + "," + p[1];
+    // };
 
     const handleOpenHistoricModal = (pricing) => {
         setSelectedHistoric(pricing);
@@ -220,6 +227,8 @@ const Products = () => {
                             <TableCell align="center">{i18n.t("product.grid.productName")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.monthValue")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.tripCostValue")}</TableCell>
+                            <TableCell align="center">{"Valor por Mensagem Recebida"}</TableCell>
+                            <TableCell align="center">{"Valor por Mensagem Enviada"}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.monthlyInterestRate")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.penaltyMount")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.actions")}</TableCell>
@@ -230,10 +239,12 @@ const Products = () => {
                         {products && products.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell align="center">{product.name}</TableCell>
-                                <TableCell align="center">{formatReal(product.monthlyFee)}</TableCell>
-                                <TableCell align="center">{formatReal(product.triggerFee)}</TableCell>
-                                <TableCell align="center">{formatReal(product.monthlyInterestRate)}</TableCell>
-                                <TableCell align="center">{formatReal(product.penaltyMount)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.monthlyFee)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.triggerFee)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.receivedMessageFee)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.sentMessageFee)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.monthlyInterestRate)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.penaltyMount)}</TableCell>
                                 <TableCell align="center">
                                 <IconButton
                                     size="small"
