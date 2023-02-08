@@ -16,6 +16,8 @@ interface ProductData {
   triggerFee: number;
   monthlyInterestRate: number;
   penaltyMount: number;
+  receivedMessageFee: number;
+  sentMessageFee: number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -42,7 +44,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     monthlyFee,
     triggerFee,
     monthlyInterestRate,
-    penaltyMount
+    penaltyMount,
+    receivedMessageFee,
+    sentMessageFee
   }: ProductData = req.body;
 
   const product = await CreateProductService({
@@ -50,7 +54,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     monthlyFee,
     triggerFee,
     monthlyInterestRate,
-    penaltyMount
+    penaltyMount,
+    receivedMessageFee,
+    sentMessageFee
   });
 
   await CreateHistoricService({
