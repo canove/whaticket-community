@@ -52,17 +52,21 @@ const ProductModal = ({ open, onClose, productId }) => {
 	const { i18n } = useTranslation();
 
 	const [name, setName] = useState("");
-	const [monthlyFee, setMonthlyFee] = useState("");
-	const [triggerFee, setTriggerFee] = useState("");
-	const [monthlyInterestRate, setMonthlyInterestRate] = useState("");
-	const [penaltyMount, setPenaltyMount] = useState("");
-
+	const [monthlyFee, setMonthlyFee] = useState(0.0);
+	const [triggerFee, setTriggerFee] = useState(0.0);
+	const [monthlyInterestRate, setMonthlyInterestRate] = useState(0.0);
+	const [penaltyMount, setPenaltyMount] = useState(0.0);
+	const [receivedMessageFee, setReceivedMessageFee] = useState(0.0); 
+	const [sentMessageFee, setSentMessageFee] = useState(0.0);
+	
 	const handleClose = () => {
 		setName("");
-		setMonthlyFee("");
-		setTriggerFee("");
-		setMonthlyInterestRate("");
-		setPenaltyMount("");
+		setMonthlyFee(0.0);
+		setTriggerFee(0.0);
+		setMonthlyInterestRate(0.0);
+		setPenaltyMount(0.0);
+		setReceivedMessageFee(0.0);
+		setSentMessageFee(0.0);
 		onClose();
 	};
 
@@ -90,24 +94,34 @@ const ProductModal = ({ open, onClose, productId }) => {
 		setPenaltyMount(value);
 	};
 
+	const handleReceivedMessageFee = (e, value) =>{
+		e.preventDefault();
+		setReceivedMessageFee(value);
+	};
+
+	const handleSentMessageFee = (e, value) =>{
+		e.preventDefault();
+		setSentMessageFee(value);
+	};
+
 	useEffect(() => {
 		const fetchProduct = async () => {
+			if (!productId) return;
 			try {
 				const { data } = await api.get(`/products/${productId}`);
-				setName(data.name)
-				setMonthlyFee(data.monthlyFee)
-				setTriggerFee(data.triggerFee)
-				setMonthlyInterestRate(data.monthlyInterestRate)
-				setPenaltyMount(data.penaltyMount)
+				setName(data.name);
+				setMonthlyFee(data.monthlyFee || 0.0);
+				setTriggerFee(data.triggerFee || 0.0);
+				setMonthlyInterestRate(data.monthlyInterestRate || 0.0);
+				setPenaltyMount(data.penaltyMount || 0.0);
+				setReceivedMessageFee(data.receivedMessageFee || 0.0);
+				setSentMessageFee(data.sentMessageFee || 0.0);
 			} catch (err) {
 				toastError(err);
 			}
 		}
-		if (productId) {
-			fetchProduct();
-		}
+		fetchProduct();
 	}, [open, productId])
-
 
 	const handleSubmit = async () => {
 		const productData = {
@@ -116,6 +130,8 @@ const ProductModal = ({ open, onClose, productId }) => {
 			triggerFee: triggerFee,
 			monthlyInterestRate: monthlyInterestRate,
 			penaltyMount: penaltyMount,
+			receivedMessageFee: receivedMessageFee,
+			sentMessageFee: sentMessageFee
 		};
 
 		 try {
@@ -207,6 +223,24 @@ const ProductModal = ({ open, onClose, productId }) => {
 						name="penaltyMount"
 						value={penaltyMount}
 						onChange={handlePenaltyMount}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+                  	/>
+					<Typography variant="subtitle1">{"Valor por Mensagem Recebida"}</Typography>
+                 	<IntlCurrencyInput
+						name="receivedMessageFee"
+						value={receivedMessageFee}
+						onChange={handleReceivedMessageFee}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+                  	/>
+					<Typography variant="subtitle1">{"Valor por Mensagem Enviada"}</Typography>
+                 	<IntlCurrencyInput
+						name="sentMessageFee"
+						value={sentMessageFee}
+						onChange={handleSentMessageFee}
 						config={currencyConfig}
 						currency="BRL"
 						style={{width:"100%", padding:"10px", fontSize:"16px"}}
