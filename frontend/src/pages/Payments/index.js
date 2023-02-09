@@ -45,6 +45,7 @@ const Payments = () => {
             try {
                 const { data } = await api.get("/billings/");
                 setBillings(data);
+                console.log(data);
                 setLoading(false);
             } catch (err) {
                 toastError(err);
@@ -55,8 +56,9 @@ const Payments = () => {
     }, []);
 
     const formatToBRL = (quantity) => {
-        let money = quantity.toFixed(2);
+        if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
 
+        let money = quantity.toFixed(2);
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
     }
 

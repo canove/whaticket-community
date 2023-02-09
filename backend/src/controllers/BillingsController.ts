@@ -109,13 +109,23 @@ const getMonthTotalValue = async (companyId: number | string) => {
   });
 
   let triggerTotal = 0;
+  let sentMessageTotal = 0;
+  let receivedMessageTotal = 0;
 
   for (const billingControl of billingControls) {
       const graceTriggers = billingControl.usedGraceTriggers;
       const triggerFee = billingControl.triggerFee;
       const quantity = billingControl.quantity;
 
+      const sentMessageFee = billingControl.sentMessageFee;
+      const sentMessageQuantity = billingControl.sentMessageQuantity;
+
+      const receivedMessageFee = billingControl.receivedMessageFee;
+      const receivedMessageQuantity = billingControl.receivedMessageQuantity;
+
       triggerTotal = triggerTotal + (triggerFee * (quantity - graceTriggers));
+      sentMessageTotal = sentMessageTotal + (sentMessageFee * sentMessageQuantity);
+      receivedMessageTotal = receivedMessageTotal + (receivedMessageFee * receivedMessageQuantity);
   }
 
   const pricing = await Pricing.findOne({
@@ -133,10 +143,9 @@ const getMonthTotalValue = async (companyId: number | string) => {
   if (!pricing) return { monthTotalValue: 0, expectedTotalMonthValue: 0 }
   
   const totalMonthValue = pricing.product.monthlyFee;
-  const totalTriggerValue = triggerTotal;
-  const monthTotalValue = totalMonthValue + totalTriggerValue;
-  
-  const expectedTotalMonthValue = ((totalTriggerValue / today) * 30) + totalMonthValue;
+
+  const monthTotalValue = totalMonthValue + triggerTotal + sentMessageTotal + receivedMessageTotal;
+  const expectedTotalMonthValue = ((triggerTotal / today) * 30) + ((sentMessageTotal / today) * 30) + ((receivedMessageTotal / today) * 30) + totalMonthValue;
 
   return { monthTotalValue, expectedTotalMonthValue };
 }

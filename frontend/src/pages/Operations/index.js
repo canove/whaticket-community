@@ -112,8 +112,9 @@ const Operations = () => {
     };
 
     const formatToBRL = (quantity) => {
-        let money = quantity.toFixed(2);
+        if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
 
+        let money = quantity.toFixed(2);
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
     }
 
