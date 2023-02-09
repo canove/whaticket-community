@@ -18,7 +18,14 @@ import { IsTicketInBotService, IsTicketInBotPostService} from "../services/Ticke
 import AverageService from "../services/TicketServices/AverageService";
 import Whatsapp from "../database/models/Whatsapp";
 import Contact from "../database/models/Contact";
-import { preparePhoneNumber, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../utils/common";
+import {
+  isValidHttpUrl,
+  preparePhoneNumber9Digit,
+  removePhoneNumber9Digit,
+  removePhoneNumber9DigitCountry,
+  removePhoneNumberCountry,
+  removePhoneNumberWith9Country
+} from "../utils/common";
 import Ticket from "../database/models/Ticket";
 
 type IndexQuery = {
@@ -86,9 +93,9 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
 
     let whatsapp = await Whatsapp.findOne({
       where:{
-        name: session,
-        status: 'CONNECTED'
-      }
+        name: session
+      },
+      order: [["createdAt", "DESC"]],
     })
 
     if(!whatsapp ) {
@@ -103,13 +110,16 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
     const contact = await Contact.findOne({
       where: {
         companyId: whatsapp.companyId,
-        number: {
-          [Op.or] : [
-            {[Op.like]: `%${preparePhoneNumber(phone)}%` },
-            {[Op.like]: `%${removePhoneNumber9Digit(phone)}%` },
-            {[Op.like]: `%${preparePhoneNumber9Digit(phone)}%` }
-          ]
-        }
+        number: 
+          { 
+            [Op.or]: [
+              removePhoneNumberWith9Country(phone),
+              preparePhoneNumber9Digit(phone),
+              removePhoneNumber9Digit(phone),
+              removePhoneNumberCountry(phone),
+              removePhoneNumber9DigitCountry(phone)
+            ],
+          }
      }});
 
      if(!contact) {
