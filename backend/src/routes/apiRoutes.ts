@@ -116,7 +116,7 @@ ApiRoutes.get("/tickets/inticket", isAuthApi, TicketController.containTicket);
 ApiRoutes.get("/whatsapp/getCallback/", isAuthApi, WhatsAppController.getCallbackUrl);
 
 ApiRoutes.get(
-  "/officialTemplates/:templateName",
+  "/officialTemplates/getParams/",
   isAuthApi,
   TemplateController.getParams
 );
