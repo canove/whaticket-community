@@ -11,7 +11,7 @@ import Ticket from "../../database/models/Ticket";
 import FileRegister from "../../database/models/FileRegister";
 import Queue from "../../database/models/Queue";
 import NodeRegisters from "../../database/models/NodeRegisters";
-import { preparePhoneNumber9Digit } from "../../utils/common";
+import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
 import { ca } from "date-fns/locale";
 import { createClient } from 'redis';
 
@@ -263,20 +263,27 @@ const processNode = async (node: any, session: any, body: any) => {
         client.on('error', err => console.log('Redis Client Error', err));
         await client.connect();
   
-        const valueRedis = await client.get(`${session.id}-${session.companyId}`);
-  
-        if (valueRedis) value = JSON.parse(valueRedis);
+        value = await getRedisValue(session.id,session.companyId, client);
       } catch (err) {
         console.log("REDIS", err);
       }
 
       await client.disconnect();
     }
-
+    
     if (!value) {
       value = await FileRegister.findOne({
         where: {
-          phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
+          phoneNumber: 
+          { 
+            [Op.or]: [
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ],
+          },
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
@@ -332,9 +339,7 @@ const processNode = async (node: any, session: any, body: any) => {
         client.on('error', err => console.log('Redis Client Error', err));
         await client.connect();
   
-        const valueRedis = await client.get(`${session.id}-${session.companyId}`);
-        
-        if (valueRedis) value = JSON.parse(valueRedis);
+        value = await getRedisValue(session.id,session.companyId, client);
       } catch (err) {
         console.log("REDIS", err);
       }
@@ -345,7 +350,16 @@ const processNode = async (node: any, session: any, body: any) => {
     if (!value) {
       value = await FileRegister.findOne({
         where: {
-          phoneNumber: { [Op.like]: `%${session.id.substr(5,8)}%` },
+          phoneNumber: 
+          { 
+            [Op.or]: [
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ],
+          },
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
@@ -405,10 +419,7 @@ const processNode = async (node: any, session: any, body: any) => {
       try {
         client.on('error', err => console.log('Redis Client Error', err));
         await client.connect();
-  
-        const valueRedis = await client.get(`${session.id}-${session.companyId}`);
-        
-        if (valueRedis) value = JSON.parse(valueRedis);
+        value = await getRedisValue(session.id,session.companyId, client);
       } catch (err) {
         console.log("REDIS", err);
       }
@@ -421,7 +432,17 @@ const processNode = async (node: any, session: any, body: any) => {
         where: {
           [Op.or]: [
             { phoneNumber: session.id } ,
-            { phoneNumber: preparePhoneNumber9Digit(session.id) }
+            { phoneNumber: 
+              { 
+                [Op.or]: [
+                  removePhoneNumberWith9Country(session.id),
+                  preparePhoneNumber9Digit(session.id),
+                  removePhoneNumber9Digit(session.id),
+                  removePhoneNumberCountry(session.id),
+                  removePhoneNumber9DigitCountry(session.id)
+                ],
+              }
+            }
           ],
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
@@ -483,6 +504,36 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   return {};
+}
+
+const getRedisValue = async (session: string, companyId: string, client: any) =>  {
+  let valueRedis = await client.get(`${session}-${companyId}`);
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumberWith9Country(session)}-${companyId}`);
+  }
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${preparePhoneNumber9Digit(session)}-${companyId}`);
+  }
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumber9Digit(session)}-${companyId}`);
+  }
+  
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumberCountry(session)}-${companyId}`);
+  }
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumber9DigitCountry(session)}-${companyId}`);
+  }
+
+  if (valueRedis){
+    return JSON.parse(valueRedis);
+  };
+
+  return null;
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {
