@@ -44,7 +44,7 @@ ApiRoutes.get(
 ApiRoutes.post(
   "/whatsapp/botmessage",
   isAuthApi,
-  WhatsAppController.botMessage
+  WhatsAppController.botMessageApi
 );
 
 ApiRoutes.post(
