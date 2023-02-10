@@ -110,12 +110,8 @@ const StartExposedImportService = async ({
   var today = new Date();
   today.setHours(today.getHours() - 4);
 
-  const requiredItems = JSON.parse(exposedImport.requiredItems);
-
   if (Array.isArray(payload)) {
     let registersToInsert = [];
-    let registersWithError = [];
-    let newRequiredItems = [];
 
     for (const obj of payload) {
       try {
@@ -158,25 +154,6 @@ const StartExposedImportService = async ({
           whatsappId
         };
 
-        if (requiredItems) {
-          const requiredItem = requiredItems.find((item) => (!register[item] || register[item] === 'undefined' || register[item] === '""'));
-
-          if (newRequiredItems.length === 0) {
-            requiredItems.forEach(item => {
-              if (mapping[item]) {
-                newRequiredItems.push(mapping[item]);
-              } else {
-                newRequiredItems.push(item);
-              }
-            });
-          }
-
-          if (requiredItem) {
-            registersWithError.push(obj);
-            continue;
-          }
-        }
-
         registersToInsert.push(register);
 
         if (client) {
@@ -205,10 +182,6 @@ const StartExposedImportService = async ({
     }
     console.log("update exposedImport exposedImportService 145");
     await exposedImport.update({ qtdeRegister: totalRegisters });
-
-    if (registersWithError.length > 0) {
-      throw new AppError(`${JSON.stringify(newRequiredItems)} are required. Payload with error: ` + JSON.stringify(registersWithError));
-    }
   } else {
     const name = getRelationValue(mapping.name, payload);
     const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
@@ -281,20 +254,6 @@ const StartExposedImportService = async ({
       var5,
       companyId,
       whatsappId
-    }
-
-    if (requiredItems) {
-      let requiredItem = "";
-
-      requiredItems.find((item) => {
-        if (!register[item] || register[item] === 'undefined' || register[item] === '""') {
-          requiredItem = mapping[item] ?? item;
-
-          return true;
-        }
-      });
-
-      if (requiredItem) throw new AppError(`${requiredItem} is required.`);
     }
 
     if (client) {

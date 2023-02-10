@@ -8,6 +8,9 @@ import DeleteExposedImportService from "../services/ExposedImportService/DeleteE
 import StartExposedImportService from "../services/ExposedImportService/StartExposedImportService";
 
 import { getIO } from "../libs/socket";
+import TestRequiredExposedImportService from "../services/ExposedImportService/TestRequiredExposedImportService";
+
+const AWS = require('aws-sdk');
 
 type IndexQuery = {
   pageNumber: string;
@@ -129,17 +132,56 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
   const payload = req.body;
 
-  const exposedImport = await StartExposedImportService({
-    exposedImportId,
-    companyId,
-    payload
-  });
+  const response = await TestRequiredExposedImportService({ exposedImportId, companyId, payload });
 
-  const io = getIO();
-  io.emit(`exposedImport${companyId}`, {
-    action: "update",
-    exposedImport
-  });
+  if (!response) {
+    await sendSqs({
+      MessageBody: JSON.stringify({ payload, exposedImportId, companyId }),
+      QueueUrl: process.env.SQS_DISPATCH_QUEUE,
+    });
 
-  return res.status(200).json({ message: "request was received with success" });
+    return res.status(200).json({ message: "request was received with success" }); 
+  } else {
+    const { requiredItems, registersWithError, newPayload } = response;
+
+    await sendSqs({
+      MessageBody: JSON.stringify({ payload: newPayload, exposedImportId, companyId }),
+      QueueUrl: process.env.SQS_DISPATCH_QUEUE,
+    });
+
+    return res.status(400).json({ 
+      message: "request was received with success, but some items weren't sent.",
+      required: requiredItems,
+      payloadWithError: registersWithError
+    }); 
+  }
 };
+
+const CONSTANT = {
+	region: process.env.ENV_AWS_REGION,
+  key:  process.env.ENV_AWS_ACCESS_KEY_ID,
+  secret: process.env.ENV_AWS_SECRET_ACCESS_KEY
+}
+
+const SQS = new AWS.SQS({
+  region: CONSTANT.region,
+  secretAccessKey:CONSTANT.secret,
+  accessKeyId: CONSTANT.key
+});
+
+const sendSqs = async (params): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    SQS.sendMessage(params, function(err, data) {
+        if (err) console.error('Request could not be sent to SQS')
+
+        console.log(' -- Request sent to SQS -- ', params.QueueUrl);
+        try {
+          setTimeout(function(){
+            resolve();
+          },1000);
+        } catch (e) {
+          resolve();
+        }
+    });
+  })
+}
