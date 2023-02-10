@@ -53,6 +53,9 @@ class ExposedImport extends Model<ExposedImport> {
   @Column
   deletedAt: Date;
 
+  @Column
+  requiredItems: string;
+
   @CreatedAt
   createdAt: Date;
 

@@ -1254,6 +1254,7 @@ const messages = {
           save: "Save",
           relations: "Relations",
           tutorial: "To use the payload use: ",
+          required: "Required",
         },
       },
 

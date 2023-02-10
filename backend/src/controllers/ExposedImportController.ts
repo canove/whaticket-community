@@ -30,6 +30,7 @@ interface ExposedImportData {
   mapping: string;
   template: string;
   connections: string[];
+  requiredItems: string;
   connectionType: string | boolean;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
@@ -41,6 +42,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     mapping,
     template,
     connections,
+    requiredItems,
     connectionType,
     officialTemplatesId,
     officialConnectionId,
@@ -53,6 +55,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     mapping,
     template,
     connections,
+    requiredItems,
     connectionType,
     officialTemplatesId,
     officialConnectionId,
