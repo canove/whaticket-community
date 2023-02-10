@@ -210,7 +210,7 @@ const StatusMessageWhatsappService = async ({
   var registersCount = await FileRegister.count({
     where: {
       fileId: register?.fileId,
-      sentAt: null
+      processedAt: null
     }
   });
   

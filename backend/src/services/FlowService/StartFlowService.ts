@@ -613,7 +613,16 @@ const StartFlowService = async ({
     await FileRegister.update({ interactionAt: new Date() }, { 
       where: { 
         companyId: companyId,
-        phoneNumber: sessionId,
+        phoneNumber: 
+        { 
+          [Op.or]: [
+            removePhoneNumberWith9Country(sessionId),
+            preparePhoneNumber9Digit(sessionId),
+            removePhoneNumber9Digit(sessionId),
+            removePhoneNumberCountry(sessionId),
+            removePhoneNumber9DigitCountry(sessionId)
+          ],
+        },
         interactionAt: null
       }
     });
