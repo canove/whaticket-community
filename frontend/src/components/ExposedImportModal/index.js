@@ -2,11 +2,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Paper,
@@ -104,6 +106,22 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   const [offTemplates, setOffTemplates] = useState([]);
   const [selectedOffTemplate, setSelectedOffTemplate] = useState("");
 
+  const initialRequiredItems = {
+    name: false,
+    phoneNumber: false,
+    documentNumber: false,
+    template: false,
+    templateParams: false,
+    message: false,
+    var1: false,
+    var2: false,
+    var3: false,
+    var4: false,
+    var5: false,
+    phoneNumberFrom: false,
+  };
+  const [requiredItems, setRequiredItems] = useState(initialRequiredItems);
+
   useEffect(() => {
     const fetchExposedImport = async () => {
       try {
@@ -118,6 +136,19 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         setConnections(
           data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]
         );
+
+        if (data.requiredItems) {
+          setRequiredItems(prevItems => {
+            let obj = prevItems;
+            let items = JSON.parse(data.requiredItems);
+
+            items.forEach(item => {
+              obj[item] = true;
+            });
+  
+            return obj;
+          });
+        }
       } catch (err) {
         toastError(err);
       }
@@ -245,10 +276,18 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     setOffConnection("");
     setSelectedOffTemplate("");
 
+    setRequiredItems(initialRequiredItems);
+
     onClose();
   };
 
   const handleSubmit = async () => {
+    let required = [];
+
+    Object.keys(requiredItems).forEach(item => {
+      if (requiredItems[item]) required.push(item);
+    });
+
     const importData = {
       name,
       mapping: JSON.stringify(mapping),
@@ -256,8 +295,9 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       connections: connections,
       connectionType,
       officialConnectionId: offConnection ? offConnection : null,
-      officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null
-    };
+      officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
+      requiredItems: required.length > 0 ? JSON.stringify(required) : null
+     };
 
     try {
       if (exposedImportId) {
@@ -397,6 +437,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     setOffConnection(e.target.value);
     setConnections([]);
   };
+
+  const handleChangeRequiredItem = (e, item) => {
+    setRequiredItems(prevItems => ({...prevItems, [item]: !prevItems[item] }));
+  }
 
   return (
     <div className={classes.root}>
@@ -714,6 +758,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["name"]} onChange={(e) => { handleChangeRequiredItem(e, "name") }} />}
+                />
               </div>
               <div
                 style={{
@@ -757,6 +805,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["phoneNumber"]} onChange={(e) => { handleChangeRequiredItem(e, "phoneNumber") }} />}
+                />
               </div>
               <div
                 style={{
@@ -800,6 +852,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["documentNumber"]} onChange={(e) => { handleChangeRequiredItem(e, "documentNumber") }} />}
+                />
               </div>
               <div
                 style={{
@@ -843,6 +899,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["template"]} onChange={(e) => { handleChangeRequiredItem(e, "template") }} />}
+                />
               </div>
               <div
                 style={{
@@ -886,6 +946,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["templateParams"]} onChange={(e) => { handleChangeRequiredItem(e, "templateParams") }} />}
+                />
               </div>
               <div
                 style={{
@@ -929,6 +993,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["message"]} onChange={(e) => { handleChangeRequiredItem(e, "message") }} />}
+                />
               </div>
               <div
                 style={{
@@ -972,6 +1040,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["var1"]} onChange={(e) => { handleChangeRequiredItem(e, "var1") }} />}
+                />
               </div>
               <div
                 style={{
@@ -1015,6 +1087,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["var2"]} onChange={(e) => { handleChangeRequiredItem(e, "var2") }} />}
+                />
               </div>
               <div
                 style={{
@@ -1058,6 +1134,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["var3"]} onChange={(e) => { handleChangeRequiredItem(e, "var3") }} />}
+                />
               </div>
               <div
                 style={{
@@ -1101,6 +1181,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["var4"]} onChange={(e) => { handleChangeRequiredItem(e, "var4") }} />}
+                />
               </div>
               <div
                 style={{
@@ -1144,6 +1228,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["var5"]} onChange={(e) => { handleChangeRequiredItem(e, "var5") }} />}
+                />
               </div>
               <div
                 style={{
@@ -1187,6 +1275,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     }}
                   />
                 </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["phoneNumberFrom"]} onChange={(e) => { handleChangeRequiredItem(e, "phoneNumberFrom") }} />}
+                />
               </div>
             </div>
           </Paper>

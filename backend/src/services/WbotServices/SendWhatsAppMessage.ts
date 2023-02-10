@@ -9,7 +9,14 @@ import Whatsapp from "../../database/models/Whatsapp";
 import FileRegister from "../../database/models/FileRegister";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import Contact from "../../database/models/Contact";
-import { isValidHttpUrl, removePhoneNumber9Digit } from "../../utils/common";
+import {
+  isValidHttpUrl,
+  preparePhoneNumber9Digit,
+  removePhoneNumber9Digit,
+  removePhoneNumber9DigitCountry,
+  removePhoneNumberCountry,
+  removePhoneNumberWith9Country
+} from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
 interface Request {
@@ -63,20 +70,30 @@ const SendWhatsAppMessage = async ({
       companyId: companyId
     }
   });
+  
+  if(!messageSended && !contact) {
+    console.log()
+    throw new AppError("ERR_CONTACT_NOT_FOUND");
+  }
 
   const reg = await FileRegister.findOne({
     where: { 
         companyId: companyId,
-        phoneNumber : {
-            [Op.like]: `%${contact.number.substr(5,8)}%`
-        },
+        phoneNumber: 
+          { 
+            [Op.or]: [
+              removePhoneNumberWith9Country(contact.number),
+              preparePhoneNumber9Digit(contact.number),
+              removePhoneNumber9Digit(contact.number),
+              removePhoneNumberCountry(contact.number),
+              removePhoneNumber9DigitCountry(contact.number)
+            ],
+          },
         whatsappId: connnection.id
     },
     order: [['createdAt', 'DESC']]
   });
-  
-  if(!messageSended && !contact)
-    throw new AppError("ERR_SENDING_WAPP_MSG");
+   
 
   if (connnection?.official) {
     const lastMessage = await Message.findAll({
@@ -201,8 +218,9 @@ const SendWhatsAppMessage = async ({
       };
 
       let ack = 3;
+      let sendWhats;
       if(whatsMsgId == '' || whatsMsgId == null) {
-        const sendWhats = await axios.post(apiUrl, payload, {
+        sendWhats = await axios.post(apiUrl, payload, {
           headers: {
             "api-key": `${process.env.WPPNOF_API_TOKEN}`,
             "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
@@ -234,9 +252,14 @@ const SendWhatsAppMessage = async ({
           await CreateMessageService({ messageData });
       
       }else{
+        console.log('ERR_SENDING_WAPP_MSG_ERROR', payload);
+        console.log('ERR_SENDING_WAPP_MSG_ERROR', sendWhats);
         throw new AppError("ERR_SENDING_WAPP_MSG");
       }
-    } catch (e) {
+    } catch (e: any) {
+      if(e.message == 'Request failed with status code 504') {
+        throw new AppError("ERR_SENDING_WAPP_MSG_RETRY");
+      }
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   }

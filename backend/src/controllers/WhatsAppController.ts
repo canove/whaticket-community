@@ -571,10 +571,7 @@ export const listReport = async (req: Request, res: Response): Promise<Response>
   });
 };
 
-export const newMessage = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const newMessage = async (payload) => {
   const {
     id,
     fromMe,
@@ -588,7 +585,7 @@ export const newMessage = async (
     file,
     session,
     bot
-  } = req.body;
+  } = payload;
 
   const message = await NewMessageWhatsapp({
     id,
@@ -605,7 +602,7 @@ export const newMessage = async (
     bot
   });
 
-  return res.status(200).json(message);
+  return message;
 };
 
 export const messageStatus = async (
@@ -672,14 +669,20 @@ const verifyContact = async (
   return contact;
 };
 
-export const botMessage = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  const { fromMe, to, body, cation, contactName, session, bot, id, type } = req.body;
+export const botMessageApi = async (req: Request, res: Response) => {
+  try {
+    await botMessage(req.body);
+    res.status(200).json("success");
+  } catch (err) {
+    res.status(500).json("error");
+  }
+}
+
+export const botMessage = async (payload) => {
+  const { fromMe, to, body, cation, contactName, session, bot, id, type } = payload;
 
   if (!fromMe) {
-    const message = await newMessage(req, res);
+    const message = await newMessage(payload);
     return message;
   }
 
@@ -714,20 +717,17 @@ export const botMessage = async (
     type
   });
 
-  return res.status(200).json("success");
+  return true;
 };
 
 export const botMessageCustomer = async (
   req: Request,
   res: Response
-): Promise<Response> => {
+) => {
   const { companyId } = req.user;
-  const { fromMe, to, body, cation, contactName, session, bot, id, type } = req.body;
-
-  if (!fromMe) {
-    const message = await newMessage(req, res);
-    return message;
-  }
+  const { to, body, cation, contactName, session, id, type } = req.body;
+  const fromMe = true;
+  const bot = true;
 
   const whatsapp = await Whatsapp.findOne({
     where: {

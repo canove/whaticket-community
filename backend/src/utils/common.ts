@@ -39,8 +39,46 @@ const removePhoneNumber9Digit = (phone:string): string => {
   }
 
   if (phoneNumber.length == 13){
-    phoneNumber = `${phoneNumber.substring(0, 4)}${phoneNumber.substring(5, phoneNumber.length)}`
+    switch(phoneNumber.substring(5, 6)) {
+      case '9':
+      case '8':
+      case '7':
+        phoneNumber = `${phoneNumber.substring(0, 4)}${phoneNumber.substring(5, phoneNumber.length)}`
+    }
   }
+  return phoneNumber;
+}
+
+const removePhoneNumberCountry = (phone:string): string => {
+  let phoneNumber = phone.replace('+','');
+  let country = phoneNumber.substring(0,2);
+  if(country == '55') {
+    phoneNumber = phoneNumber.substring(2, phoneNumber.length)
+  }
+  return phoneNumber;
+}
+
+const removePhoneNumberWith9Country = (phone:string): string => {
+  let phoneNumber = phone.replace('+','');
+  let country = phoneNumber.substring(0,2);
+  if(country == '55') {
+    phoneNumber = phoneNumber.substring(2, phoneNumber.length)
+  }
+
+  if (phoneNumber.length < 11){
+    phoneNumber = `${phoneNumber.substring(2, 0)}9${phoneNumber.substring(phoneNumber.length, 2)}`
+  }
+  return phoneNumber;
+}
+
+const removePhoneNumber9DigitCountry = (phone:string): string => {
+  let phoneNumber = phone.replace('+','');
+  let country = phoneNumber.substring(0,2);
+  if(country == '55') {
+    phoneNumber = phoneNumber.substring(2, phoneNumber.length)
+  }
+
+  phoneNumber = `${phoneNumber.substring(0, 2)}${phoneNumber.substring(3, phoneNumber.length)}`
   return phoneNumber;
 }
 
@@ -69,4 +107,4 @@ const isValidHttpUrl = (text: string): any => {
   return null;
 }
 
-export { preparePhoneNumber, preparePhoneNumber9Digit, isValidHttpUrl, removePhoneNumber9Digit };
+export { preparePhoneNumber, preparePhoneNumber9Digit, isValidHttpUrl, removePhoneNumber9Digit,removePhoneNumberCountry,removePhoneNumber9DigitCountry, removePhoneNumberWith9Country };

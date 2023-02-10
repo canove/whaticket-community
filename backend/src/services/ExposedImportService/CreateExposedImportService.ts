@@ -6,10 +6,11 @@ interface Request {
   mapping: string;
   template: string;
   connections: string[];
-  companyId: number;
+  requiredItems: string;
   connectionType: string | boolean;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
+  companyId: number;
 }
 
 const CreateExposedImportService = async ({
@@ -17,6 +18,7 @@ const CreateExposedImportService = async ({
   mapping,
   template,
   connections,
+  requiredItems,
   connectionType,
   officialTemplatesId,
   officialConnectionId,
@@ -43,7 +45,8 @@ const CreateExposedImportService = async ({
     official: connectionType,
     companyId,
     officialConnectionId,
-    officialTemplatesId
+    officialTemplatesId,
+    requiredItems
   });
 
   return exposedImport;

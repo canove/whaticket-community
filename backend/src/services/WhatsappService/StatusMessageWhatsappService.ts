@@ -194,7 +194,7 @@ const StatusMessageWhatsappService = async ({
         await register?.update({ haveWhatsapp: false });
         break;
     case "retry":
-          await register?.update({ processedAt: null, msgWhatsId: null });
+          await register?.update({ processedAt: null, whatsappId: null, sentAt: null });
           break;
     case "delivered":
       await register?.update({ deliveredAt: new Date() });
@@ -210,7 +210,7 @@ const StatusMessageWhatsappService = async ({
   var registersCount = await FileRegister.count({
     where: {
       fileId: register?.fileId,
-      sentAt: null
+      processedAt: null
     }
   });
   

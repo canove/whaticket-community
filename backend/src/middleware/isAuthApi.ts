@@ -32,7 +32,8 @@ const isAuthApi = async (
       companyId: getToken.companyId
     };
   } catch (err) {
-    console.log(err);
+    console.log("ERRO TOKEN", err);
+    console.log("ERRO TOKEN", authHeader);
     throw new AppError(
       "Invalid token. We'll try to assign a new one on next request",
       403

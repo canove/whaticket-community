@@ -1249,7 +1249,7 @@ const messages = {
         },
         modal: {
           createSuccess: "Importação Exposta criada com sucesso",
-          editSuccess: "Importação Exposata salva com sucesso",
+          editSuccess: "Importação Exposta salva com sucesso",
           create: "Criar",
           edit: "Editar",
           pastePayload: "Cole seu payload aqui.",
@@ -1257,6 +1257,7 @@ const messages = {
           save: "Salvar",
           relations: "Relações",
           tutorial: "Para usar o payload utilize: ",
+          required: "Obrigatório",
         },
       },
 

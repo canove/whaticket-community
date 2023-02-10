@@ -174,7 +174,7 @@ export const getParams = async (
     }
   });
 
-  if (!template) throw new AppError("NO_TEMPLATE_FOUND");
+  if (!template) throw new AppError("NO_TEMPLATE_FOUND", 404);
 
   let mapping = null;
   if (template.mapping) {
