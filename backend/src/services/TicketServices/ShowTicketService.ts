@@ -3,6 +3,7 @@ import AppError from "../../errors/AppError";
 import Contact from "../../database/models/Contact";
 import User from "../../database/models/User";
 import Queue from "../../database/models/Queue";
+import Whatsapp from "../../database/models/Whatsapp";
 
 const ShowTicketService = async (
   id: string | number,
@@ -16,6 +17,11 @@ const ShowTicketService = async (
         as: "contact",
         attributes: ["id", "name", "number", "profilePicUrl"],
         include: ["extraInfo"]
+      },
+      {
+        model: Whatsapp,
+        as: "whatsapp",
+        attributes: ["name", "status", "deleted", "official"], 
       },
       {
         model: User,

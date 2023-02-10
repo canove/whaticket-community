@@ -82,6 +82,7 @@ const Ticket = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
+  const [whatsapp, setWhatsapp] = useState({});
   const [ticket, setTicket] = useState({});
   const { user } = useContext(AuthContext);
 
@@ -93,6 +94,7 @@ const Ticket = () => {
           const { data } = await api.get("/tickets/" + ticketId);
 
           setContact(data.contact);
+          setWhatsapp(data.whatsapp);
           setTicket(data);
           setLoading(false);
         } catch (err) {
@@ -179,6 +181,7 @@ const Ticket = () => {
         open={drawerOpen}
         handleDrawerClose={handleDrawerClose}
         contact={contact}
+        whatsapp={whatsapp}
         loading={loading}
       />
     </div>

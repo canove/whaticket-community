@@ -80,7 +80,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
+const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, loading }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
@@ -156,6 +156,51 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 							</Paper>
 						))}
 					</Paper>
+					{ whatsapp && 
+						<Paper square variant="outlined" className={classes.contactDetails}>
+							<Typography variant="subtitle1">
+								{"Whatsapp Info"}
+							</Typography>
+							<Paper
+								square
+								variant="outlined"
+								className={classes.contactExtraInfo}
+							>
+								<InputLabel>{"Telefone"}</InputLabel>
+								<Typography component="div" noWrap style={{ paddingTop: 2 }}>
+									<MarkdownWrapper>{whatsapp.name}</MarkdownWrapper>
+								</Typography>
+							</Paper>
+							<Paper
+								square
+								variant="outlined"
+								className={classes.contactExtraInfo}
+							>
+								<InputLabel>{whatsapp.official ? "OFICIAL" : "NÃO OFICIAL"}</InputLabel>
+							</Paper>
+							{ !whatsapp.official && 
+								<Paper
+									square
+									variant="outlined"
+									className={classes.contactExtraInfo}
+								>
+									<InputLabel>{"Status"}</InputLabel>
+									<Typography component="div" noWrap style={{ paddingTop: 2 }}>
+										<MarkdownWrapper>{whatsapp.status}</MarkdownWrapper>
+									</Typography>
+								</Paper>
+							}
+							{ whatsapp.deleted && 
+								<Paper
+									square
+									variant="outlined"
+									className={classes.contactExtraInfo}
+								>
+									<InputLabel style={{ color: "red" }}>{"NÚMERO DELETADO"}</InputLabel>
+								</Paper>
+							}
+						</Paper>
+					}
 				</div>
 			)}
 		</Drawer>
