@@ -42,13 +42,25 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json({ reports, category, connectedWhatsapps });
 };
 
+type ChartQuery = {
+  date: string;
+  selectedDate?: string;
+}
+
 export const chart = async (req: Request, res: Response): Promise<Response> => {
-  const { date } = req.query as IndexQuery;
+  const { date, selectedDate } = req.query as ChartQuery;
   const { companyId } = req.user;
 
   let whereCondition = null;
 
-  if (date) {
+  if (selectedDate) {
+    whereCondition = {
+      createdAt: {
+        [Op.between]: [+startOfDay(parseISO(selectedDate)), +endOfDay(parseISO(selectedDate))]
+      },
+      companyId
+    };
+  } else if (date) {
     whereCondition = {
       createdAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
@@ -59,7 +71,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 
   const reports = await FileRegister.findAll({
     where: whereCondition,
-    attributes: ["createdAt"]
+    attributes: ["createdAt", "sentAt"]
   });
 
   return res.status(200).json({ reports });
