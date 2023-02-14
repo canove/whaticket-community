@@ -14,6 +14,9 @@ import Ticket from "../../database/models/Ticket";
 import { preparePhoneNumber } from "../../utils/common";
 import ExposedImport from "../../database/models/ExposedImport";
 import  crypto  from "crypto";
+import { createClient } from "redis";
+import Whatsapp from "../../database/models/Whatsapp";
+import ConnectionFiles from "../../database/models/ConnectionFile";
 interface Request {
   msgId: number;
   statusType: string;
@@ -41,7 +44,7 @@ const StatusMessageWhatsappService = async ({
       statusType,
       msgId
     });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
   let register;
@@ -105,6 +108,47 @@ const StatusMessageWhatsappService = async ({
   switch(statusType){
     case "sent":
       await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId });
+
+      try {
+        const client = createClient({
+          url: process.env.REDIS_URL
+        });
+
+        client.on('error', err => console.log('Redis Client Error', err));
+        await client.connect();
+
+        const whatsapp = await Whatsapp.findOne({
+          where: { id: register.whatsappId },
+          include: [{
+            model: ConnectionFiles,
+            as: "connectionFile",
+            attributes: ["name"],
+            required: true,
+          }]
+        });
+
+        const info = {
+          name: register.name,
+          documentNumber: register.documentNumber,
+          message: register.message,
+          phoneNumber: register.phoneNumber,
+          companyId: register.companyId,
+          var1: register.var1,
+          var2: register.var2,
+          var3: register.var3,
+          var4: register.var4,
+          var5: register.var5,
+          portfolio: (whatsapp && whatsapp.connectionFile) ? whatsapp.connectionFile.name : null
+        }
+
+        await client.set(`${msgWhatsId}`, JSON.stringify(info), {
+          EX: parseInt(process.env.REDIS_SAVE_TIME)
+        });
+
+        await client.disconnect();
+      } catch (err) {
+        console.log("REDIS ERR - STATUS MESSAGE", err);
+      }
 
       const message = await Message.findByPk(msgWhatsId);
         if(!message) {
