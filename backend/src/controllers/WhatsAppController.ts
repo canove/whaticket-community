@@ -571,7 +571,7 @@ export const listReport = async (req: Request, res: Response): Promise<Response>
   });
 };
 
-export const newMessage = async (payload) => {
+export const newMessage = async (req) => {
   const {
     id,
     fromMe,
@@ -585,7 +585,7 @@ export const newMessage = async (payload) => {
     file,
     session,
     bot
-  } = payload;
+  } = req.body;
 
   const message = await NewMessageWhatsapp({
     id,
