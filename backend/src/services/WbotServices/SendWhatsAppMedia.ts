@@ -13,6 +13,8 @@ import AWS from "aws-sdk";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 
+import { v4 as uuidv4 } from "uuid";
+
 interface Request {
   media: Express.Multer.File;
   ticket: Ticket;
@@ -55,7 +57,7 @@ const SendWhatsAppMedia = async ({
     });
 
     const contact = await Contact.findOne({ where: {
-      id: message[0].contactId
+      id:  message[0] ? message[0].contactId : ticket.contactId
     }});
   
     const messageSended = await FileRegister.findOne({
@@ -179,19 +181,47 @@ const SendWhatsAppMedia = async ({
         let buffer = await fs.readFileSync(media.path);
         let mediaUrl = await upoloadToS3(buffer,path.basename(media.path),media.mimetype.split('/')[0],connnection.companyId);
 
+        const messageData = {
+          id: uuidv4(),
+          ticketId: ticket.id,
+          bot: ticket.status == 'inbot',
+          contactId: undefined,
+          body: body,
+          fromMe: true,
+          read: true,
+          mediaUrl: mediaUrl,
+          mediaType: media.mimetype.split('/')[0],
+          quotedMsgId: null,
+          companyId
+        };
+      
+        await ticket.update({ lastMessage: body });
+        const createdMessage = await CreateMessageService({ messageData });
+
         const payload = {
           "session": connnection.name,
           "number": phoneNumber,
           "text": media.originalname,//(body == '' || body == null?'':formatBody(body, ticket.contact)),
-          "path": `data:${media.mimetype};base64,${base64file}`
+          "path": `data:${media.mimetype};base64,${base64file}`,
+          "type": "file64",
+          "messageId": createdMessage.id
+        };
+
+        const headers = {
+          "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
         };
   
-        var result = await axios.post(apiUrl, payload, {
-          headers: {
-            "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-            "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
-          }
-        });
+        await sendMessageToSQS({ message: payload, headers });
+
+        // const msgWhatsId = (typeof result.data.data.id === "object") ? result.data.data.id._serialized : result.data.data.id;
+  
+        // var result = await axios.post(apiUrl, payload, {
+        //   headers: {
+            // "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+            // "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+        //   }
+        // });
 
         fs.unlink(media.path, (err: Error) => {
           if (err) {
@@ -199,29 +229,29 @@ const SendWhatsAppMedia = async ({
           }
         });
   
-        if(result.status == 200){
-            const msgWhatsId = (typeof result.data.data.id === "object") ? result.data.data.id._serialized : result.data.data.id;
+        // if(result.status == 200){
+        //     const msgWhatsId = (typeof result.data.data.id === "object") ? result.data.data.id._serialized : result.data.data.id;
             
-            const messageData = {
-              id: msgWhatsId,
-              ticketId: ticket.id,
-              bot: ticket.status == 'inbot',
-              contactId: undefined,
-              body: body,
-              fromMe: true,
-              read: true,
-              mediaUrl: mediaUrl,
-              mediaType: media.mimetype.split('/')[0],
-              quotedMsgId: null,
-              companyId
-            };
+        //     const messageData = {
+        //       id: msgWhatsId,
+        //       ticketId: ticket.id,
+        //       bot: ticket.status == 'inbot',
+        //       contactId: undefined,
+        //       body: body,
+        //       fromMe: true,
+        //       read: true,
+        //       mediaUrl: mediaUrl,
+        //       mediaType: media.mimetype.split('/')[0],
+        //       quotedMsgId: null,
+        //       companyId
+        //     };
           
-            await ticket.update({ lastMessage: body });
-            await CreateMessageService({ messageData });
+        //     await ticket.update({ lastMessage: body });
+        //     await CreateMessageService({ messageData });
         
-        }else{
-          throw new AppError("ERR_SENDING_WAPP_MSG");
-        }
+        // }else{
+        //   throw new AppError("ERR_SENDING_WAPP_MSG");
+        // }
       } catch (e) {
         throw new AppError("ERR_SENDING_WAPP_MSG");
       }
@@ -262,5 +292,40 @@ const upoloadToS3 = async (blob, file, type, companyId ): Promise<string> => {
       console.log('ocorreu um erro ao tentar enviar o arquivo para o s3',JSON.stringify(err))
   }   
 };
+
+const CONSTANT = {
+  region: process.env.ENV_AWS_REGION,
+  key:  process.env.ENV_AWS_ACCESS_KEY_ID,
+  secret: process.env.ENV_AWS_SECRET_ACCESS_KEY
+}
+
+const SQS = new AWS.SQS({
+  region: CONSTANT.region,
+  secretAccessKey:CONSTANT.secret,
+  accessKeyId: CONSTANT.key
+});	
+
+const sendMessageToSQS = async (payload): Promise<void> => {
+  const params = {
+    MessageBody: JSON.stringify(payload),
+    QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+  }
+
+  return new Promise((resolve, reject) => {
+    SQS.sendMessage(params, function(err, data) {
+      if (err) console.error('SendWhatsAppMessage - Message could not be sent to SQS')
+  
+      console.log(' -- SendWhatsAppMessage - Message sent to SQS -- ', params.QueueUrl);
+      try {
+        setTimeout(function(){
+          resolve();
+        }, 1000);
+      } catch (e) {
+        console.log("SendWhatsAppMessage - Message Error", e);
+          resolve();
+      }
+    });
+  });
+}
 
 export default SendWhatsAppMedia;
