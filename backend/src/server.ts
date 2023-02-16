@@ -11,9 +11,9 @@ const server = app.listen(process.env.PORT, () => {
 });
 
 initIO(server);
-//initConsumer();
+initConsumer();
 console.log('\n\nWelcome to SQS CONSUMER');
-//initBotMessageConsumer();
+initBotMessageConsumer();
 console.log('\n\nWelcome to SQS BOT MESSAGE CONSUMER');
 //StartAllWhatsAppsSessions();
 gracefulShutdown(server);
