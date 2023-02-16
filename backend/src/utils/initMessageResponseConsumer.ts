@@ -30,20 +30,9 @@ export const initMessageResponseConsumer = () => {
         const { response, code, message } = JSON.parse(record.Body);
 
         try {
-          let msg = null;
-          let ticket = null;
-
           if (code === 200) {    
             const ack = 1;
             const msgWhatsId = (typeof response.data.id === "object") ? response.data.id._serialized : response.data.id;;
-
-            msg = await Message.findOne({
-              where: { id: message.messageId }
-            });
-  
-            ticket = await Ticket.findOne({
-              where: { id: msg.ticketId }
-            });
 
             await Message.update({
               id: msgWhatsId,
@@ -54,32 +43,46 @@ export const initMessageResponseConsumer = () => {
               }
             });
 
+            const msg = await Message.findOne({
+              where: {
+                id: msgWhatsId
+              }
+            });
+  
+            const ticket = await Ticket.findOne({
+              where: { id: msg.ticketId }
+            });
+
             await ticket.update({ lastMessage: message.text });
+
+            const io = getIO();
+            io.emit(`appMessage${ticket.companyId}`, {
+              action: "update",
+              message: msg
+            });
           } else {
-            msg = await Message.findOne({
+            const msg = await Message.findOne({
               where: { id: message.messageId }
             });
   
-            ticket = await Ticket.findOne({
+            const ticket = await Ticket.findOne({
               where: { id: msg.ticketId }
             });
   
             await msg.update({ ack: 5 });
             await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
+
+            await msg.reload();
+
+            const io = getIO();
+            io.emit(`appMessage${ticket.companyId}`, {
+              action: "update",
+              message: msg
+            });
           }
-
-          await msg.update();
-
-          const io = getIO();
-          io.emit(`appMessage${ticket.companyId}`, {
-            action: "update",
-            message: msg
-          });
         } catch (err) {
           console.log(err);
         }
-
-
       });
     }
   });
