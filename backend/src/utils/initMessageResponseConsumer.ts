@@ -45,32 +45,6 @@ export const initMessageResponseConsumer = () => {
               where: { id: msg.ticketId }
             });
 
-            // await msg.update({ 
-            //   id: msgWhatsId,
-            //   ack, 
-            // });
-
-            // await Message.findOne(message.messageId).then(function(mssg) {
-            //   mssg.set('id', msgWhatsId, { raw: true });
-            //   mssg.changed('id', true);
-            //   mssg.save(); 
-            // });
-
-            // await msg.set({ id: msgWhatsId });
-            // await msg.save();
-
-            // await msg.changed('id');
-            // await msg.update({ id: msgWhatsId });
-
-            // await Message.sequelize?.query(
-            //   `
-            //     UPDATE Whaticket.Messages
-            //     SET id = "${msgWhatsId}", akc = 1
-            //     WHERE id = "${message.messageId}"
-            //   `,
-            //   { type: QueryTypes.UPDATE }
-            // );
-
             await Message.update({
               id: msgWhatsId,
               ack
