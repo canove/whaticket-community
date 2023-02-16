@@ -143,9 +143,12 @@ const OfficialTemplates = () => {
   const handleSubmitConfirmationModal = async () => {
     if (confirmModalInfo.action === "delete") {
       try {
-        await api.delete(
-          `/whatsappTemplate/delete/${confirmModalInfo.whatsAppId}/${confirmModalInfo.templateName}`
-        );
+        await api.delete('/whatsappTemplate/delete/meta', {
+          params: {
+            whatsAppId: confirmModalInfo.whatsAppId,
+            templateName: confirmModalInfo.templateName
+          }
+        });
         toast.success(i18n.t("templates.templateModal.delete"));
       } catch (err) {
         toastError(err);
@@ -283,7 +286,7 @@ const OfficialTemplates = () => {
                           onClick={(e) => {
                             handleOpenConfirmationModal(
                               "delete",
-                              connection,
+                              connection.id,
                               template.name
                             );
                           }}

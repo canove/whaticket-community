@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import { Op } from "sequelize";
 import OfficialTemplates from "../../database/models/OfficialTemplates";
 import AppError from "../../errors/AppError";
 import ShowOfficialWhatsappService from "../OfficialWhatsappServices/ShowOfficialWhatsappService";
@@ -12,7 +13,7 @@ const ListMetaTemplateService = async ({
   companyId
 }: Request): Promise<OfficialTemplates[]> => {
     const templates = await OfficialTemplates.findAll({
-        where: { companyId }
+        where: { companyId, deletedAt: null }
     });
 
     return templates;

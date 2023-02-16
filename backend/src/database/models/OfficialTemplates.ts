@@ -7,9 +7,11 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  ForeignKey
+  ForeignKey,
+  HasMany
 } from "sequelize-typescript";
 import Company from "./Company";
+import OfficialTemplatesStatus from "./OfficialTemplatesStatus";
 
 @Table
 class OfficialTemplates extends Model<OfficialTemplates> {
@@ -42,6 +44,12 @@ class OfficialTemplates extends Model<OfficialTemplates> {
   @ForeignKey(() => Company)
   @Column
   companyId: number;
+
+  @Column
+  deletedAt: Date;
+
+  @HasMany(() => OfficialTemplatesStatus, "officialTemplateId")
+  officialTemplatesStatus: OfficialTemplatesStatus[];
 
   @CreatedAt
   createdAt: Date;

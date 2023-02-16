@@ -33,21 +33,6 @@ export const getInfo = async (
 ): Promise<Response> => {
   const { msgWhatsId } = req.query;
 
-  // try {
-  //   const client = createClient({
-  //     url: process.env.REDIS_URL
-  //   });
-
-  //   client.on('error', err => console.log('Redis Client Error', err));
-  //   await client.connect();
-
-  //   await client.disconnect();
-  
-  //   const value = await client.get(msgWhatsId);
-  // } catch (err) {
-  //   console.log("REDIS ERR - GET INFO", err)
-  // }
-
   const fileRegister = await FileRegister.findOne({
     where: { msgWhatsId }
   });
