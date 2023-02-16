@@ -649,6 +649,7 @@ const verifyContact = async (
   contactNumber: string,
   companyId: number
 ): Promise<Contact> => {
+ 
   if (contactName === "") {
     const contact = await FileRegister.findAll({
       where: { phoneNumber: contactNumber, companyId },

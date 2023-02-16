@@ -591,7 +591,7 @@ const StartFlowService = async ({
       status: "SESSION_ID_IS_REQUIRED"
     }
   }
-  
+  //TODO - ALTERAR CAMPO DE FILTRO , RETIRAR LIKE DO JSON
   const flowNodes = await FlowsNodes.findOne({
     where: {
       json: {
@@ -632,7 +632,16 @@ const StartFlowService = async ({
     where: {
       updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
       companyId,
-      id:  { [Op.like]: `%${sessionId.substr(6,8)}%` },
+      id: 
+      { 
+        [Op.or]: [
+          removePhoneNumberWith9Country(sessionId),
+          preparePhoneNumber9Digit(sessionId),
+          removePhoneNumber9Digit(sessionId),
+          removePhoneNumberCountry(sessionId),
+          removePhoneNumber9DigitCountry(sessionId)
+        ],
+      },
       nodeId: { [Op.ne]: null },
       flowId: flowNodes.flowId,
     }
