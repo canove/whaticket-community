@@ -76,7 +76,8 @@ export const initMessageResponseConsumer = () => {
                 "type": message.type,
                 "to": message.number,
                 "from":message.session,
-                "body": message.text
+                "body": message.text,
+                "mediaUrl": message.path
              });
 
              const whats = await Whatsapp.findOne({
