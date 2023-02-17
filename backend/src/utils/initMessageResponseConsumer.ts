@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { QueryTypes } from "sequelize";
 import { botMessage } from "../controllers/WhatsAppController";
@@ -34,32 +35,50 @@ export const initMessageResponseConsumer = () => {
             const ack = 1;
             const msgWhatsId = (typeof response.data.id === "object") ? response.data.id._serialized : response.data.id;;
 
-            await Message.update({
-              id: msgWhatsId,
-              ack
-            }, {
-              where: {
-                id: message.messageId
-              }
-            });
+            if (message.messageId) {
+              await Message.update({
+                id: msgWhatsId,
+                ack
+              }, {
+                where: {
+                  id: message.messageId
+                }
+              });
 
-            const msg = await Message.findOne({
-              where: {
-                id: msgWhatsId
-              }
-            });
+              const msg = await Message.findOne({
+                where: {
+                  id: msgWhatsId
+                }
+              });
+    
+              const ticket = await Ticket.findOne({
+                where: { id: msg.ticketId }
+              });
   
-            const ticket = await Ticket.findOne({
-              where: { id: msg.ticketId }
-            });
+              await ticket.update({ lastMessage: message.text });
+  
+              const io = getIO();
+              io.emit(`appMessage${ticket.companyId}`, {
+                action: "update",
+                message: msg
+              });
 
-            await ticket.update({ lastMessage: message.text });
+            } else {
+              await botMessage({
+                "session": message.session ,
+                "id": msgWhatsId,
+                "fromMe": true,
+                "bot":true,
+                "isGroup":false,
+                "type": message.type,
+                "to": message.number,
+                "from":message.session,
+                "body": message.text
+             });
+            }
+            
 
-            const io = getIO();
-            io.emit(`appMessage${ticket.companyId}`, {
-              action: "update",
-              message: msg
-            });
+            
           } else {
             const msg = await Message.findOne({
               where: { id: message.messageId }

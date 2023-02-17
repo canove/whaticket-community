@@ -585,7 +585,7 @@ export const newMessage = async (req) => {
     file,
     session,
     bot
-  } = req.body;
+  } = typeof req.body == 'string'?req:req.body;
 
   const message = await NewMessageWhatsapp({
     id,
