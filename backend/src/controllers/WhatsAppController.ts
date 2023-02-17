@@ -680,7 +680,7 @@ export const botMessageApi = async (req: Request, res: Response) => {
 }
 
 export const botMessage = async (payload) => {
-  const { fromMe, to, body, cation, contactName, session, bot, id, type } = payload;
+  const { fromMe, to, body, cation, contactName, session, bot, id, type, mediaUrl } = payload;
 
   if (!fromMe) {
     const message = await newMessage(payload);
@@ -715,7 +715,8 @@ export const botMessage = async (payload) => {
     contactId: contact.id,
     whatsMsgId: id,
     cation,
-    type
+    type,
+    mediaUrl
   });
 
   return true;

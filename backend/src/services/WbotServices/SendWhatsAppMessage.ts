@@ -34,6 +34,7 @@ interface Request {
   contactId?: number;
   cation?: string;
   type?: string;
+  mediaUrl?: string;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -45,7 +46,8 @@ const SendWhatsAppMessage = async ({
   contactId,
   whatsMsgId,
   cation,
-  type
+  type,
+  mediaUrl
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -187,10 +189,10 @@ const SendWhatsAppMessage = async ({
     }
   } else {
     try {
-      const { url, type, fileName } = isValidHttpUrl(body);
+      const { url, type: bodyType, fileName } = isValidHttpUrl(body);
 
       let apiUrl = `${process.env.WPPNOF_URL}/sendText`;
-      switch(type) {
+      switch(bodyType) {
         case 'file':
           apiUrl = `${process.env.WPPNOF_URL}/sendFile`;
           break;
@@ -222,8 +224,8 @@ const SendWhatsAppMessage = async ({
         body: body,
         fromMe: fromMe,
         read: true,
-        mediaUrl: url,
-        mediaType: type,
+        mediaUrl: url ? url : mediaUrl,
+        mediaType: bodyType ? bodyType : type,
         quotedMsgId: null,
         bot: (ticket.status == 'inbot' || bot),
         companyId
@@ -239,7 +241,7 @@ const SendWhatsAppMessage = async ({
           "number": phoneNumber,
           "path": url,
           "text": fileName != null ? fileName : `${formatBody(body, reg)}`,
-          "type": type
+          "type": bodyType
         };
   
         const headers = {
