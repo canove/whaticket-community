@@ -62,9 +62,15 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
       /*verifica mensagem de fishing*/
       let messageToSend = await GreetingMessageControls.findOne({
           where: { 
-               phoneNumber : {
-                  [Op.like]: `%${linkeNumber}%`
-               },
+               phoneNumber : { 
+                [Op.or]: [
+                        removePhoneNumberWith9Country(contactNumber),
+                        preparePhoneNumber9Digit(contactNumber),
+                        removePhoneNumber9Digit(contactNumber),
+                        removePhoneNumberCountry(contactNumber),
+                        removePhoneNumber9DigitCountry(contactNumber)
+                    ],
+                },
                sendAt: null },
           order: [['createdAt', 'DESC']]
       });

@@ -39,6 +39,9 @@ class OfficialTemplatesStatus extends Model<OfficialTemplatesStatus> {
   @Column
   officialTemplateId: number;
 
+  @BelongsTo(() => OfficialTemplates)
+  officialTemplate: OfficialTemplates;
+
   @ForeignKey(() => Whatsapp)
   @Column
   whatsappId: number;

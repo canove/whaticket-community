@@ -11,6 +11,8 @@ import BindTemplateService from "../services/TemplateService/BindTemplateService
 import OfficialTemplatesStatus from "../database/models/OfficialTemplatesStatus";
 import AppError from "../errors/AppError";
 import OfficialTemplates from "../database/models/OfficialTemplates";
+import ShowTemplateService from "../services/TemplateService/ShowTemplateService";
+import DeleteBitsTemplateService from "../services/TemplateService/DeleteBitsTemplateService";
 
 interface TemplateData {
   name: string;
@@ -26,6 +28,15 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const templates = await ListTemplateService({ companyId });
 
   return res.status(200).json(templates);
+};
+
+export const show = async (req: Request, res: Response): Promise<Response> => {
+  const { templateId } = req.params;
+  const { companyId } = req.user;
+
+  const template = await ShowTemplateService({ companyId, templateId });
+
+  return res.status(200).json(template);
 };
 
 type TemplateQuery = {
@@ -202,16 +213,41 @@ export const getParams = async (
   return res.status(200).json(response);
 };
 
-export const remove = async (
+type RemoveMetaQuery = {
+  whatsAppId: string;
+  templateName: string;
+}
+
+export const removeMeta = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { whatsAppId, templateName } = req.params;
+  const { whatsAppId, templateName } = req.query as RemoveMetaQuery;
   const { companyId } = req.user;
 
   const response = await DeleteTemplateService({
     whatsAppId,
     templateName,
+    companyId
+  });
+
+  return res.status(200).json(response);
+};
+
+type RemoveBitsQuery = {
+  whatsAppId: string;
+  officialTemplateId: string;
+}
+
+export const removeBits = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { officialTemplateId } = req.query as RemoveBitsQuery;
+  const { companyId } = req.user;
+
+  const response = await DeleteBitsTemplateService({
+    officialTemplateId,
     companyId
   });
 

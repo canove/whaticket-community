@@ -4,7 +4,7 @@ import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
-import { green } from "@material-ui/core/colors";
+import { green, red } from "@material-ui/core/colors";
 import {
   Button,
   CircularProgress,
@@ -20,6 +20,7 @@ import {
   ExpandMore,
   GetApp,
 } from "@material-ui/icons";
+import CloseIcon from '@material-ui/icons/Close';
 
 import MarkdownWrapper from "../MarkdownWrapper";
 import VcardPreview from "../VcardPreview";
@@ -251,6 +252,13 @@ const useStyles = makeStyles((theme) => ({
 
   ackDoneAllIcon: {
     color: green[500],
+    fontSize: 18,
+    verticalAlign: "middle",
+    marginLeft: 4,
+  },
+
+  ackErrorIcon: {
+    color: red[500],
     fontSize: 18,
     verticalAlign: "middle",
     marginLeft: 4,
@@ -526,8 +534,11 @@ const MessagesList = ({ ticketId, isGroup }) => {
     if (message.ack === 2) {
       return <DoneAll fontSize="small" className={classes.ackIcons} />;
     }
-    if (message.ack === 3 || message.ack === 4) {
+    if (message.ack === 3 || message.ack === 4) { // || message.ack === 4
       return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} />;
+    }
+    if (message.ack === 5) {
+      return <CloseIcon fontSize="small" className={classes.ackErrorIcon} />
     }
   };
 

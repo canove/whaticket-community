@@ -93,7 +93,7 @@ const StartExposedImportService = async ({
       url: process.env.REDIS_URL
     });
   } catch (err) {
-    console.log("REDIS", err);
+    console.log("REDIS ERR - START EXPOSED IMPORT", err);
   }
 
   if (client) {
@@ -101,7 +101,7 @@ const StartExposedImportService = async ({
       client.on('error', err => console.log('Redis Client Error', err));
       await client.connect();
     } catch (err) {
-      console.log("REDIS", err);
+      console.log("REDIS ERR - START EXPOSED IMPORT", err);
     }
   }
 
@@ -162,7 +162,7 @@ const StartExposedImportService = async ({
               EX: parseInt(process.env.REDIS_SAVE_TIME)
             });
           } catch (err) {
-            console.log("REDIS", err);
+            console.log("REDIS ERR - START EXPOSED IMPORT", err);
           }
         }
 
@@ -265,7 +265,7 @@ const StartExposedImportService = async ({
           EX: parseInt(process.env.REDIS_SAVE_TIME)
         });
       } catch (err) {
-        console.log("REDIS", err);
+        console.log("REDIS ERR - START EXPOSED IMPORT", err);
       }
     }
 
