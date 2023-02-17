@@ -76,9 +76,6 @@ export const initMessageResponseConsumer = () => {
                 "body": message.text
              });
             }
-            
-
-            
           } else {
             const msg = await Message.findOne({
               where: { id: message.messageId }
