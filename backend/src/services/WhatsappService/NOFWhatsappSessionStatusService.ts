@@ -75,12 +75,17 @@ const NOFWhatsappSessionStatusService = async ({
         qrcode: null
       });
   }
-  
-  const io = getIO();
-  io.emit(`whatsappSession${whatsapp.companyId}`, {
-    action: "update",
-    session: whatsapp
-  });
+  try{
+      
+    const io = getIO();
+    io.emit(`whatsappSession${whatsapp.companyId}`, {
+      action: "update",
+      session: whatsapp
+    });
+  }catch(e) {
+
+  }
+
   
   return { success: true };
 };

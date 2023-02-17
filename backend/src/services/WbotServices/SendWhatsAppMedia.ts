@@ -202,8 +202,8 @@ const SendWhatsAppMedia = async ({
           "session": connnection.name,
           "number": phoneNumber,
           "text": media.originalname,//(body == '' || body == null?'':formatBody(body, ticket.contact)),
-          "path": `data:${media.mimetype};base64,${base64file}`,
-          "type": "file64",
+          "path": mediaUrl, //`data:${media.mimetype};base64,${base64file}`
+          "type": media.mimetype.split('/')[0],
           "messageId": createdMessage.id
         };
 
