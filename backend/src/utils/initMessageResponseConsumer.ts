@@ -1,11 +1,14 @@
 /*eslint-disable */
 import { SQSClient } from "@aws-sdk/client-sqs";
-import { QueryTypes } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import { botMessage } from "../controllers/WhatsAppController";
+import FileRegister from "../database/models/FileRegister";
 import Message from "../database/models/Message";
 import Ticket from "../database/models/Ticket";
+import Whatsapp from "../database/models/Whatsapp";
 import { getIO } from "../libs/socket";
 import StartExposedImportService from "../services/ExposedImportService/StartExposedImportService";
+import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "./common";
 
 const { Consumer } = require("sqs-consumer");
 const AWS = require("aws-sdk");
@@ -75,6 +78,36 @@ export const initMessageResponseConsumer = () => {
                 "from":message.session,
                 "body": message.text
              });
+
+             const whats = await Whatsapp.findOne({
+              where: {
+                name: message.session,
+                deleted: false,
+              }
+             });
+
+             const reg = await FileRegister.findOne({
+              where: {
+                phoneNumber: 
+                { 
+                  [Op.or]: [
+                    removePhoneNumberWith9Country(message.number),
+                    preparePhoneNumber9Digit(message.number),
+                    removePhoneNumber9Digit(message.number),
+                    removePhoneNumberCountry(message.number),
+                    removePhoneNumber9DigitCountry(message.number)
+                  ],
+                },
+                companyId: whats.companyId,
+                processedAt: { [Op.ne]: null }
+              },
+              order: [["createdAt", "DESC"]]
+            });
+
+            await reg.update({
+              sentAt: new Date(),
+              msgWhatsId: msgWhatsId
+            });
             }
           } else {
             const msg = await Message.findOne({
