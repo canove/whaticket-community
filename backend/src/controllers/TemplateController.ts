@@ -126,23 +126,12 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const {
-    templateName,
-    category,
-    whatsAppId,
-    bodyText,
-    footerText,
-    templateId
-  } = req.body;
-
+  const { templateId } = req.params;
+  const templateBody = req.body;
   const { companyId } = req.user;
 
   const response = await UpdateTemplateService({
-    templateName,
-    category,
-    whatsAppId,
-    bodyText,
-    footerText,
+    templateBody,
     templateId,
     companyId
   });

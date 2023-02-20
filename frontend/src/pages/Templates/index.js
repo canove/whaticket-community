@@ -27,7 +27,7 @@ import {
 } from "@material-ui/core";
 import TemplateModal from "../../components/TemplateModal";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
-import { DeleteOutline, Visibility } from "@material-ui/icons";
+import { DeleteOutline, Edit, Visibility } from "@material-ui/icons";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
@@ -161,7 +161,7 @@ const Templates = () => {
         open={bindTemplateModalOpen}
         onClose={handleCloseBindTemplateModal}
         aria-labelledby="form-dialog-title"
-        template={selectedTemplate}
+        templateId={selectedTemplate?.id}
       />
       <MainHeader>
         <Title>{i18n.t("templates.title")}</Title>
@@ -220,7 +220,7 @@ const Templates = () => {
                           size="small"
                           onClick={() => handleOpenInfoTemplateModal(template)}
                         >
-                          <Visibility />
+                          <Edit />
                         </IconButton>
                         <IconButton
                           size="small"

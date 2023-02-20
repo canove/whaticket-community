@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const BindTemplateModal = ({ open, onClose, template }) => {
+const BindTemplateModal = ({ open, onClose, templateId }) => {
   const { i18n } = useTranslation();
   const classes = useStyles();
 
@@ -76,6 +76,8 @@ const BindTemplateModal = ({ open, onClose, template }) => {
 
   const [selectedOfficialWhats, setSelectedOfficialWhats] = useState("");
   const [officialWhatsapps, setOfficialWhatsapps] = useState([]);
+  const [template, setTemplate] = useState(null);
+  const [templateStatuses, setTemplateStatuses] = useState([]);
 
   useEffect(() => {
     const fetchOfficialWhats = async () => {
@@ -87,13 +89,37 @@ const BindTemplateModal = ({ open, onClose, template }) => {
       }
     };
 
+    const fetchTemplate = async () => {
+      if (!templateId) return;
+
+      try {
+        const { data } = await api.get(`/whatsappTemplate/show/${templateId}`);
+        setTemplate(prevTemplate => ({
+          ...prevTemplate,
+          name: data.name,
+          category: data.category,
+          body: data.body,
+          footer: data.footer,
+          header: data.header ? JSON.parse(data.header) : null,
+          mapping: Object.keys(JSON.parse(data.mapping)).length > 0 ? JSON.parse(data.mapping) : null
+        }));
+
+        setTemplateStatuses(data.officialTemplatesStatus);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+    fetchTemplate();
     fetchOfficialWhats();
-  }, [open]);
+  }, [open, templateId]);
 
   const handleClose = () => {
     onClose();
     setSelectedOfficialWhats("");
     setConnections([]);
+    setTemplate(null);
+    setTemplateStatuses([]);
   };
 
   const handleSubmit = async () => {
@@ -220,6 +246,20 @@ const BindTemplateModal = ({ open, onClose, template }) => {
               </FormControl>
             </div>
           )}
+          <div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", borderRadius: "5px", padding: "5px", margin: "10px 0"}}>
+            <Typography style={{ fontWeight: "bold" }}>
+              Números com esse template:
+            </Typography>
+            { templateStatuses.length > 0 && templateStatuses.map(templateStatus => {
+              const whats = templateStatus.whatsapp ? templateStatus.whatsapp.name : null;
+              if (!whats) return null;
+              return (
+                <Typography key={templateStatus.id}>
+                  - {whats}
+                </Typography>
+              )
+            })}
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary" variant="outlined">

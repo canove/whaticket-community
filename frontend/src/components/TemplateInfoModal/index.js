@@ -21,6 +21,7 @@ import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import ParamsSelect from "../ParamsSelect";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -46,6 +47,45 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const paramTypes = [
+  {
+    name: "Nome",
+    value: "name"
+  },
+  {
+    name: "CPF",
+    value: "documentNumber"
+  },
+  {
+    name: "Telefone",
+    value: "phoneNumber"
+  },
+  {
+    name: "Var 1",
+    value: "var1"
+  },
+  {
+    name: "Var 2",
+    value: "var2"
+  },
+  {
+    name: "Var 3",
+    value: "var3"
+  },
+  {
+    name: "Var 4",
+    value: "var4"
+  },
+  {
+    name: "Var 5",
+    value: "var5"
+  },
+  {
+    name: "Custom Param",
+    value: "custom"
+  }
+];
+
 const TemplateInfoModal = ({ open, onClose, templateId }) => {
   const { i18n } = useTranslation();
   const classes = useStyles();
@@ -59,7 +99,6 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
     footer: "",
   }
   const [template, setTemplate] = useState(initialTemplate);
-  const [templateStatuses, setTemplateStatuses] = useState([]);
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -76,8 +115,6 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
           header: data.header ? JSON.parse(data.header) : null,
           mapping: Object.keys(JSON.parse(data.mapping)).length > 0 ? JSON.parse(data.mapping) : null
         }));
-
-        setTemplateStatuses(data.officialTemplatesStatus);
       } catch (err) {
         toastError(err);
       }
@@ -88,8 +125,56 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
 
   const handleClose = () => {
     setTemplate(initialTemplate);
-    setTemplateStatuses([]);
     onClose();
+  }
+
+  const handleSubmit = async () => {
+    const body = {
+      ...template,
+      header: template.header ? JSON.stringify(template.header) : null,
+      mapping: template.mapping ? JSON.stringify(template.mapping) : JSON.stringify({}),
+    }
+
+    try {
+      await api.put(`/whatsappTemplate/${templateId}`, body);
+      toast.success("Template atualizado com sucesso!");
+    } catch (err) {
+      toastError(err);
+    }
+
+    handleClose();
+  }
+
+  const handleHeaderChange = (e, param) => {
+    const value = e.target.value;
+
+    setTemplate(prevTemplate => {
+      const newHeader = {
+        ...prevTemplate.header,
+        [param]: value
+      }
+
+      return ({
+        ...prevTemplate,
+        header: newHeader
+      })
+    });
+  }
+
+  const handleMappingChange = (e, param) => {
+    const value = e.target.value;
+
+    setTemplate(prevTemplate => {
+      const newMapping = {
+        ...prevTemplate.mapping,
+        [param]: value
+      }
+
+      return ({
+        ...prevTemplate,
+        mapping: newMapping
+      })
+    });
   }
 
   return (
@@ -114,6 +199,22 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
               disabled={true}
             />
           </div>
+          { template.header &&
+            <div>
+              { Object.keys(template.header).map(key => {
+                const item = template.header[key];
+
+                return (
+                  <ParamsSelect
+                    key={key}
+                    param={key}
+                    value={item}
+                    onChange={handleHeaderChange}
+                  />
+                )
+              })}
+            </div>
+          }
           { template.header && 
             <div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", borderRadius: "5px", padding: "5px", margin: "10px 0"}}>
               <Typography style={{ fontWeight: "bold" }}>
@@ -143,6 +244,23 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
               disabled={true}
             />
           </div>
+          
+          { template.mapping && 
+            <div>
+              { Object.keys(template.mapping).map(key => {
+                const item = template.mapping[key];
+
+                return (
+                  <ParamsSelect
+                    key={key}
+                    param={key}
+                    value={item}
+                    onChange={handleMappingChange}
+                  />
+                )
+              })}
+            </div>
+          }
           { template.mapping && 
             <div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", borderRadius: "5px", padding: "5px", margin: "10px 0"}}>
               <Typography style={{ fontWeight: "bold" }}>
@@ -174,23 +292,6 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
               />
             </div>
           }
-          { templateStatuses.length > 0 &&
-            <div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", borderRadius: "5px", padding: "5px", margin: "10px 0"}}>
-              <Typography style={{ fontWeight: "bold" }}>
-                Números com esse template:
-              </Typography>
-              { templateStatuses.map(templateStatus => {
-                const whats = templateStatus.whatsapp ? templateStatus.whatsapp.name : null;
-                if (!whats) return null;
-
-                return (
-                  <Typography key={templateStatus.id}>
-                    - {whats}
-                  </Typography>
-                )
-              })}
-            </div>
-          }
         </DialogContent>
         <DialogActions>
           <Button
@@ -200,6 +301,15 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
           >
             {i18n.t("templates.buttons.cancel")}
           </Button>
+          { (template.mapping || template.header) &&
+            <Button
+              onClick={handleSubmit}
+              color="primary"
+              variant="contained"
+            >
+              {"Salvar"}
+            </Button>
+          }
         </DialogActions>
       </Dialog>
     </div>

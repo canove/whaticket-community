@@ -17,6 +17,12 @@ templateRoutes.get(
   TemplateController.show
 );
 
+templateRoutes.put(
+  "/whatsappTemplate/:templateId",
+  isAuth,
+  TemplateController.update
+);
+
 templateRoutes.get(
   "/whatsappTemplate/getWhatsapps",
   isAuth,
@@ -45,12 +51,6 @@ templateRoutes.post(
   "/whatsappTemplate/createOfficialTemplate/",
   isAuth,
   TemplateController.createOfficialTemplate
-);
-
-templateRoutes.post(
-  "/whatsappTemplate/edit/",
-  isAuth,
-  TemplateController.update
 );
 
 templateRoutes.delete(
