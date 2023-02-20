@@ -25,7 +25,7 @@ export const StartWhatsAppSession = async (
       companyId: whatsapp.companyId,
       wh_status: process.env.WPP_NOF_WEBHOOK_URL,
       wh_message: process.env.WPP_NOF_WEBHOOK_URL,
-      wh_qrcode: process.env.WPP_NOF_WEBHOOK_URL,
+      wh_qrcode: process.env.WPP_NOF_WEBHOOK_QRCODE_URL,
       wh_connect: process.env.WPP_NOF_WEBHOOK_URL
     };
 
