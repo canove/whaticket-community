@@ -19,6 +19,10 @@ import {
 } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
+import { v4 as uuidv4 } from "uuid";
+
+const AWS = require('aws-sdk');
+
 interface Request {
   body: string;
   whatsMsgId: string;
@@ -30,6 +34,7 @@ interface Request {
   contactId?: number;
   cation?: string;
   type?: string;
+  mediaUrl?: string;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -41,7 +46,8 @@ const SendWhatsAppMessage = async ({
   contactId,
   whatsMsgId,
   cation,
-  type
+  type,
+  mediaUrl
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -183,10 +189,10 @@ const SendWhatsAppMessage = async ({
     }
   } else {
     try {
-      const { url, type, fileName } = isValidHttpUrl(body);
+      const { url, type: bodyType, fileName } = isValidHttpUrl(body);
 
       let apiUrl = `${process.env.WPPNOF_URL}/sendText`;
-      switch(type) {
+      switch(bodyType) {
         case 'file':
           apiUrl = `${process.env.WPPNOF_URL}/sendFile`;
           break;
@@ -210,52 +216,81 @@ const SendWhatsAppMessage = async ({
         }
       }
 
-      const payload = {
-        "session": connnection.name,
-        "number": phoneNumber,
-        "path": url,
-        "text": fileName != null? fileName :`${formatBody(body, reg)} NO-TYPING` 
+      const messageData = {
+        id: whatsMsgId ? whatsMsgId : uuidv4(),
+        ack: 2,
+        ticketId: ticket.id,
+        contactId: undefined,
+        body: body,
+        fromMe: fromMe,
+        read: true,
+        mediaUrl: url ? url : mediaUrl,
+        mediaType: bodyType ? bodyType : type,
+        quotedMsgId: null,
+        bot: (ticket.status == 'inbot' || bot),
+        companyId
       };
 
-      let ack = 3;
-      let sendWhats;
-      if(whatsMsgId == '' || whatsMsgId == null) {
-        sendWhats = await axios.post(apiUrl, payload, {
-          headers: {
-            "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-            "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
-          }
-        });
-        if(sendWhats.status == 200) {
-          ack = 0;
-          whatsMsgId = (typeof sendWhats.data.data.id === "object") ? sendWhats.data.data.id._serialized : sendWhats.data.data.id;
-        }
+      await ticket.update({ lastMessage: body });
+      const createdMessage = await CreateMessageService({ messageData });
+
+      if (whatsMsgId == '' || whatsMsgId == null) {
+        const payload = {
+          "messageId": createdMessage.id,
+          "session": connnection.name,
+          "number": phoneNumber,
+          "path": url,
+          "text": fileName != null ? fileName : `${formatBody(body, reg)}`,
+          "type": bodyType
+        };
+  
+        const headers = {
+          "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+          "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+        };
+        
+        await sendMessageToSQS({ message: payload, headers });
       }
 
-      if(whatsMsgId != '' && whatsMsgId != null) {          
-          const messageData = {
-            id: whatsMsgId,
-            ack,
-            ticketId: ticket.id,
-            contactId: undefined,
-            body: body,
-            fromMe: fromMe,
-            read: true,
-            mediaUrl: url,
-            mediaType: type,
-            quotedMsgId: null,
-            bot: (ticket.status == 'inbot' || bot),
-            companyId
-          };
+      // let ack = 3;
+      // let sendWhats;
+      // if(whatsMsgId == '' || whatsMsgId == null) {
+      //   sendWhats = await axios.post(apiUrl, payload, {
+      //     headers: {
+      //       "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+      //       "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+      //     }
+      //   });
+      //   if(sendWhats.status == 200) {
+      //     ack = 0;
+      //     whatsMsgId = (typeof sendWhats.data.data.id === "object") ? sendWhats.data.data.id._serialized : sendWhats.data.data.id;
+      //   }
+      // }
+
+      // if(whatsMsgId != '' && whatsMsgId != null) {          
+          // const messageData = {
+          //   id: whatsMsgId,
+          //   ack,
+          //   ticketId: ticket.id,
+          //   contactId: undefined,
+          //   body: body,
+          //   fromMe: fromMe,
+          //   read: true,
+          //   mediaUrl: url,
+          //   mediaType: type,
+          //   quotedMsgId: null,
+          //   bot: (ticket.status == 'inbot' || bot),
+          //   companyId
+          // };
         
-          await ticket.update({ lastMessage: body });
-          await CreateMessageService({ messageData });
+          // await ticket.update({ lastMessage: body });
+          // await CreateMessageService({ messageData });
       
-      }else{
-        console.log('ERR_SENDING_WAPP_MSG_ERROR', payload);
-        console.log('ERR_SENDING_WAPP_MSG_ERROR', sendWhats);
-        throw new AppError("ERR_SENDING_WAPP_MSG");
-      }
+      // }else{
+        // console.log('ERR_SENDING_WAPP_MSG_ERROR', payload);
+        // console.log('ERR_SENDING_WAPP_MSG_ERROR', sendWhats);
+        // throw new AppError("ERR_SENDING_WAPP_MSG");
+      // }
     } catch (e: any) {
       if(e.message == 'Request failed with status code 504') {
         throw new AppError("ERR_SENDING_WAPP_MSG_RETRY");
@@ -264,5 +299,40 @@ const SendWhatsAppMessage = async ({
     }
   }
 };
+
+const CONSTANT = {
+  region: process.env.ENV_AWS_REGION,
+  key:  process.env.ENV_AWS_ACCESS_KEY_ID,
+  secret: process.env.ENV_AWS_SECRET_ACCESS_KEY
+}
+
+const SQS = new AWS.SQS({
+  region: CONSTANT.region,
+  secretAccessKey:CONSTANT.secret,
+  accessKeyId: CONSTANT.key
+});	
+
+const sendMessageToSQS = async (payload): Promise<void> => {
+  const params = {
+    MessageBody: JSON.stringify(payload),
+    QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+  }
+
+  return new Promise((resolve, reject) => {
+    SQS.sendMessage(params, function(err, data) {
+      if (err) console.error('SendWhatsAppMessage - Message could not be sent to SQS')
+  
+      console.log(' -- SendWhatsAppMessage - Message sent to SQS -- ', params.QueueUrl);
+      try {
+        setTimeout(function(){
+          resolve();
+        }, 1000);
+      } catch (e) {
+        console.log("SendWhatsAppMessage - Message Error", e);
+          resolve();
+      }
+    });
+  });
+}
 
 export default SendWhatsAppMessage;

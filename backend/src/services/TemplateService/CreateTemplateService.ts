@@ -20,6 +20,15 @@ const CreateTemplateService = async ({
   mapping,
   companyId
 }: TemplateData): Promise<OfficialTemplates> => {
+  const templateExists = await OfficialTemplates.findOne({
+    where: {
+      name,
+      companyId
+    }
+  });
+
+  if (templateExists) throw new AppError("TEMPLATE_ALREADY_EXISTS");
+
   const template = await OfficialTemplates.create({
     name,
     footer: footerText,

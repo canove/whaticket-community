@@ -27,13 +27,14 @@ import {
 } from "@material-ui/core";
 import TemplateModal from "../../components/TemplateModal";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
-import { DeleteOutline } from "@material-ui/icons";
+import { DeleteOutline, Edit, Visibility } from "@material-ui/icons";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import PhoneIcon from '@material-ui/icons/Phone';
 import BindTemplateModal from "../../components/BindTemplateModal";
+import TemplateInfoModal from "../../components/TemplateInfoModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,6 +71,9 @@ const Templates = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(true); 
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [bindTemplateModalOpen, setBindTemplateModalOpen] = useState(false);
+  const [infoTemplateModalOpen, setInfoTemplateModalOpen] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [deletingTemplate, setDeletingTemplate] = useState(null);
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -87,7 +91,7 @@ const Templates = () => {
     fetchTemplates();
   }, []);
 
-  const handleTemplateModal = () => {
+  const handleOpenTemplateModal = () => {
     setSelectedTemplate(null);
     setTemplateModalOpen(true);
   };
@@ -102,24 +106,62 @@ const Templates = () => {
     setBindTemplateModalOpen(true);
   }
 
-  const handleCloseBindTemplateModal = (template) => {
+  const handleCloseBindTemplateModal = () => {
     setSelectedTemplate(null);
     setBindTemplateModalOpen(false);
   }
 
+  const handleOpenInfoTemplateModal = (template) => {
+    setSelectedTemplate(template);
+    setInfoTemplateModalOpen(true);
+  }
+
+  const handleCloseInfoTemplateModal = () => {
+    setSelectedTemplate(null);
+    setInfoTemplateModalOpen(false);
+  }
+
+  const handleDeleteTemplate = async (templateId) => {
+    try {
+      await api.delete("/whatsappTemplate/delete/bits", {
+        params: { officialTemplateId: templateId }
+      });
+      toast.success("Template deletado com sucesso!");
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
   return (
     <MainContainer>
+      <ConfirmationModal
+        title={
+          deletingTemplate &&
+          `Deletar: ${deletingTemplate.name}?`
+        }
+        open={confirmModalOpen}
+        onClose={setConfirmModalOpen}
+        onConfirm={() => handleDeleteTemplate(deletingTemplate.id)}
+      >
+        {"Você tem certeza que deseja deletar esta template?"}
+      </ConfirmationModal>
       <TemplateModal
         open={templateModalOpen}
         onClose={handleCloseTemplateModal}
         aria-labelledby="form-dialog-title"
         templateName={selectedTemplate && selectedTemplate.name}
       />
+      <TemplateInfoModal
+        open={infoTemplateModalOpen}
+        onClose={handleCloseInfoTemplateModal}
+        aria-labelledby="form-dialog-title"
+        templateId={selectedTemplate && selectedTemplate.id}
+      />
       <BindTemplateModal 
         open={bindTemplateModalOpen}
         onClose={handleCloseBindTemplateModal}
         aria-labelledby="form-dialog-title"
-        template={selectedTemplate}
+        templateId={selectedTemplate?.id}
       />
       <MainHeader>
         <Title>{i18n.t("templates.title")}</Title>
@@ -135,7 +177,7 @@ const Templates = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={handleTemplateModal}
+              onClick={handleOpenTemplateModal}
             >
               {i18n.t("templates.buttons.newTemplate")}
             </Button>
@@ -173,12 +215,29 @@ const Templates = () => {
                     <TableCell align="center">{template.body}</TableCell>
                     <TableCell align="center">{template.footer}</TableCell>
                     <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenBindTemplateModal(template)}
-                      >
-                        <PhoneIcon />
-                      </IconButton>
+                      <div style={{display:"inline-block", minWidth:"90px"}}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenInfoTemplateModal(template)}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenBindTemplateModal(template)}
+                        >
+                          <PhoneIcon />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            setConfirmModalOpen(true);
+                            setDeletingTemplate(template);
+                          }}
+                        >
+                          <DeleteOutline />
+                        </IconButton>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

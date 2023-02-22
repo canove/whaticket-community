@@ -79,15 +79,16 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       const mediaUrl = report.mediaUrl ? report.mediaUrl : "";
       const ticketId  = report.ticket.id;
       const createdAt = formatDate(report.createdAt);
+
       text += `
                 <tr>
-                    <td style="border: 1px solid black">${id}</td>
-                    <td style="border: 1px solid black">${body}</td>
-                    <td style="border: 1px solid black">${read}</td>
-                    <td style="border: 1px solid black">${number}</td>
-                    <td style="border: 1px solid black">${mediaUrl}</td>
-                    <td style="border: 1px solid black">${ticketId}</td>
-                    <td style="border: 1px solid black">${createdAt}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${id}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${body.replace(/{{/g, '{').replace(/}}/g, '}')}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${read}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${number}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${mediaUrl}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${ticketId}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${createdAt}</td>
                 </tr>
             `;
     });

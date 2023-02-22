@@ -12,6 +12,18 @@ templateRoutes.get(
 );
 
 templateRoutes.get(
+  "/whatsappTemplate/show/:templateId",
+  isAuth,
+  TemplateController.show
+);
+
+templateRoutes.put(
+  "/whatsappTemplate/:templateId",
+  isAuth,
+  TemplateController.update
+);
+
+templateRoutes.get(
   "/whatsappTemplate/getWhatsapps",
   isAuth,
   TemplateController.getWhatsapps
@@ -41,16 +53,16 @@ templateRoutes.post(
   TemplateController.createOfficialTemplate
 );
 
-templateRoutes.post(
-  "/whatsappTemplate/edit/",
+templateRoutes.delete(
+  "/whatsappTemplate/delete/meta",
   isAuth,
-  TemplateController.update
+  TemplateController.removeMeta
 );
 
 templateRoutes.delete(
-  "/whatsappTemplate/delete/:whatsAppId/:templateName",
+  "/whatsappTemplate/delete/bits",
   isAuth,
-  TemplateController.remove
+  TemplateController.removeBits
 );
 
 export default templateRoutes;

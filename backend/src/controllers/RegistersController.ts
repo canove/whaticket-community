@@ -55,16 +55,34 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 
   if (selectedDate) {
     whereCondition = {
-      createdAt: {
-        [Op.between]: [+startOfDay(parseISO(selectedDate)), +endOfDay(parseISO(selectedDate))]
-      },
+      [Op.or]: [
+        {
+          createdAt: {
+            [Op.between]: [+startOfDay(parseISO(selectedDate)), +endOfDay(parseISO(selectedDate))]
+          },
+        },
+        {
+          sentAt: {
+            [Op.between]: [+startOfDay(parseISO(selectedDate)), +endOfDay(parseISO(selectedDate))]
+          },
+        }
+      ],
       companyId
     };
   } else if (date) {
     whereCondition = {
-      createdAt: {
-        [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
-      },
+      [Op.or]: [
+        {
+          createdAt: {
+            [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
+          },
+        },
+        {
+          sentAt: {
+            [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
+          },
+        }
+      ],
       companyId
     };
   }

@@ -10,6 +10,14 @@ import GreetingMessageControls from "../../database/models/GreetingMessageContro
 import FileRegister from "../../database/models/FileRegister";
 import WhatsappsConfig from "../../database/models/WhatsappsConfig";
 
+import {
+    removePhoneNumberWith9Country,
+    preparePhoneNumber9Digit,
+    removePhoneNumber9Digit,
+    removePhoneNumberCountry,
+    removePhoneNumber9DigitCountry
+  } from "../../utils/common";
+
 interface BodyData {
   contactNumber: string;
   session: string;
@@ -31,9 +39,16 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
       let reg = await FileRegister.findOne({
           where: { 
               companyId: whatsapp.companyId,
-              phoneNumber : {
-                  [Op.like]: `%${contactNumber.substr(5,8)}%`
-              },
+              phoneNumber: 
+            { 
+                [Op.or]: [
+                removePhoneNumberWith9Country(contactNumber),
+                preparePhoneNumber9Digit(contactNumber),
+                removePhoneNumber9Digit(contactNumber),
+                removePhoneNumberCountry(contactNumber),
+                removePhoneNumber9DigitCountry(contactNumber)
+                ],
+            },
               whatsappId: whatsapp.id
           },
           order: [['createdAt', 'DESC']]
@@ -47,9 +62,15 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
       /*verifica mensagem de fishing*/
       let messageToSend = await GreetingMessageControls.findOne({
           where: { 
-               phoneNumber : {
-                  [Op.like]: `%${linkeNumber}%`
-               },
+               phoneNumber : { 
+                [Op.or]: [
+                        removePhoneNumberWith9Country(contactNumber),
+                        preparePhoneNumber9Digit(contactNumber),
+                        removePhoneNumber9Digit(contactNumber),
+                        removePhoneNumberCountry(contactNumber),
+                        removePhoneNumber9DigitCountry(contactNumber)
+                    ],
+                },
                sendAt: null },
           order: [['createdAt', 'DESC']]
       });

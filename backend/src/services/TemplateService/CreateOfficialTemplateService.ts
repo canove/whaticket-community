@@ -35,6 +35,16 @@ const CreateOfficialTemplateService = async ({
   companyId,
   documentName
 }: TemplateData): Promise<OfficialTemplates> => {
+  const templateExists = await OfficialTemplatesStatus.findOne({
+    where: {
+      status: "APPROVED",
+      facebookTemplateId: officialTemplate.id,
+      companyId
+    },
+  });
+
+  if (templateExists) throw new AppError("TEMPLATE_ALREADY_EXISTS");
+
   const getTemplateComponent = (components, type, item) => {
     const component = components.find(component => component.type === type);
 

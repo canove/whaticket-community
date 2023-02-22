@@ -5,7 +5,7 @@ import ExposedImport from "../../database/models/ExposedImport";
 import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
-import { preparePhoneNumber, preparePhoneNumber9Digit, removePhoneNumber9Digit } from "../../utils/common";
+import { removePhoneNumberWith9Country, preparePhoneNumber9Digit, removePhoneNumber9Digit,removePhoneNumberCountry, removePhoneNumber9DigitCountry } from "../../utils/common";
 import { createClient } from 'redis';
 
 interface Request {
@@ -93,7 +93,7 @@ const StartExposedImportService = async ({
       url: process.env.REDIS_URL
     });
   } catch (err) {
-    console.log("REDIS", err);
+    console.log("REDIS ERR - START EXPOSED IMPORT", err);
   }
 
   if (client) {
@@ -101,7 +101,7 @@ const StartExposedImportService = async ({
       client.on('error', err => console.log('Redis Client Error', err));
       await client.connect();
     } catch (err) {
-      console.log("REDIS", err);
+      console.log("REDIS ERR - START EXPOSED IMPORT", err);
     }
   }
 
@@ -162,7 +162,7 @@ const StartExposedImportService = async ({
               EX: parseInt(process.env.REDIS_SAVE_TIME)
             });
           } catch (err) {
-            console.log("REDIS", err);
+            console.log("REDIS ERR - START EXPOSED IMPORT", err);
           }
         }
 
@@ -187,6 +187,7 @@ const StartExposedImportService = async ({
     const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
 
     if(numberDispatcher[phoneNumber]) {
+      numberDispatcher[phoneNumber] = [];
       throw new AppError("DUPLICATED_NUMBER", 403);
     }
   
@@ -201,14 +202,16 @@ const StartExposedImportService = async ({
           createdAt: {
             [Op.gte]: today
           },
-          phoneNumber: {
-            [Op.or] : [
-              {[Op.like]: `%${phoneNumber}%` },
-              {[Op.like]: `%${preparePhoneNumber(phoneNumber)}%` },
-              {[Op.like]: `%${removePhoneNumber9Digit(phoneNumber)}%` },
-              {[Op.like]: `%${preparePhoneNumber9Digit(phoneNumber)}%` }
-            ]
-          },
+          phoneNumber: 
+            { 
+              [Op.or]: [
+                removePhoneNumberWith9Country(phoneNumber),
+                preparePhoneNumber9Digit(phoneNumber),
+                removePhoneNumber9Digit(phoneNumber),
+                removePhoneNumberCountry(phoneNumber),
+                removePhoneNumber9DigitCountry(phoneNumber)
+              ],
+            }
        },
        order: [["createdAt", "DESC"]] 
       });
@@ -262,7 +265,7 @@ const StartExposedImportService = async ({
           EX: parseInt(process.env.REDIS_SAVE_TIME)
         });
       } catch (err) {
-        console.log("REDIS", err);
+        console.log("REDIS ERR - START EXPOSED IMPORT", err);
       }
     }
 

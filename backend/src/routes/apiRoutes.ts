@@ -107,7 +107,7 @@ ApiRoutes.get(
 
 ApiRoutes.post(
   "/officialTemplates/updateStatus",
-  isAuth,
+  isAuthApi,
   TemplateController.updateStatus
 );
 

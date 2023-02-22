@@ -1,6 +1,14 @@
 import { Op } from "sequelize";
 import { getIO } from "../../libs/socket";
 import Contact from "../../database/models/Contact";
+import {
+  removePhoneNumberWith9Country,
+  preparePhoneNumber9Digit,
+  removePhoneNumber9Digit,
+  removePhoneNumberCountry,
+  removePhoneNumber9DigitCountry
+} from "../../utils/common";
+
 /*eslint-disable */
 interface ExtraInfo {
   name: string;
@@ -33,9 +41,16 @@ const CreateOrUpdateContactService = async ({
 
   contact = await Contact.findOne({
     where: {
-      number: {
-        [Op.like]: `%${number.substr(5, 8)}%`
-     },
+     number: 
+        { 
+          [Op.or]: [
+            removePhoneNumberWith9Country(number),
+            preparePhoneNumber9Digit(number),
+            removePhoneNumber9Digit(number),
+            removePhoneNumberCountry(number),
+            removePhoneNumber9DigitCountry(number)
+          ],
+        }
    }});
 
   if (contact) {

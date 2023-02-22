@@ -86,6 +86,7 @@ const reducer = (state, action) => {
   }
 };
 
+
 const Category = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
