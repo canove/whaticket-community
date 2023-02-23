@@ -310,7 +310,7 @@ const StatusMessageWhatsappService = async ({
             companyId: (file ? file.companyId : exposed.companyId)
           };
         
-          await createTicket.update({ lastMessage: messageTxt ? messageTxt : "" });
+          await createTicket.update({ lastMessage: messageTxt ? messageTxt : mediaUrl ? "mensagem de media" : "" });
           await CreateMessageService({ messageData });
         }
         /*FIM*/
