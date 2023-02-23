@@ -650,7 +650,7 @@ const verifyContact = async (
   companyId: number
 ): Promise<Contact> => {
  
-  if (contactName === "") {
+  if (!contactName) {
     const contact = await FileRegister.findAll({
       where: { phoneNumber: contactNumber, companyId },
       limit: 1
@@ -665,7 +665,7 @@ const verifyContact = async (
     companyId
   };
 
-  const contact = CreateOrUpdateContactService(contactData);
+  const contact = await CreateOrUpdateContactService(contactData);
 
   return contact;
 };

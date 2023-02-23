@@ -71,7 +71,7 @@ export const initMessageResponseConsumer = () => {
 
             } else {
               let mediaUrl = '';
-              let body = '';
+              let body = message.text;
 
               if (message.mediaUrl) {
                 if(!message.mediaUrl?.includes('http')) {
@@ -101,7 +101,8 @@ export const initMessageResponseConsumer = () => {
                 "to": message.number,
                 "from":message.session,
                 "body": body,
-                "mediaUrl": mediaUrl
+                "mediaUrl": mediaUrl,
+                "contactName": message.contactName
              });
 
              const whats = await Whatsapp.findOne({
