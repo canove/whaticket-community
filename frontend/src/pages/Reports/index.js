@@ -111,6 +111,7 @@ const Reports = () => {
                 downloadLink.click();
             } catch (err) {
                 toastError(err)
+                console.error(err);
             }
         }
     };

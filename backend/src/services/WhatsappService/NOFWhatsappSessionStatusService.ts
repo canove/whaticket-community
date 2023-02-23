@@ -48,22 +48,22 @@ const NOFWhatsappSessionStatusService = async ({
     return { success: false };
   }
 
-  switch(status){
-    case "isLogged":
+  switch(status.toLowerCase()){
+    case "islogged":
     case "connected":
       await whatsapp.update({
         status: "CONNECTED"
       });
       break;
-    case "disconnectedMobile":
-    case "notLogged":
-    case "autocloseCalled":
+    case "disconnectedmobile":
+    case "notlogged":
+    case "autoclosecalled":
       await whatsapp.update({
         status: "DISCONNECTED",
         qrcode: null
       });
     break;
-    case "OPENING":
+    case "opening":
       await whatsapp.update({
         status: "OPENING",
         qrcode: null
