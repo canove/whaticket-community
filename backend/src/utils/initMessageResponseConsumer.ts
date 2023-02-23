@@ -36,7 +36,7 @@ export const initMessageResponseConsumer = () => {
         try {
           if (code === 200) {    
             const ack = 1;
-            const msgWhatsId = (typeof response.data.id === "object") ? response.data.id._serialized : response.data.id;;
+            const msgWhatsId = response.messageId;
 
             if (message.messageId) {
               await Message.update({
