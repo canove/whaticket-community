@@ -79,11 +79,11 @@ export const index = async (req: Request, res: Response): Promise<void> => {
 
       text += `
                 <tr>
-                    <td style="border: 1px solid black">${id}</td>
-                    <td style="border: 1px solid black">${body}</td>
-                    <td style="border: 1px solid black">${mediaUrl}</td>
-                    <td style="border: 1px solid black">${createdAt}</td>
-                    <td style="border: 1px solid black">${read}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${id}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${body}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${mediaUrl}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${createdAt}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${read}</td>
                 </tr>
             `;
     });
@@ -127,6 +127,11 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       contents: {
         default:
           '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>'
+      }
+    },
+    childProcessOptions: {
+      env: {
+        OPENSSL_CONF: "/dev/null"
       }
     }
   };
