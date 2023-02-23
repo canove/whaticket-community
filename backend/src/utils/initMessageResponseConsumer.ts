@@ -33,6 +33,9 @@ export const initMessageResponseConsumer = () => {
       records.forEach(async record => {
         const { response, code, message } = JSON.parse(record.Body);
 
+        /*TO DO SE VIER STATUS CODE 400 enviar para reprocessamento 
+        {"session":"551151968683","number":"554195891447","text":"Olá, ADILSON DA SILVA ALVES, tudo bem? Aqui é da Pefisa/Pernambucanas! Temos uma informação IMPORTANTE para você! Caso possa conversa, digite SIM.","path":"Olá, ADILSON DA SILVA ALVES, tudo bem? Aqui é da Pefisa/Pernambucanas! Temos uma informação IMPORTANTE para você! Caso possa conversa, digite SIM.","type":"text","buttons":[]}
+        */
         try {
           if (code === 200) {    
             const ack = 1;
@@ -67,17 +70,31 @@ export const initMessageResponseConsumer = () => {
               });
 
             } else {
+              let mediaUrl = '';
+
+              if(message.mediaUrl) {
+                if(!message.mediaUrl?.includes('http')) {
+                  mediaUrl = '';
+                }
+              }
+
+              if(message.path) {
+                if(!message.path?.includes('http')) {
+                  mediaUrl = '';
+                }
+              }
+
               await botMessage({
-                "session": message.session ,
+                "session": message.session,
                 "id": msgWhatsId,
                 "fromMe": true,
                 "bot":true,
                 "isGroup":false,
-                "type": message.type,
+                "type": message.type == 'file'? 'document': message.type,
                 "to": message.number,
                 "from":message.session,
                 "body": message.text,
-                "mediaUrl": message.path
+                "mediaUrl": mediaUrl
              });
 
              const whats = await Whatsapp.findOne({
