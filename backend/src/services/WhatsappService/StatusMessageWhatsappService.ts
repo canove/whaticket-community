@@ -153,7 +153,7 @@ const StatusMessageWhatsappService = async ({
       }
 
       const message = await Message.findByPk(msgWhatsId);
-        if(!message) {
+        if (!message) {
           const file = await File.findByPk(register.fileId);
           const exposed = await ExposedImport.findByPk(register.exposedImportId);
 
@@ -276,7 +276,7 @@ const StatusMessageWhatsappService = async ({
           }
 
           const contactData = {
-            name: `${register.name}`,
+            name: register.name ? `${register.name}` : "Nome: (não informado)",
             number: register.phoneNumber,
             companyId: (file ? file.companyId : exposed.companyId),
             profilePicUrl: null,
