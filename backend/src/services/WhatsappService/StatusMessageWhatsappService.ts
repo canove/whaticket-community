@@ -17,6 +17,8 @@ import  crypto  from "crypto";
 import { createClient } from "redis";
 import Whatsapp from "../../database/models/Whatsapp";
 import ConnectionFiles from "../../database/models/ConnectionFile";
+import OfficialTemplates from "../../database/models/OfficialTemplates";
+import OfficialTemplatesStatus from "../../database/models/OfficialTemplatesStatus";
 interface Request {
   msgId: number;
   statusType: string;
@@ -154,20 +156,55 @@ const StatusMessageWhatsappService = async ({
         if(!message) {
           const file = await File.findByPk(register.fileId);
           const exposed = await ExposedImport.findByPk(register.exposedImportId);
+
           let template = null;
-          if(file && file.templateId) {
+          let officialTemplate = null;
+
+          if (file && file.templateId) {
             template = await Templates.findByPk(file.templateId);
           }
-          if(exposed && exposed.templateId) {
+          if (exposed && exposed.templateId) {
             template = await Templates.findByPk(exposed.templateId);
+          }
+
+          if (register.template) {
+            const templateStatus = await OfficialTemplatesStatus.findOne({
+              where: {
+                status: "APPROVED",
+                whatsappId: register.whatsappId,
+                companyId: (file ? file.companyId : exposed.companyId)
+              },
+              include: [
+                {
+                  model: OfficialTemplates,
+                  as: "officialTemplate",
+                  attributes: ["body", "footer", "mapping", "header"],
+                  required: true,
+                  where: {
+                    name: register.template
+                  }
+                }
+              ]
+            });
+
+            officialTemplate = templateStatus ? templateStatus.officialTemplate : null;
+          }
+
+          if (!template && !officialTemplate) {
+            if (file && file.officialTemplatesId) {
+              officialTemplate = await OfficialTemplates.findByPk(file.officialTemplatesId);
+            }
+            if (exposed && exposed.officialTemplatesId) {
+              officialTemplate = await OfficialTemplates.findByPk(exposed.officialTemplatesId);
+            }
           }
 
           let messageTxt = register.message;
           let mediaUrl = null;
 
-          if(template) {
+          if (template) {
             const messagesTemplate = JSON.parse(template.text);
-           
+          
             switch (messageType) {
               case 'text':
                 let text = messagesTemplate.find((m) => m['type'] == messageType);
@@ -180,26 +217,68 @@ const StatusMessageWhatsappService = async ({
               case 'contact':
                 let contact = messagesTemplate.find((m) => m['type'] == 'contact');
                 messageTxt = 'CONTATO: ' + preparePhoneNumber(contact['value']);
-                break;
-                case 'ptt':
-                case 'image':
-                case 'video':
-                case 'audio':
-                  if(messageType == 'ptt') {
-                    messageType = 'audio';
-                  }
-                  let media = messagesTemplate.find((m) => m['type'] == messageType);
-                  messageTxt = media['value'];
-                  mediaUrl = messageTxt;
-                  break;
-
+              break;
+              case 'ptt':
+              case 'image':
+              case 'video':
+              case 'audio':
+                if (messageType == 'ptt') {
+                  messageType = 'audio';
+                }
+                let media = messagesTemplate.find((m) => m['type'] == messageType);
+                messageTxt = media['value'];
+                mediaUrl = messageTxt;
+              break;
             }
+          } 
+          
+          if (officialTemplate) {
+            let body = officialTemplate.body;
+            let header = JSON.parse(officialTemplate.header);
+
+            const params = getTemplateParams(register.templateParams);
+            const mapping = JSON.parse(officialTemplate.mapping);
+
+            let paramIndex = 1;
+            if (Array.isArray(params)) {
+              params.forEach((param) => {
+                if (!param) return;
+                
+                if (param.slice(0, 10) === "headerUrl:") {
+                  const url = param.slice(10);
+                  mediaUrl = url;
+                } else {
+                  body = body.replace(`{{${paramIndex}}}`, param);
+                  paramIndex++;
+                }
+              });
+            } else {
+              Object.keys(mapping).forEach((key) => {
+                const variable = mapping[key];
+
+                const useReg = ["var1", "var2", "var3", "var4", "var5"].includes(variable);
+                const text = useReg ? register[variable] : params[variable];
+  
+                body = body.replace(key, text);
+              });
+
+              if (header) {
+                const variable = header.link;
+
+                const useReg = ["var1", "var2", "var3", "var4", "var5"].includes(variable);
+                const url = useReg ? register[variable] : params[variable];
+  
+                mediaUrl = url;
+              }
+            }
+
+            messageTxt = body;
           }
 
           const contactData = {
             name: `${register.name}`,
             number: register.phoneNumber,
-            companyId: (file?file.companyId:exposed.companyId),
+            companyId: (file ? file.companyId : exposed.companyId),
             profilePicUrl: null,
             isGroup: false
           };
@@ -214,22 +293,24 @@ const StatusMessageWhatsappService = async ({
             null,
             true
           );
-          /*CRIA A MENSAGEM NO CHAT*/
+
+          /* CRIA A MENSAGEM NO CHAT */
           const messageData = {
-            id: msgWhatsId?msgWhatsId:crypto.randomBytes(16).toString('hex'),
+            id: msgWhatsId ? msgWhatsId : crypto.randomBytes(16).toString('hex'),
             ticketId: createTicket.id,
             bot: createTicket.status == 'inbot',
             contactId: undefined,
-            body: mediaUrl != null ? '' :messageTxt == null? '': messageTxt,
+            body: (mediaUrl != null && !officialTemplate) ? '' : messageTxt == null ? '' : messageTxt,
             ack: 3,
             fromMe: true,
             read: true,
             mediaUrl: mediaUrl,
             mediaType: messageType,
             quotedMsgId: null,
-            companyId: (file?file.companyId:exposed.companyId)
+            companyId: (file ? file.companyId : exposed.companyId)
           };
         
+          await createTicket.update({ lastMessage: messageTxt ? messageTxt : "" });
           await CreateMessageService({ messageData });
         }
         /*FIM*/
@@ -274,5 +355,14 @@ const StatusMessageWhatsappService = async ({
 
   return { success: true };
 };
+
+const getTemplateParams = (templateParams: string) => {
+  try {
+    const params = JSON.parse(templateParams);
+    return params;
+  } catch {
+    return templateParams.split(",");
+  }
+}
 
 export default StatusMessageWhatsappService;
