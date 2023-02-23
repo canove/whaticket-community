@@ -71,17 +71,24 @@ export const initMessageResponseConsumer = () => {
 
             } else {
               let mediaUrl = '';
+              let body = '';
 
-              if(message.mediaUrl) {
+              if (message.mediaUrl) {
                 if(!message.mediaUrl?.includes('http')) {
                   mediaUrl = '';
                 }
               }
 
-              if(message.path) {
+              if (message.path) {
                 if(!message.path?.includes('http')) {
                   mediaUrl = '';
+                } else {
+                  mediaUrl = message.path;
                 }
+              }
+
+              if (message.text === mediaUrl) {
+                body = '';
               }
 
               await botMessage({
@@ -93,7 +100,7 @@ export const initMessageResponseConsumer = () => {
                 "type": message.type == 'file'? 'document': message.type,
                 "to": message.number,
                 "from":message.session,
-                "body": message.text,
+                "body": body,
                 "mediaUrl": mediaUrl
              });
 

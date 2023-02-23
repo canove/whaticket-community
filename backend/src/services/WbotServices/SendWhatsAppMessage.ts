@@ -189,24 +189,18 @@ const SendWhatsAppMessage = async ({
     }
   } else {
     try {
-      const { url, type: bodyType, fileName } = isValidHttpUrl(body);
+      const validUrl = isValidHttpUrl(body);
 
-      let apiUrl = `${process.env.WPPNOF_URL}/sendText`;
-      switch(bodyType) {
-        case 'file':
-          apiUrl = `${process.env.WPPNOF_URL}/sendFile`;
-          break;
-        case 'video':
-          apiUrl = `${process.env.WPPNOF_URL}/sendVideo`;
-          break;
-        case 'image':
-          apiUrl = `${process.env.WPPNOF_URL}/sendImage`;
-          break;
-        case 'buttons':
-          apiUrl = `${process.env.WPPNOF_URL}/send-buttons`;
-          break;
+      let url = "";
+      let bodyType = "";
+      let fileName = "";
+
+      if (validUrl) {
+        url = validUrl.url
+        bodyType = validUrl.type
+        fileName = validUrl.fileName
       }
-
+      
       let phoneNumber =  removePhoneNumber9Digit(!messageSended?.phoneNumber?contact.number: messageSended?.phoneNumber);
       
       if (phoneNumber.length > 12){
