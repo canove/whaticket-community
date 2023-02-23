@@ -71,7 +71,7 @@ export const initMessageResponseConsumer = () => {
 
             } else {
               let mediaUrl = '';
-              let body = '';
+              let body = message.text;
 
               if (message.mediaUrl) {
                 if(!message.mediaUrl?.includes('http')) {
