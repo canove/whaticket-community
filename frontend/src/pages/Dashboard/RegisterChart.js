@@ -65,7 +65,9 @@ const RegisterChart = () => {
 	
 				aux.forEach(a => {
 					registers.forEach(reg => {
-						format(startOfHour(parseISO(reg.createdAt)), "HH:mm") === a.time && a.total++;
+						if (reg.processedAt) {
+							format(startOfHour(parseISO(reg.processedAt)), "HH:mm") === a.time && a.total++;
+						}
 						
 						if (reg.sentAt) {
 							format(startOfHour(parseISO(reg.sentAt)), "HH:mm") === a.time && a.sent++;
