@@ -24,6 +24,11 @@ const UpdateFileService = async ({
     return file;
   }
 
+  if (status === "5") {
+    await file.update({ status: FileStatus.Sending });
+    return file;
+  }
+
   if (status === "7") {
     await file.update({ status: FileStatus.Refused });
     await file.update({ refusedAt: date });
@@ -33,6 +38,11 @@ const UpdateFileService = async ({
 
   if (status === "8") {
     await file.update({ status: FileStatus.TestingWhatsapp });
+    return file;
+  }
+
+  if (status === "10") {
+    await file.update({ status: FileStatus.Paused });
     return file;
   }
 

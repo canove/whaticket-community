@@ -10,4 +10,5 @@ export enum FileStatus {
   Refused = 7,
   TestingWhatsapp = 8,
   TestingWhatsappProcessing = 9,
+  Paused = 10,
 }

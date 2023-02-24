@@ -13,7 +13,9 @@ const ShowFileService = async (
       "approvedAt",
       "refusedAt",
       "approvedOrRefusedId",
-      "CreatedAt"
+      "CreatedAt",
+      "ownerid",
+      "QtdeRegister",
     ]
   });
   if (!file) {
