@@ -21,16 +21,27 @@ const ListRegistersService = async ({
   initialDate, 
   finalDate
 }: Request) => {
-  let whereCondition = null;
+  let whereConditionCreatedAt = null;
+  let whereConditionProcessedAt = null;
 
-  whereCondition = {
-    ...whereCondition,
+  whereConditionCreatedAt = {
+    ...whereConditionCreatedAt,
+    companyId
+  }
+
+  whereConditionProcessedAt = {
+    ...whereConditionProcessedAt,
     companyId
   }
 
   if (fileId) {
-    whereCondition = {
-      ...whereCondition,
+    whereConditionCreatedAt = {
+      ...whereConditionCreatedAt,
+      fileId
+    }
+
+    whereConditionProcessedAt = {
+      ...whereConditionProcessedAt,
       fileId
     }
   } else {
@@ -46,17 +57,28 @@ const ListRegistersService = async ({
 
     if (files.length > 0) {
       const filesArray = files.map(file => file.id);
-      whereCondition = {
-        ...whereCondition,
+      whereConditionCreatedAt = {
+        ...whereConditionCreatedAt,
+        fileId: { [Op.notIn]: filesArray }
+      }
+      whereConditionProcessedAt = {
+        ...whereConditionProcessedAt,
         fileId: { [Op.notIn]: filesArray }
       }
     }
   }
 
   if (date) {
-    whereCondition = {
-      ...whereCondition,
+    whereConditionCreatedAt = {
+      ...whereConditionCreatedAt,
       createdAt: {
+        [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
+      },
+    }
+
+    whereConditionProcessedAt = {
+      ...whereConditionProcessedAt,
+      processedAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       },
     }
@@ -69,19 +91,25 @@ const ListRegistersService = async ({
     const thirtyDays = 31 * 24 * 60 * 60 * 1000; // dia * horas * minutos * segundos * milisegundos
 
     if (!(f.getTime() - i.getTime() >= thirtyDays)) {
-      whereCondition = {
-        ...whereCondition,
+      whereConditionCreatedAt = {
+        ...whereConditionCreatedAt,
         createdAt: {
+          [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+        },
+      };
+
+      whereConditionProcessedAt = {
+        ...whereConditionProcessedAt,
+        processedAt: {
           [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
         },
       };
     }
   }
 
-  const totalAmount = await FileRegister.findOne({
-    where: whereCondition,
+  const createdAtAmount = await FileRegister.findOne({
+    where: whereConditionCreatedAt,
     attributes: [
-      [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
       [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
       [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
       [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
@@ -93,7 +121,15 @@ const ListRegistersService = async ({
     raw: true
   });
 
-  return totalAmount;
+  const processedAtAmount = await FileRegister.findOne({
+    where: whereConditionProcessedAt,
+    attributes: [
+      [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
+    ],
+    raw: true
+  });
+
+  return { ...createdAtAmount, ...processedAtAmount };
 };
 
 export default ListRegistersService;

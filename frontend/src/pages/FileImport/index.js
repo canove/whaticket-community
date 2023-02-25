@@ -24,7 +24,7 @@ import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { parseISO, format } from "date-fns";
 import { IconButton, Typography } from "@material-ui/core";
-import { Visibility } from "@material-ui/icons";
+import { Cancel, Pause, PlayArrow, Visibility } from "@material-ui/icons";
 import WhatsAppIcon from '@material-ui/icons/WhatsApp';
 import RegisterFileModal from "../../components/RegisterFileModal";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -107,6 +107,9 @@ const FileImport = () => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [testingFile, setTestingFile] = useState(null);
 
+  const [cancelingFile, setCancelingFile] = useState(null);
+  const [cancelingModalOpen, setCancelingModalOpen] = useState(false);
+
   const { user } = useContext(AuthContext);
   const [users, dispatchUsers] = useReducer(reducer, []);
   const [imports, dispatchImports] = useReducer(reducer, []);
@@ -179,6 +182,8 @@ const FileImport = () => {
       return "8";
     } else if (status === `Processando Números`) { 
       return "9";
+    } else if (status === `Pausado`) {
+      return "10";
     } else {
       return status;
     }
@@ -205,6 +210,8 @@ const FileImport = () => {
       return `Validando Números`;
     } else if (id === 9) {
       return `Processando Números`;
+    } else if (id === 10) {
+      return `Pausado`;
     } else {
       return id;
     }
@@ -308,6 +315,26 @@ const FileImport = () => {
     };
   }, [user]);
 
+  const handlePause = async (fileId) => {
+    await updateFile(fileId, 10);
+  }
+
+  const handleStart = async (fileId) => {
+    await updateFile(fileId, 5);
+  }
+
+  const handleCancel = async (fileId) => {
+    await updateFile(fileId, 7);
+  }
+
+  const updateFile = async (fileId, status) => {
+    try {
+      await api.put(`/file/update/${fileId}/?status=${status}`);
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
   return (
     <MainContainer>
       <ImportModal
@@ -336,6 +363,19 @@ const FileImport = () => {
       >
         Você tem certeza que deseja remover os números que não tem whatsapp desse arquivo? Essa ação não poderá ser desfeita.
       </ConfirmationModal>
+      <ConfirmationModal
+        title={
+          cancelingFile &&
+          `Cancelar os disparos do arquivo: ${
+            cancelingFile.name
+          }?`
+        }
+        open={cancelingModalOpen}
+        onClose={setCancelingModalOpen}
+        onConfirm={() => { handleCancel(cancelingFile.id) }}
+      >
+        Você tem certeza que deseja cancelar os disparos desse arquivo? Essa ação não poderá ser desfeita.
+      </ConfirmationModal>
       <MainHeader>
         <Title>{i18n.t("importation.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -351,7 +391,8 @@ const FileImport = () => {
               `${i18n.t("importation.form.finished")}`,
               `${i18n.t("importation.form.refused")}`,
               `Validando Números`,
-              `Processando Números`
+              `Processando Números`,
+              `Pausado`
             ]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}
@@ -446,6 +487,33 @@ const FileImport = () => {
                               }}
                             >
                               <WhatsAppIcon />
+                            </IconButton>
+                          </>
+                        )}
+                        {item.status === 5 && (
+                          <IconButton
+                            size="small"
+                            onClick={() => handlePause(item.id)}
+                          >
+                            <Pause />
+                          </IconButton>
+                        )}
+                        {item.status === 10 && (
+                          <>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleStart(item.id)}
+                            >
+                              <PlayArrow />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setCancelingFile(item);
+                                setCancelingModalOpen(true);
+                              }}
+                            >
+                              <Cancel />
                             </IconButton>
                           </>
                         )}

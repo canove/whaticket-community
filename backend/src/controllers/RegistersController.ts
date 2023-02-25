@@ -57,7 +57,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
     whereCondition = {
       [Op.or]: [
         {
-          createdAt: {
+          processedAt: {
             [Op.between]: [+startOfDay(parseISO(selectedDate)), +endOfDay(parseISO(selectedDate))]
           },
         },
@@ -73,7 +73,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
     whereCondition = {
       [Op.or]: [
         {
-          createdAt: {
+          processedAt: {
             [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
           },
         },
@@ -89,7 +89,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 
   const reports = await FileRegister.findAll({
     where: whereCondition,
-    attributes: ["createdAt", "sentAt"]
+    attributes: ["createdAt", "sentAt", "processedAt"]
   });
 
   return res.status(200).json({ reports });
