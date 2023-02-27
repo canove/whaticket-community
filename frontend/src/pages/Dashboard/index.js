@@ -222,6 +222,13 @@ const Dashboard = () => {
       setNoWhatsCount(data.reports.noWhats || "0");
       setQueueCount(data.reports.queue || "0");
 
+      // let queueCounter = 0;
+
+      // if (data.reports.fileQueue) queueCounter += Number(data.reports.fileQueue);
+      // if (data.reports.registerQueue) queueCounter += Number(data.reports.registerQueue);
+
+      // setQueueCount(queueCounter);
+
       setCategoryCount(data.category);
       setConnectedWhatsapps(data.connectedWhatsapps);
 
