@@ -1,6 +1,7 @@
 import axios from "axios";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
+import { getIO } from "../../libs/socket";
 import { logger } from "../../utils/logger";
 /*eslint-disable*/
 const DeleteWhatsAppService = async (id: string, companyId: string | number): Promise<void> => {
@@ -11,6 +12,14 @@ const DeleteWhatsAppService = async (id: string, companyId: string | number): Pr
   if (!whatsapp) {
     throw new AppError("ERR_NO_WAPP_FOUND", 404);
   }
+
+  await whatsapp.update({ status: "OPENING" });
+  
+  const io = getIO();
+  io.emit(`whatsappSession${companyId}`, {
+    action: "update",
+    session: whatsapp
+  });
 
   try {
     const apiUrl = `${process.env.WPPNOF_URL}/stop`;
