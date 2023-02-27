@@ -13,6 +13,7 @@ interface Request {
   templateId?: number;
   officialConnectionId?: string | number;
   offTemplateId?: string | number;
+  connectionFileId?: string | number;
 }
 
 const CreateUploadFileService = async ({
@@ -25,6 +26,7 @@ const CreateUploadFileService = async ({
   templateId = null,
   officialConnectionId = null,
   offTemplateId = null,
+  connectionFileId = null,
 }: Request): Promise<File> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
@@ -57,7 +59,8 @@ const CreateUploadFileService = async ({
     companyId,
     templateId,
     officialConnectionId,
-    officialTemplatesId: offTemplateId
+    officialTemplatesId: offTemplateId,
+    connectionFileId
   });
 
   return file;

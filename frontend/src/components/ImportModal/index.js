@@ -91,6 +91,9 @@ const ImportModal = ({ open, onClose }) => {
   const [offTemplates, setOffTemplates] = useState([]);
   const [selectedOffTemplate, setSelectedOffTemplate] = useState("Nenhum");
 
+  const [connectionFiles, setConnectionFiles] = useState([]);
+  const [selectedConnectionFile, setSelectedConnectionFile] = useState("Nenhum");
+
   useEffect(() => {
     const fetchMenus = async () => {
       try {
@@ -128,6 +131,16 @@ const ImportModal = ({ open, onClose }) => {
       }
     };
 
+    const fetchConnectionFiles = async () => {
+			try {
+				const { data } = await api.get(`/connectionFiles/`);
+				setConnectionFiles(data);
+			} catch (err) {
+				toastError(err);
+			}
+		};
+
+		fetchConnectionFiles();
     fetchPhoneNumbers();
     fetchOffTemplates();
     fetchTemplates();
@@ -158,6 +171,7 @@ const ImportModal = ({ open, onClose }) => {
     setSelectedConnection([]);
     setSelectedTemplate("Nenhum");
     setSelectedOffTemplate("Nenhum");
+    setSelectedConnectionFile("Nenhum");
   };
 
   const handleFile = (e) => {
@@ -193,6 +207,9 @@ const ImportModal = ({ open, onClose }) => {
         }
         if (selectedOffTemplate !== "Nenhum") {
           formData.set("offTemplateId", selectedOffTemplate);
+        }
+        if (selectedConnectionFile !== "Nenhum") {
+          formData.set("connectionFileId", selectedConnectionFile);
         }
 
         await api.post("file/upload", formData);
@@ -248,6 +265,11 @@ const ImportModal = ({ open, onClose }) => {
     setOffConnection(e.target.value);
     setSelectedConnection([]);
   };
+
+  const handleChangeConnectionFile = (e) => {
+    setSelectedConnectionFile(e.target.value);
+    setSelectedConnection([]);
+  }
 
   useEffect(() => {
     if (menus) {
@@ -391,6 +413,38 @@ const ImportModal = ({ open, onClose }) => {
             </FormControl>
           )}
           {selectedType === false && (
+            <Typography variant="subtitle1" gutterBottom>
+              {"Categoria"}
+            </Typography>
+          )}
+          {selectedType === false && (
+            <div className={classes.multFieldLine}>
+              <Select
+                variant="outlined"
+                labelId="category-select-label"
+                id="category-select"
+                value={selectedConnectionFile}
+                label="Categoria"
+                onChange={(e) => {
+                  handleChangeConnectionFile(e);
+                }}
+                style={{ width: "100%" }}
+              >
+                <MenuItem value={"Nenhum"}>
+                  {i18n.t("importModal.form.none")}
+                </MenuItem>
+                {connectionFiles.length > 0 &&
+                  connectionFiles.map((connectionFile, index) => {
+                    return (
+                      <MenuItem key={index} value={connectionFile.id}>
+                        {connectionFile.name}
+                      </MenuItem>
+                    );
+                  })}
+              </Select>
+            </div>
+          )}
+          {selectedType === false && (
             <>
               <Typography variant="subtitle1" gutterBottom>
                 {i18n.t("importModal.form.connection")}
@@ -416,7 +470,8 @@ const ImportModal = ({ open, onClose }) => {
                     whatsApps.map((whats) => {
                       if (
                         whats.official === selectedType &&
-                        whats.status === "CONNECTED"
+                        whats.status === "CONNECTED" &&
+                        (selectedConnectionFile === "Nenhum" || whats.connectionFileId === selectedConnectionFile)
                       ) {
                         return (
                           <MenuItem key={whats.id} value={whats.id}>

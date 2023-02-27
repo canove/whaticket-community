@@ -13,6 +13,7 @@ import {
   Default
 } from "sequelize-typescript";
 import Company from "./Company";
+import ConnectionFiles from "./ConnectionFile";
 import OfficialTemplates from "./OfficialTemplates";
 import OfficialWhatsapp from "./OfficialWhatsapp";
 import Templates from "./TemplatesData";
@@ -85,6 +86,13 @@ class File extends Model<File> {
   @ForeignKey(() => User)
   @Column
   ownerid: number;
+
+  @ForeignKey(() => ConnectionFiles)
+  @Column
+  connectionFileId: number;
+
+  @BelongsTo(() => ConnectionFiles)
+  connectionFile: ConnectionFiles;
 }
 
 export default File;
