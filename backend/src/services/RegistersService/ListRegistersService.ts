@@ -116,7 +116,7 @@ const ListRegistersService = async ({
       [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
       [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
       [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND (haveWhatsapp = 0 OR msgWhatsId IS NULL)")), 'noWhats' ],
-      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL")), 'queue' ],
+      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL AND (fileId IS NULL OR EXISTS (SELECT status FROM Files WHERE Files.id = fileId AND Files.status = 5))")), 'queue' ],
     ],
     raw: true
   });

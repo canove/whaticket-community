@@ -23,6 +23,12 @@ connectionFilesRoutes.post(
   ConnectionFilesController.store
 );
 
+connectionFilesRoutes.post(
+  "/connectionFiles/bind/",
+  isAuth,
+  ConnectionFilesController.bind
+);
+
 connectionFilesRoutes.put(
   "/connectionFiles/:connectionFileId",
   isAuth,

@@ -6,6 +6,7 @@ import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppSer
 import TestWhatsAppConnectionService from "../services/WhatsappService/TestWhatsAppConnectionService";
 import { logger } from "../utils/logger";
 import AppError from "../errors/AppError";
+import { getIO } from "../libs/socket";
 
 type IndexQuery = {
   connectionId: string | number;
@@ -85,6 +86,14 @@ const remove = async (req: Request, res: Response): Promise<Response> => {
 
   const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
+  await whatsapp.update({ status: "OPENING" });
+
+  const io = getIO();
+  io.emit(`whatsappSession${companyId}`, {
+    action: "update",
+    session: whatsapp
+  });
+
   try {
     const apiUrl = `${process.env.WPPNOF_URL}/stop`;
     const payload = {
@@ -102,9 +111,12 @@ const remove = async (req: Request, res: Response): Promise<Response> => {
     logger.error(err);
   }
 
-  /* const wbot = getWbot(whatsapp.id);
+  await whatsapp.update({ status: "DISCONNECTED" });
 
-  wbot.logout(); */
+  io.emit(`whatsappSession${companyId}`, {
+    action: "update",
+    session: whatsapp
+  });
 
   return res.status(200).json({ message: "Session disconnected." });
 };

@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 import ShowConnectionFileByNameService from "../ConnectionFileService/ShowConnectionFileByNameService";
+import Flows from "../../database/models/Flows";
 
 interface Request {
   companyId: string | number;
@@ -99,6 +100,11 @@ const ListWhatsAppsService = async ({
         as: "queues",
         attributes: ["id", "name", "color", "greetingMessage"]
       },
+      {
+        model: Flows,
+        as: "flow",
+        attributes: ["name"]
+      }
     ],
     // order: [["status", "DESC"]]
   });

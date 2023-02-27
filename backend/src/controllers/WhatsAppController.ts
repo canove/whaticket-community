@@ -214,6 +214,32 @@ export const transfer = async (
   return res.status(200).json("OK");
 };
 
+export const maturing = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { maturing } = req.body;
+  const { whatsappId } = req.params;
+  const { companyId } = req.user;
+
+  const whatsapp = await Whatsapp.findOne({
+    where: {
+      id: whatsappId,
+      companyId
+    }
+  })
+
+  await whatsapp.update({ maturing: !maturing });
+
+  const io = getIO();
+  io.emit(`whatsapp${companyId}`, {
+    action: "update",
+    whatsapp
+  });
+
+  return res.status(200).json("OK");
+};
+
 export const config = async (
   req: Request,
   res: Response

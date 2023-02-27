@@ -20,6 +20,7 @@ import {
 import {
 	Edit,
 	DeleteOutline,
+	Timeline,
 } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
@@ -34,6 +35,7 @@ import { useTranslation } from 'react-i18next'
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import ConnectionFileModal from "../../components/ConnectionFileModal";
+import BindFlowModal from "../../components/BindFlowModal";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -126,6 +128,7 @@ const ConnectionFiles = () => {
 		confirmationModalInitialState
 	);
 	const { user } = useContext(AuthContext);
+	const [openBindFlowModal, setOpenBindFlowModal] = useState(false);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -208,6 +211,16 @@ const ConnectionFiles = () => {
 		setConfirmModalInfo(confirmationModalInitialState);
 	};
 
+	const handleOpenFlowModal = async (connectionFile) => {
+		setOpenBindFlowModal(true);
+		setSelectedConnectionFile(connectionFile);
+	}
+
+	const handleCloseFlowModal = async () => {
+		setOpenBindFlowModal(false);
+		setSelectedConnectionFile(null);
+	}
+
 	return (
 		<MainContainer>
 			<ConfirmationModal
@@ -222,6 +235,11 @@ const ConnectionFiles = () => {
 				open={connectionFileModalOpen}
 				onClose={handleCloseConnectionFileModal}
 				connectionFileId={selectedConnectionFile?.id}
+			/>
+			<BindFlowModal
+				open={openBindFlowModal}
+				onClose={handleCloseFlowModal}
+				connectionFile={selectedConnectionFile}
 			/>
 			<MainHeader>
 				<Title>{i18n.t("connectionsFiles.title")}</Title>
@@ -277,6 +295,12 @@ const ConnectionFiles = () => {
 										onClick={() => handleEditConnectionFile(connectionFile)}
 									>
 										<Edit />
+									</IconButton>
+									<IconButton
+										size="small"
+										onClick={() => handleOpenFlowModal(connectionFile)}
+									>
+										<Timeline />
 									</IconButton>
 									<IconButton
 										size="small"
