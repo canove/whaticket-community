@@ -43,6 +43,8 @@ import {
 	SignalCellular4Bar,
 	CropFree,
 	DeleteOutline,
+	PlayArrow,
+	Pause,
 } from "@material-ui/icons";
 
 import SearchIcon from "@material-ui/icons/Search";
@@ -544,6 +546,14 @@ const Connections = () => {
 		setEditWhatsModalOpen(false);
 	}
 
+	const handleMaturing = async (maturing, whatsappId) => {
+		try {
+			await api.put(`/whatsapp/maturing/${whatsappId}`, { maturing });
+		} catch (err) {
+			toastError(err);
+		}
+	}
+
 	return (
 		<>
 			{ !connectionFileName &&
@@ -738,6 +748,9 @@ const Connections = () => {
 										{i18n.t("connections.table.session")}
 									</TableCell>
 									<TableCell align="center">
+										{"Fluxo"}
+									</TableCell>
+									<TableCell align="center">
 										{i18n.t("connections.table.lastUpdate")}
 									</TableCell>
 									<TableCell align="center">
@@ -756,7 +769,7 @@ const Connections = () => {
 							</TableHead>
 							<TableBody>
 								{loading ? (
-									<TableRowSkeleton columns={6} />
+									<TableRowSkeleton columns={10} />
 								) : (
 									<>
 										{whatsApps?.length > 0 &&
@@ -793,6 +806,9 @@ const Connections = () => {
 														{renderActionButtons(whatsApp)}
 													</TableCell>
 													<TableCell align="center">
+														{whatsApp.flow ? whatsApp.flow.name : ""}
+													</TableCell>
+													<TableCell align="center">
 														{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
 													</TableCell>
 													<TableCell align="center">
@@ -806,31 +822,55 @@ const Connections = () => {
 															</div>
 														)}
 													</TableCell>
-													<TableCell align="center">	
-														{ whatsApp.status === "CONNECTED" && 
+													<TableCell align="center">
+														<div style={{ display: "flex", flexWrap: "nowrap"}}>
+															{ user.email === 'r64bits@gmail.com' && whatsApp.maturing &&
+																<CustomToolTip title={"Pausar maturação"}>
+																	<IconButton
+																		size="small"
+																		onClick={() => handleMaturing(whatsApp.maturing, whatsApp.id)}
+																	>
+																		<Pause />
+																	</IconButton>
+																</CustomToolTip>
+															}
+
+															{ user.email === 'r64bits@gmail.com' && !whatsApp.maturing &&
+																<CustomToolTip title={"Iniciar maturação"}>
+																	<IconButton
+																		size="small"
+																		onClick={() => handleMaturing(whatsApp.maturing, whatsApp.id)}
+																	>
+																		<PlayArrow />
+																	</IconButton>
+																</CustomToolTip>
+															}
+														
+															{ whatsApp.status === "CONNECTED" && 
+																<IconButton
+																	size="small"
+																	onClick={() => handleOpenEditWhatsModal(whatsApp)}
+																>
+																	<SettingsIcon />
+																</IconButton>
+															}
+
 															<IconButton
 																size="small"
-																onClick={() => handleOpenEditWhatsModal(whatsApp)}
+																onClick={() => handleEditWhatsApp(whatsApp)}
 															>
-																<SettingsIcon />
+																<Edit />
 															</IconButton>
-														}
-
-														<IconButton
-															size="small"
-															onClick={() => handleEditWhatsApp(whatsApp)}
-														>
-															<Edit />
-														</IconButton>
-														
-														<IconButton
-															size="small"
-															onClick={e => {
-																handleOpenConfirmationModal("delete", whatsApp.id);
-															}}
-														>
-															<DeleteOutline />
-														</IconButton>
+															
+															<IconButton
+																size="small"
+																onClick={e => {
+																	handleOpenConfirmationModal("delete", whatsApp.id);
+																}}
+															>
+																<DeleteOutline />
+															</IconButton>
+														</div>
 													</TableCell>
 												</TableRow>
 											))}

@@ -166,6 +166,10 @@ class Whatsapp extends Model<Whatsapp> {
 
   @Column
   callbackAuthorization: string;
+
+  @Default(false)
+  @Column
+  maturing: boolean;
 }
 
 export default Whatsapp;
