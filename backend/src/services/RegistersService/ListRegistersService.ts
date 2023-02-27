@@ -108,7 +108,7 @@ const ListRegistersService = async ({
   }
 
   const createdAtAmount = await FileRegister.findOne({
-    where: whereConditionCreatedAt,
+    where: whereConditionProcessedAt,
     attributes: [
       [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
       [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
@@ -122,7 +122,7 @@ const ListRegistersService = async ({
   });
 
   const processedAtAmount = await FileRegister.findOne({
-    where: whereConditionProcessedAt,
+    where: whereConditionCreatedAt,
     attributes: [
       [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
     ],
