@@ -116,7 +116,9 @@ const TemplateTable = ({ body }) => {
         if (body.type === "buttons") {
             return (
               <TableCell align="center">
-                <Typography>{value}</Typography>
+                <Typography>{"Text: " + value}</Typography>
+                <Typography>{body.footer ? "Footer: " + body.footer : ""}</Typography>
+                <Typography>{body.imageUrl ? "Image URL: " + body.imageUrl : ""}</Typography>
                 <TemplateButtonsTable buttons={body.buttons} />
               </TableCell>
             );
