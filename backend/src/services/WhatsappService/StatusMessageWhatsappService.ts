@@ -76,7 +76,7 @@ const StatusMessageWhatsappService = async ({
 
    if(msgRegister) {
     console.log("update Message statusmessageservice 71");
-    switch(statusType){
+    switch(statusType.toLowerCase()){
       case "sent":
         await msgRegister?.update({ ack: 1 });
         break;
