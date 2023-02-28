@@ -54,6 +54,14 @@ const TemplateButtonsTable = ({ buttons }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
+	const getButtonInfo = (button) => {
+		if (button.type === "quickReplyButton") return button.buttonId;
+		if (button.type === "callButton") return button.phoneNumber;
+		if (button.type === "urlButton") return button.url;
+
+		return "";
+	}
+
 	return (
 		<TableContainer component={Paper} className={classes.root}>
             { buttons &&
@@ -61,6 +69,8 @@ const TemplateButtonsTable = ({ buttons }) => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">{i18n.t("templatesData.grid.buttons")}</TableCell>
+							<TableCell align="center">{"Tipo"}</TableCell>
+							<TableCell align="center">{"Extra"}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -68,6 +78,8 @@ const TemplateButtonsTable = ({ buttons }) => {
                             return (
                                 <TableRow key={button.id}>
                                     <TableCell align="center">{button.text}</TableCell>
+									<TableCell align="center">{button.type}</TableCell>
+									<TableCell align="center">{getButtonInfo(button)}</TableCell>
                                 </TableRow>
                               );
                         }) }
