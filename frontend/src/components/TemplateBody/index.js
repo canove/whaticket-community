@@ -79,6 +79,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
     const [image, setImage] = useState("");
     const [file, setFile] = useState("");
     const [fileUrl, setFileUrl] = useState("");
+    const [footer, setFooter] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
     const [param, setParam] = useState("");
     const [paramsQuantity, setParamsQuantity] = useState(0);
@@ -126,6 +128,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 
             if (body.type === "buttons") {
                 setText(body.value);
+                setFooter(body.footer);
+                setImageUrl(body.imageUrl);
                 setButtons(body.buttons);
             }
         }
@@ -142,6 +146,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
         setVideo("");
         setImage("");
         setFileUrl("");
+        setFooter("");
+        setImageUrl("");
         
         setDisableButton(false);
 
@@ -224,6 +230,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                 type,
                 value: text,
                 buttons: buttons,
+                footer: footer,
+                imageUrl: imageUrl
             }
 
             handleBodiesChange(bodyData, index);
@@ -266,6 +274,14 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
 
     const handleFileUrlChange = (e) => {
         setFileUrl(e.target.value);
+    }
+
+    const handleFooterChange = (e) => {
+        setFooter(e.target.value);
+    }
+
+    const handleImageUrlChange = (e) => {
+        setImageUrl(e.target.value);
     }
 
     const handleParams = () => {
@@ -347,23 +363,31 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
       const handleButtonsChange = (button, index) => {
         let array = [...buttons];
 
-        array = array.map((bt, index) => ({ text: bt.text, id: (1+index).toString() }));
+        array = array.map((bt, index) => ({ ...bt, id: (1 + index) }));
 
-        if (index || index === 0) {
-          array[index] = { text: button, id: (1+index).toString() };
+        if (typeof index === "number") {
+          array[index] = { ...button, id: (1 + index) };
           setButtons(array);
         } else {
-          array.push({ text: button, id: (1+array.length).toString() });
+          array.push({ ...button, id: (1 + array.length) });
           setButtons(array);
         }
       }
   
-      const handleDeleteButtonModal = (button, index) => {
+      const handleDeleteButtonModal = (_, index) => {
         const array = [...buttons];
         array.splice(index, 1);
   
         setButtons(array);
       }
+
+        const getButtonInfo = (button) => {
+            if (button.type === "quickReplyButton") return button.buttonId;
+            if (button.type === "callButton") return button.phoneNumber;
+            if (button.type === "urlButton") return button.url;
+
+            return "";
+        }
 
 	return (
 		<div className={classes.root}>
@@ -624,6 +648,40 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                     }
                     { type === "buttons" &&
                         <div className={classes.root}>
+                            <FormControl
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+						    >
+                                <TextField
+                                    label={"Rodapé"}
+                                    variant="outlined"
+                                    value={footer}
+                                    onChange={handleFooterChange}
+                                    fullWidth
+                                />
+						    </FormControl>
+                        </div>
+                    }
+                    { type === "buttons" &&
+                        <div className={classes.root}>
+                            <FormControl
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+						    >
+                                <TextField
+                                    label={"URL da Imagem"}
+                                    variant="outlined"
+                                    value={imageUrl}
+                                    onChange={handleImageUrlChange}
+                                    fullWidth
+                                />
+						    </FormControl>
+                        </div>
+                    }
+                    { type === "buttons" &&
+                        <div className={classes.root}>
                             <Button
                                 color="primary"
                                 variant="contained"
@@ -642,6 +700,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                             <TableHead>
                               <TableRow>
                                 <TableCell align="center">{i18n.t("templatesData.modal.text")}</TableCell>
+                                <TableCell align="center">{"Tipo"}</TableCell>
+                                <TableCell align="center">{"Extra"}</TableCell>
                                 <TableCell align="center">{i18n.t("templatesData.modal.actions")}</TableCell>
                               </TableRow>
                             </TableHead>
@@ -651,6 +711,8 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                   return (
                                     <TableRow key={index}>
                                       <TableCell align="center">{button.text}</TableCell>
+                                      <TableCell align="center">{button.type}</TableCell>
+                                      <TableCell align="center">{getButtonInfo(button)}</TableCell>
                                       <TableCell align="center">
                                         <IconButton
                                           size="small"

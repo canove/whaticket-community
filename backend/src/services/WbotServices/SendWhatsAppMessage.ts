@@ -212,7 +212,7 @@ const SendWhatsAppMessage = async ({
 
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
-        ack: 2,
+        ack: 0,
         ticketId: ticket.id,
         contactId: undefined,
         body: body,
