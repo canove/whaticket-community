@@ -335,6 +335,13 @@ const FileImport = () => {
     }
   }
 
+  const getTemplate = (file) => {
+    if (file.template) return file.template.name;
+    if (file.officialTemplate) return file.officialTemplate.name;
+
+    return "";
+  }
+
   return (
     <MainContainer>
       <ImportModal
@@ -435,6 +442,9 @@ const FileImport = () => {
                 {i18n.t("importation.table.fileName")}
               </TableCell>
               <TableCell align="center">
+                {"Template"}
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("importation.table.sentBy")}
               </TableCell>
               <TableCell align="center">
@@ -460,6 +470,7 @@ const FileImport = () => {
                       {format(parseISO(item.CreatedAt), "dd/MM/yyyy HH:mm")}
                     </TableCell>
                     <TableCell align="center">{item.name}</TableCell>
+                    <TableCell align="center">{getTemplate(item)}</TableCell>
                     <TableCell align="center">
                       {getUserById(item.ownerid)}
                     </TableCell>

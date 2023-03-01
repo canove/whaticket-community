@@ -13,7 +13,7 @@ interface Request {
   status?: string;
   date?: string;
   showAll?: string;
-  userId: string;
+  userId: string | number;
   withUnreadMessages?: string;
   queueIds: number[];
   companyId: string | number;

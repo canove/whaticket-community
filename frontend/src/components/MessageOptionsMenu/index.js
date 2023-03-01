@@ -9,7 +9,7 @@ import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessa
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 
-const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
+const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl, whatsapp }) => {
   const { i18n } = useTranslation();
   const { setReplyingMessage } = useContext(ReplyMessageContext);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
@@ -31,6 +31,16 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
     setConfirmationOpen(true);
     handleClose();
   };
+
+  const handleResendMessage = async () => {
+    try {
+      await api.post("/messages/resend", { message });
+    } catch (err) {
+      toastError(err);
+    }
+    
+    handleClose();
+  }
 
   return (
     <>
@@ -64,6 +74,11 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
         <MenuItem onClick={hanldeReplyMessage}>
           {i18n.t("messageOptionsMenu.reply")}
         </MenuItem>
+        {(message.ack === 5 && whatsapp && (whatsapp.status === "CONNECTED" || (whatsapp.official && !whatsapp.deleted))) && (
+          <MenuItem onClick={handleResendMessage}>
+            Reenviar
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

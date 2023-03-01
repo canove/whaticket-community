@@ -40,9 +40,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const { body }: MessageData = req.body;
   const medias = req.files as Express.Multer.File[];
-  const { companyId } = req.user;
+  const { companyId, id } = req.user;
 
   const ticket = await ShowTicketService(ticketId, companyId);
+
+  if (ticket.userId != null && ticket.userId != id) throw new AppError("ERR_TICKET_ACCEPTED_BY_OTHER_USER");
 
   if (medias) {
     await Promise.all(
@@ -88,4 +90,26 @@ export const getMessages = async (req: Request, res: Response): Promise<Response
   });
 
   return res.json({ messages: messages.reverse() });
+};
+
+export const resend = async (req: Request, res: Response): Promise<Response> => {
+  const { message } = req.body;
+  const { companyId } = req.user;
+
+  const ticket = await ShowTicketService(message.ticketId, companyId);
+
+  await SendWhatsAppMessage({ 
+    body: message.body, 
+    mediaUrl: message.mediaUrl ? message.mediaUrl : null, 
+    type: message.type,
+    ticket, 
+    companyId, 
+    fromMe: true, 
+    bot: false, 
+    whatsMsgId: null 
+  });
+
+  SetTicketMessagesAsRead(ticket);
+
+  return res.status(200).json("OK");
 };
