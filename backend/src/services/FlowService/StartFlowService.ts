@@ -14,6 +14,7 @@ import NodeRegisters from "../../database/models/NodeRegisters";
 import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
 import { ca } from "date-fns/locale";
 import { createClient } from 'redis';
+import formatMessage from "../../helpers/Mustache";
 
 interface Request {
   flowNodeId?: string;
@@ -66,7 +67,71 @@ const processNode = async (node: any, session: any, body: any) => {
     const messageJSON = node.data.content;
     const messageOBJ = JSON.parse(messageJSON);
 
-    return { message: messageOBJ };
+    let msg = null;
+
+    if (messageOBJ.blocks && messageOBJ.blocks.length > 0) {
+      let value = null;
+      let client = null;
+  
+      try {
+        client = createClient({
+          url: process.env.REDIS_URL
+        });
+      } catch (err) {
+        console.log("REDIS", err);
+      }
+  
+      if (client) {
+        try {
+          client.on('error', err => console.log('Redis Client Error', err));
+          await client.connect();
+          value = await getRedisValue(session.id,session.companyId, client);
+        } catch (err) {
+          console.log("REDIS", err);
+        }
+    
+        await client.disconnect();
+      }
+  
+      if (!value) {
+        value = await FileRegister.findOne({
+          where: {
+            [Op.or]: [
+              { phoneNumber: session.id } ,
+              { phoneNumber: 
+                { 
+                  [Op.or]: [
+                    removePhoneNumberWith9Country(session.id),
+                    preparePhoneNumber9Digit(session.id),
+                    removePhoneNumber9Digit(session.id),
+                    removePhoneNumberCountry(session.id),
+                    removePhoneNumber9DigitCountry(session.id)
+                  ],
+                }
+              }
+            ],
+            companyId: session.companyId,
+            processedAt: { [Op.ne]: null }
+          },
+          order: [["createdAt", "DESC"]]
+        });
+      }
+      
+      msg = {
+        ...messageOBJ,
+        blocks: messageOBJ.blocks.map((block) => {
+          let newText = block.text;
+          newText = formatMessage(block.text, value);
+  
+          return {
+            ...block,
+            text: newText.replace(/&#x2F;/g, '/')
+          }
+        })
+      }
+    }
+
+    return { message: msg ? msg : messageOBJ };
   }
 
   if (node.type === "conditional-node") {
@@ -453,8 +518,11 @@ const processNode = async (node: any, session: any, body: any) => {
 
     node.messages.forEach(message => {
       if (message.messageType === "text") {
+        let newText = message.messageContent;
+        newText = formatMessage(newText, value);
+
         const newMessage = {
-          text: message.messageContent,
+          text: newText.replace(/&#x2F;/g, '/'),
           type: "text"
         };
 
@@ -477,10 +545,13 @@ const processNode = async (node: any, session: any, body: any) => {
     
         const variable = value[message.messageContent] ? value[message.messageContent] : "";
     
+        let newCation = message.cation;
+        newCation = formatMessage(newCation, value);
+
         const newMessage = {
           text: variable,
           type: message.textType,
-          cation: message.cation
+          cation: newCation.replace(/&#x2F;/g, '/')
         };
 
         blocks.push(newMessage);
