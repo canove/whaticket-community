@@ -55,6 +55,9 @@ class File extends Model<File> {
   @Column
   templateId: number;
 
+  @BelongsTo(() => Templates)
+  template: Templates;
+
   @AllowNull(true)
   @Column
   approvedOrRefusedId: number;
@@ -69,6 +72,9 @@ class File extends Model<File> {
   @ForeignKey(() => OfficialTemplates)
   @Column
   officialTemplatesId: number;
+
+  @BelongsTo(() => OfficialTemplates)
+  officialTemplate: OfficialTemplates;
 
   @Column
   refusedAt: Date;

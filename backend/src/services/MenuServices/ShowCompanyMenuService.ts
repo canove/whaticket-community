@@ -3,7 +3,7 @@ import Company from "../../database/models/Company";
 import Menu from "../../database/models/Menu";
 import ShowUserService from "../UserServices/ShowUserService";
 
-const ShowCompanyMenuService = async (companyId: number, userId: string): Promise<Menu[]> => {
+const ShowCompanyMenuService = async (companyId: number, userId: string | number): Promise<Menu[]> => {
   const user = await ShowUserService(userId, companyId);
 
   let menuList = null;

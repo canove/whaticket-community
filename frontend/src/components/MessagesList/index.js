@@ -19,6 +19,7 @@ import {
   DoneAll,
   ExpandMore,
   GetApp,
+  Replay,
 } from "@material-ui/icons";
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -319,7 +320,7 @@ const reducer = (state, action) => {
   }
 };
 
-const MessagesList = ({ ticketId, isGroup }) => {
+const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -713,6 +714,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
         anchorEl={anchorEl}
         menuOpen={messageOptionsMenuOpen}
         handleClose={handleCloseMessageOptionsMenu}
+        whatsapp={whatsapp}
       />
       <div
         id="messagesList"

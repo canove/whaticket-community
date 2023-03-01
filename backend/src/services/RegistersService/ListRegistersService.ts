@@ -21,29 +21,14 @@ const ListRegistersService = async ({
   initialDate, 
   finalDate
 }: Request) => {
+  let whereCondition = null;
   let whereConditionCreatedAt = null;
   let whereConditionProcessedAt = null;
 
-  whereConditionCreatedAt = {
-    ...whereConditionCreatedAt,
-    companyId
-  }
-
-  whereConditionProcessedAt = {
-    ...whereConditionProcessedAt,
-    companyId
-  }
+  whereCondition = { ...whereCondition, companyId };
 
   if (fileId) {
-    whereConditionCreatedAt = {
-      ...whereConditionCreatedAt,
-      fileId
-    }
-
-    whereConditionProcessedAt = {
-      ...whereConditionProcessedAt,
-      fileId
-    }
+    whereCondition = { ...whereCondition, fileId };
   } else {
     const files = await File.findAll({
       where: { 
@@ -57,12 +42,9 @@ const ListRegistersService = async ({
 
     if (files.length > 0) {
       const filesArray = files.map(file => file.id);
-      whereConditionCreatedAt = {
-        ...whereConditionCreatedAt,
-        fileId: { [Op.notIn]: filesArray }
-      }
-      whereConditionProcessedAt = {
-        ...whereConditionProcessedAt,
+
+      whereCondition = {
+        ...whereCondition,
         fileId: { [Op.notIn]: filesArray }
       }
     }
@@ -107,8 +89,8 @@ const ListRegistersService = async ({
     }
   }
 
-  const createdAtAmount = await FileRegister.findOne({
-    where: whereConditionProcessedAt,
+  const info1 = await FileRegister.findOne({
+    where: { ...whereCondition, ...whereConditionProcessedAt },
     attributes: [
       [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
       [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
@@ -116,20 +98,28 @@ const ListRegistersService = async ({
       [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
       [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
       [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND (haveWhatsapp = 0 OR msgWhatsId IS NULL)")), 'noWhats' ],
-      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL AND (fileId IS NULL OR EXISTS (SELECT status FROM Files WHERE Files.id = fileId AND Files.status = 5))")), 'queue' ],
+      // [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL AND (fileId IS NULL OR EXISTS (SELECT status FROM Files WHERE Files.id = fileId AND Files.status = 5))")), 'queue' ],
     ],
     raw: true
   });
 
-  const processedAtAmount = await FileRegister.findOne({
-    where: whereConditionCreatedAt,
+  const info2 = await FileRegister.findOne({
+    where: { ...whereCondition, ...whereConditionCreatedAt },
     attributes: [
       [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
     ],
     raw: true
   });
 
-  return { ...createdAtAmount, ...processedAtAmount };
+  const info3 = await FileRegister.findOne({
+    where: whereCondition,
+    attributes: [
+      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL AND (fileId IS NULL OR EXISTS (SELECT status FROM Files WHERE Files.id = fileId AND Files.status = 5))")), 'queue' ],
+    ],
+    raw: true
+  });
+
+  return { ...info1, ...info2, ...info3 };
 };
 
 export default ListRegistersService;

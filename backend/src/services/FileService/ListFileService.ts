@@ -1,6 +1,8 @@
 /*eslint-disable*/
 import { Op } from "sequelize";
 import File from "../../database/models/File";
+import OfficialTemplates from "../../database/models/OfficialTemplates";
+import Templates from "../../database/models/TemplatesData";
 
 interface Response {
   reports: File[];
@@ -78,6 +80,20 @@ const ListFileService = async ({
       order: [['createdAt', 'DESC']],
       limit,
       offset,
+      include: [
+        {
+          model: Templates,
+          as: "template",
+          attributes: ["id", "name"],
+          required: false,
+        },
+        {
+          model: OfficialTemplates,
+          as: "officialTemplate",
+          attributes: ["id", "name"],
+          required: false,
+        }
+      ]
     });
 
     const hasMore = count > offset + reports.length;
