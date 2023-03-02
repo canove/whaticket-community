@@ -32,6 +32,7 @@ import { DatabaseNodeModel } from '../nodes/Database/DatabaseNodeModel';
 import { MessageConditionNodeModel } from '../nodes/MessageCondition/MessageConditionNodeModel';
 import { MultipleMessagesNodeModel } from '../nodes/MultipleMessages/MultipleMessagesNodeModel';
 import { JumpNodeModel } from '../nodes/Jump/JumpNodeModel';
+import { DatabaseSaveNodeModel } from '../nodes/DatabaseSave/DatabaseSaveNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -145,6 +146,12 @@ export class BodyWidget extends React.Component {
 							color="#98CEFF"
 							icon={<GiReturnArrow style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget
+							model={{ type: 'database-save' }} 
+							name="Database Save" 
+							color="#BFBFBF" 
+							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -158,56 +165,74 @@ export class BodyWidget extends React.Component {
 							// var nodesCount = _.keys(this.props.app.getDiagramEngine().getModel().getNodes()).length;
 
 							var node = null;
-							if (data.type === 'chat') {
-								node = new ChatNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out'));
-							} else if (data.type === 'conditional') {
-								node = new ConditionalNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out-c1'));
-								node.addPort(new AdvancedPortModel(false, 'out-else'));
-							} else if (data.type === 'request') {
-								node = new RequestNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(true, 'out-2xx'));
-								node.addPort(new AdvancedPortModel(true, 'out-err'));
-							} else if (data.type === 'save-variable') {
-								node = new SaveVariableNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out'));
-							} else if (data.type === "end") {
-								node = new EndNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-							} else if (data.type === "start-inactivity") {
-								node = new StartInactivityNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out-1'));
-								node.addPort(new AdvancedPortModel(false, 'out-2'));
-							} else if (data.type === "transfer-queue") {
-								node = new TransferQueueNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-							} else if (data.type === "database-condition") {
-								node = new DatabaseConditionNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out-true'));
-								node.addPort(new AdvancedPortModel(false, 'out-false'));
-							} else if (data.type === "database") {
-								node = new DatabaseNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out'));
-							} else if (data.type === "message-condition") {
-								node = new MessageConditionNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out-1'));
-								node.addPort(new AdvancedPortModel(false, 'out-else'));
-							} else if (data.type === "multiple-messages") {
-								node = new MultipleMessagesNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
-								node.addPort(new AdvancedPortModel(false, 'out'));
-							} else if (data.type === "jump") {
-								node = new JumpNodeModel();
-								node.addPort(new AdvancedPortModel(true, 'in'));
+							switch (data.type) {
+								case 'chat':
+									node = new ChatNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'conditional':
+									node = new ConditionalNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out-c1'));
+									node.addPort(new AdvancedPortModel(false, 'out-else'));
+								break;
+								case 'request':
+									node = new RequestNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(true, 'out-2xx'));
+									node.addPort(new AdvancedPortModel(true, 'out-err'));
+								break;
+								case 'save-variable':
+									node = new SaveVariableNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'end':
+									node = new EndNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+								break;
+								case 'start-inactivity':
+									node = new StartInactivityNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out-1'));
+									node.addPort(new AdvancedPortModel(false, 'out-2'));
+								break;
+								case 'transfer-queue':
+									node = new TransferQueueNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+								break;
+								case 'database-condition':
+									node = new DatabaseConditionNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out-true'));
+									node.addPort(new AdvancedPortModel(false, 'out-false'));
+								break;
+								case 'database':
+									node = new DatabaseNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'message-condition':
+									node = new MessageConditionNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out-1'));
+									node.addPort(new AdvancedPortModel(false, 'out-else'));
+								break;
+								case 'multiple-messages':
+									node = new MultipleMessagesNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'jump':
+									node = new JumpNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+								break;
+								case 'database-save':
+									node = new DatabaseSaveNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
 							}
 
 							var point = this.props.app.getDiagramEngine().getRelativeMousePoint(event);
