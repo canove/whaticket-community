@@ -93,7 +93,12 @@ const StatusMessageWhatsappService = async ({
 
     const tck = await Ticket.findByPk(msgRegister.ticketId);
     const io = getIO();
-    io.to(msgRegister.ticketId.toString()).emit(`whatsapp-message${tck.companyId}`, {
+    // io.to(msgRegister.ticketId.toString()).emit(`whatsapp-message${tck.companyId}`, {
+    //   action: "update",
+    //   message: msgRegister
+    // });
+
+    io.emit(`appMessage${tck.companyId}`, {
       action: "update",
       message: msgRegister
     });

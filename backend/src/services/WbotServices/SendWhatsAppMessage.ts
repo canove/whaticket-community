@@ -15,13 +15,12 @@ import {
   removePhoneNumber9Digit,
   removePhoneNumber9DigitCountry,
   removePhoneNumberCountry,
-  removePhoneNumberWith9Country
+  removePhoneNumberWith9Country,
+  sendMessageToSQS
 } from "../../utils/common";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
 import { v4 as uuidv4 } from "uuid";
-
-const AWS = require('aws-sdk');
 
 interface Request {
   body: string;
@@ -242,8 +241,13 @@ const SendWhatsAppMessage = async ({
           "api-key": `${process.env.WPPNOF_API_TOKEN}`,
           "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
         };
+
+        const params = {
+          MessageBody: JSON.stringify({ message: payload, headers }),
+          QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+        }
         
-        await sendMessageToSQS({ message: payload, headers });
+        await sendMessageToSQS(params);
       }
 
       // let ack = 3;
@@ -293,40 +297,5 @@ const SendWhatsAppMessage = async ({
     }
   }
 };
-
-const CONSTANT = {
-  region: process.env.ENV_AWS_REGION,
-  key:  process.env.ENV_AWS_ACCESS_KEY_ID,
-  secret: process.env.ENV_AWS_SECRET_ACCESS_KEY
-}
-
-const SQS = new AWS.SQS({
-  region: CONSTANT.region,
-  secretAccessKey:CONSTANT.secret,
-  accessKeyId: CONSTANT.key
-});	
-
-const sendMessageToSQS = async (payload): Promise<void> => {
-  const params = {
-    MessageBody: JSON.stringify(payload),
-    QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
-  }
-
-  return new Promise((resolve, reject) => {
-    SQS.sendMessage(params, function(err, data) {
-      if (err) console.error('SendWhatsAppMessage - Message could not be sent to SQS')
-  
-      console.log(' -- SendWhatsAppMessage - Message sent to SQS -- ', params.QueueUrl);
-      try {
-        setTimeout(function(){
-          resolve();
-        }, 1000);
-      } catch (e) {
-        console.log("SendWhatsAppMessage - Message Error", e);
-          resolve();
-      }
-    });
-  });
-}
 
 export default SendWhatsAppMessage;

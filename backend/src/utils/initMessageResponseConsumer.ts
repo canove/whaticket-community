@@ -8,7 +8,7 @@ import Ticket from "../database/models/Ticket";
 import Whatsapp from "../database/models/Whatsapp";
 import { getIO } from "../libs/socket";
 import StartExposedImportService from "../services/ExposedImportService/StartExposedImportService";
-import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "./common";
+import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country, sendMessageToSQS } from "./common";
 
 const { Consumer } = require("sqs-consumer");
 const AWS = require("aws-sdk");
@@ -136,24 +136,47 @@ export const initMessageResponseConsumer = () => {
             });
             }
           } else {
-            const msg = await Message.findOne({
-              where: { id: message.messageId }
+            const whats = await Whatsapp.findOne({
+              where: {
+                name: message.session,
+                status: "CONNECTED",
+                deleted: false,
+              }
             });
-  
-            const ticket = await Ticket.findOne({
-              where: { id: msg.ticketId }
-            });
-  
-            await msg.update({ ack: 5 });
-            await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
 
-            await msg.reload();
-
-            const io = getIO();
-            io.emit(`appMessage${ticket.companyId}`, {
-              action: "update",
-              message: msg
-            });
+            if (whats) {
+              const headers = {
+                "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+              };
+              
+              const params = {
+                MessageBody: JSON.stringify({ message, headers }),
+                QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+                DelaySeconds: 5
+              }
+              
+              await sendMessageToSQS(params);
+            } else {
+              const msg = await Message.findOne({
+                where: { id: message.messageId }
+              });
+    
+              const ticket = await Ticket.findOne({
+                where: { id: msg.ticketId }
+              });
+    
+              await msg.update({ ack: 5 });
+              await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
+  
+              await msg.reload();
+  
+              const io = getIO();
+              io.emit(`appMessage${ticket.companyId}`, {
+                action: "update",
+                message: msg
+              });
+            }
           }
         } catch (err) {
           console.log(err);
