@@ -147,6 +147,18 @@ class FileRegister extends Model<FileRegister> {
   @AllowNull(true)
   @Column
   var5: string;
+
+  @AllowNull(true)
+  @Column
+  input1: string;
+
+  @AllowNull(true)
+  @Column
+  input2: string;
+
+  @AllowNull(true)
+  @Column
+  input3: string;
 }
 
 export default FileRegister;

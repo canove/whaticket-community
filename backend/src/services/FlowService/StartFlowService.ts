@@ -574,6 +574,49 @@ const processNode = async (node: any, session: any, body: any) => {
     return {};
   }
 
+  if (node.type === "database-save-node") {
+    try {
+      const input = node.input;
+      let value = node.value;
+      
+      // if (value.includes("{{text}}") && body.variables) {
+      //   let newValue = body.variables.lastText || "";
+      //   value = value.replace("{{text}}", newValue);
+      // }
+
+      if (value.includes("{{text}}")) {
+        value = value.replace("{{text}}", body.text);
+      }
+
+      const reg = await FileRegister.findOne({
+        attributes: ["id"],
+        where: {
+          [Op.or]: [
+            { phoneNumber: session.id } ,
+            { phoneNumber: 
+              { 
+                [Op.or]: [
+                  removePhoneNumberWith9Country(session.id),
+                  preparePhoneNumber9Digit(session.id),
+                  removePhoneNumber9Digit(session.id),
+                  removePhoneNumberCountry(session.id),
+                  removePhoneNumber9DigitCountry(session.id)
+                ],
+              }
+            }
+          ],
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+
+      await reg.update({ [input]: value });
+    } catch (err) {
+      return {};
+    }
+  }
+
   return {};
 }
 
@@ -764,6 +807,7 @@ const StartFlowService = async ({
     console.log("update session startFlowService 529");
     await session.update({
       nodeId: nextNode.id,
+      // variables: JSON.stringify({ ...variables, lastText: body.text })
     });
   }
 
@@ -837,6 +881,15 @@ const StartFlowService = async ({
   // }
 
   if (node.type === "message-condition-node") {
+    return await StartFlowService({
+      flowNodeId,
+      sessionId,
+      companyId,
+      body: { ...body, variables }
+    });
+  }
+
+  if (node.type === "database-save-node") {
     return await StartFlowService({
       flowNodeId,
       sessionId,
