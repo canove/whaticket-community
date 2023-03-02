@@ -21,6 +21,7 @@ import { DatabaseNodeFactory } from './nodes/Database/DatabaseNodeFactory';
 import { MessageConditionNodeFactory } from './nodes/MessageCondition/MessageConditionNodeFactory';
 import { MultipleMessagesNodeFactory } from './nodes/MultipleMessages/MultipleMessagesNodeFactory';
 import { JumpNodeFactory } from './nodes/Jump/JumpNodeFactory';
+import { DatabaseSaveNodeFactory } from './nodes/DatabaseSave/DatabaseSaveNodeFactory';
 
 export class Application {
 	constructor() {
@@ -45,6 +46,7 @@ export class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new MessageConditionNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new MultipleMessagesNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new JumpNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new DatabaseSaveNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());
