@@ -81,6 +81,9 @@ class Message extends Model<Message> {
   @Column
   billingProcessedAt: Date
 
+  @Column
+  footer: string
+
   // Para Relatório
   lastMessage: string;
 }

@@ -95,14 +95,15 @@ export const initMessageResponseConsumer = () => {
                 "session": message.session,
                 "id": msgWhatsId,
                 "fromMe": true,
-                "bot":true,
+                "bot": true,
                 "isGroup":false,
-                "type": message.type == 'file'? 'document': message.type,
+                "type": message.type == 'file' ? 'document' : message.type,
                 "to": message.number,
-                "from":message.session,
+                "from": message.session,
                 "body": body,
                 "mediaUrl": mediaUrl,
-                "contactName": message.contactName
+                "contactName": message.contactName,
+                "templateButtons": message.templateButtons ? message.templateButtons : null
              });
 
              const whats = await Whatsapp.findOne({

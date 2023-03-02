@@ -51,17 +51,18 @@ const ChipsReports = () => {
     const [hasMore, setHasMore] = useState(false);
     const [count, setCount] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
+    const [date, setDate] = useState("");
 
     useEffect(() => {
         setPageNumber(1);
-    }, [searchParam, status]);
+    }, [searchParam, status, date]);
 
     useEffect(() => {
         setLoading(true);
         const fetchReports = async () => {
             try {
                 const { data } = await api.get('/whatsapp/listReport/', {
-                    params: { searchParam, status, pageNumber }
+                    params: { searchParam, status, pageNumber, date }
                 });
                 setReports(data.reports);
                 setHasMore(data.hasMore);
@@ -74,7 +75,7 @@ const ChipsReports = () => {
         }
 
         fetchReports();
-    }, [searchParam, status, pageNumber]);
+    }, [searchParam, status, pageNumber, date]);
 
     const handleSearchParamChange = (e) => {
         setSearchParam(e.target.value);
@@ -91,6 +92,18 @@ const ChipsReports = () => {
                 <MainHeaderButtonsWrapper>
                     <div style={{ display: "flex", alignItems: "end" }}>
                         <TextField
+                            onChange={(e) => {
+                                setDate(e.target.value);
+                            }}
+                            value={date}
+                            label={"Data"}
+                            InputLabelProps={{ shrink: true, required: true }}
+                            type="date"
+                        />
+                        <TextField
+                            style={{
+                                marginLeft: "10px",
+                            }}
                             placeholder={i18n.t("chipReports.grid.phoneNumber")}
                             type="search"
                             value={searchParam}
@@ -105,7 +118,7 @@ const ChipsReports = () => {
                         />
                         <FormControl
                             style={{
-                                margin: "0 10px",
+                                marginLeft: "10px",
                             }}
                         >
                             <InputLabel id="status-select-label">
