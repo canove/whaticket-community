@@ -5,9 +5,9 @@ import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSess
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 import TestWhatsAppConnectionService from "../services/WhatsappService/TestWhatsAppConnectionService";
 import { logger } from "../utils/logger";
-import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
 
+/*eslint-disable */
 type IndexQuery = {
   connectionId: string | number;
   whatsappAccountId: string;
@@ -44,9 +44,11 @@ const update = async (req: Request, res: Response): Promise<Response> => {
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   
-  const whats = await ShowWhatsAppService(whatsappId, companyId);
+  //const whats = await ShowWhatsAppService(whatsappId, companyId);
 
-  const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
+ /* const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
+
+ REMOVIDO ESTE CODIGO PQ AGORA NAO E NECESSARIO VALIDAR
 
   const payload = {
     companyId,
@@ -67,7 +69,7 @@ const update = async (req: Request, res: Response): Promise<Response> => {
         }
       throw new AppError(err.response.data.message);
     }
-  }
+  }*/
 
   const { whatsapp } = await UpdateWhatsAppService({
     whatsappId,

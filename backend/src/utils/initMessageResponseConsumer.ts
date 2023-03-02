@@ -41,34 +41,49 @@ export const initMessageResponseConsumer = () => {
             const ack = 1;
             const msgWhatsId = response.messageId;
 
-            if (message.messageId) {
-              await Message.update({
-                id: msgWhatsId,
-                ack
-              }, {
-                where: {
-                  id: message.messageId
-                }
-              });
+            if (message.messageId) { 
 
-              const msg = await Message.findOne({
-                where: {
-                  id: msgWhatsId
+              if (!msgWhatsId) {
+                const headers = {
+                  "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                  "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+                };
+                
+                const params = {
+                  MessageBody: JSON.stringify({ message, headers }),
+                  QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+                  DelaySeconds: 10
                 }
-              });
+                
+                await sendMessageToSQS(params);
+              } else {
+                await Message.update({
+                  id: msgWhatsId,
+                  ack
+                }, {
+                  where: {
+                    id: message.messageId
+                  }
+                });
+  
+                const msg = await Message.findOne({
+                  where: {
+                    id: msgWhatsId
+                  }
+                });
+      
+                const ticket = await Ticket.findOne({
+                  where: { id: msg.ticketId }
+                });
     
-              const ticket = await Ticket.findOne({
-                where: { id: msg.ticketId }
-              });
-  
-              await ticket.update({ lastMessage: message.text });
-  
-              const io = getIO();
-              io.emit(`appMessage${ticket.companyId}`, {
-                action: "update",
-                message: msg
-              });
-
+                await ticket.update({ lastMessage: message.text });
+    
+                const io = getIO();
+                io.emit(`appMessage${ticket.companyId}`, {
+                  action: "update",
+                  message: msg
+                });
+              }
             } else {
               let mediaUrl = '';
               let body = message.text;

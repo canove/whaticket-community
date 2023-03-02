@@ -92,14 +92,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   const { companyId } = req.user;
 
+  /*
   const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
 
-  const payload = {
+   const payload = {
     companyId,
     service
   };
-
-  if(!official) {
+  
+  if(!official) { REMOVIDO ESTE CODIGO PQ AGORA NAO E NECESSARIO VALIDAR
     try {
       await axios.post(apiUrl, payload, {
         headers: {
@@ -113,7 +114,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         }
       throw new AppError(err.response.data.message);
     }
-  }
+  }*/
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
