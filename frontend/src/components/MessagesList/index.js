@@ -11,6 +11,8 @@ import {
   Divider,
   IconButton,
   makeStyles,
+  Tooltip,
+  Typography,
 } from "@material-ui/core";
 import {
   AccessTime,
@@ -486,7 +488,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
 			)
 		} else return (<></>)
 	}*/
-  else if (message.mediaType === "image") {
+  else if (message.mediaType === "image" || message.mediaType === "buttons") {
       return <ModalImageCors imageUrl={message.mediaUrl} />;
     } else if (message.mediaType === "audio") {
       return (
@@ -621,6 +623,49 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
     );
   };
 
+  const renderFooter = (message) => {
+    const footer = JSON.parse(message.footer);
+    if (!footer) return "";
+
+    return (
+      <div style={{ marginTop: "2px", flexWrap: "wrap" }}>
+        {footer.text && <MarkdownWrapper>{footer.text}</MarkdownWrapper>}
+        {footer.buttons && footer.buttons.map(button => {
+          let text = "";
+          let tooltip = "";
+
+          if (button.urlButton) {
+            text = button.urlButton.displayText;
+            tooltip = "LINK: " + button.urlButton.url;
+          }
+
+          if (button.callButton) {
+            text = button.callButton.displayText;
+            tooltip = "PHONE NUMBER: " + button.callButton.phoneNumber;
+          }
+
+          if (button.quickReplyButton) {
+            text = button.quickReplyButton.displayText;
+            tooltip = "ID: " + button.quickReplyButton.id;
+          }
+
+          return (
+            <Tooltip title={tooltip}>
+              <Button
+                key={button.index}
+                variant="outlined"
+                style={{ margin: "2px" }}
+                fullWidth
+              >
+                {text}
+              </Button>
+            </Tooltip>
+          )
+        })}
+      </div>
+    );
+  }
+
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
@@ -691,6 +736,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
                   )}
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
+                  {message.footer && renderFooter(message)}
                   <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
                     {renderMessageAck(message)}

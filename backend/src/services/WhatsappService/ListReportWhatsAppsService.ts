@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import FileRegister from "../../database/models/FileRegister";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 
 interface WhatsReports {
   whatsapp: Whatsapp;
@@ -14,6 +15,7 @@ interface Request {
   searchParam?: string;
   status?: string;
   pageNumber?: string;
+  date?: string;
 }
 
 interface Response {
@@ -31,13 +33,20 @@ const ListReportWhatsAppsService = async ({
   searchParam,
   status,
   companyId,
-  pageNumber
+  pageNumber,
+  date
 }: Request): Promise<Response> => {
   let whatsCondition = null;
+  let regCondition = null;
 
   whatsCondition = {
     id: Sequelize.literal('FileRegister.whatsappId'),
     deleted: false
+  };
+
+  regCondition = { 
+    whatsappId: { [Op.ne]: null }, 
+    companyId 
   };
 
   if (status === "deleted") whatsCondition = { ...whatsCondition, deleted: true };
@@ -51,11 +60,20 @@ const ListReportWhatsAppsService = async ({
     }
   }
 
+  if (date) {
+    regCondition = {
+      ...regCondition,
+      createdAt: {
+        [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
+      },
+    }
+  }
+
   const limit = 10;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: whatsReports }: ReportData = await FileRegister.findAndCountAll({
-    where: { whatsappId: { [Op.ne]: null }, companyId },
+    where: regCondition,
     attributes: [
       "whatsappId",
       [Sequelize.fn("COUNT", Sequelize.col("whatsappId")), "qtdeRegisters"],

@@ -41,34 +41,48 @@ export const initMessageResponseConsumer = () => {
             const ack = 1;
             const msgWhatsId = response.messageId;
 
-            if (message.messageId) {
-              await Message.update({
-                id: msgWhatsId,
-                ack
-              }, {
-                where: {
-                  id: message.messageId
+            if (message.messageId) { 
+              if (!msgWhatsId) {
+                const headers = {
+                  "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                  "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+                };
+                
+                const params = {
+                  MessageBody: JSON.stringify({ message, headers }),
+                  QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+                  DelaySeconds: 10
                 }
-              });
-
-              const msg = await Message.findOne({
-                where: {
-                  id: msgWhatsId
-                }
-              });
+                
+                await sendMessageToSQS(params);
+              } else {
+                await Message.update({
+                  id: msgWhatsId,
+                  ack
+                }, {
+                  where: {
+                    id: message.messageId
+                  }
+                });
+  
+                const msg = await Message.findOne({
+                  where: {
+                    id: msgWhatsId
+                  }
+                });
+      
+                const ticket = await Ticket.findOne({
+                  where: { id: msg.ticketId }
+                });
     
-              const ticket = await Ticket.findOne({
-                where: { id: msg.ticketId }
-              });
-  
-              await ticket.update({ lastMessage: message.text });
-  
-              const io = getIO();
-              io.emit(`appMessage${ticket.companyId}`, {
-                action: "update",
-                message: msg
-              });
-
+                await ticket.update({ lastMessage: message.text });
+    
+                const io = getIO();
+                io.emit(`appMessage${ticket.companyId}`, {
+                  action: "update",
+                  message: msg
+                });
+              }
             } else {
               let mediaUrl = '';
               let body = message.text;
@@ -95,45 +109,25 @@ export const initMessageResponseConsumer = () => {
                 "session": message.session,
                 "id": msgWhatsId,
                 "fromMe": true,
-                "bot":true,
+                "bot": true,
                 "isGroup":false,
-                "type": message.type == 'file'? 'document': message.type,
+                "type": message.type == 'file' ? 'document' : message.type,
                 "to": message.number,
-                "from":message.session,
+                "from": message.session,
                 "body": body,
                 "mediaUrl": mediaUrl,
-                "contactName": message.contactName
+                "contactName": message.contactName,
+                "templateButtons": message.templateButtons ? message.templateButtons : null
              });
 
-             const whats = await Whatsapp.findOne({
-              where: {
-                name: message.session,
-                deleted: false,
-              }
-             });
+             const reg = await getRegister(message);
 
-             const reg = await FileRegister.findOne({
-              where: {
-                phoneNumber: 
-                { 
-                  [Op.or]: [
-                    removePhoneNumberWith9Country(message.number),
-                    preparePhoneNumber9Digit(message.number),
-                    removePhoneNumber9Digit(message.number),
-                    removePhoneNumberCountry(message.number),
-                    removePhoneNumber9DigitCountry(message.number)
-                  ],
-                },
-                companyId: whats.companyId,
-                processedAt: { [Op.ne]: null }
-              },
-              order: [["createdAt", "DESC"]]
-            });
-
-            await reg.update({
-              sentAt: new Date(),
-              msgWhatsId: msgWhatsId
-            });
+            if (reg) {
+              await reg.update({
+                sentAt: new Date(),
+                msgWhatsId: msgWhatsId
+              });
+            }
             }
           } else {
             const whats = await Whatsapp.findOne({
@@ -144,39 +138,51 @@ export const initMessageResponseConsumer = () => {
               }
             });
 
-            if (whats) {
-              const headers = {
-                "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-                "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
-              };
-              
-              const params = {
-                MessageBody: JSON.stringify({ message, headers }),
-                QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
-                DelaySeconds: 5
+            if (response.message === "O telefone informado nao esta registrado no whatsapp.") {
+              const reg = await getRegister(message);
+
+              if (reg) {
+                await reg.update({
+                  sentAt: new Date(),
+                  haveWhatsapp: false 
+                });
               }
-              
-              await sendMessageToSQS(params);
             } else {
-              const msg = await Message.findOne({
-                where: { id: message.messageId }
-              });
+              if (whats) {
+                const headers = {
+                  "api-key": `${process.env.WPPNOF_API_TOKEN}`,
+                  "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+                };
+                
+                const params = {
+                  MessageBody: JSON.stringify({ message, headers }),
+                  QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
+                  DelaySeconds: 5
+                }
+                
+                await sendMessageToSQS(params);
+              } else {
+                const msg = await Message.findOne({
+                  where: { id: message.messageId }
+                });
+      
+                const ticket = await Ticket.findOne({
+                  where: { id: msg.ticketId }
+                });
+      
+                await msg.update({ ack: 5 });
+                await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
     
-              const ticket = await Ticket.findOne({
-                where: { id: msg.ticketId }
-              });
+                await msg.reload();
     
-              await msg.update({ ack: 5 });
-              await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
-  
-              await msg.reload();
-  
-              const io = getIO();
-              io.emit(`appMessage${ticket.companyId}`, {
-                action: "update",
-                message: msg
-              });
+                const io = getIO();
+                io.emit(`appMessage${ticket.companyId}`, {
+                  action: "update",
+                  message: msg
+                });
+              }
             }
+
           }
         } catch (err) {
           console.log(err);
@@ -195,3 +201,32 @@ export const initMessageResponseConsumer = () => {
 
   app.start();
 };
+
+const getRegister = async (message) => {
+  const whats = await Whatsapp.findOne({
+    where: {
+      name: message.session,
+      deleted: false,
+    }
+   });
+
+  const reg = await FileRegister.findOne({
+    where: {
+      phoneNumber: 
+      { 
+        [Op.or]: [
+          removePhoneNumberWith9Country(message.number),
+          preparePhoneNumber9Digit(message.number),
+          removePhoneNumber9Digit(message.number),
+          removePhoneNumberCountry(message.number),
+          removePhoneNumber9DigitCountry(message.number)
+        ],
+      },
+      companyId: whats.companyId,
+      processedAt: { [Op.ne]: null }
+    },
+    order: [["createdAt", "DESC"]]
+  });
+
+  return reg;
+}

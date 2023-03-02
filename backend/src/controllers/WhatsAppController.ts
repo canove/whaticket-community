@@ -92,14 +92,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   const { companyId } = req.user;
 
+  /*
   const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;
 
-  const payload = {
+   const payload = {
     companyId,
     service
   };
-
-  if(!official) {
+  
+  if(!official) { REMOVIDO ESTE CODIGO PQ AGORA NAO E NECESSARIO VALIDAR
     try {
       await axios.post(apiUrl, payload, {
         headers: {
@@ -113,7 +114,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         }
       throw new AppError(err.response.data.message);
     }
-  }
+  }*/
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -582,13 +583,14 @@ type ListReportQuery = {
   searchParam: string;
   status: string;
   pageNumber: string;
+  date: string;
 }
 
 export const listReport = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, status, pageNumber } = req.query as ListReportQuery;
+  const { searchParam, status, pageNumber, date } = req.query as ListReportQuery;
   const { companyId } = req.user;
 
-  const { reports, count, hasMore } = await ListReportWhatsAppsService({ searchParam, companyId, status, pageNumber });
+  const { reports, count, hasMore } = await ListReportWhatsAppsService({ searchParam, companyId, status, pageNumber, date });
 
   return res.status(200).json({
     reports, 
@@ -706,7 +708,7 @@ export const botMessageApi = async (req: Request, res: Response) => {
 }
 
 export const botMessage = async (payload) => {
-  const { fromMe, to, body, cation, contactName, session, bot, id, type, mediaUrl } = payload;
+  const { fromMe, to, body, cation, contactName, session, bot, id, type, mediaUrl, templateButtons } = payload;
 
   if (!fromMe) {
     const message = await newMessage(payload);
@@ -742,7 +744,8 @@ export const botMessage = async (payload) => {
     whatsMsgId: id,
     cation,
     type,
-    mediaUrl
+    mediaUrl,
+    templateButtons
   });
 
   return true;

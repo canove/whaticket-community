@@ -34,6 +34,7 @@ interface Request {
   cation?: string;
   type?: string;
   mediaUrl?: string;
+  templateButtons?: any;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -46,7 +47,8 @@ const SendWhatsAppMessage = async ({
   whatsMsgId,
   cation,
   type,
-  mediaUrl
+  mediaUrl,
+  templateButtons
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -209,6 +211,19 @@ const SendWhatsAppMessage = async ({
         }
       }
 
+      let footer = null;
+
+      if (type === "buttons") {
+        bodyType = "buttons";
+
+        if (templateButtons.image) url = templateButtons.image.url;
+
+        footer = JSON.stringify({
+          text: templateButtons.footer,
+          buttons: templateButtons.templateButtons
+        });
+      }
+
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
         ack: 0,
@@ -221,7 +236,8 @@ const SendWhatsAppMessage = async ({
         mediaType: bodyType ? bodyType : type,
         quotedMsgId: null,
         bot: (ticket.status == 'inbot' || bot),
-        companyId
+        companyId,
+        footer
       };
 
       await ticket.update({ lastMessage: body });
@@ -234,7 +250,7 @@ const SendWhatsAppMessage = async ({
           "number": phoneNumber,
           "path": url,
           "text": fileName != null && fileName != '' ? fileName : `${formatBody(body, reg)}`,
-          "type": bodyType == '' ?type: bodyType
+          "type": bodyType == '' ? type : bodyType
         };
   
         const headers = {
