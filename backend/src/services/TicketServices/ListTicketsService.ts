@@ -17,6 +17,7 @@ interface Request {
   withUnreadMessages?: string;
   queueIds: number[];
   companyId: string | number;
+  categoryId: string;
 }
 
 interface Response {
@@ -34,7 +35,8 @@ const ListTicketsService = async ({
   showAll,
   userId,
   withUnreadMessages,
-  companyId
+  companyId,
+  categoryId
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
@@ -65,6 +67,13 @@ const ListTicketsService = async ({
       ...whereCondition,
       status
     };
+  }
+
+  if (categoryId) {
+    whereCondition = {
+      ...whereCondition,
+      categoryId
+    }
   }
 
   if (searchParam) {

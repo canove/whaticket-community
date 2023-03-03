@@ -20,8 +20,10 @@ import TabPanel from "../TabPanel";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import TicketsQueueSelect from "../TicketsQueueSelect";
-import { Button } from "@material-ui/core";
+import { Button, FormControl, ListItemText, MenuItem, Select } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
 
 const useStyles = makeStyles((theme) => ({
   ticketsWrapper: {
@@ -109,10 +111,24 @@ const TicketsManager = () => {
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
+  const [categories, setCategories] = useState([]);
+  const [categoryId, setCategoryId] = useState("");
+
   useEffect(() => {
     // if (user.profile.toUpperCase() === "ADMIN") {
     //   setShowAllTickets(true);
     // }
+
+    const fetchCategories = async () => {
+      try {
+        const { data } = await api.get("/category/");
+        setCategories(data);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -154,6 +170,10 @@ const TicketsManager = () => {
     }
   };
 
+  const handleCategoryChange = e => {
+		setCategoryId(e.target.value);
+	};
+
   return (
     <Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
       <NewTicketModal
@@ -190,18 +210,27 @@ const TicketsManager = () => {
         </Tabs>
       </Paper>
       <Paper square elevation={0} className={classes.ticketOptionsBox}>
-        {tab === "search" ? (
-          <div className={classes.serachInputWrapper}>
-            <SearchIcon className={classes.searchIcon} />
-            <InputBase
-              className={classes.searchInput}
-              inputRef={searchInputRef}
-              placeholder={i18n.t("tickets.search.placeholder")}
-              type="search"
-              onChange={handleSearch}
+        {tab === "search" && (
+          <>
+            <div className={classes.serachInputWrapper}>
+              <SearchIcon className={classes.searchIcon} />
+              <InputBase
+                className={classes.searchInput}
+                inputRef={searchInputRef}
+                placeholder={i18n.t("tickets.search.placeholder")}
+                type="search"
+                onChange={handleSearch}
+              />
+            </div>
+            <TicketsQueueSelect
+              style={{ marginLeft: 6 }}
+              selectedQueueIds={selectedQueueIds}
+              userQueues={user?.queues}
+              onChange={(values) => setSelectedQueueIds(values)}
             />
-          </div>
-        ) : (
+          </>
+        )}
+        {tab === "open" && (
           <>
             <Button
               variant="outlined"
@@ -231,14 +260,99 @@ const TicketsManager = () => {
                 />
               )}
             />
+            <TicketsQueueSelect
+              style={{ marginLeft: 6 }}
+              selectedQueueIds={selectedQueueIds}
+              userQueues={user?.queues}
+              onChange={(values) => setSelectedQueueIds(values)}
+            />
           </>
         )}
-        <TicketsQueueSelect
-          style={{ marginLeft: 6 }}
-          selectedQueueIds={selectedQueueIds}
-          userQueues={user?.queues}
-          onChange={(values) => setSelectedQueueIds(values)}
-        />
+        {tab === "closed" && (
+          <div style={{ width: "100%" }}>
+            <Can
+              role={user.profiles}
+              perform="tickets-manager:showall"
+              yes={() => (
+                <div 
+                  style={{ 
+                    textAlign: "center", 
+                    width: "100%", 
+                    marginBottom: "10px",
+                  }}
+                >
+                  <FormControlLabel
+                    label={i18n.t("tickets.buttons.showAll")}
+                    labelPlacement="start"
+                    control={
+                      <Switch
+                        size="small"
+                        checked={showAllTickets}
+                        onChange={() =>
+                          setShowAllTickets((prevState) => !prevState)
+                        }
+                        name="showAllTickets"
+                        color="primary"
+                      />
+                    }
+                  />
+                </div>
+              )}
+            />
+            <div 
+              style={{ 
+                display: "flex", 
+                flexWrap: "wrap", 
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px"
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setNewTicketModalOpen(true)}
+              >
+                {i18n.t("ticketsManager.buttons.newTicket")}
+              </Button>
+              <div style={{ width: 120, marginTop: -4 }}>
+                <FormControl fullWidth margin="dense">
+                  <Select
+                    displayEmpty
+                    variant="outlined"
+                    value={categoryId}
+                    onChange={handleCategoryChange}
+                    MenuProps={{
+                      anchorOrigin: {
+                        vertical: "bottom",
+                        horizontal: "left",
+                      },
+                      transformOrigin: {
+                        vertical: "top",
+                        horizontal: "left",
+                      },
+                      getContentAnchorEl: null,
+                    }}
+                    renderValue={() => "Categoria"}
+                  >
+                    {categories?.length > 0 &&
+                      categories.map(category => (
+                        <MenuItem dense key={category.id} value={category.id}>
+                          <ListItemText primary={category.name} />
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              </div>
+              <TicketsQueueSelect
+                style={{ marginLeft: 6 }}
+                selectedQueueIds={selectedQueueIds}
+                userQueues={user?.queues}
+                onChange={(values) => setSelectedQueueIds(values)}
+              />
+            </div>
+          </div>
+        )}
       </Paper>
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
         <Tabs
@@ -296,6 +410,7 @@ const TicketsManager = () => {
           status="closed"
           showAll={true}
           selectedQueueIds={selectedQueueIds}
+          categoryId={categoryId}
         />
       </TabPanel>
       <TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
