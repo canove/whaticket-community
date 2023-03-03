@@ -38,7 +38,6 @@ export const initMessageResponseConsumer = () => {
         */
         try {
           if (code === 200) {    
-            const ack = 1;
             const msgWhatsId = response.messageId;
 
             if (message.messageId) { 
@@ -58,7 +57,7 @@ export const initMessageResponseConsumer = () => {
               } else {
                 await Message.update({
                   id: msgWhatsId,
-                  ack
+                  ack: 1
                 }, {
                   where: {
                     id: message.messageId
@@ -76,6 +75,8 @@ export const initMessageResponseConsumer = () => {
                 });
     
                 await ticket.update({ lastMessage: message.text });
+
+                await msg.reload();
     
                 const io = getIO();
                 io.emit(`appMessage${ticket.companyId}`, {
