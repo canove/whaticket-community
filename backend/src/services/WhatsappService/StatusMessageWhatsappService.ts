@@ -103,16 +103,16 @@ const StatusMessageWhatsappService = async ({
       message: msgRegister
     });
 
-    return { success: true }
+    // return { success: true }
    }
   }
 
   if (!register) {
-    return { success: false };
+    return { success: true };
   }
 
   console.log("update FileRegister statusmessageservice 103");
-  switch(statusType){
+  switch(statusType.toLowerCase()){
     case "sent":
       await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId });
 
