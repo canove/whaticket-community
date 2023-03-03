@@ -67,7 +67,7 @@ const StatusMessageWhatsappService = async ({
     });
   }
 
-  if (!register && msgWhatsId) {
+  if (msgWhatsId) {
     const msgRegister = await Message.findOne({
       where: {
         id: msgWhatsId
