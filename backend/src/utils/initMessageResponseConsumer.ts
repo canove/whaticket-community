@@ -37,7 +37,7 @@ export const initMessageResponseConsumer = () => {
         {"session":"551151968683","number":"554195891447","text":"Olá, ADILSON DA SILVA ALVES, tudo bem? Aqui é da Pefisa/Pernambucanas! Temos uma informação IMPORTANTE para você! Caso possa conversa, digite SIM.","path":"Olá, ADILSON DA SILVA ALVES, tudo bem? Aqui é da Pefisa/Pernambucanas! Temos uma informação IMPORTANTE para você! Caso possa conversa, digite SIM.","type":"text","buttons":[]}
         */
         try {
-          if (code === 200) {    
+          if (code === 200 && response && response.message != 'sessão inválida ou inexistente') {    
             const msgWhatsId = response.messageId;
 
             if (message.messageId) { 
@@ -50,7 +50,7 @@ export const initMessageResponseConsumer = () => {
                 const params = {
                   MessageBody: JSON.stringify({ message, headers }),
                   QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
-                  DelaySeconds: 10
+                  DelaySeconds: 60
                 }
                 
                 await sendMessageToSQS(params);
@@ -149,7 +149,7 @@ export const initMessageResponseConsumer = () => {
                 });
               }
             } else {
-              if (whats) {
+              if (whats && response.message == 'sessão inválida ou inexistente') {
                 const headers = {
                   "api-key": `${process.env.WPPNOF_API_TOKEN}`,
                   "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
@@ -158,7 +158,7 @@ export const initMessageResponseConsumer = () => {
                 const params = {
                   MessageBody: JSON.stringify({ message, headers }),
                   QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
-                  DelaySeconds: 5
+                  DelaySeconds: 60
                 }
                 
                 await sendMessageToSQS(params);
