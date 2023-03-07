@@ -57,6 +57,9 @@ class Company extends Model<Company> {
   @Column
   address: string;
 
+  @Column
+  onlyOwnedMessages: boolean;
+
   @AllowNull(false)
   @Default("ativo")
   @Column

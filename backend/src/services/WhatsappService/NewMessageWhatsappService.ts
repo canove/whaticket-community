@@ -16,7 +16,10 @@ import FileRegister from "../../database/models/FileRegister";
 import Company from "../../database/models/Company";
 import axios from "axios";
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
-import { removePhoneNumber9Digit } from "../../utils/common";
+import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
+import ShowCompanyService from "../CompanyService/ShowCompanyService";
+import { Op } from "sequelize";
+
 /*eslint-disable*/
 interface Request {
   id: string;
@@ -94,7 +97,7 @@ const NewMessageWhatsappService = async ({
       type,
       isGroup
     });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
   // eslint-disable-next-line no-use-before-define
@@ -212,6 +215,31 @@ const handleMessage = async (
     if (!whatsapp) throw "number identification not found";
 
     const contact = await verifyContact(contactName, from, whatsapp.companyId);
+
+    const company = await ShowCompanyService(whatsapp.companyId);
+
+    if (company.onlyOwnedMessages) {
+      const reg = await FileRegister.findOne({
+        where: { 
+            companyId: whatsapp.companyId,
+            phoneNumber: 
+              { 
+                [Op.or]: [
+                  removePhoneNumberWith9Country(contact.number),
+                  preparePhoneNumber9Digit(contact.number),
+                  removePhoneNumber9Digit(contact.number),
+                  removePhoneNumberCountry(contact.number),
+                  removePhoneNumber9DigitCountry(contact.number)
+                ],
+              },
+            whatsappId: whatsapp.id
+        },
+        order: [['createdAt', 'DESC']]
+      });
+
+      if (!reg) throw `company only owned messages: reg not found in this company.`;
+    }
+
     const ticket = await FindOrCreateTicketService(
       contact,
       whatsapp.id,

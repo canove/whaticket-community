@@ -11,6 +11,8 @@ import {
   CircularProgress,
   TextField,
   Typography,
+  FormControlLabel,
+  Switch,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -74,6 +76,7 @@ const UserSchema = Yup.object().shape({
   const [company, setCompany] = useState(initialState);
   const [textAlias, setTextAlias] = useState("");
   const [logo, setLogo] = useState();
+  const [onlyOwnedMessages, setOnlyOwnedMessages] = useState(false);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -83,6 +86,7 @@ const UserSchema = Yup.object().shape({
         setCompany((prevState) => {
           return { ...prevState, ...data };
         });
+        setOnlyOwnedMessages(data.onlyOwnedMessages ? true : false);
         setLogo(data.logo);
       } catch (err) {
         toastError(err);
@@ -104,7 +108,7 @@ const UserSchema = Yup.object().shape({
 
   const handleSaveCompany = async (values) => {
     const uploadLogo = async (logo, compId) => {
-      if (compId && logo) {
+      if (compId && logo && logo.name) {
         const formData = new FormData();
         formData.append("file", logo, logo.name);
         formData.set("name", logo.name);
@@ -119,7 +123,7 @@ const UserSchema = Yup.object().shape({
       return null;
     }
 
-    const companyData = { ...values };
+    const companyData = { ...values, onlyOwnedMessages };
 
     if (companyId) {
       try {
@@ -129,6 +133,7 @@ const UserSchema = Yup.object().shape({
         }
         toast.success(i18n.t("company.update"));
       } catch (err) {
+        console.log(err);
         toastError(err);
       }
     } else {
@@ -307,6 +312,22 @@ const UserSchema = Yup.object().shape({
                     variant="outlined"
                     margin="dense"
                     fullWidth
+                  />
+                </div>
+                <div className={classes.multFieldLine}>
+                  <FormControlLabel
+                    label={"Só Receber Mensagens com Disparo"}
+                    labelPlacement="start"
+                    control={
+                      <Switch
+                        size="small"
+                        checked={onlyOwnedMessages}
+                        onChange={() =>
+                          setOnlyOwnedMessages((prevState) => !prevState)
+                        }
+                        color="primary"
+                      />
+                    }
                   />
                 </div>
                 <div className={classes.multFieldLine}>
