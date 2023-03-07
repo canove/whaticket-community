@@ -65,7 +65,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
-  const { companyId } = req.user;
+  const { companyId, id } = req.user;
 
   let queueIds: number[] = [];
 
@@ -83,7 +83,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     queueIds,
     withUnreadMessages,
     companyId,
-    categoryId
+    categoryId,
+    loggedUserId: id
   });
 
   return res.status(200).json({ tickets, count, hasMore });

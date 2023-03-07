@@ -18,12 +18,12 @@ import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../Can";
 import TicketsQueueSelect from "../TicketsQueueSelect";
 import { Button, FormControl, ListItemText, MenuItem, Select } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
+import Can from "../Can";
 
 const useStyles = makeStyles((theme) => ({
   ticketsWrapper: {
@@ -240,9 +240,8 @@ const TicketsManager = () => {
               {i18n.t("ticketsManager.buttons.newTicket")}
             </Button>
             <Can
-              role={user.profiles}
-              perform="tickets-manager:showall"
-              yes={() => (
+              permission="tickets-manager:showall"
+              item={
                 <FormControlLabel
                   label={i18n.t("tickets.buttons.showAll")}
                   labelPlacement="start"
@@ -258,7 +257,26 @@ const TicketsManager = () => {
                     />
                   }
                 />
-              )}
+              }
+              // role={user.profiles}
+              // perform="tickets-manager:showall"
+              // yes={() => (
+                // <FormControlLabel
+                //   label={i18n.t("tickets.buttons.showAll")}
+                //   labelPlacement="start"
+                //   control={
+                //     <Switch
+                //       size="small"
+                //       checked={showAllTickets}
+                //       onChange={() =>
+                //         setShowAllTickets((prevState) => !prevState)
+                //       }
+                //       name="showAllTickets"
+                //       color="primary"
+                //     />
+                //   }
+                // />
+              // )}
             />
             <TicketsQueueSelect
               style={{ marginLeft: 6 }}
@@ -271,9 +289,8 @@ const TicketsManager = () => {
         {tab === "closed" && (
           <div style={{ width: "100%" }}>
             <Can
-              role={user.profiles}
-              perform="tickets-manager:showall"
-              yes={() => (
+              permission="tickets-manager:showall"
+              item={
                 <div 
                   style={{ 
                     textAlign: "center", 
@@ -297,7 +314,34 @@ const TicketsManager = () => {
                     }
                   />
                 </div>
-              )}
+              }
+              // role={user.profiles}
+              // perform="tickets-manager:showall"
+              // yes={() => (
+              //   <div 
+              //     style={{ 
+              //       textAlign: "center", 
+              //       width: "100%", 
+              //       marginBottom: "10px",
+              //     }}
+              //   >
+              //     <FormControlLabel
+              //       label={i18n.t("tickets.buttons.showAll")}
+              //       labelPlacement="start"
+              //       control={
+              //         <Switch
+              //           size="small"
+              //           checked={showAllTickets}
+              //           onChange={() =>
+              //             setShowAllTickets((prevState) => !prevState)
+              //           }
+              //           name="showAllTickets"
+              //           color="primary"
+              //         />
+              //       }
+              //     />
+              //   </div>
+              // )}
             />
             <div 
               style={{ 

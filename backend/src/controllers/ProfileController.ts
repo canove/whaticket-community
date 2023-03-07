@@ -5,6 +5,7 @@ import CreateProfileService from "../services/ProfileServices/CreateProfileServi
 import ShowProfileService from "../services/ProfileServices/ShowProfileService";
 import UpdateProfileService from "../services/ProfileServices/UpdateProfileService";
 import DeleteProfileService from "../services/ProfileServices/DeleteProfileService";
+import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService"
 
 import { getIO } from "../libs/socket";
 
@@ -40,6 +41,19 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.status(200).json(profile);
+};
+
+type CheckQuery = {
+  permission: string;
+} 
+
+export const check = async (req: Request, res: Response): Promise<Response> => {
+  const { permission } = req.query as CheckQuery;
+  const { companyId, profile } = req.user;
+
+  const response = await CheckProfilePermissionService({ profileId: profile, companyId, permission });
+
+  return res.status(200).json(response);
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {

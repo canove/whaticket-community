@@ -29,8 +29,8 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../Can";
 import { useTranslation } from "react-i18next";
+import Can from "../Can";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -264,9 +264,8 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 									>
 										<Can
-											role={loggedInUser.profiles}
-											perform="user-modal:editProfile"
-											yes={() => (
+											permission="user-modal:editProfile"
+											item={
 												<>
 													<InputLabel id="profile-selection-input-label">
 														{i18n.t("userModal.form.profile")}
@@ -284,7 +283,28 @@ const UserModal = ({ open, onClose, userId }) => {
 														))}
 													</Field>
 												</>
-											)}
+											}
+											// role={loggedInUser.profiles}
+											// perform="user-modal:editProfile"
+											// yes={() => (
+											// 	<>
+											// 		<InputLabel id="profile-selection-input-label">
+											// 			{i18n.t("userModal.form.profile")}
+											// 		</InputLabel>
+											// 		<Field
+											// 			as={Select}
+											// 			label={i18n.t("userModal.form.profile")}
+											// 			name="profileId"
+											// 			labelId="profile-selection-label"
+											// 			id="profile-selection"
+											// 			required
+											// 		>
+											// 			{profiles && profiles.map(profile => (
+											// 				<MenuItem key={profile.id} value={profile.id}>{profile.name}</MenuItem>
+											// 			))}
+											// 		</Field>
+											// 	</>
+											// )}
 										/>
 									</FormControl>
 								</div>
@@ -333,14 +353,21 @@ const UserModal = ({ open, onClose, userId }) => {
 									</div>
 								}
 								<Can
-									role={loggedInUser.profiles}
-									perform="user-modal:editQueues"
-									yes={() => (
+									permission="user-modal:editQueues"
+									item={
 										<QueueSelect
 											selectedQueueIds={selectedQueueIds}
 											onChange={values => setSelectedQueueIds(values)}
 										/>
-									)}
+									}
+									// role={loggedInUser.profiles}
+									// perform="user-modal:editQueues"
+									// yes={() => (
+									// 	<QueueSelect
+									// 		selectedQueueIds={selectedQueueIds}
+									// 		onChange={values => setSelectedQueueIds(values)}
+									// 	/>
+									// )}
 								/>
 							</DialogContent>
 							<DialogActions>

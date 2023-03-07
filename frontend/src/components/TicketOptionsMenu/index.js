@@ -7,9 +7,9 @@ import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
 import toastError from "../../errors/toastError";
-import { Can } from "../Can";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import Can from "../Can";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
@@ -70,13 +70,19 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 					{i18n.t("ticketOptionsMenu.transfer")}
 				</MenuItem>
 				<Can
-					role={user.profiles}
-					perform="ticket-options:deleteTicket"
-					yes={() => (
+					permission="ticket-options:deleteTicket"
+					item={
 						<MenuItem onClick={handleOpenConfirmationModal}>
 							{i18n.t("ticketOptionsMenu.delete")}
 						</MenuItem>
-					)}
+					}
+					// role={user.profiles}
+					// perform="ticket-options:deleteTicket"
+					// yes={() => (
+						// <MenuItem onClick={handleOpenConfirmationModal}>
+						// 	{i18n.t("ticketOptionsMenu.delete")}
+						// </MenuItem>
+					// )}
 				/>
 			</Menu>
 			<ConfirmationModal
