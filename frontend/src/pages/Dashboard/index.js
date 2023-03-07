@@ -154,6 +154,9 @@ const Dashboard = () => {
   const [queueCount, setQueueCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState([]);
 
+  const [sentMessageCount, setSentMessageCount] = useState(0);
+  const [receivedMessageCount, setReceivedMessageCount] = useState(0);
+
   // const [files, setFiles] = useState([]);
 
   const [fileId, setFileId] = useState("");
@@ -231,6 +234,9 @@ const Dashboard = () => {
 
       setCategoryCount(data.category);
       setConnectedWhatsapps(data.connectedWhatsapps);
+
+      setSentMessageCount(data.messages.sent || "0");
+      setReceivedMessageCount(data.messages.received || "0");
 
       setLoading(false);
     } catch (err) {
@@ -742,7 +748,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={4}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -753,6 +759,36 @@ const Dashboard = () => {
               <Grid item>
                 <Typography component="h1" variant="h4">
                   {noWhatsCount}
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                Mensagens Trafegadas Enviadas
+              </Typography>
+              <Grid item>
+                <Typography component="h1" variant="h4">
+                  {sentMessageCount}
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
+              <Typography component="h3" variant="h6" color="primary" paragraph>
+                Mensagens Trafegadas Recebidas
+              </Typography>
+              <Grid item>
+                <Typography component="h1" variant="h4">
+                  {receivedMessageCount}
                 </Typography>
               </Grid>
             </Paper>

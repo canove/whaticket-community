@@ -37,6 +37,7 @@ import officialWhatsappRoutes from "./officialWhatsappRoutes";
 import officialWhatsappReportRoutes from "./officialWhatsappReportRoutes"
 import profileRoutes from "./profileRoutes";
 import operationsRoutes from "./operationsRoutes"
+import generalReportsRoutes from "./generalReportsRoutes";
 
 const routes = Router();
 
@@ -77,5 +78,6 @@ routes.use(officialWhatsappRoutes);
 routes.use(officialWhatsappReportRoutes);
 routes.use(profileRoutes);
 routes.use(operationsRoutes);
+routes.use(generalReportsRoutes);
 
 export default routes;

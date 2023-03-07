@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { Op } from "sequelize";
 import FileRegister from "../database/models/FileRegister";
 import DashboardCategoryService from "../services/CategoryServices/DashboardCategoryService";
+import CountMessagesServices from "../services/MessageServices/CountMessagesService";
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
 import ListReportRegistersService from "../services/RegistersService/ListReportRegistersService";
 import GetConnectedWhatsAppsService from "../services/WhatsappService/GetConnectedWhatsAppsService";
@@ -39,7 +40,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
 
-  return res.status(200).json({ reports, category, connectedWhatsapps });
+  const messages = await CountMessagesServices({ companyId, date, initialDate, finalDate });
+
+  return res.status(200).json({ reports, category, connectedWhatsapps, messages });
 };
 
 type ChartQuery = {
