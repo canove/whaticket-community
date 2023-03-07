@@ -116,6 +116,9 @@ class FileRegister extends Model<FileRegister> {
   @Column
   companyId: number;
 
+  @BelongsTo(() => Company)
+  company: Company;
+
   @ForeignKey(() => File)
   @Column
   fileId: number;
