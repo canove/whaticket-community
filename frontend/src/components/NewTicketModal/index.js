@@ -19,12 +19,13 @@ import ContactModal from "../ContactModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import { Typography } from "@material-ui/core";
 
 const filter = createFilterOptions({
 	trim: true,
 });
 
-const NewTicketModal = ({ modalOpen, onClose }) => {
+const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 	const history = useHistory();
 	const { i18n } = useTranslation();
 
@@ -67,7 +68,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		setSelectedContact(null);
 	};
 
-	const handleSaveTicket = async contactId => {
+	const handleSaveTicket = async (contactId) => {
 		if (!contactId) return;
 		setLoading(true);
 		try {
@@ -75,6 +76,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 				contactId: contactId,
 				userId: user.id,
 				status: "open",
+				ticketId: ticketId,
 			});
 			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
@@ -142,45 +144,50 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					{i18n.t("newTicketModal.title")}
 				</DialogTitle>
 				<DialogContent dividers>
-					<Autocomplete
-						options={options}
-						loading={loading}
-						style={{ width: 300 }}
-						clearOnBlur
-						autoHighlight
-						freeSolo
-						clearOnEscape
-						getOptionLabel={renderOptionLabel}
-						renderOption={renderOption}
-						filterOptions={createAddContactOption}
-						onChange={(e, newValue) => handleSelectOption(e, newValue)}
-						renderInput={params => (
-							<TextField
-								{...params}
-								label={i18n.t("newTicketModal.fieldLabel")}
-								variant="outlined"
-								autoFocus
-								onChange={e => setSearchParam(e.target.value)}
-								onKeyPress={e => {
-									if (loading || !selectedContact) return;
-									else if (e.key === "Enter") {
-										handleSaveTicket(selectedContact.id);
-									}
-								}}
-								InputProps={{
-									...params.InputProps,
-									endAdornment: (
-										<React.Fragment>
-											{loading ? (
-												<CircularProgress color="inherit" size={20} />
-											) : null}
-											{params.InputProps.endAdornment}
-										</React.Fragment>
-									),
-								}}
-							/>
-						)}
-					/>
+					{ contactId &&
+						<Typography>Você tem certeza que deseja continuar esta conversa com outro número? Este ticket será fechado.</Typography>
+					}
+					{ !contactId &&
+						<Autocomplete
+							options={options}
+							loading={loading}
+							style={{ width: 300 }}
+							clearOnBlur
+							autoHighlight
+							freeSolo
+							clearOnEscape
+							getOptionLabel={renderOptionLabel}
+							renderOption={renderOption}
+							filterOptions={createAddContactOption}
+							onChange={(e, newValue) => handleSelectOption(e, newValue)}
+							renderInput={params => (
+								<TextField
+									{...params}
+									label={i18n.t("newTicketModal.fieldLabel")}
+									variant="outlined"
+									autoFocus
+									onChange={e => setSearchParam(e.target.value)}
+									onKeyPress={e => {
+										if (loading || !selectedContact) return;
+										else if (e.key === "Enter") {
+											handleSaveTicket(selectedContact.id);
+										}
+									}}
+									InputProps={{
+										...params.InputProps,
+										endAdornment: (
+											<React.Fragment>
+												{loading ? (
+													<CircularProgress color="inherit" size={20} />
+												) : null}
+												{params.InputProps.endAdornment}
+											</React.Fragment>
+										),
+									}}
+								/>
+							)}
+						/>
+					}
 				</DialogContent>
 				<DialogActions>
 					<Button
@@ -194,12 +201,12 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					<ButtonWithSpinner
 						variant="contained"
 						type="button"
-						disabled={!selectedContact}
-						onClick={() => handleSaveTicket(selectedContact.id)}
+						disabled={(!selectedContact && !contactId)}
+						onClick={() => handleSaveTicket(selectedContact ? selectedContact.id : contactId)}
 						color="primary"
 						loading={loading}
 					>
-						{i18n.t("newTicketModal.buttons.ok")}
+						{contactId ? "Criar" : i18n.t("newTicketModal.buttons.ok")}
 					</ButtonWithSpinner>
 				</DialogActions>
 			</Dialog>

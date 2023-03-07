@@ -3,21 +3,36 @@ import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import Ticket from "../../database/models/Ticket";
 import ShowContactService from "../ContactServices/ShowContactService";
+import UpdateTicketService from "./UpdateTicketService";
 
 interface Request {
   contactId: number;
   status: string;
   userId: number;
-  companyId: string | number;
+  companyId: number;
+  ticketId: number;
 }
 
 const CreateTicketService = async ({
   contactId,
   status,
   userId,
-  companyId
+  companyId,
+  ticketId
 }: Request): Promise<Ticket> => {
-  const defaultWhatsapp = await GetDefaultWhatsApp();
+  const defaultWhatsapp = await GetDefaultWhatsApp(companyId);
+
+  if (ticketId) {
+    await UpdateTicketService({ 
+      ticketData: {
+        status: "closed",
+        userId: userId || null,
+        categoryId: null
+      }, 
+      ticketId, 
+      companyId 
+    });
+  }
 
   await CheckContactOpenTickets(contactId);
 

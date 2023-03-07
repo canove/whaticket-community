@@ -42,6 +42,7 @@ type IndexQuery = {
 };
 
 interface TicketData {
+  ticketId: number;
   contactId: number;
   status: string;
   queueId: number;
@@ -146,14 +147,15 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId, status, userId }: TicketData = req.body;
+  const { contactId, status, userId, ticketId }: TicketData = req.body;
   const { companyId } = req.user;
 
   const ticket = await CreateTicketService({
     contactId,
     status,
     userId,
-    companyId
+    companyId,
+    ticketId
   });
 
   const io = getIO();
