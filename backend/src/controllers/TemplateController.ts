@@ -64,7 +64,6 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
 export const bind = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
-
   const response = await BindTemplateService({ data: req.body, companyId });
 
   return res.status(200).json(response);
