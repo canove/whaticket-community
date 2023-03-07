@@ -145,7 +145,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 				</DialogTitle>
 				<DialogContent dividers>
 					{ contactId &&
-						<Typography>Você tem certeza que deseja continuar esta conversa com outro número? Este ticket será fechado.</Typography>
+						<Typography>Você tem certeza que deseja continuar esta conversa com outro número? Este ticket será finalizado e um novo ticket será criado.</Typography>
 					}
 					{ !contactId &&
 						<Autocomplete
