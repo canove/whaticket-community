@@ -6,6 +6,7 @@ import Contact from "../../database/models/Contact";
 import Message from "../../database/models/Message";
 import Queue from "../../database/models/Queue";
 import ShowUserService from "../UserServices/ShowUserService";
+import CheckProfilePermissionService from "../ProfileServices/CheckProfilePermissionService";
 
 interface Request {
   searchParam?: string;
@@ -16,7 +17,9 @@ interface Request {
   userId: string | number;
   withUnreadMessages?: string;
   queueIds: number[];
-  companyId: string | number;
+  companyId: number;
+  categoryId: string;
+  loggedUserId: string | number;
 }
 
 interface Response {
@@ -34,7 +37,9 @@ const ListTicketsService = async ({
   showAll,
   userId,
   withUnreadMessages,
-  companyId
+  companyId,
+  categoryId,
+  loggedUserId
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
@@ -65,6 +70,13 @@ const ListTicketsService = async ({
       ...whereCondition,
       status
     };
+  }
+
+  if (categoryId) {
+    whereCondition = {
+      ...whereCondition,
+      categoryId
+    }
   }
 
   if (searchParam) {
@@ -133,6 +145,15 @@ const ListTicketsService = async ({
 
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
+
+  const allTickets = await CheckProfilePermissionService({ userId: loggedUserId , companyId, permission: "tickets-manager:showall" });
+
+  if (!allTickets) {
+    whereCondition = {
+      ...whereCondition,
+      userId: { [Op.or]: [loggedUserId, null]  }
+    }
+  }
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,

@@ -41,6 +41,7 @@ import OfficialTemplates from "../pages/OfficialTemplates";
 import OfficialWhatsappReport from "../pages/OfficialWhatsappReport";
 import Profiles from "../pages/Profiles";
 import Operations from "../pages/Operations";
+import GeneralReports from "../pages/GeneralReports";
 
 const RenderRoutes = () => {
   const { isAuth, user } = useContext(AuthContext);
@@ -93,7 +94,7 @@ const RenderRoutes = () => {
     if (name === "Queues") {
       return Queues;
     }
-    if (name === "Reports") {
+    if (name === "Reports" || name === "Conversation Report") {
       return Reports;
     }
     if (name === "Reports Ticket") {
@@ -164,6 +165,9 @@ const RenderRoutes = () => {
     }
     if (name === "Operations") {
       return Operations;
+    }
+    if (name === "General Report") {
+      return GeneralReports;
     }
   };
 

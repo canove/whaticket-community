@@ -151,7 +151,8 @@ const SendWhatsAppMedia = async ({
               mediaType: type,
               quotedMsgId: null,
               bot: ticket.status == 'inbot',
-              companyId
+              companyId,
+              userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
             };
           
             await ticket.update({ lastMessage: body });
@@ -192,7 +193,8 @@ const SendWhatsAppMedia = async ({
           mediaUrl: mediaUrl,
           mediaType: media.mimetype.split('/')[0],
           quotedMsgId: null,
-          companyId
+          companyId,
+          userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
         };
       
         await ticket.update({ lastMessage: body });

@@ -45,7 +45,6 @@ const Payments = () => {
             try {
                 const { data } = await api.get("/billings/");
                 setBillings(data);
-                console.log(data);
                 setLoading(false);
             } catch (err) {
                 toastError(err);

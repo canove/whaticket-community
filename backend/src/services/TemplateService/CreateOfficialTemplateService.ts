@@ -50,6 +50,7 @@ const CreateOfficialTemplateService = async ({
 
     if (item === "text") return component ? component.text : null;
     if (item === "format") return component ? component.format : "";
+    if (item === "buttons") return component ? component.buttons : null;
   };
 
   const { name, components, category } = officialTemplate;
@@ -57,6 +58,7 @@ const CreateOfficialTemplateService = async ({
   const headerFormat = getTemplateComponent(components, "HEADER", "format");
   const bodyText = getTemplateComponent(components, "BODY", "text");
   const footerText = getTemplateComponent(components, "FOOTER", "text");
+  const buttons = getTemplateComponent(components, "BUTTONS", "buttons");
 
   let headerObj = null;
   if (headerFormat && headerVar) {
@@ -74,7 +76,8 @@ const CreateOfficialTemplateService = async ({
     body: bodyText,
     footer: footerText,
     mapping: JSON.stringify(mapping),
-    companyId
+    companyId,
+    buttons: buttons ? JSON.stringify(buttons) : null
   });
 
   await OfficialTemplatesStatus.create({

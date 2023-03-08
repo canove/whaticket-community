@@ -133,9 +133,14 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         setTemplate(data.templateId);
         setSelectedOffTemplate(data.officialTemplatesId);
         setOffConnection(data.officialConnectionId);
-        setConnections(
-          data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"]
-        );
+
+        let newConnections = data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"];
+
+        if (!newConnections.includes("Todos")) {
+          newConnections = newConnections.map(id => parseInt(id));
+        }
+
+        setConnections(newConnections);
 
         if (data.requiredItems) {
           setRequiredItems(prevItems => {
@@ -297,7 +302,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       officialConnectionId: offConnection ? offConnection : null,
       officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
       requiredItems: required.length > 0 ? JSON.stringify(required) : null
-     };
+    };
 
     try {
       if (exposedImportId) {

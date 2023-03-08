@@ -153,7 +153,7 @@ const reducer = (state, action) => {
 };
 
 	const TicketsList = (props) => {
-		const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
+		const { status, searchParam, showAll, selectedQueueIds, updateCount, style, categoryId } =
 			props;
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -164,7 +164,7 @@ const reducer = (state, action) => {
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
-	}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
+	}, [status, searchParam, dispatch, showAll, selectedQueueIds, categoryId]);
 
 	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
@@ -172,6 +172,7 @@ const reducer = (state, action) => {
 		status,
 		showAll,
 		queueIds: JSON.stringify(selectedQueueIds),
+		categoryId: status === "closed" ? categoryId : null,
 	});
 
 	useEffect(() => {

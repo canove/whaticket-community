@@ -27,7 +27,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { alias, name, cnpj, phone, email, address, logo } = req.body;
+  const { alias, name, cnpj, phone, email, address, logo, onlyOwnedMessages } = req.body;
   const { companyId } = req.user;
 
   const company = await CreateCompanyService({
@@ -37,7 +37,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     phone,
     email,
     address,
-    logo
+    logo,
+    onlyOwnedMessages
   });
 
   const io = getIO();

@@ -18,6 +18,7 @@ import FileRegister from "./FileRegister";
 import Menu from "./Menu";
 import MenuCompanies from "./MenuCompanies";
 import Pricing from "./Pricing";
+import Ticket from "./Ticket";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 import WhatsappsConfig from "./WhatsappsConfig";
@@ -56,6 +57,9 @@ class Company extends Model<Company> {
   @Column
   address: string;
 
+  @Column
+  onlyOwnedMessages: boolean;
+
   @AllowNull(false)
   @Default("ativo")
   @Column
@@ -87,6 +91,12 @@ class Company extends Model<Company> {
 
   @HasOne(() => Pricing, "companyId")
   pricing: Pricing;
+
+  @HasMany(() => FileRegister, "companyId")
+  registers: FileRegister[];
+
+  @HasMany(() => Ticket, "companyId")
+  tickets: Ticket[];
 }
 
 export default Company;

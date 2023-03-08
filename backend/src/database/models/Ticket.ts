@@ -90,7 +90,6 @@ class Ticket extends Model<Ticket> {
 
   @Column
   finalizedAt: Date;
-
 }
 
 export default Ticket;
