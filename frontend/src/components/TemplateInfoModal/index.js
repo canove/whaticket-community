@@ -15,6 +15,7 @@ import {
   Select,
   MenuItem,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -97,6 +98,7 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
     body: "",
     mapping: null, 
     footer: "",
+    buttons: []
   }
   const [template, setTemplate] = useState(initialTemplate);
 
@@ -113,6 +115,7 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
           body: data.body,
           footer: data.footer,
           header: data.header ? JSON.parse(data.header) : null,
+          buttons: data.buttons ? JSON.parse(data.buttons) : [],
           mapping: Object.keys(JSON.parse(data.mapping)).length > 0 ? JSON.parse(data.mapping) : null
         }));
       } catch (err) {
@@ -290,6 +293,21 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
                 className={classes.textField}
                 disabled={true}
               />
+            </div>
+          }
+          {template.buttons.length > 0 &&
+            <div style={{ border: "1px solid rgba(0, 0, 0, 0.5)", borderRadius: "5px", padding: "8px", marginTop: "8px" }}>
+              <Typography style={{ fontWeight: "bold" }}>Botões: </Typography>
+              { template.buttons.map((button, index) => (
+                <Tooltip title={button.type} key={index}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                  >
+                    {button.text}
+                  </Button>
+                </Tooltip>
+              )) }
             </div>
           }
         </DialogContent>

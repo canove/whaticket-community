@@ -14,10 +14,14 @@ const ShowCompanyMenuService = async (companyId: number, userId: string | number
     menuList = [];
   }
 
+  let whereCondition = null;
+
+  if (menuList !== null) {
+    whereCondition = { id: { [Op.or]: menuList } };
+  }
+
   const menus = await Menu.findAll({
-    where: {
-      id: { [Op.or]: menuList } 
-    },
+    where: whereCondition,
     include: [
       {
         model: Company,

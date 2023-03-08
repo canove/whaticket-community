@@ -14,6 +14,7 @@ interface CompanyData {
   menusIds?: string;
   alias?: string;
   logo?: string;
+  onlyOwnedMessages?: boolean;
 }
 interface Request {
   companyData: CompanyData;
@@ -28,6 +29,7 @@ interface Response {
   address: string;
   alias: string;
   logo: string;
+  onlyOwnedMessages: boolean;
 }
 
 const UpdateCompanyService = async ({
@@ -50,12 +52,13 @@ const UpdateCompanyService = async ({
     email,
     address,
     menusIds = [],
-    logo
+    logo,
+    onlyOwnedMessages
   } = companyData;
 
   try {
     await schema.validate({ name, id, alias, cnpj, phone, email, address });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
   console.log("update company companyService 61");
@@ -67,7 +70,8 @@ const UpdateCompanyService = async ({
     phone,
     email,
     address,
-    logo
+    logo,
+    onlyOwnedMessages
   });
 
   if (menusIds.length > 0) {
@@ -84,7 +88,8 @@ const UpdateCompanyService = async ({
     phone: company.phone,
     email: company.email,
     address: company.address,
-    logo: company.logo
+    logo: company.logo,
+    onlyOwnedMessages: company.onlyOwnedMessages
   };
 
   return serializedCompany;

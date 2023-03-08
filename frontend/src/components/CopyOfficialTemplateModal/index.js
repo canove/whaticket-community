@@ -15,6 +15,7 @@ import {
   Select,
   MenuItem,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -57,6 +58,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
     bodyText: "",
     footerText: "",
     category: "",
+    buttons: []
   }
 
   const [template, setTemplate] = useState(initialState);
@@ -70,6 +72,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
       const getTemplateComponent = (type, item) => {
         const component = officialTemplate.components.find(component => component.type === type);
         
+        if (item === "buttons") return component ? component.buttons : [];
         if (item === "text") return component ? component.text : ""; 
         if (item === "format") return component ? component.format : ""; 
         if (item === "example") {
@@ -93,6 +96,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
         headerExample: getTemplateComponent("HEADER", "example"),
         bodyText: getTemplateComponent("BODY", "text"),
         footerText: getTemplateComponent("FOOTER", "text"),
+        buttons: getTemplateComponent("BUTTONS", "buttons"),
         category: officialTemplate.category,
       });
 
@@ -108,7 +112,7 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
       mapping,
       headerVar,
       documentName,
-      whatsappId: connection.id
+      whatsappId: connection.id,
     }
 
     try {
@@ -405,116 +409,21 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
                     InputLabelProps={{ shrink: true }}
                   />
                 </div>
-                {/* <div className={classes.multFieldLine}>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("templates.templateModal.name")}
-                    autoFocus
-                    name="name"
-                    error={touched.name && Boolean(errors.name)}
-                    helperText={touched.name && errors.name}
-                    variant="outlined"
-                    margin="dense"
-                    fullWidth
-                    className={classes.textField}
-                    onChange={(e) => {
-                      setValues({ name: e.target.value.toLowerCase().replaceAll(" ", "_") })
-                    }}
-                  />
-                </div>
-                <div style={{ marginTop: "5px" }}>
-                  <FormControl fullWidth variant="outlined">
-                    <InputLabel id="category-select-label">
-                      {i18n.t("templates.templateModal.category")}
-                    </InputLabel>
-                    <Select
-                      labelId="category-select-label"
-                      id="category-select"
-                      label={i18n.t("templates.templateModal.category")}
-                      value={category}
-                      onChange={handleCategoryChange}
-                      fullWidth
-                    >
-                      <MenuItem value={"transactional"}>
-                        {i18n.t("templates.templateModal.transactional")}
-                      </MenuItem>
-                      <MenuItem value={"marketing"}>
-                        {i18n.t("templates.templateModal.marketing")}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </div>
-                <div>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("templates.templateModal.body")}
-                    type="bodyText"
-                    onChange={(e) => {
-                      handleChangeBodyText(e);
-                    }}
-                    value={bodyText}
-                    multiline
-                    minRows={5}
-                    fullWidth
-                    maxLength="1024"
-                    name="bodyText"
-                    error={touched.bodyText && Boolean(errors.bodyText)}
-                    helperText={touched.bodyText && errors.bodyText}
-                    variant="outlined"
-                    margin="dense"
-                  />
-                </div>
-                <div>
-                  <Button onClick={handleAddParam}>
-                    Adicionar Parametro
-                  </Button>
-                </div>
-                <div>
-                  { parameters.map((param, index) => {
-                    return (
-                      <FormControl
-                        key={index} 
-                        fullWidth 
-                        variant="outlined" 
-                        style={{ marginTop: "10px" }}
-                      >
-                        <InputLabel id="param-type-select-label">
-                          {param}
-                        </InputLabel>
-                        <Select
-                          labelId="param-type-select-label"
-                          id="param-type-select"
-                          label={param}
-                          value={mapping[param] || ""}
-                          onChange={(e) => handleMappingChange(e, param)}
+                {template.buttons.length > 0 &&
+                  <div style={{ border: "1px solid rgba(0, 0, 0, 0.5)", borderRadius: "5px", padding: "8px", marginTop: "8px" }}>
+                    <Typography>Botões: </Typography>
+                    { template.buttons.map((button, index) => (
+                      <Tooltip title={button.type} key={index}>
+                        <Button
+                          variant="outlined"
                           fullWidth
                         >
-                          <MenuItem value={""} disabled>Parametros:</MenuItem>
-                          { paramTypes.map(paramType => (
-                            <MenuItem key={paramType.value} value={paramType.value}>{paramType.name}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    );
-                  })}
-                </div>
-                <div>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("templates.templateModal.footer")}
-                    type="footerText"
-                    multiline
-                    minRows={2}
-                    fullWidth
-                    maxLength="60"
-                    name="footerText"
-                    error={touched.footerText && Boolean(errors.footerText)}
-                    helperText={touched.footerText && errors.footerText}
-                    variant="outlined"
-                    margin="dense"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </div> */}
+                          {button.text}
+                        </Button>
+                      </Tooltip>
+                    )) }
+                  </div>
+                }
               </DialogContent>
               <DialogActions>
                 <Button

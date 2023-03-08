@@ -9,6 +9,8 @@ profileRoutes.get("/profile", isAuth, ProfileController.index);
 
 profileRoutes.post("/profile", isAuth, ProfileController.store);
 
+profileRoutes.get("/profile/check", isAuth, ProfileController.check);
+
 profileRoutes.get("/profile/:profileId", isAuth, ProfileController.show);
 
 profileRoutes.put("/profile/:profileId", isAuth, ProfileController.update);

@@ -15,6 +15,7 @@ import ContactModal from "../ContactModal";
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { useTranslation } from "react-i18next";
+import NewTicketModal from "../NewTicketModal";
 
 const drawerWidth = 320;
 
@@ -80,11 +81,12 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, loading }) => {
+const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, ticketId, loading }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
 	const [modalOpen, setModalOpen] = useState(false);
+	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
 
 	return (
 		<Drawer
@@ -102,6 +104,12 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, loading }) 
 				paper: classes.drawerPaper,
 			}}
 		>
+			<NewTicketModal
+				modalOpen={newTicketModalOpen}
+				onClose={(e) => setNewTicketModalOpen(false)}
+				contactId={contact.id}
+				ticketId={ticketId}
+			/>
 			<div className={classes.header}>
 				<IconButton onClick={handleDrawerClose}>
 					<CloseIcon />
@@ -191,13 +199,22 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, loading }) 
 								</Paper>
 							}
 							{ whatsapp.deleted && 
-								<Paper
-									square
-									variant="outlined"
-									className={classes.contactExtraInfo}
-								>
-									<InputLabel style={{ color: "red" }}>{"NÚMERO DELETADO"}</InputLabel>
-								</Paper>
+								<>
+									<Paper
+										square
+										variant="outlined"
+										className={classes.contactExtraInfo}
+									>
+										<InputLabel style={{ color: "red" }}>{"NÚMERO DELETADO"}</InputLabel>
+									</Paper>
+									<Button
+										style={{ marginTop: 4 }}
+										variant="outlined"
+										onClick={() => setNewTicketModalOpen(true)}
+									>
+										Continuar conversa com outro número
+									</Button>
+								</>
 							}
 						</Paper>
 					}

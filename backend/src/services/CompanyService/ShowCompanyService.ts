@@ -11,9 +11,11 @@ const ShowCompanyService = async (id: string | number): Promise<Company> => {
       "phone",
       "email",
       "address",
-      "logo"
+      "logo",
+      "onlyOwnedMessages",
     ]
   });
+
   if (!company) {
     throw new AppError("ERR_NO_COMPANY_FOUND", 404);
   }

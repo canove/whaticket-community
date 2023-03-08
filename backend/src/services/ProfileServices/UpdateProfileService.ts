@@ -24,15 +24,15 @@ const UpdateProfileService = async ({
 
   const { name, menus, permissions } = profileData;
 
-  const profileWithSameName = await Profiles.findOne({
+  const profileExists = await Profiles.findOne({
     where: {
-      companyId: { [Op.or]: [companyId, null], 
-      id: { [Op.ne]: profileId } },
-      name: name
+      companyId: { [Op.or]: [companyId, null] },
+      name: name,
+      id: { [Op.ne]: profileId }
     }
   });
 
-  if (profileWithSameName) throw new AppError("ERR_PROFILE_NAME_ALREADY_EXISTS");
+  if (profileExists) throw new AppError("ERR_PROFILE_NAME_ALREADY_EXISTS");
 
   await profile.update({
     name,

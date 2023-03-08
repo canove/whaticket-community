@@ -176,7 +176,8 @@ const SendWhatsAppMessage = async ({
             mediaUrl: null,
             mediaType: null,
             quotedMsgId: null,
-            companyId
+            companyId,
+            userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
           };
         
           await ticket.update({ lastMessage: body });
@@ -237,7 +238,8 @@ const SendWhatsAppMessage = async ({
         quotedMsgId: null,
         bot: (ticket.status == 'inbot' || bot),
         companyId,
-        footer
+        footer,
+        userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
       };
 
       await ticket.update({ lastMessage: type == 'buttons' ? templateButtons?.text : body });

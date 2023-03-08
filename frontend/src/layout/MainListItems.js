@@ -410,8 +410,16 @@ const MainListItems = (props) => {
       return i18n.t("mainDrawer.listItems.reports");
     }
 
+    if (name === "Conversation Reports") {
+      return i18n.t("mainDrawer.listItems.conversationReports");
+    }
+
     if (name === "Reports Talk") {
       return i18n.t("mainDrawer.listItems.reportsTalk");
+    }
+
+    if (name === "General Report") {
+      return "Relatório Geral";
     }
 
     if (name === "Reports Ticket") {

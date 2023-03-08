@@ -183,6 +183,7 @@ const Ticket = () => {
         handleDrawerClose={handleDrawerClose}
         contact={contact}
         whatsapp={whatsapp}
+        ticketId={ticket.id}
         loading={loading}
       />
     </div>

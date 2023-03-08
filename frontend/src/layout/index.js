@@ -144,9 +144,9 @@ const LoggedInLayout = ({ children }) => {
 
   const { i18n } = useTranslation();
 
-  function handleChangeLanguage(language) {
+  const handleChangeLanguage = async (language) => {
+    await handleSaveUser(language);
     i18n.changeLanguage(language);
-    handleSaveUser(language);
   }
 
   const handleSaveUser = async (language) => {

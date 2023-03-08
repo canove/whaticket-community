@@ -361,6 +361,7 @@ const messages = {
           payments: "Pagamentos",
           flows: "Fluxo",
           connectionFiles: "Categorias",
+          conversationReports: "Relatório de Conversas"
         },
         whatsApp: {
           connections: "Conexões",

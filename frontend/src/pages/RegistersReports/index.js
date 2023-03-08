@@ -233,6 +233,18 @@ const RegistersReports = () => {
         link.click();
     }
 
+    const getHaveWhatsapp = (reg) => {
+        if (reg.haveWhatsapp === null && reg.sentAt) {
+            return "SIM";
+        }
+
+        if (reg.haveWhatsapp === null && !reg.sentAt) {
+            return "DESCONHECIDO";
+        }
+
+        return reg.haveWhatsapp ? "SIM" : "NÃO";
+    }
+
     return (
         <MainContainer>
             <MainHeader>
@@ -244,13 +256,6 @@ const RegistersReports = () => {
                             type="search"
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
-                            // InputProps={{
-                            // startAdornment: (
-                            //     <InputAdornment position="start">
-                            //         <SearchIcon style={{ color: "gray" }} />
-                            //     </InputAdornment>
-                            // ),
-                            // }}
                         />
                         <TextField
                             style={{ marginLeft: "8px" }}
@@ -258,13 +263,6 @@ const RegistersReports = () => {
                             type="search"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            // InputProps={{
-                            // startAdornment: (
-                            //     <InputAdornment position="start">
-                            //         <SearchIcon style={{ color: "gray" }} />
-                            //     </InputAdornment>
-                            // ),
-                            // }}
                         />
                         <TextField
                             style={{ marginLeft: "8px" }}
@@ -317,6 +315,7 @@ const RegistersReports = () => {
                                 <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
                                 <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
                                 <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
+                                <MenuItem value={"interaction"}>{"Interação"}</MenuItem>
                             </Select>
                         </FormControl>
                     </div>
@@ -365,7 +364,9 @@ const RegistersReports = () => {
                             <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.read")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.errors")}</TableCell>
+                            <TableCell align="center">Interação</TableCell>
                             <TableCell align="center">Processado</TableCell>
+                            <TableCell align="center">Tem Whatsapp?</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -380,11 +381,13 @@ const RegistersReports = () => {
                                         <TableCell align="center">{formatDate(register.deliveredAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.readAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.errorAt)}</TableCell>
+                                        <TableCell align="center">{formatDate(register.interactionAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.processedAt)}</TableCell>
+                                        <TableCell align="center">{getHaveWhatsapp(register)}</TableCell>
                                     </TableRow>
                                 )
                             }))}
-                            {loading && <TableRowSkeleton columns={8} />}
+                            {loading && <TableRowSkeleton columns={10} />}
                         </>
                     </TableBody>
                 </Table>

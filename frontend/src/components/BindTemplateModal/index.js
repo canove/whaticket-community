@@ -125,7 +125,7 @@ const BindTemplateModal = ({ open, onClose, templateId }) => {
   const handleSubmit = async () => {
     const body = {
       whatsappIds: connections,
-      templateId: template.id,
+      templateId: templateId,
       officialWhatsappId: selectedOfficialWhats
     };
 

@@ -83,6 +83,10 @@ const ListReportRegistersService = async ({
       array.push({ errorAt: { [Op.ne]: null } });
     }
 
+    if (statuses.includes("interaction")) {
+      array.push({ interactionAt: { [Op.ne]: null } });
+    }
+
     return array;
   };
 
