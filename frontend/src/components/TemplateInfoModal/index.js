@@ -191,6 +191,13 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
       >
         <DialogTitle>Template</DialogTitle>
         <DialogContent dividers>
+          { template.header &&
+            <div style={{ border: "2px solid red", borderRadius: "5px", padding: "5px", margin: "10px 0"}}>
+              <Typography style={{ fontWeight: "bold" }}>
+                Para templates com arquivo (header), é necessário adicionar um arquivo de exemplo diretamente no site da META.
+              </Typography>
+            </div>
+          }
           <div className={classes.multFieldLine}>
             <TextField
               label={i18n.t("templates.templateModal.name")}

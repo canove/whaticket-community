@@ -149,7 +149,7 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
       QueueUrl: process.env.SQS_DISPATCH_QUEUE,
     });
 
-    return res.status(400).json({ 
+    return res.status(200).json({ 
       message: "request was received with success, but some items weren't sent.",
       required: requiredItems,
       payloadWithError: registersWithError

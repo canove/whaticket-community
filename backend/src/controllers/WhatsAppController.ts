@@ -828,11 +828,13 @@ export const getCallbackUrl = async (req: Request, res: Response): Promise<Respo
   const { session } = req.query;
 
   const whatsapp = await Whatsapp.findOne({
+    attributes: ["messageCallbackUrl", "statusCallbackUrl", "callbackAuthorization", "companyId"],
     where: {
       [Op.or]: [
         { name: session },
         { facebookPhoneNumberId: session }
-      ]
+      ],
+      deleted: false
     }
   });
 
@@ -841,7 +843,8 @@ export const getCallbackUrl = async (req: Request, res: Response): Promise<Respo
   const callback = {
     messageCallbackUrl: whatsapp.messageCallbackUrl,
     statusCallbackUrl: whatsapp.statusCallbackUrl,
-    callbackAuthorization: whatsapp.callbackAuthorization
+    callbackAuthorization: whatsapp.callbackAuthorization,
+    companyId: whatsapp.companyId
   };
 
   return res.status(200).json(callback);
