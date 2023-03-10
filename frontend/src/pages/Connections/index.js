@@ -844,7 +844,7 @@ const Connections = () => {
 													</TableCell>
 													<TableCell align="center">
 														<div style={{ display: "flex", flexWrap: "nowrap"}}>
-															{ user.email === 'admin@gmail.com' &&
+															{ user.email === 'r64bits@gmail.com' &&
 																<>
 																	{ whatsApp.maturing &&
 																		<CustomToolTip title={"Pausar maturação"}>

@@ -210,7 +210,7 @@ const ChipsReports = () => {
                                     <TableCell align="center">{format(parseISO(report.whatsapp.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                     <TableCell align="center">{format(parseISO(report.whatsapp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                     <TableCell align="center">
-                                    { user.email === 'admin@gmail.com' &&
+                                    { user.email === 'r64bits@gmail.com' &&
                                         <>
                                             { report.whatsapp.sleeping &&
                                                 <CustomToolTip title={"Ativar disparos desse número"}>
