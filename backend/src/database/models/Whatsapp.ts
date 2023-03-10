@@ -103,6 +103,13 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   deleted: boolean;
 
+  @Default(false)
+  @Column
+  sleeping: boolean;
+
+  @Column
+  automaticControl: boolean;
+
   @CreatedAt
   createdAt: Date;
 

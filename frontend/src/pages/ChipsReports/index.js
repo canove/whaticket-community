@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -7,6 +7,7 @@ import Title from "../../components/Title";
 import {
     Button,
     FormControl,
+    IconButton,
     InputAdornment,
     InputLabel,
     makeStyles,
@@ -19,6 +20,7 @@ import {
     TableHead,
     TableRow,
     TextField,
+    Tooltip,
     Typography
 } from "@material-ui/core";
 import toastError from "../../errors/toastError";
@@ -26,6 +28,8 @@ import api from "../../services/api";
 import { format, parseISO } from "date-fns";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import SearchIcon from "@material-ui/icons/Search";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { Brightness3, NightsStay, WbSunny } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,9 +44,34 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const CustomToolTip = ({ title, content, children }) => {
+	const classes = useStyles();
+
+	return (
+		<Tooltip
+			arrow
+			classes={{
+				tooltip: classes.tooltip,
+				popper: classes.tooltipPopper,
+			}}
+			title={
+				<React.Fragment>
+					<Typography gutterBottom color="inherit">
+						{title}
+					</Typography>
+					{content && <Typography>{content}</Typography>}
+				</React.Fragment>
+			}
+		>
+			{children}
+		</Tooltip>
+	);
+};
+
 const ChipsReports = () => {
     const classes = useStyles();
     const { i18n } = useTranslation();
+    const { user } = useContext(AuthContext);
 
     const [loading, setLoading] = useState(false);
     const [reports, setReports] = useState([]);
@@ -84,6 +113,23 @@ const ChipsReports = () => {
     const handleStatusChange = (e) => {
         setStatus(e.target.value);
     }
+
+    const handleSleeping = async (sleeping, whatsappId) => {
+		try {
+			const { data } = await api.put(`/whatsapp/sleeping/${whatsappId}`, { sleeping });
+
+            setReports(prevReports => {
+                const whatsapp = data;
+                const whatsappIndex = prevReports.findIndex((w) => w.whatsappId === whatsapp.id);
+
+                prevReports[whatsappIndex].whatsapp = whatsapp;
+
+                return [...prevReports];
+            });
+		} catch (err) {
+			toastError(err);
+		}
+	}
 
     return (
         <MainContainer>
@@ -152,19 +198,46 @@ const ChipsReports = () => {
                             <TableCell align="center">{i18n.t("chipReports.grid.registerAmount")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.createdAt")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.updatedAt")}</TableCell>
+                            <TableCell align="center">{"Ações"}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <>
                             {reports && reports.map(report => (
                                 <TableRow key={report.whatsappId}>
-                                    <TableCell align="center">{report["whatsapp.name"]}</TableCell>
+                                    <TableCell align="center">{report.whatsapp.name}</TableCell>
                                     <TableCell align="center">{report.qtdeRegisters}</TableCell>
-                                    <TableCell align="center">{format(parseISO(report["whatsapp.createdAt"]), "dd/MM/yyyy HH:mm")}</TableCell>
-                                    <TableCell align="center">{format(parseISO(report["whatsapp.updatedAt"]), "dd/MM/yyyy HH:mm")}</TableCell>
+                                    <TableCell align="center">{format(parseISO(report.whatsapp.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
+                                    <TableCell align="center">{format(parseISO(report.whatsapp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
+                                    <TableCell align="center">
+                                    { user.email === 'admin@gmail.com' &&
+                                        <>
+                                            { report.whatsapp.sleeping &&
+                                                <CustomToolTip title={"Ativar disparos desse número"}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleSleeping(report.whatsapp.sleeping, report.whatsappId)}
+                                                    >
+                                                        <WbSunny />
+                                                    </IconButton>
+                                                </CustomToolTip>
+                                            }
+                                            { !report.whatsapp.sleeping && 
+                                                <CustomToolTip title={"Desativar disparos desse número"}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleSleeping(report.whatsapp.sleeping, report.whatsappId)}
+                                                    >
+                                                        <Brightness3 />
+                                                    </IconButton>
+                                                </CustomToolTip>
+                                            }
+                                        </>
+                                    }
+                                    </TableCell>
                                 </TableRow>
                             ))}
-                            {loading && <TableRowSkeleton columns={4} />}
+                            {loading && <TableRowSkeleton columns={5} />}
                         </>
                     </TableBody>
                 </Table>
@@ -181,7 +254,7 @@ const ChipsReports = () => {
 					<Typography
 						style={{ display: "inline-block", fontSize: "1.25rem" }}
 					>
-						{ pageNumber } / { Math.ceil(count / 10) }
+						{ pageNumber } / { Math.ceil(count / 15) }
 					</Typography>
 					<Button
 						variant="outlined"

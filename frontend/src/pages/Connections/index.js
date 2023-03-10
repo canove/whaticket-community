@@ -45,6 +45,10 @@ import {
 	DeleteOutline,
 	PlayArrow,
 	Pause,
+	Brightness3,
+	WbSunny,
+	CheckCircleOutline,
+	Cancel,
 } from "@material-ui/icons";
 
 import SearchIcon from "@material-ui/icons/Search";
@@ -554,6 +558,22 @@ const Connections = () => {
 		}
 	}
 
+	const handleSleeping = async (sleeping, whatsappId) => {
+		try {
+			await api.put(`/whatsapp/sleeping/${whatsappId}`, { sleeping });
+		} catch (err) {
+			toastError(err);
+		}
+	}
+
+	const handleAutomaticControl= async (automaticControl, whatsappId) => {
+		try {
+			await api.put(`/whatsapp/automaticControl/${whatsappId}`, { automaticControl });
+		} catch (err) {
+			toastError(err);
+		}
+	}
+
 	return (
 		<>
 			{ !connectionFileName &&
@@ -824,26 +844,69 @@ const Connections = () => {
 													</TableCell>
 													<TableCell align="center">
 														<div style={{ display: "flex", flexWrap: "nowrap"}}>
-															{ user.email === 'r64bits@gmail.com' && whatsApp.maturing &&
-																<CustomToolTip title={"Pausar maturação"}>
-																	<IconButton
-																		size="small"
-																		onClick={() => handleMaturing(whatsApp.maturing, whatsApp.id)}
-																	>
-																		<Pause />
-																	</IconButton>
-																</CustomToolTip>
-															}
-
-															{ user.email === 'r64bits@gmail.com' && !whatsApp.maturing &&
-																<CustomToolTip title={"Iniciar maturação"}>
-																	<IconButton
-																		size="small"
-																		onClick={() => handleMaturing(whatsApp.maturing, whatsApp.id)}
-																	>
-																		<PlayArrow />
-																	</IconButton>
-																</CustomToolTip>
+															{ user.email === 'admin@gmail.com' &&
+																<>
+																	{ whatsApp.maturing &&
+																		<CustomToolTip title={"Pausar maturação"}>
+																			<IconButton
+																				size="small"
+																				onClick={() => handleMaturing(whatsApp.maturing, whatsApp.id)}
+																			>
+																				<Pause />
+																			</IconButton>
+																		</CustomToolTip>
+																	}
+																	{ !whatsApp.maturing &&
+																		<CustomToolTip title={"Iniciar maturação"}>
+																			<IconButton
+																				size="small"
+																				onClick={() => handleMaturing(whatsApp.maturing, whatsApp.id)}
+																			>
+																				<PlayArrow />
+																			</IconButton>
+																		</CustomToolTip>
+																	}
+																	{ whatsApp.automaticControl &&
+																		<CustomToolTip title={"Desativar controle automatico do tempo de disparo"}>
+																			<IconButton
+																				size="small"
+																				onClick={() => handleAutomaticControl(whatsApp.automaticControl, whatsApp.id)}
+																			>
+																				<Cancel />
+																			</IconButton>
+																		</CustomToolTip>
+																	}
+																	{ !whatsApp.automaticControl &&
+																		<CustomToolTip title={"Ativar controle automatico do tempo de disparo"}>
+																			<IconButton
+																				size="small"
+																				onClick={() => handleAutomaticControl(whatsApp.automaticControl, whatsApp.id)}
+																			>
+																				<CheckCircle />
+																			</IconButton>
+																		</CustomToolTip>
+																	}
+																	{ whatsApp.sleeping &&
+																		<CustomToolTip title={"Ativar disparos desse número"}>
+																			<IconButton
+																				size="small"
+																				onClick={() => handleSleeping(whatsApp.sleeping, whatsApp.id)}
+																			>
+																				<WbSunny />
+																			</IconButton>
+																		</CustomToolTip>
+																	}
+																	{ !whatsApp.sleeping && 
+																		<CustomToolTip title={"Desativar disparos desse número"}>
+																			<IconButton
+																				size="small"
+																				onClick={() => handleSleeping(whatsApp.sleeping, whatsApp.id)}
+																			>
+																				<Brightness3 />
+																			</IconButton>
+																		</CustomToolTip>
+																	}
+																</>
 															}
 														
 															{ whatsApp.status === "CONNECTED" && 
