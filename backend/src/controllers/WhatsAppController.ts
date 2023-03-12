@@ -223,12 +223,7 @@ export const maturing = async (
   const { whatsappId } = req.params;
   const { companyId } = req.user;
 
-  const whatsapp = await Whatsapp.findOne({
-    where: {
-      id: whatsappId,
-      companyId
-    }
-  })
+  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
   await whatsapp.update({ maturing: !maturing });
 
@@ -238,7 +233,49 @@ export const maturing = async (
     whatsapp
   });
 
-  return res.status(200).json("OK");
+  return res.status(200).json(whatsapp);
+};
+
+export const sleeping = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { sleeping } = req.body;
+  const { whatsappId } = req.params;
+  const { companyId } = req.user;
+
+  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
+
+  await whatsapp.update({ sleeping: !sleeping });
+
+  const io = getIO();
+  io.emit(`whatsapp${companyId}`, {
+    action: "update",
+    whatsapp
+  });
+
+  return res.status(200).json(whatsapp);
+};
+
+export const automaticControl = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { automaticControl } = req.body;
+  const { whatsappId } = req.params;
+  const { companyId } = req.user;
+
+  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
+
+  await whatsapp.update({ automaticControl: !automaticControl });
+
+  const io = getIO();
+  io.emit(`whatsapp${companyId}`, {
+    action: "update",
+    whatsapp
+  });
+
+  return res.status(200).json(whatsapp);
 };
 
 export const config = async (
@@ -828,11 +865,13 @@ export const getCallbackUrl = async (req: Request, res: Response): Promise<Respo
   const { session } = req.query;
 
   const whatsapp = await Whatsapp.findOne({
+    attributes: ["messageCallbackUrl", "statusCallbackUrl", "callbackAuthorization", "companyId"],
     where: {
       [Op.or]: [
         { name: session },
         { facebookPhoneNumberId: session }
-      ]
+      ],
+      deleted: false
     }
   });
 
@@ -841,7 +880,8 @@ export const getCallbackUrl = async (req: Request, res: Response): Promise<Respo
   const callback = {
     messageCallbackUrl: whatsapp.messageCallbackUrl,
     statusCallbackUrl: whatsapp.statusCallbackUrl,
-    callbackAuthorization: whatsapp.callbackAuthorization
+    callbackAuthorization: whatsapp.callbackAuthorization,
+    companyId: whatsapp.companyId
   };
 
   return res.status(200).json(callback);

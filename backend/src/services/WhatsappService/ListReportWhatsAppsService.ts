@@ -63,13 +63,13 @@ const ListReportWhatsAppsService = async ({
   if (date) {
     regCondition = {
       ...regCondition,
-      createdAt: {
+      processedAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       },
     }
   }
 
-  const limit = 10;
+  const limit = 15;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: whatsReports }: ReportData = await FileRegister.findAndCountAll({
@@ -80,11 +80,12 @@ const ListReportWhatsAppsService = async ({
     ],
     include: [{
       model: Whatsapp,
-      attributes: ["name", "createdAt", "updatedAt"],
+      attributes: ["name", "createdAt", "updatedAt", "sleeping"],
       where: whatsCondition
     }],
+    limit,
+    offset,
     group: "whatsappId",
-    raw: true
   });
 
   const countNumber =  Array.isArray(count) ? count.length : count;

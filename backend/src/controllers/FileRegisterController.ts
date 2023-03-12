@@ -31,11 +31,21 @@ export const getInfo = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { msgWhatsId } = req.query;
+  const { msgWhatsId, registerId } = req.query;
 
-  const fileRegister = await FileRegister.findOne({
-    where: { msgWhatsId }
-  });
+  let fileRegister = null;
+
+  if (msgWhatsId) {
+    fileRegister = await FileRegister.findOne({
+      where: { msgWhatsId }
+    });
+  }
+
+  if (registerId) {
+    fileRegister = await FileRegister.findOne({
+      where: { id: registerId }
+    });
+  }
 
   if (!fileRegister) {
     throw new AppError("ERR_FILE_REGISTER_DO_NOT_EXISTS");

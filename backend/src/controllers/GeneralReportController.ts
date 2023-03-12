@@ -46,6 +46,9 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
                     <meta charset="utf-8" />
                     <title>PDF - Ticket Report</title>
                 </head>
+                <style>
+                    html { zoom: 0.7; }
+                </style>
                 <body style="width: 100%">
                     <h1>Relatório de Conversas</h1>
                     <h3>Filtros:</h3>
@@ -120,16 +123,16 @@ const getReportRows = (reports: any[]) => {
     let rows = "";
 
     for (const report of reports) {
-        const company_name = report.name || "";
-        const register_total = report["registers.total"] || 0;
-        const register_sent = report["registers.sent"] || 0;
-        const register_delivered = report["registers.delivered"] || 0;
-        const register_read = report["registers.read"] || 0;
-        const register_error = report["registers.error"] || 0;
-        const register_interaction = report["registers.interaction"] || 0;
-        const register_no_whats = report["registers.noWhats"] || 0;
-        const message_sent = report.message_sent || 0;
-        const message_received = report.message_received || 0;
+        const company_name = report.company.name || "";
+        const register_total = report.total || 0;
+        const register_sent = report.sent || 0;
+        const register_delivered = report.delivered || 0;
+        const register_read = report.read || 0;
+        const register_error = report.error || 0;
+        const register_interaction = report.interaction || 0;
+        const register_no_whats = report.noWhats || 0;
+        const message_sent = report.sentMessages || 0;
+        const message_received = report.receivedMessages || 0;
 
         rows += `
             <tr>

@@ -1,6 +1,7 @@
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 import Queue from "../../database/models/Queue";
+import Flows from "../../database/models/Flows";
 
 const ShowWhatsAppService = async (
   id: string | number,
@@ -14,6 +15,11 @@ const ShowWhatsAppService = async (
         as: "queues",
         attributes: ["id", "name", "color", "greetingMessage"]
       },
+      {
+        model: Flows,
+        as: "flow",
+        attributes: ["name"]
+      }
     ],
     order: [["queues", "name", "ASC"]]
   });
