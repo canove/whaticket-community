@@ -230,7 +230,7 @@ const SendWhatsAppMessage = async ({
         ack: 0,
         ticketId: ticket.id,
         contactId: undefined,
-        body: body ??  bodyType == 'buttons' ? templateButtons?.text :'',
+        body: body ??  (type == 'buttons' ? templateButtons?.text :''),
         fromMe: fromMe,
         read: true,
         mediaUrl: url ? url : mediaUrl,
@@ -242,7 +242,7 @@ const SendWhatsAppMessage = async ({
         userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
       };
 
-      await ticket.update({ lastMessage: bodyType == 'buttons' ? templateButtons?.text : body });
+      await ticket.update({ lastMessage: type == 'buttons' ? templateButtons?.text : body });
       const createdMessage = await CreateMessageService({ messageData });
 
       if (whatsMsgId == '' || whatsMsgId == null) {

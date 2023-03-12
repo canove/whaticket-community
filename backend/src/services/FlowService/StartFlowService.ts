@@ -617,6 +617,139 @@ const processNode = async (node: any, session: any, body: any) => {
     }
   }
 
+  if (node.type === "button-message-node") {
+    let value = null;
+    let client = null;
+
+    try {
+      client = createClient({
+        url: process.env.REDIS_URL
+      });
+    } catch (err) {
+      console.log("REDIS", err);
+    }
+
+    if (client) {
+      try {
+        client.on('error', err => console.log('Redis Client Error', err));
+        await client.connect();
+        value = await getRedisValue(session.id, session.companyId, client);
+      } catch (err) {
+        console.log("REDIS", err);
+      }
+
+      await client.disconnect();
+    }
+
+    if (!value) {
+      value = await FileRegister.findOne({
+        where: {
+          [Op.or]: [
+            { phoneNumber: session.id } ,
+            { phoneNumber: 
+              { 
+                [Op.or]: [
+                  removePhoneNumberWith9Country(session.id),
+                  preparePhoneNumber9Digit(session.id),
+                  removePhoneNumber9Digit(session.id),
+                  removePhoneNumberCountry(session.id),
+                  removePhoneNumber9DigitCountry(session.id)
+                ],
+              }
+            }
+          ],
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+    }
+
+    const text = node['text']
+    .replace("{{name}}", value.name)
+    .replace("{{documentNumber}}", value.documentNumber)
+    .replace("{{var1}}", value.var1)
+    .replace("{{var2}}", value.var2)
+    .replace("{{var3}}", value.var3)
+    .replace("{{var4}}", value.var4)
+    .replace("{{var5}}", value.var5)
+    .replace("{{phoneNumber}}", value.phoneNumber);
+
+    const footer = node['footer']
+    .replace("{{name}}", value.name)
+    .replace("{{documentNumber}}", value.documentNumber)
+    .replace("{{var1}}", value.var1)
+    .replace("{{var2}}", value.var2)
+    .replace("{{var3}}", value.var3)
+    .replace("{{var4}}", value.var4)
+    .replace("{{var5}}", value.var5)
+    .replace("{{phoneNumber}}", value.phoneNumber);
+
+    let image = null;
+
+    if (node['imageUrl']) {
+      const url = node['imageUrl']
+      .replace("{{name}}", value.name)
+      .replace("{{documentNumber}}", value.documentNumber)
+      .replace("{{var1}}", value.var1)
+      .replace("{{var2}}", value.var2)
+      .replace("{{var3}}", value.var3)
+      .replace("{{var4}}", value.var4)
+      .replace("{{var5}}", value.var5)
+      .replace("{{phoneNumber}}", value.phoneNumber);
+
+      image = { url };
+    }
+
+    const templateButtons = node['buttons'].map(button => {
+      if (button.type === "quickReplyButton") {
+        return {
+          "index": button.id,
+          "quickReplyButton": {
+            "displayText": button.text,
+            "id": button.buttonId
+          }
+        }
+      }
+
+      if (button.type === "callButton") {
+        return {
+          "index": button.id,
+          "callButton": {
+            "displayText": button.text,
+            "phoneNumber": button.phoneNumber
+          }
+        }
+      }
+
+      if (button.type === "urlButton") {
+        return {
+          "index": button.id,
+          "urlButton": {
+            "displayText": button.text,
+            "url": button.url
+          }
+        }
+      }
+    });
+
+    const message = {
+      blocks: [
+        {
+          templateButtons: {
+            text,
+            footer,
+            image,
+            templateButtons
+          },
+          type: "buttons"
+        },
+      ]
+    }
+
+    return { message }
+  }
+
   return {};
 }
 

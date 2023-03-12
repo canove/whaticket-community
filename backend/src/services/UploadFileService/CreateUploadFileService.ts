@@ -20,7 +20,7 @@ const CreateUploadFileService = async ({
   name,
   ownerid,
   official,
-  whatsappIds,
+  whatsappIds = null,
   filePath,
   companyId,
   templateId = null,

@@ -33,6 +33,7 @@ import { MessageConditionNodeModel } from '../nodes/MessageCondition/MessageCond
 import { MultipleMessagesNodeModel } from '../nodes/MultipleMessages/MultipleMessagesNodeModel';
 import { JumpNodeModel } from '../nodes/Jump/JumpNodeModel';
 import { DatabaseSaveNodeModel } from '../nodes/DatabaseSave/DatabaseSaveNodeModel';
+import { ButtonMessageNodeModel } from '../nodes/ButtonMessage/ButtonMessageNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -152,6 +153,12 @@ export class BodyWidget extends React.Component {
 							color="#BFBFBF" 
 							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
 						/>
+						<TrayItemWidget
+							model={{ type: 'button-message' }}
+							name="Button Message"
+							color="#25D366"
+							icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -230,6 +237,11 @@ export class BodyWidget extends React.Component {
 								break;
 								case 'database-save':
 									node = new DatabaseSaveNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'button-message':
+									node = new ButtonMessageNodeModel();
 									node.addPort(new AdvancedPortModel(true, 'in'));
 									node.addPort(new AdvancedPortModel(false, 'out'));
 								break;

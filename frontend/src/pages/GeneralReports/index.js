@@ -195,17 +195,17 @@ const GeneralReports = () => {
           <TableBody>
             <>
               {reports.map((report) => (
-                <TableRow key={report.company_id}>
-                  <TableCell align="center">{report.name || ""}</TableCell>
-                  <TableCell align="center">{report["registers.total"] || 0}</TableCell>
-                  <TableCell align="center">{report["registers.sent"] || 0}</TableCell>
-                  <TableCell align="center">{report["registers.delivered"] || 0}</TableCell>
-                  <TableCell align="center">{report["registers.read"] || 0}</TableCell>
-                  <TableCell align="center">{report["registers.error"] || 0}</TableCell>
-                  <TableCell align="center">{report["registers.interaction"] || 0}</TableCell>
-                  <TableCell align="center">{report["registers.noWhats"] || 0}</TableCell>
-                  <TableCell align="center">{report.message_sent || 0}</TableCell>
-                  <TableCell align="center">{report.message_received || 0}</TableCell>
+                <TableRow key={report.companyId}>
+                  <TableCell align="center">{report.company.name || ""}</TableCell>
+                  <TableCell align="center">{report.total || 0}</TableCell>
+                  <TableCell align="center">{report.sent || 0}</TableCell>
+                  <TableCell align="center">{report.delivered || 0}</TableCell>
+                  <TableCell align="center">{report.read || 0}</TableCell>
+                  <TableCell align="center">{report.error || 0}</TableCell>
+                  <TableCell align="center">{report.interaction || 0}</TableCell>
+                  <TableCell align="center">{report.noWhats || 0}</TableCell>
+                  <TableCell align="center">{report.sentMessages || 0}</TableCell>
+                  <TableCell align="center">{report.receivedMessages || 0}</TableCell>
                 </TableRow>
               ))}
               {loading && <TableRowSkeleton columns={10} />}

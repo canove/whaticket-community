@@ -193,9 +193,7 @@ const ImportModal = ({ open, onClose }) => {
         formData.set("ownerid", user.id);
         formData.set("name", file.name);
         formData.set("official", selectedType);
-        if (selectedConnection.includes("Todos")) {
-          formData.set("whatsappIds", null);
-        } else {
+        if (!selectedConnection.includes("Todos")) {
           const selectedConnectionToString = selectedConnection.join();
           formData.set("whatsappIds", selectedConnectionToString);
         }

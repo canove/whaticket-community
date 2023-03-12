@@ -30,6 +30,18 @@ whatsappRoutes.put(
 );
 
 whatsappRoutes.put(
+  "/whatsapp/sleeping/:whatsappId",
+  isAuth,
+  WhatsAppController.sleeping
+);
+
+whatsappRoutes.put(
+  "/whatsapp/automaticControl/:whatsappId",
+  isAuth,
+  WhatsAppController.automaticControl
+);
+
+whatsappRoutes.put(
   "/whatsapp/config/multiple",
   isAuth,
   WhatsAppController.multipleConfig
