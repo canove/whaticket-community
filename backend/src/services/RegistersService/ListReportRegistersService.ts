@@ -1,6 +1,6 @@
 import { Op, Sequelize } from "sequelize";
 import FileRegister from "../../database/models/FileRegister";
-import { subHours } from "date-fns";
+import { endOfDay, parseISO, startOfDay, subHours } from "date-fns";
 
 interface Request {
   statuses?: Array<any>;
@@ -90,20 +90,6 @@ const ListReportRegistersService = async ({
     return array;
   };
 
-  const getDate = (date, option) => {
-    if (option === "MORNING") {
-        const morningDate = new Date(`${date} GMT-3`);
-        morningDate.setHours(0, 0, 0, 0);
-        return morningDate;
-    }
-    if (option === "NIGHT") {
-        const nightDate = new Date(`${date} GMT-3`);
-        nightDate.setHours(23, 59, 59, 999);
-        return nightDate;
-    }
-    return null;
-};
-
   if (statuses) {
     whereCondition = {
       ...whereCondition,
@@ -124,7 +110,7 @@ const ListReportRegistersService = async ({
   if (initialDate && finalDate) {
     whereCondition = {
       ...whereCondition,
-      processedAt: { [Op.between]: [getDate(initialDate, "MORNING"), getDate(finalDate, "NIGHT")] }
+      processedAt: { [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))] }
     }
   }
 
