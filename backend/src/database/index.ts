@@ -35,6 +35,7 @@ import OfficialWhatsapp from "./models/OfficialWhatsapp";
 import OfficialTemplates from "./models/OfficialTemplates";
 import OfficialTemplatesStatus from "./models/OfficialTemplatesStatus";
 import Profiles from "./models/Profiles";
+import WhatsAppLearning from "./models/WhatsappLearning";
 import GeneralReports from "./models/GeneralReports";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -79,6 +80,7 @@ const models = [
   OfficialTemplates,
   OfficialTemplatesStatus,
   Profiles,
+  WhatsAppLearning,
   GeneralReports
 ];
 

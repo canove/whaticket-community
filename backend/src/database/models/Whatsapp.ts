@@ -110,6 +110,16 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   automaticControl: boolean;
 
+  @AllowNull
+  @Column
+  automaticControlProcessDate: Date;
+
+  @Column
+  currentTriggerQuantity: number;
+
+  @Column
+  currentTriggerInterval: number;
+
   @CreatedAt
   createdAt: Date;
 
