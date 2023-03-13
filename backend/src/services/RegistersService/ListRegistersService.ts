@@ -28,7 +28,7 @@ const ListRegistersService = async ({
   whereCondition = { ...whereCondition, companyId };
 
   if (fileId) {
-    whereCondition = { ...whereCondition, fileId };
+    whereConditionCreatedAt = { ...whereConditionCreatedAt, fileId };
   } else {
     const files = await File.findAll({
       where: { 
@@ -43,8 +43,8 @@ const ListRegistersService = async ({
     if (files.length > 0) {
       const filesArray = files.map(file => file.id);
 
-      whereCondition = {
-        ...whereCondition,
+      whereConditionCreatedAt = {
+        ...whereConditionCreatedAt,
         fileId: { [Op.notIn]: filesArray }
       }
     }
@@ -98,7 +98,6 @@ const ListRegistersService = async ({
       [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
       [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
       [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND haveWhatsapp = 0 AND msgWhatsId IS NULL")), 'noWhats' ],
-      // [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL AND (fileId IS NULL OR EXISTS (SELECT status FROM Files WHERE Files.id = fileId AND Files.status = 5))")), 'queue' ],
     ],
     raw: true
   });

@@ -131,85 +131,33 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
     phoneNumber
   });
 
-  const checkZero = data => {
-    if (data.length === 1) {
-      data = `0${data}`;
-    }
-    return data;
-  };
-
-  const formatDate = date => {
-    if (date === null) {
-      return "";
-    }
-    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
-      `${date.getHours()}`
-    )}:${checkZero(`${date.getMinutes()}`)}`;
-    return dateString;
-  };
-
-  const getRegistersData = () => {
-    let text = "";
-
-    registers.forEach(register => {
-      const name = register.getDataValue("name");
-      const sentAt = formatDate(register.getDataValue("sentAt"));
-      const deliveredAt = formatDate(register.getDataValue("deliveredAt"));
-      const readAt = formatDate(register.getDataValue("readAt"));
-      const errorAt = formatDate(register.getDataValue("errorAt"));
-
-      let status = "";
-      if (errorAt) {
-        status = "Erro";
-      } else if (register.readAt) {
-        status = "Lido";
-      } else if (register.deliveredAt) {
-        status = "Entregue";
-      } else if (register.sentAt) {
-        status = "Enviado";
-      }
-
-      text += `
-        <tr>
-          <td style="border: 1px solid black">${name}</td>
-          <td style="border: 1px solid black">${status}</td>
-          <td style="border: 1px solid black">${sentAt}</td>
-          <td style="border: 1px solid black">${deliveredAt}</td>
-          <td style="border: 1px solid black">${readAt}</td>
-          <td style="border: 1px solid black">${errorAt}</td>
-        </tr>
-      `;
-    });
-
-    return text;
-  };
-
   const html = `
-        <!DOCTYPE html>
-        <html>
+      <!DOCTYPE html>
+      <html>
         <head>
-            <meta charset="utf-8" />
-            <title>PDF - Relatório de Registros</title>
+          <meta charset="utf-8" />
+          <title>PDF - Relatório de Registros</title>
         </head>
         <body>
-            <h1>Relatório de Registros</h1>
-            <table style="border: 1px solid black; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <td style="border: 1px solid black">Nome</td>
-                        <td style="border: 1px solid black">Status</td>
-                        <td style="border: 1px solid black">Enviado</td>
-                        <td style="border: 1px solid black">Entregue</td>
-                        <td style="border: 1px solid black">Lido</td>
-                        <td style="border: 1px solid black">Erro</td>
-                    <tr>
-                </thead>
-                <tbody>
-                  ${getRegistersData()}
-                </tbody>
-              </table>
+          <h1>Relatório de Registros</h1>
+          <table style="border: 1px solid black; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <td style="border: 1px solid black">Nome</td>
+                <td style="border: 1px solid black">Status</td>
+                <td style="border: 1px solid black">Processado</td>
+                <td style="border: 1px solid black">Enviado</td>
+                <td style="border: 1px solid black">Entregue</td>
+                <td style="border: 1px solid black">Lido</td>
+                <td style="border: 1px solid black">Erro</td>
+              <tr>
+            </thead>
+            <tbody>
+              ${getRegistersData(registers)}
+            </tbody>
+          </table>
         </body>
-        </html>
+      </html>
     `;
 
   const options = {
@@ -232,9 +180,7 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
 
   const documento = {
     html,
-    data: {
-      registers
-    },
+    data: {},
     path: "./src/downloads/output.pdf",
     type: ""
   };
@@ -250,6 +196,61 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
       throw err;
     }
   });
+};
+
+const checkZero = data => {
+  if (data.length === 1) {
+    data = `0${data}`;
+  }
+  return data;
+};
+
+const formatDate = date => {
+  if (date === null) {
+    return "";
+  }
+  const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
+    `${date.getHours()}`
+  )}:${checkZero(`${date.getMinutes()}`)}`;
+  return dateString;
+};
+
+const getRegistersData = registers => {
+  let text = "";
+
+  registers.forEach(register => {
+    const name = register.getDataValue("name");
+    const sentAt = formatDate(register.getDataValue("sentAt"));
+    const deliveredAt = formatDate(register.getDataValue("deliveredAt"));
+    const readAt = formatDate(register.getDataValue("readAt"));
+    const errorAt = formatDate(register.getDataValue("errorAt"));
+    const processedAt = formatDate(register.getDataValue("processedAt"));
+
+    let status = "";
+    if (errorAt) {
+      status = "Erro";
+    } else if (register.readAt) {
+      status = "Lido";
+    } else if (register.deliveredAt) {
+      status = "Entregue";
+    } else if (register.sentAt) {
+      status = "Enviado";
+    }
+
+    text += `
+      <tr>
+        <td style="border: 1px solid black">${name}</td>
+        <td style="border: 1px solid black">${status}</td>
+        <td style="border: 1px solid black">${processedAt}</td>
+        <td style="border: 1px solid black">${sentAt}</td>
+        <td style="border: 1px solid black">${deliveredAt}</td>
+        <td style="border: 1px solid black">${readAt}</td>
+        <td style="border: 1px solid black">${errorAt}</td>
+      </tr>
+    `;
+  });
+
+  return text;
 };
 
 export const exportCsv = async (

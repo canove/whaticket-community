@@ -101,7 +101,9 @@ const RegistersReports = () => {
                     fileIds,
                     pageNumber: "ALL",
                     initialDate,
-                    finalDate
+                    finalDate,
+                    name,
+                    phoneNumber
                 }
             });
             setCsv(data);
@@ -115,8 +117,6 @@ const RegistersReports = () => {
     }
 
     const createPDF = async () => {
-        setCreatingPDF(true);
-
         try {
             const { data } = await api.get(`/registers/exportPdf`, {
                 params: {
@@ -124,17 +124,18 @@ const RegistersReports = () => {
                     fileIds,
                     pageNumber: "ALL",
                     initialDate,
-                    finalDate
+                    finalDate,
+                    name,
+                    phoneNumber
                 }
             });
             setPdf(data);
+            return data;
         } catch (err) {
             toastError(err);
         }
 
-        await downloadPdf();
-
-        setCreatingPDF(false);
+        return null;
     }
 
     const filterReport = async () => {
@@ -215,7 +216,15 @@ const RegistersReports = () => {
     }
 
     const downloadPdf = async () => {
-        const linkSource = `data:application/pdf;base64,${pdf}`;
+        let newPDF = null;
+
+        if (!pdf) {
+            setCreatingPDF(true);
+            newPDF = await createPDF();
+            setCreatingPDF(false);
+        }
+
+        const linkSource = `data:application/pdf;base64,${newPDF ? newPDF : pdf}`;
         const downloadLink = document.createElement("a");
         const fileName = `report.pdf`;
         downloadLink.href = linkSource;
@@ -333,7 +342,7 @@ const RegistersReports = () => {
                             style={{ marginLeft: "8px" }}
                             variant="contained"
                             color="primary"
-                            onClick={createPDF}
+                            onClick={downloadPdf}
                             disabled={creatingPDF}
                         >
                             {i18n.t("logReport.buttons.exportPdf")}
