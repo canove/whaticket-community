@@ -6,7 +6,7 @@ import { format, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
+import { green, yellow } from "@material-ui/core/colors";
 import {
 	Button,
 	TableBody,
@@ -49,6 +49,10 @@ import {
 	WbSunny,
 	CheckCircleOutline,
 	Cancel,
+	Clear,
+	Battery20,
+	Battery60,
+	BatteryFull,
 } from "@material-ui/icons";
 
 import SearchIcon from "@material-ui/icons/Search";
@@ -532,6 +536,41 @@ const Connections = () => {
 		);
 	};
 
+	const renderQuality = (quantity) => {
+		if (!quantity) {
+			return (
+				<CustomToolTip
+					title={"Qualidade: Indefinido"}
+				>
+					<Clear color="error" />
+				</CustomToolTip>
+			)
+		}
+		
+		let quality = "";
+		let icon = null;
+
+		if (quantity > 0 && quantity <= 30) {
+			quality = "BAIXA";
+			icon = <Battery20 color="error" />
+		} else if (quantity > 30 && quantity <= 80) {
+			quality = "MÉDIA";
+			icon = <Battery60 style={{ color: yellow[700] }} />
+		} else if (quantity > 80) {
+			quality = "ALTA";
+			icon = <BatteryFull style={{ color: green[500] }} />
+		}
+
+		return (
+				<CustomToolTip
+					title={`Qualidade: ${quality}`}
+					content={`Sugestão de disparos por dia: ${quantity}`}
+				>
+					{icon}
+				</CustomToolTip>
+		)
+	}
+
 	const handleSearch = (event) => {
 		setSearchParam(event.target.value.toLowerCase());
 	};
@@ -756,9 +795,6 @@ const Connections = () => {
 							<TableHead>
 								<TableRow>
 									<TableCell align="center">
-										Perfil
-									</TableCell>
-									<TableCell align="center">
 										{i18n.t("connections.table.name")}
 									</TableCell>
 									<TableCell align="center">
@@ -779,9 +815,11 @@ const Connections = () => {
 									<TableCell align="center">
 										{i18n.t("Business")}
 									</TableCell>
-									<TableCell align="center">
-										{i18n.t("connections.table.default")}
-									</TableCell>
+									{ user.email === 'r64bits@gmail.com' &&
+										<TableCell align="center">
+											Qualidade
+										</TableCell>
+									}
 									<TableCell align="center">
 										{i18n.t("connections.table.actions")}
 									</TableCell>
@@ -789,35 +827,12 @@ const Connections = () => {
 							</TableHead>
 							<TableBody>
 								{loading ? (
-									<TableRowSkeleton columns={10} />
+									<TableRowSkeleton columns={user.email === 'r64bits@gmail.com' ? 9 : 8} />
 								) : (
 									<>
 										{whatsApps?.length > 0 &&
 											whatsApps.map(whatsApp => (
 												<TableRow key={whatsApp.id}>
-													<TableCell align="center">
-														<div
-															style={{
-																display: "flex",
-																justifyContent: "center",
-																alignItems: "center",
-															}}
-														>
-															{whatsApp.whatsImage && 
-															<img
-																style={{
-																	border: "1px solid rgba(0,0,0,0.5)",
-																	borderRadius: "100%",
-																	heigth: "30px",
-																	marginRight: "5px",
-																	width: "30px",
-																}}
-																src={whatsApp.whatsImage}
-															/>
-														}
-															{whatsApp.whatsName}
-														</div>
-													</TableCell>
 													<TableCell align="center">{whatsApp.name}</TableCell>
 													<TableCell align="center">
 														{renderStatusToolTips(whatsApp)}
@@ -835,13 +850,13 @@ const Connections = () => {
 														{format(parseISO(whatsApp.createdAt), "dd/MM/yy HH:mm")}
 													</TableCell>
 													<TableCell align="center">{clickOn(whatsApp.business)}</TableCell>
-													<TableCell align="center">
-														{whatsApp.isDefault && (
-															<div className={classes.customTableCell}>
-																<CheckCircle style={{ color: green[500] }} />
+													{ user.email === 'r64bits@gmail.com' &&
+														<TableCell align="center">
+															<div style={{ display: "flex", flexWrap: "nowrap", justifyContent: "center" }}>
+																{renderQuality(whatsApp.currentTriggerQuantity)}
 															</div>
-														)}
-													</TableCell>
+														</TableCell>
+													}
 													<TableCell align="center">
 														<div style={{ display: "flex", flexWrap: "nowrap"}}>
 															{ user.email === 'r64bits@gmail.com' &&
