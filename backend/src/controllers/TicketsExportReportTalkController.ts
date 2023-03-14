@@ -86,6 +86,9 @@ export const index = async (req: Request, res: Response): Promise<void> => {
                 <meta charset="utf-8" />
                 <title>PDF - Ticket Report</title>
             </head>
+            <style>
+              html { zoom: 0.7; }
+            </style>
             <body style="width: 100%">
                 <h1>Relatório de Conversas</h1>
                 <h3>Filtros:</h3>
