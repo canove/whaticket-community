@@ -199,22 +199,22 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, ticketId, l
 								</Paper>
 							}
 							{ whatsapp.deleted && 
-								<>
-									<Paper
-										square
-										variant="outlined"
-										className={classes.contactExtraInfo}
-									>
-										<InputLabel style={{ color: "red" }}>{"NÚMERO DELETADO"}</InputLabel>
-									</Paper>
-									<Button
-										style={{ marginTop: 4 }}
-										variant="outlined"
-										onClick={() => setNewTicketModalOpen(true)}
-									>
-										Continuar conversa com outro número
-									</Button>
-								</>
+								<Paper
+									square
+									variant="outlined"
+									className={classes.contactExtraInfo}
+								>
+									<InputLabel style={{ color: "red" }}>{"NÚMERO DELETADO"}</InputLabel>
+								</Paper>
+							}
+							{ (whatsapp.deleted || whatsapp.status === "DISCONNECTED") &&
+								<Button
+									style={{ marginTop: 4 }}
+									variant="outlined"
+									onClick={() => setNewTicketModalOpen(true)}
+								>
+									Continuar conversa com outro número
+								</Button>
 							}
 						</Paper>
 					}

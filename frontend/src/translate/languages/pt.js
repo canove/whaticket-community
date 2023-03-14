@@ -30,8 +30,8 @@ const messages = {
         moreThanThirtyDaysError: "Período máximo de 30 dias.",
         charts: {
           perDay: {
-            title: "Chamadas hoje: ",
-            calls: "Chamadas",
+            title: "Conversas hoje: ",
+            calls: "Conversas",
           },
         },
         messages: {
@@ -191,7 +191,7 @@ const messages = {
           deleteTitle: "Deletar ",
           importTitlte: "Importar contatos",
           deleteMessage:
-            "Tem certeza que deseja deletar este contato? Todas as chamadas relacionados serão perdidos.",
+            "Tem certeza que deseja deletar este contato? Todas as conversas relacionados serão perdidos.",
           importMessage: "Deseja importar todos os contatos do telefone?",
         },
         buttons: {
@@ -289,7 +289,7 @@ const messages = {
           search: { title: "Busca" },
         },
         search: {
-          placeholder: "Buscar chamadas e mensagens",
+          placeholder: "Buscar conversas e mensagens",
         },
         buttons: {
           showAll: "Todos",
@@ -333,7 +333,7 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           template: "Templates",
-          tickets: "Chamadas",
+          tickets: "Conversas",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
           importation: "Importação",
@@ -342,7 +342,7 @@ const messages = {
           users: "Usuários",
           settings: "Configurações",
           reportsTalk: "Relatórios Conversa",
-          reportsTicket: "Relatórios Chamadas",
+          reportsTicket: "Relatório de Conversa",
           logReports: "Relatório Registro",
           reports: "Relatórios",
           whatsOff: "WhatsApp",
@@ -394,7 +394,7 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Excluir ",
           deleteMessage:
-            "Você tem certeza? Essa ação não pode ser revertida! As chamadas dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
+            "Você tem certeza? Essa ação não pode ser revertida! As conversas dessa fila continuarão existindo, mas não terão mais nenhuma fila atribuída.",
           delete: "Fila excluida com Sucesso!"
         },
       },
@@ -589,7 +589,7 @@ const messages = {
       },
 
       reports: {
-        title: "Relatório Conversa",
+        title: "Relatório de Conversas",
         buttons: {
           filter: "Filtrar relatórios",
           exportPdf: "Exportar PDF",
@@ -613,7 +613,7 @@ const messages = {
       },
 
       reportsTicket: {
-        title: "Relatório Chamadas",
+        title: "Relatório de Conversa",
         buttons: {
           ticketId: "Id da Chamada",
           filterReports: "Filtrar Relatórios",

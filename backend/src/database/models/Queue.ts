@@ -38,6 +38,13 @@ class Queue extends Model<Queue> {
   @Column
   greetingMessage: string;
 
+  @Column
+  limit: number;
+
+  @ForeignKey(() => Queue)
+  @Column
+  overflowQueueId: number;
+
   @ForeignKey(() => Company)
   @Column
   companyId: number;

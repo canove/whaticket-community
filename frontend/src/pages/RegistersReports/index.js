@@ -78,8 +78,6 @@ const RegistersReports = () => {
     }, []);
 
     const createCSV = async () => {
-        setCreatingCSV(true);
-
         try {
             const { data } = await api.get(`/registers/exportCsv`, {
                 params: {
@@ -92,13 +90,12 @@ const RegistersReports = () => {
                 }
             });
             setCsv(data);
+            return data;
         } catch (err) {
             toastError(err);
         }
 
-        await downloadCsv();
-        
-        setCreatingCSV(false);
+        return null;
     }
 
     const createPDF = async () => {
@@ -125,6 +122,7 @@ const RegistersReports = () => {
     const filterReport = async () => {
         setLoading(true);
         setPdf("");
+        setCsv("");
 
         try {
             const { data } = await api.get('registers/listReport/', {
@@ -219,7 +217,15 @@ const RegistersReports = () => {
     }
 
     const downloadCsv = async () => {
-        const encodedUri = encodeURI(csv);
+        let newCSV = null;
+
+        if (!csv) {
+            setCreatingCSV(true);
+            newCSV = await createCSV();
+            setCreatingCSV(false);
+        }
+
+        const encodedUri = encodeURI(newCSV ? newCSV : csv);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "report.csv");
@@ -337,7 +343,7 @@ const RegistersReports = () => {
                             style={{ marginLeft: "8px" }}
                             variant="contained"
                             color="primary"
-                            onClick={createCSV}
+                            onClick={downloadCsv}
                             disabled={creatingCSV}
                         >
                             {i18n.t("logReport.buttons.exportCsv")}

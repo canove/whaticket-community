@@ -203,23 +203,6 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
   });
 };
 
-// const checkZero = data => {
-//   if (data.length === 1) {
-//     data = `0${data}`;
-//   }
-//   return data;
-// };
-
-// const formatDate = date => {
-//   if (date === null) {
-//     return "";
-//   }
-//   const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
-//     `${date.getHours()}`
-//   )}:${checkZero(`${date.getMinutes()}`)}`;
-//   return dateString;
-// };
-
 const getRegistersData = registers => {
   let text = "";
 
@@ -277,31 +260,16 @@ export const exportCsv = async (
     phoneNumber
   });
 
-  const checkZero = data => {
-    if (data.length === 1) {
-      data = `0${data}`;
-    }
-    return data;
-  };
-
-  const formatDate = date => {
-    if (date === null) {
-      return "";
-    }
-    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
-      `${date.getHours()}`
-    )}:${checkZero(`${date.getMinutes()}`)}`;
-    return dateString;
-  };
-
-  const rows = [["Nome", "Status", "Enviado", "Entregue", "Lido", "Erro"]];
+  const rows = [["Nome", "Status", "Processado", "Enviado", "Entregue", "Lido", "Erro"]];
 
   registers.forEach(register => {
     const { name } = register;
-    const sentAt = formatDate(register.sentAt);
-    const deliveredAt = formatDate(register.deliveredAt);
-    const readAt = formatDate(register.readAt);
-    const errorAt = formatDate(register.errorAt);
+
+    const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
+    const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
+    const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
+    const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
+    const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
 
     let status = "";
     if (errorAt) {
@@ -318,10 +286,12 @@ export const exportCsv = async (
 
     columns.push(name);
     columns.push(status);
+    columns.push(processedAt);
     columns.push(sentAt);
     columns.push(deliveredAt);
     columns.push(readAt);
     columns.push(errorAt);
+
     rows.push(columns);
   });
 
