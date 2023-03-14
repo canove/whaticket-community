@@ -28,6 +28,7 @@ type ListQuery = {
   finalDate: string;
   name: string;
   phoneNumber: string;
+  limit: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -99,7 +100,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers, count, hasMore } = await ListReportRegistersService({
@@ -110,20 +111,21 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     initialDate,
     finalDate,
     name,
-    phoneNumber
+    phoneNumber,
+    limit
   });
 
   return res.json({ registers, count, hasMore });
 };
 
 export const exportPdf = async (req: Request, res: Response): Promise<void> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
     statuses,
     fileIds,
-    pageNumber,
+    limit: "-1",
     companyId,
     initialDate,
     finalDate,
@@ -257,13 +259,13 @@ export const exportCsv = async (
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
     statuses,
     fileIds,
-    pageNumber,
+    limit: "-1",
     companyId,
     initialDate,
     finalDate,

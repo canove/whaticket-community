@@ -38,16 +38,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const getCurrentDate = () => {
-    const date = new Date();
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const currentDate = `${year}-${month}-${day}`;
-
-    return currentDate;
-}
-
 const RegistersReports = () => {
     const classes = useStyles();
     const { i18n } = useTranslation();
@@ -62,12 +52,16 @@ const RegistersReports = () => {
     const [pageNumber, setPageNumber] = useState(1);
 	const [count, setCount] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
-    const [initialDate, setInitialDate] = useState(getCurrentDate());
-    const [finalDate, setFinalDate] = useState(getCurrentDate());
+    const [initialDate, setInitialDate] = useState("");
+    const [finalDate, setFinalDate] = useState("");
     const [name, setName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [creatingCSV, setCreatingCSV] = useState(false);
     const [creatingPDF, setCreatingPDF] = useState(false);
+
+    useEffect(() => {
+        setPageNumber(1);
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber]);
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -83,14 +77,6 @@ const RegistersReports = () => {
         fetchFiles();
     }, []);
 
-    useEffect(() => {
-        setPageNumber(1);
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber]);
-
-    useEffect(() => {
-        if (count > 0) filterReport();
-    }, [pageNumber]);
-
     const createCSV = async () => {
         setCreatingCSV(true);
 
@@ -99,7 +85,6 @@ const RegistersReports = () => {
                 params: {
                     statuses,
                     fileIds,
-                    pageNumber: "ALL",
                     initialDate,
                     finalDate,
                     name,
@@ -122,7 +107,6 @@ const RegistersReports = () => {
                 params: {
                     statuses,
                     fileIds,
-                    pageNumber: "ALL",
                     initialDate,
                     finalDate,
                     name,
@@ -140,6 +124,7 @@ const RegistersReports = () => {
 
     const filterReport = async () => {
         setLoading(true);
+        setPdf("");
 
         try {
             const { data } = await api.get('registers/listReport/', {
@@ -150,7 +135,8 @@ const RegistersReports = () => {
                     initialDate,
                     finalDate,
                     name,
-                    phoneNumber
+                    phoneNumber,
+                    limit: 20
                 }
             });
             setRegisters(data.registers);
