@@ -260,16 +260,19 @@ export const exportCsv = async (
     phoneNumber
   });
 
-  const rows = [["Nome", "Status", "Processado", "Enviado", "Entregue", "Lido", "Erro"]];
+  const rows = [["Nome", "Telefone", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?"]];
 
   registers.forEach(register => {
-    const { name } = register;
+    const { name, phoneNumber } = register;
 
+    const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
     const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
     const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
     const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
+    const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
     const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
-    const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
+
+    const haveWhatsapp = getHaveWhatsapp(register);
 
     let status = "";
     if (errorAt) {
@@ -285,12 +288,15 @@ export const exportCsv = async (
     const columns = [];
 
     columns.push(name);
+    columns.push(phoneNumber);
     columns.push(status);
     columns.push(processedAt);
     columns.push(sentAt);
     columns.push(deliveredAt);
     columns.push(readAt);
+    columns.push(interactionAt);
     columns.push(errorAt);
+    columns.push(haveWhatsapp);
 
     rows.push(columns);
   });
@@ -303,3 +309,15 @@ export const exportCsv = async (
 
   return res.status(200).json(csvContent);
 };
+
+const getHaveWhatsapp = (reg) => {
+  if (reg.haveWhatsapp === null && reg.sentAt) {
+      return "SIM";
+  }
+
+  if (reg.haveWhatsapp === null && !reg.sentAt) {
+      return "DESCONHECIDO";
+  }
+
+  return reg.haveWhatsapp ? "SIM" : "NÃO";
+}
