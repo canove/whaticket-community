@@ -225,7 +225,12 @@ const RegistersReports = () => {
             setCreatingCSV(false);
         }
 
-        const encodedUri = encodeURI(newCSV ? newCSV : csv);
+        let universalBOM = "\uFEFF";
+
+        const selectedCSV = newCSV ? newCSV : csv;
+        const splittedCSV = selectedCSV.split("data:text/csv;charset=utf-8,");
+
+        const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + universalBOM + splittedCSV[1]);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "report.csv");
