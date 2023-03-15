@@ -20,6 +20,7 @@ import ColorPicker from "../ColorPicker";
 import { IconButton, InputAdornment } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
 import { useTranslation } from "react-i18next";
+import QueueSelectSingle from "../QueueSelectSingle";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -61,6 +62,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		name: "",
 		color: "",
 		greetingMessage: "",
+		limit: null,
+		overflowQueueId: null,
 	};
 
 	const QueueSchema = Yup.object().shape({
@@ -94,6 +97,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				name: "",
 				color: "",
 				greetingMessage: "",
+				limit: null,
+				overflowQueueId: null,
 			});
 		};
 	}, [queueId, open]);
@@ -138,7 +143,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 						}, 400);
 					}}
 				>
-					{({ touched, errors, isSubmitting, values }) => (
+					{({ touched, errors, isSubmitting, values, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
 								<Field
@@ -215,6 +220,26 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										margin="dense"
 									/>
 								</div>
+								{/* <div>
+									<Field
+										as={TextField}
+										label={"Limite"}
+										name="limit"
+										placeholder="Ilimitado"
+										type="number"
+										error={touched.limit && Boolean(errors.limit)}
+										helperText={touched.limit && errors.limit}
+										variant="outlined"
+										margin="dense"
+										fullWidth
+									/>
+								</div>
+								<div>
+									<QueueSelectSingle
+										selectedQueueIds={values.overflowQueueId ?? ""}
+										onChange={value => setFieldValue("overflowQueueId", value)}
+									/>
+								</div> */}
 							</DialogContent>
 							<DialogActions>
 								<Button

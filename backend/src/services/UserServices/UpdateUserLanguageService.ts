@@ -1,4 +1,6 @@
+import { SerializeUser } from "../../helpers/SerializeUser";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
+import ShowProfileService from "../ProfileServices/ShowProfileService";
 import ShowUserService from "./ShowUserService";
 
 interface Request {
@@ -27,19 +29,12 @@ const UpdateUserLanguageService = async ({
 
   await user.reload();
 
+  let serializedUser = SerializeUser(user);
+  
   const company = await ShowCompanyService(user.companyId);
+  const profiles = await ShowProfileService(`${user.profileId}`, user.companyId);
 
-  const serializedUser = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    profile: user.profile,
-    profileId: user.profileId,
-    queues: user.queues,
-    lang: user.lang,
-    companyId: user.companyId,
-    company
-  };
+  serializedUser = { ...serializedUser, company, profiles };
 
   return serializedUser;
 };

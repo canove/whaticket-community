@@ -94,7 +94,7 @@ const RenderRoutes = () => {
     if (name === "Queues") {
       return Queues;
     }
-    if (name === "Reports" || name === "Conversation Report") {
+    if (name === "Reports" || name === "Conversation Reports") {
       return Reports;
     }
     if (name === "Reports Ticket") {

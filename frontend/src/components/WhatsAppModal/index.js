@@ -218,46 +218,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 						}, 400);
 					}}
 				>
-					{({ values, touched, errors, isSubmitting }) => (
+					{({ values, touched, errors, isSubmitting, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
-								{/* <FormControl
-									variant="outlined"
-									margin="dense"
-									fullWidth
-									style={{
-										display: "flex",
-										flexDirection: "row",
-										flexWrap: "wrap",
-									}}
-								>
-									<div
-										style={{
-											border: "1px solid rgba(0, 0, 0, 0.5)",
-											borderRadius: "2%",
-											display: "flex",
-											fontSize: "16px",
-											marginRight: "8px",
-											padding: "16px",
-											textAlign: "center",
-											width: "10%",
-										}}
-									>
-										+55
-									</div>
-									<PhoneInput
-										style={{
-											display: "inline-block",
-											fontSize:"16px",
-											padding: "10px",
-											width: "calc(90% - 8px)",
-										}}
-										country="BR"
-										placeholder="(00) 0000-0000"
-										value={phoneNumber}
-										onChange={handlePhoneNumberChange}
-									/>
-								</FormControl> */}
 								<div className={classes.multFieldLine}>
 									<Field
 										as={TextField}
@@ -268,8 +231,11 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
-										// placeholder="55XX99998888"
 										className={classes.textField}
+										onChange={(e) => {
+											const newValue = e.target.value.replace(/[^\d]/g, "");
+											setFieldValue("name", newValue);
+										}}
 									/>
 									<FormControlLabel
 										control={

@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QueueSelect = ({ selectedQueueIds, onChange }) => {
+const QueueSelectSingle = ({ selectedQueue, onChange }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const [queues, setQueues] = useState([]);
@@ -42,13 +42,12 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	return (
 		<div style={{ marginTop: 6 }}>
 			<FormControl fullWidth margin="dense" variant="outlined">
-				<InputLabel>{i18n.t("queueSelect.inputLabel")}</InputLabel>
+				<InputLabel>{"Fila de Transbordo"}</InputLabel>
 				<Select
-					multiple
-					// labelWidth={60}
-					label={i18n.t("queueSelect.inputLabel")}
-					value={selectedQueueIds}
+					label={"Fila de Transbordo"}
+					value={selectedQueue}
 					onChange={handleChange}
+					defaultValue=""
 					MenuProps={{
 						anchorOrigin: {
 							vertical: "bottom",
@@ -60,24 +59,20 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 						},
 						getContentAnchorEl: null,
 					}}
-					renderValue={selected => (
-						<div className={classes.chips}>
-							{selected?.length > 0 &&
-								selected.map(id => {
-									const queue = queues.find(q => q.id === id);
-									return queue ? (
-										<Chip
-											key={id}
-											style={{ backgroundColor: queue.color }}
-											variant="outlined"
-											label={queue.name}
-											className={classes.chip}
-										/>
-									) : null;
-								})}
-						</div>
-					)}
+					renderValue={selected => {
+						const queue = queues.find(q => q.id === selected);
+						return queue ? (
+							<Chip
+								key={selected}
+								style={{ backgroundColor: queue.color }}
+								variant="outlined"
+								label={queue.name}
+								className={classes.chip}
+							/>
+						) : null;
+					}}
 				>
+					<MenuItem value={""}>Nenhum</MenuItem>
 					{queues.map(queue => (
 						<MenuItem key={queue.id} value={queue.id}>
 							{queue.name}
@@ -89,4 +84,4 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	);
 };
 
-export default QueueSelect;
+export default QueueSelectSingle;

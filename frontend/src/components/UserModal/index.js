@@ -155,6 +155,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		onClose();
 		setUser(initialState);
 		setSelectedCompany("");
+		setSelectedQueueIds([]);
 		setLanguage("");
 	};
 

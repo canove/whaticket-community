@@ -38,16 +38,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const getCurrentDate = () => {
-    const date = new Date();
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const currentDate = `${year}-${month}-${day}`;
-
-    return currentDate;
-}
-
 const RegistersReports = () => {
     const classes = useStyles();
     const { i18n } = useTranslation();
@@ -62,12 +52,16 @@ const RegistersReports = () => {
     const [pageNumber, setPageNumber] = useState(1);
 	const [count, setCount] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
-    const [initialDate, setInitialDate] = useState(getCurrentDate());
-    const [finalDate, setFinalDate] = useState(getCurrentDate());
+    const [initialDate, setInitialDate] = useState("");
+    const [finalDate, setFinalDate] = useState("");
     const [name, setName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [creatingCSV, setCreatingCSV] = useState(false);
     const [creatingPDF, setCreatingPDF] = useState(false);
+
+    useEffect(() => {
+        setPageNumber(1);
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber]);
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -83,23 +77,12 @@ const RegistersReports = () => {
         fetchFiles();
     }, []);
 
-    useEffect(() => {
-        setPageNumber(1);
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber]);
-
-    useEffect(() => {
-        if (count > 0) filterReport();
-    }, [pageNumber]);
-
     const createCSV = async () => {
-        setCreatingCSV(true);
-
         try {
             const { data } = await api.get(`/registers/exportCsv`, {
                 params: {
                     statuses,
                     fileIds,
-                    pageNumber: "ALL",
                     initialDate,
                     finalDate,
                     name,
@@ -107,13 +90,12 @@ const RegistersReports = () => {
                 }
             });
             setCsv(data);
+            return data;
         } catch (err) {
             toastError(err);
         }
 
-        await downloadCsv();
-        
-        setCreatingCSV(false);
+        return null;
     }
 
     const createPDF = async () => {
@@ -122,7 +104,6 @@ const RegistersReports = () => {
                 params: {
                     statuses,
                     fileIds,
-                    pageNumber: "ALL",
                     initialDate,
                     finalDate,
                     name,
@@ -140,6 +121,8 @@ const RegistersReports = () => {
 
     const filterReport = async () => {
         setLoading(true);
+        setPdf("");
+        setCsv("");
 
         try {
             const { data } = await api.get('registers/listReport/', {
@@ -150,7 +133,8 @@ const RegistersReports = () => {
                     initialDate,
                     finalDate,
                     name,
-                    phoneNumber
+                    phoneNumber,
+                    limit: 20
                 }
             });
             setRegisters(data.registers);
@@ -233,7 +217,15 @@ const RegistersReports = () => {
     }
 
     const downloadCsv = async () => {
-        const encodedUri = encodeURI(csv);
+        let newCSV = null;
+
+        if (!csv) {
+            setCreatingCSV(true);
+            newCSV = await createCSV();
+            setCreatingCSV(false);
+        }
+
+        const encodedUri = encodeURI(newCSV ? newCSV : csv);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "report.csv");
@@ -351,7 +343,7 @@ const RegistersReports = () => {
                             style={{ marginLeft: "8px" }}
                             variant="contained"
                             color="primary"
-                            onClick={createCSV}
+                            onClick={downloadCsv}
                             disabled={creatingCSV}
                         >
                             {i18n.t("logReport.buttons.exportCsv")}

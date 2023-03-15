@@ -138,26 +138,12 @@ const LoggedInLayout = ({ children }) => {
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
   const [logo, setLogo] = useState("");
+  const [language, setLanguage] = useState("");
 
 // eslint-disable-next-line react-hooks/exhaustive-deps
   const mainListItems = useMemo(() => <MainListItems drawerOpen={drawerOpen} />, [user, drawerOpen])
 
   const { i18n } = useTranslation();
-
-  const handleChangeLanguage = async (language) => {
-    await handleSaveUser(language);
-    i18n.changeLanguage(language);
-  }
-
-  const handleSaveUser = async (language) => {
-    if (user.id) {
-      try {
-        await api.put(`/users/language/${user.id}`, { language });
-      } catch (err) {
-        toastError(err);
-      }
-    }
-	};
 
   useEffect(() => {
     const fetchLogo = async () => {
@@ -186,6 +172,27 @@ const LoggedInLayout = ({ children }) => {
       setDrawerVariant("permanent");
     }
   }, [drawerOpen]);
+
+  useEffect(() => {
+    const saveLanguage = async () => {
+      if (!user.id) return;
+
+      try {
+        await api.put(`/users/language/${user.id}`, { language });
+        i18n.changeLanguage(language);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+    saveLanguage();
+  }, [language])
+
+  const handleChangeLanguage = (language) => {
+    // i18n.changeLanguage(language);
+    setLanguage(language);
+    handleCloseLanguageMenu();
+  }
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);

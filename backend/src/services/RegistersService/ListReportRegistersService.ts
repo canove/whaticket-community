@@ -11,6 +11,7 @@ interface Request {
   finalDate: string;
   name: string;
   phoneNumber: string;
+  limit: string;
 }
 
 interface Response {
@@ -27,7 +28,8 @@ const ListReportRegistersService = async ({
   initialDate,
   finalDate,
   name = "",
-  phoneNumber = ""
+  phoneNumber = "",
+  limit = "20"
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -58,74 +60,63 @@ const ListReportRegistersService = async ({
   if (fileIds) {
     whereCondition = {
       ...whereCondition,
-      fileId: {
-        [Op.or]: fileIds
-      }
+      fileId: fileIds
     };
   }
-
-  const getStatuses = () => {
-    const array = [];
-
-    if (statuses.includes("sent")) {
-      array.push({ sentAt: { [Op.ne]: null } });
-    }
-
-    if (statuses.includes("delivered")) {
-      array.push({ deliveredAt: { [Op.ne]: null } });
-    }
-
-    if (statuses.includes("read")) {
-      array.push({ readAt: { [Op.ne]: null } });
-    }
-
-    if (statuses.includes("error")) {
-      array.push({ errorAt: { [Op.ne]: null } });
-    }
-
-    if (statuses.includes("interaction")) {
-      array.push({ interactionAt: { [Op.ne]: null } });
-    }
-
-    return array;
-  };
 
   if (statuses) {
     whereCondition = {
       ...whereCondition,
-      [Op.or]: getStatuses()
+      [Op.or]: getStatuses(statuses)
     };
-  }
-
-  if (pageNumber === "ALL") {
-    const { count, rows: registers } = await FileRegister.findAndCountAll({
-      where: { ...whereCondition, companyId }
-    });
-
-    const hasMore = false;
-
-    return { registers, count, hasMore };
   }
 
   if (initialDate && finalDate) {
     whereCondition = {
       ...whereCondition,
-      processedAt: { [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))] }
+      processedAt: {
+        [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+      },
     }
   }
 
-  const limit = 20;
-  const offset = limit * (+pageNumber - 1);
+  const offset = +limit * (+pageNumber - 1);
 
   const { count, rows: registers } = await FileRegister.findAndCountAll({
-    where: { ...whereCondition, companyId },
-    limit,
-    offset
+    where: whereCondition,
+    limit: +limit > 0 ? +limit : null,
+    offset: +limit > 0 ? offset : null
   });
 
   const hasMore = count > offset + registers.length;
 
   return { registers, count, hasMore };
+};
+
+const getStatuses = (statuses) => {
+  const array = [];
+
+  if (statuses.includes("sent")) {
+    array.push({ sentAt: { [Op.ne]: null } });
+  }
+
+  if (statuses.includes("delivered")) {
+    array.push({ deliveredAt: { [Op.ne]: null } });
+  }
+
+  if (statuses.includes("read")) {
+    array.push({ readAt: { [Op.ne]: null } });
+  }
+
+  if (statuses.includes("error")) {
+    array.push({ errorAt: { [Op.ne]: null } });
+  }
+
+  if (statuses.includes("interaction")) {
+    array.push({ interactionAt: { [Op.ne]: null } });
+  }
+
+  return array;
 };
 
 export default ListReportRegistersService;

@@ -1,4 +1,4 @@
-import { endOfDay, parseISO, startOfDay } from "date-fns";
+import { endOfDay, format, parseISO, startOfDay } from "date-fns";
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import FileRegister from "../database/models/FileRegister";
@@ -28,6 +28,7 @@ type ListQuery = {
   finalDate: string;
   name: string;
   phoneNumber: string;
+  limit: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -99,7 +100,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers, count, hasMore } = await ListReportRegistersService({
@@ -110,20 +111,21 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     initialDate,
     finalDate,
     name,
-    phoneNumber
+    phoneNumber,
+    limit
   });
 
   return res.json({ registers, count, hasMore });
 };
 
 export const exportPdf = async (req: Request, res: Response): Promise<void> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
     statuses,
     fileIds,
-    pageNumber,
+    limit: "-1",
     companyId,
     initialDate,
     finalDate,
@@ -138,18 +140,21 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
           <meta charset="utf-8" />
           <title>PDF - Relatório de Registros</title>
         </head>
+        <style>
+          html { zoom: 0.7; }
+        </style>
         <body>
           <h1>Relatório de Registros</h1>
-          <table style="border: 1px solid black; border-collapse: collapse;">
+          <table style="display: block; border-collapse: collapse; width: 1200px; table-layout: fixed;">
             <thead>
               <tr>
-                <td style="border: 1px solid black">Nome</td>
-                <td style="border: 1px solid black">Status</td>
-                <td style="border: 1px solid black">Processado</td>
-                <td style="border: 1px solid black">Enviado</td>
-                <td style="border: 1px solid black">Entregue</td>
-                <td style="border: 1px solid black">Lido</td>
-                <td style="border: 1px solid black">Erro</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Nome</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Status</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Processado</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Enviado</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Entregue</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Lido</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Erro</td>
               <tr>
             </thead>
             <tbody>
@@ -198,33 +203,17 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
   });
 };
 
-const checkZero = data => {
-  if (data.length === 1) {
-    data = `0${data}`;
-  }
-  return data;
-};
-
-const formatDate = date => {
-  if (date === null) {
-    return "";
-  }
-  const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
-    `${date.getHours()}`
-  )}:${checkZero(`${date.getMinutes()}`)}`;
-  return dateString;
-};
-
 const getRegistersData = registers => {
   let text = "";
 
   registers.forEach(register => {
-    const name = register.getDataValue("name");
-    const sentAt = formatDate(register.getDataValue("sentAt"));
-    const deliveredAt = formatDate(register.getDataValue("deliveredAt"));
-    const readAt = formatDate(register.getDataValue("readAt"));
-    const errorAt = formatDate(register.getDataValue("errorAt"));
-    const processedAt = formatDate(register.getDataValue("processedAt"));
+    const name = register.name;
+
+    const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
+    const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
+    const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
+    const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
+    const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
 
     let status = "";
     if (errorAt) {
@@ -239,13 +228,13 @@ const getRegistersData = registers => {
 
     text += `
       <tr>
-        <td style="border: 1px solid black">${name}</td>
-        <td style="border: 1px solid black">${status}</td>
-        <td style="border: 1px solid black">${processedAt}</td>
-        <td style="border: 1px solid black">${sentAt}</td>
-        <td style="border: 1px solid black">${deliveredAt}</td>
-        <td style="border: 1px solid black">${readAt}</td>
-        <td style="border: 1px solid black">${errorAt}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${name}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${status}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${processedAt}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${sentAt}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${deliveredAt}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${readAt}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${errorAt}</td>
       </tr>
     `;
   });
@@ -257,13 +246,13 @@ export const exportCsv = async (
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { statuses, fileIds, pageNumber, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
     statuses,
     fileIds,
-    pageNumber,
+    limit: "-1",
     companyId,
     initialDate,
     finalDate,
@@ -271,31 +260,16 @@ export const exportCsv = async (
     phoneNumber
   });
 
-  const checkZero = data => {
-    if (data.length === 1) {
-      data = `0${data}`;
-    }
-    return data;
-  };
-
-  const formatDate = date => {
-    if (date === null) {
-      return "";
-    }
-    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
-      `${date.getHours()}`
-    )}:${checkZero(`${date.getMinutes()}`)}`;
-    return dateString;
-  };
-
-  const rows = [["Nome", "Status", "Enviado", "Entregue", "Lido", "Erro"]];
+  const rows = [["Nome", "Status", "Processado", "Enviado", "Entregue", "Lido", "Erro"]];
 
   registers.forEach(register => {
     const { name } = register;
-    const sentAt = formatDate(register.sentAt);
-    const deliveredAt = formatDate(register.deliveredAt);
-    const readAt = formatDate(register.readAt);
-    const errorAt = formatDate(register.errorAt);
+
+    const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
+    const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
+    const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
+    const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
+    const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
 
     let status = "";
     if (errorAt) {
@@ -312,10 +286,12 @@ export const exportCsv = async (
 
     columns.push(name);
     columns.push(status);
+    columns.push(processedAt);
     columns.push(sentAt);
     columns.push(deliveredAt);
     columns.push(readAt);
     columns.push(errorAt);
+
     rows.push(columns);
   });
 
