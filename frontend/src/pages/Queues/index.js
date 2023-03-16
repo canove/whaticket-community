@@ -209,6 +209,12 @@ const Queues = () => {
                 {i18n.t("queues.table.greeting")}
               </TableCell>
               <TableCell align="center">
+                {"Limite"}
+              </TableCell>
+              <TableCell align="center">
+                {"Fila de Transbordo"}
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("queues.table.actions")}
               </TableCell>
             </TableRow>
@@ -241,6 +247,8 @@ const Queues = () => {
                       </Typography>
                     </div>
                   </TableCell>
+                  <TableCell align="center">{queue.limit}</TableCell>
+                  <TableCell align="center">{queue.overflowQueue ? queue.overflowQueue.name : ""}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
@@ -261,7 +269,7 @@ const Queues = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {loading && <TableRowSkeleton columns={4} />}
+              {loading && <TableRowSkeleton columns={6} />}
             </>
           </TableBody>
         </Table>

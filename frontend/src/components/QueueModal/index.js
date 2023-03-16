@@ -220,7 +220,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										margin="dense"
 									/>
 								</div>
-								{/* <div>
+								<div>
 									<Field
 										as={TextField}
 										label={"Limite"}
@@ -232,14 +232,16 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										variant="outlined"
 										margin="dense"
 										fullWidth
+										InputLabelProps={{ shrink: true }}
 									/>
 								</div>
 								<div>
 									<QueueSelectSingle
-										selectedQueueIds={values.overflowQueueId ?? ""}
+										selectedQueue={values.overflowQueueId ?? ""}
 										onChange={value => setFieldValue("overflowQueueId", value)}
+										excludedQueue={queueId}
 									/>
-								</div> */}
+								</div>
 							</DialogContent>
 							<DialogActions>
 								<Button
@@ -253,7 +255,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								<Button
 									type="submit"
 									color="primary"
-									disabled={isSubmitting}
+									disabled={isSubmitting  || (values.limit && values.limit <= 0) || (values.limit && !values.overflowQueueId) || (!values.limit && values.overflowQueueId)}
 									variant="contained"
 									className={classes.btnWrapper}
 								>

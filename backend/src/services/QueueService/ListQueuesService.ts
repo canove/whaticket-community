@@ -5,7 +5,15 @@ const ListQueuesService = async (
 ): Promise<Queue[]> => {
   const queues = await Queue.findAll({
     where: { companyId },
-    order: [["name", "ASC"]]
+    order: [["name", "ASC"]],
+    include: [
+      {
+        model: Queue,
+        as: "overflowQueue",
+        attributes: ["name"],
+        required: false,
+      }
+    ]
   });
 
   return queues;
