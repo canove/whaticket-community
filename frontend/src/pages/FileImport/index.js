@@ -445,6 +445,9 @@ const FileImport = () => {
                 {"Template"}
               </TableCell>
               <TableCell align="center">
+                {"Categoria"}
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("importation.table.sentBy")}
               </TableCell>
               <TableCell align="center">
@@ -471,6 +474,9 @@ const FileImport = () => {
                     </TableCell>
                     <TableCell align="center">{item.name}</TableCell>
                     <TableCell align="center">{getTemplate(item)}</TableCell>
+                    <TableCell align="center">
+                      {item.connectionFile ? item.connectionFile.name : ""}
+                    </TableCell>
                     <TableCell align="center">
                       {getUserById(item.ownerid)}
                     </TableCell>

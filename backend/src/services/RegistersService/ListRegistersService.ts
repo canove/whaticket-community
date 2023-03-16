@@ -11,7 +11,8 @@ interface Request {
   date?: string;
   initialDate?: string;
   finalDate?: string;
-  companyId: number
+  categoryId?: string;
+  companyId: number;
 }
 
 const ListRegistersService = async ({
@@ -19,7 +20,8 @@ const ListRegistersService = async ({
   date,
   companyId, 
   initialDate, 
-  finalDate
+  finalDate,
+  categoryId
 }: Request) => {
   let whereCondition = null;
   let whereConditionCreatedAt = null;
@@ -89,26 +91,54 @@ const ListRegistersService = async ({
     }
   }
 
-  const info1 = await FileRegister.findOne({
-    where: { ...whereCondition, ...whereConditionProcessedAt },
-    attributes: [
-      [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
-      [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
-      [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
-      [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
-      [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
-      [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND haveWhatsapp = 0 AND msgWhatsId IS NULL")), 'noWhats' ],
-    ],
-    raw: true
-  });
+  if (categoryId) {
+    const files = await File.findAll({
+      where: { 
+        connectionFileId: categoryId,
+        companyId
+      }
+    });
 
-  const info2 = await FileRegister.findOne({
-    where: { ...whereCondition, ...whereConditionCreatedAt },
-    attributes: [
-      [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
-    ],
-    raw: true
-  });
+    if (files.length > 0) {
+      const filesArray = files.map(file => file.id);
+
+      whereCondition = {
+        ...whereCondition,
+        fileId: { [Op.in]: filesArray }
+      }
+
+      whereConditionCreatedAt = {
+        ...whereConditionCreatedAt,
+        fileId: { [Op.in]: filesArray }
+      }
+    }
+  }
+
+  let info1 = null;
+  let info2 = null;
+
+  if (date || (initialDate && finalDate)) {
+    info1 = await FileRegister.findOne({
+      where: { ...whereCondition, ...whereConditionProcessedAt },
+      attributes: [
+        [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
+        [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
+        [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
+        [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL")), 'error' ],
+        [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
+        [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND haveWhatsapp = 0 AND msgWhatsId IS NULL")), 'noWhats' ],
+      ],
+      raw: true
+    });
+  
+    info2 = await FileRegister.findOne({
+      where: { ...whereCondition, ...whereConditionCreatedAt },
+      attributes: [
+        [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
+      ],
+      raw: true
+    });
+  }
 
   const info3 = await FileRegister.findOne({
     where: whereCondition,

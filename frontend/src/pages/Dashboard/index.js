@@ -80,6 +80,12 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: -10,
   },
+  dateStyleLeft: {
+    display: "inline-block",
+    width: "40%",
+    marginTop: -10,
+    marginRight: 20,
+  },
   dateStyle: {
     display: "inline-block",
     width: "40%",
@@ -134,6 +140,13 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "5px",
     width: "100%",
   },
+
+  categoryStyle: {
+    padding: theme.spacing(2),
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+  }
 }));
 
 const Dashboard = () => {
@@ -141,8 +154,7 @@ const Dashboard = () => {
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
   var userQueueIds = [];
-
-  const [loading, setLoading] = useState(false);
+  let lastGrid = 0;
 
   const [registerCount, setRegisterCount] = useState(0);
   const [sentCount, setSentCount] = useState(0);
@@ -182,21 +194,31 @@ const Dashboard = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [companies, setCompanies] = useState([]);
 
+  const [categoryId, setCategoryId] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
   }
 
-  const GetTickets = (status, showAll, withUnreadMessages) => {
-    const { count } = useTickets({
+  const GetTickets = (status, showAll, withUnreadMessages, connectionFileId) => {
+    const { count, loading } = useTickets({
       status: status,
       showAll: showAll,
       withUnreadMessages: withUnreadMessages,
       queueIds: JSON.stringify(userQueueIds),
+      connectionFileId: connectionFileId
     });
-    return count;
+
+    return loading ? <CircularProgress /> : count;
   };
 
   const handleFilter = async () => {
+    setLoading(true);
+    setCategoryCount([]);
+
     if (initialDate && finalDate) {
       const i = new Date(+startOfDay(parseISO(initialDate)));
       const f = new Date(+endOfDay(parseISO(finalDate)));
@@ -208,15 +230,12 @@ const Dashboard = () => {
       }
     }
 
-    setLoading(true);
     try {
-      setLoading(true);
-
       const { data } = await api.get("/registers/list", {
-        params: { fileId, date, initialDate, finalDate },
+        params: { fileId, date, initialDate, finalDate, categoryId },
       });
 
-      setRegisterCount(data.reports.total);
+      setRegisterCount(data.reports.total || "0");
       setSentCount(data.reports.sent || "0");
       setDeliveredCount(data.reports.delivered || "0");
       setReadCount(data.reports.read || "0");
@@ -225,32 +244,16 @@ const Dashboard = () => {
       setNoWhatsCount(data.reports.noWhats || "0");
       setQueueCount(data.reports.queue || "0");
 
-      // let queueCounter = 0;
-
-      // if (data.reports.fileQueue) queueCounter += Number(data.reports.fileQueue);
-      // if (data.reports.registerQueue) queueCounter += Number(data.reports.registerQueue);
-
-      // setQueueCount(queueCounter);
-
       setCategoryCount(data.category);
       setConnectedWhatsapps(data.connectedWhatsapps);
 
       setSentMessageCount(data.messages.sent || "0");
       setReceivedMessageCount(data.messages.received || "0");
-
-      setLoading(false);
     } catch (err) {
       toastError(err);
     }
-  };
 
-  const fetchConfig = async () => {
-    try {
-      const { data } = await api.get("/whatsconfig/");
-      setConfig(data && data.length > 0 ? data[0] : null);
-    } catch (err) {
-      toastError(err);
-    }
+    setLoading(false);
   };
 
   const fetchBilling = async () => {
@@ -266,33 +269,16 @@ const Dashboard = () => {
     }
   }
 
-  // const handleFiles = async () => {
-  //   setLoading(true);
-  //   let allFiles = [];
-
-  //   try {
-  //     const { data } = await api.get("file/list?status=5");
-  //     allFiles = [...allFiles, ...data.reports];
-  //     setLoading(false);
-  //   } catch (err) {
-  //     toastError(err);
-  //     setLoading(false);
-  //   }
-
-  //   try {
-  //     const { data } = await api.get("file/list?status=6");
-  //     allFiles = [...allFiles, ...data.reports];
-  //     setLoading(false);
-  //   } catch (err) {
-  //     toastError(err);
-  //     setLoading(false);
-  //   }
-
-  //   setFiles(allFiles);
-  // };
+  const fetchConfig = async () => {
+    try {
+      const { data } = await api.get("/whatsconfig/");
+      setConfig(data && data.length > 0 ? data[0] : null);
+    } catch (err) {
+      toastError(err);
+    }
+  };
 
   const fetchAverangeTime = async () => {
-    setLoading(true);
     try {
       const { data } = await api.get("/tickets/time", {
         params: { searchParam },
@@ -311,16 +297,23 @@ const Dashboard = () => {
       }
 
       setAverageTime(data.totalAverageTime);
-      setLoading(false);
     } catch (err) {
       toastError(err);
-      setLoading(false);
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const { data } = await api.get("/connectionFiles/");
+      setCategories(data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     handleFilter();
-  }, [fileId, date, initialDate, finalDate]);
+  }, [fileId, date, initialDate, finalDate, categoryId]);
 
   useEffect(() => {
     fetchAverangeTime();
@@ -328,7 +321,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchConfig();
-    // handleFiles();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -361,34 +354,41 @@ const Dashboard = () => {
     setUpdatingPage(false);
   };
 
-  // const handleSelectOption = (_, newValue) => {
-  //   if (newValue) {
-  //     setFileId(newValue.id);
-  //     setDate("");
-  //   } else {
-  //     setFileId("");
-  //   }
-  // };
+  const getGridSize = (index) => {
+    // if (categoryCount.length === 1) return 12;
+    // if (categoryCount.length === 2) return 6;
+    // if (categoryCount.length === 3) return 4;
+    // if (categoryCount.length === 4) return 3;
 
-  // const renderOptionLabel = (option) => {
-  //   if (option.number) {
-  //     return `${option.name} - ${option.number}`;
-  //   } else {
-  //     return `${option.name}`;
-  //   }
-  // };
+    // if (!categoryCount[index+3] && ((index+1) % 4 === 1)) {
+    //   if (categoryCount[index+2]) {
+    //     lastGrid = 4;
+    //   } else if (categoryCount[index+1]) {
+    //     lastGrid = 6;
+    //   } else {
+    //     lastGrid = 12;
+    //   }
+    // }
 
-  const getGridSize = () => {
-    if (categoryCount.length === 1) {
-      return 12;
+    // if (lastGrid) return lastGrid;
+
+    // return 3;
+
+    if (categoryCount.length === 1) return 12;
+    if (categoryCount.length === 2) return 6;
+    if (categoryCount.length === 3) return 4;
+
+    if (!categoryCount[index+2] && ((index+1) % 3 === 1)) {
+      if (categoryCount[index+1]) {
+        lastGrid = 6;
+      } else {
+        lastGrid = 12;
+      }
     }
-    if (categoryCount.length === 2) {
-      return 6;
-    }
-    if (categoryCount.length === 3) {
-      return 4;
-    }
-    return 12;
+
+    if (lastGrid) return lastGrid;
+
+    return 4;
   };
 
   const handleSearch = (e) => {
@@ -432,16 +432,22 @@ const Dashboard = () => {
 
     let totalTriggerInterval = 0;
 
-    connectedWhatsapps.forEach((whats) => {
+    for (const whats of connectedWhatsapps) {
       connectedWhatsappsCount += 1;
       triggerIntervalCount += 1;
 
+      if (whats.automaticControl && whats.currentTriggerInterval) {
+        totalTriggerInterval += whats.currentTriggerInterval;
+        continue;
+      }
+
       if (whats.connectionFile && whats.connectionFile.triggerInterval) {
         totalTriggerInterval += whats.connectionFile.triggerInterval;
-      } else {
-        totalTriggerInterval += config.triggerInterval;
+        continue;
       }
-    });
+
+      totalTriggerInterval += config.triggerInterval;
+    }
 
     let queueCountInt = parseInt(queueCount);
 
@@ -467,6 +473,18 @@ const Dashboard = () => {
     let money = quantity.toFixed(2);
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
   }
+
+  const handleSelectOption = (_, newValue) => {
+    if (newValue) {
+      setCategoryId(newValue.id);
+    } else {
+      setCategoryId("");
+    }
+  };
+
+  const renderOptionLabel = (option) => {
+    return option.name;
+  };
 
   return (
     <div>
@@ -517,7 +535,7 @@ const Dashboard = () => {
               />
             </Paper>
           </Grid> */}
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Paper className={classes.customFixedHeightPaper}>
               <Typography
                 style={{ display: "inlineBlock" }}
@@ -538,12 +556,12 @@ const Dashboard = () => {
                 }}
                 value={date}
                 label={i18n.t("dashboard.date")}
-                InputLabelProps={{ shrink: true, required: true }}
+                InputLabelProps={{ shrink: true }}
                 type="date"
               />
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Paper className={classes.customFixedHeightPaper}>
               <Typography
                 style={{ display: "inlineBlock" }}
@@ -556,7 +574,7 @@ const Dashboard = () => {
               </Typography>
               <div>
                 <TextField
-                  className={classes.dateStyle}
+                  className={classes.dateStyleLeft}
                   onChange={(e) => {
                     setInitialDate(e.target.value);
                     setDate("");
@@ -564,7 +582,7 @@ const Dashboard = () => {
                   }}
                   value={initialDate}
                   label={i18n.t("dashboard.initialDate")}
-                  InputLabelProps={{ shrink: true, required: true }}
+                  InputLabelProps={{ shrink: true }}
                   type="date"
                 />
                 <TextField
@@ -576,8 +594,37 @@ const Dashboard = () => {
                   }}
                   value={finalDate}
                   label={i18n.t("dashboard.finalDate")}
-                  InputLabelProps={{ shrink: true, required: true }}
+                  InputLabelProps={{ shrink: true }}
                   type="date"
+                />
+              </div>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper className={classes.customFixedHeightPaper}>
+              <Typography
+                style={{ display: "inlineBlock" }}
+                component="h3"
+                variant="h6"
+                color="primary"
+                paragraph
+              >
+                {"Categoria (Whatsapp)"}
+              </Typography>
+              <div>
+                <Autocomplete
+                  onChange={(e, newValue) => handleSelectOption(e, newValue)}
+                  className={classes.selectStyle}
+                  options={categories}
+                  value={categories.find((c) => c.id === categoryId) || null}
+                  getOptionLabel={renderOptionLabel}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={"Categoria (Whatsapp)"}
+                      // InputLabelProps={{ required: true }}
+                    />
+                  )}
                 />
               </div>
             </Paper>
@@ -586,15 +633,14 @@ const Dashboard = () => {
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
-              disabled={loading}
             >
               <Typography component="h3" variant="h6" color="primary" paragraph>
                 {i18n.t("dashboard.messages.inAttendance.title")}
               </Typography>
               <Grid item>
-                <Typography component="h1" variant="h4">
-                  {GetTickets("open", "true", "false")}
-                </Typography>
+              <Typography component="h1" variant="h4">
+                {GetTickets("open", "true", "false", categoryId)}
+              </Typography>
               </Grid>
             </Paper>
           </Grid>
@@ -608,7 +654,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {GetTickets("pending", "true", "false")}
+                  {GetTickets("pending", "true", "false", categoryId)}
                 </Typography>
               </Grid>
             </Paper>
@@ -623,7 +669,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {GetTickets("closed", "true", "false")}
+                  {GetTickets("closed", "true", "false", categoryId)}
                 </Typography>
               </Grid>
             </Paper>
@@ -638,7 +684,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {queueCount}
+                  {loading ? <CircularProgress /> : queueCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -653,7 +699,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {getAverageDeliveryTime()}
+                  {loading ? <CircularProgress /> : getAverageDeliveryTime()}
                 </Typography>
               </Grid>
             </Paper>
@@ -668,7 +714,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {registerCount}
+                  {loading ? <CircularProgress /> : registerCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -683,7 +729,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {sentCount}
+                  {loading ? <CircularProgress /> : sentCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -698,7 +744,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {deliveredCount}
+                  {loading ? <CircularProgress /> : deliveredCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -713,7 +759,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {readCount}
+                  {loading ? <CircularProgress /> : readCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -728,7 +774,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {errorCount}
+                  {loading ? <CircularProgress /> : errorCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -743,7 +789,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {interactionCount}
+                  {loading ? <CircularProgress /> : interactionCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -758,7 +804,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {noWhatsCount}
+                  {loading ? <CircularProgress /> : noWhatsCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -773,7 +819,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {sentMessageCount}
+                  {loading ? <CircularProgress /> : sentMessageCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -788,7 +834,7 @@ const Dashboard = () => {
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {receivedMessageCount}
+                  {loading ? <CircularProgress /> : receivedMessageCount}
                 </Typography>
               </Grid>
             </Paper>
@@ -801,10 +847,10 @@ const Dashboard = () => {
             </Grid>
           )}
           {categoryCount &&
-            categoryCount.map((category) => (
-              <Grid item xs={getGridSize()} key={category.name}>
+            categoryCount.map((category, index) => (
+              <Grid item xs={getGridSize(index)} key={category.name}>
                 <Paper
-                  className={classes.customFixedHeightPaper}
+                  className={classes.categoryStyle}
                   style={{ overflow: "hidden" }}
                 >
                   <Typography

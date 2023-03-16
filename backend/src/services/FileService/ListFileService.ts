@@ -1,5 +1,6 @@
 /*eslint-disable*/
 import { Op } from "sequelize";
+import ConnectionFiles from "../../database/models/ConnectionFile";
 import File from "../../database/models/File";
 import OfficialTemplates from "../../database/models/OfficialTemplates";
 import Templates from "../../database/models/TemplatesData";
@@ -92,7 +93,13 @@ const ListFileService = async ({
           as: "officialTemplate",
           attributes: ["id", "name"],
           required: false,
-        }
+        },
+        {
+          model: ConnectionFiles,
+          as: "connectionFile",
+          attributes: ["id", "name"],
+          required: false,
+        },
       ]
     });
 

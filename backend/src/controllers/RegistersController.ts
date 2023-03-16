@@ -18,6 +18,7 @@ type IndexQuery = {
   date?: string;
   initialDate?: string;
   finalDate?: string;
+  categoryId?: string;
 };
 
 type ListQuery = {
@@ -32,16 +33,16 @@ type ListQuery = {
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { fileId, date, initialDate, finalDate } = req.query as IndexQuery;
+  const { fileId, date, initialDate, finalDate, categoryId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const reports = await ListRegistersService({ fileId, date, companyId, initialDate, finalDate });
+  const reports = await ListRegistersService({ fileId, date, companyId, initialDate, finalDate, categoryId });
 
-  const category = await DashboardCategoryService(companyId, date);
+  const category = await DashboardCategoryService({ companyId, date, categoryId });
 
   const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
 
-  const messages = await CountMessagesServices({ companyId, date, initialDate, finalDate });
+  const messages = await CountMessagesServices({ companyId, date, initialDate, finalDate, categoryId });
 
   return res.status(200).json({ reports, category, connectedWhatsapps, messages });
 };
@@ -154,6 +155,7 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Enviado</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Entregue</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Lido</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Interação</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Erro</td>
               <tr>
             </thead>
@@ -214,6 +216,7 @@ const getRegistersData = registers => {
     const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
     const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
     const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
+    const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
 
     let status = "";
     if (errorAt) {
@@ -234,6 +237,7 @@ const getRegistersData = registers => {
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${sentAt}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${deliveredAt}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${readAt}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${interactionAt}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${errorAt}</td>
       </tr>
     `;
@@ -260,7 +264,7 @@ export const exportCsv = async (
     phoneNumber
   });
 
-  const rows = [["Nome", "Telefone", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?"]];
+  const rows = [["Nome", "Telefone", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];
 
   registers.forEach(register => {
     const { name, phoneNumber } = register;
@@ -297,6 +301,11 @@ export const exportCsv = async (
     columns.push(interactionAt);
     columns.push(errorAt);
     columns.push(haveWhatsapp);
+    columns.push(register.var1);
+    columns.push(register.var2);
+    columns.push(register.var3);
+    columns.push(register.var4);
+    columns.push(register.var5);
 
     rows.push(columns);
   });

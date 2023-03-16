@@ -1,40 +1,47 @@
 /* eslint-disable */
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { Op } from "sequelize";
 import Category from "../../database/models/Category";
 import Ticket from "../../database/models/Ticket";
+import Whatsapp from "../../database/models/Whatsapp";
 
-const DashboardCategoryService = async (
-  companyId: string | number,
-  date: string
-): Promise<Category[]> => {
+interface Request {
+  companyId: string | number;
+  date: string;
+  categoryId: string;
+}
+
+const DashboardCategoryService = async ({
+  companyId,
+  date,
+  categoryId
+}: Request): Promise<Category[]> => {
   let whereCondition = null;
 
   whereCondition = { companyId };
-
-  const getDate = (option: string) => {
-    if (option === "MORNING") {
-      const morningDate = new Date(`${date} GMT-3`);
-      morningDate.setHours(0, 0, 0, 0);
-      return morningDate;
-    }
-
-    if (option === "NIGHT") {
-      const nightDate = new Date(`${date} GMT-3`);
-      nightDate.setHours(23, 59, 59, 999);
-      return nightDate;
-    }
-
-    return null;
-  };
 
   if (date) {
     whereCondition = {
       ...whereCondition,
       createdAt: {
-        [Op.gte]: getDate("MORNING"),
-        [Op.lte]: getDate("NIGHT")
-      }
+        [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
+      },
     };
+  }
+
+  let ticketInclude = null;
+  
+  if (categoryId) {
+    ticketInclude = {
+      include: [
+        {
+          model: Whatsapp,
+          as: "whatsapp",
+          where: { connectionFileId: categoryId },
+          required: true,
+        }
+      ]
+    }
   }
 
   const categories = await Category.findAll({ where: whereCondition });
@@ -42,7 +49,8 @@ const DashboardCategoryService = async (
 
   for (const category of categories) {
     const { count } = await Ticket.findAndCountAll({
-      where: { categoryId: category.id }
+      where: { categoryId: category.id },
+      ...ticketInclude
     });
 
     if (count > 0) {

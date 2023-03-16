@@ -39,6 +39,7 @@ type IndexQuery = {
   phone: string,
   session: string
   categoryId: string;
+  connectionFileId: string;
 };
 
 interface TicketData {
@@ -61,7 +62,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     showAll,
     queueIds: queueIdsStringified,
     withUnreadMessages,
-    categoryId
+    categoryId,
+    connectionFileId,
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -84,6 +86,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     withUnreadMessages,
     companyId,
     categoryId,
+    connectionFileId,
     loggedUserId: id
   });
 
