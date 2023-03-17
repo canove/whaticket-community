@@ -74,10 +74,6 @@ const ListTicketsService = async ({
     });
   }
 
-  if (showAll === "true") {
-    whereCondition = { companyId }; // queueId: { [Op.or]: [queueIds, null] },
-  }
-
   if (status) {
     whereCondition = {
       ...whereCondition,
@@ -161,10 +157,17 @@ const ListTicketsService = async ({
 
   const allTickets = await CheckProfilePermissionService({ userId: loggedUserId , companyId, permission: "tickets-manager:showall" });
 
+  if (showAll === "true" && allTickets) {
+    whereCondition = { companyId, queueId: { [Op.or]: [queueIds, null] } };
+
+    if (status) whereCondition = { ...whereCondition, status };
+  }
+
   if (!allTickets) {
     whereCondition = {
       ...whereCondition,
-      userId: { [Op.or]: [loggedUserId, null]  }
+      userId: { [Op.or]: [loggedUserId, null]  },
+      queueId: { [Op.or]: [queueIds, null] },
     }
   }
 
