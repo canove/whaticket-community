@@ -13,6 +13,7 @@ interface MessageData {
   mediaUrl?: string;
   companyId: number;
   bot?: boolean;
+  messageData?: number;
 }
 interface Request {
   messageData: MessageData;
@@ -21,6 +22,24 @@ interface Request {
 const CreateMessageService = async ({
   messageData
 }: Request): Promise<Message> => {
+  if (messageData.fromMe === false) {
+    const lastMessage = await Message.findOne({
+      where: {
+        fromMe: true,
+        ticketId: messageData.ticketId,
+      },
+      order: [["createdAt", "DESC"]]
+    });
+
+    if (lastMessage) {
+      const now = new Date();
+      const lastMessageDate = new Date(lastMessage.createdAt);
+
+      const responseTime = now.getTime() - lastMessageDate.getTime();
+      messageData["responseTime"] = responseTime;
+    }
+  }
+
   await Message.upsert(messageData);
 
   const message = await Message.findByPk(messageData.id, {

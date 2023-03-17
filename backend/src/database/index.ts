@@ -37,6 +37,7 @@ import OfficialTemplatesStatus from "./models/OfficialTemplatesStatus";
 import Profiles from "./models/Profiles";
 import WhatsAppLearning from "./models/WhatsappLearning";
 import GeneralReports from "./models/GeneralReports";
+import TicketHistorics from "./models/TicketHistorics";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -81,7 +82,8 @@ const models = [
   OfficialTemplatesStatus,
   Profiles,
   WhatsAppLearning,
-  GeneralReports
+  GeneralReports,
+  TicketHistorics,
 ];
 
 sequelize.addModels(models);

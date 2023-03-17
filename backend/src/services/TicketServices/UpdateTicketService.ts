@@ -3,6 +3,7 @@ import { getIO } from "../../libs/socket";
 import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "./ShowTicketService";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
+import CreateTicketHistoricService from "../TicketHistoricsServices/CreateTicketHistoricService";
 
 interface TicketData {
   status?: string;
@@ -35,10 +36,19 @@ const UpdateTicketService = async ({
 
   const oldStatus = ticket.status;
   const oldUserId = ticket.user?.id;
+  const oldQueueId = ticket.queueId;
 
+  let reopen = false;
   if (oldStatus === "closed") {
     await CheckContactOpenTickets(ticket.contact.id);
+    reopen = true;
   }
+
+  if ((!reopen) && (status !== "closed") && (!(oldStatus === "pending" && status === "open")) && (oldUserId != userId || oldQueueId != queueId)) {
+    // TICKET HISTORIC - TRANSFER
+    await CreateTicketHistoricService(ticket, "TRANSFER");
+  }
+
   console.log("update ticket updateticketservice 43");
   await ticket.update({
     status,
@@ -49,6 +59,23 @@ const UpdateTicketService = async ({
   });
 
   await ticket.reload();
+
+  if (reopen) {
+    // TICKET HISTORIC - REOPEN
+    await CreateTicketHistoricService(ticket, "REOPEN");
+  } else if (status === "closed") {
+    // TICKET HISTORIC - FINALIZE
+    await CreateTicketHistoricService(ticket, "FINALIZE");
+  } else if (oldStatus === "pending" && status === "open") {
+    // TICKET HISTORIC - ACCEPT
+    await CreateTicketHistoricService(ticket, "ACCEPT");
+  } else if (oldUserId != userId || oldQueueId != queueId) {
+    // TICKET HISTORIC - TRANSFER
+    await CreateTicketHistoricService(ticket, "TRANSFER");
+  } else {
+    // TICKET HISTORIC - UPDATE
+    await CreateTicketHistoricService(ticket, "UPDATE");
+  }
 
   const io = getIO();
 

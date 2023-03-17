@@ -10,9 +10,11 @@ import {
   Unique,
   BelongsToMany,
   ForeignKey,
-  BelongsTo
+  BelongsTo,
+  HasMany
 } from "sequelize-typescript";
 import Company from "./Company";
+import TicketHistorics from "./TicketHistorics";
 import User from "./User";
 import UserQueue from "./UserQueue";
 
@@ -58,6 +60,9 @@ class Queue extends Model<Queue> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @HasMany(() => TicketHistorics, "queueId")
+  ticketHistorics: TicketHistorics[];
 
   @BelongsToMany(() => Whatsapp, () => WhatsappQueue)
   whatsapps: Array<Whatsapp & { WhatsappQueue: WhatsappQueue }>;
