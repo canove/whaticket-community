@@ -42,6 +42,7 @@ import OfficialWhatsappReport from "../pages/OfficialWhatsappReport";
 import Profiles from "../pages/Profiles";
 import Operations from "../pages/Operations";
 import GeneralReports from "../pages/GeneralReports";
+import CategoryReport from "../pages/CategoryReport";
 
 const RenderRoutes = () => {
   const { isAuth, user } = useContext(AuthContext);
@@ -168,6 +169,9 @@ const RenderRoutes = () => {
     }
     if (name === "General Report") {
       return GeneralReports;
+    }
+    if (name === "Category Report") {
+      return CategoryReport;
     }
   };
 

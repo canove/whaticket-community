@@ -59,9 +59,14 @@ const RegistersReports = () => {
     const [creatingCSV, setCreatingCSV] = useState(false);
     const [creatingPDF, setCreatingPDF] = useState(false);
 
+    const [categories, setCategories] = useState([]);
+    const [categoryIds, setCategoryIds] = useState([]);
+
+    const [showFilters, setShowFilters] = useState(false);
+
     useEffect(() => {
         setPageNumber(1);
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber]);
+    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber, categoryIds]);
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -74,7 +79,18 @@ const RegistersReports = () => {
                 toastError(err);
             }
         }
+
+        const fetchCategories = async () => {
+            try {
+                const { data } = await api.get('/connectionFiles');
+                setCategories(data);
+            } catch (err) {
+                toastError(err);
+            }
+        }
+
         fetchFiles();
+        fetchCategories();
     }, []);
 
     const createCSV = async () => {
@@ -86,7 +102,8 @@ const RegistersReports = () => {
                     initialDate,
                     finalDate,
                     name,
-                    phoneNumber
+                    phoneNumber,
+                    categoryIds
                 }
             });
             setCsv(data);
@@ -107,7 +124,8 @@ const RegistersReports = () => {
                     initialDate,
                     finalDate,
                     name,
-                    phoneNumber
+                    phoneNumber,
+                    categoryIds
                 }
             });
             setPdf(data);
@@ -134,7 +152,8 @@ const RegistersReports = () => {
                     finalDate,
                     name,
                     phoneNumber,
-                    limit: 20
+                    limit: 20,
+                    categoryIds
                 }
             });
             setRegisters(data.registers);
@@ -156,6 +175,18 @@ const RegistersReports = () => {
             setFileIds([]);
         } else {
             setFileIds(typeof value === 'string' ? value.split(',') : value,);
+        }
+    }
+
+    const handleCategoryIDsChange = (e) => {
+        const {
+            target: { value },
+        } = e;
+
+        if (value.includes("none")) {
+            setCategoryIds([]);
+        } else {
+            setCategoryIds(typeof value === 'string' ? value.split(',') : value,);
         }
     }
 
@@ -256,103 +287,138 @@ const RegistersReports = () => {
             <MainHeader>
                 <Title>{i18n.t("logReport.title")}</Title>
                 <MainHeaderButtonsWrapper>
-                    <div style={{ display: "flex", alignItems: "flex-end" }}>
-                        <TextField
-                            placeholder={"Telefone"}
-                            type="search"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                        />
-                        <TextField
-                            style={{ marginLeft: "8px" }}
-                            placeholder={"Nome"}
-                            type="search"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        <TextField
-                            style={{ marginLeft: "8px" }}
-                            onChange={(e) => { setInitialDate(e.target.value) }}
-                            label={i18n.t("reports.form.initialDate")}
-                            InputLabelProps={{ shrink: true, required: true }}
-                            type="date"
-                            value={initialDate}
-                        />
-                        <TextField
-                            style={{ marginLeft: "8px" }}
-                            onChange={(e) => { setFinalDate(e.target.value) }}
-                            label={i18n.t("reports.form.finalDate")}
-                            InputLabelProps={{ shrink: true, required: true }}
-                            type="date"
-                            value={finalDate}
-                        />
-                        <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
-                            <InputLabel id="file-select-label">{i18n.t("logReport.select.file")}</InputLabel>
-                            <Select
-                                className={classes.select}
-                                labelId="file-select-label"
-                                id="file-select"
-                                value={fileIds}
-                                onChange={handleFileSelectChange}
-                                multiple
+                    <div>
+                        { showFilters &&
+                            <>
+                                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                                    <TextField
+                                        placeholder={"Telefone"}
+                                        type="search"
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                    />
+                                    <TextField
+                                        style={{ marginLeft: "8px" }}
+                                        placeholder={"Nome"}
+                                        type="search"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                    <TextField
+                                        style={{ marginLeft: "8px" }}
+                                        onChange={(e) => { setInitialDate(e.target.value) }}
+                                        label={i18n.t("reports.form.initialDate")}
+                                        InputLabelProps={{ shrink: true, required: true }}
+                                        type="date"
+                                        value={initialDate}
+                                    />
+                                    <TextField
+                                        style={{ marginLeft: "8px" }}
+                                        onChange={(e) => { setFinalDate(e.target.value) }}
+                                        label={i18n.t("reports.form.finalDate")}
+                                        InputLabelProps={{ shrink: true, required: true }}
+                                        type="date"
+                                        value={finalDate}
+                                    />
+                                </div>
+                                <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "end" }}>
+                                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
+                                        <InputLabel id="category-label">{"Categoria"}</InputLabel>
+                                        <Select
+                                            className={classes.select}
+                                            labelId="category-label"
+                                            id="category"
+                                            value={categoryIds}
+                                            onChange={handleCategoryIDsChange}
+                                            multiple
+                                        >
+                                            <MenuItem value={"none"}>{"Nenhum"}</MenuItem>
+                                            {categories && categories.map((category) => {
+                                                return (
+                                                    <MenuItem key={category.id} value={category.id}>
+                                                        {category.name}
+                                                    </MenuItem>
+                                                );
+                                            })}
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
+                                        <InputLabel id="file-select-label">{i18n.t("logReport.select.file")}</InputLabel>
+                                        <Select
+                                            className={classes.select}
+                                            labelId="file-select-label"
+                                            id="file-select"
+                                            value={fileIds}
+                                            onChange={handleFileSelectChange}
+                                            multiple
+                                        >
+                                            <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
+                                            {files && files.map((file) => {
+                                                return (
+                                                    <MenuItem key={file.id} value={file.id}>
+                                                        {file.name}
+                                                    </MenuItem>
+                                                );
+                                            })}
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
+                                        <InputLabel id="status-select-label">{i18n.t("logReport.select.status")}</InputLabel>
+                                        <Select
+                                            className={classes.select}
+                                            labelId="status-select-label"
+                                            id="status-select"
+                                            value={statuses}
+                                            onChange={handleStatusSelectChange}
+                                            multiple
+                                        >
+                                            <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
+                                            <MenuItem value={"sent"}>{i18n.t("logReport.select.sent")}</MenuItem>
+                                            <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
+                                            <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
+                                            <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
+                                            <MenuItem value={"interaction"}>{"Interação"}</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                            </>
+                        }
+                        <div style={{ textAlign: "right", marginTop: "8px" }}>
+                            <Button
+                                style={{ marginLeft: "8px" }}
+                                variant="contained"
+                                color="primary"
+                                onClick={filterReport}
+                                disabled={loading}
                             >
-                                <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
-                                {files && files.map((file, index) => {
-                                    return (
-                                        <MenuItem key={index} value={file.id}>
-                                            {file.name}
-                                        </MenuItem>
-                                    );
-                                })}
-                            </Select>
-                        </FormControl>
-                        <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
-                            <InputLabel id="status-select-label">{i18n.t("logReport.select.status")}</InputLabel>
-                            <Select
-                                className={classes.select}
-                                labelId="status-select-label"
-                                id="status-select"
-                                value={statuses}
-                                onChange={handleStatusSelectChange}
-                                multiple
+                                {"Filtrar"}
+                            </Button>
+                            <Button
+                                style={{ marginLeft: "8px" }}
+                                variant="contained"
+                                color="primary"
+                                onClick={downloadPdf}
+                                disabled={creatingPDF}
                             >
-                                <MenuItem value={"all"}>{i18n.t("logReport.select.all")}</MenuItem>
-                                <MenuItem value={"sent"}>{i18n.t("logReport.select.sent")}</MenuItem>
-                                <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
-                                <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
-                                <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
-                                <MenuItem value={"interaction"}>{"Interação"}</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                        <Button
-                            style={{ marginLeft: "8px" }}
-                            variant="contained"
-                            color="primary"
-                            onClick={filterReport}
-                            disabled={loading}
-                        >
-                            {"Filtrar"}
-                        </Button>
-                        <Button
-                            style={{ marginLeft: "8px" }}
-                            variant="contained"
-                            color="primary"
-                            onClick={downloadPdf}
-                            disabled={creatingPDF}
-                        >
-                            {i18n.t("logReport.buttons.exportPdf")}
-                        </Button>
-                        <Button
-                            style={{ marginLeft: "8px" }}
-                            variant="contained"
-                            color="primary"
-                            onClick={downloadCsv}
-                            disabled={creatingCSV}
-                        >
-                            {i18n.t("logReport.buttons.exportCsv")}
-                        </Button>
+                                {i18n.t("logReport.buttons.exportPdf")}
+                            </Button>
+                            <Button
+                                style={{ marginLeft: "8px" }}
+                                variant="contained"
+                                color="primary"
+                                onClick={downloadCsv}
+                                disabled={creatingCSV}
+                            >
+                                {i18n.t("logReport.buttons.exportCsv")}
+                            </Button>
+                            <Button
+                                style={{ marginLeft: "8px" }}
+                                variant="contained"
+                                onClick={() => setShowFilters(prevFilter => !prevFilter)}
+                            >
+                                {showFilters ? "Esconder Filtros" : "Mostrar Filtros"}
+                            </Button>
+                        </div>
                     </div>
                 </MainHeaderButtonsWrapper>
             </MainHeader>
@@ -365,6 +431,7 @@ const RegistersReports = () => {
                         <TableRow>
                             <TableCell align="center">{i18n.t("logReport.grid.name")}</TableCell>
                             <TableCell align="center">{"Telefone"}</TableCell>
+                            <TableCell align="center">{"Categoria"}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.status")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.sent")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.delivered")}</TableCell>
@@ -382,6 +449,7 @@ const RegistersReports = () => {
                                     <TableRow key={index}>
                                         <TableCell align="center">{register.name}</TableCell>
                                         <TableCell align="center">{register.phoneNumber}</TableCell>
+                                        <TableCell align="center">{(register.file && register.file.connectionFile) ? register.file.connectionFile.name : ""}</TableCell>
                                         <TableCell align="center">{getStatus(register)}</TableCell>
                                         <TableCell align="center">{formatDate(register.sentAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.deliveredAt)}</TableCell>

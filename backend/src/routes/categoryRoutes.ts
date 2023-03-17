@@ -7,6 +7,12 @@ const categoryRoutes = Router();
 
 categoryRoutes.get("/category", isAuth, CategoryController.index);
 
+categoryRoutes.get("/category/count", isAuth, CategoryController.count);
+
+categoryRoutes.get("/category/exportPDF", isAuth, CategoryController.exportPDF);
+
+categoryRoutes.get("/category/exportCSV", isAuth, CategoryController.exportCSV);
+
 categoryRoutes.post("/category", isAuth, CategoryController.store);
 
 categoryRoutes.get("/category/:categoryId", isAuth, CategoryController.show);

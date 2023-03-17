@@ -30,6 +30,7 @@ type ListQuery = {
   name: string;
   phoneNumber: string;
   limit: string;
+  categoryIds: Array<any>;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -101,7 +102,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber, categoryIds } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers, count, hasMore } = await ListReportRegistersService({
@@ -113,14 +114,15 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     finalDate,
     name,
     phoneNumber,
-    limit
+    limit,
+    categoryIds
   });
 
   return res.json({ registers, count, hasMore });
 };
 
 export const exportPdf = async (req: Request, res: Response): Promise<void> => {
-  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
@@ -131,41 +133,44 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
     initialDate,
     finalDate,
     name,
-    phoneNumber
+    phoneNumber,
+    categoryIds
   });
 
   const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>PDF - Relatório de Registros</title>
-        </head>
-        <style>
-          html { zoom: 0.7; }
-        </style>
-        <body>
-          <h1>Relatório de Registros</h1>
-          <table style="display: block; border-collapse: collapse; width: 1200px; table-layout: fixed;">
-            <thead>
-              <tr>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Nome</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Status</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Processado</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Enviado</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Entregue</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Lido</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Interação</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Erro</td>
-              <tr>
-            </thead>
-            <tbody>
-              ${getRegistersData(registers)}
-            </tbody>
-          </table>
-        </body>
-      </html>
-    `;
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>PDF - Relatório de Registros</title>
+      </head>
+      <style>
+        html { zoom: 0.7; }
+      </style>
+      <body>
+        <h1>Relatório de Registros</h1>
+        <table style="display: block; border-collapse: collapse; width: 1200px; table-layout: fixed;">
+          <thead>
+            <tr>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Nome</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Telefone</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Categoria</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Status</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Processado</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Enviado</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Entregue</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Lido</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Interação</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Erro</td>
+            <tr>
+          </thead>
+          <tbody>
+            ${getRegistersData(registers)}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
 
   const options = {
     format: "A3",
@@ -210,6 +215,7 @@ const getRegistersData = registers => {
 
   registers.forEach(register => {
     const name = register.name;
+    const phoneNumber = register.phoneNumber;
 
     const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
     const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
@@ -217,6 +223,8 @@ const getRegistersData = registers => {
     const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
     const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
     const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
+
+    const category = (register.file && register.file.connectionFile) ? register.file.connectionFile.name : "";
 
     let status = "";
     if (errorAt) {
@@ -232,6 +240,8 @@ const getRegistersData = registers => {
     text += `
       <tr>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${name}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${phoneNumber}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${category}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${status}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${processedAt}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${sentAt}</td>
@@ -250,7 +260,7 @@ export const exportCsv = async (
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { registers } = await ListReportRegistersService({
@@ -261,10 +271,11 @@ export const exportCsv = async (
     initialDate,
     finalDate,
     name, 
-    phoneNumber
+    phoneNumber,
+    categoryIds
   });
 
-  const rows = [["Nome", "Telefone", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];
+  const rows = [["Nome", "Telefone", "Categoria", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];
 
   registers.forEach(register => {
     const { name, phoneNumber } = register;
@@ -275,6 +286,8 @@ export const exportCsv = async (
     const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
     const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
     const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
+
+    const category = (register.file && register.file.connectionFile) ? register.file.connectionFile.name : "";
 
     const haveWhatsapp = getHaveWhatsapp(register);
 
@@ -293,6 +306,7 @@ export const exportCsv = async (
 
     columns.push(name);
     columns.push(phoneNumber);
+    columns.push(category);
     columns.push(status);
     columns.push(processedAt);
     columns.push(sentAt);
