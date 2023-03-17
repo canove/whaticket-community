@@ -184,6 +184,8 @@ const FileImport = () => {
       return "9";
     } else if (status === `Pausado`) {
       return "10";
+    } else if (status === `Interrompido`) {
+      return "11";
     } else {
       return status;
     }
@@ -212,6 +214,8 @@ const FileImport = () => {
       return `Processando Números`;
     } else if (id === 10) {
       return `Pausado`;
+    } else if (id === 11) {
+      return `Interrompido`;
     } else {
       return id;
     }
@@ -324,7 +328,7 @@ const FileImport = () => {
   }
 
   const handleCancel = async (fileId) => {
-    await updateFile(fileId, 7);
+    await updateFile(fileId, 11);
   }
 
   const updateFile = async (fileId, status) => {
@@ -399,7 +403,8 @@ const FileImport = () => {
               `${i18n.t("importation.form.refused")}`,
               `Validando Números`,
               `Processando Números`,
-              `Pausado`
+              `Pausado`,
+              `Interrompido`
             ]}
             getOptionLabel={renderOptionLabel}
             onChange={(e, newValue) => handleSelectOption(e, newValue)}

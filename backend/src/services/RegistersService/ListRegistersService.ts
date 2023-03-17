@@ -30,7 +30,7 @@ const ListRegistersService = async ({
   whereCondition = { ...whereCondition, companyId };
 
   if (fileId) {
-    whereConditionCreatedAt = { ...whereConditionCreatedAt, fileId };
+    whereCondition = { ...whereCondition, fileId };
   } else {
     const files = await File.findAll({
       where: { 
@@ -45,8 +45,8 @@ const ListRegistersService = async ({
     if (files.length > 0) {
       const filesArray = files.map(file => file.id);
 
-      whereConditionCreatedAt = {
-        ...whereConditionCreatedAt,
+      whereCondition = {
+        ...whereCondition,
         fileId: { [Op.notIn]: filesArray }
       }
     }
