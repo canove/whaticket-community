@@ -27,6 +27,8 @@ import {
   removePhoneNumberWith9Country
 } from "../utils/common";
 import Ticket from "../database/models/Ticket";
+import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService";
+import ShowUserService from "../services/UserServices/ShowUserService";
 
 type IndexQuery = {
   searchParam: string;
@@ -39,6 +41,7 @@ type IndexQuery = {
   phone: string,
   session: string
   categoryId: string;
+  connectionFileId: string;
 };
 
 interface TicketData {
@@ -61,7 +64,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     showAll,
     queueIds: queueIdsStringified,
     withUnreadMessages,
-    categoryId
+    categoryId,
+    connectionFileId,
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -84,6 +88,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     withUnreadMessages,
     companyId,
     categoryId,
+    connectionFileId,
     loggedUserId: id
   });
 
@@ -172,7 +177,17 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const { companyId } = req.user;
 
-  const contact = await ShowTicketService(ticketId, companyId);
+  const loggedUserId = req.user.id;
+  const allTickets = await CheckProfilePermissionService({ userId: loggedUserId , companyId, permission: "tickets-manager:showall" });
+
+  let userQueueIds = null;
+
+  if (!allTickets) {
+    const user = await ShowUserService(loggedUserId, companyId);
+    userQueueIds = user.queues.map(queue => queue.id);
+  }
+
+  const contact = await ShowTicketService(ticketId, companyId, userQueueIds);
 
   return res.status(200).json(contact);
 };

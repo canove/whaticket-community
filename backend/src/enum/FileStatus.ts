@@ -11,4 +11,5 @@ export enum FileStatus {
   TestingWhatsapp = 8,
   TestingWhatsappProcessing = 9,
   Paused = 10,
+  Interrupted = 11,
 }

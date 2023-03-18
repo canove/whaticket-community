@@ -85,10 +85,12 @@ const FindOrCreateTicketService = async (
         {
           model: Queue,
           as: "queues",
-          attributes: ["id"]
+          attributes: ["id", "limit", "overflowQueueId", "companyId"],
         }
       ],
     });
+
+    const queueId = await getQueueId(whatsapp);
 
     ticket = await Ticket.create({
       contactId: groupContact ? groupContact.id : contact.id,
@@ -97,7 +99,8 @@ const FindOrCreateTicketService = async (
       unreadMessages,
       whatsappId,
       companyId,
-      queueId: (whatsapp && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : null
+      queueId,
+      // queueId: (whatsapp && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : null
     });
   }
 
@@ -105,5 +108,53 @@ const FindOrCreateTicketService = async (
 
   return ticket;
 };
+
+const getQueueId = async (whatsapp: Whatsapp) => {
+  try {
+    if (whatsapp && whatsapp.queues && whatsapp.queues.length > 0) {
+      let selectedQueueId = null;
+  
+      for (const queue of whatsapp.queues) {
+        selectedQueueId = await checkQueue(queue);
+
+        if (selectedQueueId) break;
+      }
+
+      return selectedQueueId;
+    }
+
+    return null;
+  } catch (err) {
+    console.log(err);
+  }
+
+  return null;
+}
+
+const checkQueue = async (queue: Queue) => {
+  if (!queue.limit) return queue.id;
+
+  const ticketCount = await Ticket.count({
+    where: {
+      companyId: queue.companyId,
+      queueId: queue.id,
+      status: "pending",
+    }
+  });
+
+  if (ticketCount < queue.limit) return queue.id;
+
+  const overflowQueue = await Queue.findOne({
+    where: { 
+      id: queue.overflowQueueId, 
+      companyId: queue.companyId,
+    },
+    attributes: ["id", "limit", "overflowQueueId", "companyId"]
+  });
+
+  const overflowQueueId = await checkQueue(overflowQueue);
+
+  return overflowQueueId;
+}
 
 export default FindOrCreateTicketService;

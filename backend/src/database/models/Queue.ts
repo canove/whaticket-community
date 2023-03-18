@@ -9,7 +9,8 @@ import {
   AllowNull,
   Unique,
   BelongsToMany,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
 import Company from "./Company";
 import User from "./User";
@@ -44,6 +45,9 @@ class Queue extends Model<Queue> {
   @ForeignKey(() => Queue)
   @Column
   overflowQueueId: number;
+
+  @BelongsTo(() => Queue)
+  overflowQueue: Queue;
 
   @ForeignKey(() => Company)
   @Column

@@ -1,17 +1,20 @@
 import { Op, Sequelize } from "sequelize";
 import FileRegister from "../../database/models/FileRegister";
 import { endOfDay, parseISO, startOfDay, subHours } from "date-fns";
+import File from "../../database/models/File";
+import ConnectionFiles from "../../database/models/ConnectionFile";
 
 interface Request {
   statuses?: Array<any>;
   fileIds?: Array<any>;
   pageNumber?: string | number;
   companyId: number;
-  initialDate: string;
-  finalDate: string;
-  name: string;
-  phoneNumber: string;
-  limit: string;
+  initialDate?: string;
+  finalDate?: string;
+  name?: string;
+  phoneNumber?: string;
+  limit?: string;
+  categoryIds?: Array<any>;
 }
 
 interface Response {
@@ -29,9 +32,11 @@ const ListReportRegistersService = async ({
   finalDate,
   name = "",
   phoneNumber = "",
-  limit = "20"
+  limit = "20",
+  categoryIds
 }: Request): Promise<Response> => {
   let whereCondition = null;
+  let fileInclude = null;
 
   whereCondition = { companyId };
 
@@ -80,12 +85,35 @@ const ListReportRegistersService = async ({
     }
   }
 
+  if (categoryIds) {
+    fileInclude = {
+      where: { connectionFileId: categoryIds },
+      required: true
+    }
+  }
+
   const offset = +limit * (+pageNumber - 1);
 
   const { count, rows: registers } = await FileRegister.findAndCountAll({
     where: whereCondition,
+    include: [
+      {
+        model: File,
+        as: "file",
+        attributes: ["connectionFileId"],
+        include: [
+          {
+            model: ConnectionFiles,
+            as: "connectionFile",
+            attributes: ["name"],
+            required: false,
+          }
+        ],
+        ...fileInclude,
+      }
+    ],
     limit: +limit > 0 ? +limit : null,
-    offset: +limit > 0 ? offset : null
+    offset: +limit > 0 ? offset : null,
   });
 
   const hasMore = count > offset + registers.length;

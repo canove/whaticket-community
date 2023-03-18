@@ -7,6 +7,7 @@ import Message from "../../database/models/Message";
 import Queue from "../../database/models/Queue";
 import ShowUserService from "../UserServices/ShowUserService";
 import CheckProfilePermissionService from "../ProfileServices/CheckProfilePermissionService";
+import Whatsapp from "../../database/models/Whatsapp";
 
 interface Request {
   searchParam?: string;
@@ -20,6 +21,7 @@ interface Request {
   companyId: number;
   categoryId: string;
   loggedUserId: string | number;
+  connectionFileId: string;
 }
 
 interface Response {
@@ -37,6 +39,7 @@ const ListTicketsService = async ({
   showAll,
   userId,
   withUnreadMessages,
+  connectionFileId,
   companyId,
   categoryId,
   loggedUserId
@@ -58,11 +61,17 @@ const ListTicketsService = async ({
       model: Queue,
       as: "queue",
       attributes: ["id", "name", "color"]
-    }
+    },
   ];
 
-  if (showAll === "true") {
-    whereCondition = { companyId }; // queueId: { [Op.or]: [queueIds, null] },
+  if (connectionFileId) {
+    includeCondition.push({
+      model: Whatsapp,
+      as: "whatsapp",
+      attributes: ["id", "name", "connectionFileId"],
+      where: { connectionFileId },
+      required: true,
+    });
   }
 
   if (status) {
@@ -148,10 +157,17 @@ const ListTicketsService = async ({
 
   const allTickets = await CheckProfilePermissionService({ userId: loggedUserId , companyId, permission: "tickets-manager:showall" });
 
+  if (showAll === "true" && allTickets) {
+    whereCondition = { companyId, queueId: { [Op.or]: [queueIds, null] } };
+
+    if (status) whereCondition = { ...whereCondition, status };
+  }
+
   if (!allTickets) {
     whereCondition = {
       ...whereCondition,
-      userId: { [Op.or]: [loggedUserId, null]  }
+      userId: { [Op.or]: [loggedUserId, null]  },
+      queueId: { [Op.or]: [queueIds, null] },
     }
   }
 

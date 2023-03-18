@@ -5,7 +5,17 @@ const ShowQueueService = async (
   queueId: number | string,
   companyId: number | string
 ): Promise<Queue> => {
-  const queue = await Queue.findOne({ where: { id: queueId, companyId } });
+  const queue = await Queue.findOne({ 
+    where: { id: queueId, companyId },
+    include: [
+      {
+        model: Queue,
+        as: "overflowQueue",
+        attributes: ["name"],
+        required: false,
+      }
+    ]
+  });
 
   if (!queue) {
     throw new AppError("ERR_QUEUE_NOT_FOUND");

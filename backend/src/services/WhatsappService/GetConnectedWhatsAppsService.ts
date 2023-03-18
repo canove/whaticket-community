@@ -9,6 +9,7 @@ const GetConnectedWhatsAppsService = async (companyId: number): Promise<Whatsapp
       status: "CONNECTED",
       companyId: companyId
     },
+    attributes: ["id", "automaticControl", "currentTriggerInterval"],
     include: [
       {
         model: ConnectionFiles,

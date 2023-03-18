@@ -5,9 +5,12 @@ import Queue from "../../database/models/Queue";
 import ShowQueueService from "./ShowQueueService";
 
 interface QueueData {
+  id?: string | number;
   name?: string;
   color?: string;
   greetingMessage?: string;
+  limit?: string;
+  overflowQueueId?: string;
 }
 
 const UpdateQueueService = async (
@@ -15,7 +18,7 @@ const UpdateQueueService = async (
   queueData: QueueData,
   companyId: number | string
 ): Promise<Queue> => {
-  const { color, name } = queueData;
+  const { color, name, greetingMessage, limit, overflowQueueId } = queueData;
 
   const queueSchema = Yup.object().shape({
     name: Yup.string()
@@ -66,7 +69,55 @@ const UpdateQueueService = async (
 
   const queue = await ShowQueueService(queueId, companyId);
 
-  await queue.update(queueData);
+  if (limit && overflowQueueId) {
+    let loopError = false;
+
+    let loopCount = 0;
+    let queueList = [];
+    let currentQueueId: number | string = queue.id;
+
+    while (loopCount <= 10) {
+      loopCount++;
+  
+      const overflowQueue = await ShowQueueService(currentQueueId, companyId);
+  
+      if (overflowQueue.id == queueId) {
+        if (queueList.includes(queueId)) {
+          loopError = true;
+          break;
+        }
+
+        if (queueList.includes(queueId)) {
+          loopError = true;
+          break;
+        }
+
+        queueList.push(queueId);
+        currentQueueId = overflowQueueId;
+      } else if (overflowQueue.limit && overflowQueue.overflowQueueId) {
+        if (queueList.includes(overflowQueue.id)) {
+          loopError = true;
+          break;
+        }
+
+        queueList.push(overflowQueue.id);
+        currentQueueId = overflowQueue.overflowQueueId;
+      } else {
+        break;
+      }
+    }
+
+    if (loopError) throw new AppError("ERR_QUEUE_CREATES_A_LOOP");
+    if (loopCount > 10) throw new AppError("ERR_QUEUE_PATH_TOO_LONG");
+  }
+
+  await queue.update({
+    color,
+    name,
+    greetingMessage,
+    limit: limit ? limit : null,
+    overflowQueueId: overflowQueueId ? overflowQueueId : null,
+  });
 
   return queue;
 };

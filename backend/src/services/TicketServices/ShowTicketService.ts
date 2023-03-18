@@ -4,13 +4,26 @@ import Contact from "../../database/models/Contact";
 import User from "../../database/models/User";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
+import { Op } from "sequelize";
 
 const ShowTicketService = async (
   id: string | number,
-  companyId: string | number
+  companyId: string | number,
+  queuesIds: Queue[] = null
 ): Promise<Ticket> => {
+  let whereCondition = null;
+
+  whereCondition = { id, companyId };
+
+  if (queuesIds) {
+    whereCondition = {
+      ...whereCondition,
+      queueId: { [Op.or]: [queuesIds, null] },
+    }
+  }
+
   const ticket = await Ticket.findOne({
-    where: { id, companyId },
+    where: whereCondition,
     include: [
       {
         model: Contact,

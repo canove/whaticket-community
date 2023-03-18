@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QueueSelectSingle = ({ selectedQueue, onChange }) => {
+const QueueSelectSingle = ({ selectedQueue, onChange, excludedQueue }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const [queues, setQueues] = useState([]);
@@ -73,11 +73,14 @@ const QueueSelectSingle = ({ selectedQueue, onChange }) => {
 					}}
 				>
 					<MenuItem value={""}>Nenhum</MenuItem>
-					{queues.map(queue => (
-						<MenuItem key={queue.id} value={queue.id}>
-							{queue.name}
-						</MenuItem>
-					))}
+					{queues.map(queue => {
+						if (queue.id == excludedQueue) return;
+						return (
+							<MenuItem key={queue.id} value={queue.id}>
+								{queue.name}
+							</MenuItem>
+						)
+					})}
 				</Select>
 			</FormControl>
 		</div>

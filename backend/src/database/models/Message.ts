@@ -14,6 +14,7 @@ import {
 import Contact from "./Contact";
 import FileRegister from "./FileRegister";
 import Ticket from "./Ticket";
+import User from "./User";
 
 @Table
 class Message extends Model<Message> {
@@ -71,6 +72,10 @@ class Message extends Model<Message> {
   @ForeignKey(() => Contact)
   @Column
   contactId: number;
+
+  @ForeignKey(() => User)
+  @Column
+  userId: number;
 
   @BelongsTo(() => Contact, "contactId")
   contact: Contact;

@@ -4,12 +4,14 @@ import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 import { Op, Sequelize } from "sequelize";
 import { endOfDay, parseISO, startOfDay } from "date-fns";
+import Whatsapp from "../../database/models/Whatsapp";
 
 interface Request {
   date?: string 
   initialDate?: string; 
   finalDate?: string;
   companyId?: number;
+  categoryId?: string;
 }
 
 interface Response {
@@ -21,7 +23,8 @@ const CountMessagesServices = async ({
   companyId, 
   date, 
   initialDate, 
-  finalDate 
+  finalDate,
+  categoryId
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -50,29 +53,51 @@ const CountMessagesServices = async ({
     }
   }
 
-  const sent = await Message.count({
-    where: { ...whereCondition, fromMe: true },
-    include: [
-      {
-        model: Ticket,
-        as: "ticket",
-        where: { companyId },
-        required: true
-      }
-    ],
-  });
+  let sent = null;
+  let received = null;
 
-  const received = await Message.count({
-    where: { ...whereCondition, fromMe: false },
-    include: [
-      {
-        model: Ticket,
-        as: "ticket",
-        where: { companyId },
-        required: true
-      }
-    ],
-  });
+  let whatsappInclude = null;
+
+  if (categoryId) {
+    whatsappInclude = { 
+      include: [
+        {
+          model: Whatsapp,
+          as: "whatsapp",
+          where: { connectionFileId: categoryId },
+          required: true,
+        }
+      ]
+    }
+  }
+
+  if (date || (initialDate && finalDate)) {
+    sent = await Message.count({
+      where: { ...whereCondition, fromMe: true },
+      include: [
+        {
+          model: Ticket,
+          as: "ticket",
+          where: { companyId },
+          required: true,
+          ...whatsappInclude
+        }
+      ],
+    });
+  
+    received = await Message.count({
+      where: { ...whereCondition, fromMe: false },
+      include: [
+        {
+          model: Ticket,
+          as: "ticket",
+          where: { companyId },
+          required: true,
+          ...whatsappInclude
+        }
+      ],
+    });
+  }
 
   return { sent, received };
 };
