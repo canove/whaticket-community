@@ -255,18 +255,6 @@ const reducer = (state, action) => {
 		if (typeof updateCount === "function") {
 			updateCount(ticketsList.length);
 		}
-
-		// const countUnreadTickets = () => {
-		// 	let total = 0;
-
-		// 	for (const ticket of ticketsList) {
-		// 		if (ticket.unreadMessages > 0) total++
-		// 	}
-
-		// 	setUnreadTickets(total);
-		// }
-
-		// countUnreadTickets();
 	}, [ticketsList]);
 
 	const loadMore = () => {
