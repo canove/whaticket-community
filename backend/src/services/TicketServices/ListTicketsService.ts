@@ -17,11 +17,12 @@ interface Request {
   showAll?: string;
   userId: string | number;
   withUnreadMessages?: string;
-  queueIds: number[];
-  companyId: number;
-  categoryId: string;
-  loggedUserId: string | number;
-  connectionFileId: string;
+  queueIds?: number[];
+  companyId?: number;
+  categoryId?: string;
+  loggedUserId?: string | number;
+  connectionFileId?: string;
+  pendingAnswer?: string;
 }
 
 interface Response {
@@ -42,7 +43,8 @@ const ListTicketsService = async ({
   connectionFileId,
   companyId,
   categoryId,
-  loggedUserId
+  loggedUserId,
+  pendingAnswer
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
@@ -168,6 +170,13 @@ const ListTicketsService = async ({
       ...whereCondition,
       userId: { [Op.or]: [loggedUserId, null]  },
       queueId: { [Op.or]: [queueIds, null] },
+    }
+  }
+
+  if (pendingAnswer === "true") {
+    whereCondition = {
+      ...whereCondition,
+      lastMessageFromMe: false
     }
   }
 

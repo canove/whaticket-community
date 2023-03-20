@@ -145,7 +145,7 @@ const verifyMessage = async (
     companyId: ticket.companyId
   };
 
-  await ticket.update({ lastMessage: msg.body });
+  await ticket.update({ lastMessage: msg.body, lastMessageFromMe: msg.fromMe });
 
   await CreateMessageService({ messageData });
 };
@@ -372,7 +372,7 @@ const verifyMediaMessage = async (
     companyId: ticket.companyId
   };
 
-  await ticket.update({ lastMessage: msg.file });
+  await ticket.update({ lastMessage: msg.file, lastMessageFromMe: msg.fromMe });
   await CreateMessageService({ messageData });
 };
 

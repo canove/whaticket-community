@@ -11,6 +11,7 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	ticketsListWrapper: {
@@ -153,13 +154,13 @@ const reducer = (state, action) => {
 };
 
 	const TicketsList = (props) => {
-		const { status, searchParam, showAll, selectedQueueIds, updateCount, style, categoryId } =
-			props;
+	const { status, searchParam, showAll, selectedQueueIds, updateCount, style, categoryId, pendingAnswer } = props;
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
 	const { user } = useContext(AuthContext);
+	// const [unreadTickets, setUnreadTickets] = useState(0);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -173,6 +174,7 @@ const reducer = (state, action) => {
 		showAll,
 		queueIds: JSON.stringify(selectedQueueIds),
 		categoryId: status === "closed" ? categoryId : null,
+		pendingAnswer
 	});
 
 	useEffect(() => {
@@ -250,11 +252,22 @@ const reducer = (state, action) => {
 	}, [status, searchParam, showAll, user, selectedQueueIds]);
 
 	useEffect(() => {
-    if (typeof updateCount === "function") {
-      updateCount(ticketsList.length);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketsList]);
+		if (typeof updateCount === "function") {
+			updateCount(ticketsList.length);
+		}
+
+		// const countUnreadTickets = () => {
+		// 	let total = 0;
+
+		// 	for (const ticket of ticketsList) {
+		// 		if (ticket.unreadMessages > 0) total++
+		// 	}
+
+		// 	setUnreadTickets(total);
+		// }
+
+		// countUnreadTickets();
+	}, [ticketsList]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);

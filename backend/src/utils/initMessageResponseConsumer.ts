@@ -74,7 +74,7 @@ export const initMessageResponseConsumer = () => {
                   where: { id: msg.ticketId }
                 });
     
-                await ticket.update({ lastMessage: message.text });
+                await ticket.update({ lastMessage: message.text, lastMessageFromMe: true }); // VERIFICAR SE FROM ME É SEMPRE TRUE
 
                 await msg.reload();
     
