@@ -360,6 +360,7 @@ const messages = {
           payments: "Payments",
           flows: "Flows",
           connectionFiles: "Categories",
+          categoryReport: "Category Report",
         },
         whatsApp: {
           connections: "Connections",

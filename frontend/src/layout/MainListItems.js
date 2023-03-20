@@ -471,6 +471,9 @@ const MainListItems = (props) => {
     if (name === "Official Whatsapp Report") {
       return i18n.t("sessionReports.title");
     }
+    if (name === "Category Report") {
+      return i18n.t("mainDrawer.listItems.categoryReport")
+    }
 
     return name;
   }
