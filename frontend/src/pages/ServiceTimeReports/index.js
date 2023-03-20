@@ -21,6 +21,7 @@ import toastError from "../../errors/toastError";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,11 +42,12 @@ const ServiceTimeReports = () => {
 
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState([]);
+  const [tmaType, setTMAType] = useState("queue");
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/ticketHistorics');
+      const { data } = await api.get('/serviceTime/queue');
       setReports(data.reports);
     } catch (err) {
       toastError(err);
@@ -85,7 +87,7 @@ const ServiceTimeReports = () => {
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
 
-  const getServiceTime = (hists) => {
+  const getQueueServiceTime = (hists) => {
     let currentID = 0;
 
     const createdHist = hists.find(h => h.id > currentID);
@@ -104,7 +106,7 @@ const ServiceTimeReports = () => {
     return serviceTime;
   }
 
-  const getQueueServiceTime = (historics = []) => {    
+  const processHistorics = (historics = []) => {    
     let tickets = [];
 
     for (const historic of historics) {
@@ -133,7 +135,7 @@ const ServiceTimeReports = () => {
       if (hists.length < 2) continue;
 
       if (hists.length === 2) {
-        const serviceTime = getServiceTime(hists);
+        const serviceTime = getQueueServiceTime(hists);
         ticketsServiceTime.push(serviceTime);
         continue;
       }
@@ -146,8 +148,8 @@ const ServiceTimeReports = () => {
         }
 
         for (const newHists of histsArray) {
-          // if (newHists.length % 2 !== 0) continue;
-          const serviceTime = getServiceTime(newHists);
+          if (newHists.length % 2 !== 0) continue;
+          const serviceTime = getQueueServiceTime(newHists);
           ticketsServiceTime.push(serviceTime);
           continue;
         }
@@ -166,46 +168,105 @@ const ServiceTimeReports = () => {
     return formatTime(averageServiceTime);
   }
 
+  if (tmaType === "queue") {
+    return (
+      <MainContainer>
+        <MainHeader>
+          <Title>{"Relatório de Tempo de Atendimento"}</Title>
+          <MainHeaderButtonsWrapper>
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              <FormControl style={{ display: "inline-flex", width: "150px" }}>
+                <InputLabel>{"Tipo"}</InputLabel>
+                <Select
+                  value={tmaType}
+                  defaultValue="queue"
+                  onChange={(e) => setTMAType(e.target.value)}
+                >
+                  <MenuItem value={"queue"}>{"Fila"}</MenuItem>
+                  <MenuItem value={"user"}>{"Operador"}</MenuItem>
+                  <MenuItem value={"client"}>{"Cliente"}</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                style={{ marginLeft: "8px" }}
+                variant="contained"
+                color="primary"
+                onClick={ filterReports }
+              >
+                {"Filtrar"}
+              </Button>
+              <Button
+                style={{ marginLeft: "8px" }}
+                variant="contained"
+                color="primary"
+              >
+                {"Exportar PDF"}
+              </Button>
+            </div>
+          </MainHeaderButtonsWrapper>
+        </MainHeader>
+        <Paper className={classes.mainPaper} variant="outlined">
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">{"Fila"}</TableCell>
+                <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <>
+                {reports.map((report) => (
+                  <TableRow key={report.id}>
+                    <TableCell align="center">{report.name}</TableCell>
+                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                  </TableRow>
+                ))}
+                {loading && <TableRowSkeleton columns={2} />}
+              </>
+            </TableBody>
+          </Table>
+        </Paper>
+      </MainContainer>
+    );
+  }
+
   return (
     <MainContainer>
       <MainHeader>
         <Title>{"Relatório de Tempo de Atendimento"}</Title>
         <MainHeaderButtonsWrapper>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={ filterReports }
-          >
-            {"Filtrar"}
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-          >
-            {"Exportar PDF"}
-          </Button>
+          <div style={{ display: "flex", alignItems: "flex-end" }}>
+            <FormControl style={{ display: "inline-flex", width: "150px" }}>
+              <InputLabel>{"Tipo"}</InputLabel>
+              <Select
+                value={tmaType}
+                defaultValue="queue"
+                onChange={(e) => setTMAType(e.target.value)}
+              >
+                <MenuItem value={"queue"}>{"Fila"}</MenuItem>
+                <MenuItem value={"user"}>{"Operador"}</MenuItem>
+                <MenuItem value={"client"}>{"Cliente"}</MenuItem>
+              </Select>
+            </FormControl>
+            {/* <Button
+              style={{ marginLeft: "8px" }}
+              variant="contained"
+              color="primary"
+              onClick={ filterReports }
+            >
+              {"Filtrar"}
+            </Button>
+            <Button
+              style={{ marginLeft: "8px" }}
+              variant="contained"
+              color="primary"
+            >
+              {"Exportar PDF"}
+            </Button> */}
+          </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">{"Fila"}</TableCell>
-              <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <>
-              {reports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell align="center">{report.name}</TableCell>
-                  <TableCell align="center">{getQueueServiceTime(report.ticketHistorics)}</TableCell>
-                </TableRow>
-              ))}
-              {loading && <TableRowSkeleton columns={2} />}
-            </>
-          </TableBody>
-        </Table>
       </Paper>
     </MainContainer>
   );

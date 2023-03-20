@@ -10,7 +10,7 @@ interface Response {
     reports: Queue[];
 }
 
-const ListTicketHistoricService = async ({
+const ListQueueTicketHistoricService = async ({
     companyId
 }: Request): Promise<Response> => {
     const reports = await Queue.findAll({
@@ -37,4 +37,4 @@ const ListTicketHistoricService = async ({
     return { reports };
 };
 
-export default ListTicketHistoricService;
+export default ListQueueTicketHistoricService;
