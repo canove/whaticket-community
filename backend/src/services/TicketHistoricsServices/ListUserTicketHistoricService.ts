@@ -1,7 +1,7 @@
-import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { Op } from "sequelize";
-import Queue from "../../database/models/Queue";
+import User from "../../database/models/User";
 import TicketHistorics from "../../database/models/TicketHistorics";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 
 interface Request {
     companyId: number;
@@ -9,11 +9,11 @@ interface Request {
     finalDate: string;
 }
 
-const ListQueueTicketHistoricService = async ({
+const ListUserTicketHistoricService = async ({
     companyId,
     initialDate,
-    finalDate,
-}: Request): Promise<Queue[]> => {
+    finalDate
+}: Request): Promise<User[]> => {
     let dateFilter = null;
 
     if (initialDate && finalDate) {
@@ -24,7 +24,7 @@ const ListQueueTicketHistoricService = async ({
         }
     }
 
-    const reports = await Queue.findAll({
+    const reports = await User.findAll({
         where: { companyId },
         attributes: ["id", "name"],
         include: [
@@ -37,6 +37,7 @@ const ListQueueTicketHistoricService = async ({
                         { transferedAt: { [Op.ne]: null } },
                         { finalizedAt: { [Op.ne]: null } },
                         { reopenedAt: { [Op.ne]: null } },
+                        { acceptedAt: { [Op.ne]: null } },
                     ],
                     ...dateFilter
                 },
@@ -49,4 +50,4 @@ const ListQueueTicketHistoricService = async ({
     return reports;
 };
 
-export default ListQueueTicketHistoricService;
+export default ListUserTicketHistoricService;

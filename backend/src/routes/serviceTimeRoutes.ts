@@ -6,9 +6,21 @@ import * as ServiceTimeController from "../controllers/ServiceTimeController";
 const serviceTimeRoutes = express.Router();
 
 serviceTimeRoutes.get(
-  "/serviceTime/queue",
+  "/serviceTime/",
   isAuth,
-  ServiceTimeController.queue
+  ServiceTimeController.index
+);
+
+serviceTimeRoutes.get(
+  "/serviceTime/exportPDF",
+  isAuth,
+  ServiceTimeController.exportPDF
+);
+
+serviceTimeRoutes.get(
+  "/serviceTime/exportCSV",
+  isAuth,
+  ServiceTimeController.exportCSV
 );
 
 export default serviceTimeRoutes;

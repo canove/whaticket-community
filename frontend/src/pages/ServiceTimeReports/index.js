@@ -42,21 +42,102 @@ const ServiceTimeReports = () => {
 
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState([]);
+
   const [tmaType, setTMAType] = useState("queue");
+  const [initialDate, setInitialDate] = useState("");
+  const [finalDate, setFinalDate] = useState("");
+
+  const [pdf, setPDF] = useState("");
+  const [creatingPDF, setCreatingPDF] = useState(false);
+  const [csv, setCSV] = useState("");
+  const [creatingCSV, setCreatingCSV] = useState(false);
+
+  useEffect(() => {
+    setReports([]);
+    setPDF("");
+    setCSV("");
+  }, [tmaType])
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/serviceTime/queue');
-      setReports(data.reports);
+      const { data } = await api.get('/serviceTime/', {
+        params: { tmaType, initialDate, finalDate }
+      });
+      setReports(data);
     } catch (err) {
       toastError(err);
     }
     setLoading(false);
   };
 
+  const createPDF = async () => {
+    try {
+      const { data } = await api.get('/serviceTime/exportPDF', {
+        params: { tmaType, initialDate, finalDate }
+      });
+      setPDF(data);
+      return data;
+    } catch (err) {
+      toastError(err);
+    }
+
+    return null;
+  }
+
+  const createCSV = async () => {
+    try {
+      const { data } = await api.get('/serviceTime/exportCSV', {
+        params: { tmaType, initialDate, finalDate }
+      });
+      setCSV(data);
+      return data;
+    } catch (err) {
+      toastError(err);
+    }
+
+    return null;
+  }
+
   const filterReports = async () => {
+    setPDF("");
+    setCSV("");
     await fetchReports();
+  }
+
+  const downloadPDF = async () => {
+    let newPDF = null;
+
+    if (!pdf) {
+        setCreatingPDF(true);
+        newPDF = await createPDF();
+        setCreatingPDF(false);
+    }
+
+    const linkSource = `data:application/pdf;base64,${newPDF ? newPDF : pdf}`;
+    const downloadLink = document.createElement("a");
+    const fileName = `report.pdf`;
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
+  }
+
+  const downloadCSV = async () => {
+    let newCSV = null;
+
+    if (!csv) {
+        setCreatingCSV(true);
+        newCSV = await createCSV();
+        setCreatingCSV(false);
+    }
+
+    const encodedUri = encodeURI(newCSV ? newCSV : csv);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "report.csv");
+    document.body.appendChild(link);
+
+    link.click();
   }
 
   const formatTime = (milliseconds) => {
@@ -84,8 +165,29 @@ const ServiceTimeReports = () => {
       hoursString = `0${hoursString}`;
     }
 
+    if (hoursString === "NaN" || minutesString === "NaN" || secondsString === "NaN") return "00:00:00";
+
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
+
+  const getUserServiceTime = (hists) => {
+    let currentID = 0;
+
+    const createdHist = hists.find(h => h.id > currentID);
+    currentID = createdHist.id;
+
+    const finalizedHist = hists.find(h => h.id > currentID);
+
+    const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
+    const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
+
+    const createdAtDate = new Date(createdAt);
+    const finalizedAtDate = new Date(finalizedAt);
+
+    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
+
+    return serviceTime;
+  }
 
   const getQueueServiceTime = (hists) => {
     let currentID = 0;
@@ -97,6 +199,8 @@ const ServiceTimeReports = () => {
 
     const createdAt = createdHist.ticketCreatedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
     const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
+
+    if (!createdAt || !finalizedAt) return 0;
 
     const createdAtDate = new Date(createdAt);
     const finalizedAtDate = new Date(finalizedAt);
@@ -135,7 +239,16 @@ const ServiceTimeReports = () => {
       if (hists.length < 2) continue;
 
       if (hists.length === 2) {
-        const serviceTime = getQueueServiceTime(hists);
+        let serviceTime = 0;
+
+        if (tmaType === "queue") {
+          serviceTime = getQueueServiceTime(hists);
+        }
+
+        if (tmaType === "user") {
+          serviceTime = getUserServiceTime(hists);
+        }
+
         ticketsServiceTime.push(serviceTime);
         continue;
       }
@@ -149,7 +262,17 @@ const ServiceTimeReports = () => {
 
         for (const newHists of histsArray) {
           if (newHists.length % 2 !== 0) continue;
-          const serviceTime = getQueueServiceTime(newHists);
+
+          let serviceTime = 0;
+
+          if (tmaType === "queue") {
+            serviceTime = getQueueServiceTime(newHists);
+          }
+
+          if (tmaType === "user") {
+            serviceTime = getUserServiceTime(newHists);
+          }
+
           ticketsServiceTime.push(serviceTime);
           continue;
         }
@@ -166,68 +289,6 @@ const ServiceTimeReports = () => {
     const averageServiceTime = milliseconds / itemCount;
 
     return formatTime(averageServiceTime);
-  }
-
-  if (tmaType === "queue") {
-    return (
-      <MainContainer>
-        <MainHeader>
-          <Title>{"Relatório de Tempo de Atendimento"}</Title>
-          <MainHeaderButtonsWrapper>
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
-              <FormControl style={{ display: "inline-flex", width: "150px" }}>
-                <InputLabel>{"Tipo"}</InputLabel>
-                <Select
-                  value={tmaType}
-                  defaultValue="queue"
-                  onChange={(e) => setTMAType(e.target.value)}
-                >
-                  <MenuItem value={"queue"}>{"Fila"}</MenuItem>
-                  <MenuItem value={"user"}>{"Operador"}</MenuItem>
-                  <MenuItem value={"client"}>{"Cliente"}</MenuItem>
-                </Select>
-              </FormControl>
-              <Button
-                style={{ marginLeft: "8px" }}
-                variant="contained"
-                color="primary"
-                onClick={ filterReports }
-              >
-                {"Filtrar"}
-              </Button>
-              <Button
-                style={{ marginLeft: "8px" }}
-                variant="contained"
-                color="primary"
-              >
-                {"Exportar PDF"}
-              </Button>
-            </div>
-          </MainHeaderButtonsWrapper>
-        </MainHeader>
-        <Paper className={classes.mainPaper} variant="outlined">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">{"Fila"}</TableCell>
-                <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <>
-                {reports.map((report) => (
-                  <TableRow key={report.id}>
-                    <TableCell align="center">{report.name}</TableCell>
-                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
-                  </TableRow>
-                ))}
-                {loading && <TableRowSkeleton columns={2} />}
-              </>
-            </TableBody>
-          </Table>
-        </Paper>
-      </MainContainer>
-    );
   }
 
   return (
@@ -248,7 +309,23 @@ const ServiceTimeReports = () => {
                 <MenuItem value={"client"}>{"Cliente"}</MenuItem>
               </Select>
             </FormControl>
-            {/* <Button
+            <TextField
+              style={{ marginLeft: "8px" }}
+              type="date"
+              label={i18n.t("reports.form.initialDate")}
+              value={initialDate}
+              onChange={(e) => { setInitialDate(e.target.value) }}
+              InputLabelProps={{ shrink: true, required: true }}
+            />
+            <TextField
+              style={{ marginLeft: "8px" }}
+              type="date"
+              label={i18n.t("reports.form.finalDate")}
+              value={finalDate}
+              onChange={(e) => { setFinalDate(e.target.value) }}
+              InputLabelProps={{ shrink: true, required: true }}
+            />
+            <Button
               style={{ marginLeft: "8px" }}
               variant="contained"
               color="primary"
@@ -260,13 +337,80 @@ const ServiceTimeReports = () => {
               style={{ marginLeft: "8px" }}
               variant="contained"
               color="primary"
+              onClick={downloadPDF}
+              disabled={creatingPDF}
             >
               {"Exportar PDF"}
-            </Button> */}
+            </Button>
+            <Button
+              style={{ marginLeft: "8px" }}
+              variant="contained"
+              color="primary"
+              onClick={downloadCSV}
+              disabled={creatingCSV}
+            >
+              {"Exportar CSV"}
+            </Button>
           </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">
+        { tmaType === "queue" &&
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">{"Fila"}</TableCell>
+                <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <>
+                {reports.map((report) => (
+                  <TableRow key={`queue-${report.id}`}>
+                    <TableCell align="center">{report.name}</TableCell>
+                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                  </TableRow>
+                ))}
+                {loading && <TableRowSkeleton columns={2} />}
+              </>
+            </TableBody>
+          </Table>
+        }
+        { tmaType === "user" &&
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">{"Usuário"}</TableCell>
+                <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <>
+                {reports.map((report) => (
+                  <TableRow key={`user-${report.id}`}>
+                    <TableCell align="center">{report.name}</TableCell>
+                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                  </TableRow>
+                ))}
+                {loading && <TableRowSkeleton columns={2} />}
+              </>
+            </TableBody>
+          </Table>
+        }
+        { tmaType === "client" &&
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">{"Tempo de Resposta"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell align="center">{formatTime(reports[0])}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        }
       </Paper>
     </MainContainer>
   );
