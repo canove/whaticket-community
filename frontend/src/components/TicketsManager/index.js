@@ -425,19 +425,6 @@ const TicketsManager = () => {
               <Badge
                 overlap="rectangular"
                 className={classes.badge}
-                badgeContent={pendingAnswerCount}
-                color="primary"
-              >
-                {"Aguardando Resposta"}
-              </Badge>
-            }
-            value={"pendingAnswer"}
-          />
-          <Tab
-            label={
-              <Badge
-                overlap="rectangular"
-                className={classes.badge}
                 badgeContent={pendingCount}
                 color="secondary"
               >
@@ -445,6 +432,19 @@ const TicketsManager = () => {
               </Badge>
             }
             value={"pending"}
+          />
+          <Tab
+            label={
+              <Badge
+                overlap="rectangular"
+                className={classes.badge}
+                badgeContent={pendingAnswerCount}
+                color="primary"
+              >
+                {"Aguardando Resposta"}
+              </Badge>
+            }
+            value={"pendingAnswer"}
           />
         </Tabs>
         <Paper className={classes.ticketsWrapper}>
