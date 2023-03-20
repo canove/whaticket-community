@@ -21,6 +21,7 @@ import Queue from "./Queue";
 import UserQueue from "./UserQueue";
 import Company from "./Company";
 import Profiles from "./Profiles";
+import TicketHistorics from "./TicketHistorics";
 
 @Table
 class User extends Model<User> {
@@ -78,6 +79,9 @@ class User extends Model<User> {
 
   @BelongsTo(() => Profiles)
   profiles: Profiles;
+
+  @HasMany(() => TicketHistorics, "userId")
+  ticketHistorics: TicketHistorics[];
 
   @BeforeUpdate
   @BeforeCreate

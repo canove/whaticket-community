@@ -5,6 +5,7 @@ import Message from "../../database/models/Message";
 import Contact from "../../database/models/Contact";
 import User from "../../database/models/User";
 import { getIO } from "../../libs/socket";
+import CreateTicketHistoricService from "../TicketHistoricsServices/CreateTicketHistoricService";
 
 interface Request {
   messageId: string | number;
@@ -68,11 +69,18 @@ const ChangeQueueOrResolveTicketService = async ({
         companyId: ticket.companyId
       }
     });
+
+    // TICKET HISTORIC - TRANSFER
+    await CreateTicketHistoricService(ticket, "TRANSFER");
+
     console.log("update ticket changequeueorresolve 71");
     await ticket.update({
       status: "pending",
       queueId: queue ? queue.id : null
     });
+
+    // TICKET HISTORIC - TRANSFER
+    await CreateTicketHistoricService(ticket, "TRANSFER");
 
     const io = getIO();
     io.to(message.ticketId.toString())
@@ -90,6 +98,9 @@ const ChangeQueueOrResolveTicketService = async ({
       status: "closed",
       finalizedAt: new Date()
     });
+
+    // TICKET HISTORIC - FINALIZE
+    await CreateTicketHistoricService(ticket, "FINALIZE");
   }
 
   await ticket.reload();

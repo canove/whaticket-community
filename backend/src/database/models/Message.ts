@@ -59,6 +59,9 @@ class Message extends Model<Message> {
   @Column
   quotedMsgId: string;
 
+  @Column
+  responseTime: number;
+
   @BelongsTo(() => Message, "quotedMsgId")
   quotedMsg: Message;
 

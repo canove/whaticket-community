@@ -474,6 +474,9 @@ const MainListItems = (props) => {
     if (name === "Category Report") {
       return i18n.t("mainDrawer.listItems.categoryReport")
     }
+    if (name === "Service Time") {
+      return "Tempo de Atendimento";
+    }
 
     return name;
   }
