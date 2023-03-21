@@ -7,9 +7,11 @@ import {
   PrimaryKey,
   AutoIncrement,
   ForeignKey,
-  AllowNull
+  AllowNull,
+  HasMany
 } from "sequelize-typescript";
 import Company from "./Company";
+import Whatsapp from "./Whatsapp";
 
 @Table
 class ConnectionFiles extends Model<ConnectionFiles> {
@@ -31,6 +33,9 @@ class ConnectionFiles extends Model<ConnectionFiles> {
   @ForeignKey(() => Company)
   @Column
   companyId: number;
+
+  @HasMany(() => Whatsapp, "connectionFileId")
+  whatsapps: Whatsapp[];
 
   @CreatedAt
   createdAt: Date;

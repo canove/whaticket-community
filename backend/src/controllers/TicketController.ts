@@ -156,7 +156,7 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId, status, userId, ticketId }: TicketData = req.body;
+  const { contactId, status, userId, ticketId, queueId }: TicketData = req.body;
   const { companyId } = req.user;
 
   const ticket = await CreateTicketService({
@@ -164,7 +164,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     status,
     userId,
     companyId,
-    ticketId
+    ticketId,
+    queueId
   });
 
   const io = getIO();
