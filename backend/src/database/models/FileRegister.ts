@@ -109,9 +109,6 @@ class FileRegister extends Model<FileRegister> {
   @UpdatedAt
   updatedAt: Date;
 
-  @BelongsTo(() => File)
-  file: File;
-
   @ForeignKey(() => Company)
   @Column
   companyId: number;
@@ -123,13 +120,22 @@ class FileRegister extends Model<FileRegister> {
   @Column
   fileId: number;
 
+  @BelongsTo(() => File)
+  file: File;
+
   @ForeignKey(() => IntegratedImport)
   @Column
   integratedImportId: number;
 
+  @BelongsTo(() => IntegratedImport)
+  integratedImport: IntegratedImport;
+
   @ForeignKey(() => ExposedImport)
   @Column
   exposedImportId: string;
+
+  @BelongsTo(() => ExposedImport)
+  exposedImport: ExposedImport;
 
   @AllowNull(true)
   @Column

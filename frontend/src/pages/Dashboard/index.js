@@ -215,6 +215,15 @@ const Dashboard = () => {
     return loading ? <CircularProgress /> : count;
   };
 
+  // const fetchQueueTime = async () => {
+  //   try {
+  //     const { data } = await api.get("/registers/queue");
+  //     console.log(data);
+  //   } catch (err) {
+  //     toastError(err);
+  //   }
+  // }
+
   const handleFilter = async () => {
     setLoading(true);
     setCategoryCount([]);
@@ -345,6 +354,7 @@ const Dashboard = () => {
   const updatePage = async () => {
     setUpdatingPage(true);
 
+    // await fetchQueueTime()
     await handleFilter();
     // await handleFiles();
     await fetchAverangeTime();
