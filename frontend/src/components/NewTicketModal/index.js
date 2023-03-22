@@ -19,14 +19,26 @@ import ContactModal from "../ContactModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
-import { Typography } from "@material-ui/core";
+import { Chip, FormControl, InputLabel, makeStyles, MenuItem, Select, Typography } from "@material-ui/core";
+import QueueSelectSingle from "../QueueSelectSingle";
 
 const filter = createFilterOptions({
 	trim: true,
 });
 
+const useStyles = makeStyles(theme => ({
+	chips: {
+		display: "flex",
+		flexWrap: "wrap",
+	},
+	chip: {
+		margin: 2,
+	},
+}));
+
 const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 	const history = useHistory();
+	const classes = useStyles();
 	const { i18n } = useTranslation();
 
 	const [options, setOptions] = useState([]);
@@ -35,7 +47,26 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 	const [selectedContact, setSelectedContact] = useState(null);
 	const [newContact, setNewContact] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [queueId, setQueueId] = useState("");
 	const { user } = useContext(AuthContext);
+
+	const [queues, setQueues] = useState([]);
+
+	useEffect(() => {
+		(async () => {
+			if (user.profileId !== 1) {
+				setQueues(user.queues);
+				return;
+			}
+			
+			try {
+				const { data } = await api.get("/queue");
+				setQueues(data);
+			} catch (err) {
+				toastError(err);
+			}
+		})();
+	}, []);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -64,6 +95,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 
 	const handleClose = () => {
 		onClose();
+		setQueueId("");
 		setSearchParam("");
 		setSelectedContact(null);
 	};
@@ -77,6 +109,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 				userId: user.id,
 				status: "open",
 				ticketId: ticketId,
+				queueId: queueId ? queueId : null,
 			});
 			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
@@ -138,7 +171,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 				initialValues={newContact}
 				onClose={handleCloseContactModal}
 				onSave={handleAddNewContactTicket}
-			></ContactModal>
+			/>
 			<Dialog open={modalOpen} onClose={handleClose}>
 				<DialogTitle id="form-dialog-title">
 					{i18n.t("newTicketModal.title")}
@@ -148,45 +181,90 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 						<Typography>Você tem certeza que deseja continuar esta conversa com outro número? Este ticket será finalizado e um novo ticket será criado.</Typography>
 					}
 					{ !contactId &&
-						<Autocomplete
-							options={options}
-							loading={loading}
-							style={{ width: 300 }}
-							clearOnBlur
-							autoHighlight
-							freeSolo
-							clearOnEscape
-							getOptionLabel={renderOptionLabel}
-							renderOption={renderOption}
-							filterOptions={createAddContactOption}
-							onChange={(e, newValue) => handleSelectOption(e, newValue)}
-							renderInput={params => (
-								<TextField
-									{...params}
-									label={i18n.t("newTicketModal.fieldLabel")}
-									variant="outlined"
-									autoFocus
-									onChange={e => setSearchParam(e.target.value)}
-									onKeyPress={e => {
-										if (loading || !selectedContact) return;
-										else if (e.key === "Enter") {
-											handleSaveTicket(selectedContact.id);
-										}
-									}}
-									InputProps={{
-										...params.InputProps,
-										endAdornment: (
-											<React.Fragment>
-												{loading ? (
-													<CircularProgress color="inherit" size={20} />
-												) : null}
-												{params.InputProps.endAdornment}
-											</React.Fragment>
-										),
-									}}
-								/>
-							)}
-						/>
+						<>
+							<Autocomplete
+								options={options}
+								loading={loading}
+								style={{ width: 300 }}
+								clearOnBlur
+								autoHighlight
+								freeSolo
+								clearOnEscape
+								getOptionLabel={renderOptionLabel}
+								renderOption={renderOption}
+								filterOptions={createAddContactOption}
+								onChange={(e, newValue) => handleSelectOption(e, newValue)}
+								renderInput={params => (
+									<TextField
+										{...params}
+										label={i18n.t("newTicketModal.fieldLabel")}
+										variant="outlined"
+										autoFocus
+										onChange={e => setSearchParam(e.target.value)}
+										onKeyPress={e => {
+											if (loading || !selectedContact) return;
+											else if (e.key === "Enter") {
+												handleSaveTicket(selectedContact.id);
+											}
+										}}
+										InputProps={{
+											...params.InputProps,
+											endAdornment: (
+												<React.Fragment>
+													{loading ? (
+														<CircularProgress color="inherit" size={20} />
+													) : null}
+													{params.InputProps.endAdornment}
+												</React.Fragment>
+											),
+										}}
+									/>
+								)}
+							/>
+							<div style={{ marginTop: 6 }}>
+								<FormControl fullWidth margin="dense" variant="outlined">
+									<InputLabel>{"Fila"}</InputLabel>
+									<Select
+										label={"Fila"}
+										value={queueId}
+										onChange={(e) => setQueueId(e.target.value)}
+										defaultValue=""
+										MenuProps={{
+											anchorOrigin: {
+												vertical: "bottom",
+												horizontal: "left",
+											},
+											transformOrigin: {
+												vertical: "top",
+												horizontal: "left",
+											},
+											getContentAnchorEl: null,
+										}}
+										renderValue={selected => {
+											const queue = queues.find(q => q.id === selected);
+											return queue ? (
+												<Chip
+													key={selected}
+													style={{ backgroundColor: queue.color }}
+													variant="outlined"
+													label={queue.name}
+													className={classes.chip}
+												/>
+											) : null;
+										}}
+									>
+										<MenuItem value={""}>Nenhum</MenuItem>
+										{queues.map(queue => {
+											return (
+												<MenuItem key={queue.id} value={queue.id}>
+													{queue.name}
+												</MenuItem>
+											)
+										})}
+									</Select>
+								</FormControl>
+							</div>
+						</>
 					}
 				</DialogContent>
 				<DialogActions>

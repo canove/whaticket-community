@@ -8,34 +8,32 @@ import {
   AutoIncrement,
   ForeignKey,
   AllowNull,
-  HasMany
+  HasMany,
+  BelongsTo
 } from "sequelize-typescript";
 import Company from "./Company";
-import Whatsapp from "./Whatsapp";
+import Contact from "./Contact";
 
 @Table
-class ConnectionFiles extends Model<ConnectionFiles> {
+class ContactBlacklist extends Model<ContactBlacklist> {
   @PrimaryKey
   @AutoIncrement
   @Column
   id: number;
 
+  @ForeignKey(() => Contact)
   @Column
-  name: string;
+  contactId: number;
 
-  @Column
-  icon: string;
-
-  @AllowNull(true)
-  @Column
-  triggerInterval: number;
+  @BelongsTo(() => Contact)
+  contact: Contact;
 
   @ForeignKey(() => Company)
   @Column
   companyId: number;
 
-  @HasMany(() => Whatsapp, "connectionFileId")
-  whatsapps: Whatsapp[];
+  @BelongsTo(() => Company)
+  company: Company;
 
   @CreatedAt
   createdAt: Date;
@@ -44,4 +42,4 @@ class ConnectionFiles extends Model<ConnectionFiles> {
   updatedAt: Date;
 }
 
-export default ConnectionFiles;
+export default ContactBlacklist;

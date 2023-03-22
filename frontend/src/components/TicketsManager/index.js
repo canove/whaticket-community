@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   badge: {
-    right: "-10px",
+    right: "-5px",
   },
   show: {
     display: "block",
@@ -107,6 +107,7 @@ const TicketsManager = () => {
 
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingAnswerCount, setPendingAnswerCount] = useState(0);
 
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
@@ -432,6 +433,19 @@ const TicketsManager = () => {
             }
             value={"pending"}
           />
+          <Tab
+            label={
+              <Badge
+                overlap="rectangular"
+                className={classes.badge}
+                badgeContent={pendingAnswerCount}
+                color="primary"
+              >
+                {"Aguardando Resposta"}
+              </Badge>
+            }
+            value={"pendingAnswer"}
+          />
         </Tabs>
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
@@ -440,6 +454,13 @@ const TicketsManager = () => {
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setOpenCount(val)}
             style={applyPanelStyle("open")}
+          />
+          <TicketsList
+            status="open"
+            pendingAnswer={true}
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => setPendingAnswerCount(val)}
+            style={applyPanelStyle("pendingAnswer")}
           />
           <TicketsList
             status="pending"

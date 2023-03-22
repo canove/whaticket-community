@@ -180,7 +180,7 @@ const SendWhatsAppMessage = async ({
             userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
           };
         
-          await ticket.update({ lastMessage: body });
+          await ticket.update({ lastMessage: body, lastMessageFromMe: fromMe });
           await CreateMessageService({ messageData });
       
       }else{
@@ -242,7 +242,10 @@ const SendWhatsAppMessage = async ({
         userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
       };
 
-      await ticket.update({ lastMessage: type == 'buttons' ? templateButtons?.text : body });
+      await ticket.update({ 
+        lastMessage: type == 'buttons' ? templateButtons?.text : body, 
+        lastMessageFromMe: fromMe 
+      });
       const createdMessage = await CreateMessageService({ messageData });
 
       if (whatsMsgId == '' || whatsMsgId == null) {

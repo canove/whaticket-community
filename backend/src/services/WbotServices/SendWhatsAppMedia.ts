@@ -155,7 +155,7 @@ const SendWhatsAppMedia = async ({
               userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
             };
           
-            await ticket.update({ lastMessage: body });
+            await ticket.update({ lastMessage: body, lastMessageFromMe: true });
             await CreateMessageService({ messageData });
         
         }else{
@@ -197,7 +197,7 @@ const SendWhatsAppMedia = async ({
           userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
         };
       
-        await ticket.update({ lastMessage: body });
+        await ticket.update({ lastMessage: body, lastMessageFromMe: true });
         const createdMessage = await CreateMessageService({ messageData });
 
         const payload = {

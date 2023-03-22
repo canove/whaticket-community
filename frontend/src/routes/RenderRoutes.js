@@ -43,6 +43,8 @@ import Profiles from "../pages/Profiles";
 import Operations from "../pages/Operations";
 import GeneralReports from "../pages/GeneralReports";
 import CategoryReport from "../pages/CategoryReport";
+import ServiceTimeReports from "../pages/ServiceTimeReports";
+import ContactBlacklist from "../pages/ContactBlacklist";
 
 const RenderRoutes = () => {
   const { isAuth, user } = useContext(AuthContext);
@@ -172,6 +174,12 @@ const RenderRoutes = () => {
     }
     if (name === "Category Report") {
       return CategoryReport;
+    }
+    if (name === "Service Time") {
+      return ServiceTimeReports;
+    }
+    if (name === "Contact Blacklist") {
+      return ContactBlacklist;
     }
   };
 

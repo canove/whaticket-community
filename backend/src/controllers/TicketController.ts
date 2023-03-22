@@ -42,6 +42,7 @@ type IndexQuery = {
   session: string
   categoryId: string;
   connectionFileId: string;
+  pendingAnswer: string;
 };
 
 interface TicketData {
@@ -66,6 +67,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     withUnreadMessages,
     categoryId,
     connectionFileId,
+    pendingAnswer
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -89,7 +91,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     companyId,
     categoryId,
     connectionFileId,
-    loggedUserId: id
+    loggedUserId: id,
+    pendingAnswer
   });
 
   return res.status(200).json({ tickets, count, hasMore });
@@ -153,7 +156,7 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId, status, userId, ticketId }: TicketData = req.body;
+  const { contactId, status, userId, ticketId, queueId }: TicketData = req.body;
   const { companyId } = req.user;
 
   const ticket = await CreateTicketService({
@@ -161,7 +164,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     status,
     userId,
     companyId,
-    ticketId
+    ticketId,
+    queueId
   });
 
   const io = getIO();

@@ -14,6 +14,7 @@ const useTickets = ({
     withUnreadMessages,
     categoryId,
     connectionFileId,
+    pendingAnswer,
 }) => {
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(false);
@@ -35,7 +36,8 @@ const useTickets = ({
                             queueIds,
                             withUnreadMessages,
                             categoryId,
-                            connectionFileId
+                            connectionFileId,
+                            pendingAnswer
                         },
                     })
                     setTickets(data.tickets)
@@ -85,7 +87,8 @@ const useTickets = ({
         queueIds,
         withUnreadMessages,
         categoryId,
-        connectionFileId
+        connectionFileId,
+        pendingAnswer
     ])
 
     return { tickets, loading, hasMore, count };

@@ -4,6 +4,7 @@ import Contact from "../../database/models/Contact";
 import Queue from "../../database/models/Queue";
 import Ticket from "../../database/models/Ticket";
 import Whatsapp from "../../database/models/Whatsapp";
+import CreateTicketHistoricService from "../TicketHistoricsServices/CreateTicketHistoricService";
 import ShowTicketService from "./ShowTicketService";
 /*eslint-disable */
 const FindOrCreateTicketService = async (
@@ -32,6 +33,9 @@ const FindOrCreateTicketService = async (
     if (!inBot && !isDispatcher && ticket.status != 'open') {
       console.log("update ticket findOrCreateticketService 31");
       await ticket.update({ status: "pending" });
+
+      // TICKET HISTORIC - UPDATE
+      await CreateTicketHistoricService(ticket, "UPDATE");
     }
   }
 
@@ -51,6 +55,9 @@ const FindOrCreateTicketService = async (
         userId: null,
         unreadMessages
       });
+
+      // TICKET HISTORIC - UPDATE
+      await CreateTicketHistoricService(ticket, "UPDATE");
     }
   }
 
@@ -75,6 +82,9 @@ const FindOrCreateTicketService = async (
         userId: null,
         unreadMessages
       });
+
+      // TICKET HISTORIC - UPDATE
+      await CreateTicketHistoricService(ticket, "UPDATE");
     }
   }
 
@@ -100,8 +110,10 @@ const FindOrCreateTicketService = async (
       whatsappId,
       companyId,
       queueId,
-      // queueId: (whatsapp && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : null
     });
+
+    // TICKET HISTORIC - CREATE
+    await CreateTicketHistoricService(ticket, "CREATE");
   }
 
   ticket = await ShowTicketService(ticket.id, companyId);

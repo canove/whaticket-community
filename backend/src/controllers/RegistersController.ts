@@ -1,7 +1,10 @@
 import { endOfDay, format, parseISO, startOfDay } from "date-fns";
 import { Request, Response } from "express";
 import { Op } from "sequelize";
+import ExposedImport from "../database/models/ExposedImport";
+import File from "../database/models/File";
 import FileRegister from "../database/models/FileRegister";
+import IntegratedImport from "../database/models/IntegratedImport";
 import DashboardCategoryService from "../services/CategoryServices/DashboardCategoryService";
 import CountMessagesServices from "../services/MessageServices/CountMessagesService";
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
@@ -46,6 +49,62 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const messages = await CountMessagesServices({ companyId, date, initialDate, finalDate, categoryId });
 
   return res.status(200).json({ reports, category, connectedWhatsapps, messages });
+};
+
+export const queue = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+  // const queue = await FileRegister.findAll({
+  //   where: { 
+  //     processedAt: null,
+  //     fileId: null,
+  //     companyId,
+  //   },
+  //   attributes: [],
+  //   include: [
+  //     {
+  //       model: IntegratedImport,
+  //       as: "integratedImport",
+  //       attributes: ["whatsappIds"],
+  //       required: false,
+  //     },
+  //     {
+  //       model: ExposedImport,
+  //       as: "exposedImport",
+  //       attributes: ["whatsappIds"],
+  //       required: false,
+  //     },
+  //   ]
+  // });
+
+  // const fileQueue = await FileRegister.findAll({
+  //   where: {
+  //     processedAt: null,
+  //     companyId,
+  //   },
+  //   attributes: [],
+  //   include: [
+  //     {
+  //       model: File,
+  //       as: "file",
+  //       where: { status: 5 },
+  //       attributes: ["whatsappIds"],
+  //       required: true,
+  //     }
+  //   ]
+  // });
+
+  /*
+  
+  WHATSAPPS - CONNECTED
+  CONNECTION FILES
+  WHATSAPPS CONFIGS
+
+  ...
+
+  */
+
+  return res.status(200).json({ message: "OK" });
 };
 
 type ChartQuery = {

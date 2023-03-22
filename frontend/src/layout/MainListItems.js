@@ -471,6 +471,15 @@ const MainListItems = (props) => {
     if (name === "Official Whatsapp Report") {
       return i18n.t("sessionReports.title");
     }
+    if (name === "Category Report") {
+      return i18n.t("mainDrawer.listItems.categoryReport")
+    }
+    if (name === "Service Time") {
+      return "Tempo de Atendimento";
+    }
+    if (name === "Contact Blacklist") {
+      return "Blacklist de Contatos";
+    }
 
     return name;
   }

@@ -74,7 +74,7 @@ export const initMessageResponseConsumer = () => {
                   where: { id: msg.ticketId }
                 });
     
-                await ticket.update({ lastMessage: message.text });
+                await ticket.update({ lastMessage: message.text }); 
 
                 await msg.reload();
     

@@ -7,6 +7,8 @@ const registersRoutes = Router();
 
 registersRoutes.get("/registers/list", isAuth, RegistersController.index);
 
+registersRoutes.get("/registers/queue", isAuth, RegistersController.queue);
+
 registersRoutes.get("/registers/chart", isAuth, RegistersController.chart);
 
 registersRoutes.get("/registers/listReport", isAuth, RegistersController.list);
