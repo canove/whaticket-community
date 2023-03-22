@@ -143,7 +143,7 @@ const SendWhatsAppMedia = async ({
             const messageData = {
               id: msgWhatsId,
               ticketId: ticket.id,
-              contactId: undefined,
+              contactId: contact ? contact.id : undefined,
               body: body,
               fromMe: true,
               read: true,
@@ -186,7 +186,7 @@ const SendWhatsAppMedia = async ({
           id: uuidv4(),
           ticketId: ticket.id,
           bot: ticket.status == 'inbot',
-          contactId: undefined,
+          contactId: contact ? contact.id : undefined,
           body: body,
           fromMe: true,
           read: true,
