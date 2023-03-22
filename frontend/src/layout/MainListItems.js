@@ -480,6 +480,9 @@ const MainListItems = (props) => {
     if (name === "Contact Blacklist") {
       return "Blacklist de Contatos";
     }
+    if (name === "Supervisor") {
+      return "Supervisor";
+    }
 
     return name;
   }
