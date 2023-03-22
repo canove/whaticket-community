@@ -168,6 +168,10 @@ class FileRegister extends Model<FileRegister> {
   @AllowNull(true)
   @Column
   input3: string;
+
+  @AllowNull(true)
+  @Column
+  blacklist: boolean;
 }
 
 export default FileRegister;

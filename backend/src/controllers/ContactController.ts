@@ -10,7 +10,7 @@ import DeleteContactService from "../services/ContactServices/DeleteContactServi
 
 import AppError from "../errors/AppError";
 import GetContactService from "../services/ContactServices/GetContactService";
-// import ContactBlacklist from "../database/models/ContactBlacklist";
+import ContactBlacklist from "../database/models/ContactBlacklist";
 
 type IndexQuery = {
   searchParam: string;
@@ -109,20 +109,20 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(contact);
 };
 
-// export const blacklist = async (req: Request, res: Response): Promise<Response> => {
-//   const { contactId } = req.params;
-//   const { companyId } = req.user;
+export const blacklist = async (req: Request, res: Response): Promise<Response> => {
+  const { contactId } = req.params;
+  const { companyId } = req.user;
 
-//   const blacklist = await ContactBlacklist.findOne({
-//     where: { contactId, companyId }
-//   });
+  const blacklist = await ContactBlacklist.findOne({
+    where: { contactId, companyId }
+  });
 
-//   if (blacklist) throw new AppError("NUMBER_ALREADY_ON_BLACKLIST");
+  if (blacklist) throw new AppError("NUMBER_ALREADY_ON_BLACKLIST");
 
-//   await ContactBlacklist.create({ contactId, companyId });
+  await ContactBlacklist.create({ contactId, companyId });
 
-//   return res.status(200).json("OK");
-// }
+  return res.status(200).json("OK");
+}
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { contactId } = req.params;

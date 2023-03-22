@@ -38,6 +38,7 @@ import Profiles from "./models/Profiles";
 import WhatsAppLearning from "./models/WhatsappLearning";
 import GeneralReports from "./models/GeneralReports";
 import TicketHistorics from "./models/TicketHistorics";
+import ContactBlacklist from "./models/ContactBlacklist";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -84,6 +85,7 @@ const models = [
   WhatsAppLearning,
   GeneralReports,
   TicketHistorics,
+  ContactBlacklist,
 ];
 
 sequelize.addModels(models);

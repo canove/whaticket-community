@@ -53,6 +53,7 @@ import {
 	Battery20,
 	Battery60,
 	BatteryFull,
+	Visibility,
 } from "@material-ui/icons";
 
 import SearchIcon from "@material-ui/icons/Search";
@@ -227,6 +228,9 @@ const Connections = () => {
 
 	const [editWhatsModalOpen, setEditWhatsModalOpen] = useState(false);
 
+	const [config, setConfig] = useState(null);
+	const [showDispatchQuantity, setShowDispatchQuantity] = useState(false);
+
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 	}, [pageNumber, searchParam, status]);
@@ -289,9 +293,19 @@ const Connections = () => {
 			}
 		}
 
+		const fetchConfig = async () => {
+            try {
+                const { data } = await api.get('/whatsconfig/');
+                setConfig(data[0]);
+            } catch (err) {
+                toastError(err);
+            }
+        }
+
+        fetchConfig();
 		fetchConnectionFiles();
 		fetchServices();
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		const socket = openSocket();
@@ -605,12 +619,82 @@ const Connections = () => {
 		}
 	}
 
-	const handleAutomaticControl= async (automaticControl, whatsappId) => {
+	const handleAutomaticControl = async (automaticControl, whatsappId) => {
 		try {
 			await api.put(`/whatsapp/automaticControl/${whatsappId}`, { automaticControl });
 		} catch (err) {
 			toastError(err);
 		}
+	}
+
+	const getRemainingDispatch = (connectionFile) => {
+		const now = new Date();
+
+		const start = new Date();
+		start.setHours(8, 0, 0);
+
+		const end = new Date();
+		end.setHours(21, 0, 0);
+
+		const totalDispatchTime = (end.getTime() - start.getTime()) / (1000 * 60);
+		const remainingDispatchTime = (end.getTime() - now.getTime()) / (1000 * 60);
+
+		const whatsapps = connectionFile.whatsapps;
+
+		let automaticRemainingDispatchTotalQuantity = 0;
+		let categoryRemainingDispatchTotalQuantity = 0;
+		let configRemainingDispatchTotalQuantity = 0;
+
+		for (const whats of whatsapps) {
+			let triggerInterval = 1;
+
+			if (whats.automaticControl && whats.currentTriggerInterval) {
+				triggerInterval = whats.currentTriggerInterval;
+
+				const automaticDispatchQuantity = totalDispatchTime / triggerInterval;
+				const automaticDispatchPerHour = automaticDispatchQuantity / totalDispatchTime;
+				const automaticRemainingDispatchQuantity = Math.floor(automaticDispatchPerHour * remainingDispatchTime);
+	
+				automaticRemainingDispatchTotalQuantity += automaticRemainingDispatchQuantity;
+			} else if (connectionFile.triggerInterval) {
+				triggerInterval = connectionFile.triggerInterval;
+
+				const categoryDispatchQuantity = totalDispatchTime / triggerInterval;
+				const categoryDispatchPerHour = categoryDispatchQuantity / totalDispatchTime;
+				const categoryRemainingDispatchQuantity = Math.floor(categoryDispatchPerHour * remainingDispatchTime);
+	
+				categoryRemainingDispatchTotalQuantity += categoryRemainingDispatchQuantity;
+			} else {
+				triggerInterval = config.triggerInterval;
+
+				const configDispatchQuantity = totalDispatchTime / triggerInterval;
+				const configDispatchPerHour = configDispatchQuantity / totalDispatchTime;
+				const configRemainingDispatchQuantity = Math.floor(configDispatchPerHour * remainingDispatchTime);
+	
+				configRemainingDispatchTotalQuantity += configRemainingDispatchQuantity;
+			}
+		}
+
+		return (
+			<>
+				{ showDispatchQuantity &&
+					<>
+						<Typography gutterBottom variant="subtitle2" component="p" style={{ textAlign: "center" }} >
+							Disparos disponíveis:
+						</Typography>
+						<Typography gutterBottom variant="subtitle2" component="p" style={{ textAlign: "center" }} >
+							[ Automático: {automaticRemainingDispatchTotalQuantity} ]
+						</Typography>
+						<Typography gutterBottom variant="subtitle2" component="p" style={{ textAlign: "center" }} >
+							[ Categoria: {categoryRemainingDispatchTotalQuantity} ]
+						</Typography>
+						<Typography gutterBottom variant="subtitle2" component="p" style={{ textAlign: "center" }} >
+							[ Padrão: {configRemainingDispatchTotalQuantity} ]
+						</Typography>
+					</>
+				}
+			</>
+		)
 	}
 
 	return (
@@ -619,6 +703,14 @@ const Connections = () => {
 				<MainContainer>
 					<MainHeader>
 						<Title>Conexões</Title>
+						{ user.profileId === 1 &&
+							<IconButton
+								size="small"
+								onClick={() => setShowDispatchQuantity(prevShow => !prevShow)}
+							>
+								<Visibility />
+							</IconButton>
+						}
 					</MainHeader>
 					<Paper className={classes.cardsPaper} variant="outlined">
 						{ connectionFiles && connectionFiles.map(connectionFile => (
@@ -634,6 +726,7 @@ const Connections = () => {
 										<Typography gutterBottom variant="h5" component="h2" style={{ textAlign: "center" }} >
 											{ connectionFile.name }
 										</Typography>
+										{ getRemainingDispatch(connectionFile) }
 									</CardContent>
 								</CardActionArea>
 							</Card>

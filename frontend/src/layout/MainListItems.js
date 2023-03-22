@@ -477,6 +477,9 @@ const MainListItems = (props) => {
     if (name === "Service Time") {
       return "Tempo de Atendimento";
     }
+    if (name === "Contact Blacklist") {
+      return "Blacklist de Contatos";
+    }
 
     return name;
   }

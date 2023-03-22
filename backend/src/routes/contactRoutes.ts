@@ -9,6 +9,8 @@ contactRoutes.get("/contacts", isAuth, ContactController.index);
 
 contactRoutes.get("/contacts/:contactId", isAuth, ContactController.show);
 
+contactRoutes.post("/contacts/blacklist/:contactId", isAuth, ContactController.blacklist);
+
 contactRoutes.post("/contacts", isAuth, ContactController.store);
 
 contactRoutes.post("/contact", isAuth, ContactController.getContact);
