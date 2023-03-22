@@ -304,7 +304,7 @@ const StatusMessageWhatsappService = async ({
             id: msgWhatsId ? msgWhatsId : crypto.randomBytes(16).toString('hex'),
             ticketId: createTicket.id,
             bot: createTicket.status == 'inbot',
-            contactId: undefined,
+            contactId: contact ? contact.id : undefined,
             body: (mediaUrl != null && !officialTemplate) ? '' : messageTxt == null ? '' : messageTxt,
             ack: 3,
             fromMe: true,

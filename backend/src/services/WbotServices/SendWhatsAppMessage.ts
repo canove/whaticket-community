@@ -169,7 +169,7 @@ const SendWhatsAppMessage = async ({
           const messageData = {
             id: msgWhatsId,
             ticketId: ticket.id,
-            contactId: undefined,
+            contactId: contact ? contact.id : undefined,
             body: body,
             fromMe: fromMe,
             read: true,
@@ -229,7 +229,7 @@ const SendWhatsAppMessage = async ({
         id: whatsMsgId ? whatsMsgId : uuidv4(),
         ack: 0,
         ticketId: ticket.id,
-        contactId: undefined,
+        contactId: contact ? contact.id : undefined,
         body: body ??  (type == 'buttons' ? templateButtons?.text :''),
         fromMe: fromMe,
         read: true,
