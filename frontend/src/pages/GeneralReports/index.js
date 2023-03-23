@@ -186,6 +186,7 @@ const GeneralReports = () => {
               <TableCell align="center">{"Entregues"}</TableCell>
               <TableCell align="center">{"Lidos"}</TableCell>
               <TableCell align="center">{"Erros"}</TableCell>
+              <TableCell align="center">{"Blacklist"}</TableCell>
               <TableCell align="center">{"Interações"}</TableCell>
               <TableCell align="center">{"Sem Whatsapp"}</TableCell>
               <TableCell align="center">{"Mensagens Trafegadas Enviadas"}</TableCell>
@@ -202,6 +203,7 @@ const GeneralReports = () => {
                   <TableCell align="center">{report.delivered || 0}</TableCell>
                   <TableCell align="center">{report.read || 0}</TableCell>
                   <TableCell align="center">{report.error || 0}</TableCell>
+                  <TableCell align="center">{report.blacklist || 0}</TableCell>
                   <TableCell align="center">{report.interaction || 0}</TableCell>
                   <TableCell align="center">{report.noWhats || 0}</TableCell>
                   <TableCell align="center">{report.sentMessages || 0}</TableCell>

@@ -2,7 +2,7 @@ import FileRegister from "../../database/models/FileRegister";
 import Message from "../../database/models/Message";
 import Ticket from "../../database/models/Ticket";
 import Whatsapp from "../../database/models/Whatsapp";
-import { subHours } from "date-fns";
+import { endOfDay, format, parseISO, startOfDay, subHours } from "date-fns";
 import { Op, Sequelize } from "sequelize";
 import Contact from "../../database/models/Contact";
 
@@ -35,6 +35,8 @@ interface Request {
   pageNumber: string;
   phoneNumber: string;
   clientPhoneNumber: string;
+  initialDate: string;
+  finalDate: string;
 }
 
 interface Response {
@@ -47,10 +49,13 @@ const ListOfficialWhatsappService = async ({
   limit = "10",
   pageNumber = "1",
   phoneNumber,
-  clientPhoneNumber
+  clientPhoneNumber,
+  initialDate,
+  finalDate
 }: Request): Promise<Response> => {
   let whereConditionContact = null;
   let whereConditionWhatsapp = null;
+  let whereConditionMessage = null;
 
   if (clientPhoneNumber) {
     whereConditionContact = {
@@ -64,33 +69,18 @@ const ListOfficialWhatsappService = async ({
     }
   }
 
+  if (initialDate && finalDate) {
+    whereConditionMessage = {
+      createdAt: { [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))] }
+    }
+  }
+
   const offset = +limit * (+pageNumber - 1);
 
   const { count, rows: messages } = await Message.findAndCountAll({
-    attributes: {
-      include: [
-        [
-          Sequelize.literal(`(
-            SELECT id FROM Messages AS LastMessage
-              WHERE 
-                Message.ticketId = LastMessage.ticketId AND 
-                Message.id != LastMessage.id AND 
-                LastMessage.createdAt >= DATE_SUB(Message.createdAt, INTERVAL 1 DAY) AND
-                LastMessage.createdAt <= Message.createdAt
-            LIMIT 1
-          )`),
-          'lastMessage'
-        ]
-      ]
-    },
+    where: whereConditionMessage,
+    attributes: ["id", "body", "mediaType", "mediaUrl", "ticketId", "createdAt", "updatedAt"],
     include: [
-      {
-        model: Contact,
-        as: "contact",
-        attributes: ["number"],
-        required: true,
-        where: whereConditionContact
-      },
       {
         model: Ticket,
         as: "ticket",
@@ -101,8 +91,15 @@ const ListOfficialWhatsappService = async ({
             model: Whatsapp,
             as: "whatsapp",
             attributes: ["name"],
-            required: true,
+            required: whereConditionWhatsapp ? true : false,
             where: whereConditionWhatsapp
+          },
+          {
+            model: Contact,
+            as: "contact",
+            attributes: ["number"],
+            required: whereConditionContact ? true : false,
+            where: whereConditionContact
           }
         ],
         required: true
@@ -110,6 +107,7 @@ const ListOfficialWhatsappService = async ({
       {
         model: FileRegister,
         as: "fileRegister",
+        attributes: ["id", "var1", "var2", "var3", "var4", "var5", "createdAt", "updatedAt", "phoneNumber", "errorAt", "sentAt", "deliveredAt", "readAt"],
         required: false
       }
     ],
@@ -126,10 +124,6 @@ const ListOfficialWhatsappService = async ({
     let session = "inbound";
     let direction = "incoming";
 
-    if (message.lastMessage) {
-      session = "messages";
-    }
-
     let external_id = null;
     let var1 = null;
     let var2 = null;
@@ -139,6 +133,9 @@ const ListOfficialWhatsappService = async ({
     let create_at_session = null;
     let update_at_session = null;
     let status = null;
+
+    let client_phone_number = message.ticket.contact ? message.ticket.contact.number : null;
+    let phone_number = message.ticket.whatsapp ? message.ticket.whatsapp.name : null;
 
     if (message.fileRegister) {
       session = "outbound";
@@ -153,6 +150,8 @@ const ListOfficialWhatsappService = async ({
       create_at_session = message.fileRegister.createdAt;
       update_at_session = message.fileRegister.updatedAt;
       status = getStatus(message.fileRegister);
+
+      if (!client_phone_number) client_phone_number = message.fileRegister.phoneNumber;
     } else {
       external_id = "";
       var1 = "";
@@ -163,7 +162,27 @@ const ListOfficialWhatsappService = async ({
       create_at_session = "";
       update_at_session = "";
       status = "";
+
+      const date1 = new Date(message.createdAt);
+      date1.setDate(date1.getDate() - 1);
+
+      const date2 = format(message.createdAt, "yyyy-MM-dd HH:mm");
+
+      const lastMessage = await Message.findOne({
+        where: { 
+          id: { [Op.ne]: message.id }, 
+          ticketId: message.ticketId,
+          createdAt: { [Op.between]: [+parseISO(format(date1, "yyyy-MM-dd HH:mm")), +parseISO(date2)] }
+        },
+        attributes: ["id"],
+        order: [["createdAt", "DESC"]]
+      });
+
+      if (lastMessage) session = "messages";
     }
+
+    if (!client_phone_number) client_phone_number = "---";
+    if (!phone_number) client_phone_number = "---";
 
     report = {
       "id_session": message.id,
@@ -172,8 +191,8 @@ const ListOfficialWhatsappService = async ({
       "media_link": message.mediaUrl,
       "create_at_message": message.createdAt,
       "update_at_message": message.updatedAt,
-      "client_phone_number": message.contact.number,
-      "phone_number": message.ticket.whatsapp.name,
+      "client_phone_number": client_phone_number,
+      "phone_number": phone_number,
       "session": session,
       "direction": direction,
       "destination_number_type": "MOBILE",

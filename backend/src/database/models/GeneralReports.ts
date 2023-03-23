@@ -62,6 +62,10 @@ class GeneralReports extends Model<GeneralReports> {
   @Column
   receivedMessages: number;
 
+  @Default(0)
+  @Column
+  blacklist: number;
+
   @CreatedAt
   createdAt: Date;
 

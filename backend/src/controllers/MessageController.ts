@@ -8,6 +8,7 @@ import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import AppError from "../errors/AppError";
+import { getIO } from "../libs/socket";
 
 type IndexQuery = {
   pageNumber: string;
@@ -48,17 +49,38 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   if (ticket.userId != null && ticket.userId != id) throw new AppError("ERR_TICKET_ACCEPTED_BY_OTHER_USER");
 
-  if (medias) {
-    await Promise.all(
-      medias.map(async (media: Express.Multer.File) => {
-        await SendWhatsAppMedia({ media, ticket, companyId, body });
-      })
-    );
-  } else {
-    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null });
+  // if (medias) {
+  //   await Promise.all(
+  //     medias.map(async (media: Express.Multer.File) => {
+  //       await SendWhatsAppMedia({ media, ticket, companyId, body });
+  //     })
+  //   );
+  // } else {
+  //   await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null });
+  // }
+
+  // SetTicketMessagesAsRead(ticket);
+
+  await ticket.update({ 
+    lastMessageFromMe: !ticket.lastMessageFromMe 
+  });
+
+  const io = getIO();
+
+  if (ticket.lastMessageFromMe === true) {
+    io.emit(`ticket${ticket.companyId}`, {
+      action: "deleteLastMessage",
+      ticketId: ticket.id
+    });
   }
 
-  SetTicketMessagesAsRead(ticket);
+  io.to(ticket.status)
+    .to("notification")
+    .to(ticketId.toString())
+    .emit(`ticket${ticket.companyId}`, {
+      action: "update",
+      ticket
+    });
 
   return res.send();
 };

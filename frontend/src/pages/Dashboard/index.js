@@ -780,7 +780,7 @@ const Dashboard = () => {
               style={{ overflow: "hidden" }}
             >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.mistake.title")}
+                {i18n.t("dashboard.messages.mistake.title")} / Blacklist
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
