@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -64,9 +64,7 @@ const RegistersReports = () => {
 
     const [showFilters, setShowFilters] = useState(false);
 
-    useEffect(() => {
-        setPageNumber(1);
-    }, [fileIds, statuses, initialDate, finalDate, name, phoneNumber, categoryIds]);
+    const firstUpdate = useRef(true);
 
     useEffect(() => {
         const fetchFiles = async () => {
@@ -137,10 +135,8 @@ const RegistersReports = () => {
         return null;
     }
 
-    const filterReport = async () => {
+    const fetchReport = async () => {
         setLoading(true);
-        setPdf("");
-        setCsv("");
 
         try {
             const { data } = await api.get('registers/listReport/', {
@@ -164,6 +160,22 @@ const RegistersReports = () => {
         }
 
         setLoading(false);
+    }
+
+    useEffect(() => {
+        if (firstUpdate.current) {
+            firstUpdate.current = false;
+            return;
+        }
+
+        fetchReport();
+    }, [pageNumber]);
+
+    const filterReport = async () => {
+        setPageNumber(1);
+        setPdf("");
+        setCsv("");
+        await fetchReport();
     }
 
     const handleFileSelectChange = (e) => {

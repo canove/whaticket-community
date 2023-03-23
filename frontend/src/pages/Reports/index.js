@@ -48,15 +48,17 @@ const Reports = () => {
 
     const { user } = useContext(AuthContext);
 
+    const [loading, setLoading] = useState(false);
+
     const [users, setUsers] = useState([]);
     const [companies, setCompanies] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
 
     const [reports, setReports] = useState([]);
     const [count, setCount] = useState(0);
     const [hasMore, setHasMore] = useState(false);
 
-    const [disablePDFButton, setDisablePDFButton] = useState(false);
+    const [creatingPDF, setCreatingPDF] = useState(false);
     const [pdf, setPdf] = useState();
     
     const [pageNumber, setPageNumber] = useState(1);
@@ -66,6 +68,9 @@ const Reports = () => {
     const [userId, setUserId] = useState("");
     const [company, setCompany] = useState("");
     const [contactNumber, setContactNumber] = useState("");
+    const [categoryId, setCategoryId] = useState("");
+
+    const firstUpdate = useRef(true);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -87,14 +92,24 @@ const Reports = () => {
             }
         }
 
+        const fetchCategories = async () => {
+            try {
+                const { data } = await api.get("/category/");
+                setCategories(data);
+            } catch (err) {
+                toastError(err);
+            }
+        };
+
         fetchUsers();
         fetchCompanies();
+        fetchCategories();
     }, []);
 
     const createPdf = async () => {
         try {
             const { data } = await api.get("/tickets-export-report-talk", {
-                params: { initialDate, finalDate, userId, contactNumber, company }
+                params: { initialDate, finalDate, userId, contactNumber, company, categoryId }
             });
 
             setPdf(data);
@@ -111,7 +126,7 @@ const Reports = () => {
 
         try {
             const { data } = await api.get("/report-talk", { 
-                params: { pageNumber, initialDate, finalDate, userId, contactNumber, company } 
+                params: { pageNumber, initialDate, finalDate, userId, contactNumber, company, categoryId } 
             });
 
             setReports(data.messages);
@@ -124,6 +139,15 @@ const Reports = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        if (firstUpdate.current) {
+            firstUpdate.current = false;
+            return;
+        }
+
+        fetchReports();
+    }, [pageNumber]);
+
     const filterReports = async () => {
         setPageNumber(1);
         setPdf(null);
@@ -134,9 +158,9 @@ const Reports = () => {
         let newPDF = null;
 
         if (!pdf) {
-            setDisablePDFButton(true)
+            setCreatingPDF(true)
             newPDF = await createPdf();
-            setDisablePDFButton(false);
+            setCreatingPDF(false);
         }
 
         const linkSource = `data:application/pdf;base64,${newPDF ?? pdf}`;
@@ -152,6 +176,14 @@ const Reports = () => {
             setUserId(newValue.id);
         } else {
             setUserId("");
+        }
+	};
+
+    const handleCategoryChange = (_, newValue) => {
+        if (newValue) {
+            setCategoryId(newValue.id);
+        } else {
+            setCategoryId("");
         }
 	};
 
@@ -200,6 +232,20 @@ const Reports = () => {
                                 />
                             }
                         />
+                        <Autocomplete
+                            style={{ marginLeft: "10px" }}
+                            onChange={(e, newValue) => handleCategoryChange(e, newValue)}
+                            className={classes.root}
+                            options={categories}
+                            getOptionLabel={renderOptionLabel}
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
+                                    label={"Categorias"}
+                                    InputLabelProps={{ required: true}}
+                                />
+                            }
+                        />
                         { user.companyId === 1 &&
                             <Autocomplete
                                 style={{ marginLeft: "10px" }}
@@ -244,7 +290,7 @@ const Reports = () => {
                             variant="contained"
                             color="primary"
                             onClick={ downloadPdf }
-                            disabled={ disablePDFButton }
+                            disabled={ creatingPDF }
                         >
                             {"Exportar PDF"}
                         </Button>
@@ -258,12 +304,13 @@ const Reports = () => {
                 <Table size="small">
                 <TableHead>
                     <TableRow>
+                        <TableCell align="center">{"ID do Ticket"}</TableCell>
+                        <TableCell align="center">{"Categoria"}</TableCell>
                         <TableCell align="center">{"Operador"}</TableCell>
                         <TableCell align="center">{"Cliente"}</TableCell>
                         <TableCell align="center">{"Enviado Por"}</TableCell>
                         <TableCell align="center">{"Telefone"}</TableCell>
                         <TableCell align="center">{"Mensagem"}</TableCell>
-                        <TableCell align="center">{"ID do Ticket"}</TableCell>
                         <TableCell align="center">{"Data"}</TableCell>
                     </TableRow>
                 </TableHead>
@@ -271,16 +318,17 @@ const Reports = () => {
                     <>
                         {reports && reports.map((message) => (
                             <TableRow key={message.id}>
+                                <TableCell align="center">{message.ticketId}</TableCell>
+                                <TableCell align="center">{message.ticket.category ? message.ticket.category.name : ""}</TableCell>
                                 <TableCell align="center">{message.ticket.user ? message.ticket.user.name : "BOT"}</TableCell>
                                 <TableCell align="center">{(message.ticket.contact && message.ticket.contact.name) ? message.ticket.contact.name : "DESCONHECIDO"}</TableCell>
                                 <TableCell align="center">{message.fromMe ? "OPERADOR" : "CLIENTE"}</TableCell>
                                 <TableCell align="center">{(message.ticket.contact && message.ticket.contact.number) ? message.ticket.contact.number : "DESCONHECIDO"}</TableCell>
                                 <TableCell align="center">{message.mediaUrl ? `[MEDIA_URL: ${message.mediaUrl}]${message.body}` : message.body}</TableCell>
-                                <TableCell align="center">{message.ticketId}</TableCell>
                                 <TableCell align="center">{format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}</TableCell>
                             </TableRow>
                         ))}
-                        {loading && <TableRowSkeleton columns={7} />}
+                        {loading && <TableRowSkeleton columns={8} />}
                     </>
                 </TableBody>
                 </Table>

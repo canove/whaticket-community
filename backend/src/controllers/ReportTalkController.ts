@@ -8,10 +8,11 @@ type IndexQuery = {
   userId?: string, 
   contactNumber?: string,
   company?: string
+  categoryId?: string;
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { pageNumber, initialDate, finalDate, userId, contactNumber, company } = req.query as IndexQuery;
+  const { pageNumber, initialDate, finalDate, userId, contactNumber, company, categoryId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
   const report = await ListReportService({
@@ -21,7 +22,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     userId,
     initialDate,
     finalDate,
-    company
+    company,
+    categoryId
   });
 
   return res.status(200).json(report);

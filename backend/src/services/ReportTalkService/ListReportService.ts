@@ -5,6 +5,7 @@ import Contact from "../../database/models/Contact";
 import Message from "../../database/models/Message";
 import Ticket from "../../database/models/Ticket";
 import User from "../../database/models/User";
+import Category from "../../database/models/Category";
 
 interface Request {
   pageNumber?: string;
@@ -15,6 +16,7 @@ interface Request {
   initialDate?: string;
   finalDate?: string;
   company?: string;
+  categoryId?: string;
 }
 
 interface Response {
@@ -31,33 +33,23 @@ const ListReportService = async ({
   userId,
   initialDate,
   finalDate,
-  company = null
+  company = null,
+  categoryId
 }: Request): Promise<Response> => {
   let whereConditionTicket = null;
   let whereConditionMessage = null;
+  let whereConditionContact = null;
 
   whereConditionTicket = {
     companyId: companyId === 1 ? company ? company : companyId : companyId,
   }
 
   if (contactNumber) {
-    const contacts = await Contact.findAll({
-      attributes: ["id"],
+    whereConditionContact = {
+      required: true,
+      attributes: ["id", "name", "number"],
       where: { 
-        "$Contact.number$": Sequelize.where(
-          Sequelize.fn("LOWER", Sequelize.col("Contact.number")),
-          "LIKE",
-          `%${contactNumber.toLowerCase()}%`
-        )
-      }
-    });
-
-    if (contacts.length > 0) {
-      const contactsArray = contacts.map(contact => contact.id);
-
-      whereConditionTicket = {
-        ...whereConditionTicket,
-        contactId: { [Op.in]: contactsArray }
+        number: { [Op.like]: `%${contactNumber.toLowerCase()}%` }
       }
     }
   }
@@ -66,6 +58,13 @@ const ListReportService = async ({
     whereConditionTicket = { 
       ...whereConditionTicket,
       userId 
+    }
+  }
+
+  if (categoryId) {
+    whereConditionTicket = { 
+      ...whereConditionTicket,
+      categoryId 
     }
   }
 
@@ -108,6 +107,13 @@ const ListReportService = async ({
             model: Contact,
             as: "contact",
             attributes: ["name", "number"],
+            required: false,
+            ...whereConditionContact
+          },
+          {
+            model: Category,
+            as: "category",
+            attributes: ["name"],
             required: false,
           }
         ]
