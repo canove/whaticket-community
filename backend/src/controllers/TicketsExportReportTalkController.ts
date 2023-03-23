@@ -16,10 +16,11 @@ type IndexQuery = {
   userId?: string, 
   contactNumber?: string,
   company?: string,
+  categoryId?: string,
 };
 
 export const index = async (req: Request, res: Response): Promise<void> => {
-  const { initialDate, finalDate, userId, contactNumber, company } = req.query as IndexQuery;
+  const { initialDate, finalDate, userId, contactNumber, company, categoryId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
   try {
@@ -30,7 +31,8 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       userId,
       initialDate,
       finalDate,
-      company
+      company,
+      categoryId
    });
   
     let reports = [];
@@ -62,12 +64,13 @@ export const index = async (req: Request, res: Response): Promise<void> => {
           <table style="display: block; border-collapse: collapse; width: 1200px; table-layout: fixed;">
             <thead>
               <tr>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">ID do Ticket</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Categoria</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Operador</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Cliente</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Enviado Por</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Telefone</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 140px; max-width: 140px; font-weight: bold">Mensagem</td>
-                <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">ID do Ticket</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Data</td>
               <tr>
             </thead>
@@ -93,6 +96,7 @@ export const index = async (req: Request, res: Response): Promise<void> => {
                 <h1>Relatório de Conversas</h1>
                 <h3>Filtros:</h3>
                 <h4>Telefone: ${contactNumber}</h4>
+                <h4>ID da Categoria: ${categoryId}</h4>
                 <h4>ID do Usuário: ${userId}</h4>
                 <h4>Data Inicial: ${initialDate}</h4>
                 <h4>Data Final: ${finalDate}</h4>
@@ -153,15 +157,17 @@ const getMessageRows = (messages: Message[]) => {
     const msg = message.mediaUrl ? `[MEDIA_URL: ${message.mediaUrl}]${message.body}` : message.body;
     const ticketId = message.ticketId;
     const date = format(message.createdAt, "dd/MM/yyyy HH:mm");
+    const category = message.ticket.category ? message.ticket.category.name : "";
 
     rows += `
       <tr>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${ticketId}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${category}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${userName}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${contactName}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${fromMe}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${contactNumber}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 140px; max-width: 140px; padding: 5px; word-wrap: break-word">${msg.replace(/{/g, '/{').replace(/}/g, '/}')}</td>
-        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${ticketId}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${date}</td>
       </tr>
     `;

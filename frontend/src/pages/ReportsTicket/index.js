@@ -22,6 +22,8 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 
+import { format, parseISO } from "date-fns";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "inline-flex",
@@ -40,34 +42,52 @@ const ReportsTicket = () => {
   const { i18n } = useTranslation();
 
   const [loading, setLoading] = useState(false);
+
   const [reports, setReports] = useState([]);
+  const [ticket, setTicket] = useState(null);
+
   const [tickets, setTickets] = useState([]);
-  const [ticketId, setTicketId] = useState();
-  const [disableButton, setDisableButton] = useState(true);
-  const [pdf, setPdf] = useState();
+  const [ticketId, setTicketId] = useState("");
+
+  const [pdf, setPDF] = useState("");
+  const [creatingPDF, setCreatingPDF] = useState(false);
 
   const filterReports = async () => {
-    setDisableButton(true);
-    await fetchReports(ticketId);
-    await createPdf();
-    setDisableButton(false);
-  }
-
-  const createPdf = async () => {
     if (!ticketId) {
       toast.error(i18n.t("reportsTicket.errors.toastErr"));
-    } else {
-      try {
-        const { data } = await api.get(`/tickets-export-report?ticketId=${ticketId}`);
-        setPdf(data);
-      } catch (err) {
-        toastError(err)
-      }
+      return;
     }
+
+    setPDF("");
+    await fetchReports(ticketId);
   }
 
-  const downloadPdf = () => {
-    const linkSource = `data:application/pdf;base64,${pdf}`;
+  const createPDF = async () => {
+    try {
+      const { data } = await api.get(`/tickets-export-report?ticketId=${ticketId}`);
+      setPDF(data);
+      return data;
+    } catch (err) {
+      toastError(err)
+    }
+    return null;
+  }
+
+  const downloadPDF = async () => {
+    if (!ticketId) {
+      toast.error(i18n.t("reportsTicket.errors.toastErr"));
+      return;
+    }
+
+    let newPDF = null;
+  
+    if (!pdf) {
+        setCreatingPDF(true);
+        newPDF = await createPDF();
+        setCreatingPDF(false);
+    }
+    
+    const linkSource = `data:application/pdf;base64,${newPDF ? newPDF : pdf}`;
     const downloadLink = document.createElement("a");
     const fileName = `report.pdf`;
     downloadLink.href = linkSource;
@@ -76,36 +96,29 @@ const ReportsTicket = () => {
   }
 
   useEffect(() => {
-    setLoading(true);
-    const delayDebounceFn = setTimeout(() => {
-      const fetchTickets = async () => {
-        try {
-          const { data } = await api.get("/tickets")
-          setTickets(data.tickets)
-          setLoading(false)
-        } catch (err) {
-          setLoading(false)
-          toastError(err)
-        }
+    const fetchTickets = async () => {
+      try {
+        const { data } = await api.get("/tickets/list")
+        setTickets(data.tickets)
+        setLoading(false)
+      } catch (err) {
+        setLoading(false)
+        toastError(err)
       }
-      fetchTickets()
-    }, 500)
-    return () => clearTimeout(delayDebounceFn)
+    }
+    fetchTickets()
   }, [])
 
   const fetchReports = async (ticketId) => {
-    if (!ticketId) {
-      toast.error(i18n.t("reportsTicket.errors.toastErr"));
-    } else {
-      try {
-        setLoading(true);
-        const { data } = await api.get(`tickets-report?ticketId=${ticketId}`);
-        setReports(data);
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-      }
+    setLoading(true);
+    try {
+      const { data } = await api.get(`tickets-report?ticketId=${ticketId}`);
+      setTicket(data);
+      setReports(data.messages);
+    } catch (err) {
+      toastError(err);
     }
+    setLoading(false);
   };
 
   const handleSelectOption = (e, newValue) => {
@@ -139,8 +152,8 @@ const ReportsTicket = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={ downloadPdf }
-            disabled={ disableButton }
+            onClick={ downloadPDF }
+            disabled={ creatingPDF }
           >
             {i18n.t("reportsTicket.buttons.exportPdf")}
           </Button>
@@ -150,23 +163,27 @@ const ReportsTicket = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.ticketId")}</TableCell>
               <TableCell align="center">{i18n.t("reportsTicket.grid.messageId")}</TableCell>
               <TableCell align="center">{i18n.t("reportsTicket.grid.bodyText")}</TableCell>
               <TableCell align="center">{i18n.t("reportsTicket.grid.read")}</TableCell>
-              <TableCell align="center">{i18n.t("reportsTicket.grid.ticketId")}</TableCell>
+              <TableCell align="center">{"Criado em"}</TableCell>
+              <TableCell align="center">{"Categoria"}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <>
               {reports.map((report) => (
                 <TableRow key={report.id}>
+                  <TableCell align="center">{report.ticketId}</TableCell>
                   <TableCell align="center">{report.id}</TableCell>
                   <TableCell align="center">{report.body}</TableCell>
-                  <TableCell align="center">{report.read}</TableCell>
-                  <TableCell align="center">{report.ticketId}</TableCell>
+                  <TableCell align="center">{report.read ? "SIM" : "NÃO"}</TableCell>
+                  <TableCell align="center">{format(parseISO(report.createdAt), "dd/MM/yy HH:mm")}</TableCell>
+                  <TableCell align="center">{ticket.category ? ticket.category.name : ""}</TableCell>
                 </TableRow>
               ))}
-              {loading && <TableRowSkeleton columns={4} />}
+              {loading && <TableRowSkeleton columns={6} />}
             </>
           </TableBody>
         </Table>

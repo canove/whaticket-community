@@ -29,6 +29,7 @@ import {
 import Ticket from "../database/models/Ticket";
 import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService";
 import ShowUserService from "../services/UserServices/ShowUserService";
+import ListAllTicketsService from "../services/TicketServices/ListAllTicketsService";
 
 type IndexQuery = {
   searchParam: string;
@@ -96,6 +97,14 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.status(200).json({ tickets, count, hasMore });
+};
+
+export const list = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const { tickets } = await ListAllTicketsService({ companyId });
+
+  return res.status(200).json({ tickets });
 };
 
 export const containTicket = async (req: Request, res: Response): Promise<Response> => {

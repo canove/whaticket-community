@@ -1,13 +1,16 @@
+import { format } from "date-fns";
 import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
 import Message from "../database/models/Message";
+import AppError from "../errors/AppError";
+import ListTicketsReportService from "../services/TicketsReportService/ListTicketsReportService";
 
 const fs = require("fs");
 const pdf = require("pdf-creator-node");
 const pdf2base64 = require("pdf-to-base64");
 
 type IndexQuery = {
-  ticketId?: number;
+  ticketId?: string;
 };
 
 type Report = {
@@ -23,99 +26,40 @@ export const index = async (req: Request, res: Response): Promise<void> => {
   const { ticketId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const reports: Array<Report> = await Message.sequelize?.query(
-    `
-        select
-            msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
-        from
-            whaticket.Messages as msg
-        inner join
-            whaticket.Tickets as ticket
-        on
-            msg.ticketId = ticket.id
-        where
-            ticket.id = ${ticketId}
-        and
-            ticket.companyId = ${companyId}
-    `,
-    { type: QueryTypes.SELECT }
-  );
+  if (!ticketId) throw new AppError("NO_TICKET_SELECTED");
 
-  const checkZero = data => {
-    if (data.length === 1) {
-      data = `0${data}`;
-    }
-    return data;
-  };
-
-  const formatDate = date => {
-    if (date === null) {
-      return "";
-    }
-    const dateString = `${date.toLocaleDateString("pt-BR")} ${checkZero(
-      `${date.getHours()}`
-    )}:${checkZero(`${date.getMinutes()}`)}`;
-    return dateString;
-  };
-
-  const isRead = read => {
-    if (read === 1) {
-      return "Sim";
-    }
-    if (read === 2) {
-      return "Não";
-    }
-    return read;
-  };
-
-  const getReportData = () => {
-    let text = "";
-    reports.forEach((report: Report) => {
-      const { id } = report;
-      const { body } = report;
-      const mediaUrl = report.mediaUrl ? report.mediaUrl : "";
-      const createdAt = formatDate(report.createdAt);
-      const read = isRead(report.read);
-
-      text += `
-                <tr>
-                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${id}</td>
-                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${body}</td>
-                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${mediaUrl}</td>
-                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${createdAt}</td>
-                    <td style="border: 1px solid black; padding: 5px; text-align: center; max-width: 250px; min-width: 100px; word-wrap: break-word">${read}</td>
-                </tr>
-            `;
-    });
-    return text;
-  };
+  const ticket = await ListTicketsReportService({ ticketId, companyId });
 
   const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>PDF - Ticket Report</title>
-        </head>
-        <body>
-            <h1>Tickets Report</h1>
-            <h2>Ticket ID: ${ticketId}</h2>
-            <table style="border: 1px solid black; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <td style="border: 1px solid black">ID</td>
-                        <td style="border: 1px solid black">Body</td>
-                        <td style="border: 1px solid black">Media URL</td>
-                        <td style="border: 1px solid black">Created At</td>
-                        <td style="border: 1px solid black">Read</td>
-                    <tr>
-                </thead>
-                <tbody>
-                    ${getReportData()}
-                </tbody>
-            </table>
-        </body>
-        </html>
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <meta charset="utf-8" />
+          <title>PDF - Relatório de Conversa</title>
+      </head>
+      <style>
+        html { zoom: 0.7; }
+      </style>
+      <body>
+          <h1>Relatório de Conversa</h1>
+          <h3>ID da Conversa: ${ticketId}</h3>
+          <h3>Categoria: ${ticket.category ? ticket.category.name : ""}</h3>
+          <table style="border: 1px solid black; border-collapse: collapse;">
+              <thead>
+                  <tr>
+                      <td  style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; font-weight: bold">ID</td>
+                      <td  style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; font-weight: bold">Corpo</td>
+                      <td  style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; font-weight: bold">Media URL</td>
+                      <td  style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; font-weight: bold">Lido</td>
+                      <td  style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; font-weight: bold">Criado em</td>
+                  <tr>
+              </thead>
+              <tbody>
+                  ${getReportData(ticket, ticket.messages)}
+              </tbody>
+          </table>
+      </body>
+      </html>
     `;
 
   const options = {
@@ -138,9 +82,7 @@ export const index = async (req: Request, res: Response): Promise<void> => {
 
   const documento = {
     html,
-    data: {
-      reports
-    },
+    data: {},
     path: "./src/downloads/output.pdf",
     type: ""
   };
@@ -156,4 +98,28 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       throw err;
     }
   });
+};
+
+const getReportData = (ticket, messages) => {
+  let text = "";
+
+  for (const message of messages) {
+    const { id, body } = message;
+
+    const mediaUrl = message.mediaUrl ? message.mediaUrl : "";
+    const createdAt = format(message.createdAt, "dd/MM/yyyy HH:mm");
+    const read = message.read ? "SIM" : "NÃO";
+
+    text += `
+      <tr>
+        <td style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; padding: 5px; word-wrap: break-word">${id}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; padding: 5px; word-wrap: break-word">${body}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; padding: 5px; word-wrap: break-word">${mediaUrl}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; padding: 5px; word-wrap: break-word">${read}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 200px; max-width: 200px; padding: 5px; word-wrap: break-word">${createdAt}</td>
+      </tr>
+    `;
+  }
+
+  return text;
 };

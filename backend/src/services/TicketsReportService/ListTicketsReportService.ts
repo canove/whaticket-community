@@ -1,34 +1,37 @@
 import { QueryTypes } from "sequelize";
+import Category from "../../database/models/Category";
 import Message from "../../database/models/Message";
+import Ticket from "../../database/models/Ticket";
 
 interface Request {
-  ticketId: number;
+  ticketId: string;
   companyId: number;
 }
 
 const ListTicketsReportService = async ({
   ticketId,
   companyId
-}: Request): Promise<Message[]> => {
-  const messages: Message[] = await Message.sequelize?.query(
-    `
-        select
-            msg.id, msg.body, msg.mediaUrl, msg.ticketId, msg.createdAt, msg.read
-        from
-            whaticket.Messages as msg
-        inner join
-            whaticket.Tickets as ticket
-        on
-            msg.ticketId = ticket.id
-        where
-            ticket.id = ${ticketId}
-        and
-            ticket.companyId = ${companyId} 
-    `,
-    { type: QueryTypes.SELECT }
-  );
+}: Request): Promise<Ticket> => {
+  const ticket = await Ticket.findOne({
+    where: { id: ticketId, companyId },
+    attributes: ["id"],
+    include: [
+      {
+        model: Message,
+        as: "messages",
+        attributes: ["id", "body", "mediaUrl", "ticketId", "createdAt", "read"],
+        required: false,
+      },
+      {
+        model: Category,
+        as: "category",
+        attributes: ["name"],
+        required: false,
+      }
+    ]
+  }); 
 
-  return messages;
+  return ticket;
 };
 
 export default ListTicketsReportService;
