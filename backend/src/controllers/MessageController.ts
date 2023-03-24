@@ -49,21 +49,17 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   if (ticket.userId != null && ticket.userId != id) throw new AppError("ERR_TICKET_ACCEPTED_BY_OTHER_USER");
 
-  // if (medias) {
-  //   await Promise.all(
-  //     medias.map(async (media: Express.Multer.File) => {
-  //       await SendWhatsAppMedia({ media, ticket, companyId, body });
-  //     })
-  //   );
-  // } else {
-  //   await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null });
-  // }
+  if (medias) {
+    await Promise.all(
+      medias.map(async (media: Express.Multer.File) => {
+        await SendWhatsAppMedia({ media, ticket, companyId, body });
+      })
+    );
+  } else {
+    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null });
+  }
 
-  // SetTicketMessagesAsRead(ticket);
-
-  await ticket.update({ 
-    lastMessageFromMe: !ticket.lastMessageFromMe 
-  });
+  SetTicketMessagesAsRead(ticket);
 
   const io = getIO();
 
