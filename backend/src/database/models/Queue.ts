@@ -14,6 +14,7 @@ import {
   HasMany
 } from "sequelize-typescript";
 import Company from "./Company";
+import Ticket from "./Ticket";
 import TicketHistorics from "./TicketHistorics";
 import User from "./User";
 import UserQueue from "./UserQueue";
@@ -63,6 +64,9 @@ class Queue extends Model<Queue> {
 
   @HasMany(() => TicketHistorics, "queueId")
   ticketHistorics: TicketHistorics[];
+
+  @HasMany(() => Ticket, "queueId")
+  tickets: Ticket[];
 
   @BelongsToMany(() => Whatsapp, () => WhatsappQueue)
   whatsapps: Array<Whatsapp & { WhatsappQueue: WhatsappQueue }>;

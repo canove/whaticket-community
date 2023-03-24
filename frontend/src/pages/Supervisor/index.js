@@ -12,6 +12,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
@@ -47,12 +48,42 @@ const Supervisor = () => {
   const { i18n } = useTranslation();
 
   const [loading, setLoading] = useState(false);
+  
+  const [info, setInfo] = useState([]);
+
+  const [type, setType] = useState("queue");
+
+  const [queueId, setQueueId] = useState("");
+  const [status, setStatus] = useState("");
 
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      const fetchInfo = async () => {
+        try {
+          const { data } = await api.get("/supervisor", {
+            params: { type, queueId, status }
+          });
+          console.log(data);
+          setInfo(data);
+        } catch (err) {
+          toastError(err);
+        }
+      }
 
-  }, []);
+      fetchInfo();
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
+  }, [type, queueId, status]);
+
+  const handleInfoClick = ({ queueId, status, type }) => {
+    setInfo([]);
+    setType(type);
+    setQueueId(queueId);
+    setStatus(status);
+  }
 
   return (
     <MainContainer>
@@ -62,6 +93,149 @@ const Supervisor = () => {
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">
+        { type === "queue" &&
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="left">{"Fila"}</TableCell>
+                <TableCell align="center">{"Conversas em Espera"}</TableCell>
+                <TableCell align="center">{"Conversas em Atendimento"}</TableCell>
+                <TableCell align="center">{"Conversas Finalizadas"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <>
+                {info && info.map((queue) => (
+                  <TableRow key={queue.id}>
+                    <TableCell align="left">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "start",
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 20,
+                            height: 20,
+                            marginRight: 5,
+                            alignSelf: "center",
+                            // borderRadius: "100%",
+                            backgroundColor: queue.color,
+                            border: queue.color ? null : "1px solid black",
+                          }}
+                        />
+                        <Typography>{queue.name}</Typography>
+                      </div>
+                    </TableCell>
+                    <TableCell align="center">
+                      <span
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => { 
+                          handleInfoClick({ 
+                            type: "queue-ticket", 
+                            queueId: queue.id, 
+                            status: "pending",
+                          });
+                        }}
+                      >
+                        {queue.pending_tickets}
+                      </span>
+                    </TableCell>
+                    <TableCell align="center">
+                      <span
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => { 
+                          handleInfoClick({ 
+                            type: "queue-ticket", 
+                            queueId: queue.id, 
+                            status: "open",
+                          });
+                        }}
+                      >
+                        {queue.open_tickets}
+                      </span>
+                    </TableCell>
+                    <TableCell align="center">
+                      <span
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => { 
+                          handleInfoClick({ 
+                            type: "queue-ticket", 
+                            queueId: queue.id, 
+                            status: "closed",
+                          });
+                        }}
+                      >
+                        {queue.closed_tickets}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {loading && <TableRowSkeleton columns={4} />}
+              </>
+            </TableBody>
+          </Table>
+        }
+        { type === "queue-ticket" &&
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">{"ID da Conversa"}</TableCell>
+                <TableCell align="center">{"Fila"}</TableCell>
+                <TableCell align="center">{"Status"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <>
+                {info && info.map((ticket) => (
+                  <TableRow key={ticket.id}>
+                    <TableCell align="center">
+                      <span
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => { 
+
+                        }}
+                      >
+                        {ticket.id}
+                      </span>
+                    </TableCell>
+                    <TableCell align="center">
+                      <span
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => { 
+                          // handleInfoClick({ 
+                          //   type: "queue-ticket", 
+                          //   queueId: ticket.queue ? ticket.queue.id : "NO_QUEUE", 
+                          //   status: null,
+                          // });
+                        }}
+                      >
+                        {ticket.queue ? ticket.queue.name : "SEM FILA"}
+                      </span>
+                    </TableCell>
+                    <TableCell align="center">
+                      <span
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => { 
+                          // handleInfoClick({
+                          //   type: "queue-ticket",
+                          //   queueId: null, 
+                          //   status: ticket.status,
+                          // });
+                        }}
+                      >
+                        {ticket.status}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {loading && <TableRowSkeleton columns={3} />}
+              </>
+            </TableBody>
+          </Table>
+        }
       </Paper>
     </MainContainer>
   );
