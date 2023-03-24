@@ -10,6 +10,7 @@ import UpdateUserService from "../services/UserServices/UpdateUserService";
 import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 import UpdateUserLanguageService from "../services/UserServices/UpdateUserLanguageService";
+import ListAllUsersService from "../services/UserServices/ListAllUsersService";
 
 type IndexQuery = {
   searchParam: string;
@@ -27,6 +28,14 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.json({ users, count, hasMore });
+};
+
+export const list = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const users = await ListAllUsersService({ companyId });
+
+  return res.json(users);
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {

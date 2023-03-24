@@ -22,6 +22,7 @@ import UserQueue from "./UserQueue";
 import Company from "./Company";
 import Profiles from "./Profiles";
 import TicketHistorics from "./TicketHistorics";
+import Message from "./Message";
 
 @Table
 class User extends Model<User> {
@@ -82,6 +83,9 @@ class User extends Model<User> {
 
   @HasMany(() => TicketHistorics, "userId")
   ticketHistorics: TicketHistorics[];
+
+  @HasMany(() => Message, "userId")
+  messages: Message[];
 
   @BeforeUpdate
   @BeforeCreate

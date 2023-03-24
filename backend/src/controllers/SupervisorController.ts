@@ -8,44 +8,69 @@ import AppError from "../errors/AppError";
 
 import Ticket from "../database/models/Ticket";
 import Queue from "../database/models/Queue";
+import User from "../database/models/User";
+import Message from "../database/models/Message";
+import Category from "../database/models/Category";
+import { endOfDay, startOfDay } from "date-fns";
+import TicketHistorics from "../database/models/TicketHistorics";
 
 type IndexQuery = {
-    type: string,
+    tab: string,
     status: string,
     queueId: string,
+    userId: string,
+    pageNumber: string,
+    categoryId: string
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-    const { type, status, queueId } = req.query as IndexQuery;
+    const { tab, status, queueId, userId, pageNumber, categoryId } = req.query as IndexQuery;
     const { companyId } = req.user;
 
     let info = null;
 
-    switch (type) {
+    const initialDate = new Date();
+    initialDate.setDate(initialDate.getDate() - 30);
+
+    const finalDate = new Date();
+
+    const dateFilter = { [Op.between]: [+startOfDay(initialDate), +endOfDay(finalDate)] }
+
+    switch (tab) {
         case "queue":
-            const queues = await Queue.findAll({
+            info = [];
+    
+            const queues: any = await Queue.findAll({
                 where: { companyId },
                 attributes: [
                     "id", 
                     "name", 
                     "color",
-                    [ Sequelize.fn('sum', Sequelize.literal('tickets.status = "pending"')), "pending_tickets" ],
-                    [ Sequelize.fn('sum', Sequelize.literal('tickets.status = "open"')), "open_tickets" ],
-                    [ Sequelize.fn('sum', Sequelize.literal('tickets.status = "closed"')), "closed_tickets" ],
+                    "limit",
                 ],
-                include: [
-                    {
-                        model: Ticket,
-                        as: "tickets",
-                        attributes: ["id"],
-                        required: false,
-                    }
-                ],
-                group: "Queue.id"
             });
+
+            for (const queue of queues) {
+                const ticket_count: any = await Ticket.findOne({
+                    where: { companyId, queueId: queue.id, updatedAt: dateFilter },
+                    attributes: [
+                        [ Sequelize.fn('sum', Sequelize.literal('status = "pending"')), "pending_tickets" ],
+                        [ Sequelize.fn('sum', Sequelize.literal('status = "open"')), "open_tickets" ],
+                        [ Sequelize.fn('sum', Sequelize.literal('status = "closed"')), "closed_tickets" ],
+                    ],
+                    raw: true,
+                });
+
+                const newQueue = {
+                    ...queue.dataValues,
+                    ...ticket_count
+                }
+
+                info.push(newQueue);
+            }
     
             const no_queue: any = await Ticket.findOne({
-                where: { companyId, queueId: null },
+                where: { companyId, queueId: null, updatedAt: dateFilter },
                 attributes: [
                     [ Sequelize.fn('sum', Sequelize.literal('status = "pending"')), "pending_tickets" ],
                     [ Sequelize.fn('sum', Sequelize.literal('status = "open"')), "open_tickets" ],
@@ -61,46 +86,223 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 open_tickets: no_queue.open_tickets,
                 closed_tickets: no_queue.closed_tickets,
             }
-    
-            info = [...queues, no_queue_info];
+
+            info.push(no_queue_info);
         break;
-        case "queue-ticket":
-            if (queueId === "NO_QUEUE") {
-                let whereConditionTicket = null;
+        case "user":
+            info = [];
 
-                whereConditionTicket = { companyId };
+            const users: any = await User.findAll({
+                where: { companyId },
+                attributes: [
+                    "id", 
+                    "name",
+                ],
+            });
 
-                if (status) whereConditionTicket = { ...whereConditionTicket, status };
-                if (queueId) whereConditionTicket = { ...whereConditionTicket, queueId: null };
+            const historics = await User.findAll({
+                where: { companyId },
+                attributes: ["id"],
+                include: [
+                    {
+                        model: TicketHistorics,
+                        as: "ticketHistorics",
+                        attributes: ["id", "ticketId", "ticketCreatedAt", "transferedAt", "finalizedAt", "reopenedAt", "acceptedAt", "createdAt"],
+                        where: {
+                            [Op.or]: [
+                                { ticketCreatedAt: { [Op.ne]: null } },
+                                { transferedAt: { [Op.ne]: null } },
+                                { finalizedAt: { [Op.ne]: null } },
+                                { reopenedAt: { [Op.ne]: null } },
+                                { acceptedAt: { [Op.ne]: null } },
+                            ],
+                            createdAt: dateFilter
+                        },
+                        required: true,
+                        order: [["createdAt", "ASC"]],
+                    },
+                ],
+            });
 
-                const tickets = await Ticket.findAll({
-                    where: whereConditionTicket,
-                    attributes: ["id", "queueId", "status"],
+            for (const user of users) {
+                const serviceTime = historics.find(historic => user.id === historic.id);
+
+                const ticket_count: any = await Ticket.findOne({
+                    where: { companyId, userId: user.id, updatedAt: dateFilter },
+                    attributes: [
+                        [ Sequelize.fn('sum', Sequelize.literal('status = "pending"')), "pending_tickets" ],
+                        [ Sequelize.fn('sum', Sequelize.literal('status = "open"')), "open_tickets" ],
+                        [ Sequelize.fn('sum', Sequelize.literal('status = "closed"')), "closed_tickets" ],
+                    ],
+                    raw: true,
                 });
 
-                info = tickets;
-            } else {
-                let whereConditionTicket = null;
+                let lastSentMessage = null;
 
-                whereConditionTicket = { companyId };
-
-                if (status) whereConditionTicket = { ...whereConditionTicket, status };
-                if (queueId) whereConditionTicket = { ...whereConditionTicket, queueId };
-
-                const tickets = await Ticket.findAll({
-                    where: whereConditionTicket,
-                    attributes: ["id", "queueId", "status"],
+                const lastMessage = await Message.findOne({
+                    where: { fromMe: true, userId: user.id },
+                    attributes: ["id", "fromMe", "createdAt"],
                     include: [
                         {
-                            model: Queue,
-                            as: "queue",
-                            attributes: ["id", "name", "color"]
+                            model: Ticket,
+                            as: "ticket",
+                            where: { companyId },
+                            required: true
                         }
-                    ]
+                    ],
+                    order: [["createdAt", "DESC"]],
                 });
 
-                info = tickets;
+                if (lastMessage && lastMessage.createdAt) {
+                    const now = new Date();
+                    const messageDate = new Date(lastMessage.createdAt);
+
+                    lastSentMessage = now.getTime() - messageDate.getTime();
+                }
+
+                const newUser = {
+                    ...user.dataValues,
+                    ...ticket_count,
+                    ticketHistorics: serviceTime ? serviceTime.ticketHistorics : null,
+                    lastSentMessage
+                };
+
+                info.push(newUser);
             }
+    
+            const no_user: any = await Ticket.findOne({
+                where: { companyId, userId: null, updatedAt: dateFilter },
+                attributes: [
+                    [ Sequelize.fn('sum', Sequelize.literal('status = "pending"')), "pending_tickets" ],
+                    [ Sequelize.fn('sum', Sequelize.literal('status = "open"')), "open_tickets" ],
+                    [ Sequelize.fn('sum', Sequelize.literal('status = "closed"')), "closed_tickets" ],
+                ],
+                raw: true,
+            });
+    
+            const no_user_info = {
+                id: "NO_USER",
+                name: "SEM USER",
+                pending_tickets: no_user.pending_tickets,
+                open_tickets: no_user.open_tickets,
+                closed_tickets: no_user.closed_tickets,
+            }
+
+            info.push(no_user_info);
+        break;
+        case "ticket":
+            let whereCondition = null;
+
+            whereCondition = { companyId, updatedAt: dateFilter };
+
+            if (status) {
+                whereCondition = { 
+                    ...whereCondition, 
+                    status
+                };
+            }
+
+            if (queueId) {
+                whereCondition = {
+                    ...whereCondition,
+                    queueId: queueId === "NO_QUEUE" ? null : queueId
+                };
+            }
+
+            if (userId) {
+                whereCondition = {
+                    ...whereCondition,
+                    userId: userId === "NO_USER" ? null : userId
+                };
+            }
+
+            if (categoryId) {
+                whereCondition = {
+                    ...whereCondition,
+                    categoryId: categoryId === "NO_CATEGORY" ? null : categoryId
+                };
+            }
+
+            const limit = 20;
+            const offset = limit * (+pageNumber - 1);
+
+            const { count, rows: tickets }: any = await Ticket.findAndCountAll({
+                where: whereCondition,
+                attributes: [
+                    "id", 
+                    "queueId", 
+                    "status",
+                ],
+                include: [
+                    {
+                        model: Queue,
+                        as: "queue",
+                        attributes: ["id", "name", "color"],
+                        required: false
+                    },
+                    {
+                        model: User,
+                        as: "user",
+                        attributes: ["id", "name"],
+                        required: false
+                    },
+                    {
+                        model: Category,
+                        as: "category",
+                        attributes: ["id", "name"],
+                        required: false
+                    }
+                ],
+                limit,
+                offset,
+                group: "Ticket.id"
+            });
+
+            let newTickets = [];
+
+            for (const ticket of tickets) {
+                const { count: sent_count, rows: sentMessages } = await Message.findAndCountAll({
+                    where: { fromMe: true },
+                    attributes: ["id", "createdAt"],
+                    include: [
+                        {
+                            model: Ticket,
+                            as: "ticket",
+                            where: { id: ticket.id, companyId },
+                            attributes: ["id"],
+                            required: true,
+                        }
+                    ],
+                    order: [["createdAt", "DESC"]]
+                });
+                
+                const { count: received_count, rows: receivedMessages } = await Message.findAndCountAll({
+                    where: { fromMe: false },
+                    attributes: ["id", "createdAt"],
+                    include: [
+                        {
+                            model: Ticket,
+                            as: "ticket",
+                            where: { id: ticket.id, companyId },
+                            attributes: ["id"],
+                            required: true,
+                        }
+                    ],
+                    order: [["createdAt", "DESC"]]
+                });
+
+                const newTicket = {
+                    ...ticket.dataValues,
+                    sent_messages: sent_count,
+                    received_messages: received_count,
+                    lastSentMessage: (sentMessages && sentMessages.length > 0) ? sentMessages[0].createdAt : null,
+                    lastReceivedMessage: (receivedMessages && receivedMessages.length > 0) ? receivedMessages[0].createdAt : null,
+                };
+
+                newTickets.push(newTicket);
+            }
+
+            info = { tickets: newTickets, count: count.length };
         break;
     }
 
