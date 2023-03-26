@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -47,17 +47,29 @@ const OfficialWhatsappReport = () => {
   const [reports, setReports] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [count, setCount] = useState(0);
+
   const [creatingXLSX, setCreatingXLSX] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [clientPhoneNumber, setClientPhoneNumber] = useState("");
+  const [initialDate, setInitialDate] = useState("");
+  const [finalDate, setFinalDate] = useState("");
 
-  const filterReports = async () => {
+  const firstUpdate = useRef(true);
+
+  const fetchReport = async () => {
+    if (!(initialDate && finalDate)) {
+      toast.error("Selecione uma data inicial e final.");
+      return;
+    }
+
     setLoading(true);
+    setReports([]);
 
     try {
       const { data } = await api.get("/officialWhatsappReports", {
-        params: { pageNumber, limit: "10", phoneNumber, clientPhoneNumber },
+        params: { pageNumber, limit: "10", phoneNumber, clientPhoneNumber, initialDate, finalDate },
       });
       setReports(data.reports);
       setCount(data.count);
@@ -68,8 +80,18 @@ const OfficialWhatsappReport = () => {
     setLoading(false);
   };
 
+  const filterReports = async () => {
+    setPageNumber(1);
+    await fetchReport();
+  }
+
   useEffect(() => {
-    if (count > 0) filterReports();
+    if (firstUpdate.current) {
+        firstUpdate.current = false;
+        return;
+    }
+
+    fetchReport();
   }, [pageNumber]);
 
   const createExcel = async () => {
@@ -115,7 +137,7 @@ const OfficialWhatsappReport = () => {
 
     try {
       const { data } = await api.get("/officialWhatsappReports", {
-        params: { pageNumber, limit: "-1" },
+        params: { pageNumber, limit: "-1", phoneNumber, clientPhoneNumber, initialDate, finalDate },
       });
 
       reports = data.reports;
@@ -189,140 +211,59 @@ const OfficialWhatsappReport = () => {
     setCreatingXLSX(false);
   };
 
-  // const [loading, setLoading] = useState(false);
-  // const [reports, setReports] = useState([]);
-  // const [tickets, setTickets] = useState([]);
-  // const [ticketId, setTicketId] = useState();
-  // const [disableButton, setDisableButton] = useState(true);
-  // const [pdf, setPdf] = useState();
-
-  // const filterReports = async () => {
-  //   setDisableButton(true);
-  //   await fetchReports(ticketId);
-  //   await createPdf();
-  //   setDisableButton(false);
-  // }
-
-  // const createPdf = async () => {
-  //   if (!ticketId) {
-  //     toast.error(i18n.t("reportsTicket.errors.toastErr"));
-  //   } else {
-  //     try {
-  //       const { data } = await api.get(`/tickets-export-report?ticketId=${ticketId}`);
-  //       setPdf(data);
-  //     } catch (err) {
-  //       toastError(err)
-  //     }
-  //   }
-  // }
-
-  // const downloadPdf = () => {
-  //   const linkSource = `data:application/pdf;base64,${pdf}`;
-  //   const downloadLink = document.createElement("a");
-  //   const fileName = `report.pdf`;
-  //   downloadLink.href = linkSource;
-  //   downloadLink.download = fileName;
-  //   downloadLink.click();
-  // }
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const delayDebounceFn = setTimeout(() => {
-  //     const fetchTickets = async () => {
-  //       try {
-  //         const { data } = await api.get("/tickets")
-  //         setTickets(data.tickets)
-  //         setLoading(false)
-  //       } catch (err) {
-  //         setLoading(false)
-  //         toastError(err)
-  //       }
-  //     }
-  //     fetchTickets()
-  //   }, 500)
-  //   return () => clearTimeout(delayDebounceFn)
-  // }, [])
-
-  // const fetchReports = async (ticketId) => {
-  //   if (!ticketId) {
-  //     toast.error(i18n.t("reportsTicket.errors.toastErr"));
-  //   } else {
-  //     try {
-  //       setLoading(true);
-  //       const { data } = await api.get(`tickets-report?ticketId=${ticketId}`);
-  //       setReports(data);
-  //       setLoading(false);
-  //     } catch (err) {
-  //       toastError(err);
-  //     }
-  //   }
-  // };
-
-  // const handleSelectOption = (e, newValue) => {
-  //   setTicketId(newValue);
-  // };
-
   return (
     <MainContainer>
       <MainHeader>
         <Title>{i18n.t("sessionReports.title")}</Title>
         <MainHeaderButtonsWrapper>
-          {/* <Autocomplete
-            onChange={(e, newValue) => handleSelectOption(e, newValue)}
-            className={classes.root}
-            options={tickets.map(ticket => ((ticket.id).toString()))}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={i18n.t("reportsTicket.buttons.ticketId")}
-                InputLabelProps={{ required: true }}
-              />
-            )}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={ filterReports }
-          >
-            {i18n.t("reportsTicket.buttons.filterReports")}
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={ downloadPdf }
-            disabled={ disableButton }
-          >
-            {i18n.t("reportsTicket.buttons.exportPdf")}
-          </Button> */}
-          <TextField
+          <div style={{ display: "flex", alignItems: "flex-end" }}>
+            <TextField
+              style={{ marginLeft: "8px" }}
+              onChange={(e) => { setInitialDate(e.target.value) }}
+              label={"Data Inicial"}
+              InputLabelProps={{ shrink: true, required: true }}
+              type="date"
+            />
+            <TextField
+              style={{ marginLeft: "8px" }}
+              onChange={(e) => { setFinalDate(e.target.value) }}
+              label={"Data Final"}
+              InputLabelProps={{ shrink: true, required: true }}
+              type="date"
+            />
+            <TextField
+              style={{ marginLeft: "8px" }}
               placeholder={"Telefone"}
               type="search"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <TextField
+            />
+            <TextField
               style={{ marginLeft: "8px" }}
               placeholder={"Telefone do Cliente"}
               type="search"
               value={clientPhoneNumber}
               onChange={(e) => setClientPhoneNumber(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={filterReports}
-            disabled={loading}
-          >
-            Filtrar
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createExcel}
-            disabled={creatingXLSX}
-          >
-            Exportar XLSX
-          </Button>
+            />
+            <Button
+              style={{ marginLeft: "8px" }}
+              variant="contained"
+              color="primary"
+              onClick={filterReports}
+              disabled={loading}
+            >
+              Filtrar
+            </Button>
+            <Button
+              style={{ marginLeft: "8px" }}
+              variant="contained"
+              color="primary"
+              onClick={createExcel}
+              disabled={creatingXLSX}
+            >
+              Exportar XLSX
+            </Button>
+          </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">

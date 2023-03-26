@@ -9,13 +9,15 @@ type IndexQuery = {
     limit: string;
     phoneNumber: string;
     clientPhoneNumber: string;
+    initialDate: string;
+    finalDate: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-    const { pageNumber, limit, phoneNumber, clientPhoneNumber } = req.query as IndexQuery;
+    const { pageNumber, limit, phoneNumber, clientPhoneNumber, initialDate, finalDate } = req.query as IndexQuery;
     const { companyId } = req.user;
   
-    const reports = await ListOfficialWhatsappReportsService({ companyId, pageNumber, limit, phoneNumber, clientPhoneNumber });
+    const reports = await ListOfficialWhatsappReportsService({ companyId, pageNumber, limit, phoneNumber, clientPhoneNumber, initialDate, finalDate });
   
     return res.status(200).json(reports);
 }

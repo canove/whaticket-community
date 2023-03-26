@@ -64,6 +64,7 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
                                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Entregues</td>
                                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Lidos</td>
                                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Erros</td>
+                                <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Blacklist</td>
                                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Interações</td>
                                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Sem Whatsapp</td>
                                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; font-weight: bold">Mensagens Trafegadas Enviadas</td>
@@ -129,11 +130,12 @@ const getReportRows = (reports: any[]) => {
         const register_delivered = report.delivered || 0;
         const register_read = report.read || 0;
         const register_error = report.error || 0;
+        const register_blacklist = report.blacklist || 0;
         const register_interaction = report.interaction || 0;
         const register_no_whats = report.noWhats || 0;
         const message_sent = report.sentMessages || 0;
         const message_received = report.receivedMessages || 0;
-
+        
         rows += `
             <tr>
                 <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${company_name}</td>
@@ -142,6 +144,7 @@ const getReportRows = (reports: any[]) => {
                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${register_delivered}</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${register_read}</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${register_error}</td>
+                <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${register_blacklist}</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${register_interaction}</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${register_no_whats}</td>
                 <td style="border: 1px solid black; text-align: center; min-width: 100px; max-width: 100px; padding: 5px; word-wrap: break-word">${message_sent}</td>

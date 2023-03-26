@@ -56,6 +56,7 @@ const ListGeneralReportService = async ({
             [ Sequelize.fn('sum', Sequelize.col("GeneralReports.noWhats")), 'noWhats' ],
             [ Sequelize.fn('sum', Sequelize.col("GeneralReports.sentMessages")), 'sentMessages' ],
             [ Sequelize.fn('sum', Sequelize.col("GeneralReports.receivedMessages")), 'receivedMessages' ],
+            [ Sequelize.fn('sum', Sequelize.col("GeneralReports.blacklist")), 'blacklist' ],
         ],
         include: [
             {

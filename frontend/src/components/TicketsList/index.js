@@ -190,6 +190,7 @@ const reducer = (state, action) => {
 		const socket = openSocket();
 
 		const shouldUpdateTicket = ticket => !searchParam &&
+			(!pendingAnswer || pendingAnswer && ticket.lastMessageFromMe === false) &&
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&
 			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
@@ -226,6 +227,10 @@ const reducer = (state, action) => {
 			if (data.action === "delete") {
 				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
 			}
+
+			if (data.action === "deleteLastMessage" && pendingAnswer) {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
+			}
 		});
 
 		socket.on(`appMessage${user.companyId}`, data => {
@@ -249,7 +254,7 @@ const reducer = (state, action) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, searchParam, showAll, user, selectedQueueIds]);
+	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer]);
 
 	useEffect(() => {
 		if (typeof updateCount === "function") {
