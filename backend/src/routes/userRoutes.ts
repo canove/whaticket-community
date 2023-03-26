@@ -7,6 +7,8 @@ const userRoutes = Router();
 
 userRoutes.get("/users", isAuth, UserController.index);
 
+userRoutes.get("/users/list", isAuth, UserController.list);
+
 userRoutes.post("/users", isAuth, UserController.store);
 
 userRoutes.put("/users/:userId", isAuth, UserController.update);

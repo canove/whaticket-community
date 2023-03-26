@@ -40,6 +40,7 @@ import operationsRoutes from "./operationsRoutes"
 import generalReportsRoutes from "./generalReportsRoutes";
 import serviceTimeRoutes from "./serviceTimeRoutes";
 import contactBlacklistRoutes from "./contactBlacklistRoutes";
+import supervisorRoutes from "./supervisorRoutes";
 
 const routes = Router();
 
@@ -83,5 +84,6 @@ routes.use(operationsRoutes);
 routes.use(generalReportsRoutes);
 routes.use(serviceTimeRoutes);
 routes.use(contactBlacklistRoutes);
+routes.use(supervisorRoutes);
 
 export default routes;

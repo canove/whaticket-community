@@ -160,7 +160,7 @@ const ListTicketsService = async ({
   const allTickets = await CheckProfilePermissionService({ userId: loggedUserId , companyId, permission: "tickets-manager:showall" });
 
   if (showAll === "true" && allTickets) {
-    whereCondition = { companyId, queueId: { [Op.or]: [queueIds, null] } };
+    whereCondition = { ...whereCondition, companyId, queueId: { [Op.or]: [queueIds, null] } };
 
     if (status) whereCondition = { ...whereCondition, status };
   }

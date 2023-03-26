@@ -380,6 +380,9 @@ const TicketsManager = () => {
                     }}
                     renderValue={() => "Categoria"}
                   >
+                    <MenuItem dense value={""}>
+                      <ListItemText primary={"Nenhuma"} />
+                    </MenuItem>
                     {categories?.length > 0 &&
                       categories.map(category => (
                         <MenuItem dense key={category.id} value={category.id}>
