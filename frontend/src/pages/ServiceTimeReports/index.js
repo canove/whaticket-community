@@ -181,6 +181,8 @@ const ServiceTimeReports = () => {
     const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
     const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
 
+    if (!createdAt || !finalizedAt) return null;
+  
     const createdAtDate = new Date(createdAt);
     const finalizedAtDate = new Date(finalizedAt);
 
@@ -200,7 +202,7 @@ const ServiceTimeReports = () => {
     const createdAt = createdHist.ticketCreatedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
     const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
 
-    if (!createdAt || !finalizedAt) return 0;
+    if (!createdAt || !finalizedAt) return null;
 
     const createdAtDate = new Date(createdAt);
     const finalizedAtDate = new Date(finalizedAt);
@@ -210,7 +212,9 @@ const ServiceTimeReports = () => {
     return serviceTime;
   }
 
-  const processHistorics = (historics = []) => {    
+  const processHistorics = (historics = []) => {   
+    if (!historics || historics.length === 0) return "--:--:--";
+ 
     let tickets = [];
 
     for (const historic of historics) {
@@ -248,6 +252,8 @@ const ServiceTimeReports = () => {
         if (tmaType === "user") {
           serviceTime = getUserServiceTime(hists);
         }
+
+        if (serviceTime === null) continue;
 
         ticketsServiceTime.push(serviceTime);
         continue;
