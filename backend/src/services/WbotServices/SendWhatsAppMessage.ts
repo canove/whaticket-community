@@ -255,7 +255,8 @@ const SendWhatsAppMessage = async ({
           "number": phoneNumber,
           "path": url,
           "text": fileName != null && fileName != '' ? fileName : `${formatBody(body, reg)}`,
-          "type": bodyType == '' ? type : bodyType
+          "type": bodyType == '' ? type : bodyType,
+          "templateButtons": templateButtons ? templateButtons : null
         };
   
         const headers = {

@@ -10,6 +10,8 @@ import {
   Typography,
   Select,
   MenuItem,
+  FormControl,
+  InputLabel,
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -55,118 +57,147 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ResolveModal = ({ open, onClose, ticketId, userId }) => {
-    const { i18n } = useTranslation();
-    const classes = useStyles();
-    const history = useHistory();
-    const [description, setDescription] = useState("");
-    const [openSelect, setOpenSelect] = useState(false);
-    const [selectedDescription, setSelectedDescription] = useState("Nenhuma");
+  const { i18n } = useTranslation();
+  const classes = useStyles();
+  const history = useHistory();
 
-    useEffect(() => {
-      const fetchCategory = async () => {
-        try {
-          const { data } = await api.get(`/category`);
-            setDescription(data)
-        } catch (err) {
-            toastError(err);
-        }
-    };
-          fetchCategory();
-    }, [open]);
+  const [categories, setCategories] = useState([]);
+  const [surveys, setSurveys] = useState([]);
 
-    const handleUpdateTicketStatus = async (e, status, userId, categoryId) => {
+  const [selectedCategory, setSelectedCategory] = useState("none");
+  const [selectedSurvey, setSelectedSurvey] = useState("none");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
       try {
-        await api.put(`/tickets/${ticketId}`, {
-          status: status,
-          userId: userId || null,
-          categoryId: categoryId === "Nenhuma" ? null : categoryId
-        });
+        const { data } = await api.get('/category');
+        setCategories(data)
+        } catch (err) {
+        toastError(err);
+      }
+    };
 
-        if (status === "open") {
-          history.push(`/tickets/${ticketId}`);
-        } else {
-          history.push("/tickets");
-        }
+    const fetchSurveys = async () => {
+      try {
+        const { data } = await api.get('/satisfactionSurvey', {
+          params: { limit: -1 }
+        });
+        setSurveys(data.surveys);
       } catch (err) {
         toastError(err);
-        }
-	  };
+      }
+    }
 
-    const handleClose = () => {
-      onClose();
-    };
+    fetchCategories();
+    fetchSurveys();
+  }, [open]);
 
-    const handleSelectDescription = (e) => {
-      setSelectedDescription(e.target.value);
-    };
+  const handleResolveTicket = async (userId, categoryId, surveyId) => {
+    try {
+      await api.put(`/tickets/${ticketId}`, {
+        status: "closed",
+        userId: userId || null,
+        categoryId: categoryId === "none" ? null : categoryId,
+        surveyId: surveyId === "none" ? null : surveyId, 
+      });
 
-    const handleOpenSelect = () => {
-		  setOpenSelect(true)
-	  };
+      history.push("/tickets");
+    } catch (err) {
+      toastError(err);
+    }
+	};
 
-    const handleCloseSelect = () => {
-      setOpenSelect(false)
-    };
+  const handleClose = () => {
+    onClose();
+    setSelectedCategory("none");
+    setSelectedSurvey("none");
+  };
 
-    return (
-      <div className={classes.root}>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          maxWidth="sm"
-          fullWidth
-          scroll="paper"
-        >
-          <DialogTitle id="form-dialog-title">
-            {i18n.t("category.title")}
-          </DialogTitle>
-              <DialogContent dividers>
-                <Typography variant="subtitle1" gutterBottom>
-                    {i18n.t("category.categoryModal.select")}
-                </Typography>
-					<div className={classes.multFieldLine}>
-						<Select
-							variant="outlined"
-							labelId="type-select-label"
-							id="type-select"
-							value={selectedDescription}
-							label="Type"
-							onChange={(e) => { handleSelectDescription(e) }}
-							open={openSelect}
-							onOpen={handleOpenSelect}
-							onClose={handleCloseSelect}
-							style={{width: "100%"}}
-						>
-              <MenuItem value={"Nenhuma"}>{i18n.t("category.categoryModal.none")}</MenuItem>
-							{description.length > 0 && description.map((category, index) => {
-										return (
-							<MenuItem key={index} value={category.id}>{category.name}</MenuItem>
-										)
-							})}
-						</Select>
-					</div>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                    type="submit"
-                    color="primary"
-                    variant="contained"
-                    className={classes.btnWrapper}
-                    onClick={e => handleUpdateTicketStatus(e, "closed", userId, selectedDescription)}
-                >
-                {i18n.t("Resolver")}
-                </Button>
-                <Button
-                  onClick={handleClose}
-                  color="secondary"
-                  variant="outlined"
-                >
-                  {i18n.t("category.categoryModal.cancel")}
-                </Button>
-              </DialogActions>
-          </Dialog>
-      </div>
-    );
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+  };
+
+  const handleSurveyChange = (e) => {
+    setSelectedSurvey(e.target.value);
+  };
+
+  return (
+    <div className={classes.root}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        scroll="paper"
+      >
+        <DialogTitle id="form-dialog-title">
+          {"Resolver o Ticket"}
+        </DialogTitle>
+        <DialogContent dividers>
+          <div className={classes.multFieldLine}>
+            <FormControl
+              variant="outlined"
+              margin="dense"
+              fullWidth
+            >
+              <InputLabel>{"Categoria"}</InputLabel>
+              <Select
+                variant="outlined"
+                label="Categoria"
+                value={selectedCategory}
+                onChange={(e) => handleCategoryChange(e)}
+                fullWidth
+              >
+                <MenuItem value={"none"}>{i18n.t("category.categoryModal.none")}</MenuItem>
+                {categories.length > 0 && categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+          <div className={classes.multFieldLine}>
+            <FormControl
+              variant="outlined"
+              margin="dense"
+              fullWidth
+            >
+              <InputLabel>{"Pesquisa de Satisfação"}</InputLabel>
+              <Select
+                variant="outlined"
+                label="Pesquisa de Satisfação"
+                value={selectedSurvey}
+                onChange={(e) => handleSurveyChange(e)}
+                fullWidth
+              >
+                <MenuItem value={"none"}>{"Nenhuma"}</MenuItem>
+                {surveys.length > 0 && surveys.map((survey) => (
+                  <MenuItem key={survey.id} value={survey.id}>{survey.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleClose}
+            color="secondary"
+            variant="outlined"
+          >
+            {i18n.t("category.categoryModal.cancel")}
+          </Button>
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            className={classes.btnWrapper}
+            onClick={() => handleResolveTicket(userId, selectedCategory, selectedSurvey)}
+          >
+            {i18n.t("Resolver")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
 };
 
 export default ResolveModal;
