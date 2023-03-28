@@ -5,6 +5,7 @@ import openSocket from "../../services/socket-io";
 
 import {
   Button,
+  CircularProgress,
   FormControl,
   IconButton,
   InputLabel,
@@ -33,6 +34,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import { useTranslation } from "react-i18next";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { GrUpdate } from "react-icons/gr";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -161,7 +163,27 @@ const Supervisor = () => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [tab, queueId, status, userId, pageNumber]);
+  }, [tab, queueId, categoryId, status, userId, pageNumber]);
+
+  const refetchInfo = async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/supervisor", {
+        params: { tab, queueId, userId, status, pageNumber, categoryId }
+      });
+
+      if (tab === "ticket") {
+        setCount(data.count);
+        setInfo(data.tickets);
+      } else {
+        setInfo(data);
+      }
+
+    } catch (err) {
+      toastError(err);
+    }
+    setLoading(false);
+  }
 
   const handleInfoClick = ({ queueId, userId, status, tab, categoryId }) => {
     setInfo([]);
@@ -316,6 +338,8 @@ const Supervisor = () => {
     const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
     const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
 
+    if (!createdAt || !finalizedAt) return null;
+
     const createdAtDate = new Date(createdAt);
     const finalizedAtDate = new Date(finalizedAt);
 
@@ -326,7 +350,7 @@ const Supervisor = () => {
 
   const processHistorics = (historics = []) => {
     if (!historics || historics.length === 0) return "--:--:--";
-    
+
     let tickets = [];
 
     for (const historic of historics) {
@@ -376,6 +400,8 @@ const Supervisor = () => {
           let serviceTime = 0;
 
           serviceTime = getUserServiceTime(newHists);
+
+          if (serviceTime === null) continue;
 
           ticketsServiceTime.push(serviceTime);
           continue;
@@ -458,6 +484,9 @@ const Supervisor = () => {
     <MainContainer>
       <MainHeader>
         <Title>{"Supervisor"}</Title>
+        <IconButton size="small" onClick={refetchInfo} disabled={loading}>
+          <GrUpdate />
+        </IconButton>
         <MainHeaderButtonsWrapper>
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             <FormControl style={{ display: "inline-flex", width: "150px", marginLeft: "8px" }}>

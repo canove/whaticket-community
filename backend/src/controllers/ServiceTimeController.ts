@@ -269,6 +269,8 @@ const getUserServiceTime = (hists) => {
   const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
   const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
 
+  if (!createdAt || !finalizedAt) return null;
+
   const createdAtDate = new Date(createdAt);
   const finalizedAtDate = new Date(finalizedAt);
 
@@ -288,7 +290,7 @@ const getQueueServiceTime = (hists) => {
   const createdAt = createdHist.ticketCreatedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
   const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
 
-  if (!createdAt || !finalizedAt) return 0;
+  if (!createdAt || !finalizedAt) return null;
 
   const createdAtDate = new Date(createdAt);
   const finalizedAtDate = new Date(finalizedAt);
@@ -299,6 +301,8 @@ const getQueueServiceTime = (hists) => {
 }
 
 const processHistorics = (tmaType, historics = []) => {    
+  if (!historics || historics.length === 0) return "--:--:--";
+
   let tickets = [];
 
   for (const historic of historics) {
@@ -336,6 +340,8 @@ const processHistorics = (tmaType, historics = []) => {
       if (tmaType === "user") {
         serviceTime = getUserServiceTime(hists);
       }
+
+      if (serviceTime === null) continue;
 
       ticketsServiceTime.push(serviceTime);
       continue;
