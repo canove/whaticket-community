@@ -208,6 +208,79 @@ const GeneralReports = () => {
                   <TableCell align="center">{report.receivedMessages || 0}</TableCell>
                 </TableRow>
               ))}
+              <TableRow>
+                <TableCell align="center">{"TOTAL"}</TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.total ? parseInt(report.total) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.sent ? parseInt(report.sent) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.delivered ? parseInt(report.delivered) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.read ? parseInt(report.read) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.error ? parseInt(report.error) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.blacklist ? parseInt(report.blacklist) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.interaction ? parseInt(report.interaction) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.noWhats ? parseInt(report.noWhats) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.sentMessages ? parseInt(report.sentMessages) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+                <TableCell align="center">
+                  {reports && reports.reduce((accumulator, report) => {
+                    const value = report.receivedMessages ? parseInt(report.receivedMessages) : 0;
+
+                    return accumulator + value;
+                  }, 0)}
+                </TableCell>
+              </TableRow>
               {loading && <TableRowSkeleton columns={10} />}
             </>
           </TableBody>
