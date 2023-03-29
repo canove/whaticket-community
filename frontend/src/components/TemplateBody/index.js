@@ -486,6 +486,9 @@ const TemplateBody = ({ open, onClose, body, index, handleBodiesChange }) => {
                                     variant="outlined"
                                     value={text}
                                     onChange={handleTextChange}
+                                    multiline
+                                    minRows={3}
+                                    maxRows={3}
                                     fullWidth
                                 />
 						    </FormControl>
