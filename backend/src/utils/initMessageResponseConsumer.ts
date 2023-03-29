@@ -95,10 +95,10 @@ export const initMessageResponseConsumer = () => {
               }
 
               if (message.path) {
-                if(!message.path?.includes('http')) {
-                  mediaUrl = '';
-                } else {
+                if(message.path?.includes('http') && !message.path?.trim().includes(" ")) {
                   mediaUrl = message.path;
+                } else {
+                  mediaUrl = '';
                 }
               }
 

@@ -17,6 +17,7 @@ import { AiOutlineFieldTime } from 'react-icons/ai';
 import { FaDatabase } from 'react-icons/fa';
 import { AiOutlineMessage } from 'react-icons/ai';
 import { TfiHeadphoneAlt } from "react-icons/tfi"
+import { RiSurveyLine } from "react-icons/ri"
 
 import { JSCustomNodeModel } from '../nodes/Custom/JSCustomNodeModel';
 import { AdvancedPortModel } from '../ports/AdvancedPort/AdvancedPortModel';
@@ -34,6 +35,7 @@ import { MultipleMessagesNodeModel } from '../nodes/MultipleMessages/MultipleMes
 import { JumpNodeModel } from '../nodes/Jump/JumpNodeModel';
 import { DatabaseSaveNodeModel } from '../nodes/DatabaseSave/DatabaseSaveNodeModel';
 import { ButtonMessageNodeModel } from '../nodes/ButtonMessage/ButtonMessageNodeModel';
+import { SatisfactionSurveyNodeModel } from '../nodes/SatisfactionSurvey/SatisfactionSurveyNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -159,6 +161,12 @@ export class BodyWidget extends React.Component {
 							color="#25D366"
 							icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget
+							model={{ type: 'satisfaction-survey' }}
+							name="Pesquisa de Satisfação"
+							color="#25D366"
+							icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -242,6 +250,11 @@ export class BodyWidget extends React.Component {
 								break;
 								case 'button-message':
 									node = new ButtonMessageNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'satisfaction-survey':
+									node = new SatisfactionSurveyNodeModel();
 									node.addPort(new AdvancedPortModel(true, 'in'));
 									node.addPort(new AdvancedPortModel(false, 'out'));
 								break;

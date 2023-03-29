@@ -15,6 +15,8 @@ import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9Di
 import { ca } from "date-fns/locale";
 import { createClient } from 'redis';
 import formatMessage from "../../helpers/Mustache";
+import ShowSatisfactionSurveyService from "../SatisfactionSurveyService/ShowSatisfactionSurveyService";
+import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurveyResponses";
 
 interface Request {
   flowNodeId?: string;
@@ -748,6 +750,124 @@ const processNode = async (node: any, session: any, body: any) => {
     }
 
     return { message }
+  }
+
+  if (node.type === "satisfaction-survey-node") {
+    let value = null;
+    let client = null;
+
+    try {
+      client = createClient({
+        url: process.env.REDIS_URL
+      });
+    } catch (err) {
+      console.log("REDIS", err);
+    }
+
+    if (client) {
+      try {
+        client.on('error', err => console.log('Redis Client Error', err));
+        await client.connect();
+        value = await getRedisValue(session.id, session.companyId, client);
+      } catch (err) {
+        console.log("REDIS", err);
+      }
+
+      await client.disconnect();
+    }
+
+    if (!value) {
+      value = await FileRegister.findOne({
+        where: {
+          [Op.or]: [
+            { phoneNumber: session.id } ,
+            { phoneNumber: 
+              { 
+                [Op.or]: [
+                  removePhoneNumberWith9Country(session.id),
+                  preparePhoneNumber9Digit(session.id),
+                  removePhoneNumber9Digit(session.id),
+                  removePhoneNumberCountry(session.id),
+                  removePhoneNumber9DigitCountry(session.id)
+                ],
+              }
+            }
+          ],
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+    }
+
+    const contact = await Contact.findOne({
+      where: {
+        [Op.or]: [
+          { number: session.id } ,
+          { number: 
+            { 
+              [Op.or]: [
+                removePhoneNumberWith9Country(session.id),
+                preparePhoneNumber9Digit(session.id),
+                removePhoneNumber9Digit(session.id),
+                removePhoneNumberCountry(session.id),
+                removePhoneNumber9DigitCountry(session.id)
+              ],
+            }
+          }
+        ],
+      },
+      attributes: ["id"],
+    });
+
+    const ticket = await Ticket.findOne({
+      where: {
+        contactId: contact.id,
+        companyId: session.companyId,
+        whatsappId: value.whatsappId,
+      },
+      attributes: ["id"],
+      order: [["createdAt", "DESC"]]
+    });
+
+    await SatisfactionSurveyResponses.create({
+      satisfactionSurveyId: node.surveyId,
+      ticketId: ticket.id,
+      userId: null,
+      contactId: contact.id,
+      companyId: session.companyId
+    });
+
+    const satisfactionSurvey = await ShowSatisfactionSurveyService(node.surveyId, session.companyId);
+
+      const answers = JSON.parse(satisfactionSurvey.answers);
+
+      const templateButtons = {
+        text: satisfactionSurvey.message,
+        footer: "",
+        templateButtons: answers.map((answer: string, index: number) => {
+          const button = {
+            index: index + 1,
+            quickReplyButton: {
+              displayText: answer,
+              id: `ANSWER-${index + 1}`
+            }
+          };
+
+          return button;
+        })
+      };
+
+    const message = {
+      blocks: [
+        {
+          templateButtons,
+          type: "buttons"
+        },
+      ]
+    }
+
+    return { message };
   }
 
   return {};
