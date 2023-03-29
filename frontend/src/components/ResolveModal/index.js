@@ -105,6 +105,8 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
     } catch (err) {
       toastError(err);
     }
+
+    handleClose();
 	};
 
   const handleClose = () => {
@@ -155,7 +157,7 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
               </Select>
             </FormControl>
           </div>
-          {/* <div className={classes.multFieldLine}>
+          <div className={classes.multFieldLine}>
             <FormControl
               variant="outlined"
               margin="dense"
@@ -175,7 +177,7 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
                 ))}
               </Select>
             </FormControl>
-          </div> */}
+          </div>
         </DialogContent>
         <DialogActions>
           <Button
