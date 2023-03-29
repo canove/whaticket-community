@@ -19,6 +19,7 @@ import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import { Op } from "sequelize";
+import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurveyResponses";
 
 /*eslint-disable*/
 interface Request {
@@ -240,6 +241,43 @@ const handleMessage = async (
 
       if (!reg) throw `company only owned messages: reg not found in this company.`;
     }
+
+    // let ticket = null;
+
+    // const survey = await SatisfactionSurveyResponses.findOne({
+    //   where: { 
+    //     companyId: company.id, 
+    //     contactId: contact.id,
+    //     response: null,
+    //     interactionAt: null
+    //   },
+    //   attributes: ["id", "ticketId"],
+    //   order: [["createdAt", "DESC"]]
+    // });
+  
+    // if (survey) {
+    //   const tck = await Ticket.findOne({
+    //     where: {
+    //       id: survey.ticketId,
+    //       status: {
+    //         [Op.or]: ["closed", "inbot"]
+    //       },
+    //       whatsappId: whatsapp.id,
+    //       contactId: contact.id,
+    //       companyId: company.id
+    //     },
+    //     order: [["updatedAt", "DESC"]]
+    //   });
+
+    //   if (tck) {
+    //     await survey.update({
+    //       interactionAt: new Date(),
+    //       response: body
+    //     });
+
+    //     ticket = tck;
+    //   }
+    // }
 
     const ticket = await FindOrCreateTicketService(
       contact,

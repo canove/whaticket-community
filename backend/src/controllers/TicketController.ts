@@ -236,57 +236,57 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
     companyId
   });
 
-  if (ticket.status === "closed" && surveyId) {
-    const whatsapp = await ShowWhatsAppService(ticket.whatsappId, companyId);
+  // if (ticket.status === "closed" && surveyId) {
+  //   const whatsapp = await ShowWhatsAppService(ticket.whatsappId, companyId);
 
-    const { official } = whatsapp;
+  //   const { official } = whatsapp;
 
-    if (official) {
-      console.log("Whatsapp Official -> Pesquisa de Satisfação Não Enviada para Ticket " + ticketId);
-    } else {
-      const satisfactionSurvey = await ShowSatisfactionSurveyService(surveyId, companyId);
+  //   if (official) {
+  //     console.log("Whatsapp Official -> Pesquisa de Satisfação Não Enviada para Ticket " + ticketId);
+  //   } else {
+  //     const satisfactionSurvey = await ShowSatisfactionSurveyService(surveyId, companyId);
 
-      await SatisfactionSurveyResponses.create({
-        satisfactionSurveyId: surveyId,
-        ticketId: ticketId,
-        userId: userId,
-        contactId: ticket.contactId,
-        companyId: companyId
-      });
+  //     await SatisfactionSurveyResponses.create({
+  //       satisfactionSurveyId: surveyId,
+  //       ticketId: ticketId,
+  //       userId: userId,
+  //       contactId: ticket.contactId,
+  //       companyId: companyId
+  //     });
 
-      const answers = JSON.parse(satisfactionSurvey.answers);
+  //     const answers = JSON.parse(satisfactionSurvey.answers);
 
-      const templateButtons = {
-        text: satisfactionSurvey.message,
-        footer: "",
-        templateButtons: answers.map((answer: string, index: number) => {
-          const button = {
-            index: index + 1,
-            quickReplyButton: {
-              displayText: answer,
-              id: `ANSWER-${index + 1}`
-            }
-          };
+  //     const templateButtons = {
+  //       text: satisfactionSurvey.message,
+  //       footer: "",
+  //       templateButtons: answers.map((answer: string, index: number) => {
+  //         const button = {
+  //           index: index + 1,
+  //           quickReplyButton: {
+  //             displayText: answer,
+  //             id: `ANSWER-${index + 1}`
+  //           }
+  //         };
 
-          return button;
-        })
-      };
+  //         return button;
+  //       })
+  //     };
 
-      await SendWhatsAppMessage({
-        body: null,
-        ticket: ticket,
-        companyId,
-        fromMe: true,
-        bot: true,
-        contactId: ticket.contactId,
-        whatsMsgId: null,
-        cation: null,
-        type: "buttons",
-        mediaUrl: null,
-        templateButtons
-      });
-    }
-  }
+  //     await SendWhatsAppMessage({
+  //       body: null,
+  //       ticket: ticket,
+  //       companyId,
+  //       fromMe: true,
+  //       bot: true,
+  //       contactId: ticket.contactId,
+  //       whatsMsgId: null,
+  //       cation: null,
+  //       type: "buttons",
+  //       mediaUrl: null,
+  //       templateButtons
+  //     });
+  //   }
+  // }
 
   return res.status(200).json(ticket);
 };

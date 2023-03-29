@@ -61,6 +61,9 @@ class SatisfactionSurveyResponses extends Model<SatisfactionSurveyResponses> {
   @BelongsTo(() => Company)
   company: Company;
 
+  @Column
+  interactionAt: Date;
+
   @CreatedAt
   createdAt: Date;
 
