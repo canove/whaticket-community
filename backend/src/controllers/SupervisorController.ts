@@ -137,6 +137,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                     raw: true,
                 });
 
+                const pending = (!ticket_count.pending_tickets || ticket_count.pending_tickets == 0) ? null : ticket_count.pending_tickets;
+                const open = (!ticket_count.open_tickets || ticket_count.open_tickets == 0) ? null : ticket_count.open_tickets;
+                const closed = (!ticket_count.closed_tickets || ticket_count.closed_tickets == 0) ? null : ticket_count.closed_tickets;
+
+                if (!pending && !open && !closed) continue;
+
                 let lastSentMessage = null;
 
                 const lastMessage = await Message.findOne({
@@ -232,6 +238,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                     "id", 
                     "queueId", 
                     "status",
+                    "updatedAt",
                 ],
                 include: [
                     {
@@ -255,7 +262,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 ],
                 limit,
                 offset,
-                group: "Ticket.id"
+                group: "Ticket.id",
+                order: [["updatedAt", "DESC"]],
             });
 
             let newTickets = [];

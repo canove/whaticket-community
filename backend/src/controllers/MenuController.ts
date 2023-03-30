@@ -8,6 +8,7 @@ import UpdateMenuService from "../services/MenuServices/UpdateMenuService";
 import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
 import DeleteMenuService from "../services/MenuServices/DeleteMenuService";
+import CheckMenuService from "../services/MenuServices/CheckMenuService";
 
 type IndexQuery = {
   searchParam: string;
@@ -29,6 +30,19 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   });
 
   return res.json({ menus, count, hasMore });
+};
+
+type CheckQuery = {
+  menuName: string;
+}
+
+export const check = async (req: Request, res: Response): Promise<Response> => {
+  const { menuName } = req.query as CheckQuery;
+  const { companyId } = req.user;
+
+  const response = await CheckMenuService(menuName, companyId);
+
+  return res.status(200).json(response);
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {

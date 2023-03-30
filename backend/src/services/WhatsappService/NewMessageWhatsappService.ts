@@ -20,6 +20,7 @@ import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9Di
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import { Op } from "sequelize";
 import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurveyResponses";
+import SatisfactionSurveys from "../../database/models/SatisfactionSurveys";
 
 /*eslint-disable*/
 interface Request {
@@ -242,52 +243,57 @@ const handleMessage = async (
       if (!reg) throw `company only owned messages: reg not found in this company.`;
     }
 
-    // let ticket = null;
+    let ticket = null;
 
-    // const survey = await SatisfactionSurveyResponses.findOne({
-    //   where: { 
-    //     companyId: company.id, 
-    //     contactId: contact.id,
-    //     response: null,
-    //     interactionAt: null
-    //   },
-    //   attributes: ["id", "ticketId"],
-    //   order: [["createdAt", "DESC"]]
-    // });
+    const survey = await SatisfactionSurveyResponses.findOne({
+      where: { 
+        companyId: company.id, 
+        contactId: contact.id,
+        response: null,
+        interactionAt: null
+      },
+      attributes: ["id", "ticketId"],
+      include: [
+        {
+          model: SatisfactionSurveys,
+          as: "satisfactionSurvey",
+          attributes: ["id", "answers"],
+          required: true
+        }
+      ],
+      order: [["createdAt", "DESC"]]
+    });
   
-    // if (survey) {
-    //   const tck = await Ticket.findOne({
-    //     where: {
-    //       id: survey.ticketId,
-    //       status: {
-    //         [Op.or]: ["closed", "inbot"]
-    //       },
-    //       whatsappId: whatsapp.id,
-    //       contactId: contact.id,
-    //       companyId: company.id
-    //     },
-    //     order: [["updatedAt", "DESC"]]
-    //   });
+    if (survey) {
+      const answers = JSON.parse(survey.satisfactionSurvey.answers);
 
-    //   if (tck) {
-    //     await survey.update({
-    //       interactionAt: new Date(),
-    //       response: body
-    //     });
+      if (answers.includes(body)) {
+        await survey.update({
+          response: body,
+          interactionAt: new Date()
+        });
 
-    //     ticket = tck;
-    //   }
-    // }
+        ticket = await Ticket.findOne({
+          where: { id: survey.ticketId }
+        });
+      }
+    }
 
-    const ticket = await FindOrCreateTicketService(
-      contact,
-      whatsapp.id,
-      whatsapp.companyId,
-      unreadMessages,
-      null,
-      false,
-      bot
-    );
+    if (!ticket) {
+      ticket = await FindOrCreateTicketService(
+        contact,
+        whatsapp.id,
+        whatsapp.companyId,
+        unreadMessages,
+        null,
+        false,
+        bot
+      );
+
+      if (survey) {
+        await survey.update({ interactionAt: new Date() });
+      }
+    }
 
     if (type !== "text") {
       await verifyMediaMessage({

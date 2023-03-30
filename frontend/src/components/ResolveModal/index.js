@@ -61,8 +61,12 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
   const classes = useStyles();
   const history = useHistory();
 
+  const [loading, setLoading] = useState(false);
+
   const [categories, setCategories] = useState([]);
   const [surveys, setSurveys] = useState([]);
+
+  const [canUseSurvey, setCanUseSurvey] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState("none");
   const [selectedSurvey, setSelectedSurvey] = useState("none");
@@ -88,11 +92,25 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
       }
     }
 
+    const checkCanUseSurveys = async () => {
+      try {
+        const { data } = await api.get('/menus/check', {
+          params: { menuName: "Satisfaction Survey" }
+        });
+
+        setCanUseSurvey(data);
+      } catch (err) {
+        setCanUseSurvey(false);
+      }
+    }
+
+    checkCanUseSurveys();
     fetchCategories();
     fetchSurveys();
   }, [open]);
 
   const handleResolveTicket = async (userId, categoryId, surveyId) => {
+    setLoading(true);
     try {
       await api.put(`/tickets/${ticketId}`, {
         status: "closed",
@@ -106,6 +124,7 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
       toastError(err);
     }
 
+    setLoading(false);
     handleClose();
 	};
 
@@ -157,33 +176,36 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
               </Select>
             </FormControl>
           </div>
-          <div className={classes.multFieldLine}>
-            <FormControl
-              variant="outlined"
-              margin="dense"
-              fullWidth
-            >
-              <InputLabel>{"Pesquisa de Satisfação"}</InputLabel>
-              <Select
+          { canUseSurvey &&
+            <div className={classes.multFieldLine}>
+              <FormControl
                 variant="outlined"
-                label="Pesquisa de Satisfação"
-                value={selectedSurvey}
-                onChange={(e) => handleSurveyChange(e)}
+                margin="dense"
                 fullWidth
               >
-                <MenuItem value={"none"}>{"Nenhuma"}</MenuItem>
-                {surveys.length > 0 && surveys.map((survey) => (
-                  <MenuItem key={survey.id} value={survey.id}>{survey.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
+                <InputLabel>{"Pesquisa de Satisfação"}</InputLabel>
+                <Select
+                  variant="outlined"
+                  label="Pesquisa de Satisfação"
+                  value={selectedSurvey}
+                  onChange={(e) => handleSurveyChange(e)}
+                  fullWidth
+                >
+                  <MenuItem value={"none"}>{"Nenhuma"}</MenuItem>
+                  {surveys.length > 0 && surveys.map((survey) => (
+                    <MenuItem key={survey.id} value={survey.id}>{survey.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          }
         </DialogContent>
         <DialogActions>
           <Button
             onClick={handleClose}
             color="secondary"
             variant="outlined"
+            disabled={loading}
           >
             {i18n.t("category.categoryModal.cancel")}
           </Button>
@@ -193,6 +215,7 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
             variant="contained"
             className={classes.btnWrapper}
             onClick={() => handleResolveTicket(userId, selectedCategory, selectedSurvey)}
+            disabled={loading}
           >
             {i18n.t("Resolver")}
           </Button>

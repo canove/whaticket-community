@@ -54,8 +54,13 @@ const CreateOrUpdateContactService = async ({
    }});
 
   if (contact) {
+    const oldName = contact.name;
+
     console.log("update contact contactService 42");
-    contact.update({ profilePicUrl });
+    await contact.update({ 
+      name: name && (name !== "" && name !== "undefined" && name !== "Empty") ? name : oldName,
+      profilePicUrl 
+    });
 
     io.emit(`contact${companyId}`, {
       action: "update",
