@@ -7,6 +7,8 @@ const menuRoutes = Router();
 
 menuRoutes.get("/menus/", isAuth, MenuController.index);
 
+menuRoutes.get("/menus/check", isAuth, MenuController.check);
+
 menuRoutes.get("/menus/company", isAuth, MenuController.showCompany);
 
 menuRoutes.get("/menus/:menuId", isAuth, MenuController.show);

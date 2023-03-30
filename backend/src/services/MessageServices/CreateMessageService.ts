@@ -61,17 +61,17 @@ const CreateMessageService = async ({
   if (!message) {
     throw new Error("ERR_CREATING_MESSAGE");
   }
-  if (!messageData.bot) {
+  if (!messageData.bot && message.ticket.status !== "closed") {
     const io = getIO();
     io.to(message.ticketId.toString())
-      .to(message.ticket.status)
-      .to("notification")
-      .emit(`appMessage${messageData.companyId}`, {
-        action: "create",
-        message,
-        ticket: message.ticket,
-        contact: message.ticket.contact
-      });
+    .to(message.ticket.status)
+    .to("notification")
+    .emit(`appMessage${messageData.companyId}`, {
+      action: "create",
+      message,
+      ticket: message.ticket,
+      contact: message.ticket.contact
+    });
   }
   return message;
 };

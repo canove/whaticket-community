@@ -225,12 +225,14 @@ const SendWhatsAppMessage = async ({
         });
       }
 
+      let newBody = body ?? (type == 'buttons' ? templateButtons?.text : '')
+
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
         ack: 0,
         ticketId: ticket.id,
         contactId: contact ? contact.id : undefined,
-        body: body ??  (type == 'buttons' ? templateButtons?.text :''),
+        body: newBody,
         fromMe: fromMe,
         read: true,
         mediaUrl: url ? url : mediaUrl,
@@ -254,7 +256,7 @@ const SendWhatsAppMessage = async ({
           "session": connnection.name,
           "number": phoneNumber,
           "path": url,
-          "text": fileName != null && fileName != '' ? fileName : `${formatBody(body, reg)}`,
+          "text": (fileName != null && fileName != '') ? fileName : `${formatBody(newBody, reg)}`,
           "type": bodyType == '' ? type : bodyType,
           "templateButtons": templateButtons ? templateButtons : null
         };
