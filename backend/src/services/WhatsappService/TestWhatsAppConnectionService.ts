@@ -23,7 +23,7 @@ const TestWhatsAppConnectionService = async ({
 
   try {
     const { data, status } = await axios.get(
-      `https://graph.facebook.com/v15.0/${whatsappAccountId}/phone_numbers?access_token=${facebookAccessToken}`
+      `https://graph.facebook.com/v16.0/${whatsappAccountId}/phone_numbers?access_token=${facebookAccessToken}`
     );
 
     if (status === 200) return data;

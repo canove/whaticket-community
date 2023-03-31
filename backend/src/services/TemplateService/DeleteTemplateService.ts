@@ -25,7 +25,7 @@ const DeleteTemplateService = async ({
 
   try {
     const response = await axios.delete(
-      `https://graph.facebook.com/v13.0/${whatsappAccountId}/message_templates?name=${templateName}&access_token=${facebookAccessToken}`
+      `https://graph.facebook.com/v16.0/${whatsappAccountId}/message_templates?name=${templateName}&access_token=${facebookAccessToken}`
     );
 
     const templates = await OfficialTemplatesStatus.findAll({

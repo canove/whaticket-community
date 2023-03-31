@@ -371,7 +371,7 @@ const verifyMediaMessage = async (
       where: { id: whatsapp.officialWhatsappId }
     });
 
-    const { data }: MediaData = await axios.get(`https://graph.facebook.com/v15.0/${msg.body}`, {
+    const { data }: MediaData = await axios.get(`https://graph.facebook.com/v16.0/${msg.body}`, {
       headers: {
         "Authorization": `Bearer ${officialWhatsapp.facebookAccessToken}`,
       }

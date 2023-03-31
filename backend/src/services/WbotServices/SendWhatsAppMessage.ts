@@ -127,7 +127,7 @@ const SendWhatsAppMessage = async ({
     });
 
     try {
-      const apiUrl = `https://graph.facebook.com/v13.0/${connnection.facebookPhoneNumberId}/messages`;
+      const apiUrl = `https://graph.facebook.com/v16.0/${connnection.facebookPhoneNumberId}/messages`;
 
       const { url, fileName } = isValidHttpUrl(body);
 
