@@ -43,6 +43,10 @@ class WhatsappLearning extends Model<WhatsappLearning> {
   @Column
   interval: number;
 
+  @AllowNull(false)
+  @Column
+  sugestion: number;
+
   @CreatedAt
   createdAt: Date;
 
