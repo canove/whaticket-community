@@ -55,7 +55,7 @@ const TemplateModal = ({ open, onClose }) => {
   const [template, setTemplate] = useState(initialState);
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("transactional");
+  const [category, setCategory] = useState("utility");
   const [bodyText, setBodyText] = useState("");
   const [footerText, setFooterText] = useState("");
 
@@ -110,7 +110,7 @@ const TemplateModal = ({ open, onClose }) => {
   const handleClose = () => {
     onClose();
     setTemplate(initialState);
-    setCategory("transactional");
+    setCategory("utility");
     setBodyText("");
     setName("");
     setParamsQuantity(0);
@@ -227,11 +227,17 @@ const TemplateModal = ({ open, onClose }) => {
                       onChange={handleCategoryChange}
                       fullWidth
                     >
-                      <MenuItem value={"transactional"}>
+                      {/* <MenuItem value={"transactional"}>
                         {i18n.t("templates.templateModal.transactional")}
+                      </MenuItem> */}
+                      <MenuItem value={"utility"}>
+                        {"Utilitário"}
                       </MenuItem>
                       <MenuItem value={"marketing"}>
                         {i18n.t("templates.templateModal.marketing")}
+                      </MenuItem>
+                      <MenuItem value={"authentication"}>
+                        {"Autenticação"}
                       </MenuItem>
                     </Select>
                   </FormControl>

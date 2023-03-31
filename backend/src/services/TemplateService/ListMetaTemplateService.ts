@@ -20,7 +20,7 @@ const ListMetaTemplateService = async ({
 
   try {
     const { data } = await axios.get(
-      `https://graph.facebook.com/v13.0/${whatsappAccountId}/message_templates?access_token=${facebookAccessToken}&language=pt_BR`
+      `https://graph.facebook.com/v16.0/${whatsappAccountId}/message_templates?access_token=${facebookAccessToken}&language=pt_BR`
     );
 
     return data.data;
