@@ -306,7 +306,7 @@ const processNode = async (node: any, session: any, body: any) => {
     });
 
     return {
-      queueName: queue.name,
+      queueName: queue ? queue.name : "NO_QUEUE",
       queueId: node.queueId,
       type: "TRANSFER_QUEUE"
     };

@@ -8,6 +8,7 @@ import {
   CircularProgress,
   FormControl,
   IconButton,
+  InputAdornment,
   InputLabel,
   makeStyles,
   MenuItem,
@@ -18,6 +19,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@material-ui/core";
 
@@ -28,7 +30,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Title from "../../components/Title";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import { DeleteOutline, Edit, Visibility } from "@material-ui/icons";
+import { DeleteOutline, Edit, Phone, Visibility } from "@material-ui/icons";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { useTranslation } from "react-i18next";
@@ -78,6 +80,7 @@ const Supervisor = () => {
   const [queueId, setQueueId] = useState("");
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   
   const [pageNumber, setPageNumber] = useState(1);
   const [count, setCount] = useState(0);
@@ -92,6 +95,7 @@ const Supervisor = () => {
       const newStatus = searchParams.get("status");
       const newPageNumber = searchParams.get("pageNumber");
       const newCategoryId = searchParams.get("categoryId");
+      const newContactNumber = searchParams.get("contactNumber");
 
       if (newTab !== tab) setTab(newTab ?? "queue");
       if (newQueueId !== queueId) setQueueId(newQueueId ?? "");
@@ -99,6 +103,7 @@ const Supervisor = () => {
       if (newStatus !== status) setStatus(newStatus ?? "");
       if (newPageNumber !== pageNumber) setPageNumber(newPageNumber ?? "");
       if (newCategoryId !== categoryId) setCategoryId(newCategoryId ?? "");
+      if (newContactNumber !== contactNumber) setContactNumber(newContactNumber ?? "");
     }
 
     loadSearchParams();
@@ -143,7 +148,7 @@ const Supervisor = () => {
       const fetchInfo = async () => {
         try {
           const { data } = await api.get("/supervisor", {
-            params: { tab, queueId, userId, status, pageNumber, categoryId }
+            params: { tab, queueId, userId, status, pageNumber, categoryId, contactNumber }
           });
 
           if (tab === "ticket") {
@@ -163,13 +168,13 @@ const Supervisor = () => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [tab, queueId, categoryId, status, userId, pageNumber]);
+  }, [tab, queueId, categoryId, status, userId, pageNumber, contactNumber]);
 
   const refetchInfo = async () => {
     setLoading(true);
     try {
       const { data } = await api.get("/supervisor", {
-        params: { tab, queueId, userId, status, pageNumber, categoryId }
+        params: { tab, queueId, userId, status, pageNumber, categoryId, contactNumber }
       });
 
       if (tab === "ticket") {
@@ -185,13 +190,14 @@ const Supervisor = () => {
     setLoading(false);
   }
 
-  const handleInfoClick = ({ queueId, userId, status, tab, categoryId }) => {
+  const handleInfoClick = ({ queueId, userId, status, tab, categoryId, contactNumber }) => {
     setInfo([]);
     setTab(tab);
     setQueueId(queueId);
     setUserId(userId);
     setStatus(status);
     setCategoryId(categoryId);
+    setContactNumber(contactNumber);
     setPageNumber(1);
 
     history.push({
@@ -201,6 +207,7 @@ const Supervisor = () => {
         userId: userId ?? "", 
         status: status ?? "", 
         categoryId: categoryId ?? "", 
+        contactNumber: contactNumber ?? "",
         pageNumber: 1,
         tab: tab ?? "queue" 
       }).toString()
@@ -218,6 +225,7 @@ const Supervisor = () => {
         userId: e.target.value ?? "",
         status: status ?? "",
         categoryId: categoryId ?? "",
+        contactNumber: contactNumber ?? "",
         pageNumber: 1,
         tab: tab ?? "queue",
       }).toString()
@@ -235,6 +243,7 @@ const Supervisor = () => {
         userId: userId ?? "",
         status: status ?? "",
         categoryId: categoryId ?? "",
+        contactNumber: contactNumber ?? "",
         pageNumber: 1,
         tab: tab ?? "queue",
       }).toString()
@@ -252,6 +261,7 @@ const Supervisor = () => {
         userId: userId ?? "",
         status: e.target.value ?? "",
         categoryId: categoryId ?? "",
+        contactNumber: contactNumber ?? "",
         pageNumber: 1,
         tab: tab ?? "queue",
       }).toString()
@@ -269,11 +279,30 @@ const Supervisor = () => {
         userId: userId ?? "",
         status: status ?? "",
         categoryId: e.target.value ?? "",
+        contactNumber: contactNumber ?? "",
         pageNumber: 1,
         tab: tab ?? "queue",
       }).toString()
     });
   } 
+
+  const handleContactNumberChange = (e) => {
+    setContactNumber(e.target.value);
+    setPageNumber(1);
+
+    history.push({
+      pathname: '/Supervisor',
+      search: "?" + new URLSearchParams({ 
+        queueId: queueId ?? "",
+        userId: userId ?? "",
+        status: status ?? "",
+        categoryId: categoryId ?? "",
+        contactNumber: e.target.value ?? "",
+        pageNumber: 1,
+        tab: tab ?? "queue",
+      }).toString()
+    });
+  }
 
   const handleTabChange = (e) => {
     setInfo([]);
@@ -282,6 +311,7 @@ const Supervisor = () => {
     setUserId("");
     setStatus("");
     setCategoryId("");
+    setContactNumber("");
     setPageNumber(1);
 
     history.push({
@@ -291,6 +321,7 @@ const Supervisor = () => {
         userId: "", 
         status: "", 
         categoryId: "",
+        contactNumber: "",
         pageNumber: 1,
         tab: e.target.value ?? "queue" 
       }).toString()
@@ -457,6 +488,7 @@ const Supervisor = () => {
         userId: userId ?? "",
         status: status ?? "",
         categoryId: categoryId ?? "",
+        contactNumber: contactNumber ?? "",
         pageNumber: currentPageNumber - 1,
         tab: tab ?? "queue",
       }).toString()
@@ -474,6 +506,7 @@ const Supervisor = () => {
         userId: userId ?? "",
         status: status ?? "",
         categoryId: categoryId ?? "",
+        contactNumber: contactNumber ?? "",
         pageNumber: currentPageNumber + 1,
         tab: tab ?? "queue",
       }).toString()
@@ -503,6 +536,20 @@ const Supervisor = () => {
             </FormControl>
             { tab === "ticket" && 
               <>
+                <TextField
+                  style={{ display: "inline-flex", width: "150px", marginLeft: "8px" }}
+                  label="Telefone"
+                  placeholder="Telefone"
+                  value={contactNumber}
+                  onChange={(e) => handleContactNumberChange(e)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                          <Phone style={{ color: "gray" }}/>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
                 <FormControl style={{ display: "inline-flex", width: "150px", marginLeft: "8px" }}>
                   <InputLabel>{"Usuário"}</InputLabel>
                   <Select
@@ -745,6 +792,7 @@ const Supervisor = () => {
                   <TableCell align="center">{"User"}</TableCell>
                   <TableCell align="center">{"Status"}</TableCell>
                   <TableCell align="center">{"Categoria"}</TableCell>
+                  <TableCell align="center">{"Telefone"}</TableCell>
                   <TableCell align="center">{"Mensagens Enviadas"}</TableCell>
                   <TableCell align="center">{"Mensagens Recebidas"}</TableCell>
                   <TableCell align="center">{"Data da Última Mensagem Enviada"}</TableCell>
@@ -820,6 +868,22 @@ const Supervisor = () => {
                           }}
                         >
                           {ticket.category ? ticket.category.name : "SEM CATEGORIA"}
+                        </span>
+                      </TableCell>
+                      <TableCell align="center">
+                        <span
+                          // style={{ cursor: "pointer" }} 
+                          onClick={() => { 
+                            // handleInfoClick({
+                            //   tab: "ticket",
+                            //   queueId: null, 
+                            //   userId: null,
+                            //   status: null,
+                            //   categoryId: ticket.category ? ticket.category.id : "NO_CATEGORY"
+                            // });
+                          }}
+                        >
+                          {ticket.contact ? ticket.contact.number : "SEM NÚMERO"}
                         </span>
                       </TableCell>
                       <TableCell align="center">

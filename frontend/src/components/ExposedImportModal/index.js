@@ -304,6 +304,11 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       requiredItems: required.length > 0 ? JSON.stringify(required) : null
     };
 
+    if ((connectionType && !importData.officialTemplatesId) || (!connectionType && !template)) {
+      toast.error("Template is required.");
+      return;
+    }
+
     try {
       if (exposedImportId) {
         await api.put(`/exposedImports/${exposedImportId}`, importData);

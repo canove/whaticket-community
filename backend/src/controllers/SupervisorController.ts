@@ -13,6 +13,7 @@ import Message from "../database/models/Message";
 import Category from "../database/models/Category";
 import { endOfDay, startOfDay } from "date-fns";
 import TicketHistorics from "../database/models/TicketHistorics";
+import Contact from "../database/models/Contact";
 
 type IndexQuery = {
     tab: string,
@@ -20,11 +21,12 @@ type IndexQuery = {
     queueId: string,
     userId: string,
     pageNumber: string,
-    categoryId: string
+    categoryId: string,
+    contactNumber: string,
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-    const { tab, status, queueId, userId, pageNumber, categoryId } = req.query as IndexQuery;
+    const { tab, status, queueId, userId, pageNumber, categoryId, contactNumber } = req.query as IndexQuery;
     const { companyId } = req.user;
 
     let info = null;
@@ -198,8 +200,29 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
         break;
         case "ticket":
             let whereCondition = null;
+            let includeCondition = [];
 
             whereCondition = { companyId, updatedAt: dateFilter };
+            includeCondition = [
+                {
+                    model: Queue,
+                    as: "queue",
+                    attributes: ["id", "name", "color"],
+                    required: false
+                },
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["id", "name"],
+                    required: false
+                },
+                {
+                    model: Category,
+                    as: "category",
+                    attributes: ["id", "name"],
+                    required: false
+                },
+            ]
 
             if (status) {
                 whereCondition = { 
@@ -229,6 +252,29 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 };
             }
 
+            if (contactNumber) {
+                includeCondition.push({
+                    model: Contact,
+                    as: "contact",
+                    where: {
+                        "$contact.number$": Sequelize.where(
+                            Sequelize.fn("LOWER", Sequelize.col("contact.number")),
+                            "LIKE",
+                            `%${contactNumber.toLowerCase()}%`
+                        )  
+                    },
+                    attributes: ["id", "number"],
+                    required: true,
+                });
+            } else {
+                includeCondition.push({
+                    model: Contact,
+                    as: "contact",
+                    attributes: ["id", "number"],
+                    required: false,
+                });
+            }
+
             const limit = 20;
             const offset = limit * (+pageNumber - 1);
 
@@ -240,26 +286,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                     "status",
                     "updatedAt",
                 ],
-                include: [
-                    {
-                        model: Queue,
-                        as: "queue",
-                        attributes: ["id", "name", "color"],
-                        required: false
-                    },
-                    {
-                        model: User,
-                        as: "user",
-                        attributes: ["id", "name"],
-                        required: false
-                    },
-                    {
-                        model: Category,
-                        as: "category",
-                        attributes: ["id", "name"],
-                        required: false
-                    }
-                ],
+                include: includeCondition,
                 limit,
                 offset,
                 group: "Ticket.id",
