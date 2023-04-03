@@ -190,7 +190,7 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
                     variant="outlined"
                     margin="dense"
                     fullWidth
-                    disabled={connectionId ? true : false}
+                    // disabled={connectionId ? true : false}
                   />
                 </div>
                 {/* <div className={classes.multFieldLine}>
