@@ -73,6 +73,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		isDefault: false,
 		official: false,
 		business: false,
+		useGroup: false,
 	};
 
 	const SessionSchema = Yup.object().shape({
@@ -237,6 +238,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 											setFieldValue("name", newValue);
 										}}
 									/>
+								</div>
+								<div className={classes.multFieldLine}>
 									<FormControlLabel
 										control={
 											<Field
@@ -258,6 +261,17 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 											/>
 										}
 										label={i18n.t("Business")}
+									/>
+									<FormControlLabel
+										control={
+											<Field
+												as={Switch}
+												color="primary"
+												name="useGroup"
+												checked={values.useGroup}
+											/>
+										}
+										label={"Usar Grupo"}
 									/>
 								</div>
 								<div>
