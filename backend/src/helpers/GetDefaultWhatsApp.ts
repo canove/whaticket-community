@@ -1,14 +1,27 @@
 import AppError from "../errors/AppError";
 import Whatsapp from "../database/models/Whatsapp";
 
-const GetDefaultWhatsApp = async (companyId: number): Promise<Whatsapp> => {
+interface Request {
+  companyId: number;
+  whatsappId?: string;
+  official?: boolean;
+}
+
+const GetDefaultWhatsApp = async ({ companyId, whatsappId, official }: Request): Promise<Whatsapp> => {
+  let whereCondition = null;
+
+  whereCondition = { companyId, deleted: false };
+
+  if (!official) {
+    whereCondition = { ...whereCondition, status: "CONNECTED", official: false };
+  }
+
+  if (whatsappId) {
+    whereCondition = { ...whereCondition, id: whatsappId };
+  }
+
   const defaultWhatsapp = await Whatsapp.findOne({
-    where: {
-      companyId,
-      status: "CONNECTED",
-      official: false,
-      deleted: false,
-    }
+    where: whereCondition
   });
 
   if (!defaultWhatsapp) {

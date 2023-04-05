@@ -5,6 +5,7 @@ import AppError from "../../errors/AppError";
 import Whatsapp from "../../database/models/Whatsapp";
 import ShowWhatsAppService from "./ShowWhatsAppService";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
+import { createClient } from "redis";
 
 interface WhatsappData {
   name?: string;
@@ -27,6 +28,7 @@ interface WhatsappData {
   messageCallbackUrl?: string;
   statusCallbackUrl?: string;
   callbackAuthorization?: string;
+  useGroup?: boolean;
 }
 
 interface Request {
@@ -71,7 +73,8 @@ const UpdateWhatsAppService = async ({
     whatsappAccountId,
     messageCallbackUrl,
     statusCallbackUrl,
-    callbackAuthorization
+    callbackAuthorization,
+    useGroup
   } = whatsappData;
 
   try {
@@ -101,6 +104,27 @@ const UpdateWhatsAppService = async ({
 
   const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
+  try {
+    const client = createClient({
+      url: process.env.REDIS_URL
+    });
+    
+    client.on('error', err => console.log('Redis Client Error', err));
+    await client.connect();
+
+    if (useGroup === true) {
+      await client.set(`${name}-group`, "true");
+    } else {
+      const exists = await client.get(`${name}-group`);
+  
+      if (exists) await client.del(`${name}-group`);
+    }
+
+    await client.disconnect();
+  } catch (err: any) {
+    throw new AppError(err);
+  }
+
   await whatsapp.update({
     name,
     status,
@@ -120,7 +144,8 @@ const UpdateWhatsAppService = async ({
     whatsappAccountId,
     messageCallbackUrl,
     statusCallbackUrl,
-    callbackAuthorization
+    callbackAuthorization,
+    useGroup
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);

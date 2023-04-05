@@ -22,10 +22,15 @@ interface TemplateData {
   mapping: string;
 }
 
+type IndexQuery = {
+  whatsappId: string,
+}
+
 export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { whatsappId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const templates = await ListTemplateService({ companyId });
+  const templates = await ListTemplateService({ companyId, whatsappId });
 
   return res.status(200).json(templates);
 };

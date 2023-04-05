@@ -19,8 +19,9 @@ import ContactModal from "../ContactModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
-import { Chip, FormControl, InputLabel, makeStyles, MenuItem, Select, Typography } from "@material-ui/core";
+import { Checkbox, Chip, FormControl, FormControlLabel, InputLabel, makeStyles, MenuItem, Select, Tooltip, Typography } from "@material-ui/core";
 import QueueSelectSingle from "../QueueSelectSingle";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const filter = createFilterOptions({
 	trim: true,
@@ -34,26 +35,43 @@ const useStyles = makeStyles(theme => ({
 	chip: {
 		margin: 2,
 	},
+	multFieldLine: {
+		display: "flex",
+		"& > *:not(:last-child)": {
+		  marginRight: theme.spacing(1),
+		},
+	},
 }));
 
 const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 	const history = useHistory();
 	const classes = useStyles();
+
 	const { i18n } = useTranslation();
 
-	const [options, setOptions] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [searchParam, setSearchParam] = useState("");
-	const [selectedContact, setSelectedContact] = useState(null);
-	const [newContact, setNewContact] = useState({});
-	const [contactModalOpen, setContactModalOpen] = useState(false);
-	const [queueId, setQueueId] = useState("");
 	const { user } = useContext(AuthContext);
+	const { whatsApps } = useContext(WhatsAppsContext);
 
+	const [options, setOptions] = useState([]);
 	const [queues, setQueues] = useState([]);
+	const [templates, setTemplates] = useState([]);
+
+	const [loading, setLoading] = useState(false);
+	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [official, setOfficial] = useState(false);
+
+	const [searchParam, setSearchParam] = useState("");
+	const [queueId, setQueueId] = useState("");
+	const [whatsappId, setWhatsappId] = useState("");
+	
+	const [selectedContact, setSelectedContact] = useState(null);
+	const [selectedTemplate, setSelectedTemplate] = useState(null);
+	const [variables, setVariables] = useState(null);
+	const [header, setHeader] = useState(null);
+	const [newContact, setNewContact] = useState({});
 
 	useEffect(() => {
-		(async () => {
+		const fetchQueues = async () => {
 			if (user.profileId !== 1) {
 				setQueues(user.queues);
 				return;
@@ -65,8 +83,27 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 			} catch (err) {
 				toastError(err);
 			}
-		})();
+		}
+
+		fetchQueues();
 	}, []);
+
+	useEffect(() => {
+		const fetchTemplates = async () => {
+			if (!whatsappId) return;
+
+			try {
+				const { data } = await api.get("/whatsappTemplate/", {
+					params: { whatsappId }
+				});
+				setTemplates(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
+		fetchTemplates();
+	}, [whatsappId]);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -97,7 +134,12 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 		onClose();
 		setQueueId("");
 		setSearchParam("");
+		setWhatsappId("");
 		setSelectedContact(null);
+		setSelectedTemplate(null);
+		setVariables(null);
+		setHeader(null);
+		setOfficial(false);
 	};
 
 	const handleSaveTicket = async (contactId) => {
@@ -110,6 +152,11 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 				status: "open",
 				ticketId: ticketId,
 				queueId: queueId ? queueId : null,
+				whatsappId: whatsappId ? whatsappId : null,
+				official,
+				templateId: selectedTemplate ? selectedTemplate.id : null,
+				templateVariables: variables ? JSON.stringify(variables) : null,
+				templateHeader: header ? JSON.stringify(header) : null,
 			});
 			history.push(`/tickets/${ticket.id}`);
 		} catch (err) {
@@ -172,7 +219,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 				onClose={handleCloseContactModal}
 				onSave={handleAddNewContactTicket}
 			/>
-			<Dialog open={modalOpen} onClose={handleClose}>
+			<Dialog open={modalOpen} onClose={handleClose} maxWidth="sm" fullWidth>
 				<DialogTitle id="form-dialog-title">
 					{i18n.t("newTicketModal.title")}
 				</DialogTitle>
@@ -185,7 +232,8 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 							<Autocomplete
 								options={options}
 								loading={loading}
-								style={{ width: 300 }}
+								// style={{ width: 300 }}
+								fullWidth
 								clearOnBlur
 								autoHighlight
 								freeSolo
@@ -264,6 +312,193 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 									</Select>
 								</FormControl>
 							</div>
+							<div>
+								<FormControlLabel
+									control={
+										<Checkbox
+											checked={official}
+											onChange={() => {
+												setOfficial(prevOfficial => !prevOfficial);
+												setWhatsappId("");
+												setSelectedTemplate(null);
+												setVariables(null);
+												setHeader(null);
+											}}
+											name="official"
+											color="primary"
+										/>
+									}
+									label="Whatsapp Oficial"
+								/>
+							</div>
+							<div>
+								<FormControl variant="outlined" margin="normal" fullWidth>
+									<InputLabel>Conexões</InputLabel>
+									<Select
+										variant="outlined"
+										value={whatsappId}
+										label={"Conexões"}
+										onChange={(e) => {
+											setWhatsappId(e.target.value)
+											setSelectedTemplate(null);
+											setVariables(null);
+											setHeader(null);
+										}}
+										fullWidth
+									>
+										<MenuItem value={""}>
+											{"Qualquer Número"}
+										</MenuItem>
+										{whatsApps &&
+											whatsApps.map((whats) => {
+												if (official) {
+													if (whats.official === true && whats.deleted === false) {
+														return (
+															<MenuItem key={whats.id} value={whats.id}>
+																{whats.name}
+															</MenuItem>
+														);
+													}
+												} else {
+													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false) {
+														return (
+															<MenuItem key={whats.id} value={whats.id}>
+																{whats.name}
+															</MenuItem>
+														);
+													}
+												}
+
+												return null;
+											})
+										}
+									</Select>
+								</FormControl>
+							</div>
+							{ official && whatsappId &&
+								<div>
+									<FormControl variant="outlined" margin="normal" fullWidth>
+										<InputLabel>Templates</InputLabel>
+										<Select
+											variant="outlined"
+											value={selectedTemplate}
+											label={"Templates"}
+											onChange={(e) => {
+												setSelectedTemplate(e.target.value);
+												setVariables(JSON.parse(e.target.value.mapping));
+												setHeader(JSON.parse(e.target.value.header))
+											}}
+											fullWidth
+										>
+											<MenuItem value={""}>
+												{"Nenhum"}
+											</MenuItem>
+											{templates &&
+												templates.map((template) => (
+													<MenuItem key={template.id} value={template}>
+														{template.name}
+													</MenuItem>
+												))
+											}
+										</Select>
+									</FormControl>
+								</div>
+							}
+							{ selectedTemplate &&
+								<div style={{ border: "1px solid rgba(0, 0, 0, 0.7)", borderRadius: "3px", padding: "5px" }}>
+									{ (selectedTemplate.header || selectedTemplate.buttons) &&
+										<div style={{ border: "2px solid red", borderRadius: "5px", padding: "5px", marginBottom: "5px" }}>
+											{"Iniciar conversar enviando mensagens com arquivo ou botões não é possível no momento."}
+										</div>
+									}
+
+									{ (!selectedTemplate.header && !selectedTemplate.buttons) &&
+										<>
+											<div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", borderRadius: "5px", padding: "5px" }}>
+												{selectedTemplate.body}
+											</div>
+
+											{ selectedTemplate.footer &&
+												<div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", borderTop: "none", borderRadius: "5px", padding: "5px", fontSize: "10px" }}>
+													{selectedTemplate.footer}
+												</div>
+											}
+
+											{ selectedTemplate.mapping && Object.keys(JSON.parse(selectedTemplate.mapping)).length > 0 &&
+												<div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", marginTop: "8px", borderRadius: "5px", padding: "5px" }}>
+													<Typography>Variáveis: </Typography>
+													{ Object.keys(JSON.parse(selectedTemplate.mapping)).map(key => {
+														return (
+															<div key={key} className={classes.multFieldLine} style={{ marginTop: "5px" }}>
+																<Typography>
+																	{key}
+																</Typography>
+																<TextField
+																	variant="outlined"
+																	fullWidth
+																	value={variables[key]}
+																	onChange={(e) => { 
+																		const value = e.target.value;
+
+																		setVariables(prevVariables => ({
+																			...prevVariables, 
+																			[key]: value
+																		})) 
+																	}}
+																/>
+															</div>
+														)
+													})}
+												</div>
+											}
+										</>
+									}
+
+									{/* { selectedTemplate.buttons &&
+										<div style={{ border: "1px solid rgba(0, 0, 0, 0.5)", borderRadius: "5px", padding: "8px", marginTop: "8px" }}>
+											<Typography>Botões: </Typography>
+											{ JSON.parse(selectedTemplate.buttons).map((button, index) => (
+												<Tooltip title={button.type} key={index}>
+													<Button
+														variant="outlined"
+														fullWidth
+													>
+														{button.text}
+													</Button>
+												</Tooltip>
+											)) }
+										</div>
+									} */}
+
+									{/* { selectedTemplate.header &&
+										<div style={{ border: "1px solid rgba(0, 0, 0, 0.3)", marginTop: "8px", borderRadius: "5px", padding: "5px" }}>
+											<Typography>Arquivo: </Typography>
+											{ Object.keys(JSON.parse(selectedTemplate.header)).map(key => {
+												return (
+													<div key={key} className={classes.multFieldLine} style={{ marginTop: "5px" }}>
+														<Typography>
+															{key}
+														</Typography>
+														<TextField
+															variant="outlined"
+															fullWidth
+															value={header[key]}
+															onChange={(e) => { 
+																const value = e.target.value;
+
+																setHeader(prevHeader => ({
+																	...prevHeader, 
+																	[key]: value
+																})) 
+															}}
+														/>
+													</div>
+												)
+											})}
+										</div>
+									} */}
+								</div>
+							}
 						</>
 					}
 				</DialogContent>
@@ -279,7 +514,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 					<ButtonWithSpinner
 						variant="contained"
 						type="button"
-						disabled={(!selectedContact && !contactId)}
+						disabled={(!selectedContact && !contactId) || (official && (!whatsappId || !selectedTemplate) || (selectedTemplate && (selectedTemplate.header || selectedTemplate.buttons)))}
 						onClick={() => handleSaveTicket(selectedContact ? selectedContact.id : contactId)}
 						color="primary"
 						loading={loading}
