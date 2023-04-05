@@ -6,6 +6,7 @@ interface ProductData {
   productId: number;
   gracePeriod: number;
   graceTrigger: number;
+  packageId: number;
 }
 
 interface Request {
@@ -19,13 +20,14 @@ const UpdatePricingService = async ({
 }: Request): Promise<Pricing> => {
   const pricing = await ShowPricingService(pricingId);
 
-  const { companyId, productId, gracePeriod, graceTrigger } = pricingData;
+  const { companyId, productId, gracePeriod, graceTrigger, packageId } = pricingData;
 
   await pricing.update({
     companyId,
     productId,
     gracePeriod,
-    graceTrigger
+    graceTrigger,
+    packageId
   });
 
   const updatedPricing = ShowPricingService(pricingId);

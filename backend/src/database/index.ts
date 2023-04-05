@@ -41,6 +41,7 @@ import TicketHistorics from "./models/TicketHistorics";
 import ContactBlacklist from "./models/ContactBlacklist";
 import SatisfactionSurveys from "./models/SatisfactionSurveys";
 import SatisfactionSurveyResponses from "./models/SatisfactionSurveyResponses";
+import Packages from "./models/Packages";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -89,7 +90,8 @@ const models = [
   TicketHistorics,
   ContactBlacklist,
   SatisfactionSurveys,
-  SatisfactionSurveyResponses
+  SatisfactionSurveyResponses,
+  Packages,
 ];
 
 sequelize.addModels(models);

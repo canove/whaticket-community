@@ -785,7 +785,7 @@ export const botMessage = async (payload) => {
     cation,
     type,
     mediaUrl,
-    templateButtons
+    templateButtons,
   });
 
   return true;

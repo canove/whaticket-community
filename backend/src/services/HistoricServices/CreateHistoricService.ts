@@ -43,6 +43,7 @@ export default CreateHistoricService;
     System Change:
         0 -> Product
         1 -> Pricing
+        2 -> Package
 
     Action Type:
         0 -> Create

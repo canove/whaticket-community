@@ -47,6 +47,9 @@ class Message extends Model<Message> {
   @Column
   isDeleted: boolean;
 
+  @Column
+  author: string;
+
   @CreatedAt
   @Column(DataType.DATE(6))
   createdAt: Date;

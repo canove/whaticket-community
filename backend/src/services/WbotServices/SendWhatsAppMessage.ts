@@ -48,7 +48,7 @@ const SendWhatsAppMessage = async ({
   cation,
   type,
   mediaUrl,
-  templateButtons
+  templateButtons,
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -177,7 +177,7 @@ const SendWhatsAppMessage = async ({
             mediaType: null,
             quotedMsgId: null,
             companyId,
-            userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
+            userId: ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
           };
         
           await ticket.update({ lastMessage: body, lastMessageFromMe: fromMe });
@@ -241,7 +241,7 @@ const SendWhatsAppMessage = async ({
         bot: (ticket.status == 'inbot' || bot),
         companyId,
         footer,
-        userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
+        userId: ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
       };
 
       await ticket.update({ 
@@ -254,11 +254,12 @@ const SendWhatsAppMessage = async ({
         const payload = {
           "messageId": createdMessage.id,
           "session": connnection.name,
-          "number": phoneNumber,
+          "number": (contact.isGroup) ? contact.number : phoneNumber,
           "path": url,
           "text": (fileName != null && fileName != '') ? fileName : `${formatBody(newBody, reg)}`,
           "type": bodyType == '' ? type : bodyType,
-          "templateButtons": templateButtons ? templateButtons : null
+          "templateButtons": templateButtons ? templateButtons : null,
+          "isGroup": contact.isGroup
         };
   
         const headers = {
