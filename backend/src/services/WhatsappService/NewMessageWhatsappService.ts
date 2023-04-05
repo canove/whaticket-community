@@ -132,7 +132,8 @@ const verifyMessage = async (
     bot: boolean
   },
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  contactName: string
 ) => {
 
   const messageData = {
@@ -145,7 +146,8 @@ const verifyMessage = async (
     fromMe: msg.fromMe,
     mediaType: msg.type,
     read: msg.fromMe,
-    companyId: ticket.companyId
+    companyId: ticket.companyId,
+    author: contactName ? contactName : "DESCONHECIDO"
   };
 
   await ticket.update({ lastMessage: msg.body, lastMessageFromMe: msg.fromMe });
@@ -306,7 +308,7 @@ const handleMessage = async (
         file,
         isGroup,
         bot
-      }, ticket, contact, whatsapp);
+      }, ticket, contact, whatsapp, contactName);
     } else {
       await verifyMessage(
         {
@@ -320,7 +322,7 @@ const handleMessage = async (
           bot
         },
         ticket,
-        contact
+        contact, contactName
       );
     }
   } catch (err) {
@@ -358,7 +360,8 @@ const verifyMediaMessage = async (
   },
   ticket: Ticket,
   contact: Contact,
-  whatsapp: Whatsapp
+  whatsapp: Whatsapp,
+  contactName: string,
 ): Promise<void> => {  
   let type = msg.type;
   let mediaUrl = msg.body;
@@ -415,7 +418,8 @@ const verifyMediaMessage = async (
     read: msg.fromMe,
     mediaUrl: mediaUrl,
     mediaType: type,
-    companyId: ticket.companyId
+    companyId: ticket.companyId,
+    author: contactName ? contactName : "DESCONHECIDO"
   };
 
   await ticket.update({ lastMessage: msg.file, lastMessageFromMe: msg.fromMe });

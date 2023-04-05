@@ -786,7 +786,6 @@ export const botMessage = async (payload) => {
     type,
     mediaUrl,
     templateButtons,
-    contactName
   });
 
   return true;
