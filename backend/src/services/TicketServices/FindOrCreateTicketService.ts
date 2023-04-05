@@ -105,7 +105,7 @@ const FindOrCreateTicketService = async (
     ticket = await Ticket.create({
       contactId: groupContact ? groupContact.id : contact.id,
       status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
-      isGroup: !!groupContact,
+      isGroup: (contact && contact.number && contact.number.length > 15) ? true : false,
       unreadMessages,
       whatsappId,
       companyId,
