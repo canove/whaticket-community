@@ -4,6 +4,7 @@ import AppError from "../../errors/AppError";
 import Whatsapp from "../../database/models/Whatsapp";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 import { faBusinessTime } from "@fortawesome/free-solid-svg-icons";
+import { createClient } from "redis";
 
 interface Request {
   name: string;
@@ -27,6 +28,7 @@ interface Request {
   messageCallbackUrl?: string;
   statusCallbackUrl?: string;
   callbackAuthorization?: string;
+  useGroup?: boolean;
 }
 
 interface Response {
@@ -55,7 +57,8 @@ const CreateWhatsAppService = async ({
   officialConnectionId,
   messageCallbackUrl,
   statusCallbackUrl,
-  callbackAuthorization
+  callbackAuthorization,
+  useGroup
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -105,6 +108,27 @@ const CreateWhatsAppService = async ({
   }
   const lastPingDate = new Date();
 
+  try {
+    const client = createClient({
+      url: process.env.REDIS_URL
+    });
+    
+    client.on('error', err => console.log('Redis Client Error', err));
+    await client.connect();
+
+    if (useGroup === true) {
+      await client.set(`${name}-group`, "true");
+    } else {
+      const exists = await client.get(`${name}-group`);
+  
+      if (exists) await client.del(`${name}-group`);
+    }
+
+    await client.disconnect();
+  } catch (err: any) {
+    throw new AppError(err);
+  }
+
   const whatsapp = await Whatsapp.create(
     {
       name,
@@ -129,7 +153,8 @@ const CreateWhatsAppService = async ({
       usedLimit: official ? 0 : null,
       messageCallbackUrl,
       statusCallbackUrl,
-      callbackAuthorization
+      callbackAuthorization,
+      useGroup
     },
     { include: ["queues"] }
   );

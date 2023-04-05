@@ -51,6 +51,9 @@ class Whatsapp extends Model<Whatsapp> {
   plugged: boolean;
 
   @Column
+  useGroup: boolean;
+
+  @Column
   retries: number;
 
   @Column(DataType.TEXT)
