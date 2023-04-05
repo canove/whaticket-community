@@ -42,6 +42,7 @@ import serviceTimeRoutes from "./serviceTimeRoutes";
 import contactBlacklistRoutes from "./contactBlacklistRoutes";
 import supervisorRoutes from "./supervisorRoutes";
 import satisfactionSurveyRoutes from "./satisfactionSurveyRoutes";
+import packageRoutes from "./packageRoutes";
 
 const routes = Router();
 
@@ -87,5 +88,6 @@ routes.use(serviceTimeRoutes);
 routes.use(contactBlacklistRoutes);
 routes.use(supervisorRoutes);
 routes.use(satisfactionSurveyRoutes);
+routes.use(packageRoutes);
 
 export default routes;

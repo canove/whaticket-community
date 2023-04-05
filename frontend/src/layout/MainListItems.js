@@ -486,6 +486,9 @@ const MainListItems = (props) => {
     if (name === "Satisfaction Survey") {
       return "Pesquisa de Satisfação";
     }
+    if (name === "Packages") {
+      return "Pacotes";
+    }
 
     return name;
   }

@@ -60,11 +60,13 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 
 	const [company, setCompany] = useState("");
 	const [product, setProduct] = useState("");
+	const [packageId, setPackageId] = useState("");
 	const [gracePeriod, setGracePeriod] = useState("");
 	const [graceTrigger, setGraceTrigger] = useState("");
 
 	const [companies, setCompanies] = useState([]);
 	const [products, setProducts] = useState([]);
+	const [packages, setPackages] = useState([]);
 
 	const [disableButton, setDisableButton] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -88,13 +90,24 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 			}
 		}
 
+		const fetchPackages = async () => {
+			try {
+				const { data } = await api.get('/packages/');
+				setPackages(data);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
 		const fetchPricing = async () => {
+			if (!pricingId) return;
 			try {
 				const { data } = await api.get(`/pricings/${pricingId}`);
 				setCompany(data.companyId);
 				setProduct(data.productId);
 				setGracePeriod(data.gracePeriod);
 				setGraceTrigger(data.graceTrigger);
+				setPackageId(data.packageId);
 			} catch (err) {
 				toastError(err);
 			}
@@ -102,10 +115,8 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 
 		fetchCompanies();
 		fetchProducts();
-
-		if (pricingId) {
-			fetchPricing();
-		}
+		fetchPackages();
+		fetchPricing();
 	}, [open, pricingId])
 
 	useEffect(() => {
@@ -122,6 +133,7 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 		setProduct("");
 		setGracePeriod("");
 		setGraceTrigger("");
+		setPackageId("");
 	};
 
 	const handleSubmit = async () => {
@@ -129,7 +141,8 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 			companyId: company,
 			productId: product,
 			gracePeriod,
-			graceTrigger
+			graceTrigger,
+			packageId,
 		};
 
 		if (pricingId) {
@@ -150,7 +163,8 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 			companyId: company,
 			productId: product,
 			gracePeriod,
-			graceTrigger
+			graceTrigger,
+			packageId
 		};
 
 		try {
@@ -239,15 +253,42 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 							</InputLabel>
 							<Select
 								labelId="product-select-label"
-								label="Empresa"
+								label="Produto"
 								id="product-select"
 								value={product}
 								onChange={handleProductChange}
 								fullWidth
 							>
+								<MenuItem value={""}>Nenhum</MenuItem>
 								{ products && products.map(product => {
 									return (
 										<MenuItem key={product.id} value={product.id}>{ product.name }</MenuItem>
+									)
+								})}
+							</Select>
+						</FormControl>
+                    </div>
+					<div className={classes.root}>
+						<FormControl
+							variant="outlined"
+							margin="dense"
+							fullWidth
+						>
+							<InputLabel id="package-select-label">
+								{"Pacote"}
+							</InputLabel>
+							<Select
+								labelId="package-select-label"
+								label="Pacote"
+								id="package-select"
+								value={packageId}
+								onChange={(e) => setPackageId(e.target.value)}
+								fullWidth
+							>
+								<MenuItem value={""}>Nenhum</MenuItem>
+								{ packages && packages.map(pack => {
+									return (
+										<MenuItem key={pack.id} value={pack.id}>{ pack.name }</MenuItem>
 									)
 								})}
 							</Select>

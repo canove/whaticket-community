@@ -239,6 +239,7 @@ const Pricing = () => {
                         <TableRow>
                             <TableCell align="center">{i18n.t("pricing.grid.company")}</TableCell>
                             <TableCell align="center">{i18n.t("pricing.grid.registeredProduct")}</TableCell>
+                            <TableCell align="center">{"Pacote"}</TableCell>
                             <TableCell align="center">{i18n.t("pricing.grid.status")}</TableCell>
                             <TableCell align="center">{i18n.t("pricing.grid.gracePeriod")}</TableCell>
                             <TableCell align="center">{i18n.t("pricing.grid.lackOfShots")}</TableCell>
@@ -251,7 +252,8 @@ const Pricing = () => {
                             return (
                                 <TableRow key={pricing.id}>
                                     <TableCell align="center">{pricing.company.name}</TableCell>
-                                    <TableCell align="center">{pricing.product.name}</TableCell>
+                                    <TableCell align="center">{pricing.product ? pricing.product.name : ""}</TableCell>
+                                    <TableCell align="center">{pricing.package ? pricing.package.name : ""}</TableCell>
                                     <TableCell align="center">{formatStatus(pricing.company.status)}</TableCell>
                                     <TableCell align="center">{pricing.gracePeriod}</TableCell>
                                     <TableCell align="center">{pricing.graceTrigger}</TableCell>

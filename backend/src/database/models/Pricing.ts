@@ -11,6 +11,7 @@ import {
 } from "sequelize-typescript";
 import Company from "./Company";
 import Product from "./Products";
+import Packages from "./Packages";
 
 @Table
 class Pricing extends Model<Pricing> {
@@ -35,6 +36,13 @@ class Pricing extends Model<Pricing> {
 
   @BelongsTo(() => Product)
   product: Product;
+
+  @ForeignKey(() => Packages)
+  @Column
+  packageId: number;
+
+  @BelongsTo(() => Packages)
+  package: Packages;
 
   @Column
   usedGraceTriggers: number;
