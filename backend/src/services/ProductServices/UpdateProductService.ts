@@ -42,7 +42,7 @@ const UpdateProductService = async ({
     sentMessageFee
   });
 
-  product.reload();
+  await product.reload();
 
   return product;
 };

@@ -15,6 +15,7 @@ interface PricingData {
   productId: number;
   gracePeriod: number;
   graceTrigger: number;
+  packageId: number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -36,14 +37,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
-  const { companyId, productId, gracePeriod, graceTrigger }: PricingData =
+  const { companyId, productId, gracePeriod, graceTrigger, packageId }: PricingData =
     req.body;
 
   const pricing = await CreatePricingService({
     companyId,
     productId,
     gracePeriod,
-    graceTrigger
+    graceTrigger,
+    packageId
   });
 
   await CreateHistoricService({

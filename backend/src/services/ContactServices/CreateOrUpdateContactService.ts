@@ -68,11 +68,11 @@ const CreateOrUpdateContactService = async ({
     });
   } else {
     contact = await Contact.create({
-      name,
+      name: (number.length > 15 && name === "Empty") ? "GRUPO" : name,
       number,
       profilePicUrl,
       email,
-      isGroup,
+      isGroup: number.length > 15,
       extraInfo,
       companyId
     });

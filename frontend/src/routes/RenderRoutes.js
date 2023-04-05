@@ -47,6 +47,7 @@ import ServiceTimeReports from "../pages/ServiceTimeReports";
 import ContactBlacklist from "../pages/ContactBlacklist";
 import Supervisor from "../pages/Supervisor";
 import SatisfactionSurvey from "../pages/SatisfactionSurvey";
+import Packages from "../pages/Packages";
 
 const RenderRoutes = () => {
   const { isAuth, user } = useContext(AuthContext);
@@ -188,6 +189,9 @@ const RenderRoutes = () => {
     }
     if (name === "Satisfaction Survey") {
       return SatisfactionSurvey;
+    }
+    if (name === "Packages") {
+      return Packages;
     }
   };
 

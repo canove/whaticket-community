@@ -6,20 +6,23 @@ interface Request {
   productId: number;
   gracePeriod: number;
   graceTrigger: number;
+  packageId: number;
 }
 
 const CreatePricingService = async ({
   companyId,
   productId,
   gracePeriod,
-  graceTrigger
+  graceTrigger,
+  packageId
 }: Request): Promise<Pricing> => {
   const pricing = await Pricing.create({
     companyId,
-    productId,
+    productId: productId ? productId : null,
     gracePeriod,
     graceTrigger,
-    usedGraceTriggers: 0
+    usedGraceTriggers: 0,
+    packageId: packageId ? packageId : null,
   });
 
   const createdPricing = await ShowPricingService(pricing.id);

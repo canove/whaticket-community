@@ -687,7 +687,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
                 </IconButton>
                 {isGroup && (
                   <span className={classes.messageContactName}>
-                    {message.contact?.name}
+                    {message.author}
                   </span>
                 )}
                 {(message.mediaUrl || message.mediaType === "location" || message.mediaType === "vcard"
