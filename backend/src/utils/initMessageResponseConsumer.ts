@@ -57,7 +57,6 @@ export const initMessageResponseConsumer = () => {
               } else {
                 await Message.update({
                   id: msgWhatsId,
-                  ack: 1
                 }, {
                   where: {
                     id: message.messageId
@@ -69,6 +68,8 @@ export const initMessageResponseConsumer = () => {
                     id: msgWhatsId
                   }
                 });
+
+                if (msg.ack < 2) await msg.update({ ack: 1 });  
       
                 const ticket = await Ticket.findOne({
                   where: { id: msg.ticketId }
@@ -77,11 +78,12 @@ export const initMessageResponseConsumer = () => {
                 await ticket.update({ lastMessage: message.text }); 
 
                 await msg.reload();
-    
+
                 const io = getIO();
                 io.emit(`appMessage${ticket.companyId}`, {
                   action: "update",
-                  message: msg
+                  message: msg,
+                  oldId: message.messageId
                 });
               }
             } else {
