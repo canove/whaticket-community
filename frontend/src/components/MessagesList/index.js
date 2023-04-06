@@ -317,6 +317,18 @@ const reducer = (state, action) => {
     return [...state];
   }
 
+  if (action.type === "UPDATE_MESSAGE_ID") {
+    const oldId = action.payload.oldId;
+    const messageToUpdate = action.payload.message;
+    const messageIndex = state.findIndex((m) => m.id === oldId);
+
+    if (messageIndex !== -1) {
+      state[messageIndex] = messageToUpdate;
+    }
+
+    return [...state];
+  }
+
   if (action.type === "RESET") {
     return [];
   }
@@ -386,7 +398,11 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
       }
 
       if (data.action === "update") {
-        dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+        if (data.oldId) {
+          dispatch({ type: "UPDATE_MESSAGE_ID", payload: data });
+        } else {
+          dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+        }
       }
     });
 

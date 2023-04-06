@@ -58,7 +58,7 @@ const CreateOrUpdateContactService = async ({
 
     console.log("update contact contactService 42");
     await contact.update({ 
-      name: name && (name !== "" && name !== "undefined" && name !== "Empty") ? name : oldName,
+      name: (number && number.length < 15) && (name && name !== "" && name !== "undefined" && name !== "Empty") ? name : oldName,
       profilePicUrl 
     });
 

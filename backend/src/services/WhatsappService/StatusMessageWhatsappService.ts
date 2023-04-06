@@ -78,13 +78,17 @@ const StatusMessageWhatsappService = async ({
     console.log("update Message statusmessageservice 71");
     switch(statusType.toLowerCase()){
       case "sent":
+        if (msgRegister?.ack === 2 || msgRegister?.ack === 3) break;
+
         await msgRegister?.update({ ack: 1 });
         break;
       case "delivered":
+        if (msgRegister?.ack === 3) break;
+
         await msgRegister?.update({ ack: 2 });
         break;
       case "read":
-        await msgRegister?.update({ ack:3, read: 1 });
+        await msgRegister?.update({ ack: 3, read: 1 });
         break;
       case "error":
         await msgRegister?.update({ errorAt: new Date(), errorMessage: errorMessage });
@@ -93,17 +97,10 @@ const StatusMessageWhatsappService = async ({
 
     const tck = await Ticket.findByPk(msgRegister.ticketId);
     const io = getIO();
-    // io.to(msgRegister.ticketId.toString()).emit(`whatsapp-message${tck.companyId}`, {
-    //   action: "update",
-    //   message: msgRegister
-    // });
-
     io.emit(`appMessage${tck.companyId}`, {
       action: "update",
       message: msgRegister
     });
-
-    // return { success: true }
    }
   }
 
