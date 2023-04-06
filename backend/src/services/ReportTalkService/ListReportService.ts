@@ -101,6 +101,7 @@ const ListReportService = async ({
             model: User,
             as: "user",
             attributes: ["name"],
+            where: { deletedAt: null },
             required: false,
           },
           {

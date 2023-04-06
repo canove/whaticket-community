@@ -33,7 +33,8 @@ const ListUsersService = async ({
         )
       },
       { email: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
-    ]
+    ],
+    deletedAt: null
   };
 
   if (companyId !== 1) {

@@ -25,7 +25,7 @@ const ListUserTicketHistoricService = async ({
     }
 
     const reports = await User.findAll({
-        where: { companyId },
+        where: { companyId, deletedAt: null },
         attributes: ["id", "name"],
         include: [
             {

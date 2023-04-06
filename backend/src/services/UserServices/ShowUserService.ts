@@ -9,7 +9,7 @@ const ShowUserService = async (
 ): Promise<User> => {
   let whereCondition = null;
 
-  whereCondition = { id }
+  whereCondition = { id, deletedAt: null }
 
   if (companyId !== 1) whereCondition = { ...whereCondition, companyId }
 

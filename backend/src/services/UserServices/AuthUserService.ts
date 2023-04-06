@@ -53,7 +53,7 @@ const AuthUserService = async ({
   }
 
   const user = await User.findOne({
-    where: { email, companyId: companyDb.id },
+    where: { email, companyId: companyDb.id, deletedAt: null },
     include: ["queues"]
   });
 

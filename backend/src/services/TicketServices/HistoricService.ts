@@ -11,7 +11,9 @@ const HistoricService = async (
       {
         model: User,
         as: "user",
-        attributes: ["id", "name"]
+        attributes: ["id", "name"],
+        where: { deletedAt: null },
+        required: false,
       }
     ],
 
