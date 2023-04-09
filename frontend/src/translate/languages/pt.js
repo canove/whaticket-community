@@ -322,6 +322,9 @@ const messages = {
       queueSelect: {
         inputLabel: "Filas",
       },
+      quickAnswersSelect: {
+        inputLabel: "Usuários",
+      },
       quickAnswers: {
         title: "Respostas Rápidas",
         table: {
