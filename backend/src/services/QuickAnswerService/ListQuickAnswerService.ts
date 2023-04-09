@@ -1,9 +1,15 @@
-import { Sequelize } from "sequelize";
+import { Includeable, Sequelize, WhereOptions } from "sequelize";
+
 import QuickAnswer from "../../models/QuickAnswer";
+import User from "../../models/User";
 
 interface Request {
   searchParam?: string;
   pageNumber?: string;
+  user: {
+    id: string;
+    profile: string;
+  };
 }
 
 interface Response {
@@ -14,9 +20,18 @@ interface Response {
 
 const ListQuickAnswerService = async ({
   searchParam = "",
-  pageNumber = "1"
+  pageNumber = "1",
+  user
 }: Request): Promise<Response> => {
-  const whereCondition = {
+  const includeCondition: Includeable[] = [
+    {
+      model: User,
+      attributes: ["id", "name", "email"],
+      where: user?.profile === "user" ? { id: user.id } : undefined
+    }
+  ];
+
+  const whereCondition: WhereOptions = {
     message: Sequelize.where(
       Sequelize.fn("LOWER", Sequelize.col("message")),
       "LIKE",
@@ -26,14 +41,29 @@ const ListQuickAnswerService = async ({
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
-  const { count, rows: quickAnswers } = await QuickAnswer.findAndCountAll({
+  const { count, rows } = await QuickAnswer.findAndCountAll({
+    include: includeCondition,
     where: whereCondition,
     limit,
     offset,
     order: [["message", "ASC"]]
   });
 
-  const hasMore = count > offset + quickAnswers.length;
+  const hasMore = count > offset + rows.length;
+
+  const quickAnswers = await Promise.all(
+    rows.map(async quickAnswer => {
+      const quickAnswerId = String(quickAnswer.id);
+      const quickAnswerFound = await QuickAnswer.findByPk(quickAnswerId, {
+        include: [{ model: User, attributes: ["id", "name", "email"] }]
+      });
+      const hasUsers = !!quickAnswerFound?.get("users").length;
+      if (hasUsers && quickAnswerFound) {
+        quickAnswer.set("users", quickAnswerFound.get("users"));
+      }
+      return quickAnswer;
+    })
+  );
 
   return {
     quickAnswers,

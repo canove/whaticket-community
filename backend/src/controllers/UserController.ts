@@ -1,26 +1,28 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
-import CheckSettingsHelper from "../helpers/CheckSettings";
 import AppError from "../errors/AppError";
+import CheckSettingsHelper from "../helpers/CheckSettings";
 
 import CreateUserService from "../services/UserServices/CreateUserService";
-import ListUsersService from "../services/UserServices/ListUsersService";
-import UpdateUserService from "../services/UserServices/UpdateUserService";
-import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
+import ListUsersService from "../services/UserServices/ListUsersService";
+import ShowUserService from "../services/UserServices/ShowUserService";
+import UpdateUserService from "../services/UserServices/UpdateUserService";
 
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
+  profile: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { searchParam, pageNumber, profile } = req.query as IndexQuery;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
-    pageNumber
+    pageNumber,
+    profile
   });
 
   return res.json({ users, count, hasMore });

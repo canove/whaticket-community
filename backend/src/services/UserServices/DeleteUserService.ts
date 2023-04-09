@@ -1,11 +1,13 @@
-import User from "../../models/User";
 import AppError from "../../errors/AppError";
-import Ticket from "../../models/Ticket";
 import UpdateDeletedUserOpenTicketsStatus from "../../helpers/UpdateDeletedUserOpenTicketsStatus";
+import QuickAnswer from "../../models/QuickAnswer";
+import Ticket from "../../models/Ticket";
+import User from "../../models/User";
 
 const DeleteUserService = async (id: string | number): Promise<void> => {
   const user = await User.findOne({
-    where: { id }
+    where: { id },
+    include: [{ model: QuickAnswer }]
   });
 
   if (!user) {
@@ -20,6 +22,7 @@ const DeleteUserService = async (id: string | number): Promise<void> => {
     UpdateDeletedUserOpenTicketsStatus(userOpenTickets);
   }
 
+  await user.$remove("quickAnswers", user.quickAnswers);
   await user.destroy();
 };
 

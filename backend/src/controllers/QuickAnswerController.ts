@@ -1,12 +1,12 @@
-import * as Yup from "yup";
 import { Request, Response } from "express";
+import * as Yup from "yup";
 import { getIO } from "../libs/socket";
 
-import ListQuickAnswerService from "../services/QuickAnswerService/ListQuickAnswerService";
 import CreateQuickAnswerService from "../services/QuickAnswerService/CreateQuickAnswerService";
+import DeleteQuickAnswerService from "../services/QuickAnswerService/DeleteQuickAnswerService";
+import ListQuickAnswerService from "../services/QuickAnswerService/ListQuickAnswerService";
 import ShowQuickAnswerService from "../services/QuickAnswerService/ShowQuickAnswerService";
 import UpdateQuickAnswerService from "../services/QuickAnswerService/UpdateQuickAnswerService";
-import DeleteQuickAnswerService from "../services/QuickAnswerService/DeleteQuickAnswerService";
 
 import AppError from "../errors/AppError";
 
@@ -18,6 +18,7 @@ type IndexQuery = {
 interface QuickAnswerData {
   shortcut: string;
   message: string;
+  userIds: number[];
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -25,7 +26,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const { quickAnswers, count, hasMore } = await ListQuickAnswerService({
     searchParam,
-    pageNumber
+    pageNumber,
+    user: req.user
   });
 
   return res.json({ quickAnswers, count, hasMore });

@@ -1,13 +1,17 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsToMany,
   Column,
-  DataType,
   CreatedAt,
-  UpdatedAt,
+  DataType,
   Model,
   PrimaryKey,
-  AutoIncrement
+  Table,
+  UpdatedAt
 } from "sequelize-typescript";
+
+import User from "./User";
+import UserQuickAnswer from "./UserQuickAnswer";
 
 @Table
 class QuickAnswer extends Model<QuickAnswer> {
@@ -27,6 +31,9 @@ class QuickAnswer extends Model<QuickAnswer> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @BelongsToMany(() => User, () => UserQuickAnswer)
+  users: Array<User & { UserQuickAnswer: UserQuickAnswer }>;
 }
 
 export default QuickAnswer;
