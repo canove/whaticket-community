@@ -50,6 +50,12 @@ class BillingControls extends Model<BillingControls> {
   @Column
   receivedMessageQuantity: number;
 
+  @Column
+  extraUserQuantity: number;
+
+  @Column
+  extraUserFee: number;
+
   @CreatedAt
   createdAt: Date;
 

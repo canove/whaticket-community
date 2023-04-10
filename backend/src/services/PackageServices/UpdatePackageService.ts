@@ -4,9 +4,11 @@ import ShowPackageService from "./ShowPackageService";
 interface PackageData {
   name: string;
   maxUsers: number;
+  monthlyFee: number;
   extraUserPrice: number;
   maxTicketsByMonth: number;
   extraTicketPrice: number;
+  maxWhatsapps: number;
   whatsappMonthlyPrice: number;
 }
 
@@ -24,18 +26,22 @@ const UpdateProductService = async ({
   const {
     name,
     maxUsers,
+    monthlyFee,
     extraUserPrice,
     maxTicketsByMonth,
     extraTicketPrice,
+    maxWhatsapps,
     whatsappMonthlyPrice,
   } = packageData;
 
   await pack.update({
     name,
     maxUsers,
+    monthlyFee,
     extraUserPrice,
     maxTicketsByMonth,
     extraTicketPrice,
+    maxWhatsapps,
     whatsappMonthlyPrice,
   });
 

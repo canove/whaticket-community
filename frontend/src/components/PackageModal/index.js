@@ -54,17 +54,21 @@ const PackageModal = ({ open, onClose, packageId }) => {
 
 	const [name, setName] = useState("");
 	const [maxUsers, setMaxUsers] = useState(0);
+	const [monthlyFee, setMonthlyFee] = useState(0.0);
 	const [extraUserPrice, setExtraUserPrice] = useState(0.0);
 	const [maxTicketsByMonth, setMaxTicketsByMonth] = useState(0);
 	const [extraTicketPrice, setExtraTicketPrice] = useState(0.0);
+	const [maxWhatsapps, setMaxWhatsapps] = useState(0);
 	const [whatsappMonthlyPrice, setWhatsappMonthlyPrice] = useState(0.0);
 	
 	const handleClose = () => {
 		setName("");
 		setMaxUsers(0);
+		setMonthlyFee(0.0);
 		setExtraUserPrice(0.0);
 		setMaxTicketsByMonth(0);
 		setExtraTicketPrice(0.0);
+		setMaxWhatsapps(0);
 		setWhatsappMonthlyPrice(0.0);
 		onClose();
 	};
@@ -76,9 +80,11 @@ const PackageModal = ({ open, onClose, packageId }) => {
 				const { data } = await api.get(`/packages/${packageId}`);
 				setName(data.name);
 				setMaxUsers(data.maxUsers);
+				setMonthlyFee(data.monthlyFee || 0.0);
 				setExtraUserPrice(data.extraUserPrice || 0.0);
 				setMaxTicketsByMonth(data.maxTicketsByMonth);
 				setExtraTicketPrice(data.extraTicketPrice || 0.0);
+				setMaxWhatsapps(data.maxWhatsapps);
 				setWhatsappMonthlyPrice(data.whatsappMonthlyPrice || 0.0);
 			} catch (err) {
 				toastError(err);
@@ -95,6 +101,7 @@ const PackageModal = ({ open, onClose, packageId }) => {
 			extraUserPrice: extraUserPrice,
 			maxTicketsByMonth: maxTicketsByMonth,
 			extraTicketPrice: extraTicketPrice,
+			maxWhatsapps: maxWhatsapps,
 			whatsappMonthlyPrice: whatsappMonthlyPrice
 		};
 
@@ -196,6 +203,42 @@ const PackageModal = ({ open, onClose, packageId }) => {
 							}}
 						/>
 					</FormControl>
+				</div>
+				<div>
+					<FormControl
+						variant="outlined"
+						margin="dense"
+						fullWidth
+					>
+						<TextField
+							name="maxWhatsapps"
+							label={"Máx. Whatsapps"}
+							type="number"
+							variant="outlined"
+							value={maxWhatsapps}
+							onChange={(e) => setMaxWhatsapps(e.target.value)}
+							fullWidth
+							inputProps={{
+								step: 1,
+								min: 0,
+								type: 'number',
+							}}
+						/>
+					</FormControl>
+				</div>
+				<div>
+					<Typography variant="subtitle1">{"Mensalidade"}</Typography>
+					<IntlCurrencyInput
+						name="monthlyFee"
+						value={monthlyFee}
+						onChange={(e, value) =>{
+							e.preventDefault();
+							setMonthlyFee(value);
+						}}
+						config={currencyConfig}
+						currency="BRL"
+						style={{ width:"100%", padding:"10px", fontSize:"16px" }}
+					/>
 				</div>
 				<div>
 					<Typography variant="subtitle1">{"Preço por Usuário Extra"}</Typography>

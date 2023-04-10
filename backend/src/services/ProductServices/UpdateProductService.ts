@@ -3,7 +3,6 @@ import ShowProductService from "./ShowProductService";
 
 interface ProductData {
   name: string;
-  monthlyFee: number;
   triggerFee: number;
   monthlyInterestRate: number;
   penaltyMount: number;
@@ -24,7 +23,6 @@ const UpdateProductService = async ({
 
   const {
     name,
-    monthlyFee,
     triggerFee,
     monthlyInterestRate,
     penaltyMount,
@@ -34,7 +32,6 @@ const UpdateProductService = async ({
 
   await product.update({
     name,
-    monthlyFee,
     triggerFee,
     monthlyInterestRate,
     penaltyMount,

@@ -13,9 +13,11 @@ import CreateHistoricService from "../services/HistoricServices/CreateHistoricSe
 interface PackageData {
   name: string;
   maxUsers: number;
+  monthlyFee: number;
   extraUserPrice: number;
   maxTicketsByMonth: number;
   extraTicketPrice: number;
+  maxWhatsapps: number;
   whatsappMonthlyPrice: number;
 }
 
@@ -41,18 +43,22 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const {
     name,
     maxUsers,
+    monthlyFee,
     extraUserPrice,
     maxTicketsByMonth,
     extraTicketPrice,
+    maxWhatsapps,
     whatsappMonthlyPrice,
   }: PackageData = req.body;
 
   const pack = await CreatePackageService({
     name,
     maxUsers,
+    monthlyFee,
     extraUserPrice,
     maxTicketsByMonth,
     extraTicketPrice,
+    maxWhatsapps,
     whatsappMonthlyPrice,
   });
 
@@ -142,7 +148,7 @@ export const remove = async (
   });
 
   const io = getIO();
-  io.emit("product", {
+  io.emit("pack", {
     action: "delete",
     packageId
   });
