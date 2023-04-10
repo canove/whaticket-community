@@ -319,6 +319,9 @@ const messages = {
       queueSelect: {
         inputLabel: "Queues",
       },
+      quickAnswersSelect: {
+        inputLabel: "Users",
+      },
       quickAnswers: {
         title: "Quick Answers",
         table: {

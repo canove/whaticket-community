@@ -1,24 +1,27 @@
+import { compare, hash } from "bcryptjs";
 import {
-  Table,
-  Column,
-  CreatedAt,
-  UpdatedAt,
-  Model,
-  DataType,
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
-  PrimaryKey,
-  AutoIncrement,
-  Default,
-  HasMany,
+  BelongsTo,
   BelongsToMany,
+  Column,
+  CreatedAt,
+  DataType,
+  Default,
   ForeignKey,
-  BelongsTo
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt
 } from "sequelize-typescript";
-import { hash, compare } from "bcryptjs";
-import Ticket from "./Ticket";
+
 import Queue from "./Queue";
+import QuickAnswer from "./QuickAnswer";
+import Ticket from "./Ticket";
 import UserQueue from "./UserQueue";
+import UserQuickAnswer from "./UserQuickAnswer";
 import Whatsapp from "./Whatsapp";
 
 @Table
@@ -66,6 +69,9 @@ class User extends Model<User> {
 
   @BelongsToMany(() => Queue, () => UserQueue)
   queues: Queue[];
+
+  @BelongsToMany(() => QuickAnswer, () => UserQuickAnswer)
+  quickAnswers: QuickAnswer[];
 
   @BeforeUpdate
   @BeforeCreate

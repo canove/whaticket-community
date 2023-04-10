@@ -1,4 +1,4 @@
-import { Sequelize, Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import Queue from "../../models/Queue";
 import User from "../../models/User";
 import Whatsapp from "../../models/Whatsapp";
@@ -6,6 +6,7 @@ import Whatsapp from "../../models/Whatsapp";
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
+  profile?: string;
 }
 
 interface Response {
@@ -16,9 +17,15 @@ interface Response {
 
 const ListUsersService = async ({
   searchParam = "",
-  pageNumber = "1"
+  pageNumber = "1",
+  profile
 }: Request): Promise<Response> => {
+  const searchProfile = profile && {
+    profile: { [Op.eq]: `${profile.toLowerCase()}` }
+  };
+
   const whereCondition = {
+    ...searchProfile,
     [Op.or]: [
       {
         "$User.name$": Sequelize.where(
@@ -41,7 +48,7 @@ const ListUsersService = async ({
     order: [["createdAt", "DESC"]],
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
-      { model: Whatsapp, as: "whatsapp", attributes: ["id", "name"] },
+      { model: Whatsapp, as: "whatsapp", attributes: ["id", "name"] }
     ]
   });
 

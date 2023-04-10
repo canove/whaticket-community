@@ -1,34 +1,35 @@
-import React, { useState, useEffect, useReducer } from "react";
-import openSocket from "../../services/socket-io";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import {
   Button,
   IconButton,
-  makeStyles,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  InputAdornment,
   TextField,
+  makeStyles,
 } from "@material-ui/core";
-import { Edit, DeleteOutline } from "@material-ui/icons";
+import { DeleteOutline, Edit } from "@material-ui/icons";
 import SearchIcon from "@material-ui/icons/Search";
+import { toast } from "react-toastify";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 
-import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
-import TableRowSkeleton from "../../components/TableRowSkeleton";
-import QuickAnswersModal from "../../components/QuickAnswersModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
-import { toast } from "react-toastify";
+import QuickAnswersModal from "../../components/QuickAnswersModal";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
+import { AuthContext } from '../../context/Auth/AuthContext';
 import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import openSocket from "../../services/socket-io";
+import { i18n } from "../../translate/i18n";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_QUICK_ANSWERS") {
@@ -86,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
 const QuickAnswers = () => {
   const classes = useStyles();
 
+  const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchParam, setSearchParam] = useState("");
@@ -125,12 +127,14 @@ const QuickAnswers = () => {
     const socket = openSocket();
 
     socket.on("quickAnswer", (data) => {
-      if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_QUICK_ANSWERS", payload: data.quickAnswer });
-      }
+      const isUserQuickAnswer = data?.quickAnswer?.users.find(userData => userData.id === user.id);
+
+      if ((isUserQuickAnswer || user.profile === 'admin') && data.action !== "delete") {
+        return dispatch({ type: "UPDATE_QUICK_ANSWERS", payload: data.quickAnswer });
+      };
 
       if (data.action === "delete") {
-        dispatch({
+        return dispatch({
           type: "DELETE_QUICK_ANSWERS",
           payload: +data.quickAnswerId,
         });
@@ -204,7 +208,7 @@ const QuickAnswers = () => {
         open={quickAnswersModalOpen}
         onClose={handleCloseQuickAnswersModal}
         aria-labelledby="form-dialog-title"
-        quickAnswerId={selectedQuickAnswers && selectedQuickAnswers.id}
+        quickAnswerInfo={selectedQuickAnswers}
       ></QuickAnswersModal>
       <MainHeader>
         <Title>{i18n.t("quickAnswers.title")}</Title>

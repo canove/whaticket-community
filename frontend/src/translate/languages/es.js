@@ -323,6 +323,9 @@ const messages = {
       queueSelect: {
         inputLabel: "Linhas",
       },
+      quickAnswersSelect: {
+        inputLabel: "Usuarios",
+      },
       quickAnswers: {
         title: "Respuestas rápidas",
         table: {
