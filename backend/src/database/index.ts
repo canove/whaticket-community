@@ -13,6 +13,7 @@ import QuickAnswer from "./models/QuickAnswer";
 import File from "./models/File";
 import FileRegister from "./models/FileRegister";
 import WhatsappsConfig from "./models/WhatsappsConfig";
+import GreetingMessageControls from "./models/GreetingMessageControls";
 import GreetingMessages from "./models/GreetingMessages";
 import Company from "./models/Company";
 import Menu from "./models/Menu";
@@ -63,6 +64,7 @@ const models = [
   File,
   FileRegister,
   WhatsappsConfig,
+  GreetingMessageControls,
   GreetingMessages,
   Company,
   Menu,
@@ -91,7 +93,7 @@ const models = [
   ContactBlacklist,
   SatisfactionSurveys,
   SatisfactionSurveyResponses,
-  Packages,
+  Packages
 ];
 
 sequelize.addModels(models);

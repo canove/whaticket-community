@@ -58,7 +58,7 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
         console.log("update fileregister sendMessageservice 43");
           await reg.update({interactionAt: new Date()})
       }
-      let linkeNumber = contactNumber.substr(7,8);
+      
       /*verifica mensagem de fishing*/
       let messageToSend = await GreetingMessageControls.findOne({
           where: { 
