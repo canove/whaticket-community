@@ -151,7 +151,7 @@ export const initMessageResponseConsumer = () => {
                 });
               }
             } else {
-              if (whats && response.message == 'sessão inválida ou inexistente' || code == 500) {
+              if (whats && (response.message == 'sessão inválida ou inexistente' || code == 500)) {
                 const headers = {
                   "api-key": `${process.env.WPPNOF_API_TOKEN}`,
                   "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`

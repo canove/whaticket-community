@@ -34,6 +34,26 @@ const SendWhatsAppMedia = async ({
       where: {
         id: ticket.whatsappId
        }});
+
+       if (connnection.official === false && connnection.status !== "CONNECTED") {
+        try {
+          const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
+    
+          const payload = {
+            "session": connnection.name,
+            "number": connnection.name,
+          }    
+      
+          const result = await axios.post(CHECK_NUMBER_URL, payload, {
+            headers: {
+              "api-key": process.env.WPPNOF_API_TOKEN,
+              "sessionkey": process.env.WPPNOF_SESSION_KEY,
+            }
+          });
+        } catch (err: any) {
+          console.log(err?.message);
+        }
+      }
   
     const message = await Message.findAll({
       where: {
