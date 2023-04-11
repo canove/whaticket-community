@@ -56,6 +56,12 @@ class BillingControls extends Model<BillingControls> {
   @Column
   extraUserFee: number;
 
+  @Column
+  extraTicketQuantity: number;
+
+  @Column
+  extraTicketFee: number;
+
   @CreatedAt
   createdAt: Date;
 
