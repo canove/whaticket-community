@@ -1356,6 +1356,7 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+        ERR_DOUBLE_QUEUES: "Só uma fila permitida por número.",
         ERR_NO_COMPANY_FOUND: "Erro ao excluir a Empresa.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Já existe uma empresa com esse CNPJ.",
         ERR_NO_CATEGORY_FOUND : "Erro categoria não encontrada!",

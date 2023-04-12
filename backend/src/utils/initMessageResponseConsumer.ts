@@ -165,24 +165,62 @@ export const initMessageResponseConsumer = () => {
                 
                 await sendMessageToSQS(params);
               } else {
-                const msg = await Message.findOne({
-                  where: { id: message.messageId }
-                });
+                if (message.messageId) {
+                  const msg = await Message.findOne({
+                    where: { id: message.messageId }
+                  });
+        
+                  const ticket = await Ticket.findOne({
+                    where: { id: msg.ticketId }
+                  });
+        
+                  await msg.update({ ack: 5 });
+                  await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
       
-                const ticket = await Ticket.findOne({
-                  where: { id: msg.ticketId }
-                });
+                  await msg.reload();
       
-                await msg.update({ ack: 5 });
-                await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
+                  const io = getIO();
+                  io.emit(`appMessage${ticket.companyId}`, {
+                    action: "update",
+                    message: msg
+                  });
+                } else {
+                  let mediaUrl = '';
+                  let body = message.text;
     
-                await msg.reload();
+                  if (message.mediaUrl) {
+                    if(!message.mediaUrl?.includes('http')) {
+                      mediaUrl = '';
+                    }
+                  }
     
-                const io = getIO();
-                io.emit(`appMessage${ticket.companyId}`, {
-                  action: "update",
-                  message: msg
-                });
+                  if (message.path) {
+                    if(message.path?.includes('http') && !message.path?.trim().includes(" ")) {
+                      mediaUrl = message.path;
+                    } else {
+                      mediaUrl = '';
+                    }
+                  }
+    
+                  if (message.text === mediaUrl) {
+                    body = '';
+                  }
+                  
+                  await botMessage({
+                    "session": message.session,
+                    "id": null,
+                    "fromMe": true,
+                    "bot": true,
+                    "isGroup":false,
+                    "type": message.type == 'file' ? 'document' : message.type,
+                    "to": message.number,
+                    "from": message.session,
+                    "body": body,
+                    "mediaUrl": mediaUrl,
+                    "contactName": message.contactName,
+                    "templateButtons": message.templateButtons ? message.templateButtons : null
+                 });
+                }
               }
             }
 

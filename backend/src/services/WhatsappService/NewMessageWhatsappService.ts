@@ -245,7 +245,7 @@ const handleMessage = async (
       throw `company only owned messages: reg not found in this company.`;
     }
 
-    if (reg) {
+    if (reg && reg.interactionAt === null) {
       await reg.update({ interactionAt: new Date() });
     }
 
