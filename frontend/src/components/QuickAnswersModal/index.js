@@ -74,12 +74,12 @@ const QuickAnswersModal = ({
   };
 
   const [quickAnswer, setQuickAnswer] = useState(initialState);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const { user } = useContext(AuthContext);
+  const [selectedUsers, setSelectedUsers] = useState([user.id]);
 
   const handleClose = () => {
     onClose();
-    setSelectedUsers([]);
+    setSelectedUsers([user.id]);
     setQuickAnswer({
       shortcut: "",
       message: ""
@@ -87,8 +87,7 @@ const QuickAnswersModal = ({
   };
 
   const handleSaveQuickAnswer = async (values) => {
-    const userIds = user.profile === "user" ? [user.id, ...selectedUsers] : selectedUsers;
-    const quickAnswerData = { ...values, userIds };
+    const quickAnswerData = { ...values, userIds: selectedUsers };
     try {
       if (quickAnswerInfo?.id) {
         await api.put(`/quickAnswers/${quickAnswerInfo?.id}`, quickAnswerData);
@@ -117,8 +116,7 @@ const QuickAnswersModal = ({
         shortcut: quickAnswerInfo.shortcut,
         message :quickAnswerInfo.message
       });
-      const filteredUsers = quickAnswerInfo.users.filter(userInfo => userInfo.id !== user.id);
-      setSelectedUsers(filteredUsers.map(userInfo => userInfo.id));
+      setSelectedUsers(quickAnswerInfo.users.map(userInfo => userInfo.id));
     }
   }, [quickAnswerInfo?.id, open]);
 

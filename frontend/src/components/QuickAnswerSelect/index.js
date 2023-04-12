@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Chip from "@material-ui/core/Chip";
 import FormControl from "@material-ui/core/FormControl";
@@ -7,7 +7,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { AuthContext } from '../../context/Auth/AuthContext';
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
@@ -24,8 +23,7 @@ const useStyles = makeStyles(theme => ({
 
 const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 	const classes = useStyles();
-	const [users, setUsers] = useState(selectedUsers);
-  const { user } = useContext(AuthContext);
+	const [users, setUsers] = useState([]);
 
 	const handleChange = e => {
 		onChange(e.target.value);
@@ -34,12 +32,12 @@ const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 	useEffect(() => {
 		(async () => {
 			try {
-				const { data } = await api.get("/users?profile=user");
-				const filteredUsers = user.profile === "user"
-					? data?.users.filter(userData => userData.id !== user.id)
-					: data?.users;
-
-				setUsers(filteredUsers);
+				const { data } = await api.get("/users");
+				data.users.sort((a, b) => {
+					if (a.name > b.name) return 1
+					return -1
+				});
+				setUsers(data?.users);
 			} catch (err) {
 				toastError(err);
 			}
