@@ -1355,6 +1355,7 @@ const messages = {
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
+        ERR_DOUBLE_QUEUES: "Only one queue allowed.",
         ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
         ERR_NO_CATEGORY_FOUND : "¡Categoría de error no encontrada!",

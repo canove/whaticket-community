@@ -870,6 +870,37 @@ const processNode = async (node: any, session: any, body: any) => {
     return { message };
   }
 
+  if (node.type === "template-node") {
+    const reg = await FileRegister.findOne({
+      where: {
+        [Op.or]: [
+          { phoneNumber: session.id } ,
+          { phoneNumber: 
+            { 
+              [Op.or]: [
+                removePhoneNumberWith9Country(session.id),
+                preparePhoneNumber9Digit(session.id),
+                removePhoneNumber9Digit(session.id),
+                removePhoneNumberCountry(session.id),
+                removePhoneNumber9DigitCountry(session.id)
+              ],
+            }
+          }
+        ],
+        companyId: session.companyId,
+        processedAt: { [Op.ne]: null }
+      },
+      order: [["createdAt", "DESC"]]
+    });
+
+    await reg.update({
+      fishingTemplateId: node.templateId,
+      fishingProcessedAt: null
+    });
+
+    return {};
+  }
+
   return {};
 }
 
