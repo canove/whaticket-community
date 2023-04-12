@@ -231,13 +231,13 @@ const RegistersReports = () => {
 
     const getStatus = (register) => {
         if (register.errorAt) {
-            return 'Erro';
+            return i18n.t("logReport.status.error");
         } else if (register.readAt) {
-            return 'Lido';
+            return i18n.t("logReport.status.read");
         } else if (register.deliveredAt) {
-            return 'Entregue';
+            return i18n.t("logReport.status.delivered");
         } else if (register.sentAt) {
-            return 'Enviado';
+            return i18n.t("logReport.status.sent");
         }
         return '';
     }
@@ -284,14 +284,14 @@ const RegistersReports = () => {
 
     const getHaveWhatsapp = (reg) => {
         if (reg.haveWhatsapp === null && reg.sentAt) {
-            return "SIM";
+            return i18n.t("extra.yes");
         }
 
         if (reg.haveWhatsapp === null && !reg.sentAt) {
-            return "DESCONHECIDO";
+            return i18n.t("extra.unknown");
         }
 
-        return reg.haveWhatsapp ? "SIM" : "NÃO";
+        return reg.haveWhatsapp ? i18n.t("extra.yes") : i18n.t("extra.no");
     }
 
     return (
@@ -304,14 +304,14 @@ const RegistersReports = () => {
                             <>
                                 <div style={{ display: "flex", alignItems: "flex-end" }}>
                                     <TextField
-                                        placeholder={"Telefone"}
+                                        placeholder={i18n.t("logReport.form.phoneNumber")}
                                         type="search"
                                         value={phoneNumber}
                                         onChange={(e) => setPhoneNumber(e.target.value)}
                                     />
                                     <TextField
                                         style={{ marginLeft: "8px" }}
-                                        placeholder={"Nome"}
+                                        placeholder={i18n.t("logReport.form.name")}
                                         type="search"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
@@ -335,16 +335,17 @@ const RegistersReports = () => {
                                 </div>
                                 <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "end" }}>
                                     <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
-                                        <InputLabel id="category-label">{"Categoria"}</InputLabel>
+                                        <InputLabel id="category-label">{i18n.t("logReport.form.category")}</InputLabel>
                                         <Select
                                             className={classes.select}
                                             labelId="category-label"
                                             id="category"
+                                            label={i18n.t("logReport.form.category")}
                                             value={categoryIds}
                                             onChange={handleCategoryIDsChange}
                                             multiple
                                         >
-                                            <MenuItem value={"none"}>{"Nenhum"}</MenuItem>
+                                            <MenuItem value={"none"}>{i18n.t("logReport.form.none")}</MenuItem>
                                             {categories && categories.map((category) => {
                                                 return (
                                                     <MenuItem key={category.id} value={category.id}>
@@ -389,7 +390,7 @@ const RegistersReports = () => {
                                             <MenuItem value={"delivered"}>{i18n.t("logReport.select.delivered")}</MenuItem>
                                             <MenuItem value={"read"}>{i18n.t("logReport.select.read")}</MenuItem>
                                             <MenuItem value={"error"}>{i18n.t("logReport.select.errors")}</MenuItem>
-                                            <MenuItem value={"interaction"}>{"Interação"}</MenuItem>
+                                            <MenuItem value={"interaction"}>{i18n.t("logReport.select.interaction")}</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </div>

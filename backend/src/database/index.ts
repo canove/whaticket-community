@@ -13,6 +13,7 @@ import QuickAnswer from "./models/QuickAnswer";
 import File from "./models/File";
 import FileRegister from "./models/FileRegister";
 import WhatsappsConfig from "./models/WhatsappsConfig";
+import GreetingMessageControls from "./models/GreetingMessageControls";
 import GreetingMessages from "./models/GreetingMessages";
 import Company from "./models/Company";
 import Menu from "./models/Menu";
@@ -42,6 +43,7 @@ import ContactBlacklist from "./models/ContactBlacklist";
 import SatisfactionSurveys from "./models/SatisfactionSurveys";
 import SatisfactionSurveyResponses from "./models/SatisfactionSurveyResponses";
 import Packages from "./models/Packages";
+import ExtraUsersControls from "./models/ExtraUsersControls";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -63,6 +65,7 @@ const models = [
   File,
   FileRegister,
   WhatsappsConfig,
+  GreetingMessageControls,
   GreetingMessages,
   Company,
   Menu,
@@ -92,6 +95,7 @@ const models = [
   SatisfactionSurveys,
   SatisfactionSurveyResponses,
   Packages,
+  ExtraUsersControls,
 ];
 
 sequelize.addModels(models);

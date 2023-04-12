@@ -99,8 +99,8 @@ const CreateWhatsAppService = async ({
     }
   }
 
-  if (queueIds.length > 1 && !greetingMessage) {
-    throw new AppError("ERR_WAPP_GREETING_REQUIRED");
+  if (queueIds.length > 1) {
+    throw new AppError("ERR_DOUBLE_QUEUES");
   }
 
   if (!official && (facebookToken || facebookPhoneNumberId || phoneNumber)) {

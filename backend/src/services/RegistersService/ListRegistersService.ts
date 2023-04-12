@@ -35,8 +35,8 @@ const ListRegistersService = async ({
     const files = await File.findAll({
       where: { 
         [Op.or]: [
-          { status: 7 },
-          { status: 2 }, 
+          { status: 7 }, // Recusado
+          { status: 2 }, // Esperando Aprovação
         ],
         companyId
       }
@@ -47,7 +47,10 @@ const ListRegistersService = async ({
 
       whereCondition = {
         ...whereCondition,
-        fileId: { [Op.notIn]: filesArray }
+        [Op.or]: [
+          { fileId: { [Op.notIn]: filesArray } },
+          { fileId: null }
+        ]
       }
     }
   }
@@ -126,7 +129,7 @@ const ListRegistersService = async ({
         [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
         [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL OR blacklist = true")), 'error' ],
         [ Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction' ],
-        [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND haveWhatsapp = 0 AND msgWhatsId IS NULL")), 'noWhats' ],
+        [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND (haveWhatsapp = 0 OR haveWhatsapp IS NULL) AND msgWhatsId IS NULL")), 'noWhats' ],
       ],
       raw: true
     });

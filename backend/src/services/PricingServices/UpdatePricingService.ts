@@ -24,10 +24,10 @@ const UpdatePricingService = async ({
 
   await pricing.update({
     companyId,
-    productId,
+    productId: productId ? productId : null,
     gracePeriod,
     graceTrigger,
-    packageId
+    packageId: packageId ? packageId : null
   });
 
   const updatedPricing = ShowPricingService(pricingId);

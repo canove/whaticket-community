@@ -139,12 +139,12 @@ const CategoryReport = () => {
   return (
     <MainContainer>
       <MainHeader>
-        <Title>{"Relatório de Categoria"}</Title>
+        <Title>{i18n.t("categoryReport.title")}</Title>
         <MainHeaderButtonsWrapper>
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             <TextField
               style={{ marginLeft: "8px" }}
-              placeholder={"Nome"}
+              placeholder={i18n.t("categoryReport.table.name")}
               type="search"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -152,7 +152,7 @@ const CategoryReport = () => {
             <TextField
               style={{ marginLeft: "8px" }}
               onChange={(e) => { setInitialDate(e.target.value) }}
-              label={"Data Inicial"}
+              label={i18n.t("extra.initialDate")}
               InputLabelProps={{ shrink: true, required: true }}
               type="date"
               value={initialDate}
@@ -160,7 +160,7 @@ const CategoryReport = () => {
             <TextField
               style={{ marginLeft: "8px" }}
               onChange={(e) => { setFinalDate(e.target.value) }}
-              label={"Data Final"}
+              label={i18n.t("extra.finalDate")}
               InputLabelProps={{ shrink: true, required: true }}
               type="date"
               value={finalDate}
@@ -171,7 +171,7 @@ const CategoryReport = () => {
               color="primary"
               onClick={ filterReports }
             >
-              {"Filtrar"}
+              {i18n.t("extra.filter")}
             </Button>
             <Button
               style={{ marginLeft: "8px" }}
@@ -180,7 +180,7 @@ const CategoryReport = () => {
               onClick={downloadPDF}
               disabled={creatingPDF}
             >
-              {"Exportar PDF"}
+              {i18n.t("extra.exportPDF")}
             </Button>
             <Button
               style={{ marginLeft: "8px" }}
@@ -189,7 +189,7 @@ const CategoryReport = () => {
               onClick={downloadCSV}
               disabled={creatingCSV}
             >
-              {"Exportar CSV"}
+              {i18n.t("extra.exportCSV")}
             </Button>
           </div>
         </MainHeaderButtonsWrapper>
@@ -198,8 +198,8 @@ const CategoryReport = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{"Nome"}</TableCell>
-              <TableCell align="center">{"Quantidade"}</TableCell>
+              <TableCell align="center">{i18n.t("categoryReport.table.name")}</TableCell>
+              <TableCell align="center">{i18n.t("categoryReport.table.quantity")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

@@ -596,17 +596,26 @@ const messages = {
           initialDate: "Initial date",
           finalDate: "Final date",
           user: "User",
+          categories: "Categories",
+          companies: "Companies",
         },
         table: {
-          messageId: "Message Id",
-          messageBody: "Body Message",
-          read: "Read",
-          mediaURL: "Media URL",
-          ticketId: "Ticket Id",
+          ticketId: "Ticket ID",
+          category: "Category",
+          operator: "Operator",
+          customer: "Customer",
+          sentBy: "Sent By",
+          phoneNumber: "Phone Number",
+          message: "Message",
           date: "Date",
         },
         errors:{
           toastErr: "Fill in all Fields!"
+        },
+        extra: {
+          operator: "Operator",
+          customer: "Customer",
+          bot: "Bot",
         },
       },
 
@@ -622,6 +631,8 @@ const messages = {
           bodyText: "Body Text",
           read: "Read",
           ticketId: "Ticket Id",
+          createdAt: "Created At",
+          category: "Category",
         },
         errors: {
           toastErr: "Select a Call!"
@@ -720,6 +731,16 @@ const messages = {
 
       logReport:{
         title: "Log Reports",
+        form: {
+          phoneNumber: "Phone Number",
+          name: "Name",
+          category: "Category",
+          none: "None",
+        },
+        filter: {
+          show: "Show Filters",
+          hide: "Hide Filters",
+        },
         select:{
           file: "Files",
           status: "Status",
@@ -728,6 +749,7 @@ const messages = {
           delivered: "Delivered",
           read: "Read",
           errors: "Errors",
+          interaction: "Interaction",
         },
         buttons:{
           createPdf: "Create Pdf",
@@ -744,6 +766,17 @@ const messages = {
           read: "Read",
           errors: "Errors",
           status: "Status",
+          phoneNumber: "Phone Number",
+          category: "Category",
+          interaction: "Interaction",
+          processed: "Processed",
+          haveWhatsapp: "Have Whatsapp?",
+        },
+        status: {
+          error: "Error",
+          read: "Read",
+          delivered: "Delivered",
+          sent: "Sent",
         },
       },
 
@@ -1272,6 +1305,7 @@ const messages = {
           registerAmount: "Register Amount",
           createdAt: "Created At",
           updatedAt: "Updated At",
+          actions: "Actions",
         },
       },
 
@@ -1287,6 +1321,8 @@ const messages = {
         true: "True",
         false: "False",
         exportCsv: "Export CSV",
+        noFlow: "No Flow",
+        flowNotFound: "Flow Not Found",
       },
 
       officialPages: {
@@ -1313,6 +1349,45 @@ const messages = {
           cancelButton: "Cancel",
         },
         addConnection: "Add Connection",
+      },
+
+      categoryReport: {
+        title: "Category Report",
+        table: {
+          name: "Name",
+          quantity: "Quantity",
+        },
+      },
+
+      generalReports: {
+        title: "General Report",
+        companies: "Companies",
+        table: {
+          name: "Company Name",
+          imported: "Imported",
+          sent: "Sent",
+          delivered: "Delivered",
+          read: "Read",
+          error: "Error",
+          blacklist: "Blacklist",
+          interaction: "Interaction",
+          noWhats: "No Whatsapp",
+          receivedMessages: "Received Messages",
+          sentMessages: "Sent Messages",
+          total: "TOTAL",
+        }
+      },
+
+      extra: {
+        filter: "Filter",
+        exportPDF: "Export PDF",
+        exportCSV: "Export CSV",
+        initialDate: "Initial Date",
+        finalDate: "Final Date",
+        yes: "Yes",
+        no: "No",
+        unknown: "Unknown",
+        none: "None",
       },
 
       backendErrors: {
@@ -1353,6 +1428,7 @@ const messages = {
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
+        ERR_DOUBLE_QUEUES: "Only one queue allowed.",
         ERR_NO_COMPANY_FOUND: "Error deleting the Company.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "There is already a company with this CNPJ.",
         ERR_NO_CATEGORY_FOUND : "Error category not found!",

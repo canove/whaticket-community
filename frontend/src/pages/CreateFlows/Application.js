@@ -24,6 +24,7 @@ import { JumpNodeFactory } from './nodes/Jump/JumpNodeFactory';
 import { DatabaseSaveNodeFactory } from './nodes/DatabaseSave/DatabaseSaveNodeFactory';
 import { ButtonMessageNodeFactory } from './nodes/ButtonMessage/ButtonMessageNodeFactory';
 import { SatisfactionSurveyNodeFactory } from './nodes/SatisfactionSurvey/SatisfactionSurveyNodeFactory';
+import { TemplateNodeFactory } from './nodes/Template/TemplateNodeFactory';
 
 export class Application {
 	constructor() {
@@ -51,6 +52,7 @@ export class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new DatabaseSaveNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new ButtonMessageNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new SatisfactionSurveyNodeFactory());
+		this.diagramEngine.getNodeFactories().registerFactory(new TemplateNodeFactory());
 
 		this.diagramEngine.getLinkFactories().registerFactory(new AdvancedLinkFactory());
 		this.diagramEngine.getPortFactories().registerFactory(new AdvancedPortFactory());

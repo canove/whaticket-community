@@ -95,7 +95,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
             info = [];
 
             const users: any = await User.findAll({
-                where: { companyId },
+                where: { companyId, deletedAt: null },
                 attributes: [
                     "id", 
                     "name",
@@ -103,7 +103,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
             });
 
             const historics = await User.findAll({
-                where: { companyId },
+                where: { companyId, deletedAt: null },
                 attributes: ["id"],
                 include: [
                     {
@@ -214,7 +214,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                     model: User,
                     as: "user",
                     attributes: ["id", "name"],
-                    required: false
+                    where: { deletedAt: null },
+                    required: false,
                 },
                 {
                     model: Category,

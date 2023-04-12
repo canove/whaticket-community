@@ -29,12 +29,13 @@ const AverageService = async (
       "LIKE",
       `%${searchParam.toLowerCase().trim()}%`
     ),
-    companyId
+    companyId,
+    deletedAt: null
   };
-    const users = await User.findAll({
-      where: whereCondition,
 
-  })
+  const users = await User.findAll({
+    where: whereCondition,
+  });
 
   let averageTimes = [];
 

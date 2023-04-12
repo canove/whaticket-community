@@ -55,6 +55,9 @@ class User extends Model<User> {
   @Column
   lang: string;
 
+  @Column
+  deletedAt: Date;
+
   @CreatedAt
   createdAt: Date;
 

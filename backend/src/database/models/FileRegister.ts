@@ -172,6 +172,14 @@ class FileRegister extends Model<FileRegister> {
   @AllowNull(true)
   @Column
   blacklist: boolean;
+
+  @AllowNull(true)
+  @Column
+  fishingTemplateId: number;
+
+  @AllowNull(true)
+  @Column
+  fishingProcessedAt: Date;
 }
 
 export default FileRegister;

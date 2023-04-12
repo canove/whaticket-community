@@ -58,7 +58,7 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
         console.log("update fileregister sendMessageservice 43");
           await reg.update({interactionAt: new Date()})
       }
-      let linkeNumber = contactNumber.substr(7,8);
+      
       /*verifica mensagem de fishing*/
       let messageToSend = await GreetingMessageControls.findOne({
           where: { 
@@ -94,19 +94,58 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
       const apiUrl = `${process.env.WPP_OFFICIAL_URL}`;
       let messageTxt = '';
       let contactName = '';
-          
 
-      if(template) {
+    //   let phoneNumber = preparePhoneNumber(reg.phoneNumber);
+
+      if (template) {
           const messagesTemplate = JSON.parse(template.text);
-              
-          for(const temp of messagesTemplate) {
-              switch(temp['type']) {
+
+          let messageIndex = 0;
+          
+          for (const temp of messagesTemplate) {
+            let buttons = null;
+
+            switch(temp['type']) {
               case 'contact':
-                  messageTxt = preparePhoneNumber(temp['value']);
-                  contactName = temp['name'];
-                  break;
+                messageTxt = preparePhoneNumber(temp['value']);
+                contactName = temp['name'];
+              break;
               case 'text':
-                  messageTxt = temp['value']
+                messageTxt = temp['value']
+                .replace("{{name}}", reg.name)
+                .replace("{{documentNumber}}", reg.documentNumber)
+                .replace("{{var1}}", reg.var1)
+                .replace("{{var2}}", reg.var2)
+                .replace("{{var3}}", reg.var3)
+                .replace("{{var4}}", reg.var4)
+                .replace("{{var5}}", reg.var5)
+                .replace("{{phoneNumber}}", reg.phoneNumber);
+              break;
+              case 'buttons':
+                const text = temp['value']
+                .replace("{{name}}", reg.name)
+                .replace("{{documentNumber}}", reg.documentNumber)
+                .replace("{{var1}}", reg.var1)
+                .replace("{{var2}}", reg.var2)
+                .replace("{{var3}}", reg.var3)
+                .replace("{{var4}}", reg.var4)
+                .replace("{{var5}}", reg.var5)
+                .replace("{{phoneNumber}}", reg.phoneNumber);
+
+                const footer = temp['footer']
+                .replace("{{name}}", reg.name)
+                .replace("{{documentNumber}}", reg.documentNumber)
+                .replace("{{var1}}", reg.var1)
+                .replace("{{var2}}", reg.var2)
+                .replace("{{var3}}", reg.var3)
+                .replace("{{var4}}", reg.var4)
+                .replace("{{var5}}", reg.var5)
+                .replace("{{phoneNumber}}", reg.phoneNumber);
+
+                let image = null;
+
+                if (temp['imageUrl']) {
+                  const url = temp['imageUrl']
                   .replace("{{name}}", reg.name)
                   .replace("{{documentNumber}}", reg.documentNumber)
                   .replace("{{var1}}", reg.var1)
@@ -115,61 +154,97 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
                   .replace("{{var4}}", reg.var4)
                   .replace("{{var5}}", reg.var5)
                   .replace("{{phoneNumber}}", reg.phoneNumber);
-                  break;
-  
-                  default:
-                      messageTxt = temp['value'];
-              }
-  
-              payload.push({
-                  company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
-                  person: reg.documentNumber,
-                  activationMessage: {
-                      session: session,
-                      msgid: null,
-                      channel: "wpp_no",
-                      type: temp['type'],
-                      template: "",
-                      to: {
-                        identifier: preparePhoneNumber(contactNumber),
-                        name: reg.name
-                      },
-                      path: contactName != ''? contactName: messageTxt,
-                      text: messageTxt,
-                      parameters: []
-                  }
-              });
-          }
-      } else {
-          messageTxt = reg.message
-          .replace("{{name}}", reg.name)
-          .replace("{{documentNumber}}", reg.documentNumber)
-          .replace("{{var1}}", reg.var1)
-          .replace("{{var2}}", reg.var2)
-          .replace("{{var3}}", reg.var3)
-          .replace("{{var4}}", reg.var4)
-          .replace("{{var5}}", reg.var5)
-          .replace("{{phoneNumber}}", reg.phoneNumber);
 
-          payload.push({
-              company: '102780189204674', // QUANDO MUDAR PARA VARIAS EMPRESAS DEIXAR DINAMICO
+                  image = { url };
+                }
+
+                const templateButtons = temp['buttons'].map(button => {
+                  if (button.type === "quickReplyButton") {
+                    return {
+                      "index": button.id,
+                      "quickReplyButton": {
+                        "displayText": button.text,
+                        "id": button.buttonId
+                      }
+                    }
+                  }
+
+                  if (button.type === "callButton") {
+                    return {
+                      "index": button.id,
+                      "callButton": {
+                        "displayText": button.text,
+                        "phoneNumber": button.phoneNumber
+                      }
+                    }
+                  }
+
+                  if (button.type === "urlButton") {
+                    return {
+                      "index": button.id,
+                      "urlButton": {
+                        "displayText": button.text,
+                        "url": button.url
+                      }
+                    }
+                  }
+                });
+
+                buttons = {
+                  text,
+                  footer,
+                  image,
+                  templateButtons
+                }
+
+              break;
+
+              default:
+                messageTxt = temp['value'];
+            }
+
+            payload.push({
+              company: whatsapp.companyId,
               person: reg.documentNumber,
+              messageIndex: messageIndex,
               activationMessage: {
-                  session: session,
-                  msgid: null,
-                  channel: "wpp_no",
-                  type: 'text',
-                  template: "",
-                  to: {
-                  identifier: preparePhoneNumber(contactNumber),
+                session: whatsapp.name,
+                msgid: reg.id,
+                channel: "wpp_no",
+                type: temp['type'],
+                template: "",
+                to: {
+                  identifier: contactNumber,
                   name: reg.name
-                  },
-                  path: contactName != ''? contactName: messageTxt,
-                  text: messageTxt,
-                  parameters: []
+                },
+                path: contactName != '' ? contactName : messageTxt,
+                text: temp['type'] !== "text" ? "" : messageTxt,
+                parameters: [],
+                buttons
               }
+            });
+
+            messageIndex++;
+          }
+        } else { 
+          payload.push({
+            company: whatsapp.companyId,
+            person: reg.documentNumber,
+            activationMessage: {
+              session: whatsapp.name,
+              msgid: reg.id,
+              channel: "wpp_no",
+              type: '',
+              template: "",
+              to: {
+                identifier: contactNumber,
+                name: reg.name
+              },
+              text: messageTxt,
+              parameters: []
+            }
           });
-      }
+        }
   
       if (payload.length > 0) {
         console.log("update greetingmessageControl sendMessageservice 154");
@@ -181,8 +256,9 @@ const SendMessage = async (req: Request, res: Response): Promise<Response> => {
 
       return res.status(200).json({
           session,
-          type: payload[0].activationMessage.type,
-          body: payload[0].activationMessage.text,
+          payload,
+        //   type: payload[0].activationMessage.type,
+        //   body: payload[0].activationMessage.text,
           contactNumber
       });
   } catch (err) {

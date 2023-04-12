@@ -241,7 +241,7 @@ const Reports = () => {
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
-                                    label={"Categorias"}
+                                    label={i18n.t("reports.form.categories")}
                                     InputLabelProps={{ required: true}}
                                 />
                             }
@@ -256,7 +256,7 @@ const Reports = () => {
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
-                                        label={"Empresas"}
+                                        label={i18n.t("reports.form.companies")}
                                         InputLabelProps={{ required: true}}
                                     />
                                 }
@@ -292,7 +292,7 @@ const Reports = () => {
                             onClick={ downloadPdf }
                             disabled={ creatingPDF }
                         >
-                            {"Exportar PDF"}
+                            {i18n.t("extra.exportPDF")}
                         </Button>
                     </div>
                 </MainHeaderButtonsWrapper>
@@ -304,14 +304,14 @@ const Reports = () => {
                 <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell align="center">{"ID do Ticket"}</TableCell>
-                        <TableCell align="center">{"Categoria"}</TableCell>
-                        <TableCell align="center">{"Operador"}</TableCell>
-                        <TableCell align="center">{"Cliente"}</TableCell>
-                        <TableCell align="center">{"Enviado Por"}</TableCell>
-                        <TableCell align="center">{"Telefone"}</TableCell>
-                        <TableCell align="center">{"Mensagem"}</TableCell>
-                        <TableCell align="center">{"Data"}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.ticketId")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.category")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.operator")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.customer")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.sentBy")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.phoneNumber")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.message")}</TableCell>
+                        <TableCell align="center">{i18n.t("reports.table.date")}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -320,10 +320,10 @@ const Reports = () => {
                             <TableRow key={message.id}>
                                 <TableCell align="center">{message.ticketId}</TableCell>
                                 <TableCell align="center">{message.ticket.category ? message.ticket.category.name : ""}</TableCell>
-                                <TableCell align="center">{message.ticket.user ? message.ticket.user.name : "BOT"}</TableCell>
-                                <TableCell align="center">{(message.ticket.contact && message.ticket.contact.name) ? message.ticket.contact.name : "DESCONHECIDO"}</TableCell>
-                                <TableCell align="center">{message.fromMe ? "OPERADOR" : "CLIENTE"}</TableCell>
-                                <TableCell align="center">{(message.ticket.contact && message.ticket.contact.number) ? message.ticket.contact.number : "DESCONHECIDO"}</TableCell>
+                                <TableCell align="center">{message.ticket.user ? message.ticket.user.name : i18n.t("reports.extra.bot")}</TableCell>
+                                <TableCell align="center">{(message.ticket.contact && message.ticket.contact.name) ? message.ticket.contact.name : i18n.t("extra.unknown")}</TableCell>
+                                <TableCell align="center">{message.fromMe ? i18n.t("reports.extra.operator") : i18n.t("reports.extra.customer")}</TableCell>
+                                <TableCell align="center">{(message.ticket.contact && message.ticket.contact.number) ? message.ticket.contact.number : i18n.t("extra.unknown")}</TableCell>
                                 <TableCell align="center">{message.mediaUrl ? `[MEDIA_URL: ${message.mediaUrl}]${message.body}` : message.body}</TableCell>
                                 <TableCell align="center">{format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}</TableCell>
                             </TableRow>

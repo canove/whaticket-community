@@ -111,7 +111,7 @@ const StatusMessageWhatsappService = async ({
   console.log("update FileRegister statusmessageservice 103");
   switch(statusType.toLowerCase()){
     case "sent":
-      await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId });
+      await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId, haveWhatsapp: true });
 
       try {
         const client = createClient({
@@ -327,10 +327,10 @@ const StatusMessageWhatsappService = async ({
           await register?.update({ processedAt: null, whatsappId: null, sentAt: null });
           break;
     case "delivered":
-      await register?.update({ deliveredAt: new Date() });
+      await register?.update({ deliveredAt: new Date(), haveWhatsapp: true });
       break;
     case "read":
-      await register?.update({ readAt: new Date() });
+      await register?.update({ readAt: new Date(), haveWhatsapp: true });
       break;
     case "error":
       await register?.update({ sentAt: new Date(), errorAt: new Date(), errorMessage: errorMessage });
