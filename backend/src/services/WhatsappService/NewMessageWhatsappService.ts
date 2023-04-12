@@ -223,26 +223,30 @@ const handleMessage = async (
 
     const company = await ShowCompanyService(whatsapp.companyId);
 
-    if (company.onlyOwnedMessages) {
-      const reg = await FileRegister.findOne({
-        where: { 
-            companyId: whatsapp.companyId,
-            phoneNumber: 
-              { 
-                [Op.or]: [
-                  removePhoneNumberWith9Country(contact.number),
-                  preparePhoneNumber9Digit(contact.number),
-                  removePhoneNumber9Digit(contact.number),
-                  removePhoneNumberCountry(contact.number),
-                  removePhoneNumber9DigitCountry(contact.number)
-                ],
-              },
-            whatsappId: whatsapp.id
-        },
-        order: [['createdAt', 'DESC']]
-      });
+    const reg = await FileRegister.findOne({
+      where: { 
+          companyId: whatsapp.companyId,
+          phoneNumber: 
+            { 
+              [Op.or]: [
+                removePhoneNumberWith9Country(contact.number),
+                preparePhoneNumber9Digit(contact.number),
+                removePhoneNumber9Digit(contact.number),
+                removePhoneNumberCountry(contact.number),
+                removePhoneNumber9DigitCountry(contact.number)
+              ],
+            },
+          whatsappId: whatsapp.id
+      },
+      order: [['createdAt', 'DESC']]
+    });
 
-      if (!reg) throw `company only owned messages: reg not found in this company.`;
+    if (company.onlyOwnedMessages && !reg) {
+      throw `company only owned messages: reg not found in this company.`;
+    }
+
+    if (reg) {
+      reg.update({ interactionAt: new Date() });
     }
 
     let ticket = null;
