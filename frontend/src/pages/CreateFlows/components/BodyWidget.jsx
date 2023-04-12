@@ -36,6 +36,7 @@ import { JumpNodeModel } from '../nodes/Jump/JumpNodeModel';
 import { DatabaseSaveNodeModel } from '../nodes/DatabaseSave/DatabaseSaveNodeModel';
 import { ButtonMessageNodeModel } from '../nodes/ButtonMessage/ButtonMessageNodeModel';
 import { SatisfactionSurveyNodeModel } from '../nodes/SatisfactionSurvey/SatisfactionSurveyNodeModel';
+import { TemplateNodeModel } from '../nodes/Template/TemplateNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -167,6 +168,12 @@ export class BodyWidget extends React.Component {
 							color="#25D366"
 							icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
 						/>
+						<TrayItemWidget
+							model={{ type: 'template' }}
+							name="Templates"
+							color="#25D366"
+							icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+						/>
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {
@@ -255,6 +262,11 @@ export class BodyWidget extends React.Component {
 								break;
 								case 'satisfaction-survey':
 									node = new SatisfactionSurveyNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'template':
+									node = new TemplateNodeModel();
 									node.addPort(new AdvancedPortModel(true, 'in'));
 									node.addPort(new AdvancedPortModel(false, 'out'));
 								break;

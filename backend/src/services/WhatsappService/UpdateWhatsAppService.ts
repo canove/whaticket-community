@@ -83,9 +83,9 @@ const UpdateWhatsAppService = async ({
     throw new AppError(err.message);
   }
 
-  // if (!official && queueIds.length > 1 && !greetingMessage) {
-  //   throw new AppError("ERR_WAPP_GREETING_REQUIRED");
-  // }
+  if (queueIds.length > 1) {
+    throw new AppError("ERR_DOUBLE_QUEUES");
+  }
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
 
