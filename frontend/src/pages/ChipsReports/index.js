@@ -198,7 +198,7 @@ const ChipsReports = () => {
                             <TableCell align="center">{i18n.t("chipReports.grid.registerAmount")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.createdAt")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.updatedAt")}</TableCell>
-                            <TableCell align="center">{"Ações"}</TableCell>
+                            <TableCell align="center">{i18n.t("chipReports.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

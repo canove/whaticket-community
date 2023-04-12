@@ -12,7 +12,6 @@ import CreateHistoricService from "../services/HistoricServices/CreateHistoricSe
 
 interface ProductData {
   name: string;
-  monthlyFee: number;
   triggerFee: number;
   monthlyInterestRate: number;
   penaltyMount: number;
@@ -41,7 +40,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const {
     name,
-    monthlyFee,
     triggerFee,
     monthlyInterestRate,
     penaltyMount,
@@ -51,7 +49,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const product = await CreateProductService({
     name,
-    monthlyFee,
     triggerFee,
     monthlyInterestRate,
     penaltyMount,

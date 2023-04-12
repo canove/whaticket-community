@@ -32,6 +32,7 @@ import ShowUserService from "../services/UserServices/ShowUserService";
 import ListAllTicketsService from "../services/TicketServices/ListAllTicketsService";
 import SatisfactionSurveyResponses from "../database/models/SatisfactionSurveyResponses";
 import ShowSatisfactionSurveyService from "../services/SatisfactionSurveyService/ShowSatisfactionSurveyService";
+import AppError from "../errors/AppError";
 
 type IndexQuery = {
   searchParam: string;
@@ -295,6 +296,9 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
 
 export const remove = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
+  const { companyId, profile } = req.user;
+
+  if (profile !== 1 || companyId !== 1) throw new AppError("NO_PERMISSION");
 
   const ticket = await DeleteTicketService(ticketId);
 

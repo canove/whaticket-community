@@ -167,8 +167,8 @@ const ReportsTicket = () => {
               <TableCell align="center">{i18n.t("reportsTicket.grid.messageId")}</TableCell>
               <TableCell align="center">{i18n.t("reportsTicket.grid.bodyText")}</TableCell>
               <TableCell align="center">{i18n.t("reportsTicket.grid.read")}</TableCell>
-              <TableCell align="center">{"Criado em"}</TableCell>
-              <TableCell align="center">{"Categoria"}</TableCell>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.createdAt")}</TableCell>
+              <TableCell align="center">{i18n.t("reportsTicket.grid.category")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -178,7 +178,7 @@ const ReportsTicket = () => {
                   <TableCell align="center">{report.ticketId}</TableCell>
                   <TableCell align="center">{report.id}</TableCell>
                   <TableCell align="center">{report.body}</TableCell>
-                  <TableCell align="center">{report.read ? "SIM" : "NÃO"}</TableCell>
+                  <TableCell align="center">{report.read ? i18n.t("extra.yes") : i18n.t("extra.no")}</TableCell>
                   <TableCell align="center">{format(parseISO(report.createdAt), "dd/MM/yy HH:mm")}</TableCell>
                   <TableCell align="center">{ticket.category ? ticket.category.name : ""}</TableCell>
                 </TableRow>

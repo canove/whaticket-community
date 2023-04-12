@@ -30,6 +30,7 @@ import TransferWhatsAppService from "../services/WhatsappService/TransferWhatsAp
 import ListReportWhatsAppsService from "../services/WhatsappService/ListReportWhatsAppsService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import { Op } from "sequelize";
+import CheckAvailableWhatsapps from "../services/WhatsappService/CheckAvailableWhatsapps";
 
 interface WhatsappData {
   name: string;
@@ -93,6 +94,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   const { companyId } = req.user;
+
+  const availableWhatsapps = await CheckAvailableWhatsapps(companyId);
+
+  if (!availableWhatsapps) throw new AppError("ERR_MAX_WHATSAPPS_REACHED");
 
   /*
   const apiUrl = `${process.env.WPPNOF_URL}/checkAvailableCompany`;

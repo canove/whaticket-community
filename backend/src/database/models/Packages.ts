@@ -6,8 +6,10 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  AllowNull
+  AllowNull,
+  HasMany
 } from "sequelize-typescript";
+import Pricing from "./Pricing";
 
 @Table
 class Packages extends Model<Packages> {
@@ -22,6 +24,9 @@ class Packages extends Model<Packages> {
   
   @Column
   maxUsers: number;
+
+  @Column
+  monthlyFee: number;
   
   @Column
   extraUserPrice: number;
@@ -33,6 +38,9 @@ class Packages extends Model<Packages> {
   extraTicketPrice: number;
   
   @Column
+  maxWhatsapps: number;
+
+  @Column
   whatsappMonthlyPrice: number;
 
   @CreatedAt
@@ -40,6 +48,9 @@ class Packages extends Model<Packages> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @HasMany(() => Pricing, "packageId")
+  pricings: Pricing[];
 }
 
 export default Packages;

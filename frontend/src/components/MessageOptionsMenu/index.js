@@ -66,11 +66,11 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl, whatsapp
         open={menuOpen}
         onClose={handleClose}
       >
-        {message.fromMe && (
+        {/* {message.fromMe && (
           <MenuItem onClick={handleOpenConfirmationModal}>
             {i18n.t("messageOptionsMenu.delete")}
           </MenuItem>
-        )}
+        )} */}
         <MenuItem onClick={hanldeReplyMessage}>
           {i18n.t("messageOptionsMenu.reply")}
         </MenuItem>

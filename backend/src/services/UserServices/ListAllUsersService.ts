@@ -13,7 +13,7 @@ const ListAllUsersService = async ({
 }: Request): Promise<User[]> => {
   let whereCondition = null;
 
-  whereCondition = { companyId };
+  whereCondition = { companyId, deletedAt: null };
 
   const users = await User.findAll({
     where: whereCondition,

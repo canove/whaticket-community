@@ -92,6 +92,9 @@ class Ticket extends Model<Ticket> {
   category: Category;
 
   @Column
+  billingProcessedAt: Date
+
+  @Column
   finalizedAt: Date;
 }
 

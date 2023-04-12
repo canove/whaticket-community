@@ -52,7 +52,6 @@ const ProductModal = ({ open, onClose, productId }) => {
 	const { i18n } = useTranslation();
 
 	const [name, setName] = useState("");
-	const [monthlyFee, setMonthlyFee] = useState(0.0);
 	const [triggerFee, setTriggerFee] = useState(0.0);
 	const [monthlyInterestRate, setMonthlyInterestRate] = useState(0.0);
 	const [penaltyMount, setPenaltyMount] = useState(0.0);
@@ -61,7 +60,6 @@ const ProductModal = ({ open, onClose, productId }) => {
 	
 	const handleClose = () => {
 		setName("");
-		setMonthlyFee(0.0);
 		setTriggerFee(0.0);
 		setMonthlyInterestRate(0.0);
 		setPenaltyMount(0.0);
@@ -72,11 +70,6 @@ const ProductModal = ({ open, onClose, productId }) => {
 
 	const handleNameChange = (e) =>{
 		setName(e.target.value);
-	};
-
-	const handleMonthyFee = (e, value) =>{
-		e.preventDefault();
-		setMonthlyFee(value);
 	};
 
 	const handleTriggerFee = (e, value) =>{
@@ -110,7 +103,6 @@ const ProductModal = ({ open, onClose, productId }) => {
 			try {
 				const { data } = await api.get(`/products/${productId}`);
 				setName(data.name);
-				setMonthlyFee(data.monthlyFee || 0.0);
 				setTriggerFee(data.triggerFee || 0.0);
 				setMonthlyInterestRate(data.monthlyInterestRate || 0.0);
 				setPenaltyMount(data.penaltyMount || 0.0);
@@ -126,7 +118,6 @@ const ProductModal = ({ open, onClose, productId }) => {
 	const handleSubmit = async () => {
 		const productData = {
 			name: name,
-			monthlyFee: monthlyFee,
 			triggerFee: triggerFee,
 			monthlyInterestRate: monthlyInterestRate,
 			penaltyMount: penaltyMount,
@@ -191,15 +182,6 @@ const ProductModal = ({ open, onClose, productId }) => {
 					onChange={handleNameChange}
                   />
                 </div>
-					<Typography variant="subtitle1">{i18n.t("product.productModal.monthValue")}</Typography>
-					<IntlCurrencyInput
-						name="monthlyFee"
-						value={monthlyFee}
-						onChange={handleMonthyFee}
-						config={currencyConfig}
-						currency="BRL"
-						style={{width:"100%", padding:"10px", fontSize:"16px"}}
-					/>
 					<Typography variant="subtitle1">{i18n.t("product.productModal.shotsValue")}</Typography>
 					<IntlCurrencyInput
 						name="triggerFee"

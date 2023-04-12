@@ -225,7 +225,6 @@ const Products = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">{i18n.t("product.grid.productName")}</TableCell>
-                            <TableCell align="center">{i18n.t("product.grid.monthValue")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.tripCostValue")}</TableCell>
                             <TableCell align="center">{"Valor por Mensagem Recebida"}</TableCell>
                             <TableCell align="center">{"Valor por Mensagem Enviada"}</TableCell>
@@ -239,7 +238,6 @@ const Products = () => {
                         {products && products.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell align="center">{product.name}</TableCell>
-                                <TableCell align="center">{formatToBRL(product.monthlyFee)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.triggerFee)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.receivedMessageFee)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.sentMessageFee)}</TableCell>
@@ -270,7 +268,7 @@ const Products = () => {
                                 </TableCell>
                             </TableRow>
                             ))}
-                        {loading && <TableRowSkeleton columns={6} />}
+                        {loading && <TableRowSkeleton columns={7} />}
                     </TableBody>
                 </Table>
         </Paper>

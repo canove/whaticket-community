@@ -149,7 +149,7 @@ const Packages = () => {
     const handleDeletePackage = async (deletingId) => {
         try {
             await api.delete(`/packages/${deletingId}`);
-            toast.success(i18n.t("pack.confirmation.delete"));
+            toast.success("Pacote deletado com sucesso!");
         } catch (err) {
             toastError(err);
         }
@@ -162,13 +162,6 @@ const Packages = () => {
         let money = quantity.toFixed(2);
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
     }
-
-    // function formatReal(num) {
-    //     var p = num.toFixed(2).split(".");
-    //     return "R$ " + p[0].split("").reverse().reduce(function(acc, num, i) {
-    //         return num + (num !== "-" && i && !(i % 3) ? "." : "") + acc;
-    //     }, "") + "," + p[1];
-    // };
 
     const handleOpenHistoricModal = (pricing) => {
         setSelectedHistoric(pricing);
@@ -196,14 +189,12 @@ const Packages = () => {
                 systemChange={2}
             />
             <ConfirmationModal
-                title={
-                deletingPackage &&
-                `${i18n.t("pack.confirmation.title")}`}
+                title={'Deletar Pacote'}
                 open={confirmModalOpen}
                 onClose={setConfirmModalOpen}
                 onConfirm={() => handleDeletePackage(deletingPackage.id)}
             >
-                {i18n.t("pack.confirmation.confirmDelete")}
+                {"Você tem certeza que deseja deletar este pacote?"}
             </ConfirmationModal>
             <MainHeader>
                 <Title>{"Pacotes"}</Title>
@@ -225,10 +216,12 @@ const Packages = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">{"Nome"}</TableCell>
+                            <TableCell align="center">{"Mensalidade"}</TableCell>
                             <TableCell align="center">{"Máx. Usuários"}</TableCell>
                             <TableCell align="center">{"Preço por Usuário Extra"}</TableCell>
                             <TableCell align="center">{"Máx. Tickets por Mês"}</TableCell>
                             <TableCell align="center">{"Preço por Ticket Extra"}</TableCell>
+                            <TableCell align="center">{"Máx. Whatsapps"}</TableCell>
                             <TableCell align="center">{"Mensalidade por Número Conectado"}</TableCell>
                             <TableCell align="center">{"Ações"}</TableCell>
                         </TableRow>
@@ -238,10 +231,12 @@ const Packages = () => {
                         {packages && packages.map((pack) => (
                             <TableRow key={pack.id}>
                                 <TableCell align="center">{pack.name}</TableCell>
+                                <TableCell align="center">{formatToBRL(pack.monthlyFee)}</TableCell>
                                 <TableCell align="center">{pack.maxUsers}</TableCell>
                                 <TableCell align="center">{formatToBRL(pack.extraUserPrice)}</TableCell>
                                 <TableCell align="center">{pack.maxTicketsByMonth}</TableCell>
                                 <TableCell align="center">{formatToBRL(pack.extraTicketPrice)}</TableCell>
+                                <TableCell align="center">{pack.maxWhatsapps}</TableCell>
                                 <TableCell align="center">{formatToBRL(pack.whatsappMonthlyPrice)}</TableCell>
                                 <TableCell align="center">
                                     <IconButton
@@ -268,7 +263,7 @@ const Packages = () => {
                                 </TableCell>
                             </TableRow>
                             ))}
-                        {loading && <TableRowSkeleton columns={7} />}
+                        {loading && <TableRowSkeleton columns={9} />}
                     </TableBody>
                 </Table>
         </Paper>

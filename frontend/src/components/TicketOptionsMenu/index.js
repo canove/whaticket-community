@@ -13,7 +13,7 @@ import Can from "../Can";
 import { toast } from "react-toastify";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
-	const [confirmationOpen, setConfirmationOpen] = useState(false);
+	// const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
 	const [blacklistModalOpen, setBlacklistModalOpen] = useState(false);
 	const isMounted = useRef(true);
@@ -26,13 +26,13 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		};
 	}, []);
 
-	const handleDeleteTicket = async () => {
-		try {
-			await api.delete(`/tickets/${ticket.id}`);
-		} catch (err) {
-			toastError(err);
-		}
-	};
+	// const handleDeleteTicket = async () => {
+	// 	try {
+	// 		await api.delete(`/tickets/${ticket.id}`);
+	// 	} catch (err) {
+	// 		toastError(err);
+	// 	}
+	// };
 
 	const handleBlacklistContact = async () => {
 		try {
@@ -43,10 +43,10 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		}
 	}
 
-	const handleOpenConfirmationModal = e => {
-		setConfirmationOpen(true);
-		handleClose();
-	};
+	// const handleOpenConfirmationModal = e => {
+	// 	setConfirmationOpen(true);
+	// 	handleClose();
+	// };
 
 	const handleOpenBlacklistConfirmationModal = e => {
 		setBlacklistModalOpen(true);
@@ -88,16 +88,16 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				<MenuItem onClick={handleOpenBlacklistConfirmationModal}>
 					{"Adicionar a Blacklist"}
 				</MenuItem>
-				<Can
+				{/* <Can
 					permission="ticket-options:deleteTicket"
 					item={
 						<MenuItem onClick={handleOpenConfirmationModal}>
 							{i18n.t("ticketOptionsMenu.delete")}
 						</MenuItem>
 					}
-				/>
+				/> */}
 			</Menu>
-			<ConfirmationModal
+			{/* <ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${
 					ticket.id
 				} ${i18n.t("ticketOptionsMenu.confirmationModal.titleFrom")} ${
@@ -108,7 +108,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				onConfirm={handleDeleteTicket}
 			>
 				{i18n.t("ticketOptionsMenu.confirmationModal.message")}
-			</ConfirmationModal>
+			</ConfirmationModal> */}
 			<ConfirmationModal
 				title={`${ticket.contact.name} - ${ticket.contact.number}`}
 				open={blacklistModalOpen}

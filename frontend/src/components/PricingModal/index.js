@@ -120,12 +120,12 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 	}, [open, pricingId])
 
 	useEffect(() => {
-		if (company && product && typeof gracePeriod === "number" && typeof graceTrigger === "number") {
+		if (company && (product || packageId) && typeof gracePeriod === "number" && typeof graceTrigger === "number") {
 			setDisableButton(false);
 		} else {
 			setDisableButton(true);
 		}
-	}, [company, product, gracePeriod, graceTrigger])
+	}, [company, product, packageId, gracePeriod, graceTrigger])
 
 	const handleClose = () => {
 		onClose();
@@ -249,11 +249,11 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 							fullWidth
 						>
 							<InputLabel id="product-select-label">
-								{i18n.t("pricing.pricingModal.product")}
+								{i18n.t("pricing.pricingModal.product") + " (Disparos)"}
 							</InputLabel>
 							<Select
 								labelId="product-select-label"
-								label="Produto"
+								label="Produto (Disparos)"
 								id="product-select"
 								value={product}
 								onChange={handleProductChange}
@@ -275,11 +275,11 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 							fullWidth
 						>
 							<InputLabel id="package-select-label">
-								{"Pacote"}
+								{"Pacote (Plataforma)"}
 							</InputLabel>
 							<Select
 								labelId="package-select-label"
-								label="Pacote"
+								label="Pacote (Plataforma)"
 								id="package-select"
 								value={packageId}
 								onChange={(e) => setPackageId(e.target.value)}

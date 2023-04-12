@@ -2,7 +2,6 @@ import Product from "../../database/models/Products";
 
 interface Request {
   name: string;
-  monthlyFee: number;
   triggerFee: number;
   monthlyInterestRate: number;
   penaltyMount: number;
@@ -12,7 +11,6 @@ interface Request {
 
 const CreateProductService = async ({
   name,
-  monthlyFee,
   triggerFee,
   monthlyInterestRate,
   penaltyMount,
@@ -21,7 +19,6 @@ const CreateProductService = async ({
 }: Request): Promise<Product> => {
   const product = await Product.create({
     name,
-    monthlyFee,
     triggerFee,
     monthlyInterestRate,
     penaltyMount,

@@ -598,17 +598,26 @@ const messages = {
           initialDate: "Fecha inicial",
           finalDate: "Fecha final",
           user: "Usuario",
+          categories: "Categories",
+          companies: "Companies",
         },
         table: {
-          messageId: "Mensaje Id",
-          messageBody: "Cuerpo del Mensaje",
-          read: "Leer",
-          mediaURL: "URL de Medios",
-          ticketId: "Identificación de Entradas",
-          date: "Fecha",
+          ticketId: "Ticket ID",
+          category: "Category",
+          operator: "Operator",
+          customer: "Customer",
+          sentBy: "Sent By",
+          phoneNumber: "Phone Number",
+          message: "Message",
+          date: "Date",
         },
         errors:{
           toastErr: "¡Complete todos los campos!"
+        },
+        extra: {
+          operator: "Operator",
+          customer: "Customer",
+          bot: "Bot",
         },
       },
 
@@ -624,6 +633,8 @@ const messages = {
           bodyText: "Cuerpo del Mensaje",
           read: "Leer",
           ticketId: "Id de llamadas",
+          createdAt: "Created At",
+          category: "Category",
         },
         errors: {
           toastErr: "¡Seleccione una llamada!"
@@ -722,6 +733,16 @@ const messages = {
         },
         logReport:{
           title: "Informes de Registro",
+          form: {
+            phoneNumber: "Phone Number",
+            name: "Name",
+            category: "Category",
+            none: "None",
+          },
+          filter: {
+            show: "Show Filters",
+            hide: "Hide Filters",
+          },
           select:{
             file: "Archivo",
             status: "Estado",
@@ -730,6 +751,7 @@ const messages = {
             delivered: "Repartido",
             read: "Leer",
             errors: "Errores",
+            interaction: "Interaction",
           },
           buttons:{
             createPdf: "Crea Pdf",
@@ -746,6 +768,17 @@ const messages = {
             read: "Leer",
             errors: "Errores",
             status: "Status",
+            phoneNumber: "Phone Number",
+            category: "Category",
+            interaction: "Interaction",
+            processed: "Processed",
+            haveWhatsapp: "Have Whatsapp?",
+          },
+          status: {
+            error: "Error",
+            read: "Read",
+            delivered: "Delivered",
+            sent: "Sent",
           },
         },
 
@@ -1274,6 +1307,7 @@ const messages = {
           registerAmount: "Register Amount",
           createdAt: "Created At",
           updatedAt: "Updated At",
+          actions: "Actions",
         },
       },
 
@@ -1289,6 +1323,8 @@ const messages = {
         true: "True",
         false: "False",
         exportCsv: "Export CSV",
+        noFlow: "No Flow",
+        flowNotFound: "Flow Not Found",
       },
 
       officialPages: {
@@ -1315,6 +1351,45 @@ const messages = {
           cancelButton: "Cancel",
         },
         addConnection: "Add Connection",
+      },
+
+      generalReports: {
+        title: "General Report",
+        companies: "Companies",
+        table: {
+          name: "Company Name",
+          imported: "Imported",
+          sent: "Sent",
+          delivered: "Delivered",
+          read: "Read",
+          error: "Error",
+          blacklist: "Blacklist",
+          interaction: "Interaction",
+          noWhats: "No Whatsapp",
+          receivedMessages: "Received Messages",
+          sentMessages: "Sent Messages",
+          total: "TOTAL",
+        }
+      },
+
+      categoryReport: {
+        title: "Category Report",
+        table: {
+          name: "Name",
+          quantity: "Quantity",
+        },
+      },
+
+      extra: {
+        filter: "Filter",
+        exportPDF: "Export PDF",
+        exportCSV: "Export CSV",
+        initialDate: "Initial Date",
+        finalDate: "Final Date",
+        yes: "Yes",
+        no: "No",
+        unknown: "Unknown",
+        none: "None",
       },
 
       backendErrors: {

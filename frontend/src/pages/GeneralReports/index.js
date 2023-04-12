@@ -129,7 +129,7 @@ const GeneralReports = () => {
   return (
     <MainContainer>
       <MainHeader>
-        <Title>Relatório Geral</Title>
+        <Title>{i18n.t("generalReports.title")}</Title>
         <MainHeaderButtonsWrapper>
           <Autocomplete
             style={{ marginLeft: "10px" }}
@@ -140,7 +140,7 @@ const GeneralReports = () => {
             renderInput={(params) =>
               <TextField
                 {...params}
-                label={"Empresas"}
+                label={i18n.t("generalReports.companies")}
                 InputLabelProps={{ required: true}}
               />
             }
@@ -180,17 +180,17 @@ const GeneralReports = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{"Nome da Empresa"}</TableCell>
-              <TableCell align="center">{"Importados"}</TableCell>
-              <TableCell align="center">{"Enviados"}</TableCell>
-              <TableCell align="center">{"Entregues"}</TableCell>
-              <TableCell align="center">{"Lidos"}</TableCell>
-              <TableCell align="center">{"Erros"}</TableCell>
-              <TableCell align="center">{"Blacklist"}</TableCell>
-              <TableCell align="center">{"Interações"}</TableCell>
-              <TableCell align="center">{"Sem Whatsapp"}</TableCell>
-              <TableCell align="center">{"Mensagens Trafegadas Enviadas"}</TableCell>
-              <TableCell align="center">{"Mensagens Trafegadas Recebidas"}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.name")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.imported")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.sent")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.delivered")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.read")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.error")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.blacklist")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.interaction")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.noWhats")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.sentMessages")}</TableCell>
+              <TableCell align="center">{i18n.t("generalReports.table.receivedMessages")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -211,7 +211,7 @@ const GeneralReports = () => {
                 </TableRow>
               ))}
               <TableRow>
-                <TableCell align="center">{"TOTAL"}</TableCell>
+                <TableCell align="center">{i18n.t("generalReports.table.total")}</TableCell>
                 <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
                     const value = report.total ? parseInt(report.total) : 0;
