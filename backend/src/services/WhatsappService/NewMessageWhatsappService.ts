@@ -246,7 +246,7 @@ const handleMessage = async (
     }
 
     if (reg) {
-      reg.update({ interactionAt: new Date() });
+      await reg.update({ interactionAt: new Date() });
     }
 
     let ticket = null;
