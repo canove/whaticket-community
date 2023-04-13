@@ -48,7 +48,7 @@ const RegistersReports = () => {
     const [statuses, setStatuses] = useState([]);
     const [registers, setRegisters] = useState([]);
     const [pdf, setPdf] = useState("");
-    const [csv, setCsv] = useState("");
+    const [csv, setCSV] = useState("");
     const [pageNumber, setPageNumber] = useState(1);
 	const [count, setCount] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
@@ -80,7 +80,7 @@ const RegistersReports = () => {
 
         const fetchCategories = async () => {
             try {
-                const { data } = await api.get('/connectionFiles');
+                const { data } = await api.get('/category');
                 setCategories(data);
             } catch (err) {
                 toastError(err);
@@ -104,7 +104,8 @@ const RegistersReports = () => {
                     categoryIds
                 }
             });
-            setCsv(data);
+
+            setCSV(data);
             return data;
         } catch (err) {
             toastError(err);
@@ -174,7 +175,7 @@ const RegistersReports = () => {
     const filterReport = async () => {
         setPageNumber(1);
         setPdf("");
-        setCsv("");
+        setCSV("");
         await fetchReport();
     }
 
@@ -259,7 +260,7 @@ const RegistersReports = () => {
         downloadLink.click();
     }
 
-    const downloadCsv = async () => {
+    const downloadCSV = async () => {
         let newCSV = null;
 
         if (!csv) {
@@ -268,18 +269,21 @@ const RegistersReports = () => {
             setCreatingCSV(false);
         }
 
-        let universalBOM = "\uFEFF";
-
-        const selectedCSV = newCSV ? newCSV : csv;
-        const splittedCSV = selectedCSV.split("data:text/csv;charset=utf-8,");
-
-        const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + universalBOM + splittedCSV[1]);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "report.csv");
-        document.body.appendChild(link);
-
-        link.click();
+        const file = new Blob([newCSV ? newCSV : csv], { type: 'text/csv;charset=utf-8;' });
+        if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(file, "report.csv");
+        } else {
+            const link = document.createElement("a"),
+            url = URL.createObjectURL(file);
+            link.href = url;
+            link.download = "report.csv";
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(function() {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);  
+            }, 0); 
+        }
     }
 
     const getHaveWhatsapp = (reg) => {
@@ -292,6 +296,16 @@ const RegistersReports = () => {
         }
 
         return reg.haveWhatsapp ? i18n.t("extra.yes") : i18n.t("extra.no");
+    }
+
+    const getCategory = (reg) => {
+        const message = reg.messageData;
+        const ticket = message ? message.ticket : null;
+        const category = ticket ? ticket.category : null;
+
+        if (category) return category.name;
+
+        return "";
     }
 
     return (
@@ -419,7 +433,7 @@ const RegistersReports = () => {
                                 style={{ marginLeft: "8px" }}
                                 variant="contained"
                                 color="primary"
-                                onClick={downloadCsv}
+                                onClick={downloadCSV}
                                 disabled={creatingCSV}
                             >
                                 {i18n.t("logReport.buttons.exportCsv")}
@@ -462,7 +476,7 @@ const RegistersReports = () => {
                                     <TableRow key={index}>
                                         <TableCell align="center">{register.name}</TableCell>
                                         <TableCell align="center">{register.phoneNumber}</TableCell>
-                                        <TableCell align="center">{(register.file && register.file.connectionFile) ? register.file.connectionFile.name : ""}</TableCell>
+                                        <TableCell align="center">{getCategory(register)}</TableCell>
                                         <TableCell align="center">{getStatus(register)}</TableCell>
                                         <TableCell align="center">{formatDate(register.sentAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.deliveredAt)}</TableCell>

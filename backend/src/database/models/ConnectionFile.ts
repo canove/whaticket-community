@@ -26,6 +26,12 @@ class ConnectionFiles extends Model<ConnectionFiles> {
   @Column
   icon: string;
 
+  @Column
+  greetingMessage: string;
+
+  @Column
+  farewellMessage: string;
+
   @AllowNull(true)
   @Column
   triggerInterval: number;

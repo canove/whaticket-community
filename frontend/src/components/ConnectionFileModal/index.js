@@ -20,6 +20,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import IntlCurrencyInput from "react-intl-currency-input";
+import { Field } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
     "& > *:not(:last-child)": {
       marginRight: theme.spacing(1),
     },
-    marginBottom: "16px",
   },
 
   btnWrapper: {
@@ -58,14 +58,18 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
 
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("");
+  const [greetingMessage, setGreetingMessage] = useState("");
+  const [farewellMessage, setFarewellMessage] = useState("");
   const [triggerInterval, setTriggerInterval] = useState(2);
   const [useTriggerInterval, setUseTriggerInterval] = useState(false);
 
   const handleClose = () => {
     setName("");
     setIcon("");
+    setGreetingMessage("");
+    setFarewellMessage("");
     setTriggerInterval(2);
-	setUseTriggerInterval(false);
+    setUseTriggerInterval(false);
     onClose();
   };
 
@@ -87,11 +91,13 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
         const { data } = await api.get(`/connectionFiles/${connectionFileId}`);
         setName(data.name);
         setIcon(data.icon);
+        setGreetingMessage(data.greetingMessage);
+        setFarewellMessage(data.farewellMessage);
 
-		if (data.triggerInterval) { 
-			setUseTriggerInterval(true);
-			setTriggerInterval(data.triggerInterval);
-		}
+        if (data.triggerInterval) {
+          setUseTriggerInterval(true);
+          setTriggerInterval(data.triggerInterval);
+        }
       } catch (err) {
         toastError(err);
       }
@@ -106,8 +112,13 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
     const connectionFileData = new FormData();
 
     connectionFileData.set("name", name);
+    connectionFileData.set("greetingMessage", greetingMessage);
+    connectionFileData.set("farewellMessage", farewellMessage);
     connectionFileData.set("icon", icon);
-	connectionFileData.set("triggerInterval", useTriggerInterval ? triggerInterval : null);
+    connectionFileData.set(
+      "triggerInterval",
+      useTriggerInterval ? triggerInterval : null
+    );
 
     try {
       if (connectionFileId) {
@@ -172,6 +183,36 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
               onChange={handleNameChange}
             />
           </div>
+          <div>
+            <TextField
+              label={i18n.t("queueModal.form.greetingMessage")}
+              type="greetingMessage"
+              multiline
+              minRows={3}
+              maxRows={3}
+              fullWidth
+              name="greetingMessage"
+              variant="outlined"
+              margin="dense"
+              value={greetingMessage}
+              onChange={(e) => setGreetingMessage(e.target.value)}
+            />
+          </div>
+          <div style={{ marginBottom: "8px" }}>
+            <TextField
+              label={i18n.t("whatsappModal.form.farewellMessage")}
+              type="farewellMessage"
+              multiline
+              minRows={3}
+              maxRows={3}
+              fullWidth
+              name="farewellMessage"
+              variant="outlined"
+              margin="dense"
+              value={farewellMessage}
+              onChange={(e) => setFarewellMessage(e.target.value)}
+            />
+          </div>
           <div className={classes.multFieldLine}>
             <TextField
               label={i18n.t("connectionsFiles.modal.file")}
@@ -200,51 +241,55 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
             {i18n.t("connectionsFiles.modal.removeIcon")}
           </Button>
           <div>
-		  <div className={classes.multFieldLine}>
-            	<FormControlLabel
-            	  control={
-            	    <Checkbox
-            	      checked={useTriggerInterval}
-            	      onChange={(e) => { setUseTriggerInterval(e.target.checked) }}
-            	      name="useTriggerInterval"
-            	      color="primary"
-            	    />
-            	  }
-            	  label={i18n.t("connectionsFiles.modal.useTriggerInterval")}
-            	/>
+            <div className={classes.multFieldLine}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={useTriggerInterval}
+                    onChange={(e) => {
+                      setUseTriggerInterval(e.target.checked);
+                    }}
+                    name="useTriggerInterval"
+                    color="primary"
+                  />
+                }
+                label={i18n.t("connectionsFiles.modal.useTriggerInterval")}
+              />
             </div>
-			{ useTriggerInterval &&
-				<>
-					<div>
-						<Slider
-						value={typeof triggerInterval === "number" ? triggerInterval : 0}
-						onChange={handleIntervalSliderChange}
-						aria-labelledby="input-slider"
-						step={1}
-						min={0.5}
-						max={60}
-						valueLabelDisplay="auto"
-						/>
-					</div>
-					<div>
-						<Input
-							value={triggerInterval}
-							margin="dense"
-							onChange={handleIntervalInputChange}
-							onBlur={handleIntervalBlur}
-							inputProps={{
-								step: 1,
-								min: 0.5,
-								max: 60,
-								type: "number",
-								"aria-labelledby": "input-slider",
-							}}
-						/>
-						{i18n.t("connectionsFiles.modal.minutes")}
-					</div>
-				</>
-			}
-		  </div>
+            {useTriggerInterval && (
+              <>
+                <div>
+                  <Slider
+                    value={
+                      typeof triggerInterval === "number" ? triggerInterval : 0
+                    }
+                    onChange={handleIntervalSliderChange}
+                    aria-labelledby="input-slider"
+                    step={1}
+                    min={0.5}
+                    max={60}
+                    valueLabelDisplay="auto"
+                  />
+                </div>
+                <div>
+                  <Input
+                    value={triggerInterval}
+                    margin="dense"
+                    onChange={handleIntervalInputChange}
+                    onBlur={handleIntervalBlur}
+                    inputProps={{
+                      step: 1,
+                      min: 0.5,
+                      max: 60,
+                      type: "number",
+                      "aria-labelledby": "input-slider",
+                    }}
+                  />
+                  {i18n.t("connectionsFiles.modal.minutes")}
+                </div>
+              </>
+            )}
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary" variant="outlined">

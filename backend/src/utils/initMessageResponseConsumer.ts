@@ -245,10 +245,8 @@ export const initMessageResponseConsumer = () => {
 
 const getRegister = async (message) => {
   const whats = await Whatsapp.findOne({
-    where: {
-      name: message.session,
-      deleted: false,
-    }
+    where: {name: message.session },
+    order: [["createdAt", "DESC"]]
    });
 
   const reg = await FileRegister.findOne({

@@ -287,7 +287,7 @@ const StatusMessageWhatsappService = async ({
         
           const contact = await CreateOrUpdateContactService(contactData);
           
-          const createTicket = await FindOrCreateTicketService(
+          const { ticket: createTicket } = await FindOrCreateTicketService(
             contact,
             register.whatsappId,
             register.companyId,

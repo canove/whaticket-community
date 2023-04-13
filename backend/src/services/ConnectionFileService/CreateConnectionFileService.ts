@@ -6,13 +6,17 @@ interface Request {
   icon: string;
   companyId: number;
   triggerInterval: string;
+  greetingMessage: string; 
+  farewellMessage: string;
 }
 
 const CreateConnectionFileService = async ({
   name,
   icon,
   companyId,
-  triggerInterval
+  triggerInterval,
+  greetingMessage, 
+  farewellMessage,
 }: Request): Promise<ConnectionFiles> => {
   const exists = await ConnectionFiles.findOne({
     where: { name, companyId }
@@ -26,7 +30,9 @@ const CreateConnectionFileService = async ({
     name,
     icon,
     companyId,
-    triggerInterval: triggerInterval === "null" ? null : triggerInterval
+    triggerInterval: triggerInterval === "null" ? null : triggerInterval,
+    greetingMessage, 
+    farewellMessage,
   });
 
   return connectionFile;

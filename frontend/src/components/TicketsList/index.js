@@ -178,7 +178,7 @@ const reducer = (state, action) => {
 	});
 
 	useEffect(() => {
-		if (!status && !searchParam) return;
+		// if (!status && !searchParam) return;
 		dispatch({
 			type: "LOAD_TICKETS",
 			payload: tickets,

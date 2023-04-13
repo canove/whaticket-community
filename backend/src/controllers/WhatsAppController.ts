@@ -769,7 +769,7 @@ export const botMessage = async (payload) => {
 
   const contact = await verifyContact(contactName, to, whatsapp.companyId);
 
-  const ticket = await FindOrCreateTicketService(
+  const { ticket } = await FindOrCreateTicketService(
     contact,
     whatsapp.id,
     whatsapp.companyId,
@@ -815,7 +815,7 @@ export const botMessageCustomer = async (
 
   const contact = await verifyContact(contactName, to, whatsapp.companyId);
 
-  const ticket = await FindOrCreateTicketService(
+  const { ticket } = await FindOrCreateTicketService(
     contact,
     whatsapp.id,
     whatsapp.companyId,
