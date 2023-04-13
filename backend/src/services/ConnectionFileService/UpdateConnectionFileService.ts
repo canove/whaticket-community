@@ -7,6 +7,8 @@ interface ConnectionFileData {
   name?: string;
   icon?: string;
   triggerInterval?: string;
+  greetingMessage?: string; 
+  farewellMessage?: string;
 }
 
 interface Request {
@@ -20,7 +22,7 @@ const UpdateConnectionFileService = async ({
   connectionFileId,
   companyId
 }: Request): Promise<ConnectionFiles> => {
-  const { name, icon, triggerInterval } = connectionFileData;
+  const { name, icon, triggerInterval,greetingMessage, farewellMessage } = connectionFileData;
 
   const exists = await ConnectionFiles.findOne({
     where: {
@@ -43,7 +45,9 @@ const UpdateConnectionFileService = async ({
   await connectionFile.update({
     name,
     icon,
-    triggerInterval: triggerInterval === "null" ? null : triggerInterval
+    triggerInterval: triggerInterval === "null" ? null : triggerInterval,
+    greetingMessage, 
+    farewellMessage,
   });
 
   await connectionFile.reload();

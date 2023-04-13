@@ -41,13 +41,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       iconLink = await uploadToS3(fileName, companyId, buffer);
     }
 
-    const { name, icon, triggerInterval } = fields;
+    const { name, icon, triggerInterval, greetingMessage, farewellMessage } = fields;
 
     const connectionFile = await CreateConnectionFileService({
       name,
       icon: file ? iconLink : icon,
       companyId,
-      triggerInterval
+      triggerInterval,
+      greetingMessage, 
+      farewellMessage,
     });
 
     const io = getIO();
@@ -106,12 +108,20 @@ export const update = async (
       iconLink = await uploadToS3(fileName, companyId, buffer);
     }
 
-    const { name, icon, triggerInterval } = fields;
+    const { name, icon, triggerInterval, greetingMessage, farewellMessage, } = fields;
+
+    const connectionFileData = {
+      name, 
+      triggerInterval, 
+      icon: file ? iconLink : icon,
+      greetingMessage, 
+      farewellMessage,
+    }
 
     const connectionFile = await UpdateConnectionFileService({
-      connectionFileData: { name, triggerInterval, icon: file ? iconLink : icon },
+      connectionFileData,
       connectionFileId,
-      companyId
+      companyId,
     });
 
     const io = getIO();

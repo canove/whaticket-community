@@ -233,6 +233,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										variant="outlined"
 										margin="dense"
 										className={classes.textField}
+										fullWidth
 										onChange={(e) => {
 											const newValue = e.target.value.replace(/[^\d]/g, "");
 											setFieldValue("name", newValue);
@@ -274,7 +275,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										label={"Usar Grupo"}
 									/>
 								</div>
-								<div>
+								{/* <div>
 									<Field
 										as={TextField}
 										label={i18n.t("queueModal.form.greetingMessage")}
@@ -311,7 +312,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 										variant="outlined"
 										margin="dense"
 									/>
-								</div>
+								</div> */}
 								{ (user.companyId === 1 && !whatsAppId) &&
 									<div>
 										<FormControl

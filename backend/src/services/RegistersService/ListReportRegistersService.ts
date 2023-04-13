@@ -3,6 +3,9 @@ import FileRegister from "../../database/models/FileRegister";
 import { endOfDay, parseISO, startOfDay, subHours } from "date-fns";
 import File from "../../database/models/File";
 import ConnectionFiles from "../../database/models/ConnectionFile";
+import Message from "../../database/models/Message";
+import Ticket from "../../database/models/Ticket";
+import Category from "../../database/models/Category";
 
 interface Request {
   statuses?: Array<any>;
@@ -36,7 +39,7 @@ const ListReportRegistersService = async ({
   categoryIds
 }: Request): Promise<Response> => {
   let whereCondition = null;
-  let fileInclude = null;
+  let whereConditionCategory = null;
 
   whereCondition = { companyId };
 
@@ -86,9 +89,8 @@ const ListReportRegistersService = async ({
   }
 
   if (categoryIds) {
-    fileInclude = {
-      where: { connectionFileId: categoryIds },
-      required: true
+    whereConditionCategory = {
+      where: { id: categoryIds },
     }
   }
 
@@ -98,18 +100,27 @@ const ListReportRegistersService = async ({
     where: whereCondition,
     include: [
       {
-        model: File,
-        as: "file",
-        attributes: ["connectionFileId"],
+        model: Message,
+        as: "messageData",
+        attributes: ["id", "ticketId"],
         include: [
           {
-            model: ConnectionFiles,
-            as: "connectionFile",
-            attributes: ["name"],
-            required: false,
+            model: Ticket,
+            as: "ticket",
+            attributes: ["id", "categoryId"],
+            include: [
+              {
+                model: Category,
+                as: "category",
+                attributes: ["id", "name"],
+                required: true,
+                ...whereConditionCategory
+              }
+            ],
+            required: true
           }
         ],
-        ...fileInclude,
+        required: categoryIds ? true: false,
       }
     ],
     limit: +limit > 0 ? +limit : null,

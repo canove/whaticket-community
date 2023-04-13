@@ -133,8 +133,8 @@ const CreateWhatsAppService = async ({
     {
       name,
       status,
-      greetingMessage,
-      farewellMessage,
+      // greetingMessage,
+      // farewellMessage,
       isDefault,
       official,
       facebookToken,

@@ -242,7 +242,8 @@ export const exportCSV = async (
     rows.push(columns);
   });
 
-  let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+  let csvContent = "\uFEFF";
+
   rows.forEach(rowArray => {
     const row = rowArray.join(";");
     csvContent += `${row}\r\n`;

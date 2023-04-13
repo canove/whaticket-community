@@ -131,13 +131,21 @@ const ServiceTimeReports = () => {
         setCreatingCSV(false);
     }
 
-    const encodedUri = encodeURI(newCSV ? newCSV : csv);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "report.csv");
-    document.body.appendChild(link);
-
-    link.click();
+    const file = new Blob([newCSV ? newCSV : csv], { type: 'text/csv;charset=utf-8;' });
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(file, "report.csv");
+    } else {
+        const link = document.createElement("a"),
+        url = URL.createObjectURL(file);
+        link.href = url;
+        link.download = "report.csv";
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function() {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
   }
 
   const formatTime = (milliseconds) => {
