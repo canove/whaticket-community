@@ -74,6 +74,12 @@ const ListTicketsService = async ({
       where: { connectionFileId },
       required: true,
     });
+  } else {
+    includeCondition.push({
+      model: Whatsapp,
+      as: "whatsapp",
+      attributes: ["id", "name"],
+    });
   }
 
   if (status) {
@@ -128,7 +134,8 @@ const ListTicketsService = async ({
             "LIKE",
             `%${sanitizedSearchParam}%`
           )
-        }
+        },
+        { "$whatsapp.name$": { [Op.like]: `%${sanitizedSearchParam}%` } },
       ]
     };
   }
@@ -164,6 +171,32 @@ const ListTicketsService = async ({
 
     if (status) whereCondition = { ...whereCondition, status };
     if (categoryId) whereCondition = { ...whereCondition, categoryId };
+
+    if (searchParam) {
+      const sanitizedSearchParam = searchParam.toLocaleLowerCase().trim();
+  
+      whereCondition = {
+        ...whereCondition,
+        [Op.or]: [
+          {
+            "$contact.name$": where(
+              fn("LOWER", col("contact.name")),
+              "LIKE",
+              `%${sanitizedSearchParam}%`
+            )
+          },
+          { "$contact.number$": { [Op.like]: `%${sanitizedSearchParam}%` } },
+          {
+            "$message.body$": where(
+              fn("LOWER", col("body")),
+              "LIKE",
+              `%${sanitizedSearchParam}%`
+            )
+          },
+          { "$whatsapp.name$": { [Op.like]: `%${sanitizedSearchParam}%` } },
+        ]
+      };
+    }
   }
 
   if (!allTickets) {

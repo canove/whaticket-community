@@ -283,7 +283,7 @@ const getRegistersData = registers => {
     const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
     const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
 
-    const category = (register.file && register.file.connectionFile) ? register.file.connectionFile.name : "";
+    const category = getCategory(register);
 
     let status = "";
     if (errorAt) {
@@ -346,7 +346,7 @@ export const exportCsv = async (
     const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
     const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
 
-    const category = (register.file && register.file.connectionFile) ? register.file.connectionFile.name : "";
+    const category = getCategory(register);
 
     const haveWhatsapp = getHaveWhatsapp(register);
 
@@ -383,7 +383,8 @@ export const exportCsv = async (
     rows.push(columns);
   });
 
-  let csvContent = "data:text/csv;charset=utf-8,";
+  let csvContent = "\uFEFF";
+
   rows.forEach(rowArray => {
     const row = rowArray.join(";");
     csvContent += `${row}\r\n`;
@@ -402,4 +403,14 @@ const getHaveWhatsapp = (reg) => {
   }
 
   return reg.haveWhatsapp ? "SIM" : "NÃO";
+}
+
+const getCategory = (reg) => {
+  const message = reg.messageData;
+  const ticket = message ? message.ticket : null;
+  const category = ticket ? ticket.category : null;
+
+  if (category) return category.name;
+
+  return "";
 }

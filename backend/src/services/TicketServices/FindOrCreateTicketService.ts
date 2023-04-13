@@ -7,6 +7,12 @@ import Whatsapp from "../../database/models/Whatsapp";
 import CreateTicketHistoricService from "../TicketHistoricsServices/CreateTicketHistoricService";
 import ShowTicketService from "./ShowTicketService";
 /*eslint-disable */
+
+interface Response {
+  ticket: Ticket;
+  isCreated: boolean;
+}
+
 const FindOrCreateTicketService = async (
   contact: Contact,
   whatsappId: number,
@@ -15,7 +21,9 @@ const FindOrCreateTicketService = async (
   groupContact?: Contact,
   isDispatcher?: boolean,
   inBot?: boolean
-): Promise<Ticket> => {
+): Promise<Response> => {
+  let isCreated = false;
+
   let ticket = await Ticket.findOne({
     where: {
       status: {
@@ -112,13 +120,15 @@ const FindOrCreateTicketService = async (
       queueId,
     });
 
+    isCreated = true;
+
     // TICKET HISTORIC - CREATE
     await CreateTicketHistoricService(ticket, "CREATE");
   }
 
   ticket = await ShowTicketService(ticket.id, companyId);
 
-  return ticket;
+  return { ticket, isCreated };
 };
 
 const getQueueId = async (whatsapp: Whatsapp) => {

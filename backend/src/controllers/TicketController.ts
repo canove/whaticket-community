@@ -33,6 +33,7 @@ import ListAllTicketsService from "../services/TicketServices/ListAllTicketsServ
 import SatisfactionSurveyResponses from "../database/models/SatisfactionSurveyResponses";
 import ShowSatisfactionSurveyService from "../services/SatisfactionSurveyService/ShowSatisfactionSurveyService";
 import AppError from "../errors/AppError";
+import ConnectionFiles from "../database/models/ConnectionFile";
 
 type IndexQuery = {
   searchParam: string;
@@ -134,7 +135,7 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
 
     const contact = await Contact.findOne({
       where: {
-        companyId: whatsapp.companyId,
+        // companyId: whatsapp.companyId,
         number: 
           { 
             [Op.or]: [
@@ -238,6 +239,39 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
     ticketId,
     companyId
   });
+
+  if (ticket.status === "closed") {
+    const connectionFile = await ConnectionFiles.findOne({
+      where: { companyId },
+      include: [
+        {
+          model: Whatsapp,
+          as: "whatsapps",
+          attributes: ["id"],
+          where: { id: ticket.whatsappId },
+          required: true,
+        }
+      ],
+    });
+
+    if (connectionFile && connectionFile.farewellMessage) {
+      await SendWhatsAppMessage({
+        body: connectionFile.farewellMessage,
+        ticket: ticket,
+        companyId,
+        fromMe: true,
+        bot: true,
+        contactId: ticket.contactId,
+        whatsMsgId: null,
+        cation: null,
+        type: "text",
+        mediaUrl: null,
+        templateButtons: null
+      });
+
+      await ticket.update({ lastMessage: connectionFile.farewellMessage, lastMessageFromMe: true });
+    }
+  }
 
   if (ticket.status === "closed" && surveyId) {
     const whatsapp = await ShowWhatsAppService(ticket.whatsappId, companyId);

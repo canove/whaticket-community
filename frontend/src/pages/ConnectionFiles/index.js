@@ -261,7 +261,7 @@ const ConnectionFiles = () => {
 								{i18n.t("connectionsFiles.table.icon")}
 							</TableCell>
 							<TableCell align="center">
-								{}
+								{i18n.t("connectionsFiles.table.name")}
 							</TableCell>
 							<TableCell align="center">{i18n.t("connectionsFiles.table.triggerInterval")}</TableCell>
 							<TableCell align="center">

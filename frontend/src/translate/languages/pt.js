@@ -792,7 +792,7 @@ const messages = {
         delete: "Algumas Conexões Foram Deletadas...",
         salutation: "Usar mensagem de saudação?",
         modal: {
-          salutation: "Mensagem de saldação",
+          salutation: "Mensagem de saudação",
           actions: "Ações",
           edit: "Editar",
           delete: "Deletar",

@@ -21,6 +21,8 @@ import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import { Op } from "sequelize";
 import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurveyResponses";
 import SatisfactionSurveys from "../../database/models/SatisfactionSurveys";
+import ConnectionFiles from "../../database/models/ConnectionFile";
+import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
 
 /*eslint-disable*/
 interface Request {
@@ -133,9 +135,9 @@ const verifyMessage = async (
   },
   ticket: Ticket,
   contact: Contact,
-  contactName: string
+  contactName: string,
+  isTicketCreated: boolean
 ) => {
-
   const messageData = {
     id: msg.id,
     ticketId: ticket.id,
@@ -153,6 +155,39 @@ const verifyMessage = async (
   await ticket.update({ lastMessage: msg.body, lastMessageFromMe: msg.fromMe });
 
   await CreateMessageService({ messageData });
+
+  if (isTicketCreated) {
+    const connectionFile = await ConnectionFiles.findOne({
+      where: { companyId: ticket.companyId },
+      include: [
+        {
+          model: Whatsapp,
+          as: "whatsapps",
+          attributes: ["id"],
+          where: { id: ticket.whatsappId },
+          required: true,
+        }
+      ],
+    });
+  
+    if (connectionFile && connectionFile.greetingMessage) {
+      await SendWhatsAppMessage({
+        body: connectionFile.greetingMessage,
+        ticket: ticket,
+        companyId: ticket.companyId,
+        fromMe: true,
+        bot: true,
+        contactId: ticket.contactId,
+        whatsMsgId: null,
+        cation: null,
+        type: "text",
+        mediaUrl: null,
+        templateButtons: null
+      });
+
+      await ticket.update({ lastMessage: connectionFile.greetingMessage, lastMessageFromMe: true });
+    }
+  }
 };
 
 const verifyContact = async (
@@ -285,8 +320,10 @@ const handleMessage = async (
       }
     }
 
+    let isTicketCreated = false;
+
     if (!ticket) {
-      ticket = await FindOrCreateTicketService(
+      const { ticket: tck, isCreated } = await FindOrCreateTicketService(
         contact,
         whatsapp.id,
         whatsapp.companyId,
@@ -296,23 +333,33 @@ const handleMessage = async (
         bot
       );
 
+      ticket = tck;
+      isTicketCreated = isCreated;
+
       if (survey) {
         await survey.update({ interactionAt: new Date() });
       }
     }
 
     if (type !== "text") {
-      await verifyMediaMessage({
-        id,
-        fromMe,
-        body,
-        from,
-        to,
-        type,
-        file,
-        isGroup,
-        bot
-      }, ticket, contact, whatsapp, contactName);
+      await verifyMediaMessage(
+        {
+          id,
+          fromMe,
+          body,
+          from,
+          to,
+          type,
+          file,
+          isGroup,
+          bot
+        }, 
+        ticket, 
+        contact,
+        whatsapp,
+        contactName,
+        isTicketCreated,
+      );
     } else {
       await verifyMessage(
         {
@@ -326,7 +373,9 @@ const handleMessage = async (
           bot
         },
         ticket,
-        contact, contactName
+        contact, 
+        contactName,
+        isTicketCreated,
       );
     }
   } catch (err) {
@@ -366,6 +415,7 @@ const verifyMediaMessage = async (
   contact: Contact,
   whatsapp: Whatsapp,
   contactName: string,
+  isTicketCreated: boolean,
 ): Promise<void> => {  
   let type = msg.type;
   let mediaUrl = msg.body;
@@ -428,6 +478,39 @@ const verifyMediaMessage = async (
 
   await ticket.update({ lastMessage: msg.file, lastMessageFromMe: msg.fromMe });
   await CreateMessageService({ messageData });
+
+  if (isTicketCreated) {
+    const connectionFile = await ConnectionFiles.findOne({
+      where: { companyId: ticket.companyId },
+      include: [
+        {
+          model: Whatsapp,
+          as: "whatsapps",
+          attributes: ["id"],
+          where: { id: ticket.whatsappId },
+          required: true,
+        }
+      ],
+    });
+  
+    if (connectionFile && connectionFile.greetingMessage) {
+      await SendWhatsAppMessage({
+        body: connectionFile.greetingMessage,
+        ticket: ticket,
+        companyId: ticket.companyId,
+        fromMe: true,
+        bot: true,
+        contactId: ticket.contactId,
+        whatsMsgId: null,
+        cation: null,
+        type: "text",
+        mediaUrl: null,
+        templateButtons: null
+      });
+
+      await ticket.update({ lastMessage: connectionFile.greetingMessage, lastMessageFromMe: true });
+    }
+  }
 };
 
 const uploadToS3 = async (blob, file, type, companyId): Promise<string> => {
