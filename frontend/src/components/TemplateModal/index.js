@@ -50,7 +50,9 @@ const TemplateModal = ({ open, onClose }) => {
   const { i18n } = useTranslation();
   const classes = useStyles();
 
-  const initialState = {};
+  const initialState = {
+    bodyExample: {}
+  };
 
   const [template, setTemplate] = useState(initialState);
 
@@ -70,17 +72,17 @@ const TemplateModal = ({ open, onClose }) => {
         const parametersQuantity = parameters.length;
 
         let text = bodyText;
-        let map = mapping || {};
+        let newMap = {};
 
         for (let i = 0; i < parametersQuantity; i++) {
           text = text.replace(parameters[i], `{{${i+1}}}`);
-          map = { ...map, [`{{${i + 1}}}`]: "name" };
+          newMap = { ...newMap, [`{{${i + 1}}}`]: "name" };
         }
 
         setParameters(parameters);
         setParamsQuantity(parametersQuantity);
         setBodyText(text);
-        setMapping(map);
+        setMapping(newMap);
       };
       testParams();
     }, 1000);
@@ -95,7 +97,18 @@ const TemplateModal = ({ open, onClose }) => {
       bodyText,
       footerText,
       mapping: JSON.stringify(mapping),
+      // bodyExample: Object.keys(values.bodyExample).length > 0 ? JSON.stringify(values.bodyExample) : null
     };
+
+    // let haveExample = true;
+    
+    // Object.keys(mapping).forEach((key) => {
+    //   console.log(key);
+
+    //   if (!values.bodyExample[key]) haveExample = false;
+    // });
+
+    // if (!haveExample) toast.error("Escreva um exemplo para variável utilizada.");
 
     try {
       await api.post(`/whatsappTemplate/create/`, templateData);
@@ -196,7 +209,7 @@ const TemplateModal = ({ open, onClose }) => {
             }, 400);
           }}
         >
-          {({ values, touched, errors, isSubmitting, setValues, handleChange }) => (
+          {({ values, touched, errors, isSubmitting, setValues, handleChange, setFieldValue }) => (
             <Form>
               <DialogContent dividers>
                 <div className={classes.multFieldLine}>
@@ -249,6 +262,7 @@ const TemplateModal = ({ open, onClose }) => {
                     type="bodyText"
                     onChange={(e) => {
                       handleChangeBodyText(e);
+                      setFieldValue("bodyExample", {});
                     }}
                     value={bodyText}
                     multiline
@@ -297,7 +311,6 @@ const TemplateModal = ({ open, onClose }) => {
                         <Field
                           as={TextField}
                           label={"Custom Param"}
-                          autoFocus
                           variant="outlined"
                           margin="dense"
                           fullWidth
@@ -310,6 +323,19 @@ const TemplateModal = ({ open, onClose }) => {
                           }}
                         />
                       }
+                      {/* <Field
+                        as={TextField}
+                        label={"Exemplo de Conteúdo"}
+                        variant="outlined"
+                        margin="dense"
+                        fullWidth
+                        name="bodyExample"
+                        value={values.bodyExample[param] || ""}
+                        className={classes.textField}
+                        onChange={(e) => {
+                          setFieldValue("bodyExample", { ...values.bodyExample, [param]: e.target.value });
+                        }}
+                      /> */}
                       </div>
                     );
                   })}

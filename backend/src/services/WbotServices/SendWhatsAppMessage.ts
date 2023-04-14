@@ -123,24 +123,14 @@ const SendWhatsAppMessage = async ({
    
 
   if (connnection?.official) {
-    const lastMessage = await Message.findAll({
-      where: {
-        ticketId: ticket.id,
-      },
-      order: [
-        ['createdAt', 'DESC'],
-      ],
-      limit: 1
-    });
-  
-    if (lastMessage[0] && lastMessage[0].createdAt) {
-      const today = new Date();
-      const lastMessageDate = new Date(lastMessage[0].createdAt);
-  
-      const diff = lastMessageDate.getTime() - today.getTime();
-  
-      if (diff < -86400000) throw new AppError("ERR_SESSION_ENDED");
-    }
+    const now = new Date();
+    now.setDate(now.getDate() - 1);
+
+    const createdAt = new Date(ticket.createdAt);
+
+    const time = createdAt.getTime() - now.getTime();
+
+    if (time < 0) throw new AppError("ERR_SESSION_ENDED");
 
     const offConnection = await OfficialWhatsapp.findOne({
       where: { id: connnection.officialWhatsappId }

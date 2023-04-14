@@ -49,6 +49,52 @@ import Supervisor from "../pages/Supervisor";
 import SatisfactionSurvey from "../pages/SatisfactionSurvey";
 import Packages from "../pages/Packages";
 
+const pages = {
+  "Dashboard": Dashboard,
+  "Settings": Settings,
+  "Official Connections": OfficialConnections,
+  "Connections": Connections,
+  "Template Data": TemplatesData,
+  "Whats Config": WhatsConfig,
+  "Tickets": Tickets,
+  "Templates": Templates,
+  "Contacts": Contacts,
+  "Users": Users,
+  "Quick Answers": QuickAnswers,
+  "Queues": Queues,
+  "Reports": Reports,
+  "Reports Ticket": ReportsTicket,
+  "Registers Reports": RegistersReports,
+  "Company": Company,
+  "Menu Link": MenuLink,
+  "Registration": Registration,
+  "Products": Products,
+  "Pricing": Pricing,
+  "Payments": Payments,
+  "File Import": FileImport,
+  "Integrated Import": IntegratedImport,
+  "Category": Category,
+  "DialogFlow": DialogFlows,
+  "Flows": Flows,
+  "Connection Files": ConnectionFiles,
+  "Contact Transfer": ContactTransfer,
+  "Exposed Imports": ExposedImport,
+  "Chips Reports": ChipsReports,
+  "Node Reports": NodeReports,
+  "Whats Contacts": OfficialContacts,
+  "Official Templates": OfficialTemplates,
+  "Official Whatsapp Report": OfficialWhatsappReport,
+  "Profiles": Profiles,
+  "Operations": Operations,
+  "General Report": GeneralReports,
+  "Category Report": CategoryReport,
+  "Service Time": ServiceTimeReports,
+  "Contact Blacklist": ContactBlacklist,
+  "Supervisor": Supervisor,
+  "Satisfaction Survey": SatisfactionSurvey,
+  "Packages": Packages,
+};
+
 const RenderRoutes = () => {
   const { isAuth, user } = useContext(AuthContext);
   const [menus, setMenus] = useState([]);
@@ -62,137 +108,12 @@ const RenderRoutes = () => {
         toastError(err);
       }
     };
+
     fetchMenus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuth]);
 
   const getComponent = (name) => {
-    if (name === "Dashboard") {
-      return Dashboard;
-    }
-    if (name === "Official Connections") {
-      return OfficialConnections;
-    }
-    if (name === "Connections") {
-      return Connections;
-    }
-    if (name === "Template Data") {
-      return TemplatesData;
-    }
-    if (name === "Whats Config") {
-      return WhatsConfig;
-    }
-    if (name === "Tickets") {
-      return Tickets;
-    }
-    if (name === "Templates") {
-      return Templates;
-    }
-    if (name === "Contacts") {
-      return Contacts;
-    }
-    if (name === "Users") {
-      return Users;
-    }
-    if (name === "Quick Answers") {
-      return QuickAnswers;
-    }
-    if (name === "Queues") {
-      return Queues;
-    }
-    if (name === "Reports" || name === "Conversation Reports") {
-      return Reports;
-    }
-    if (name === "Reports Ticket") {
-      return ReportsTicket;
-    }
-    if (name === "Registers Reports") {
-      return RegistersReports;
-    }
-    if (name === "Company") {
-      return Company;
-    }
-    if (name === "Menu Link") {
-      return MenuLink;
-    }
-    if (name === "Registration") {
-      return Registration;
-    }
-    if (name === "Products") {
-      return Products;
-    }
-    if (name === "Pricing") {
-      return Pricing;
-    }
-    if (name === "Payments") {
-      return Payments;
-    }
-    if (name === "File Import") {
-      return FileImport;
-    }
-    if (name === "Integrated Import") {
-      return IntegratedImport;
-    }
-    if (name === "Category") {
-      return Category;
-    }
-    if (name === "DialogFlow") {
-      return DialogFlows;
-    }
-    if (name === "Flows") {
-      return Flows;
-    }
-    if (name === "Connection Files") {
-      return ConnectionFiles;
-    }
-    if (name === "Contact Transfer") {
-      return ContactTransfer;
-    }
-    if (name === "Exposed Imports") {
-      return ExposedImport;
-    }
-    if (name === "Chips Reports") {
-      return ChipsReports;
-    }
-    if (name === "Node Reports") {
-      return NodeReports;
-    }
-    if (name === "Whats Contacts") {
-      return OfficialContacts;
-    }
-    if (name === "Official Templates") {
-      return OfficialTemplates;
-    }
-    if (name === "Official Whatsapp Report") {
-      return OfficialWhatsappReport;
-    }
-    if (name === "Profiles") {
-      return Profiles;
-    }
-    if (name === "Operations") {
-      return Operations;
-    }
-    if (name === "General Report") {
-      return GeneralReports;
-    }
-    if (name === "Category Report") {
-      return CategoryReport;
-    }
-    if (name === "Service Time") {
-      return ServiceTimeReports;
-    }
-    if (name === "Contact Blacklist") {
-      return ContactBlacklist;
-    }
-    if (name === "Supervisor") {
-      return Supervisor;
-    }
-    if (name === "Satisfaction Survey") {
-      return SatisfactionSurvey;
-    }
-    if (name === "Packages") {
-      return Packages;
-    }
+    return pages[name];
   };
 
   return (

@@ -18,7 +18,7 @@ const CreateTemplateService = async ({
   category,
   bodyText,
   mapping,
-  companyId
+  companyId,
 }: TemplateData): Promise<OfficialTemplates> => {
   const templateExists = await OfficialTemplates.findOne({
     where: {
