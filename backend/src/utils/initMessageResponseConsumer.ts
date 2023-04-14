@@ -9,6 +9,7 @@ import Whatsapp from "../database/models/Whatsapp";
 import { getIO } from "../libs/socket";
 import StartExposedImportService from "../services/ExposedImportService/StartExposedImportService";
 import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country, sendMessageToSQS } from "./common";
+import axios from "axios";
 
 const { Consumer } = require("sqs-consumer");
 const AWS = require("aws-sdk");
@@ -141,6 +142,26 @@ export const initMessageResponseConsumer = () => {
               }
             });
 
+            if (!whats) {
+              try {
+                const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
+          
+                const payload = {
+                  "session": message.session,
+                  "number": message.session,
+                }    
+            
+                const result = await axios.post(CHECK_NUMBER_URL, payload, {
+                  headers: {
+                    "api-key": process.env.WPPNOF_API_TOKEN,
+                    "sessionkey": process.env.WPPNOF_SESSION_KEY,
+                  }
+                });
+              } catch (err: any) {
+                console.log(err?.message);
+              }
+            }
+
             if (response.message === "O telefone informado nao esta registrado no whatsapp.") {
               const reg = await getRegister(message);
 
@@ -151,7 +172,7 @@ export const initMessageResponseConsumer = () => {
                 });
               }
             } else {
-              if (whats && response.message == 'sessão inválida ou inexistente' || code == 500) {
+              if (whats && (response.message == 'sessão inválida ou inexistente' || code == 500)) {
                 const headers = {
                   "api-key": `${process.env.WPPNOF_API_TOKEN}`,
                   "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
