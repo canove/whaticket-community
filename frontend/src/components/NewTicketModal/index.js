@@ -17,6 +17,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
+import GroupModal from "../GroupModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
@@ -33,7 +34,11 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	const [selectedContact, setSelectedContact] = useState(null);
 	const [newContact, setNewContact] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [groupModalOpen, setGroupModalOpen] = useState(false);
+	const [choiceInput, setChoiceInput] = useState('ticket');
+  const [listSelectd, setListSelectd] = useState([])
 	const { user } = useContext(AuthContext);
+	// console.log(listSelectd)
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -47,7 +52,15 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					const { data } = await api.get("contacts", {
 						params: { searchParam },
 					});
-					setOptions(data.contacts);
+					let filter = data.contacts;
+					if (choiceInput !== 'ticket') {
+						filter = data.contacts.filter((e, i) => e.isGroup === false)
+					}
+					if (choiceInput !== 'ticket' && options.length > 0) {
+						filter = filter.filter((e, i) => e.number !== options[i].number);
+					}
+					// console.log(filter)
+					setOptions(filter);
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
@@ -64,6 +77,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		onClose();
 		setSearchParam("");
 		setSelectedContact(null);
+		setListSelectd([]);
 	};
 
 	const handleSaveTicket = async contactId => {
@@ -84,16 +98,29 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	};
 
 	const handleSelectOption = (e, newValue) => {
+		// console.log(newValue)
 		if (newValue?.number) {
 			setSelectedContact(newValue);
-		} else if (newValue?.name) {
+		} 
+		else if (newValue?.name) {
 			setNewContact({ name: newValue.name });
 			setContactModalOpen(true);
 		}
 	};
 
+	const handleListSelectd = (e, newValue) => {
+		// console.log(newValue)
+		if (newValue?.number && !listSelectd.some(e => e.number === newValue.number)) {
+			setListSelectd([...listSelectd, `${newValue.number}@c.us`]);
+		}
+	}
+
 	const handleCloseContactModal = () => {
 		setContactModalOpen(false);
+	};
+
+	const handleCloseGroupModal = () => {
+		setGroupModalOpen(false);
 	};
 
 	const handleAddNewContactTicket = contact => {
@@ -130,77 +157,176 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 
 	return (
 		<>
+			<GroupModal
+				open={groupModalOpen}
+				initialValues={listSelectd}
+				onClose={handleCloseGroupModal}
+				onSave={handleAddNewContactTicket}
+			/>
 			<ContactModal
 				open={contactModalOpen}
 				initialValues={newContact}
 				onClose={handleCloseContactModal}
 				onSave={handleAddNewContactTicket}
-			></ContactModal>
+			/>
 			<Dialog open={modalOpen} onClose={handleClose}>
-				<DialogTitle id="form-dialog-title">
-					{i18n.t("newTicketModal.title")}
-				</DialogTitle>
-				<DialogContent dividers>
-					<Autocomplete
-						options={options}
-						loading={loading}
-						style={{ width: 300 }}
-						clearOnBlur
-						autoHighlight
-						freeSolo
-						clearOnEscape
-						getOptionLabel={renderOptionLabel}
-						renderOption={renderOption}
-						filterOptions={createAddContactOption}
-						onChange={(e, newValue) => handleSelectOption(e, newValue)}
-						renderInput={params => (
-							<TextField
-								{...params}
-								label={i18n.t("newTicketModal.fieldLabel")}
+				<div 
+					style={ { display: 'flex', width: '100%', justifyContent: 'space-around' } } 
+				>
+					<DialogTitle 
+						onClick={() => {
+							setOptions([]);
+							setListSelectd([])
+							setChoiceInput('ticket')
+						}}
+						style={ { cursor: 'pointer' } }
+						id="form-dialog-title"
+					>
+						{i18n.t("newTicketModal.title")}
+					</DialogTitle>
+					<DialogTitle 
+						id="form-dialog-title"
+						style={ { cursor: 'pointer' } }
+						onClick={() => {
+							setOptions([]);
+							setChoiceInput('group')
+						}} 
+					>
+						Criar Grupo
+					</DialogTitle>
+				</div>
+				{ choiceInput === 'ticket'
+				? (
+					<>
+						<DialogContent dividers>
+						<Autocomplete
+							options={options}
+							loading={loading}
+							style={{ width: 300 }}
+							clearOnBlur
+							autoHighlight
+							freeSolo
+							clearOnEscape
+							getOptionLabel={renderOptionLabel}
+							renderOption={renderOption}
+							filterOptions={createAddContactOption}
+							onChange={(e, newValue) => handleSelectOption(e, newValue)}
+							renderInput={params => (
+								<TextField
+									{...params}
+									label={i18n.t("newTicketModal.fieldLabel")}
+									variant="outlined"
+									autoFocus
+									onChange={e => setSearchParam(e.target.value)}
+									onKeyPress={e => {
+										if (loading || !selectedContact) return;
+										else if (e.key === "Enter") {
+											handleSaveTicket(selectedContact.id);
+										}
+									}}
+									InputProps={{
+										...params.InputProps,
+										endAdornment: (
+											<React.Fragment>
+												{loading ? (
+													<CircularProgress color="inherit" size={20} />
+												) : null}
+												{params.InputProps.endAdornment}
+											</React.Fragment>
+										),
+									}}
+								/>
+							)}
+						/>
+					</DialogContent>
+						<DialogActions>
+							<Button
+								onClick={handleClose}
+								color="secondary"
+								disabled={loading}
 								variant="outlined"
-								autoFocus
-								onChange={e => setSearchParam(e.target.value)}
-								onKeyPress={e => {
-									if (loading || !selectedContact) return;
-									else if (e.key === "Enter") {
-										handleSaveTicket(selectedContact.id);
-									}
-								}}
-								InputProps={{
-									...params.InputProps,
-									endAdornment: (
-										<React.Fragment>
-											{loading ? (
-												<CircularProgress color="inherit" size={20} />
-											) : null}
-											{params.InputProps.endAdornment}
-										</React.Fragment>
-									),
-								}}
+							>
+								{i18n.t("newTicketModal.buttons.cancel")}
+							</Button>
+							<ButtonWithSpinner
+								variant="contained"
+								type="button"
+								disabled={!selectedContact}
+								onClick={() => handleSaveTicket(selectedContact.id)}
+								color="primary"
+								loading={loading}
+							>
+								{i18n.t("newTicketModal.buttons.ok")}
+							</ButtonWithSpinner>
+						</DialogActions>
+					</>
+					) 
+					: (
+						<>
+							<DialogContent dividers>
+							<Autocomplete
+								options={options}
+								loading={loading}
+								style={{ width: 300 }}
+								clearOnBlur
+								autoHighlight
+								freeSolo
+								clearOnEscape
+								getOptionLabel={renderOptionLabel}
+								renderOption={renderOption}
+								// filterOptions={createAddContactOption}
+								onChange={(e, newValue) => handleListSelectd(e, newValue)}
+								renderInput={params => (
+									<TextField
+										{...params}
+										label={i18n.t("newTicketModal.fieldLabel")}
+										variant="outlined"
+										autoFocus
+										onChange={e => setSearchParam(e.target.value)}
+										onKeyPress={e => {
+											if (loading || !selectedContact) return;
+											else if (e.key === "Enter") {
+												handleSaveTicket(selectedContact.id);
+											}
+										}}
+										InputProps={{
+											...params.InputProps,
+											endAdornment: (
+												<React.Fragment>
+													{loading ? (
+														<CircularProgress color="inherit" size={20} />
+													) : null}
+													{params.InputProps.endAdornment}
+												</React.Fragment>
+											),
+										}}
+									/>
+								)}
 							/>
-						)}
-					/>
-				</DialogContent>
-				<DialogActions>
-					<Button
-						onClick={handleClose}
-						color="secondary"
-						disabled={loading}
-						variant="outlined"
-					>
-						{i18n.t("newTicketModal.buttons.cancel")}
-					</Button>
-					<ButtonWithSpinner
-						variant="contained"
-						type="button"
-						disabled={!selectedContact}
-						onClick={() => handleSaveTicket(selectedContact.id)}
-						color="primary"
-						loading={loading}
-					>
-						{i18n.t("newTicketModal.buttons.ok")}
-					</ButtonWithSpinner>
-				</DialogActions>
+						<p>total adicionado: {listSelectd.length}</p>
+						</DialogContent>
+						<DialogActions>
+							<Button
+								onClick={handleClose}
+								color="secondary"
+								disabled={loading}
+								variant="outlined"
+							>
+								{i18n.t("newTicketModal.buttons.cancel")}
+							</Button>
+							<ButtonWithSpinner
+								variant="contained"
+								type="button"
+								disabled={!listSelectd.length > 0}
+								onClick={() => setGroupModalOpen(true)}
+								color="primary"
+								loading={loading}
+							>
+								Próximo
+							</ButtonWithSpinner>
+						</DialogActions>
+					</>
+				)}
 			</Dialog>
 		</>
 	);

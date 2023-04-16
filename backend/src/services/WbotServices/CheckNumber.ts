@@ -6,8 +6,9 @@ const CheckContactNumber = async (number: string): Promise<void> => {
 
   const wbot = getWbot(defaultWhatsapp.id);
 
-    const validNumber : any = await wbot.getNumberId(`${number}@c.us`);
-    return validNumber.user
+  const validNumber: any = await wbot.getNumberId(`${number}@c.us`);
+  // console.log(number);
+  return validNumber.user;
 };
 
 export default CheckContactNumber;

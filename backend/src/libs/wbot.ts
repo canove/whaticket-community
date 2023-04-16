@@ -43,16 +43,16 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const args:String = process.env.CHROME_ARGS || "";
+      const args: string = process.env.CHROME_ARGS || "";
 
       const wbot: Session = new Client({
         session: sessionCfg,
-        authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
+        authStrategy: new LocalAuth({ clientId: `bd_${whatsapp.id}` }),
         puppeteer: {
           executablePath: process.env.CHROME_BIN || undefined,
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: args.split(' ')
+          args: args.split(" ")
         }
       });
 
@@ -131,6 +131,12 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       logger.error(err);
     }
   });
+};
+
+export const createGroups = async (wbot: Session) => {
+  const teste = await wbot.createGroup("teste grupo 123", ["558191550920@c.us"]);
+
+  return teste;
 };
 
 export const getWbot = (whatsappId: number): Session => {

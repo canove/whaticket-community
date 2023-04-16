@@ -9,7 +9,7 @@ interface Request {
   contactId: number;
   status: string;
   userId: number;
-  queueId ?: number;
+  queueId?: number;
 }
 
 const CreateTicketService = async ({
@@ -22,10 +22,11 @@ const CreateTicketService = async ({
 
   await CheckContactOpenTickets(contactId, defaultWhatsapp.id);
 
+  // console.log(contactId);
   const { isGroup } = await ShowContactService(contactId);
 
-  if(queueId === undefined) {
-    const user = await User.findByPk(userId, { include: ["queues"]});
+  if (queueId === undefined) {
+    const user = await User.findByPk(userId, { include: ["queues"] });
     queueId = user?.queues.length === 1 ? user.queues[0].id : undefined;
   }
 
