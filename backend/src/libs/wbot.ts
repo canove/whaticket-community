@@ -133,12 +133,6 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
   });
 };
 
-export const createGroups = async (wbot: Session) => {
-  const teste = await wbot.createGroup("teste grupo 123", ["558191550920@c.us"]);
-
-  return teste;
-};
-
 export const getWbot = (whatsappId: number): Session => {
   const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
