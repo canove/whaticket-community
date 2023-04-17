@@ -31,6 +31,7 @@ import ListReportWhatsAppsService from "../services/WhatsappService/ListReportWh
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import { Op } from "sequelize";
 import CheckAvailableWhatsapps from "../services/WhatsappService/CheckAvailableWhatsapps";
+import GetCallbackService from "../services/WhatsappService/GetCallbackService";
 
 interface WhatsappData {
   name: string;
@@ -869,28 +870,14 @@ export const nofSessionQRUpdate = async (
   return res.status(200).json(message);
 };
 
+type CallbackQuery = {
+  session: string;
+}
+
 export const getCallbackUrl = async (req: Request, res: Response): Promise<Response> => {
-  const { session } = req.query;
+  const { session } = req.query as CallbackQuery;
 
-  const whatsapp = await Whatsapp.findOne({
-    attributes: ["messageCallbackUrl", "statusCallbackUrl", "callbackAuthorization", "companyId"],
-    where: {
-      [Op.or]: [
-        { name: session },
-        { facebookPhoneNumberId: session }
-      ],
-      deleted: false
-    }
-  });
-
-  if (!whatsapp) return null;
-
-  const callback = {
-    messageCallbackUrl: whatsapp.messageCallbackUrl,
-    statusCallbackUrl: whatsapp.statusCallbackUrl,
-    callbackAuthorization: whatsapp.callbackAuthorization,
-    companyId: whatsapp.companyId
-  };
+  const callback = await GetCallbackService(session);
 
   return res.status(200).json(callback);
 }

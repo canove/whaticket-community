@@ -83,7 +83,7 @@ const CreateTicketService = async ({
     });
   }
 
-  await CheckContactOpenTickets(contactId);
+  await CheckContactOpenTickets(contactId, companyId);
 
   const { isGroup } = await ShowContactService(contactId);
 

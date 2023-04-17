@@ -40,7 +40,7 @@ const UpdateTicketService = async ({
 
   let reopen = false;
   if (oldStatus === "closed") {
-    await CheckContactOpenTickets(ticket.contact.id);
+    await CheckContactOpenTickets(ticket.contact.id, ticket.companyId);
     reopen = true;
   }
 
