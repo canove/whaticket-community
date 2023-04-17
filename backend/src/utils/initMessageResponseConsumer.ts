@@ -142,24 +142,35 @@ export const initMessageResponseConsumer = () => {
               }
             });
 
-            if (!whats) {
-              try {
-                const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
+            let retry = false;
+
+            try {
+              const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
+        
+              const payload = {
+                "session": message.session,
+                "number": message.session,
+              }    
           
-                const payload = {
-                  "session": message.session,
-                  "number": message.session,
-                }    
-            
-                const result = await axios.post(CHECK_NUMBER_URL, payload, {
-                  headers: {
-                    "api-key": process.env.WPPNOF_API_TOKEN,
-                    "sessionkey": process.env.WPPNOF_SESSION_KEY,
+              const { data } = await axios.post(CHECK_NUMBER_URL, payload, {
+                headers: {
+                  "api-key": process.env.WPPNOF_API_TOKEN,
+                  "sessionkey": process.env.WPPNOF_SESSION_KEY,
+                }
+              });
+
+              if (Array.isArray(data)) {
+                for (const item of data) {
+                  if (item.exists) {
+                    retry = true;
+                    break;
                   }
-                });
-              } catch (err: any) {
-                console.log(err?.message);
+                }
               }
+            } catch (err: any) {
+              const response = err?.response?.data?.message || null;
+
+              if (response === "time out de conexão") retry = true;
             }
 
             if (response.message === "O telefone informado nao esta registrado no whatsapp.") {
@@ -172,7 +183,7 @@ export const initMessageResponseConsumer = () => {
                 });
               }
             } else {
-              if (whats && (response.message == 'sessão inválida ou inexistente' || code == 500)) {
+              if (retry || (whats && (response.message == 'sessão inválida ou inexistente' || code == 500))) {
                 const headers = {
                   "api-key": `${process.env.WPPNOF_API_TOKEN}`,
                   "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
