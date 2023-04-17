@@ -8,8 +8,18 @@ import Ticket from "../database/models/Ticket";
 import Whatsapp from "../database/models/Whatsapp";
 import { getIO } from "../libs/socket";
 import StartExposedImportService from "../services/ExposedImportService/StartExposedImportService";
-import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country, sendMessageToSQS } from "./common";
+import {
+  preparePhoneNumber9Digit,
+  removePhoneNumber9Digit,
+  removePhoneNumber9DigitCountry,
+  removePhoneNumberCountry,
+  removePhoneNumberWith9Country,
+  sendMessageToSQS
+} from "./common";
 import axios from "axios";
+import { createClient } from "redis";
+import GetCallbackService from "../services/WhatsappService/GetCallbackService";
+import GetInfo from "../services/FileRegisterService/GetInfo";
 
 const { Consumer } = require("sqs-consumer");
 const AWS = require("aws-sdk");
@@ -23,11 +33,11 @@ const CONSTANT = {
 export const initMessageResponseConsumer = () => {
   const app = Consumer.create({
     sqs: new SQSClient({
-        region: CONSTANT.region,
-        credentials: {
-          accessKeyId: CONSTANT.key,
-          secretAccessKey: CONSTANT.secret
-        }
+      region: CONSTANT.region,
+      credentials: {
+        accessKeyId: CONSTANT.key,
+        secretAccessKey: CONSTANT.secret
+      }
     }),
     queueUrl: process.env.SQS_ORQUESTRATOR_RESPONSE_URL,
     handleMessageBatch: async records => {
@@ -38,45 +48,52 @@ export const initMessageResponseConsumer = () => {
         {"session":"551151968683","number":"554195891447","text":"Olá, ADILSON DA SILVA ALVES, tudo bem? Aqui é da Pefisa/Pernambucanas! Temos uma informação IMPORTANTE para você! Caso possa conversa, digite SIM.","path":"Olá, ADILSON DA SILVA ALVES, tudo bem? Aqui é da Pefisa/Pernambucanas! Temos uma informação IMPORTANTE para você! Caso possa conversa, digite SIM.","type":"text","buttons":[]}
         */
         try {
-          if (code === 200 && response && response.message != 'sessão inválida ou inexistente') {    
+          if (
+            code === 200 &&
+            response &&
+            response.message != "sessão inválida ou inexistente"
+          ) {
             const msgWhatsId = response.messageId;
 
-            if (message.messageId) { 
+            if (message.messageId) {
               if (!msgWhatsId) {
                 const headers = {
                   "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-                  "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+                  sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
                 };
-                
+
                 const params = {
                   MessageBody: JSON.stringify({ message, headers }),
                   QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
                   DelaySeconds: 60
-                }
-                
+                };
+
                 await sendMessageToSQS(params);
               } else {
-                await Message.update({
-                  id: msgWhatsId,
-                }, {
-                  where: {
-                    id: message.messageId
+                await Message.update(
+                  {
+                    id: msgWhatsId
+                  },
+                  {
+                    where: {
+                      id: message.messageId
+                    }
                   }
-                });
-  
+                );
+
                 const msg = await Message.findOne({
                   where: {
                     id: msgWhatsId
                   }
                 });
 
-                if (msg.ack < 2) await msg.update({ ack: 1 });  
-      
+                if (msg.ack < 2) await msg.update({ ack: 1 });
+
                 const ticket = await Ticket.findOne({
                   where: { id: msg.ticketId }
                 });
-    
-                await ticket.update({ lastMessage: message.text }); 
+
+                await ticket.update({ lastMessage: message.text });
 
                 await msg.reload();
 
@@ -88,74 +105,80 @@ export const initMessageResponseConsumer = () => {
                 });
               }
             } else {
-              let mediaUrl = '';
+              let mediaUrl = "";
               let body = message.text;
 
               if (message.mediaUrl) {
-                if(!message.mediaUrl?.includes('http')) {
-                  mediaUrl = '';
+                if (!message.mediaUrl?.includes("http")) {
+                  mediaUrl = "";
                 }
               }
 
               if (message.path) {
-                if(message.path?.includes('http') && !message.path?.trim().includes(" ")) {
+                if (
+                  message.path?.includes("http") &&
+                  !message.path?.trim().includes(" ")
+                ) {
                   mediaUrl = message.path;
                 } else {
-                  mediaUrl = '';
+                  mediaUrl = "";
                 }
               }
 
               if (message.text === mediaUrl) {
-                body = '';
+                body = "";
               }
 
               await botMessage({
-                "session": message.session,
-                "id": msgWhatsId,
-                "fromMe": true,
-                "bot": true,
-                "isGroup":false,
-                "type": message.type == 'file' ? 'document' : message.type,
-                "to": message.number,
-                "from": message.session,
-                "body": body,
-                "mediaUrl": mediaUrl,
-                "contactName": message.contactName,
-                "templateButtons": message.templateButtons ? message.templateButtons : null
-             });
-
-             const reg = await getRegister(message);
-
-            if (reg) {
-              await reg.update({
-                sentAt: new Date(),
-                msgWhatsId: msgWhatsId
+                session: message.session,
+                id: msgWhatsId,
+                fromMe: true,
+                bot: true,
+                isGroup: false,
+                type: message.type == "file" ? "document" : message.type,
+                to: message.number,
+                from: message.session,
+                body: body,
+                mediaUrl: mediaUrl,
+                contactName: message.contactName,
+                templateButtons: message.templateButtons
+                  ? message.templateButtons
+                  : null
               });
-            }
+
+              const reg = await getRegister(message);
+
+              if (reg) {
+                await reg.update({
+                  sentAt: new Date(),
+                  msgWhatsId: msgWhatsId
+                });
+              }
             }
           } else {
             const whats = await Whatsapp.findOne({
               where: {
                 name: message.session,
                 status: "CONNECTED",
-                deleted: false,
+                deleted: false
               }
             });
 
             let retry = false;
 
             try {
-              const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
-        
+              const CHECK_NUMBER_URL =
+                "http://orquestrator.kankei.com.br:8080/checkNumber";
+
               const payload = {
-                "session": message.session,
-                "number": message.session,
-              }    
-          
+                session: message.session,
+                number: message.session
+              };
+
               const { data } = await axios.post(CHECK_NUMBER_URL, payload, {
                 headers: {
                   "api-key": process.env.WPPNOF_API_TOKEN,
-                  "sessionkey": process.env.WPPNOF_SESSION_KEY,
+                  sessionkey: process.env.WPPNOF_SESSION_KEY
                 }
               });
 
@@ -173,89 +196,113 @@ export const initMessageResponseConsumer = () => {
               if (response === "time out de conexão") retry = true;
             }
 
-            if (response.message === "O telefone informado nao esta registrado no whatsapp.") {
+            if (
+              response.message ===
+              "O telefone informado nao esta registrado no whatsapp."
+            ) {
               const reg = await getRegister(message);
 
               if (reg) {
                 await reg.update({
                   sentAt: new Date(),
-                  haveWhatsapp: false 
+                  haveWhatsapp: false
                 });
               }
             } else {
-              if (retry || (whats && (response.message == 'sessão inválida ou inexistente' || code == 500))) {
+              if (
+                retry ||
+                (whats &&
+                  (response.message == "sessão inválida ou inexistente" ||
+                    code == 500))
+              ) {
                 const headers = {
                   "api-key": `${process.env.WPPNOF_API_TOKEN}`,
-                  "sessionkey": `${process.env.WPPNOF_SESSION_KEY}`
+                  sessionkey: `${process.env.WPPNOF_SESSION_KEY}`
                 };
-                
+
                 const params = {
                   MessageBody: JSON.stringify({ message, headers }),
                   QueueUrl: process.env.SQS_ORQUESTRATOR_URL,
                   DelaySeconds: 60
-                }
-                
+                };
+
                 await sendMessageToSQS(params);
               } else {
                 if (message.messageId) {
                   const msg = await Message.findOne({
                     where: { id: message.messageId }
                   });
-        
+
                   const ticket = await Ticket.findOne({
                     where: { id: msg.ticketId }
                   });
-        
+
                   await msg.update({ ack: 5 });
-                  await ticket.update({ lastMessage: `(ERRO AO ENVIAR) ${message.text}` });
-      
+                  await ticket.update({
+                    lastMessage: `(ERRO AO ENVIAR) ${message.text}`
+                  });
+
                   await msg.reload();
-      
+
                   const io = getIO();
                   io.emit(`appMessage${ticket.companyId}`, {
                     action: "update",
                     message: msg
                   });
+
+                  const callbackPayload = {
+                    session: message.session,
+                    status: {
+                      phoneNumber: message.number,
+                    },
+                    error: true
+                  };
+
+                  await genericCallbackStatus(callbackPayload);
                 } else {
-                  let mediaUrl = '';
+                  let mediaUrl = "";
                   let body = message.text;
-    
+
                   if (message.mediaUrl) {
-                    if(!message.mediaUrl?.includes('http')) {
-                      mediaUrl = '';
+                    if (!message.mediaUrl?.includes("http")) {
+                      mediaUrl = "";
                     }
                   }
-    
+
                   if (message.path) {
-                    if(message.path?.includes('http') && !message.path?.trim().includes(" ")) {
+                    if (
+                      message.path?.includes("http") &&
+                      !message.path?.trim().includes(" ")
+                    ) {
                       mediaUrl = message.path;
                     } else {
-                      mediaUrl = '';
+                      mediaUrl = "";
                     }
                   }
-    
+
                   if (message.text === mediaUrl) {
-                    body = '';
+                    body = "";
                   }
-                  
+
                   await botMessage({
-                    "session": message.session,
-                    "id": null,
-                    "fromMe": true,
-                    "bot": true,
-                    "isGroup":false,
-                    "type": message.type == 'file' ? 'document' : message.type,
-                    "to": message.number,
-                    "from": message.session,
-                    "body": body,
-                    "mediaUrl": mediaUrl,
-                    "contactName": message.contactName,
-                    "templateButtons": message.templateButtons ? message.templateButtons : null
-                 });
+                    session: message.session,
+                    id: null,
+                    fromMe: true,
+                    bot: true,
+                    isGroup: false,
+                    type: message.type == "file" ? "document" : message.type,
+                    to: message.number,
+                    from: message.session,
+                    body: body,
+                    mediaUrl: mediaUrl,
+                    contactName: message.contactName,
+                    templateButtons: message.templateButtons
+                      ? message.templateButtons
+                      : null
+                  });
                 }
               }
             }
-
           }
         } catch (err) {
           console.log(err);
@@ -275,23 +322,22 @@ export const initMessageResponseConsumer = () => {
   app.start();
 };
 
-const getRegister = async (message) => {
+const getRegister = async message => {
   const whats = await Whatsapp.findOne({
-    where: {name: message.session },
+    where: { name: message.session },
     order: [["createdAt", "DESC"]]
-   });
+  });
 
   const reg = await FileRegister.findOne({
     where: {
-      phoneNumber: 
-      { 
+      phoneNumber: {
         [Op.or]: [
           removePhoneNumberWith9Country(message.number),
           preparePhoneNumber9Digit(message.number),
           removePhoneNumber9Digit(message.number),
           removePhoneNumberCountry(message.number),
           removePhoneNumber9DigitCountry(message.number)
-        ],
+        ]
       },
       companyId: whats.companyId,
       processedAt: { [Op.ne]: null }
@@ -300,4 +346,104 @@ const getRegister = async (message) => {
   });
 
   return reg;
-}
+};
+
+const genericCallbackStatus = async request => {
+  const { session, status, error } = request;
+
+  const callback = await GetCallbackService(session);
+
+  if (callback && callback.statusCallbackUrl) {
+    let header = null;
+
+    if (callback.callbackAuthorization) {
+      header = {
+        headers: {
+          Authorization: callback.callbackAuthorization
+        }
+      };
+    }
+
+    let infoPayload = null;
+
+    if (error) {
+      infoPayload = {
+        companyId: callback.companyId,
+        registerId: status.registerId,
+        phoneNumber: status.phoneNumber
+      };
+    } else {
+      infoPayload = {
+        companyId: callback.companyId,
+        msgWhatsId: status.id,
+        phoneNumber: status.recipient_id
+      };
+    }
+
+    const info = await getInfo(infoPayload);
+
+    let payload = null;
+
+    if (error) {
+      payload = {
+        timestamp: new Date().getTime(),
+        status: "error",
+        recipient_id: status.phoneNumber,
+        info: info ? info : null
+      };
+    } else {
+      payload = {
+        ...status,
+        info: info ? info : null
+      };
+    }
+
+    try {
+      const response = await axios.post(
+        callback.statusCallbackUrl,
+        payload,
+        header
+      );
+      console.log(" -- SEND STATUS GENERIC CALLBACK -- ", response);
+    } catch (e) {
+      console.log(" -- ERROR GENERIC CALLBACK STATUS -- ", JSON.stringify(e));
+    }
+  } else {
+    console.log(" -- NO STATUS CALLBACK URL -- ");
+  }
+};
+
+const getInfo = async ({ msgWhatsId, registerId, companyId, phoneNumber }) => {
+  try {
+    const client = createClient({
+      url: process.env.REDIS_URL
+    });
+
+    client.on("error", err => console.log("Redis Client Error", err));
+    await client.connect();
+
+    let value = await client.get(`${phoneNumber}-${companyId}`);
+
+    if (value) {
+      return JSON.parse(value);
+    } else {
+      const response = await GetInfo({ msgWhatsId, registerId });
+    
+      return response;
+    }
+  } catch (e) {
+    if (msgWhatsId) {
+      console.log(
+        " -- ERROR GENERIC CALLBACK getInfo-- " + msgWhatsId,
+        JSON.stringify(e)
+      );
+    } else if (registerId) {
+      console.log(
+        " -- ERROR GENERIC CALLBACK getInfo-- " + registerId,
+        JSON.stringify(e)
+      );
+    } else {
+      console.log(" -- ERROR GENERIC CALLBACK getInfo-- ", JSON.stringify(e));
+    }
+  }
+};
