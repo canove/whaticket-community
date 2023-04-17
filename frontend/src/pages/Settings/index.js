@@ -44,55 +44,97 @@ const Settings = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
-	//                  | dom | seg | ter | qua | qui | sex | sab |
-	const initialDays = [false,false,false,false,false,false,false];
-
-	const [useWorkTime, setUseWorkTime] = useState(false);
-	const [days, setDays] = useState(initialDays);
-	const [hours, setHours] = useState("");
-	const [message, setMessage] = useState("");
+	const initialSettings = {
+		hours: "",
+		message: "",
+		useWorkTime: false,
+		//    | dom | seg | ter | qua | qui | sex | sab |
+		days: [false,false,false,false,false,false,false],
+	}
+	const [settings, setSettings] = useState(initialSettings);
 
 	useEffect(() => {
-		const fetchWorkTime = async () => {
+		const fetchSettings = async () => {
 			try {
-				const { data } = await api.get("/workTime/");
-
-				const workTime = JSON.parse(data);
-
-				console.log(workTime);
-
-				setUseWorkTime(workTime.useWorkTime);
-				setDays(workTime.days)
-				setHours(workTime.hours);
-				setMessage(workTime.message);
+				const { data } = await api.get("/companySettings/");
+				setSettings(prevSettings => ({ ...prevSettings, ...data }));
 			} catch (err) {
 				toastError(err);
 			}
 		}
 
-		fetchWorkTime();
+		fetchSettings();
 	}, []);
 
-	const checkHours = () => {
-		return true;
+	const checkHours = (periods_string) => {
+		let validHours = true;
+
+		const regex = new RegExp('^([0-1][0-9]|2[0-3]):([0-5][0-9])$');
+
+		try {
+			const periods = periods_string.trim().split(",");
+
+			for (const period of periods) {
+				if (period.length !== 11) {
+					validHours = false;
+					break;
+				}
+
+				const time = period.split("-");
+
+				for (const hour of time) {
+					validHours = regex.test(hour);
+
+					if (!validHours) break;
+				}
+
+				if (!validHours) break;
+
+				const hours1 = time[0].split(":");
+				const hours2 = time[1].split(":");
+
+				const hour1 = parseInt(hours1[0]);
+				const hour2 = parseInt(hours2[0]);
+
+				const minute1 = parseInt(hours1[1]);
+				const minute2 = parseInt(hours2[1]);
+
+				if (hour1 > hour2) validHours = false;
+
+				if ((hour1 === hour2) && (minute1 >= minute2)) {
+					validHours = false;
+				}
+
+				if (!validHours) break;
+			}
+		} catch (err) {
+			validHours = false;
+		}
+
+		return validHours;
 	}
 
-	const handleSaveWorkTime = async () => {
-		const validHours = checkHours(hours);
+	const handleSaveSettings = async () => {
+		let validHours = true;
+
+		if (settings.hours) {
+			validHours = checkHours(settings.hours);
+		}
 
 		if (!validHours) {
-			toast.error("Horário inválido.");
+			toast.error("Horários inválidos.");
+			return;
 		}
 
 		const body = {
-			useWorkTime,
-			days: days.map(day => day ? true : false),
-			hours,
-			message
+			useWorkTime: settings.useWorkTime,
+			days: settings.days.map(day => day ? true : false),
+			hours: settings.hours,
+			message: settings.message,
 		};
 
 		try {
-			await api.post("/workTime/", body);
+			await api.post("/companySettings/", body);
 			toast.success("Horário de Atendimento salvo com sucesso.");
 		} catch (err) {
 			toastError(err);
@@ -100,13 +142,22 @@ const Settings = () => {
 	}
 
 	const handleDayChange = (e, day) => {
-		if (day === "dom") setDays([e.target.checked, days[1], days[2], days[3], days[4], days[5], days[6]]);
-		if (day === "seg") setDays([days[0], e.target.checked, days[2], days[3], days[4], days[5], days[6]]);
-		if (day === "ter") setDays([days[0], days[1], e.target.checked, days[3], days[4], days[5], days[6]]);
-		if (day === "qua") setDays([days[0], days[1], days[2], e.target.checked, days[4], days[5], days[6]]);
-		if (day === "qui") setDays([days[0], days[1], days[2], days[3], e.target.checked, days[5], days[6]]);
-		if (day === "sex") setDays([days[0], days[1], days[2], days[3], days[4], e.target.checked, days[6]]);
-		if (day === "sab") setDays([days[0], days[1], days[2], days[3], days[4], days[5], e.target.checked]);
+		let oldDays = settings.days;
+		let newDays = [];
+
+		if (day === "dom") newDays = [e.target.checked, oldDays[1], oldDays[2], oldDays[3], oldDays[4], oldDays[5], oldDays[6]];
+		if (day === "seg") newDays = [oldDays[0], e.target.checked, oldDays[2], oldDays[3], oldDays[4], oldDays[5], oldDays[6]];
+		if (day === "ter") newDays = [oldDays[0], oldDays[1], e.target.checked, oldDays[3], oldDays[4], oldDays[5], oldDays[6]];
+		if (day === "qua") newDays = [oldDays[0], oldDays[1], oldDays[2], e.target.checked, oldDays[4], oldDays[5], oldDays[6]];
+		if (day === "qui") newDays = [oldDays[0], oldDays[1], oldDays[2], oldDays[3], e.target.checked, oldDays[5], oldDays[6]];
+		if (day === "sex") newDays = [oldDays[0], oldDays[1], oldDays[2], oldDays[3], oldDays[4], e.target.checked, oldDays[6]];
+		if (day === "sab") newDays = [oldDays[0], oldDays[1], oldDays[2], oldDays[3], oldDays[4], oldDays[5], e.target.checked];
+
+		setSettings(prevSettings => ({ ...prevSettings, days: newDays }));
+	}
+
+	const handleSettingsChange = (value, settingName) => {
+		setSettings(prevSettings => ({ ...prevSettings, [settingName]: value }))
 	}
 
 	return (
@@ -119,48 +170,48 @@ const Settings = () => {
 							label="Horário de Atendimento"
 							control={
 							<Checkbox
-								checked={useWorkTime}
-								indeterminate={useWorkTime === false}
-								onChange={() => setUseWorkTime(prevWorkTime => !prevWorkTime)}
+								checked={settings.useWorkTime}
+								indeterminate={settings.useWorkTime === false}
+								onChange={(e) => handleSettingsChange(!settings.useWorkTime, "useWorkTime")}
 								color="primary"
 							/>
 							}
 						/>
-						{ !useWorkTime &&
+						{ !settings.useWorkTime &&
 							<Typography variant="body2" gutterBottom>
 								{"Se horário de atendimento estiver desativado, ----- será usado como padrão."}
 							</Typography>
 						}
-						{ useWorkTime &&
+						{ settings.useWorkTime &&
 							<>
 								<Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
 									<FormControlLabel
 										label="Segunda"
-										control={<Checkbox color="primary" checked={days[1]} onChange={(e) => { handleDayChange(e, "seg") }} />}
+										control={<Checkbox color="primary" checked={settings.days[1]} onChange={(e) => { handleDayChange(e, "seg") }} />}
 									/>
 									<FormControlLabel
 										label="Terça"
-										control={<Checkbox color="primary" checked={days[2]} onChange={(e) => { handleDayChange(e, "ter") }} />}
+										control={<Checkbox color="primary" checked={settings.days[2]} onChange={(e) => { handleDayChange(e, "ter") }} />}
 									/>
 									<FormControlLabel
 										label="Quarta"
-										control={<Checkbox color="primary" checked={days[3]} onChange={(e) => { handleDayChange(e, "qua") }} />}
+										control={<Checkbox color="primary" checked={settings.days[3]} onChange={(e) => { handleDayChange(e, "qua") }} />}
 									/>
 									<FormControlLabel
 										label="Quinta"
-										control={<Checkbox color="primary" checked={days[4]} onChange={(e) => { handleDayChange(e, "qui") }} />}
+										control={<Checkbox color="primary" checked={settings.days[4]} onChange={(e) => { handleDayChange(e, "qui") }} />}
 									/>
 									<FormControlLabel
 										label="Sexta"
-										control={<Checkbox color="primary" checked={days[5]} onChange={(e) => { handleDayChange(e, "sex") }} />}
+										control={<Checkbox color="primary" checked={settings.days[5]} onChange={(e) => { handleDayChange(e, "sex") }} />}
 									/>
 									<FormControlLabel
 										label="Sábado"
-										control={<Checkbox color="primary" checked={days[6]} onChange={(e) => { handleDayChange(e, "sab") }} />}
+										control={<Checkbox color="primary" checked={settings.days[6]} onChange={(e) => { handleDayChange(e, "sab") }} />}
 									/>
 									<FormControlLabel
 										label="Domingo"
-										control={<Checkbox color="primary" checked={days[0]} onChange={(e) => { handleDayChange(e, "dom") }} />}
+										control={<Checkbox color="primary" checked={settings.days[0]} onChange={(e) => { handleDayChange(e, "dom") }} />}
 									/>
 								</Box>
 								<TextField
@@ -169,8 +220,8 @@ const Settings = () => {
 									name="hours"
 									variant="outlined"
 									margin="dense"
-									value={hours}
-									onChange={(e) => { setHours(e.target.value) }}
+									value={settings.hours}
+									onChange={(e) => { handleSettingsChange(e.target.value, "hours") }}
 									fullWidth
 								/>
 								<TextField
@@ -181,8 +232,8 @@ const Settings = () => {
 									minRows={3}
 									maxRows={3}
 									multiline
-									value={message}
-									onChange={(e) => { setMessage(e.target.value) }}
+									value={settings.message}
+									onChange={(e) => { handleSettingsChange(e.target.value, "message") }}
 									fullWidth
 								/>
 							</>
@@ -190,7 +241,7 @@ const Settings = () => {
 						<Button
 							color="primary"
 							variant="contained"
-							onClick={handleSaveWorkTime}
+							onClick={handleSaveSettings}
 						>
 							Salvar
 						</Button>

@@ -171,7 +171,7 @@ const Ticket = () => {
           </div>
         </TicketHeader>
         { (ticket.whatsapp && ticket.whatsapp.official) &&
-          <SessionTimer ticket={ticket} setSessionClosed={setSessionClosed} />
+          <SessionTimer ticket={ticket} contact={contact} setSessionClosed={setSessionClosed} />
         }
         <ReplyMessageProvider>
           <MessagesList

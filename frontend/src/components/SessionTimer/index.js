@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import NewTicketModal from "../NewTicketModal";
 import ConfirmationModal from "../ConfirmationModal";
 
-const SessionTimer = ({ ticket, setSessionClosed = false }) => {
+const SessionTimer = ({ ticket, contact, setSessionClosed }) => {
     const [time, setTime] = useState(0);
     const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -79,6 +79,9 @@ const SessionTimer = ({ ticket, setSessionClosed = false }) => {
             <NewTicketModal
                 modalOpen={newTicketModalOpen}
                 onClose={(e) => setNewTicketModalOpen(false)}
+                isOfficial={true}
+                officialContact={contact}
+                officialWhatsappId={ticket.whatsappId}
             />
             <div style={{ display: "flex", justifyContent: "space-between", backgroundColor: "#eee", padding: "16px" }}>
                 <Typography>Tempo da sessão: {formatTime(time)}</Typography>
