@@ -20,6 +20,7 @@ interface TemplateData {
   category: string;
   bodyText: string;
   mapping: string;
+  bodyExample: string;
 }
 
 type IndexQuery = {
@@ -81,6 +82,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     category,
     bodyText,
     mapping,
+    bodyExample,
   }: TemplateData = req.body;
 
   const { companyId } = req.user;
@@ -91,7 +93,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     category,
     bodyText,
     mapping,
-    companyId
+    companyId,
+    bodyExample,
   });
 
   const io = getIO();

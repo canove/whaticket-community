@@ -97,18 +97,19 @@ const TemplateModal = ({ open, onClose }) => {
       bodyText,
       footerText,
       mapping: JSON.stringify(mapping),
-      // bodyExample: Object.keys(values.bodyExample).length > 0 ? JSON.stringify(values.bodyExample) : null
+      bodyExample: Object.keys(values.bodyExample).length > 0 ? JSON.stringify(values.bodyExample) : null
     };
 
-    // let haveExample = true;
+    let haveExample = true;
     
-    // Object.keys(mapping).forEach((key) => {
-    //   console.log(key);
+    Object.keys(mapping).forEach((key) => {
+      if (!values.bodyExample[key]) haveExample = false;
+    });
 
-    //   if (!values.bodyExample[key]) haveExample = false;
-    // });
-
-    // if (!haveExample) toast.error("Escreva um exemplo para variável utilizada.");
+    if (!haveExample) {
+      toast.error("Escreva um exemplo para variável utilizada.");
+      return;
+    }
 
     try {
       await api.post(`/whatsappTemplate/create/`, templateData);
@@ -323,7 +324,7 @@ const TemplateModal = ({ open, onClose }) => {
                           }}
                         />
                       }
-                      {/* <Field
+                      <Field
                         as={TextField}
                         label={"Exemplo de Conteúdo"}
                         variant="outlined"
@@ -335,7 +336,7 @@ const TemplateModal = ({ open, onClose }) => {
                         onChange={(e) => {
                           setFieldValue("bodyExample", { ...values.bodyExample, [param]: e.target.value });
                         }}
-                      /> */}
+                      />
                       </div>
                     );
                   })}

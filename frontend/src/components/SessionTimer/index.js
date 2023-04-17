@@ -1,8 +1,12 @@
-import { Typography } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
+import NewTicketModal from "../NewTicketModal";
+import ConfirmationModal from "../ConfirmationModal";
 
-const SessionTimer = ({ ticket }) => {
+const SessionTimer = ({ ticket, setSessionClosed = false }) => {
     const [time, setTime] = useState(0);
+    const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
     useEffect(() => {
         let interval = null;  
@@ -21,15 +25,16 @@ const SessionTimer = ({ ticket }) => {
                 setTime((time) => time - 10);
                 }, 10);
             } else {
-                setTime(0);
                 clearInterval(interval);
+                setTime(0);
+                setSessionClosed(true);
             }
         }
     
         return () => {
             clearInterval(interval);
         };
-    }, [ticket]);
+    }, [time, ticket]);
 
     const formatTime = (milliseconds) => {
         let seconds = milliseconds / 1000;
@@ -62,9 +67,33 @@ const SessionTimer = ({ ticket }) => {
     };
 
     return (
-        <div style={{ backgroundColor: "#eee", padding: "16px" }}>
-            <Typography>Tempo da sessão: {formatTime(time)}</Typography>
-        </div>
+        <>
+            <ConfirmationModal
+                title={"Continuar conversa"}
+                open={confirmModalOpen}
+                onClose={setConfirmModalOpen}
+                onConfirm={() => setNewTicketModalOpen(true)}
+            >
+                Você tem certeza que quer continuar a conversa? Um novo ticket será criado.
+            </ConfirmationModal>
+            <NewTicketModal
+                modalOpen={newTicketModalOpen}
+                onClose={(e) => setNewTicketModalOpen(false)}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", backgroundColor: "#eee", padding: "16px" }}>
+                <Typography>Tempo da sessão: {formatTime(time)}</Typography>
+                {time <= 0 &&
+                    <Button
+                        type="submit"
+                        color="primary"
+                        variant="contained"
+                        onClick={() => setConfirmModalOpen(true)}
+                    >
+                        Continuar conversa
+                    </Button>
+                }
+            </div>
+        </>
     );
 }
 

@@ -86,6 +86,7 @@ const Ticket = () => {
   const [whatsapp, setWhatsapp] = useState({});
   const [ticket, setTicket] = useState({});
   const { user } = useContext(AuthContext);
+  const [sessionClosed, setSessionClosed] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -170,7 +171,7 @@ const Ticket = () => {
           </div>
         </TicketHeader>
         { (ticket.whatsapp && ticket.whatsapp.official) &&
-          <SessionTimer ticket={ticket} />
+          <SessionTimer ticket={ticket} setSessionClosed={setSessionClosed} />
         }
         <ReplyMessageProvider>
           <MessagesList
@@ -178,7 +179,7 @@ const Ticket = () => {
             isGroup={ticket.isGroup}
             whatsapp={whatsapp}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} />
+          <MessageInput ticketStatus={ticket.status} sessionClosed={sessionClosed} />
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
