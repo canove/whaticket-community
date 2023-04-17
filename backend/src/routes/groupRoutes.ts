@@ -6,6 +6,8 @@ import * as GroupController from "../controllers/GroupController";
 
 const groupRoutes = express.Router();
 
+groupRoutes.get("/group/:number", isAuth, GroupController.getDados);
+
 groupRoutes.post("/group", isAuth, GroupController.store);
 
 groupRoutes.put("/group/remove", isAuth, GroupController.groupRemove);

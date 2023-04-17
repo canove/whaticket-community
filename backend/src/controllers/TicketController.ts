@@ -78,6 +78,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
 
   const contact = await ShowTicketService(ticketId);
+  // console.log(contact);
 
   return res.status(200).json(contact);
 };

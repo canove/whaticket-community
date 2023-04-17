@@ -3,7 +3,7 @@ import AppError from "../../errors/AppError";
 
 const ShowContactService = async (id: string | number): Promise<Contact> => {
   const contact = await Contact.findByPk(id, { include: ["extraInfo"] });
-  console.log("show", contact);
+  // console.log("show", contact);
 
   if (!contact) {
     throw new AppError("ERR_NO_CONTACT_FOUND", 404);

@@ -7,14 +7,13 @@ const RemovePeopleGroupService = async (
   wbot: any
 ): Promise<void> => {
   try {
-    console.log(typeof wbot.removeParticipants);
     await wbot.removeParticipants(peoples);
   } catch (err) {
     if (err.message === "invalidNumber") {
       throw new AppError("ERR_WAPP_INVALID_CONTACT");
     }
     // throw new AppError("ERR_WAPP_CHECK_CONTACT");
-    console.log(err.message);
+    // console.log(err.message);
   }
 };
 

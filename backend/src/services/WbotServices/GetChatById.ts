@@ -14,7 +14,7 @@ const GetChatById = async (chatID: string): Promise<any> => {
       throw new AppError("ERR_WAPP_INVALID_CONTACT");
     }
     // throw new AppError("ERR_WAPP_CHECK_CONTACT");
-    console.log(err.message);
+    // console.log(err.message);
   }
 };
 

@@ -21,7 +21,7 @@ const isAuth = (req: Request, res: Response, next: NextFunction): void => {
 
   const [, token] = authHeader.split(" ");
 
-  console.log(token);
+  // console.log(token);
 
   try {
     const decoded = verify(token, authConfig.secret);

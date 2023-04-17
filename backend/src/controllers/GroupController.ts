@@ -57,6 +57,7 @@ export const groupRemove = async (
   res: Response
 ): Promise<Response> => {
   const data: RemoveData = req.body;
+  // console.log(data);
 
   const wbot = await GetChatById(data.chatID);
 
@@ -89,4 +90,16 @@ export const onlyAdmin = async (
   await wbot.setMessagesAdminsOnly(data.onlyAdminMenssage);
 
   return res.status(200).json({ status: "OK" });
+};
+
+export const getDados = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { number } = req.params;
+  // console.log("number", number);
+
+  const wbot = await GetChatById(number);
+
+  return res.status(200).json(wbot);
 };
