@@ -191,6 +191,18 @@ const verifyMessage = async (
   }
 
   // const settings = await ListCompanySettingsService(ticket.companyId);
+
+  // const now = new Date();
+  // const day = now.getDay();
+
+  // const hours = now.getHours();
+  // const minutes = now.getMinutes();
+
+  // if (settings.days[day]) {
+    
+  // } else {
+
+  // }
 };
 
 const verifyContact = async (

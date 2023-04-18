@@ -28,7 +28,7 @@ const ListCompanySettingsService = async (
       throw new AppError(err);
   }
 
-  if (!settings) settings = { days: [], hours: "", message: "", useWorkTime: false };
+  if (!settings) settings = { days: [false,false,false,false,false,false,false], hours: "", message: "", useWorkTime: false };
 
   return JSON.parse(settings);
 };
