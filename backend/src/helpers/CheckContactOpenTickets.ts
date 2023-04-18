@@ -2,9 +2,9 @@ import { Op } from "sequelize";
 import AppError from "../errors/AppError";
 import Ticket from "../database/models/Ticket";
 
-const CheckContactOpenTickets = async (contactId: number): Promise<void> => {
+const CheckContactOpenTickets = async (contactId: number, companyId: number): Promise<void> => {
   const ticket = await Ticket.findOne({
-    where: { contactId, status: { [Op.or]: ["open", "pending"] } }
+    where: { contactId, companyId, status: { [Op.or]: ["open", "pending"] } }
   });
 
   if (ticket) {

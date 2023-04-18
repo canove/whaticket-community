@@ -23,6 +23,7 @@ import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurve
 import SatisfactionSurveys from "../../database/models/SatisfactionSurveys";
 import ConnectionFiles from "../../database/models/ConnectionFile";
 import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
+import ListCompanySettingsService from "../SettingServices/ListCompanySettingsService";
 
 /*eslint-disable*/
 interface Request {
@@ -188,6 +189,8 @@ const verifyMessage = async (
       await ticket.update({ lastMessage: connectionFile.greetingMessage, lastMessageFromMe: true });
     }
   }
+
+  // const settings = await ListCompanySettingsService(ticket.companyId);
 };
 
 const verifyContact = async (

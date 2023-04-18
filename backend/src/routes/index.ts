@@ -43,6 +43,7 @@ import contactBlacklistRoutes from "./contactBlacklistRoutes";
 import supervisorRoutes from "./supervisorRoutes";
 import satisfactionSurveyRoutes from "./satisfactionSurveyRoutes";
 import packageRoutes from "./packageRoutes";
+import companySettingsRoutes from "./companySettingsRoutes";
 
 const routes = Router();
 
@@ -89,5 +90,6 @@ routes.use(contactBlacklistRoutes);
 routes.use(supervisorRoutes);
 routes.use(satisfactionSurveyRoutes);
 routes.use(packageRoutes);
+routes.use(companySettingsRoutes);
 
 export default routes;

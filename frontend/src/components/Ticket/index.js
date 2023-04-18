@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
-import { Paper, makeStyles } from "@material-ui/core";
+import { Paper, Typography, makeStyles } from "@material-ui/core";
 
 import ContactDrawer from "../ContactDrawer";
 import MessageInput from "../MessageInput/";
@@ -17,6 +17,7 @@ import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import SessionTimer from "../SessionTimer";
 
 const drawerWidth = 320;
 
@@ -85,6 +86,7 @@ const Ticket = () => {
   const [whatsapp, setWhatsapp] = useState({});
   const [ticket, setTicket] = useState({});
   const { user } = useContext(AuthContext);
+  const [sessionClosed, setSessionClosed] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -137,7 +139,6 @@ const Ticket = () => {
     return () => {
       socket.disconnect();
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId, history]);
 
   const handleDrawerOpen = () => {
@@ -169,13 +170,16 @@ const Ticket = () => {
             <TicketActionButtons ticket={ticket} />
           </div>
         </TicketHeader>
+        { (ticket.whatsapp && ticket.whatsapp.official) &&
+          <SessionTimer ticket={ticket} contact={contact} setSessionClosed={setSessionClosed} />
+        }
         <ReplyMessageProvider>
           <MessagesList
             ticketId={ticketId}
             isGroup={ticket.isGroup}
             whatsapp={whatsapp}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} />
+          <MessageInput ticketStatus={ticket.status} sessionClosed={sessionClosed} />
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
