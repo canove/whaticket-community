@@ -177,11 +177,6 @@ const Settings = () => {
 							/>
 							}
 						/>
-						{ !settings.useWorkTime &&
-							<Typography variant="body2" gutterBottom>
-								{"Se horário de atendimento estiver desativado, ----- será usado como padrão."}
-							</Typography>
-						}
 						{ settings.useWorkTime &&
 							<>
 								<Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
