@@ -17,19 +17,6 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
 import background from "../../assets/imgbor1950.webp";
 
-// const Copyright = () => {
-// 	return (
-// 		<Typography variant="body2" color="textSecondary" align="center">
-// 			{"Copyleft "}
-// 			<Link color="inherit" href="https://github.com/canove">
-// 				Canove
-// 			</Link>{" "}
-// 			{new Date().getFullYear()}
-// 			{"."}
-// 		</Typography>
-// 	);
-// };
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(5),
@@ -157,7 +144,6 @@ const Login = () => {
                   </Button>
                 </form>
               </div>
-              <Box mt={8}>{/* <Copyright /> */}</Box>
             </Paper>
           </div>
         </Container>
