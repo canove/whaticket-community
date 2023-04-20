@@ -6,17 +6,30 @@ import axios from "axios";
 import Contact from "../../database/models/Contact";
 import { Op } from "sequelize";
 import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
+import Category from "../../database/models/Category";
 
 interface Request {
   ticketId: number;
   companyId: number;
+  categoryId?: number;
 }
 
 const SendTicketMessagesToCompanyService = async ({
   ticketId,
+  categoryId,
   companyId
 }: Request): Promise<void> => {
   try {
+    let categoryName = "NÃO CATEGORIZADO";
+
+    if (categoryId) {
+      const category = await Category.findOne({
+        where: { id: categoryId }
+      });
+
+      if (category) categoryName = category.name;
+    }
+
     const { count, rows: messages } = await Message.findAndCountAll({
       where: { ticketId },
       include: [
@@ -77,7 +90,7 @@ const SendTicketMessagesToCompanyService = async ({
     const payload = {
       "token": process.env.BELLINATI_TOKEN,
       "idFornecedor": process.env.BELLINATI_ID_FORNECEDOR,
-      "idEventoFornecedor": "TICKET_CLOSED",
+      "idEventoFornecedor": categoryName,
       "cdGrupo": 999,
       "texto": html,
       "CNPJ_CPF": reg.documentNumber,

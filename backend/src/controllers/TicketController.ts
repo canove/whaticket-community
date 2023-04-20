@@ -233,7 +233,7 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
   const { ticketId } = req.params;
   const { companyId, id: userId } = req.user;
   const ticketData: TicketData = req.body;
-  const { surveyId } = req.body;
+  const { surveyId, categoryId } = req.body;
 
   const { ticket } = await UpdateTicketService({
     ticketData,
@@ -243,7 +243,7 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
 
   if (ticket.status === "closed") {
     if (companyId === 6) {
-      await SendTicketMessagesToCompanyService({ ticketId: ticket.id, companyId });
+      await SendTicketMessagesToCompanyService({ ticketId: ticket.id, categoryId, companyId });
     }
 
     const connectionFile = await ConnectionFiles.findOne({
