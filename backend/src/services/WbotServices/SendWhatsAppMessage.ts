@@ -123,14 +123,14 @@ const SendWhatsAppMessage = async ({
    
 
   if (connnection?.official) {
-    const now = new Date();
-    now.setDate(now.getDate() - 1);
+    // const now = new Date();
+    // now.setDate(now.getDate() - 1);
 
-    const createdAt = new Date(ticket.createdAt);
+    // const createdAt = new Date(ticket.createdAt);
 
-    const time = createdAt.getTime() - now.getTime();
+    // const time = createdAt.getTime() - now.getTime();
 
-    if (time < 0) throw new AppError("ERR_SESSION_ENDED");
+    // if (time < 0) throw new AppError("ERR_SESSION_ENDED");
 
     const offConnection = await OfficialWhatsapp.findOne({
       where: { id: connnection.officialWhatsappId }
