@@ -10,6 +10,7 @@ interface TemplateData {
   bodyText: string;
   mapping: string;
   companyId: string | number;
+  bodyExample: string;
 }
 
 const CreateTemplateService = async ({
@@ -18,7 +19,8 @@ const CreateTemplateService = async ({
   category,
   bodyText,
   mapping,
-  companyId
+  companyId,
+  bodyExample,
 }: TemplateData): Promise<OfficialTemplates> => {
   const templateExists = await OfficialTemplates.findOne({
     where: {
@@ -35,7 +37,8 @@ const CreateTemplateService = async ({
     category,
     body: bodyText,
     mapping,
-    companyId
+    companyId,
+    bodyExample
   });
 
   return template;

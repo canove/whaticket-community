@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
+const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, officialWhatsappId, officialContact }) => {
 	const history = useHistory();
 	const classes = useStyles();
 
@@ -87,6 +87,13 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 
 		fetchQueues();
 	}, []);
+
+	useEffect(() => {
+		if (isOfficial && officialWhatsappId) {
+			setOfficial(isOfficial);
+			setWhatsappId(officialWhatsappId);
+		}
+	}, [isOfficial, officialWhatsappId]);
 
 	useEffect(() => {
 		const fetchTemplates = async () => {
@@ -269,6 +276,9 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 									/>
 								)}
 							/>
+							{ officialContact && 
+								<div>Contato da conversa: {officialContact.number}</div>
+							}
 							<div style={{ marginTop: 6 }}>
 								<FormControl fullWidth margin="dense" variant="outlined">
 									<InputLabel>{"Fila"}</InputLabel>
@@ -385,8 +395,21 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 											label={"Templates"}
 											onChange={(e) => {
 												setSelectedTemplate(e.target.value);
-												setVariables(JSON.parse(e.target.value.mapping));
-												setHeader(JSON.parse(e.target.value.header))
+
+												const mapping = e.target.value.mapping;
+												const header = e.target.value.header;
+
+												if (mapping) {
+													setVariables(JSON.parse(mapping));
+												} else {
+													setVariables(null);
+												}
+
+												if (header) {
+													setHeader(JSON.parse(header));
+												} else {
+													setHeader(null);
+												}
 											}}
 											fullWidth
 										>
@@ -519,7 +542,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId }) => {
 						color="primary"
 						loading={loading}
 					>
-						{contactId ? "Criar" : i18n.t("newTicketModal.buttons.ok")}
+						{"Criar"}
 					</ButtonWithSpinner>
 				</DialogActions>
 			</Dialog>

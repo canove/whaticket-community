@@ -198,7 +198,7 @@ const GeneralReports = () => {
               {reports.map((report) => (
                 <TableRow key={report.companyId}>
                   <TableCell align="center">{report.company.name || ""}</TableCell>
-                  <TableCell align="center">{report.total || 0}</TableCell>
+                  <TableCell align="center">{report.imported || 0}</TableCell>
                   <TableCell align="center">{report.sent || 0}</TableCell>
                   <TableCell align="center">{report.delivered || 0}</TableCell>
                   <TableCell align="center">{report.read || 0}</TableCell>
@@ -214,7 +214,7 @@ const GeneralReports = () => {
                 <TableCell align="center">{i18n.t("generalReports.table.total")}</TableCell>
                 <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
-                    const value = report.total ? parseInt(report.total) : 0;
+                    const value = report.imported ? parseInt(report.imported) : 0;
 
                     return accumulator + value;
                   }, 0)}
