@@ -185,13 +185,79 @@ const verifyMessage = async (
         mediaUrl: null,
         templateButtons: null
       });
-
-      await ticket.update({ lastMessage: connectionFile.greetingMessage, lastMessageFromMe: true });
     }
   }
 
-  // const settings = await ListCompanySettingsService(ticket.companyId);
+  const settings = await ListCompanySettingsService(ticket.companyId);
+
+  if (settings && settings.useWorkTime && settings.message && settings.hours) {
+    const isWorkTime = await verifyWorkTime(settings);
+
+    if (!isWorkTime) {
+      await SendWhatsAppMessage({
+        body: settings.message,
+        ticket: ticket,
+        companyId: ticket.companyId,
+        fromMe: true,
+        bot: true,
+        contactId: ticket.contactId,
+        whatsMsgId: null,
+        cation: null,
+        type: "text",
+        mediaUrl: null,
+        templateButtons: null
+      });
+    }
+  }
 };
+
+const verifyWorkTime = async (settings) => {
+  let isWorkTime = false;
+
+  const now = new Date();
+  const day = now.getDay();
+
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+
+  if (settings.days[day]) {
+    const periods = settings.hours.trim().split(",");
+
+    for (const period of periods) {
+      const time = period.split("-");
+
+      const hours1 = time[0].split(":");
+      const hours2 = time[1].split(":");
+
+      const hour1 = parseInt(hours1[0]);
+      const hour2 = parseInt(hours2[0]);
+
+      const minute1 = parseInt(hours1[1]);
+      const minute2 = parseInt(hours2[1]);
+
+      if ((hours > hour1) && (hours < hour2)) {
+        isWorkTime = true;
+        break;
+      }
+
+      if (hour1 === hour2) {
+        if ((hours === hour1) && (minutes >= minute1) && (minutes < minute2)) {
+          isWorkTime = true;
+          break;
+        }
+      } else {
+        if (((hours === hour1) && (minutes >= minute1)) || ((hours === hour2) && (minutes < minute2))) {
+          isWorkTime = true;
+          break;
+        }
+      }
+    }
+  } else {
+    isWorkTime = false;
+  }
+
+  return isWorkTime;
+} 
 
 const verifyContact = async (
   contactName: string,

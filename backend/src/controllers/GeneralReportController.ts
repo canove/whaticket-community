@@ -125,7 +125,7 @@ const getReportRows = (reports: any[]) => {
 
     for (const report of reports) {
         const company_name = report.company.name || "";
-        const register_total = report.total || 0;
+        const register_total = report.imported || 0;
         const register_sent = report.sent || 0;
         const register_delivered = report.delivered || 0;
         const register_read = report.read || 0;

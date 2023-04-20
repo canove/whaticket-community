@@ -170,16 +170,17 @@ const Ticket = () => {
             <TicketActionButtons ticket={ticket} />
           </div>
         </TicketHeader>
-        { (ticket.whatsapp && ticket.whatsapp.official) &&
+        {/* { (ticket.whatsapp && ticket.whatsapp.official) &&
           <SessionTimer ticket={ticket} contact={contact} setSessionClosed={setSessionClosed} />
-        }
+        } */}
         <ReplyMessageProvider>
           <MessagesList
             ticketId={ticketId}
             isGroup={ticket.isGroup}
             whatsapp={whatsapp}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} sessionClosed={sessionClosed} />
+          {/* <MessageInput ticketStatus={ticket.status} sessionClosed={sessionClosed} /> */}
+          <MessageInput ticketStatus={ticket.status} sessionClosed={false} />
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
