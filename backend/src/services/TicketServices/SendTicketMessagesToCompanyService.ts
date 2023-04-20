@@ -97,7 +97,12 @@ const SendTicketMessagesToCompanyService = async ({
       "telefone": reg.phoneNumber,
       "contrato": reg.var1,
       "dadosAdicionais": reg.var2,
-      "dataEvento": formatDate(new Date())
+      "dataEvento": formatDate(new Date()),
+      "var1": reg.var1,
+      "var2": reg.var2,
+      "var3": reg.var3,
+      "var4": reg.var4,
+      "var5": reg.var5,
     };
   
     const response = await axios.post(process.env.BELLINATI_URL, payload);
