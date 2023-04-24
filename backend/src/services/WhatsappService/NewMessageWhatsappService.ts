@@ -351,6 +351,7 @@ const handleMessage = async (
 
     if (reg && reg.interactionAt === null) {
       await reg.update({ interactionAt: new Date() });
+      console.log("handleMessage reg interaction update: ", reg);
     }
 
     let ticket = null;
@@ -375,6 +376,7 @@ const handleMessage = async (
     });
   
     if (survey) {
+      console.log("handleMessage survey: ", survey);
       const answers = JSON.parse(survey.satisfactionSurvey.answers);
 
       if (answers.includes(body)) {
@@ -386,6 +388,8 @@ const handleMessage = async (
         ticket = await Ticket.findOne({
           where: { id: survey.ticketId }
         });
+
+        console.log("handleMessage survey completed.");
       }
     }
 
