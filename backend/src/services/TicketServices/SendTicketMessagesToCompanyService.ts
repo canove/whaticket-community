@@ -19,6 +19,8 @@ const SendTicketMessagesToCompanyService = async ({
   categoryId,
   companyId
 }: Request): Promise<void> => {
+  console.log("BELLINATI CALLBACK");
+
   try {
     let categoryName = "NÃO CATEGORIZADO";
 
@@ -104,12 +106,14 @@ const SendTicketMessagesToCompanyService = async ({
       "var4": reg.var4,
       "var5": reg.var5,
     };
+
+    console.log("BELLINATI CALLBACK PAYLOAD -> ", payload);
   
     const response = await axios.post(process.env.BELLINATI_URL, payload);
 
-    console.log(response.data);
+    console.log("BELLINATI CALLBACK RESPONSE -> ", response.data);
   } catch (err) {
-    console.log(err);
+    console.log("BELLINATI CALLBACK ERROR -> ", err);
   }
 };
 
