@@ -34,6 +34,7 @@ import SatisfactionSurveyResponses from "../database/models/SatisfactionSurveyRe
 import ShowSatisfactionSurveyService from "../services/SatisfactionSurveyService/ShowSatisfactionSurveyService";
 import AppError from "../errors/AppError";
 import ConnectionFiles from "../database/models/ConnectionFile";
+import SendTicketMessagesToCompanyService from "../services/TicketServices/SendTicketMessagesToCompanyService";
 
 type IndexQuery = {
   searchParam: string;
@@ -232,7 +233,7 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
   const { ticketId } = req.params;
   const { companyId, id: userId } = req.user;
   const ticketData: TicketData = req.body;
-  const { surveyId } = req.body;
+  const { surveyId, categoryId } = req.body;
 
   const { ticket } = await UpdateTicketService({
     ticketData,
@@ -241,6 +242,10 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
   });
 
   if (ticket.status === "closed") {
+    if (`${companyId}` == process.env.BELLINATI_ID) {
+      await SendTicketMessagesToCompanyService({ ticketId: ticket.id, categoryId, companyId });
+    }
+
     const connectionFile = await ConnectionFiles.findOne({
       where: { companyId },
       include: [

@@ -48,6 +48,9 @@ class OfficialTemplates extends Model<OfficialTemplates> {
   @Column
   deletedAt: Date;
 
+  @Column
+  bodyExample: string;
+
   @HasMany(() => OfficialTemplatesStatus, "officialTemplateId")
   officialTemplatesStatus: OfficialTemplatesStatus[];
 

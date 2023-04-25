@@ -415,8 +415,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
     return () => {
       socket.disconnect();
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketId]);
+  }, [user, ticketId]);
 
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
