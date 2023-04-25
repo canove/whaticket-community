@@ -93,7 +93,7 @@ const SendTicketMessagesToCompanyService = async ({
       "token": process.env.BELLINATI_TOKEN,
       "idFornecedor": process.env.BELLINATI_ID_FORNECEDOR,
       "idEventoFornecedor": categoryName,
-      "cdGrupo": 999,
+      "cdGrupo": reg.var4,
       "texto": html,
       "CNPJ_CPF": reg.documentNumber,
       "telefone": reg.phoneNumber,
