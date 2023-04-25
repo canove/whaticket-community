@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 import AppError from "../errors/AppError";
 import authConfig from "../config/auth";
+import { firebaseAuthentication } from "../utils/firebaseAuthentication";
 
 interface TokenPayload {
   id: string;
@@ -13,7 +14,7 @@ interface TokenPayload {
   companyId: number;
 }
 
-const isAuth = (req: Request, res: Response, next: NextFunction): void => {
+const isAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -25,13 +26,23 @@ const isAuth = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const decoded = verify(token, authConfig.secret);
     const { id, profile, companyId } = decoded as TokenPayload;
+    
+    const firebaseAuthorization = await firebaseAuthentication({ userId: id, token });
+
+    if (!firebaseAuthorization && req.route.path !== "/logout") {
+      throw new AppError("ERR_SESSION_EXPIRED", 401);
+    }
 
     req.user = {
       id,
       profile,
       companyId
     };
-  } catch (err) {
+  } catch (err: any) {
+    if (err.message === "ERR_SESSION_EXPIRED" && err.statusCode === 401) {
+      throw new AppError("ERR_SESSION_EXPIRED", 401);
+    }
+
     throw new AppError(
       "Invalid token. We'll try to assign a new one on next request",
       403

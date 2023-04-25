@@ -377,7 +377,7 @@ const handleMessage = async (
   
     if (survey) {
       console.log("handleMessage survey: ", survey);
-      console.log("handleMessage survey: ", JSON.stringify(survey));
+      // console.log("handleMessage survey: ", JSON.stringify(survey));
 
       const answers = JSON.parse(survey.satisfactionSurvey.answers);
 
