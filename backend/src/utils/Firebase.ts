@@ -28,9 +28,12 @@ module.exports = {
       });      
     });
     
-    fs.initializeApp({
-      credential: fs.credential.cert('./key.json')
-    });
+    if (fs.apps.length === 0) {
+      fs.initializeApp({
+        credential: fs.credential.cert('./key.json')
+      });
+    }
+
     return fs.firestore();
   }
 };

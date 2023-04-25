@@ -52,6 +52,12 @@ const SendTicketMessagesToCompanyService = async ({
         where: { id: userId }
     });
     
+    const userId = (messages[0] && messages[0].ticket) ? messages[0].ticket.userId : null;
+
+    const user = await User.findOne({
+      where: { id: userId }
+    });
+
     let reg = null;
   
     reg = await FileRegister.findOne({

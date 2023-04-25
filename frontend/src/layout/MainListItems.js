@@ -58,6 +58,56 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const menuTranslation = {
+  "Dashboard": "mainDrawer.listItems.dashboard",
+  "WhatsApp": "mainDrawer.listItems.whatsOff",
+  "Official Connections": "mainDrawer.whatsApp.officialConnections",
+  "Templates": "mainDrawer.listItems.template",
+  "WhatsApp 2": "mainDrawer.listItems.whatsNoOff",
+  "Connections": "mainDrawer.whatsApp.connections",
+  "Whats Config": "mainDrawer.whatsApp.settings",
+  "Template Data": "mainDrawer.listItems.template",
+  "Tickets": "mainDrawer.listItems.tickets",
+  "Contacts": "mainDrawer.listItems.contacts",
+  "Quick Answers": "mainDrawer.listItems.quickAnswers",
+  "Importation": "mainDrawer.listItems.importation",
+  "File Import": "mainDrawer.listItems.fileImport",
+  "Integrated Import": "mainDrawer.listItems.integratedImport",
+  "Administration": "mainDrawer.listItems.administration",
+  "Users": "mainDrawer.listItems.users",
+  "Company": "mainDrawer.listItems.company",
+  "Menus": "mainDrawer.listItems.menus",
+  "Queues": "mainDrawer.listItems.queues",
+  "Category": "mainDrawer.listItems.category",
+  "Settings": "mainDrawer.listItems.settings",
+  "Reports": "mainDrawer.listItems.reports",
+  "Conversation Reports": "mainDrawer.listItems.conversationReports",
+  "Reports Talk": "mainDrawer.listItems.reportsTalk",
+  "General Report": "Relatório Geral",
+  "Reports Ticket": "mainDrawer.listItems.reportsTicket",
+  "Registers Reports": "mainDrawer.listItems.logReports",
+  "Admin BITS": "mainDrawer.listItems.adminBits",
+  "Menu Link": "mainDrawer.listItems.menuLink",
+  "Registration": "mainDrawer.listItems.registration",
+  "Finance": "mainDrawer.listItems.finance",
+  "Products": "mainDrawer.listItems.products",
+  "Pricing": "mainDrawer.listItems.pricing",
+  "Payments": "mainDrawer.listItems.payments",
+  "Flows": "mainDrawer.listItems.flows",
+  "Connection Files": "mainDrawer.listItems.connectionFiles",
+  "Exposed Imports": "exposedImports.title",
+  "Chips Reports": "chipReports.title",
+  "Node Reports": "nodeReports.title",
+  "Whats Contacts": "officialPages.officialContacts.title",
+  "Official Whatsapp Report": "sessionReports.title",
+  "Category Report": "mainDrawer.listItems.categoryReport",
+  "Service Time": "Tempo de Atendimento",
+  "Contact Blacklist": "Blacklist de Contatos",
+  "Supervisor": "Supervisor",
+  "Satisfaction Survey": "Pesquisa de Satisfação",
+  "Packages": "Pacotes",
+}
+
 function getIcon(icon, isParent) {
   let color = "";
 
@@ -127,7 +177,7 @@ function ListParentItemLink(props) {
     icon,
     primary,
     connectionWarning,
-    children,
+    childrenMenus,
     translation,
     drawerOpen,
   } = props;
@@ -162,15 +212,15 @@ function ListParentItemLink(props) {
       </li>
       <Collapse component="li" in={open} timeout="auto" unmountOnExit>
         <List disablePadding className={drawerOpen ? classes.nested : ""}>
-          {children &&
-            children.map((child) => {
+          {childrenMenus &&
+            childrenMenus.map((child) => {
               if (child.isParent) {
                 return (
                   <ListParentItemLink
                     key={child.id}
                     icon={child.icon}
                     primary={translation(child.name)}
-                    children={child.children}
+                    childrenMenus={child.childrenMenus1.concat(child.childrenMenus2)}
                     translation={translation}
                     drawerOpen={drawerOpen}
                   />
@@ -214,80 +264,18 @@ function ListItemLink(props) {
 
 const MainListItems = (props) => {
   const { drawerOpen, drawerClose } = props;
-  const { whatsApps } = useContext(WhatsAppsContext);
+  // const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const { i18n } = useTranslation();
 
-  const [connectionWarning, setConnectionWarning] = useState(false);
+  // const [connectionWarning, setConnectionWarning] = useState(false);
   const [menus, setMenus] = useState([]);
 
   useEffect(() => {
-    const getParentMenu = async (menuId) => {
-      try {
-        const { data } = await api.get(`/menus/${menuId}`);
-        return data;
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
     const fetchMenus = async () => {
       try {
-        const { data } = await api.get(`/menus/company`);
-
-        const menus = [];
-        const allMenus = [];
-        const parentMenus = [];
-        const parentMenusIds = [];
-
-        for (const menu of data) {
-          if (menu.parentId) {
-            if (parentMenusIds.indexOf(menu.parentId) === -1) {
-              parentMenusIds.push(menu.parentId);
-
-              const parentMenu = await getParentMenu(menu.parentId);
-              parentMenus.push(parentMenu);
-              allMenus.push(parentMenu);
-              allMenus.push(menu);
-            } else {
-              allMenus.push(menu);
-            }
-          } else {
-            allMenus.push(menu);
-          }
-        }
-
-        for (const parent of parentMenus) {
-          if (
-            parent.parentId &&
-            parentMenusIds.indexOf(parent.parentId) === -1
-          ) {
-            parentMenusIds.push(parent.parentId);
-
-            const parentMenu = await getParentMenu(parent.parentId);
-            allMenus.push(parentMenu);
-          }
-        }
-
-        for (const menu of allMenus) {
-          if (menu.parentId || menu.isParent) {
-            if (menu.isParent) {
-              const childrenMenus = [];
-              for (const children of allMenus) {
-                if (children.parentId === menu.id) {
-                  childrenMenus.push(children);
-                }
-              }
-              menu.children = [...childrenMenus];
-              if (!menu.parentId) {
-                menus.push(menu);
-              }
-            }
-          } else {
-            menus.push(menu);
-          }
-        }
-        setMenus(menus);
+        const { data } = await api.get("/menus/layout");
+        setMenus(data);
       } catch (err) {
         toastError(err);
       }
@@ -296,198 +284,36 @@ const MainListItems = (props) => {
     fetchMenus();
   }, [user]);
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (whatsApps.length > 0) {
-        const offlineWhats = whatsApps.filter((whats) => {
-          if (whats.official === false) {
-            return (
-              whats.status === "qrcode" ||
-              whats.status === "PAIRING" ||
-              whats.status === "DISCONNECTED" ||
-              whats.status === "TIMEOUT" ||
-              whats.status === "OPENING"
-            );
-          }
-          return null;
-        });
-        if (offlineWhats.length > 0) {
-          setConnectionWarning(true);
-        } else {
-          setConnectionWarning(false);
-        }
-      }
-    }, 2000);
-    return () => clearTimeout(delayDebounceFn);
-  }, [whatsApps]);
+  // useEffect(() => {
+  //   const delayDebounceFn = setTimeout(() => {
+  //     if (whatsApps.length > 0) {
+  //       const offlineWhats = whatsApps.filter((whats) => {
+  //         if (whats.official === false) {
+  //           return (
+  //             whats.status === "qrcode" ||
+  //             whats.status === "PAIRING" ||
+  //             whats.status === "DISCONNECTED" ||
+  //             whats.status === "TIMEOUT" ||
+  //             whats.status === "OPENING"
+  //           );
+  //         }
+  //         return null;
+  //       });
+  //       if (offlineWhats.length > 0) {
+  //         setConnectionWarning(true);
+  //       } else {
+  //         setConnectionWarning(false);
+  //       }
+  //     }
+  //   }, 2000);
+  //   return () => clearTimeout(delayDebounceFn);
+  // }, [whatsApps]);
 
-  function getTranslation(name) {
-    if (name === "Dashboard") {
-      return i18n.t("mainDrawer.listItems.dashboard");
-    }
+  const getTranslation = (name) => {
+    const translationLink = menuTranslation[name];
 
-    if (name === "WhatsApp") {
-      return i18n.t("mainDrawer.listItems.whatsOff");
-    }
-
-    if (name === "Official Connections") {
-      return i18n.t("mainDrawer.whatsApp.officialConnections");
-    }
-
-    if (name === "Templates") {
-      return i18n.t("mainDrawer.listItems.template");
-    }
-
-    if (name === "WhatsApp 2") {
-      return i18n.t("mainDrawer.listItems.whatsNoOff");
-    }
-
-    if (name === "Connections") {
-      return i18n.t("mainDrawer.whatsApp.connections");
-    }
-
-    if (name === "Whats Config") {
-      return i18n.t("mainDrawer.whatsApp.settings");
-    }
-
-    if (name === "Template Data") {
-      return i18n.t("mainDrawer.listItems.template");
-    }
-
-    if (name === "Tickets") {
-      return i18n.t("mainDrawer.listItems.tickets");
-    }
-
-    if (name === "Contacts") {
-      return i18n.t("mainDrawer.listItems.contacts");
-    }
-
-    if (name === "Quick Answers") {
-      return i18n.t("mainDrawer.listItems.quickAnswers");
-    }
-
-    if (name === "Importation") {
-      return i18n.t("mainDrawer.listItems.importation");
-    }
-
-    if (name === "File Import") {
-      return i18n.t("mainDrawer.listItems.fileImport");
-    }
-
-    if (name === "Integrated Import") {
-      return i18n.t("mainDrawer.listItems.integratedImport");
-    }
-
-    if (name === "Administration") {
-      return i18n.t("mainDrawer.listItems.administration");
-    }
-
-    if (name === "Users") {
-      return i18n.t("mainDrawer.listItems.users");
-    }
-
-    if (name === "Company") {
-      return i18n.t("mainDrawer.listItems.company");
-    }
-
-    if (name === "Menus") {
-      return i18n.t("mainDrawer.listItems.menus");
-    }
-
-    if (name === "Queues") {
-      return i18n.t("mainDrawer.listItems.queues");
-    }
-
-    if (name === "Category") {
-      return i18n.t("mainDrawer.listItems.category");
-    }
-
-    if (name === "Settings") {
-      return i18n.t("mainDrawer.listItems.settings");
-    }
-
-    if (name === "Reports") {
-      return i18n.t("mainDrawer.listItems.reports");
-    }
-
-    if (name === "Conversation Reports") {
-      return i18n.t("mainDrawer.listItems.conversationReports");
-    }
-
-    if (name === "Reports Talk") {
-      return i18n.t("mainDrawer.listItems.reportsTalk");
-    }
-
-    if (name === "General Report") {
-      return "Relatório Geral";
-    }
-
-    if (name === "Reports Ticket") {
-      return i18n.t("mainDrawer.listItems.reportsTicket");
-    }
-
-    if (name === "Registers Reports") {
-      return i18n.t("mainDrawer.listItems.logReports");
-    }
-    if (name === "Admin BITS") {
-      return i18n.t("mainDrawer.listItems.adminBits");
-    }
-    if (name === "Menu Link") {
-      return i18n.t("mainDrawer.listItems.menuLink");
-    }
-    if (name === "Registration") {
-      return i18n.t("mainDrawer.listItems.registration");
-    }
-    if (name === "Finance") {
-      return i18n.t("mainDrawer.listItems.finance");
-    }
-    if (name === "Products") {
-      return i18n.t("mainDrawer.listItems.products");
-    }
-    if (name === "Pricing") {
-      return i18n.t("mainDrawer.listItems.pricing");
-    }
-    if (name === "Payments") {
-      return i18n.t("mainDrawer.listItems.payments");
-    }
-    if (name === "Flows") {
-      return i18n.t("mainDrawer.listItems.flows");
-    }
-    if (name === "Connection Files") {
-      return i18n.t("mainDrawer.listItems.connectionFiles");
-    }
-    if (name === "Exposed Imports") {
-      return i18n.t("exposedImports.title");
-    }
-    if (name === "Chips Reports") {
-      return i18n.t("chipReports.title");
-    }
-    if (name === "Node Reports") {
-      return i18n.t("nodeReports.title");
-    }
-    if (name === "Whats Contacts") {
-      return i18n.t("officialPages.officialContacts.title");
-    }
-    if (name === "Official Whatsapp Report") {
-      return i18n.t("sessionReports.title");
-    }
-    if (name === "Category Report") {
-      return i18n.t("mainDrawer.listItems.categoryReport")
-    }
-    if (name === "Service Time") {
-      return "Tempo de Atendimento";
-    }
-    if (name === "Contact Blacklist") {
-      return "Blacklist de Contatos";
-    }
-    if (name === "Supervisor") {
-      return "Supervisor";
-    }
-    if (name === "Satisfaction Survey") {
-      return "Pesquisa de Satisfação";
-    }
-    if (name === "Packages") {
-      return "Pacotes";
+    if (translationLink) {
+      return i18n.t(translationLink);
     }
 
     return name;
@@ -515,7 +341,7 @@ const MainListItems = (props) => {
                 key={menu.id}
                 icon={menu.icon}
                 primary={getTranslation(menu.name)}
-                children={menu.children}
+                childrenMenus={menu.childrenMenus1.concat(menu.childrenMenus2)}
                 translation={getTranslation}
                 drawerOpen={drawerOpen}
               />

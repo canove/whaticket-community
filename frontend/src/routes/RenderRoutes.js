@@ -118,7 +118,6 @@ const RenderRoutes = () => {
 
   return (
     <>
-      {!isAuth && <Route path={`/`} isPrivate />}
       {isAuth &&
         menus &&
         menus.map((menu) => {

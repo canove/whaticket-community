@@ -12,12 +12,16 @@ const useAuth = () => {
 	const { i18n } = useTranslation();
 	const history = useHistory();
 	const [isAuth, setIsAuth] = useState(false);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [user, setUser] = useState({});
+	
+	const [accountConnected, setAccountConnected] = useState(false);
 
 	api.interceptors.request.use(
-		config => {
+		async config => {
 			const token = localStorage.getItem("token");
+			// console.log("REQUEST");
+
 			if (token) {
 				config.headers["Authorization"] = `Bearer ${JSON.parse(token)}`;
 				setIsAuth(true);
@@ -36,6 +40,7 @@ const useAuth = () => {
 		async error => {
 			const originalRequest = error.config;
 			if (error?.response?.status === 403 && !originalRequest._retry) {
+				// console.log("RESPONSE 403");
 				originalRequest._retry = true;
 
 				const { data } = await api.post("/auth/refresh_token");
@@ -43,9 +48,15 @@ const useAuth = () => {
 					localStorage.setItem("token", JSON.stringify(data.token));
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
 				}
-				return api(originalRequest);
+
+				if (isAuth) {
+					return api(originalRequest);
+				}
+
+				return Promise.reject(error);
 			}
 			if (error?.response?.status === 401) {
+				// console.log("RESPONSE 401");
 				localStorage.removeItem("token");
 				api.defaults.headers.Authorization = undefined;
 				setIsAuth(false);
@@ -60,6 +71,9 @@ const useAuth = () => {
 			if (token) {
 				try {
 					const { data } = await api.post("/auth/refresh_token");
+					// console.log("TOKEN REFRESH -> ", data.token);
+
+					localStorage.setItem("token", JSON.stringify(data.token));
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
 					setIsAuth(true);
 					setUser(data.user);
@@ -70,7 +84,6 @@ const useAuth = () => {
 			}
 			setLoading(false);
 		})();
-// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -91,16 +104,31 @@ const useAuth = () => {
 		setLoading(true);
 
 		try {
+			api.defaults.headers.Authorization = undefined;
+			localStorage.removeItem("token");
+
 			const { data } = await api.post("/auth/login", userData);
-			localStorage.setItem("token", JSON.stringify(data.token));
-			api.defaults.headers.Authorization = `Bearer ${data.token}`;
-			setUser(data.user);
-			i18n.changeLanguage(data.user.lang);
-			setIsAuth(true);
-			toast.success(i18n.t("auth.toasts.success"));
-			history.push("/tickets");
+
+			// console.log("LOGIN -> ", data.accountConnected);
+			if (data.accountConnected) {
+				setAccountConnected(true);
+			} else {
+				setAccountConnected(false);
+
+				localStorage.setItem("token", JSON.stringify(data.token));
+				api.defaults.headers.Authorization = `Bearer ${data.token}`;
+	
+				setUser(data.user);
+				i18n.changeLanguage(data.user.lang);
+				setIsAuth(true);
+	
+				toast.success(i18n.t("auth.toasts.success"));
+				history.push("/tickets");
+			}
+
 			setLoading(false);
 		} catch (err) {
+			// console.log("LOGIN ERROR: ", err);
 			toastError(err);
 			setLoading(false);
 		}
@@ -123,7 +151,7 @@ const useAuth = () => {
 		}
 	};
 
-	return { isAuth, user, loading, handleLogin, handleLogout };
+	return { isAuth, user, loading, accountConnected, setAccountConnected, handleLogin, handleLogout };
 };
 
 export default useAuth;
