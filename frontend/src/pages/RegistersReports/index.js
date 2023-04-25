@@ -6,7 +6,9 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import Title from "../../components/Title";
 import {
     Button,
+    Checkbox,
     FormControl,
+    FormControlLabel,
     InputLabel,
     makeStyles,
     MenuItem,
@@ -58,6 +60,7 @@ const RegistersReports = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [creatingCSV, setCreatingCSV] = useState(false);
     const [creatingPDF, setCreatingPDF] = useState(false);
+    const [isProcessed, setIsProcessed] = useState(true);
 
     const [categories, setCategories] = useState([]);
     const [categoryIds, setCategoryIds] = useState([]);
@@ -101,7 +104,8 @@ const RegistersReports = () => {
                     finalDate,
                     name,
                     phoneNumber,
-                    categoryIds
+                    categoryIds,
+                    isProcessed
                 }
             });
 
@@ -124,7 +128,8 @@ const RegistersReports = () => {
                     finalDate,
                     name,
                     phoneNumber,
-                    categoryIds
+                    categoryIds,
+                    isProcessed
                 }
             });
             setPdf(data);
@@ -150,7 +155,8 @@ const RegistersReports = () => {
                     name,
                     phoneNumber,
                     limit: 20,
-                    categoryIds
+                    categoryIds,
+                    isProcessed
                 }
             });
             setRegisters(data.registers);
@@ -316,7 +322,7 @@ const RegistersReports = () => {
                     <div>
                         { showFilters &&
                             <>
-                                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                                <div style={{ display: "flex", alignItems: "end", justifyContent: "end" }}>
                                     <TextField
                                         placeholder={i18n.t("logReport.form.phoneNumber")}
                                         type="search"
@@ -347,7 +353,18 @@ const RegistersReports = () => {
                                         value={finalDate}
                                     />
                                 </div>
-                                <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "end" }}>
+                                <div style={{ display: "flex", alignItems: "end", justifyContent: "end" }}>
+                                    <FormControlLabel
+                                        style={{ marginLeft: "8px" }}
+                                        label={"Processado"}
+                                        control={
+                                            <Checkbox
+                                                color="primary" 
+                                                checked={isProcessed} 
+                                                onChange={() => setIsProcessed(prevIsProcessed => !prevIsProcessed)} 
+                                            />
+                                        }
+                                    />
                                     <FormControl className={classes.root} style={{ marginLeft: "8px" }}>
                                         <InputLabel id="category-label">{i18n.t("logReport.form.category")}</InputLabel>
                                         <Select
@@ -466,6 +483,7 @@ const RegistersReports = () => {
                             <TableCell align="center">{i18n.t("logReport.grid.errors")}</TableCell>
                             <TableCell align="center">Interação</TableCell>
                             <TableCell align="center">Processado</TableCell>
+                            <TableCell align="center">Importado</TableCell>
                             <TableCell align="center">Tem Whatsapp?</TableCell>
                         </TableRow>
                     </TableHead>
@@ -484,11 +502,12 @@ const RegistersReports = () => {
                                         <TableCell align="center">{formatDate(register.errorAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.interactionAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.processedAt)}</TableCell>
+                                        <TableCell align="center">{formatDate(register.createdAt)}</TableCell>
                                         <TableCell align="center">{getHaveWhatsapp(register)}</TableCell>
                                     </TableRow>
                                 )
                             }))}
-                            {loading && <TableRowSkeleton columns={10} />}
+                            {loading && <TableRowSkeleton columns={12} />}
                         </>
                     </TableBody>
                 </Table>

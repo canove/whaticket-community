@@ -14,7 +14,7 @@ interface Response {
 interface Request {
   status?: number | string;
   initialDate?: Date | string;
-  companyId?: number | string;
+  companyId?: number;
   pageNumber?: number | string;
   limiting?: number;
   refusedStatus?: number;
@@ -69,8 +69,7 @@ const ListFileService = async ({
   }
 
   where = { ...where };
-  if(companyId > 0)
-    where = { ...where, companyId }
+  if (companyId > 0) where = { ...where, companyId }
 
   if (pageNumber) {
     const limit = 10;

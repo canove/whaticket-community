@@ -811,8 +811,13 @@ export const botMessageCustomer = async (
       name: session,
       deleted: false,
       companyId
-    }
+    },
+    order: [["createdAt", "DESC"]]
   });
+
+  if (!whatsapp) {
+    throw new AppError("NO_WHATSAPP_FOUND");
+  }
 
   const contact = await verifyContact(contactName, to, whatsapp.companyId);
 
