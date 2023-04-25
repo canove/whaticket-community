@@ -7,6 +7,7 @@ import Contact from "../../database/models/Contact";
 import { Op } from "sequelize";
 import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
 import Category from "../../database/models/Category";
+import User from "../../database/models/User";
 
 interface Request {
   ticketId: number;
@@ -45,6 +46,12 @@ const SendTicketMessagesToCompanyService = async ({
       order: [["createdAt", "ASC"]],
     });
     
+    const userId = (messages[0] && messages[0].ticket) ? messages[0].ticket.userId : null;
+
+    const user = await User.findOne({
+      where: { id: userId }
+    });
+
     let reg = null;
   
     reg = await FileRegister.findOne({
@@ -82,7 +89,7 @@ const SendTicketMessagesToCompanyService = async ({
     html += '<i>---------- Mensagens ----------</i>';
   
     for (const message of messages) {
-      const message_origin = message.fromMe ? "Operador" : "Cliente";
+      const message_origin = message.fromMe ? message.userId ? "Operador" : "Automática" : "Cliente";
       const message_content = message.body || message.mediaUrl;
       const message_date = format(message.createdAt, "dd/MM/yyyy HH:mm:ss");
   
@@ -104,7 +111,7 @@ const SendTicketMessagesToCompanyService = async ({
       "var2": reg.var2,
       "var3": reg.var3,
       "var4": reg.var4,
-      "var5": reg.var5,
+      "var5": user ? user.email : reg.var5,
     };
 
     console.log("BELLINATI CALLBACK PAYLOAD -> ", payload);
