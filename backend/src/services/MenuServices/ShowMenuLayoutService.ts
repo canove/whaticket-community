@@ -39,8 +39,20 @@ const ShowMenuLayoutService = async (companyId: number, userId: string | number)
     whereConditionChildren1 = { ...whereConditionChildren1, id: { [Op.or]: menuList } };
   }
 
-  const menus = await Menu.findAll({
-    where: whereCondition,
+  const menus1 = await Menu.findAll({
+    where: { ...whereCondition, isParent: false },
+    include: [
+      {
+        model: Company,
+        as: "companies",
+        where: { id: companyId },
+        required: true
+      },
+    ]
+  });
+
+  const menus2 = await Menu.findAll({
+    where: { ...whereCondition, isParent: true },
     include: [
       {
         model: Menu,
@@ -54,7 +66,7 @@ const ShowMenuLayoutService = async (companyId: number, userId: string | number)
             required: true
           },
         ],
-        required: false
+        required: true
       },
       {
         model: Menu,
@@ -73,7 +85,7 @@ const ShowMenuLayoutService = async (companyId: number, userId: string | number)
                 required: true
               },
             ],
-            required: false
+            required: true
           },
           {
             model: Menu,
@@ -92,7 +104,7 @@ const ShowMenuLayoutService = async (companyId: number, userId: string | number)
                     required: true
                   },
                 ],
-                required: false
+                required: true
               },
               {
                 model: Menu,
@@ -109,7 +121,7 @@ const ShowMenuLayoutService = async (companyId: number, userId: string | number)
     ]
   });
 
-  return menus;
+  return menus1.concat(menus2);
 };
 
 export default ShowMenuLayoutService;
