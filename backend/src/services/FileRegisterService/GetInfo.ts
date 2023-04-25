@@ -63,7 +63,6 @@ const GetInfo = async ({
     documentNumber: fileRegister.documentNumber,
     message: fileRegister.message,
     phoneNumber: fileRegister.phoneNumber,
-    session: whatsapp.name,
     companyId: fileRegister.companyId,
     var1: fileRegister.var1,
     var2: fileRegister.var2,
