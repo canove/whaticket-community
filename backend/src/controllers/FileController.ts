@@ -5,7 +5,7 @@ import UpdateFileService from "../services/UploadFileService/UpdateFileService";
 
 type IndexQuery = {
   status?: number;
-  initialDate?: string;
+  date?: string;
   pageNumber?: string;
   refusedStatus?: number;
 };
@@ -16,13 +16,13 @@ type UpdateQuery = {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { status, initialDate, pageNumber, refusedStatus } = req.query as IndexQuery;
+  const { status, date, pageNumber, refusedStatus } = req.query as IndexQuery;
 
   const { companyId } = req.user;
 
   const { reports, count, hasMore } = await ListFileService({
     status,
-    initialDate,
+    initialDate: date,
     companyId,
     pageNumber,
     refusedStatus
