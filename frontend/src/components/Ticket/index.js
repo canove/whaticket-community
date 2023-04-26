@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
+import clsx from "clsx";
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
-import clsx from "clsx";
 
 import { Paper, makeStyles } from "@material-ui/core";
 
-import ContactDrawer from "../ContactDrawer";
-import MessageInput from "../MessageInput/";
-import TicketHeader from "../TicketHeader";
-import TicketInfo from "../TicketInfo";
-import TicketActionButtons from "../TicketActionButtons";
-import MessagesList from "../MessagesList";
-import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import ContactDrawer from "../ContactDrawer";
+import MessageInput from "../MessageInput/";
+import MessagesList from "../MessagesList";
+import ScheduleModal from '../ScheduleModal';
+import TicketActionButtons from "../TicketActionButtons";
+import TicketHeader from "../TicketHeader";
+import TicketInfo from "../TicketInfo";
 
 const drawerWidth = 320;
 
@@ -78,6 +79,7 @@ const Ticket = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
@@ -135,6 +137,10 @@ const Ticket = () => {
     };
   }, [ticketId, history]);
 
+  const handleToggleScheduleModal = () => {
+    setScheduleModalOpen(isOpen => !isOpen);
+  }
+
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
   };
@@ -164,12 +170,19 @@ const Ticket = () => {
             <TicketActionButtons ticket={ticket} />
           </div>
         </TicketHeader>
+        <ScheduleModal
+          open={scheduleModalOpen}
+          onClose={handleToggleScheduleModal}
+          aria-labelledby="form-dialog-title"
+        />
         <ReplyMessageProvider>
           <MessagesList
             ticketId={ticketId}
             isGroup={ticket.isGroup}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} />
+          {scheduleModalOpen ? <div style={{ height: 68, backgroundColor: "#eeeeee" }} /> : (
+            <MessageInput handleOpenScheduleModal={handleToggleScheduleModal} ticketStatus={ticket.status} />
+          )}
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer

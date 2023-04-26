@@ -28,6 +28,7 @@ import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import MicIcon from "@material-ui/icons/Mic";
 import MoodIcon from "@material-ui/icons/Mood";
 import MoreVert from "@material-ui/icons/MoreVert";
+import Schedule from "@material-ui/icons/Schedule";
 import SendIcon from "@material-ui/icons/Send";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -202,7 +203,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus }) => {
+const MessageInput = ({ ticketStatus, handleOpenScheduleModal }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
 
@@ -416,7 +417,7 @@ const MessageInput = ({ ticketStatus }) => {
     );
   };
 
-  if (medias.length > 0)
+  if (medias.length > 0) {
     return (
       <Paper elevation={0} square className={classes.viewMediaInputWrapper}>
         <IconButton
@@ -447,7 +448,7 @@ const MessageInput = ({ ticketStatus }) => {
         </IconButton>
       </Paper>
     );
-  else {
+  } else {
     return (
       <Paper square elevation={0} className={classes.mainWrapper}>
         {replyingMessage && renderReplyingMessage(replyingMessage)}
@@ -473,6 +474,15 @@ const MessageInput = ({ ticketStatus }) => {
                 </ClickAwayListener>
               </div>
             ) : null}
+
+            <IconButton
+              aria-label="emojiPicker"
+              component="span"
+              disabled={loading || recording || ticketStatus !== "open"}
+              onClick={handleOpenScheduleModal}
+            >
+              <Schedule className={classes.sendMessageIcons} />
+            </IconButton>
 
             <input
               multiple

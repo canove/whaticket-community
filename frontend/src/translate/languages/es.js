@@ -183,6 +183,21 @@ const messages = {
         },
         success: "Respuesta rápida guardada correctamente.",
       },
+      scheduleModal: {
+        title: {
+          add: "Programar un mensaje",
+          edit: "Editar mensaje programado",
+        },
+        form: {
+          message: "Mensaje",
+        },
+        buttons: {
+          okAdd: "Programar",
+          okEdit: "Guardar",
+          cancel: "Cancelar",
+        },
+        success: "Programar mensaje guardado con éxito.",
+      },
       queueModal: {
         title: {
           add: "Agregar cola",

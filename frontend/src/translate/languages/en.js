@@ -180,6 +180,21 @@ const messages = {
         },
         success: "Quick Reply saved successfully.",
       },
+      scheduleModal: {
+        title: {
+          add: "Schedule a message",
+          edit: "Edit scheduled message",
+        },
+        form: {
+          message: "Message",
+        },
+        buttons: {
+          okAdd: "Schedule",
+          okEdit: "Save",
+          cancel: "Cancel",
+        },
+        success: "Schedule message saved successfully.",
+      },
       queueModal: {
         title: {
           add: "Add queue",

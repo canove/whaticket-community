@@ -182,6 +182,21 @@ const messages = {
         },
         success: "Resposta Rápida salva com sucesso.",
       },
+      scheduleModal: {
+        title: {
+          add: "Agendar uma mensagem",
+          edit: "Editar uma mensagem agendada",
+        },
+        form: {
+          message: "Mensagem",
+        },
+        buttons: {
+          okAdd: "Agendar",
+          okEdit: "Salvar",
+          cancel: "Cancelar",
+        },
+        success: "Mensagem agendada salva com sucesso.",
+      },
       queueModal: {
         title: {
           add: "Adicionar fila",
