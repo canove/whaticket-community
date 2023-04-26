@@ -30,7 +30,6 @@ interface Request {
   email: string;
   password: string;
   company: string;
-  userIp: string;
   retry: boolean;
 }
 
@@ -45,7 +44,6 @@ const AuthUserService = async ({
   email,
   password,
   company,
-  userIp,
   retry
 }: Request): Promise<Response> => {
   const whereCondition = {
@@ -126,7 +124,6 @@ const AuthUserService = async ({
         companyId: user.companyId,
         email: user.email,
         isAuth: true,
-        origin: userIp,
         token: encrypt(token)
       },
     );
