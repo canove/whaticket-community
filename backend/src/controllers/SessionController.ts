@@ -61,6 +61,8 @@ export const update = async (
     token
   );
 
+  SendRefreshToken(res, refreshToken);
+
   const database = await firebase.database();
 
   const firebaseUser = await database
@@ -87,8 +89,6 @@ export const update = async (
       throw new AppError("ERR_SESSION_EXPIRED", 401);
     }
   }
-
-  SendRefreshToken(res, refreshToken);
 
   return res.json({ token: newToken, user });
 };

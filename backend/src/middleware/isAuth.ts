@@ -27,12 +27,20 @@ const isAuth = async (req: Request, res: Response, next: NextFunction): Promise<
     const decoded = verify(token, authConfig.secret);
     const { id, profile, companyId } = decoded as TokenPayload;
     
-    const firebaseAuthorization = await firebaseAuthentication({ userId: id, token });
+    let firebaseAuthorization = null;
+    let firebaseError = false;
 
-    if (!firebaseAuthorization && req.route.path !== "/logout") {
-      throw new AppError("ERR_SESSION_EXPIRED", 401);
+    try {
+      firebaseAuthorization = await firebaseAuthentication({ userId: id, token });
+    } catch (err) {
+      console.log("Firebase Error: ", err);
+      firebaseError = true;
     }
 
+    if (!firebaseError && !firebaseAuthorization && req.route.path !== "/logout") {
+      throw new AppError("ERR_SESSION_EXPIRED", 401);
+    }
+  
     req.user = {
       id,
       profile,
