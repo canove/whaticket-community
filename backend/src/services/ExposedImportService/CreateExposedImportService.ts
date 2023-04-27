@@ -8,6 +8,7 @@ interface Request {
   connections: string[];
   requiredItems: string;
   connectionType: string | boolean;
+  connectionFileId: string | number;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
   companyId: number;
@@ -20,6 +21,7 @@ const CreateExposedImportService = async ({
   connections,
   requiredItems,
   connectionType,
+  connectionFileId,
   officialTemplatesId,
   officialConnectionId,
   companyId,
@@ -40,13 +42,14 @@ const CreateExposedImportService = async ({
     id: uuidv4(),
     name,
     mapping,
-    templateId: template,
-    whatsappIds,
-    official: connectionType,
     companyId,
-    officialConnectionId,
+    whatsappIds,
+    requiredItems,
+    connectionFileId,
     officialTemplatesId,
-    requiredItems
+    officialConnectionId,
+    templateId: template,
+    official: connectionType,
   });
 
   return exposedImport;

@@ -8,6 +8,7 @@ interface ExposedImportData {
   connections: string[];
   requiredItems: string;
   connectionType: string | boolean;
+  connectionFileId: string | number;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
 }
@@ -28,7 +29,17 @@ const UpdateExposedImportService = async ({
     companyId
   );
 
-  const { name, mapping, template, connections, connectionType, officialConnectionId, officialTemplatesId, requiredItems } = exposedImportData;
+  const {
+    name,
+    mapping,
+    template,
+    connections,
+    requiredItems,
+    connectionType,
+    connectionFileId,
+    officialTemplatesId,
+    officialConnectionId,
+  } = exposedImportData;
 
   let whatsappIds = null;
   let templateId = null;
@@ -49,11 +60,12 @@ const UpdateExposedImportService = async ({
     name,
     mapping,
     templateId,
-    official: connectionType,
     whatsappIds,
-    officialConnectionId,
+    requiredItems,
+    connectionFileId,
     officialTemplatesId,
-    requiredItems
+    officialConnectionId,
+    official: connectionType,
   });
 
   return exposedImport;

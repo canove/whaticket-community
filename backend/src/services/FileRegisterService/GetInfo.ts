@@ -50,12 +50,18 @@ const GetInfo = async ({
     where: { id: fileRegister.whatsappId }
   });
 
-  if (whatsapp && whatsapp.connectionFileId) {
-    const connectionFile = await ConnectionFiles.findOne({
-      where: { id: whatsapp.connectionFileId }
-    });
+  let session = null;
+  
+  if (whatsapp) {
+    session = whatsapp.name;
 
-    portfolio = connectionFile.name;
+    if (whatsapp.connectionFileId) {
+      const connectionFile = await ConnectionFiles.findOne({
+        where: { id: whatsapp.connectionFileId }
+      });
+  
+      portfolio = connectionFile.name;
+    }
   }
 
   const response = {
@@ -69,7 +75,8 @@ const GetInfo = async ({
     var3: fileRegister.var3,
     var4: fileRegister.var4,
     var5: fileRegister.var5,
-    portfolio
+    portfolio,
+    session
   };
 
   return response;

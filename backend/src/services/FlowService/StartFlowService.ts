@@ -901,6 +901,121 @@ const processNode = async (node: any, session: any, body: any) => {
     return {};
   }
 
+  if (node.type === "database-condition-2-node") {
+    if (!node.conditions) return { condition: "ELSE" };
+
+    let value = null;
+
+    try {
+      const client = createClient({
+        url: process.env.REDIS_URL
+      });
+
+      client.on('error', err => console.log('Redis Client Error', err));
+
+      await client.connect();
+
+      value = await getRedisValue(session.id, session.companyId, client);
+
+      await client.disconnect();
+    } catch (err) {
+      console.log("REDIS ERR - Database Condition 2", err);
+    }
+
+    if (!value) {
+      value = await FileRegister.findOne({
+        where: {
+          [Op.or]: [
+            { phoneNumber: session.id } ,
+            { phoneNumber: 
+              { 
+                [Op.or]: [
+                  removePhoneNumberWith9Country(session.id),
+                  preparePhoneNumber9Digit(session.id),
+                  removePhoneNumber9Digit(session.id),
+                  removePhoneNumberCountry(session.id),
+                  removePhoneNumber9DigitCountry(session.id)
+                ],
+              }
+            }
+          ],
+          companyId: session.companyId,
+          processedAt: { [Op.ne]: null }
+        },
+        order: [["createdAt", "DESC"]]
+      });
+    }
+
+    if (!value) return { condition: "ELSE" };
+
+    const response = Object.keys(node.conditions).find((conditionId: any) => {
+      const conditionExpression = node.conditions[conditionId];
+
+      const param1 = conditionExpression.param1 ? conditionExpression.param1 : "";
+      const param2 = conditionExpression.param2 ? conditionExpression.param2 : "";
+      const condition = conditionExpression.condition ? conditionExpression.condition : "";
+
+      if (!param1 || !condition) return false;
+
+      const params1 = param1.match(/\{{(.*?)\}}/);
+      let dinamicParam1 = [];
+      if (params1) dinamicParam1 = params1[1].trim().split(".");
+
+      let var1 = param1;
+
+      if (dinamicParam1.length === 1) {
+        var1 = value[dinamicParam1[0]];
+
+        if (condition === "exists") return var1 ? true : false;
+        if (condition === "not_exists") return var1 ? false : true;
+      } else if (dinamicParam1.length >= 2) {
+        var1 = handleParams(value, dinamicParam1);
+
+        if (condition === "exists") return var1 ? true : false;
+        if (condition === "not_exists") return var1 ? false : true;
+      }
+
+      if (!var1) return false;
+      
+      if (!param2) return false;
+
+      const params2 = param2.match(/\{{(.*?)\}}/);
+      let dinamicParam2 = [];
+      if (params2) dinamicParam2 = params2[1].trim().split(".");
+
+      let var2 = param2;
+
+      if (dinamicParam2.length === 1) {
+        var1 = value[dinamicParam2[0]];
+      } else if (dinamicParam2.length >= 2) {
+        var2 = handleParams(value, dinamicParam2);
+      }
+
+      if (!var1) return false;
+
+      if (condition === "equals") return (var1.toLowerCase() == var2.toLowerCase());
+      if (condition === "not_equal") return (var1.toLowerCase() != var2.toLowerCase());
+      if (condition === "greater_than") return (var1 > var2);
+      if (condition === "greater_than_or_equal") return (var1 >= var2);
+      if (condition === "contains") return (var1.toLowerCase().includes(var2.toLowerCase()));
+      if (condition === "not_contains") return (!var1.toLowerCase().includes(var2.toLowerCase()));
+      if (condition === "less_than") return (var1 < var2);
+      if (condition === "less_than_or_equal") return (var1 <= var2);
+    });
+
+    // await NodeRegisters.create({
+    //   phoneNumber: session.id,
+    //   text: body.text,
+    //   response: response ? response.toString() : "ELSE",
+    //   nodeId: session.nodeId,
+    //   flowId: session.flowId,
+    //   companyId: session.companyId,
+    //   type: node.type
+    // });
+
+    return { condition: response ? response : "ELSE" };
+  }
+
   return {};
 }
 
@@ -935,7 +1050,7 @@ const getRedisValue = async (session: string, companyId: string, client: any) =>
 }
 
 const getLink = (name: string, node: any, nodeResponse: any) => {
-  if (node.type === "conditional-node") {
+  if (node.type === "conditional-node" || node.type === "database-condition-2-node") {
     const portName = `${name}-${nodeResponse.condition.toLowerCase()}`;
     for (const port of node.ports) {
       if (port.name === portName) {
@@ -1119,7 +1234,7 @@ const StartFlowService = async ({
     })
   }
 
-  if (node.type === "conditional-node") {
+  if (node.type === "conditional-node" || node.type === "database-condition-2-node") {
     return await StartFlowService({
       flowNodeId,
       sessionId,

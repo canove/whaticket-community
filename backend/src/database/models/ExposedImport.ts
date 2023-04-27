@@ -5,13 +5,15 @@ import {
   UpdatedAt,
   Model,
   PrimaryKey,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
 import Company from "./Company";
 import OfficialTemplates from "./OfficialTemplates";
 import OfficialWhatsapp from "./OfficialWhatsapp";
 import Templates from "./TemplatesData";
 import Whatsapp from "./Whatsapp";
+import ConnectionFiles from "./ConnectionFile";
 
 @Table
 class ExposedImport extends Model<ExposedImport> {
@@ -41,6 +43,13 @@ class ExposedImport extends Model<ExposedImport> {
   @ForeignKey(() => Company)
   @Column
   companyId: number;
+
+  @ForeignKey(() => ConnectionFiles)
+  @Column
+  connectionFileId: number;
+
+  @BelongsTo(() => ConnectionFiles)
+  connectionFile: ConnectionFiles;
 
   @ForeignKey(() => OfficialWhatsapp)
   @Column
