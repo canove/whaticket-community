@@ -300,7 +300,7 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
     });
 
     try {
-      await api.post(`/schedule/${ticket.id}`, formData);
+      await api.post(`/schedule`, formData);
       setMedias([]);
       handleCloseModal();
     } catch (err) {
@@ -328,7 +328,7 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
       formData.append("time", time);
       selectedContacts.forEach(contact => formData.append("contacts", contact));
 
-      await api.post(`/schedule/${ticket.id}`, formData);
+      await api.post(`/schedule`, formData);
       setTimeout(() => handleCloseModal(), 800);
     } catch (err) {
       toastError(err);
@@ -352,7 +352,7 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
         : inputMessage.trim(),
     };
     try {
-      await api.post(`/schedule/${ticket.id}`, message);
+      await api.post(`/schedule`, message);
       setInputMessage("");
       handleCloseModal();
     } catch (err) {

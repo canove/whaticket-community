@@ -9,17 +9,17 @@ const scheduleRoutes = Router();
 
 const upload = multer(uploadConfig);
 
-scheduleRoutes.get("/schedules/:ticketId", isAuth, ScheduleController.index);
+scheduleRoutes.get("/schedules", isAuth, ScheduleController.index);
 
 scheduleRoutes.post(
-  "/schedule/:ticketId",
+  "/schedule",
   isAuth,
   upload.array("medias"),
   ScheduleController.store
 );
 
 scheduleRoutes.delete(
-  "/schedule/:messageId",
+  "/schedule/:scheduleId",
   isAuth,
   ScheduleController.remove
 );
