@@ -61,7 +61,7 @@ const SendTicketMessagesToCompanyService = async ({
   
     if (!reg) {
       const contact = await Contact.findOne({
-        where: { id: messages[0].ticket.contactId }
+        where: { id: messages[0].ticket.contactId, companyId }
       });
   
       reg = await FileRegister.findOne({

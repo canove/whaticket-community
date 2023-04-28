@@ -113,10 +113,7 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const containTicket = async (req: Request, res: Response): Promise<Response> => {
-  const {
-    phone,
-    session,
-  } = req.query as IndexQuery;
+  const { phone, session } = req.query as IndexQuery;
 
     let whatsapp = await Whatsapp.findOne({
       where:{
@@ -125,18 +122,18 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
       order: [["createdAt", "DESC"]],
     })
 
-    if(!whatsapp ) {
+    if (!whatsapp) {
       whatsapp = await Whatsapp.findOne({
         where:{
           name: session,
           official: true
         }
-      })
+      });
     }
 
     const contact = await Contact.findOne({
       where: {
-        // companyId: whatsapp.companyId,
+        companyId: whatsapp.companyId,
         number: 
           { 
             [Op.or]: [
@@ -149,7 +146,7 @@ export const containTicket = async (req: Request, res: Response): Promise<Respon
           }
      }});
 
-     if(!contact) {
+     if (!contact) {
       return res.status(200).json(null);
      }
 

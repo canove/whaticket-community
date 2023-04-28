@@ -87,9 +87,12 @@ const SendWhatsAppMessage = async ({
     limit: 1
   });
 
-  const contact = await Contact.findOne({ where: {
-    id: contactId > 0 ? contactId : message[0] ? message[0].contactId : ticket.contactId
-  }});
+  let contact = await Contact.findOne({ 
+    where: {
+      id: (contactId > 0) ? contactId : (message[0] && message[0].contactId) ? message[0].contactId : ticket.contactId,
+      companyId
+    }
+  });
 
   const messageSended = await FileRegister.findOne({
     where: {
