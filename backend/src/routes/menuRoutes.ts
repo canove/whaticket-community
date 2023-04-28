@@ -11,6 +11,8 @@ menuRoutes.get("/menus/check", isAuth, MenuController.check);
 
 menuRoutes.get("/menus/company", isAuth, MenuController.showCompany);
 
+menuRoutes.get("/menus/layout", isAuth, MenuController.layout);
+
 menuRoutes.get("/menus/:menuId", isAuth, MenuController.show);
 
 menuRoutes.post("/menus/", isAuth, MenuController.store);

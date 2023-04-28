@@ -9,6 +9,7 @@ import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
 import DeleteMenuService from "../services/MenuServices/DeleteMenuService";
 import CheckMenuService from "../services/MenuServices/CheckMenuService";
+import ShowMenuLayoutService from "../services/MenuServices/ShowMenuLayoutService";
 
 type IndexQuery = {
   searchParam: string;
@@ -64,6 +65,18 @@ export const showCompany = async (
 
   return res.status(200).json(menus);
 };
+
+export const layout = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { id, companyId } = req.user;
+
+  const menus = await ShowMenuLayoutService(companyId, id);
+
+  return res.status(200).json(menus);
+};
+
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { name, icon, parentId, isParent } = req.body;

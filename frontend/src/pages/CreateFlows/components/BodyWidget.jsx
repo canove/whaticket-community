@@ -37,6 +37,7 @@ import { DatabaseSaveNodeModel } from '../nodes/DatabaseSave/DatabaseSaveNodeMod
 import { ButtonMessageNodeModel } from '../nodes/ButtonMessage/ButtonMessageNodeModel';
 import { SatisfactionSurveyNodeModel } from '../nodes/SatisfactionSurvey/SatisfactionSurveyNodeModel';
 import { TemplateNodeModel } from '../nodes/Template/TemplateNodeModel';
+import { DatabaseCondition2NodeModel } from '../nodes/DatabaseCondition2/DatabaseCondition2NodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -111,6 +112,12 @@ export class BodyWidget extends React.Component {
 						<TrayItemWidget
 							model={{ type: 'database-condition' }} 
 							name="Database Condition" 
+							color="#211F7E" 
+							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
+						<TrayItemWidget
+							model={{ type: 'database-condition-2' }} 
+							name="Database Condition 2" 
 							color="#211F7E" 
 							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
 						/>
@@ -229,6 +236,12 @@ export class BodyWidget extends React.Component {
 									node.addPort(new AdvancedPortModel(true, 'in'));
 									node.addPort(new AdvancedPortModel(false, 'out-true'));
 									node.addPort(new AdvancedPortModel(false, 'out-false'));
+								break;
+								case 'database-condition-2':
+									node = new DatabaseCondition2NodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out-c1'));
+									node.addPort(new AdvancedPortModel(false, 'out-else'));
 								break;
 								case 'database':
 									node = new DatabaseNodeModel();

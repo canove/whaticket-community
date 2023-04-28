@@ -1,13 +1,20 @@
-import User from "../../database/models/User";
+import { Op, Sequelize } from "sequelize";
+
 import AppError from "../../errors/AppError";
 import {
   createAccessToken,
   createRefreshToken
 } from "../../helpers/CreateTokens";
 import { SerializeUser } from "../../helpers/SerializeUser";
+
+import User from "../../database/models/User";
 import Queue from "../../database/models/Queue";
 import Company from "../../database/models/Company";
-import { Op, Sequelize } from "sequelize";
+import { decrypt, encrypt } from "../../utils/encriptor";
+import Packages from "../../database/models/Packages";
+import Pricing from "../../database/models/Pricing";
+
+const firebase = require("../../utils/Firebase");
 
 interface SerializedUser {
   id: number;
@@ -23,18 +30,21 @@ interface Request {
   email: string;
   password: string;
   company: string;
+  retry: boolean;
 }
 
 interface Response {
-  serializedUser: SerializedUser;
-  token: string;
-  refreshToken: string;
+  serializedUser?: SerializedUser;
+  token?: string;
+  refreshToken?: string;
+  accountConnected: boolean;
 }
 
 const AuthUserService = async ({
   email,
   password,
-  company
+  company,
+  retry
 }: Request): Promise<Response> => {
   const whereCondition = {
     "$Company.name$": Sequelize.where(
@@ -68,12 +78,64 @@ const AuthUserService = async ({
   const token = createAccessToken(user);
   const refreshToken = createRefreshToken(user);
 
+  const database = await firebase.database();
+
+  const firebaseUser = await database
+  .collection("Authentication")
+  .doc(`${user.companyId}-${user.email}`)
+  .get();
+
+  if (firebaseUser.exists && !retry) {
+    return { accountConnected: true };
+  } else {
+    if (!firebaseUser.exists) {
+      const allLoggedUsers = await database
+      .collection("Authentication")
+      .where("companyId", "==", user.companyId)
+      .get();
+
+      const loggedUsersQuantity = allLoggedUsers.docs.length;
+
+      const pack = await Packages.findOne({
+        include: [
+          {
+            model: Pricing,
+            as: "pricings",
+            where: { companyId: user.companyId },
+            required: true
+          }
+        ]
+      });
+
+      const loggedUsersLimit = pack ? pack.maxUsers : null;
+
+      if (loggedUsersLimit && loggedUsersLimit <= loggedUsersQuantity) {
+        throw new AppError("LOGGED_USERS_REACHED_THE_LIMIT");
+      }
+    }
+    
+    await database
+    .collection("Authentication")
+    .doc(`${user.companyId}-${user.email}`)
+    .set(
+      {
+        authDate: new Date(),
+        companyAlias: companyDb.alias,
+        companyId: user.companyId,
+        email: user.email,
+        isAuth: true,
+        token: encrypt(token)
+      },
+    );
+  }
+
   const serializedUser = SerializeUser(user);
 
   return {
     serializedUser,
     token,
-    refreshToken
+    refreshToken,
+    accountConnected: false,
   };
 };
 

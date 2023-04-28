@@ -1391,6 +1391,7 @@ const messages = {
       },
 
       backendErrors: {
+        LOGGED_USERS_REACHED_THE_LIMIT: "Exceeded simultaneous logged in account limit.",
         ERR_SESSION_ENDED:
           "As the last message was sent more than 24 hours ago, this session has been terminated.",
         ERR_NO_OTHER_WHATSAPP:

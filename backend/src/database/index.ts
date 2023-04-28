@@ -44,6 +44,8 @@ import SatisfactionSurveys from "./models/SatisfactionSurveys";
 import SatisfactionSurveyResponses from "./models/SatisfactionSurveyResponses";
 import Packages from "./models/Packages";
 import ExtraUsersControls from "./models/ExtraUsersControls";
+import Sessions from "./models/Sessions";
+import SessionMessages from "./models/SessionMessages";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -96,6 +98,8 @@ const models = [
   SatisfactionSurveyResponses,
   Packages,
   ExtraUsersControls,
+  Sessions,
+  SessionMessages
 ];
 
 sequelize.addModels(models);

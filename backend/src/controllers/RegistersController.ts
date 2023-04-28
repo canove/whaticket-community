@@ -10,10 +10,12 @@ import CountMessagesServices from "../services/MessageServices/CountMessagesServ
 import ListRegistersService from "../services/RegistersService/ListRegistersService";
 import ListReportRegistersService from "../services/RegistersService/ListReportRegistersService";
 import GetConnectedWhatsAppsService from "../services/WhatsappService/GetConnectedWhatsAppsService";
+import AppError from "../errors/AppError";
 
 const fs = require("fs");
 const pdf = require("pdf-creator-node");
 const pdf2base64 = require("pdf-to-base64");
+const firebase = require("../utils/Firebase");
 
 type IndexQuery = {
   type?: string;
@@ -34,6 +36,7 @@ type ListQuery = {
   phoneNumber: string;
   limit: string;
   categoryIds: Array<any>;
+  isProcessed: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -44,11 +47,19 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const category = await DashboardCategoryService({ companyId, date, categoryId });
 
-  const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
+  // const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
 
   const messages = await CountMessagesServices({ companyId, date, initialDate, finalDate, categoryId });
 
-  return res.status(200).json({ reports, category, connectedWhatsapps, messages });
+  const database = await firebase.database();
+  const firebaseUsers = await database
+  .collection("Authentication")
+  .where("companyId", "==", companyId)
+  .get();
+  
+  const loggedInUsersQuantity = firebaseUsers.docs.length;
+
+  return res.status(200).json({ reports, category, loggedInUsersQuantity, messages });
 };
 
 export const queue = async (req: Request, res: Response): Promise<Response> => {
@@ -161,8 +172,12 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber, categoryIds } = req.query as ListQuery;
+  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed } = req.query as ListQuery;
   const { companyId } = req.user;
+
+  if (!initialDate || !finalDate) {
+    throw new AppError("Filtro de data inicial e final obrigatórios.");
+  }
 
   const { registers, count, hasMore } = await ListReportRegistersService({
     statuses,
@@ -174,15 +189,20 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     name,
     phoneNumber,
     limit,
-    categoryIds
+    categoryIds,
+    isProcessed
   });
 
   return res.json({ registers, count, hasMore });
 };
 
 export const exportPdf = async (req: Request, res: Response): Promise<void> => {
-  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed } = req.query as ListQuery;
   const { companyId } = req.user;
+
+  if (!initialDate || !finalDate) {
+    throw new AppError("Filtro de data inicial e final obrigatórios.");
+  }
 
   const { registers } = await ListReportRegistersService({
     statuses,
@@ -193,7 +213,8 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
     finalDate,
     name,
     phoneNumber,
-    categoryIds
+    categoryIds,
+    isProcessed
   });
 
   const html = `
@@ -319,8 +340,12 @@ export const exportCsv = async (
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed } = req.query as ListQuery;
   const { companyId } = req.user;
+
+  if (!initialDate || !finalDate) {
+    throw new AppError("Filtro de data inicial e final obrigatórios.");
+  }
 
   const { registers } = await ListReportRegistersService({
     statuses,
@@ -331,7 +356,8 @@ export const exportCsv = async (
     finalDate,
     name, 
     phoneNumber,
-    categoryIds
+    categoryIds,
+    isProcessed
   });
 
   const rows = [["Nome", "Telefone", "Categoria", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];

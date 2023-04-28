@@ -183,11 +183,11 @@ const GeneralReports = () => {
               <TableCell align="center">{i18n.t("generalReports.table.name")}</TableCell>
               <TableCell align="center">{i18n.t("generalReports.table.imported")}</TableCell>
               <TableCell align="center">{i18n.t("generalReports.table.sent")}</TableCell>
-              <TableCell align="center">{i18n.t("generalReports.table.delivered")}</TableCell>
-              <TableCell align="center">{i18n.t("generalReports.table.read")}</TableCell>
+              {/* <TableCell align="center">{i18n.t("generalReports.table.delivered")}</TableCell> */}
+              {/* <TableCell align="center">{i18n.t("generalReports.table.read")}</TableCell> */}
               <TableCell align="center">{i18n.t("generalReports.table.error")}</TableCell>
               <TableCell align="center">{i18n.t("generalReports.table.blacklist")}</TableCell>
-              <TableCell align="center">{i18n.t("generalReports.table.interaction")}</TableCell>
+              {/* <TableCell align="center">{i18n.t("generalReports.table.interaction")}</TableCell> */}
               <TableCell align="center">{i18n.t("generalReports.table.noWhats")}</TableCell>
               <TableCell align="center">{i18n.t("generalReports.table.sentMessages")}</TableCell>
               <TableCell align="center">{i18n.t("generalReports.table.receivedMessages")}</TableCell>
@@ -200,11 +200,11 @@ const GeneralReports = () => {
                   <TableCell align="center">{report.company.name || ""}</TableCell>
                   <TableCell align="center">{report.imported || 0}</TableCell>
                   <TableCell align="center">{report.sent || 0}</TableCell>
-                  <TableCell align="center">{report.delivered || 0}</TableCell>
-                  <TableCell align="center">{report.read || 0}</TableCell>
+                  {/* <TableCell align="center">{report.delivered || 0}</TableCell> */}
+                  {/* <TableCell align="center">{report.read || 0}</TableCell> */}
                   <TableCell align="center">{report.error || 0}</TableCell>
                   <TableCell align="center">{report.blacklist || 0}</TableCell>
-                  <TableCell align="center">{report.interaction || 0}</TableCell>
+                  {/* <TableCell align="center">{report.interaction || 0}</TableCell> */}
                   <TableCell align="center">{report.noWhats || 0}</TableCell>
                   <TableCell align="center">{report.sentMessages || 0}</TableCell>
                   <TableCell align="center">{report.receivedMessages || 0}</TableCell>
@@ -226,20 +226,20 @@ const GeneralReports = () => {
                     return accumulator + value;
                   }, 0)}
                 </TableCell>
-                <TableCell align="center">
+                {/* <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
                     const value = report.delivered ? parseInt(report.delivered) : 0;
 
                     return accumulator + value;
                   }, 0)}
-                </TableCell>
-                <TableCell align="center">
+                </TableCell> */}
+                {/* <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
                     const value = report.read ? parseInt(report.read) : 0;
 
                     return accumulator + value;
                   }, 0)}
-                </TableCell>
+                </TableCell> */}
                 <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
                     const value = report.error ? parseInt(report.error) : 0;
@@ -254,13 +254,13 @@ const GeneralReports = () => {
                     return accumulator + value;
                   }, 0)}
                 </TableCell>
-                <TableCell align="center">
+                {/* <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
                     const value = report.interaction ? parseInt(report.interaction) : 0;
 
                     return accumulator + value;
                   }, 0)}
-                </TableCell>
+                </TableCell> */}
                 <TableCell align="center">
                   {reports && reports.reduce((accumulator, report) => {
                     const value = report.noWhats ? parseInt(report.noWhats) : 0;

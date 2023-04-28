@@ -422,10 +422,10 @@ const getInfo = async ({ msgWhatsId, registerId, companyId, phoneNumber }) => {
     client.on("error", err => console.log("Redis Client Error", err));
     await client.connect();
 
-    let value = await client.get(`${phoneNumber}-${companyId}`);
+    const value = await getRedisValue(phoneNumber, companyId, client);
 
     if (value) {
-      return JSON.parse(value);
+      return value;
     } else {
       const response = await GetInfo({ msgWhatsId, registerId });
     
@@ -447,3 +447,33 @@ const getInfo = async ({ msgWhatsId, registerId, companyId, phoneNumber }) => {
     }
   }
 };
+
+const getRedisValue = async (phoneNumber: string, companyId: string, client: any) =>  {
+  let valueRedis = await client.get(`${phoneNumber}-${companyId}`);
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumberWith9Country(phoneNumber)}-${companyId}`);
+  }
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${preparePhoneNumber9Digit(phoneNumber)}-${companyId}`);
+  }
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumber9Digit(phoneNumber)}-${companyId}`);
+  }
+  
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumberCountry(phoneNumber)}-${companyId}`);
+  }
+
+  if (!valueRedis) {
+    valueRedis = await client.get(`${removePhoneNumber9DigitCountry(phoneNumber)}-${companyId}`);
+  }
+
+  if (valueRedis){
+    return JSON.parse(valueRedis);
+  };
+
+  return null;
+}

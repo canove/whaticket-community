@@ -5,9 +5,10 @@ interface Request {
   companyId: number;
   whatsappId?: string;
   official?: boolean;
+  queueId?: string | number;
 }
 
-const GetDefaultWhatsApp = async ({ companyId, whatsappId, official }: Request): Promise<Whatsapp> => {
+const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: Request): Promise<Whatsapp> => {
   let whereCondition = null;
 
   whereCondition = { companyId, deleted: false };
@@ -18,6 +19,10 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official }: Request):
 
   if (whatsappId) {
     whereCondition = { ...whereCondition, id: whatsappId };
+  }
+
+  if (queueId) {
+    whereCondition = { ...whereCondition, queueId: queueId };
   }
 
   const defaultWhatsapp = await Whatsapp.findOne({

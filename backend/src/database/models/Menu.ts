@@ -6,7 +6,10 @@ import {
   AutoIncrement,
   CreatedAt,
   UpdatedAt,
-  BelongsToMany
+  BelongsToMany,
+  ForeignKey,
+  HasMany,
+  BelongsTo
 } from "sequelize-typescript";
 import Company from "./Company";
 import MenuCompanies from "./MenuCompanies";
@@ -24,8 +27,18 @@ class Menu extends Model<Menu> {
   @Column
   icon: string;
 
+  @ForeignKey(() => Menu)
   @Column
   parentId: number;
+
+  @HasMany(() => Menu, "parentId")
+  childrenMenus1: Menu[];
+
+  @HasMany(() => Menu, "parentId")
+  childrenMenus2: Menu[];
+
+  @BelongsTo(() => Menu)
+  parentMenu: Menu;
 
   @Column
   isParent: boolean;

@@ -1395,6 +1395,7 @@ const messages = {
       },
 
       backendErrors: {
+        LOGGED_USERS_REACHED_THE_LIMIT: "Limite de contas logadas simultâneamente excedido.",
         ERR_SESSION_ENDED:
           "Como a última mensagem foi enviada hà mais de 24H, esta sessão foi encerrada.",
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
