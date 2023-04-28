@@ -35,7 +35,7 @@ const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
+const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const history = useHistory();
 	const classes = useStyles();
 	const { user } = useContext(AuthContext);
@@ -66,7 +66,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 			setAllQueues(list);
 			setQueues(list);
 		}
-		
+
 		loadQueues();
 	}, []);
 
@@ -79,10 +79,10 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
-					const { data } = await api.get("/users/", {
-						params: { searchParam },
+					const { data } = await api.get("/users/transferList/", {
+						params: { searchParam, queueId },
 					});
-					setOptions(data.users);
+					setOptions(data);
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
@@ -93,7 +93,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 			fetchUsers();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, modalOpen]);
+	}, [searchParam, queueId, modalOpen]);
 
 	const handleClose = () => {
 		onClose();
