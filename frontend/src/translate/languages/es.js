@@ -338,6 +338,9 @@ const messages = {
       queueSelect: {
         inputLabel: "Linhas",
       },
+      contactSelect: {
+        inputLabel: "Contactos",
+      },
       quickAnswersSelect: {
         inputLabel: "Usuarios",
       },

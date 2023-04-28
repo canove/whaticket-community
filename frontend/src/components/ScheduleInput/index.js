@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import dayjs from "dayjs";
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import MicRecorder from "mic-recorder-to-mp3";
-import { useParams } from "react-router-dom";
 
 import {
   Button,
@@ -37,6 +36,7 @@ import toastError from "../../errors/toastError";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
+import ContactSelect from '../ContactSelect';
 import RecordingTimer from "../MessageInput/RecordingTimer";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
@@ -210,13 +210,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ScheduleInput = ({ handleCloseModal }) => {
+const ScheduleInput = ({ handleCloseModal, ticket }) => {
   const classes = useStyles();
-  const { ticketId } = useParams();
   const day = dayjs();
 
   const [date, setDate] = useState(day.format("YYYY-MM-DD"));
-  const [time, setTime] = useState(day.format("HH:mm"))
+  const [time, setTime] = useState(day.format("HH:mm"));
+  const [selectedContacts, setSelectedContacts] = useState([ticket.contactId]);
   const [medias, setMedias] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -237,7 +237,7 @@ const ScheduleInput = ({ handleCloseModal }) => {
       setShowEmoji(false);
       setMedias([]);
     };
-  }, [ticketId]);
+  }, [ticket.id]);
 
   const handleSetTime = (e) => {
     const arrayTime = e.target.value.split(":");
@@ -286,32 +286,33 @@ const ScheduleInput = ({ handleCloseModal }) => {
     }
   };
 
-  const handleUploadMedia = async (e) => {
+  const handleUploadMedia = useCallback(async (e) => {
     setLoading(true);
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("date", date);
     formData.append("time", time);
+    selectedContacts.forEach(contact => formData.append("contacts", contact));
     medias.forEach((media) => {
       formData.append("medias", media);
       formData.append("body", media.name);
     });
 
     try {
-      await api.post(`/schedule/${ticketId}`, formData);
+      await api.post(`/schedule/${ticket.id}`, formData);
+      setMedias([]);
       handleCloseModal();
     } catch (err) {
       toastError(err);
     }
 
     setLoading(false);
-    setMedias([]);
-  };
+  }, [date, time, medias, selectedContacts]);
 
-  const handleUploadAudio = async () => {
+  const handleUploadAudio = useCallback(async () => {
     setLoading(true);
-    try {
+      try {
       const [, blob] = await Mp3Recorder.stop().getMp3();
       if (blob.size < 10000) {
         setLoading(false);
@@ -325,8 +326,9 @@ const ScheduleInput = ({ handleCloseModal }) => {
       formData.append("body", filename);
       formData.append("date", date);
       formData.append("time", time);
+      selectedContacts.forEach(contact => formData.append("contacts", contact));
 
-      await api.post(`/schedule/${ticketId}`, formData);
+      await api.post(`/schedule/${ticket.id}`, formData);
       setTimeout(() => handleCloseModal(), 800);
     } catch (err) {
       toastError(err);
@@ -334,32 +336,32 @@ const ScheduleInput = ({ handleCloseModal }) => {
 
     setRecording(false);
     setLoading(false);
-  };
+  }, [date, time, selectedContacts]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = useCallback(async () => {
     if (inputMessage.trim() === "") return;
     setLoading(true);
 
     const message = {
       date,
       time,
+      contacts: selectedContacts,
       mediaUrl: "",
       body: signMessage
         ? `*${user?.name}:*\n${inputMessage.trim()}`
         : inputMessage.trim(),
     };
     try {
-      await api.post(`/schedule/${ticketId}`, message);
+      await api.post(`/schedule/${ticket.id}`, message);
+      setInputMessage("");
       handleCloseModal();
     } catch (err) {
       toastError(err);
     }
 
-    setInputMessage("");
     setShowEmoji(false);
     setLoading(false);
-    ;
-  };
+  }, [date, time, signMessage, inputMessage, selectedContacts]);
 
   const handleStartRecording = async () => {
     setLoading(true);
@@ -439,7 +441,7 @@ const ScheduleInput = ({ handleCloseModal }) => {
         <SendIcon className={classes.sendMessageIcons} />
       </IconButton>
     </Paper>
-  ), [medias.length]);
+  ), [handleUploadMedia]);
 
   const inputRender = useMemo(() => (
     <Paper square elevation={0} className={classes.mainWrapper}>
@@ -655,7 +657,7 @@ const ScheduleInput = ({ handleCloseModal }) => {
         )}
       </div>
     </Paper>
-  ), [showEmoji, inputMessage, loading, recording, typeBar, signMessage])
+  ), [showEmoji, loading, recording, typeBar, handleSendMessage])
 
   return (
     <>
@@ -677,6 +679,11 @@ const ScheduleInput = ({ handleCloseModal }) => {
             min={date === day.format('YYYY-MM-DD') ? dayjs().format("HH:mm") : undefined}
           />
         </div>
+
+        <ContactSelect
+          selectedContacts={selectedContacts}
+          onChange={(values) => setSelectedContacts(values)}
+        />
       </DialogContent>
 
       {medias.length > 0 ? mediaRender : inputRender}

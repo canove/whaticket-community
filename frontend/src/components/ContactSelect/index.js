@@ -21,9 +21,9 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
+const ContactSelect = ({ selectedContacts, onChange }) => {
 	const classes = useStyles();
-	const [users, setUsers] = useState([]);
+	const [contacts, setContacts] = useState([]);
 
 	const handleChange = e => {
 		onChange(e.target.value);
@@ -32,12 +32,25 @@ const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 	useEffect(() => {
 		(async () => {
 			try {
-				const { data } = await api.get("/users");
-				data.users.sort((a, b) => {
-					if (a.name > b.name) return 1
-					return -1
-				});
-				setUsers(data?.users);
+				let hasMore = true;
+				let pageNumber = 1;
+				let dataContacts = [];
+
+				while (hasMore) {
+					const { data } = await api.get(`/contacts?pageNumber=${pageNumber}`);
+					dataContacts = dataContacts.concat(data?.contacts);
+					dataContacts.sort((a, b) => {
+						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+						return -1
+					});
+
+					if (!data.hasMore) {
+						hasMore = data?.hasMore;
+						break;
+					}
+					pageNumber += 1;
+				}
+				setContacts(dataContacts);
 			} catch (err) {
 				toastError(err);
 			}
@@ -47,11 +60,11 @@ const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 	return (
 		<div style={{ marginTop: 6 }}>
 			<FormControl fullWidth margin="dense" variant="outlined">
-				<InputLabel>{i18n.t("quickAnswersSelect.inputLabel")}</InputLabel>
+				<InputLabel>{i18n.t("contactSelect.inputLabel")}</InputLabel>
 				<Select
 					multiple
 					labelWidth={60}
-					value={selectedUsers}
+					value={selectedContacts}
 					onChange={handleChange}
 					MenuProps={{
 						anchorOrigin: {
@@ -68,13 +81,13 @@ const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 						<div className={classes.chips}>
 							{selected?.length > 0 &&
 								selected.map(id => {
-									const user = users.find(q => q.id === id);
-									return user ? (
+									const contact = contacts.find(q => q.id === id);
+									return contact ? (
 										<Chip
 											key={id}
-											style={{ backgroundColor: user.color }}
+											style={{ backgroundColor: contact.color }}
 											variant="outlined"
-											label={user.name}
+											label={contact.name}
 											className={classes.chip}
 										/>
 									) : null;
@@ -82,9 +95,9 @@ const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 						</div>
 					)}
 				>
-					{users.map(user => (
-						<MenuItem key={user.id} value={user.id}>
-							{user.name}
+					{contacts.map(contact => (
+						<MenuItem key={contact.id} value={contact.id}>
+							{contact.name}
 						</MenuItem>
 					))}
 				</Select>
@@ -93,4 +106,4 @@ const QuickAnswerSelect = ({ selectedUsers, onChange }) => {
 	);
 };
 
-export default QuickAnswerSelect;
+export default ContactSelect;

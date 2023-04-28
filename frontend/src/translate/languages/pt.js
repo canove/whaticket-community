@@ -337,6 +337,9 @@ const messages = {
       queueSelect: {
         inputLabel: "Filas",
       },
+      contactSelect: {
+        inputLabel: "Contatos",
+      },
       quickAnswersSelect: {
         inputLabel: "Usuários",
       },

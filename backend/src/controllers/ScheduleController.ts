@@ -1,14 +1,18 @@
 import dayjs from "dayjs";
+import ObjectSupport from "dayjs/plugin/objectSupport";
 import { Request, Response } from "express";
-import { RecurrenceRule, scheduleJob } from "node-schedule";
+import schedule from "node-schedule";
 import AppError from "../errors/AppError";
 
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../libs/socket";
-import Message from "../models/Message";
 
+import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp";
+import Ticket from "../models/Ticket";
+import ShowContactService from "../services/ContactServices/ShowContactService";
 import ListScheduleService from "../services/ScheduleServices/ListScheduleService";
-import ShowTicketService from "../services/TicketServices/ShowTicketService";
+import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
+import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
@@ -19,10 +23,31 @@ type IndexQuery = {
 
 type ScheduleData = {
   body: string;
-  quotedMsg?: Message;
+  contacts: number[];
   time: string;
   date: string;
 };
+
+type MessageInfos = {
+  body?: string;
+  medias?: Express.Multer.File[];
+  tickets: Ticket[];
+};
+
+async function sendAllMessages({ body = "", medias, tickets }: MessageInfos) {
+  return Promise.all(
+    tickets.map(ticket => {
+      if (medias) {
+        return Promise.all(
+          medias.map(async (media: Express.Multer.File) => {
+            await SendWhatsAppMedia({ media, ticket });
+          })
+        );
+      }
+      return SendWhatsAppMessage({ body, ticket });
+    })
+  );
+}
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
@@ -39,37 +64,61 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { ticketId } = req.params;
-  const { body, quotedMsg, time, date }: ScheduleData = req.body;
+  dayjs.extend(ObjectSupport);
+  const { body, time, date, contacts }: ScheduleData = req.body;
   const medias = req.files as Express.Multer.File[];
   const [hour, minute] = time.split(":");
   const fullDate = dayjs(date);
 
-  const ticket = await ShowTicketService(ticketId);
+  const whatsapp = await GetDefaultWhatsApp(+req.user.id);
+  const tickets = await Promise.all(
+    contacts.map(async contact => {
+      const contactById = await ShowContactService(contact);
+      const groupContact = contactById.isGroup ? contactById : undefined;
+      const ticketFound = await FindOrCreateTicketService(
+        contactById,
+        whatsapp.id,
+        0,
+        groupContact
+      );
+      const { ticket } = await UpdateTicketService({
+        ticketData: { status: "open" },
+        ticketId: ticketFound.id
+      });
+      return ticket;
+    })
+  );
 
-  const ruler = new RecurrenceRule();
+  const ruler = new schedule.RecurrenceRule();
   ruler.date = fullDate.get("date");
   ruler.month = fullDate.get("month");
   ruler.year = fullDate.get("year");
   ruler.hour = +hour;
   ruler.minute = +minute;
+  ruler.second = 1;
   ruler.tz = "America/Fortaleza";
 
-  const job = scheduleJob(ruler, async fireDate => {
-    console.log("Sent -->", fireDate);
-
-    if (medias) {
-      await Promise.all(
-        medias.map(async (media: Express.Multer.File) => {
-          await SendWhatsAppMedia({ media, ticket });
-        })
-      );
-    } else {
-      await SendWhatsAppMessage({ body, ticket, quotedMsg });
-    }
+  const strFormat = "YYYY-MM-DD HH:mm";
+  const nowDate = dayjs();
+  const nowRuler = dayjs({
+    year: ruler.year,
+    date: ruler.date,
+    month: ruler.month,
+    hour: ruler.hour,
+    minute: ruler.minute
   });
 
-  if (job) return res.send();
+  if (nowDate.format(strFormat) === nowRuler.format(strFormat)) {
+    await sendAllMessages({ body, medias, tickets });
+    return res.status(201).send();
+  }
+
+  const job = schedule.scheduleJob(ruler, async fireDate => {
+    console.log("Sent -->", fireDate);
+    await sendAllMessages({ body, medias, tickets });
+  });
+
+  if (job) return res.status(201).send();
 
   throw new AppError("ERR_SCHEDULING_WAPP_MSG");
 };

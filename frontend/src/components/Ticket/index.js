@@ -174,6 +174,7 @@ const Ticket = () => {
           open={scheduleModalOpen}
           onClose={handleToggleScheduleModal}
           aria-labelledby="form-dialog-title"
+          ticket={ticket}
         />
         <ReplyMessageProvider>
           <MessagesList

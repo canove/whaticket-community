@@ -3,16 +3,12 @@ import React, { useEffect, useRef } from "react";
 
 import {
   Dialog,
-  // DialogActions,
-  // DialogContent,
   DialogTitle,
-  // TextField,
   makeStyles,
 } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
-import { i18n } from "../../translate/i18n";
 
-// import ContactSelect from '../ContactSelect';
+import { i18n } from "../../translate/i18n";
 import ScheduleInput from '../ScheduleInput';
 
 const useStyles = makeStyles((theme) => ({
@@ -47,7 +43,7 @@ const ScheduleModal = ({
   open,
   onClose,
   scheduleInfo,
-  onSave,
+  ticket
 }) => {
   const classes = useStyles();
   const isMounted = useRef(true);
@@ -76,7 +72,7 @@ const ScheduleModal = ({
             ? `${i18n.t("scheduleModal.title.edit")}`
             : `${i18n.t("scheduleModal.title.add")}`}
         </DialogTitle>
-        <ScheduleInput handleCloseModal={handleClose} />
+        <ScheduleInput handleCloseModal={handleClose} ticket={ticket} />
       </Dialog>
     </div>
   );
