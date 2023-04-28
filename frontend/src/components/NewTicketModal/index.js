@@ -187,7 +187,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 	};
 
 	const handleAddNewContactTicket = contact => {
-		handleSaveTicket(contact.id);
+		// handleSaveTicket(contact.id);
 	};
 
 	const createAddContactOption = (filterOptions, params) => {

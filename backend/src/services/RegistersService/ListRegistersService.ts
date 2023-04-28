@@ -124,7 +124,7 @@ const ListRegistersService = async ({
     info1 = await FileRegister.findOne({
       where: { ...whereCondition, ...whereConditionProcessedAt },
       attributes: [
-        [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
+        [ Sequelize.fn('sum', Sequelize.literal("(sentAt IS NOT NULL AND msgWhatsId IS NOT NULL) OR (fileId IS NULL AND exposedImportId IS NULL AND integratedImportId IS NULL)")), 'sent' ],
         [ Sequelize.fn('sum', Sequelize.literal("deliveredAt IS NOT NULL")), 'delivered' ],
         [ Sequelize.fn('sum', Sequelize.literal("readAt IS NOT NULL")), 'read' ],
         [ Sequelize.fn('sum', Sequelize.literal("errorAt IS NOT NULL OR blacklist = true")), 'error' ],

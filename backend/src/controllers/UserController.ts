@@ -11,10 +11,12 @@ import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 import UpdateUserLanguageService from "../services/UserServices/UpdateUserLanguageService";
 import ListAllUsersService from "../services/UserServices/ListAllUsersService";
+import ListTransferUsersService from "../services/UserServices/ListTransferUsersService";
 
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
+  queueId: string | number;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -34,6 +36,19 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
   const users = await ListAllUsersService({ companyId });
+
+  return res.json(users);
+};
+
+export const transferList = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam, queueId } = req.query as IndexQuery;
+  const { companyId } = req.user;
+
+  const users = await ListTransferUsersService({
+    searchParam,
+    queueId,
+    companyId
+  });
 
   return res.json(users);
 };

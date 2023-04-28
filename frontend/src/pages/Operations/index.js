@@ -179,7 +179,7 @@ const Operations = () => {
             triggerTotal = triggerTotal + (triggerFee * (quantity - graceTriggers));
         }
         
-        const totalMonthValue = pricing.product.monthlyFee;
+        const totalMonthValue = pricing.package ? pricing.package.monthlyFee : 0;
         const totalTriggerValue = triggerTotal;
         
         const expectedTotalMonthValue = ((totalTriggerValue / today) * 30) + totalMonthValue;

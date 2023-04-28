@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
@@ -23,6 +23,7 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   maxWidth: {
@@ -34,27 +35,39 @@ const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
+const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const history = useHistory();
+	const classes = useStyles();
+	const { user } = useContext(AuthContext);
+	const { i18n } = useTranslation();
+
 	const [options, setOptions] = useState([]);
 	const [queues, setQueues] = useState([]);
 	const [allQueues, setAllQueues] = useState([]);
+
 	const [loading, setLoading] = useState(false);
+
 	const [searchParam, setSearchParam] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [selectedQueue, setSelectedQueue] = useState('');
-	const classes = useStyles();
+
 	const { findAll: findAllQueues } = useQueues();
-	const { i18n } = useTranslation();
 
 	useEffect(() => {
+		
 		const loadQueues = async () => {
+			if (user.profileId !== 1) {
+				setQueues(user.queues);
+				setAllQueues(list);
+				return;
+			}
+
 			const list = await findAllQueues();
 			setAllQueues(list);
 			setQueues(list);
 		}
+
 		loadQueues();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -66,10 +79,10 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
-					const { data } = await api.get("/users/", {
-						params: { searchParam },
+					const { data } = await api.get("/users/transferList/", {
+						params: { searchParam, queueId },
 					});
-					setOptions(data.users);
+					setOptions(data);
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
@@ -80,7 +93,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 			fetchUsers();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, modalOpen]);
+	}, [searchParam, queueId, modalOpen]);
 
 	const handleClose = () => {
 		onClose();
@@ -97,7 +110,6 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 
 			if (selectedUser) {
 				data.userId = selectedUser.id
-				data.queueId = null;
 			}
 
 			if (selectedQueue && selectedQueue !== null) {
