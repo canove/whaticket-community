@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
@@ -23,6 +23,7 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   maxWidth: {
@@ -36,25 +37,37 @@ const filterOptions = createFilterOptions({
 
 const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 	const history = useHistory();
+	const classes = useStyles();
+	const { user } = useContext(AuthContext);
+	const { i18n } = useTranslation();
+
 	const [options, setOptions] = useState([]);
 	const [queues, setQueues] = useState([]);
 	const [allQueues, setAllQueues] = useState([]);
+
 	const [loading, setLoading] = useState(false);
+
 	const [searchParam, setSearchParam] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [selectedQueue, setSelectedQueue] = useState('');
-	const classes = useStyles();
+
 	const { findAll: findAllQueues } = useQueues();
-	const { i18n } = useTranslation();
 
 	useEffect(() => {
+		
 		const loadQueues = async () => {
+			if (user.profileId !== 1) {
+				setQueues(user.queues);
+				setAllQueues(list);
+				return;
+			}
+
 			const list = await findAllQueues();
 			setAllQueues(list);
 			setQueues(list);
 		}
+		
 		loadQueues();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -97,7 +110,6 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 
 			if (selectedUser) {
 				data.userId = selectedUser.id
-				data.queueId = null;
 			}
 
 			if (selectedQueue && selectedQueue !== null) {
