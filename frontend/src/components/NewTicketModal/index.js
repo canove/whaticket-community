@@ -285,7 +285,10 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 									<Select
 										label={"Fila"}
 										value={queueId}
-										onChange={(e) => setQueueId(e.target.value)}
+										onChange={(e) => {
+											setQueueId(e.target.value)
+											setWhatsappId("");
+										}}
 										defaultValue=""
 										MenuProps={{
 											anchorOrigin: {
@@ -361,8 +364,11 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 										</MenuItem>
 										{whatsApps &&
 											whatsApps.map((whats) => {
+												const whatsQueue = whats.queues.length > 0 ? whats.queues[0] : null;
+												const queueCondition = (!queueId || (queueId && whatsQueue && whatsQueue.id === queueId));
+
 												if (official) {
-													if (whats.official === true && whats.deleted === false) {
+													if (whats.official === true && whats.deleted === false && queueCondition) {
 														return (
 															<MenuItem key={whats.id} value={whats.id}>
 																{whats.name}
@@ -370,7 +376,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 														);
 													}
 												} else {
-													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false) {
+													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false && queueCondition) {
 														return (
 															<MenuItem key={whats.id} value={whats.id}>
 																{whats.name}
