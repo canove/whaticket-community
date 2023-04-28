@@ -182,9 +182,10 @@ const Dashboard = () => {
   const [smallerTickets, setSmallerTickets] = useState([]);
   const [averageTime, setAverageTime] = useState(0);
 
-  const [config, setConfig] = useState(null);
-  const [connectedWhatsapps, setConnectedWhatsapps] = useState([]);
-
+  // const [config, setConfig] = useState(null);
+  // const [connectedWhatsapps, setConnectedWhatsapps] = useState([]);
+  const [loggedInUsersQuantity, setLoggedInUsersQuantity] = useState(0);
+  
   const [updatingPage, setUpdatingPage] = useState(false);
 
   const [billingTotalMonthValue, setBillingTotalMonthValue] = useState(0);
@@ -254,10 +255,12 @@ const Dashboard = () => {
       setQueueCount(data.reports.queue || "0");
 
       setCategoryCount(data.category);
-      setConnectedWhatsapps(data.connectedWhatsapps);
+      // setConnectedWhatsapps(data.connectedWhatsapps);
 
       setSentMessageCount(data.messages.sent || "0");
       setReceivedMessageCount(data.messages.received || "0");
+
+      setLoggedInUsersQuantity(data.loggedInUsersQuantity || "0");
     } catch (err) {
       toastError(err);
     }
@@ -278,14 +281,14 @@ const Dashboard = () => {
     }
   }
 
-  const fetchConfig = async () => {
-    try {
-      const { data } = await api.get("/whatsconfig/");
-      setConfig(data && data.length > 0 ? data[0] : null);
-    } catch (err) {
-      toastError(err);
-    }
-  };
+  // const fetchConfig = async () => {
+  //   try {
+  //     const { data } = await api.get("/whatsconfig/");
+  //     setConfig(data && data.length > 0 ? data[0] : null);
+  //   } catch (err) {
+  //     toastError(err);
+  //   }
+  // };
 
   const fetchAverangeTime = async () => {
     try {
@@ -329,7 +332,7 @@ const Dashboard = () => {
   }, [searchParam]);
 
   useEffect(() => {
-    fetchConfig();
+    // fetchConfig();
     fetchCategories();
   }, []);
 
@@ -354,12 +357,13 @@ const Dashboard = () => {
   const updatePage = async () => {
     setUpdatingPage(true);
 
-    // await fetchQueueTime()
     await handleFilter();
-    // await handleFiles();
     await fetchAverangeTime();
-    await fetchConfig();
     await fetchBilling();
+
+    // await fetchQueueTime()
+    // await handleFiles();
+    // await fetchConfig();
 
     setUpdatingPage(false);
   };
@@ -433,49 +437,49 @@ const Dashboard = () => {
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
 
-  const getAverageDeliveryTime = () => {
-    if (!config || !config.active)
-      return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
+  // const getAverageDeliveryTime = () => {
+  //   if (!config || !config.active)
+  //     return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
 
-    let triggerIntervalCount = 0;
-    let connectedWhatsappsCount = 0;
+  //   let triggerIntervalCount = 0;
+  //   let connectedWhatsappsCount = 0;
 
-    let totalTriggerInterval = 0;
+  //   let totalTriggerInterval = 0;
 
-    for (const whats of connectedWhatsapps) {
-      connectedWhatsappsCount += 1;
-      triggerIntervalCount += 1;
+  //   for (const whats of connectedWhatsapps) {
+  //     connectedWhatsappsCount += 1;
+  //     triggerIntervalCount += 1;
 
-      if (whats.automaticControl && whats.currentTriggerInterval) {
-        totalTriggerInterval += whats.currentTriggerInterval;
-        continue;
-      }
+  //     if (whats.automaticControl && whats.currentTriggerInterval) {
+  //       totalTriggerInterval += whats.currentTriggerInterval;
+  //       continue;
+  //     }
 
-      if (whats.connectionFile && whats.connectionFile.triggerInterval) {
-        totalTriggerInterval += whats.connectionFile.triggerInterval;
-        continue;
-      }
+  //     if (whats.connectionFile && whats.connectionFile.triggerInterval) {
+  //       totalTriggerInterval += whats.connectionFile.triggerInterval;
+  //       continue;
+  //     }
 
-      totalTriggerInterval += config.triggerInterval;
-    }
+  //     totalTriggerInterval += config.triggerInterval;
+  //   }
 
-    let queueCountInt = parseInt(queueCount);
+  //   let queueCountInt = parseInt(queueCount);
 
-    if (queueCountInt > 0 && connectedWhatsappsCount === 0)
-      return i18n.t(
-        "dashboard.messages.averageDeliveryTime.noConnectedWhatsapps"
-      );
-    if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
+  //   if (queueCountInt > 0 && connectedWhatsappsCount === 0)
+  //     return i18n.t(
+  //       "dashboard.messages.averageDeliveryTime.noConnectedWhatsapps"
+  //     );
+  //   if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
 
-    const triggerInterval = totalTriggerInterval / triggerIntervalCount;
+  //   const triggerInterval = totalTriggerInterval / triggerIntervalCount;
 
-    const averageDeliveryTimeMinutes =
-      (queueCountInt / connectedWhatsappsCount) * triggerInterval;
-    const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
-    const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
+  //   const averageDeliveryTimeMinutes =
+  //     (queueCountInt / connectedWhatsappsCount) * triggerInterval;
+  //   const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
+  //   const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
 
-    return averageDeliveryTime;
-  };
+  //   return averageDeliveryTime;
+  // };
 
   const formatToBRL = (quantity) => {
     if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
@@ -705,11 +709,11 @@ const Dashboard = () => {
               style={{ overflow: "hidden" }}
             >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.averageDeliveryTime.title")}
+                {"Usuários Logados"}
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : getAverageDeliveryTime()}
+                  {loading ? <CircularProgress /> : loggedInUsersQuantity}
                 </Typography>
               </Grid>
             </Paper>

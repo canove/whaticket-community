@@ -12,13 +12,13 @@ import {
   Default
 } from "sequelize-typescript";
 import Category from "./Category";
-
 import Company from "./Company";
 import Contact from "./Contact";
 import Message from "./Message";
 import Queue from "./Queue";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
+import Sessions from "./Sessions";
 
 @Table
 class Ticket extends Model<Ticket> {
@@ -55,6 +55,13 @@ class Ticket extends Model<Ticket> {
 
   @BelongsTo(() => User)
   user: User;
+
+  @ForeignKey(() => Sessions)
+  @Column
+  sessionId: number;
+
+  @BelongsTo(() => Sessions)
+  session: Sessions;
 
   @ForeignKey(() => Contact)
   @Column

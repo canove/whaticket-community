@@ -15,6 +15,7 @@ import AppError from "../errors/AppError";
 const fs = require("fs");
 const pdf = require("pdf-creator-node");
 const pdf2base64 = require("pdf-to-base64");
+const firebase = require("../utils/Firebase");
 
 type IndexQuery = {
   type?: string;
@@ -46,11 +47,19 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const category = await DashboardCategoryService({ companyId, date, categoryId });
 
-  const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
+  // const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
 
   const messages = await CountMessagesServices({ companyId, date, initialDate, finalDate, categoryId });
 
-  return res.status(200).json({ reports, category, connectedWhatsapps, messages });
+  const database = await firebase.database();
+  const firebaseUsers = await database
+  .collection("Authentication")
+  .where("companyId", "==", companyId)
+  .get();
+  
+  const loggedInUsersQuantity = firebaseUsers.docs.length;
+
+  return res.status(200).json({ reports, category, loggedInUsersQuantity, messages });
 };
 
 export const queue = async (req: Request, res: Response): Promise<Response> => {
