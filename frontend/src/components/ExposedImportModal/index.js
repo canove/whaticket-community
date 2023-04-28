@@ -106,6 +106,9 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   const [offTemplates, setOffTemplates] = useState([]);
   const [selectedOffTemplate, setSelectedOffTemplate] = useState("");
 
+  const [connectionFiles, setConnectionFiles] = useState([]);
+  const [selectedConnectionFile, setSelectedConnectionFile] = useState("Nenhum");
+
   const initialRequiredItems = {
     name: false,
     phoneNumber: false,
@@ -133,6 +136,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         setTemplate(data.templateId);
         setSelectedOffTemplate(data.officialTemplatesId);
         setOffConnection(data.officialConnectionId);
+        setSelectedConnectionFile(data.connectionFileId);
 
         let newConnections = data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"];
 
@@ -205,11 +209,21 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       }
     };
 
+    const fetchConnectionFiles = async () => {
+			try {
+				const { data } = await api.get(`/connectionFiles/`);
+				setConnectionFiles(data);
+			} catch (err) {
+				toastError(err);
+			}
+		};
+
     if (open) {
       fetchMenus();
       fetchTemplates();
       fetchPhoneNumbers();
       fetchOffTemplates();
+      fetchConnectionFiles();
     }
 
     if (exposedImportId) {
@@ -280,6 +294,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     setConnections([]);
     setOffConnection("");
     setSelectedOffTemplate("");
+    setSelectedConnectionFile("Nenhum");
 
     setRequiredItems(initialRequiredItems);
 
@@ -301,7 +316,8 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       connectionType,
       officialConnectionId: offConnection ? offConnection : null,
       officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
-      requiredItems: required.length > 0 ? JSON.stringify(required) : null
+      requiredItems: required.length > 0 ? JSON.stringify(required) : null,
+      connectionFileId: selectedConnectionFile !== "Nenhum" ? selectedConnectionFile : null,
     };
 
     if ((connectionType && !importData.officialTemplatesId) || (!connectionType && !template)) {
@@ -452,6 +468,11 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     setRequiredItems(prevItems => ({...prevItems, [item]: !prevItems[item] }));
   }
 
+  const handleChangeConnectionFile = (e) => {
+    setSelectedConnectionFile(e.target.value);
+    setConnections([]);
+  }
+
   return (
     <div className={classes.root}>
       <Dialog
@@ -585,6 +606,34 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
           )}
           {connectionType === false && (
             <FormControl variant="outlined" margin="normal" fullWidth>
+              <InputLabel InputLabel id="connection-select-label">Categoria</InputLabel>
+              <Select
+                variant="outlined"
+                labelId="category-select-label"
+                id="category-select"
+                value={selectedConnectionFile}
+                label="Categoria"
+                onChange={(e) => {
+                  handleChangeConnectionFile(e);
+                }}
+                style={{ width: "100%" }}
+              >
+                <MenuItem value={"Nenhum"}>
+                  {i18n.t("importModal.form.none")}
+                </MenuItem>
+                {connectionFiles.length > 0 &&
+                  connectionFiles.map((connectionFile, index) => {
+                    return (
+                      <MenuItem key={index} value={connectionFile.id}>
+                        {connectionFile.name}
+                      </MenuItem>
+                    );
+                  })}
+              </Select>
+            </FormControl>
+          )}
+          {connectionType === false && (
+            <FormControl variant="outlined" margin="normal" fullWidth>
               <InputLabel id="connection-select-label">Conexões</InputLabel>
               <Select
                 variant="outlined"
@@ -606,7 +655,8 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                   whatsApps.map((whats) => {
                     if (
                       whats.official === connectionType &&
-                      whats.status === "CONNECTED"
+                      whats.status === "CONNECTED" &&
+                      (selectedConnectionFile === "Nenhum" || whats.connectionFileId === selectedConnectionFile)
                     ) {
                       return (
                         <MenuItem key={whats.id} value={whats.id}>
