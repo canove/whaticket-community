@@ -664,7 +664,7 @@ const Connections = () => {
 				const categoryRemainingDispatchQuantity = Math.floor(categoryDispatchPerHour * remainingDispatchTime);
 	
 				categoryRemainingDispatchTotalQuantity += categoryRemainingDispatchQuantity;
-			} else {
+			} else if (config && config.triggerInterval) {
 				triggerInterval = config.triggerInterval;
 
 				const configDispatchQuantity = totalDispatchTime / triggerInterval;
