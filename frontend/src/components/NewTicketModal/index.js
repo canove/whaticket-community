@@ -22,6 +22,8 @@ import { useTranslation } from "react-i18next";
 import { Checkbox, Chip, FormControl, FormControlLabel, InputLabel, makeStyles, MenuItem, Select, Tooltip, Typography } from "@material-ui/core";
 import QueueSelectSingle from "../QueueSelectSingle";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const filter = createFilterOptions({
 	trim: true,
@@ -179,6 +181,8 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 		} else if (newValue?.name) {
 			setNewContact({ name: newValue.name });
 			setContactModalOpen(true);
+		} else {
+			setSelectedContact(null);
 		}
 	};
 
@@ -188,6 +192,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 
 	const handleAddNewContactTicket = contact => {
 		// handleSaveTicket(contact.id);
+		setSearchParam(contact.name);
 		setSelectedContact(contact);
 	};
 
@@ -269,6 +274,12 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 												<React.Fragment>
 													{loading ? (
 														<CircularProgress color="inherit" size={20} />
+													) : null}
+													{(!loading && selectedContact) ? (
+														<CheckCircleIcon color="inherit" size={20} />
+													) : null}
+													{(!loading && !selectedContact) ? (
+														<CancelIcon color="inherit" size={20} />
 													) : null}
 													{params.InputProps.endAdornment}
 												</React.Fragment>
