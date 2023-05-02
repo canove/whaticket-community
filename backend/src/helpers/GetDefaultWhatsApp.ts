@@ -1,5 +1,6 @@
 import AppError from "../errors/AppError";
 import Whatsapp from "../database/models/Whatsapp";
+import Queue from "../database/models/Queue";
 
 interface Request {
   companyId: number;
@@ -10,6 +11,7 @@ interface Request {
 
 const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: Request): Promise<Whatsapp> => {
   let whereCondition = null;
+  let includeCondition = [];
 
   whereCondition = { companyId, deleted: false };
 
@@ -22,11 +24,18 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
   }
 
   if (queueId) {
-    whereCondition = { ...whereCondition, queueId: queueId };
+    includeCondition.push({
+      model: Queue,
+      as: "queues",
+      attributes: ["id", "name", "color", "greetingMessage"],
+      where: { id: queueId },
+      required: true
+    });
   }
 
   const defaultWhatsapp = await Whatsapp.findOne({
-    where: whereCondition
+    where: whereCondition,
+    include: includeCondition
   });
 
   if (!defaultWhatsapp) {
