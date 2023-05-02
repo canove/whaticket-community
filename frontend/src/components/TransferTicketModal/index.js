@@ -58,7 +58,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 		const loadQueues = async () => {
 			if (user.profileId !== 1) {
 				setQueues(user.queues);
-				setAllQueues(list);
+				setAllQueues(user.queues);
 				return;
 			}
 
