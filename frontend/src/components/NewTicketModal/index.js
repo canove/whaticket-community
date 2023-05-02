@@ -135,7 +135,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 			fetchContacts();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, modalOpen]);
+	}, [searchParam, modalOpen, contactModalOpen]);
 
 	const handleClose = () => {
 		onClose();
@@ -188,6 +188,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 
 	const handleAddNewContactTicket = contact => {
 		// handleSaveTicket(contact.id);
+		setSelectedContact(contact);
 	};
 
 	const createAddContactOption = (filterOptions, params) => {

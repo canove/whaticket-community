@@ -31,6 +31,7 @@ interface Request {
   password: string;
   company: string;
   retry: boolean;
+  userIp: string;
 }
 
 interface Response {
@@ -44,7 +45,8 @@ const AuthUserService = async ({
   email,
   password,
   company,
-  retry
+  retry,
+  userIp
 }: Request): Promise<Response> => {
   const whereCondition = {
     "$Company.name$": Sequelize.where(
@@ -124,7 +126,8 @@ const AuthUserService = async ({
         companyId: user.companyId,
         email: user.email,
         isAuth: true,
-        token: encrypt(token)
+        token: encrypt(token),
+        userIp
       },
     );
   }
