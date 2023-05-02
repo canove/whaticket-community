@@ -7,17 +7,26 @@ import { SendRefreshToken } from "../helpers/SendRefreshToken";
 import User from "../database/models/User";
 import { decrypt, encrypt } from "../utils/encriptor";
 
-// const RequestIp = require('@supercharge/request-ip')
+const externalip = require("external-ip");
 const firebase = require("../utils/Firebase");
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { email, password, company, retry } = req.body;
 
+  let userIp = "";
+
+  try {
+    externalip(function (err, ip) {
+      userIp = ip;
+    });
+  } catch {}
+
   const { token, serializedUser, refreshToken, accountConnected } = await AuthUserService({
     email,
     password,
     company,
-    retry
+    retry,
+    userIp
   });
 
   if (accountConnected) {

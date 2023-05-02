@@ -8,6 +8,13 @@ interface Response {
   useWorkTime: boolean;
 }
 
+const initialSettings = { 
+  days: [false,false,false,false,false,false,false], 
+  hours: "", 
+  message: "", 
+  useWorkTime: false 
+};
+
 const ListCompanySettingsService = async (
   companyId: number | string
 ): Promise<Response> => {
@@ -28,7 +35,7 @@ const ListCompanySettingsService = async (
       throw new AppError(err);
   }
 
-  if (!settings) settings = { days: [false,false,false,false,false,false,false], hours: "", message: "", useWorkTime: false };
+  if (!settings) settings = initialSettings;
 
   return JSON.parse(settings);
 };
