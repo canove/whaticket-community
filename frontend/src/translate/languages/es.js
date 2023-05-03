@@ -301,6 +301,7 @@ const messages = {
           dashboard: "Dashboard",
           connections: "Conexiones",
           tickets: "Tickets",
+          schedules: "Programados",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
           queues: "Linhas",
@@ -361,6 +362,25 @@ const messages = {
         confirmationModal: {
           deleteTitle:
             "¿Está seguro de que desea eliminar esta respuesta rápida?",
+          deleteMessage: "Esta acción no se puede deshacer.",
+        },
+      },
+      schedules: {
+        title: "Programados",
+        table: {
+          message: "Mensaje",
+          date: "Fecha",
+          actions: "Acciones",
+        },
+        buttons: {
+          add: "Agregar nuevo programado",
+        },
+        toasts: {
+          deleted: "Mensaje programada eliminada correctamente.",
+        },
+        searchPlaceholder: "Buscar...",
+        confirmationModal: {
+          deleteTitle: "¿Está seguro de que desea eliminar esta mensaje programada?",
           deleteMessage: "Esta acción no se puede deshacer.",
         },
       },

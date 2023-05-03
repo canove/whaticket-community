@@ -1,17 +1,20 @@
 import {
-  Table,
+  AllowNull,
+  AutoIncrement,
+  BelongsToMany,
   Column,
   CreatedAt,
-  UpdatedAt,
+  Default,
+  HasMany,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  AllowNull,
+  Table,
   Unique,
-  Default,
-  HasMany
+  UpdatedAt
 } from "sequelize-typescript";
 import ContactCustomField from "./ContactCustomField";
+import Schedule from "./Schedule";
+import ScheduleContact from "./ScheduleContact";
 import Ticket from "./Ticket";
 
 @Table
@@ -46,6 +49,9 @@ class Contact extends Model<Contact> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @BelongsToMany(() => Schedule, () => ScheduleContact)
+  schedules: Schedule[];
 
   @HasMany(() => Ticket)
   tickets: Ticket[];

@@ -297,6 +297,7 @@ const messages = {
           dashboard: "Dashboard",
           connections: "Connections",
           tickets: "Tickets",
+          schedules: "Schedules",
           contacts: "Contacts",
           quickAnswers: "Quick Answers",
           queues: "Queues",
@@ -356,6 +357,25 @@ const messages = {
         searchPlaceholder: "Search...",
         confirmationModal: {
           deleteTitle: "Are you sure you want to delete this Quick Reply: ",
+          deleteMessage: "This action cannot be undone.",
+        },
+      },
+      schedules: {
+        title: "Schedules",
+        table: {
+          message: "Message",
+          date: "Date",
+          actions: "Actions",
+        },
+        buttons: {
+          add: "Add new schedule",
+        },
+        toasts: {
+          deleted: "Scheduled message deleted successfully.",
+        },
+        searchPlaceholder: "Search...",
+        confirmationModal: {
+          deleteTitle: "Are you sure you want to delete this scheduled message?",
           deleteMessage: "This action cannot be undone.",
         },
       },

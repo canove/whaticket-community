@@ -81,7 +81,10 @@ const useStyles = makeStyles((theme) => ({
   },
 
   sendMessageIcons: {
-    color: "grey",
+    color: "gray",
+    '&[disabled]': {
+      opacity: 0.3,
+    },
   },
 
   uploadInput: {
@@ -100,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
 
   emojiBox: {
     position: "fixed",
-    bottom: 52,
+    bottom: 0,
     width: 40,
     borderTop: "1px solid #e8e8e8",
   },
@@ -210,15 +213,19 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ScheduleInput = ({ handleCloseModal, ticket }) => {
+const ScheduleInput = ({ handleCloseModal, scheduleInfo, ticket }) => {
   const classes = useStyles();
   const day = dayjs();
+  const contacts = scheduleInfo ? scheduleInfo?.contacts.map(({ id }) => id) : []
+  const contactsSelected = ticket?.contactId ? [ticket.contactId] : contacts;
+  const [dateInfo, timeInfo] = scheduleInfo ? scheduleInfo?.date.split(" ") : [];
+  const bodyInfo = scheduleInfo?.body.replace(/\*.*?:\*\s*/, "");
 
-  const [date, setDate] = useState(day.format("YYYY-MM-DD"));
-  const [time, setTime] = useState(day.format("HH:mm"));
-  const [selectedContacts, setSelectedContacts] = useState([ticket.contactId]);
+  const [date, setDate] = useState(dateInfo || day.format("YYYY-MM-DD"));
+  const [time, setTime] = useState(timeInfo || day.format("HH:mm"));
+  const [selectedContacts, setSelectedContacts] = useState(contactsSelected);
   const [medias, setMedias] = useState([]);
-  const [inputMessage, setInputMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState(bodyInfo || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -237,7 +244,7 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
       setShowEmoji(false);
       setMedias([]);
     };
-  }, [ticket.id]);
+  }, [ticket?.id]);
 
   const handleSetTime = (e) => {
     const arrayTime = e.target.value.split(":");
@@ -253,7 +260,7 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
       }
     }
 
-    setTime(`${newHour}:${newMinute < 10 ? "0" + newMinute : newMinute}`);
+    setTime(`${newHour < 10 ? "0" + newHour : newHour}:${newMinute < 10 ? "0" + newMinute : newMinute}`);
   }
 
   const handleChangeInput = (e) => {
@@ -300,7 +307,11 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
     });
 
     try {
-      await api.post(`/schedule`, formData);
+      if (scheduleInfo) {
+        await api.put(`/schedule/${scheduleInfo.id}`, formData);
+      } else {
+        await api.post("/schedule", formData);
+      }
       setMedias([]);
       handleCloseModal();
     } catch (err) {
@@ -328,8 +339,12 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
       formData.append("time", time);
       selectedContacts.forEach(contact => formData.append("contacts", contact));
 
-      await api.post(`/schedule`, formData);
-      setTimeout(() => handleCloseModal(), 800);
+      if (scheduleInfo) {
+        await api.put(`/schedule/${scheduleInfo.id}`, formData);
+      } else {
+        await api.post("/schedule", formData);
+      }
+      setTimeout(() => handleCloseModal(), 500);
     } catch (err) {
       toastError(err);
     }
@@ -346,13 +361,16 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
       date,
       time,
       contacts: selectedContacts,
-      mediaUrl: "",
       body: signMessage
         ? `*${user?.name}:*\n${inputMessage.trim()}`
         : inputMessage.trim(),
     };
     try {
-      await api.post(`/schedule`, message);
+      if (scheduleInfo) {
+        await api.put(`/schedule/${scheduleInfo.id}`, message);
+      } else {
+        await api.post("/schedule", message);
+      }
       setInputMessage("");
       handleCloseModal();
     } catch (err) {
@@ -436,9 +454,9 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
         aria-label="send-upload"
         component="span"
         onClick={handleUploadMedia}
-        disabled={loading}
+        disabled={loading || !selectedContacts.length}
       >
-        <SendIcon className={classes.sendMessageIcons} />
+        <SendIcon disabled={!selectedContacts.length} className={classes.sendMessageIcons} />
       </IconButton>
     </Paper>
   ), [handleUploadMedia]);
@@ -613,9 +631,9 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
             aria-label="sendMessage"
             component="span"
             onClick={handleSendMessage}
-            disabled={loading}
+            disabled={loading || !selectedContacts.length}
           >
-            <SendIcon className={classes.sendMessageIcons} />
+            <SendIcon disabled={!selectedContacts.length} className={classes.sendMessageIcons} />
           </IconButton>
         ) : recording ? (
           <div className={classes.recorderWrapper}>
@@ -649,10 +667,10 @@ const ScheduleInput = ({ handleCloseModal, ticket }) => {
           <IconButton
             aria-label="showRecorder"
             component="span"
-            disabled={loading}
+            disabled={loading || !selectedContacts.length}
             onClick={handleStartRecording}
           >
-            <MicIcon className={classes.sendMessageIcons} />
+            <MicIcon disabled={!selectedContacts.length} className={classes.sendMessageIcons} />
           </IconButton>
         )}
       </div>

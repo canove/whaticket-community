@@ -1,53 +1,52 @@
-import AppError from "../../errors/AppError";
+import { Includeable, Sequelize, WhereOptions } from "sequelize";
+import Contact from "../../models/Contact";
 import Schedule from "../../models/Schedule";
-import Ticket from "../../models/Ticket";
-import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Request {
-  ticketId: string;
+  searchParam?: string;
   pageNumber?: string;
 }
 
 interface Response {
   schedules: Schedule[];
-  ticket: Ticket;
   count: number;
   hasMore: boolean;
 }
 
 const ListScheduleService = async ({
-  pageNumber = "1",
-  ticketId
+  searchParam = "",
+  pageNumber = "1"
 }: Request): Promise<Response> => {
-  const ticket = await ShowTicketService(ticketId);
+  const includeCondition: Includeable[] = [
+    {
+      model: Contact,
+      attributes: ["id", "name"]
+    }
+  ];
 
-  if (!ticket) {
-    throw new AppError("ERR_NO_TICKET_FOUND", 404);
-  }
-
+  const whereCondition: WhereOptions = {
+    message: Sequelize.where(
+      Sequelize.fn("LOWER", Sequelize.col("body")),
+      "LIKE",
+      `%${searchParam.toLowerCase().trim()}%`
+    )
+  };
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: schedules } = await Schedule.findAndCountAll({
-    where: { ticketId },
+    include: includeCondition,
+    where: whereCondition,
     limit,
-    include: [
-      "contact",
-      {
-        model: Schedule,
-        as: "quotedMsg",
-        include: ["contact"]
-      }
-    ],
     offset,
-    order: [["createdAt", "DESC"]]
+    order: [["date", "ASC"]],
+    attributes: ["id", "body", "date", "mediaType", "sent", "name"]
   });
 
   const hasMore = count > offset + schedules.length;
 
   return {
     schedules: schedules.reverse(),
-    ticket,
     count,
     hasMore
   };

@@ -4,6 +4,8 @@ import ContactCustomField from "../models/ContactCustomField";
 import Message from "../models/Message";
 import Queue from "../models/Queue";
 import QuickAnswer from "../models/QuickAnswer";
+import Schedule from "../models/Schedule";
+import ScheduleContact from "../models/ScheduleContact";
 import Setting from "../models/Setting";
 import Ticket from "../models/Ticket";
 import User from "../models/User";
@@ -30,7 +32,9 @@ const models = [
   WhatsappQueue,
   UserQueue,
   QuickAnswer,
-  UserQuickAnswer
+  UserQuickAnswer,
+  Schedule,
+  ScheduleContact
 ];
 
 sequelize.addModels(models);

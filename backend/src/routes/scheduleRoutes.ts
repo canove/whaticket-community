@@ -18,6 +18,8 @@ scheduleRoutes.post(
   ScheduleController.store
 );
 
+scheduleRoutes.put("/schedule/:scheduleId", isAuth, ScheduleController.update);
+
 scheduleRoutes.delete(
   "/schedule/:scheduleId",
   isAuth,

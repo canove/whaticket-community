@@ -1,28 +1,33 @@
 import {
+  AutoIncrement,
+  BelongsToMany,
   Column,
   CreatedAt,
   DataType,
   Default,
-  ForeignKey,
-  HasMany,
   Model,
   PrimaryKey,
   Table,
+  Unique,
   UpdatedAt
 } from "sequelize-typescript";
 
 import Contact from "./Contact";
-import Ticket from "./Ticket";
+import ScheduleContact from "./ScheduleContact";
 
 @Table
 class Schedule extends Model<Schedule> {
   @PrimaryKey
+  @AutoIncrement
   @Column
-  id: string;
+  id: number;
 
-  @Default(0)
+  @Unique
   @Column
-  ack: number;
+  name: string;
+
+  @Column
+  date: string;
 
   @Default(false)
   @Column
@@ -30,16 +35,6 @@ class Schedule extends Model<Schedule> {
 
   @Column(DataType.TEXT)
   body: string;
-
-  @Column(DataType.STRING)
-  get mediaUrl(): string | null {
-    if (this.getDataValue("mediaUrl")) {
-      return `${process.env.BACKEND_URL}:${
-        process.env.PROXY_PORT
-      }/public/${this.getDataValue("mediaUrl")}`;
-    }
-    return null;
-  }
 
   @Column
   mediaType: string;
@@ -52,12 +47,8 @@ class Schedule extends Model<Schedule> {
   @Column(DataType.DATE(6))
   updatedAt: Date;
 
-  @ForeignKey(() => Ticket)
-  @Column
-  ticketId: number;
-
-  @HasMany(() => Contact)
-  contactsId: number[];
+  @BelongsToMany(() => Contact, () => ScheduleContact)
+  contacts: Contact[];
 }
 
 export default Schedule;

@@ -300,6 +300,7 @@ const messages = {
           dashboard: "Dashboard",
           connections: "Conexões",
           tickets: "Tickets",
+          schedules: "Agendamentos",
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
           queues: "Filas",
@@ -360,6 +361,25 @@ const messages = {
         confirmationModal: {
           deleteTitle:
             "Você tem certeza que quer excluir esta Resposta Rápida: ",
+          deleteMessage: "Esta ação não pode ser revertida.",
+        },
+      },
+      schedules: {
+        title: "Agendamentos",
+        table: {
+          message: "Mensagem",
+          date: "Data",
+          actions: "Ações",
+        },
+        buttons: {
+          add: "Salvar novo agendamento",
+        },
+        toasts: {
+          deleted: "Mensagem agendada deletada corretamente.",
+        },
+        searchPlaceholder: "Pesquisar...",
+        confirmationModal: {
+          deleteTitle: "Você tem certeza que quer excluir esta mensagem agendada?",
           deleteMessage: "Esta ação não pode ser revertida.",
         },
       },

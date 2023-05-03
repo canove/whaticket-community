@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 
-
 import {
   Dialog,
   DialogTitle,
@@ -72,7 +71,7 @@ const ScheduleModal = ({
             ? `${i18n.t("scheduleModal.title.edit")}`
             : `${i18n.t("scheduleModal.title.add")}`}
         </DialogTitle>
-        <ScheduleInput handleCloseModal={handleClose} ticket={ticket} />
+        <ScheduleInput scheduleInfo={scheduleInfo} handleCloseModal={handleClose} ticket={ticket} />
       </Dialog>
     </div>
   );

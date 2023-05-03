@@ -10,12 +10,14 @@ interface Request {
   media: Express.Multer.File;
   ticket: Ticket;
   body?: string;
+  scheduled?: boolean;
 }
 
 const SendWhatsAppMedia = async ({
   media,
   ticket,
-  body
+  body,
+  scheduled
 }: Request): Promise<WbotMessage> => {
   try {
     const wbot = await GetTicketWbot(ticket);
@@ -35,7 +37,7 @@ const SendWhatsAppMedia = async ({
 
     await ticket.update({ lastMessage: body || media.filename });
 
-    fs.unlinkSync(media.path);
+    if (!scheduled) fs.unlinkSync(media.path);
 
     return sentMessage;
   } catch (err) {

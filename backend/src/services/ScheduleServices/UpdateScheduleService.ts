@@ -2,17 +2,17 @@ import dayjs from "dayjs";
 import ObjectSupport from "dayjs/plugin/objectSupport";
 import schedule from "node-schedule";
 
-import ShowContactService from "../ContactServices/ShowContactService";
-import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
-import UpdateTicketService from "../TicketServices/UpdateTicketService";
-import SendWhatsAppMedia from "../WbotServices/SendWhatsAppMedia";
-import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
-
+import AppError from "../../errors/AppError";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getIO } from "../../libs/socket";
 import Contact from "../../models/Contact";
 import Schedule from "../../models/Schedule";
 import Ticket from "../../models/Ticket";
+import ShowContactService from "../ContactServices/ShowContactService";
+import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
+import UpdateTicketService from "../TicketServices/UpdateTicketService";
+import SendWhatsAppMedia from "../WbotServices/SendWhatsAppMedia";
+import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
 
 interface ScheduleData {
   user: {
@@ -27,6 +27,7 @@ interface ScheduleData {
 
 interface Request {
   scheduleData: ScheduleData;
+  scheduleId: string;
 }
 
 interface MessageInfos {
@@ -50,12 +51,21 @@ async function sendAllMessages({ body = "", medias, tickets }: MessageInfos) {
   );
 }
 
-async function CreateScheduleService({
-  scheduleData
-}: Request): Promise<Schedule | void> {
+const UpdateScheduleService = async ({
+  scheduleData,
+  scheduleId
+}: Request): Promise<Schedule> => {
   dayjs.extend(ObjectSupport);
   let sent: boolean | undefined;
   let job: schedule.Job | undefined;
+
+  const scheduleDB = await Schedule.findOne({
+    where: { id: scheduleId }
+  });
+
+  if (!scheduleDB) {
+    throw new AppError("ERR_NO_QUICK_ANSWERS_FOUND", 404);
+  }
 
   const { user, body, medias, time, date, contacts } = scheduleData;
   const [hour, minute] = time.split(":");
@@ -101,32 +111,22 @@ async function CreateScheduleService({
     minute: ruler.minute
   });
 
-  console.log({
-    year: ruler.year,
-    date: ruler.date,
-    month: ruler.month,
-    hour: ruler.hour,
-    minute: ruler.minute
-  });
-
   if (nowDate.format(strFormat) === nowRuler.format(strFormat)) {
     await sendAllMessages({ body, medias, tickets });
     sent = true;
   } else {
-    job = schedule.scheduleJob(nowDate.toISOString(), ruler, async fireDate => {
+    job = schedule.scheduleJob(scheduleDB.name, ruler, async fireDate => {
       console.log("Sent -->", fireDate);
       await sendAllMessages({ body, medias, tickets });
-      await Schedule.update(
+      await scheduleDB.update(
         {
           sent: true
         },
         {
-          where: { name: nowDate.toISOString() }
+          where: { name: scheduleDB.name }
         }
       );
-
-      const scheduleDB = await Schedule.findOne({
-        where: { name: nowDate.toISOString() },
+      await scheduleDB.reload({
         attributes: ["id", "body", "date", "mediaType", "sent", "name"],
         include: [
           {
@@ -135,40 +135,27 @@ async function CreateScheduleService({
           }
         ]
       });
-
       io.emit("schedules", {
         action: "update",
         schedule: scheduleDB
       });
     });
 
-    if (!job) throw new Error("It was not possible schedule message");
+    if (!job) throw new Error("It was not possible update a scheduled message");
   }
 
-  const newSchedule = await Schedule.create(
-    {
-      body,
-      sent,
-      date: nowRuler.format(strFormat),
-      name: job?.name || nowDate.format(strFormat),
-      mediaType: medias ? "file" : "chat"
-    },
-    {
-      include: [
-        {
-          model: Contact,
-          attributes: ["id", "name"]
-        }
-      ]
-    }
-  );
+  await scheduleDB.update({
+    body,
+    medias,
+    time,
+    sent,
+    date: nowRuler.format(strFormat),
+    mediaType: medias ? "file" : "chat"
+  });
 
-  if (!newSchedule) {
-    throw new Error("ERR_CREATING_MESSAGE");
-  }
+  await scheduleDB.$set("contacts", contacts);
 
-  await newSchedule.$set("contacts", contacts);
-  await newSchedule.reload({
+  await scheduleDB.reload({
     attributes: ["id", "body", "date", "mediaType", "sent", "name"],
     include: [
       {
@@ -179,11 +166,11 @@ async function CreateScheduleService({
   });
 
   io.emit("schedules", {
-    action: "create",
-    schedule: newSchedule
+    action: "update",
+    schedule: scheduleDB
   });
 
-  return newSchedule;
-}
+  return scheduleDB;
+};
 
-export default CreateScheduleService;
+export default UpdateScheduleService;
