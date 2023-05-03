@@ -427,24 +427,12 @@ const getInfo = async ({ msgWhatsId, registerId, companyId, phoneNumber }) => {
     if (value) {
       return value;
     } else {
-      const response = await GetInfo({ msgWhatsId, registerId });
+      const response = await GetInfo({ msgWhatsId, registerId, phone: phoneNumber, companyId });
     
       return response;
     }
   } catch (e) {
-    if (msgWhatsId) {
-      console.log(
-        " -- ERROR GENERIC CALLBACK getInfo-- " + msgWhatsId,
-        JSON.stringify(e)
-      );
-    } else if (registerId) {
-      console.log(
-        " -- ERROR GENERIC CALLBACK getInfo-- " + registerId,
-        JSON.stringify(e)
-      );
-    } else {
-      console.log(" -- ERROR GENERIC CALLBACK getInfo-- ", JSON.stringify(e));
-    }
+    console.log(' -- ERROR GENERIC CALLBACK - getInfo -- ', phoneNumber , JSON.stringify(e));
   }
 };
 
@@ -472,8 +460,10 @@ const getRedisValue = async (phoneNumber: string, companyId: string, client: any
   }
 
   if (valueRedis){
+    console.log("GENERIC CALLBACK - getInfo - REDIS VALUE: ", valueRedis)
     return JSON.parse(valueRedis);
   };
 
+  console.log("GENERIC CALLBACK - getInfo - REDIS - No Info Found", phoneNumber);
   return null;
 }

@@ -1,11 +1,15 @@
+import { Op } from "sequelize";
 import ConnectionFiles from "../../database/models/ConnectionFile";
 import FileRegister from "../../database/models/FileRegister";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
+import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
 
 interface Request {
-  msgWhatsId: string;
-  registerId: string;
+  msgWhatsId?: string;
+  registerId?: string;
+  phone?: string;
+  companyId?: string;
 }
 
 interface Response {
@@ -24,19 +28,45 @@ interface Response {
 
 const GetInfo = async ({
   msgWhatsId = null,
-  registerId = null
+  registerId = null,
+  phone = null,
+  companyId = null
 }: Request): Promise<Response> => {
   let fileRegister = null;
 
-  if (msgWhatsId) {
+  if (!fileRegister && msgWhatsId) {
     fileRegister = await FileRegister.findOne({
       where: { msgWhatsId }
     });
   }
 
-  if (registerId) {
+  if (!fileRegister && registerId) {
     fileRegister = await FileRegister.findOne({
       where: { id: registerId }
+    });
+  }
+
+  if (!fileRegister && phone && companyId) {
+    fileRegister = await FileRegister.findOne({
+      where: {
+        [Op.or]: [
+          { phoneNumber: 
+            { 
+              [Op.or]: [
+                phone,
+                removePhoneNumberWith9Country(phone),
+                preparePhoneNumber9Digit(phone),
+                removePhoneNumber9Digit(phone),
+                removePhoneNumberCountry(phone),
+                removePhoneNumber9DigitCountry(phone)
+              ],
+            }
+          }
+        ],
+        companyId: companyId,
+        processedAt: { [Op.ne]: null }
+      },
+      order: [["createdAt", "DESC"]]
     });
   }
 
