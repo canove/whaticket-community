@@ -58,7 +58,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 		const loadQueues = async () => {
 			if (user.profileId !== 1) {
 				setQueues(user.queues);
-				setAllQueues(list);
+				setAllQueues(user.queues);
 				return;
 			}
 
@@ -188,7 +188,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 							disabled={selectedUser}
 						>
 							<MenuItem value={''}>&nbsp;</MenuItem>
-							{queues.map((queue) => (
+							{queues && queues.map((queue) => (
 								<MenuItem key={queue.id} value={queue.id}>{queue.name}</MenuItem>
 							))}
 						</Select>
