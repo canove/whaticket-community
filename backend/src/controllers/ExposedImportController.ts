@@ -36,6 +36,7 @@ interface ExposedImportData {
   requiredItems: string;
   connectionType: string | boolean;
   connectionFileId: string | number;
+  connectionFileIds: string;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
 }
@@ -49,6 +50,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     requiredItems,
     connectionType,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
   }: ExposedImportData = req.body;
@@ -64,6 +66,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     requiredItems,
     connectionType,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
   });

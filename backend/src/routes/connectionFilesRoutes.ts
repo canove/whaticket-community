@@ -29,6 +29,12 @@ connectionFilesRoutes.post(
   ConnectionFilesController.bind
 );
 
+connectionFilesRoutes.post(
+  "/connectionFiles/bind-queue/",
+  isAuth,
+  ConnectionFilesController.bindQueue
+);
+
 connectionFilesRoutes.put(
   "/connectionFiles/:connectionFileId",
   isAuth,

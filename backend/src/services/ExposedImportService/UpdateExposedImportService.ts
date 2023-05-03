@@ -9,6 +9,7 @@ interface ExposedImportData {
   requiredItems: string;
   connectionType: string | boolean;
   connectionFileId: string | number;
+  connectionFileIds: string;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
 }
@@ -37,6 +38,7 @@ const UpdateExposedImportService = async ({
     requiredItems,
     connectionType,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
   } = exposedImportData;
@@ -63,6 +65,7 @@ const UpdateExposedImportService = async ({
     whatsappIds,
     requiredItems,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
     official: connectionType,

@@ -240,6 +240,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										selectedQueue={values.overflowQueueId ?? ""}
 										onChange={value => setFieldValue("overflowQueueId", value)}
 										excludedQueue={queueId}
+										label={"Fila de Transbordo"}
 									/>
 								</div>
 							</DialogContent>

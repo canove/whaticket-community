@@ -44,6 +44,9 @@ class ExposedImport extends Model<ExposedImport> {
   @Column
   companyId: number;
 
+  @Column
+  connectionFileIds: string;
+
   @ForeignKey(() => ConnectionFiles)
   @Column
   connectionFileId: number;
