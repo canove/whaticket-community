@@ -49,20 +49,16 @@ const GetInfo = async ({
   if (!fileRegister && phone && companyId) {
     fileRegister = await FileRegister.findOne({
       where: {
-        [Op.or]: [
-          { phoneNumber: 
-            { 
-              [Op.or]: [
-                phone,
-                removePhoneNumberWith9Country(phone),
-                preparePhoneNumber9Digit(phone),
-                removePhoneNumber9Digit(phone),
-                removePhoneNumberCountry(phone),
-                removePhoneNumber9DigitCountry(phone)
-              ],
-            }
-          }
-        ],
+        phoneNumber: { 
+          [Op.or]: [
+            phone,
+            removePhoneNumberWith9Country(phone),
+            preparePhoneNumber9Digit(phone),
+            removePhoneNumber9Digit(phone),
+            removePhoneNumberCountry(phone),
+            removePhoneNumber9DigitCountry(phone)
+          ],
+        },
         companyId: companyId,
         processedAt: { [Op.ne]: null }
       },
