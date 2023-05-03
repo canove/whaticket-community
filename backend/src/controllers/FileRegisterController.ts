@@ -31,15 +31,17 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 type GetInfoQuery = {
   msgWhatsId: string,
   registerId: string,
+  phone: string,
+  companyId: string
 }
 
 export const getInfo = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { msgWhatsId, registerId } = req.query as GetInfoQuery;
+  const { msgWhatsId, registerId, phone, companyId } = req.query as GetInfoQuery;
 
-  const response = await GetInfo({ msgWhatsId, registerId });
+  const response = await GetInfo({ msgWhatsId, registerId, phone, companyId });
 
   return res.status(200).json(response);
 };
