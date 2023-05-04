@@ -105,7 +105,7 @@ const SendTicketMessagesToCompanyService = async ({
       "CNPJ_CPF": reg.documentNumber,
       "telefone": reg.phoneNumber,
       "contrato": reg.var1,
-      "dadosAdicionais": reg.var2,
+      "dadosAdicionais": user ? user.email : reg.var2,
       "dataEvento": formatDate(new Date()),
       "var1": reg.var1,
       "var2": reg.var2,
