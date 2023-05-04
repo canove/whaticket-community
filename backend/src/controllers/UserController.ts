@@ -54,7 +54,7 @@ export const transferList = async (req: Request, res: Response): Promise<Respons
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, profileId, queueIds, companyId } = req.body;
+  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin } = req.body;
   const userCompanyId = req.user.companyId;
 
   // if (
@@ -74,7 +74,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       profile,
       profileId,
       queueIds,
-      companyId: companyId || userCompanyId
+      companyId: companyId || userCompanyId,
+      superAdmin
     });
 
     const io = getIO();
