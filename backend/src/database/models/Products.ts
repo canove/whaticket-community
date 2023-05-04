@@ -43,6 +43,12 @@ class Product extends Model<Product> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @Column
+  inboundSessionFee: number;
+
+  @Column
+  outboundSessionFee: number;
 }
 
 export default Product;
