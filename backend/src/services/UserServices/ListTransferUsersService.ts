@@ -6,13 +6,11 @@ import User from "../../database/models/User";
 
 interface Request {
   searchParam?: string;
-  queueId?: string | number;
   companyId: number;
 }
 
 const ListTransferUsersService = async ({
   searchParam = "",
-  queueId,
   companyId
 }: Request): Promise<User[]> => {
   let whereCondition = null;
@@ -32,28 +30,15 @@ const ListTransferUsersService = async ({
     companyId
   };
 
-  let includeCondition = [];
-
-  includeCondition.push({ model: Company, as: "company", attributes: ["name"], required: true });
-  includeCondition.push({ model: Profiles, as: "profiles", attributes: ["id", "name", "permissions", "menus"] });
-
-  if (queueId) {
-    const queueInclude = { 
-      model: Queue, 
-      as: "queues", 
-      where: { id: queueId },
-      attributes: ["id", "name", "color"],
-      required: true
-    }
-
-    includeCondition.push(queueInclude);
-  }
-
   const users = await User.findAll({
     where: whereCondition,
     attributes: ["name", "id", "email", "profileId", "createdAt"],
     order: [["createdAt", "DESC"]],
-    include: includeCondition,
+    include: [
+      { model: Queue, as: "queues", attributes: ["id", "name", "color"] }
+      // { model: Company, as: "company", attributes: ["name"], required: true }
+      // { model: Profiles, as: "profiles", attributes: ["id", "name", "permissions", "menus"] }
+    ],
   });
 
   return users;
