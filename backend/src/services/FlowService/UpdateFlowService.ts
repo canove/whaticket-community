@@ -9,6 +9,7 @@ interface FlowsData {
   location: string;
   clientEmail: string;
   privateKey: string;
+  official: boolean;
 }
 
 interface Request {
@@ -31,7 +32,8 @@ const UpdateFlowService = async ({
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    official,
   } = flowData;
 
   console.log("update fow flowService 37");
@@ -42,7 +44,8 @@ const UpdateFlowService = async ({
     agentId,
     location,
     clientEmail,
-    privateKey
+    privateKey,
+    official,
   });
 
   flow.reload();

@@ -7,9 +7,9 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { flowId } = req.params;
   const { companyId } = req.user;
 
-  const flowNodes = await ShowFlowNodesService(flowId, companyId);
+  const flow = await ShowFlowNodesService(flowId, companyId);
 
-  return res.status(200).json(flowNodes);
+  return res.status(200).json(flow);
 };
 
 export const update = async (
@@ -21,11 +21,11 @@ export const update = async (
   const flowNodesData = req.body;
   const { flowId } = req.params;
 
-  const flowNodes = await UpdateFlowNodesService({
+  const nodes = await UpdateFlowNodesService({
     flowNodesData,
     flowId,
     companyId
   });
 
-  return res.status(200).json(flowNodes);
+  return res.status(200).json(nodes);
 };

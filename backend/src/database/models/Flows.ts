@@ -9,7 +9,8 @@ import {
   AllowNull,
   ForeignKey,
   BelongsTo,
-  HasMany
+  HasMany,
+  HasOne
 } from "sequelize-typescript";
 import Company from "./Company";
 import FlowsNodes from "./FlowsNodes";
@@ -48,7 +49,13 @@ class Flows extends Model<Flows> {
   privateKey: string;
 
   @Column
+  official: boolean;
+
+  @Column
   type: string;
+
+  @HasOne(() => FlowsNodes, "flowId")
+  nodes: FlowsNodes;
 
   @CreatedAt
   createdAt: Date;
