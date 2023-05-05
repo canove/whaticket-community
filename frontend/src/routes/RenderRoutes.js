@@ -96,7 +96,7 @@ const pages = {
 };
 
 const RenderRoutes = () => {
-  const { isAuth, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [menus, setMenus] = useState([]);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const RenderRoutes = () => {
     };
 
     fetchMenus();
-  }, [isAuth]);
+  }, [user]);
 
   const getComponent = (name) => {
     return pages[name];
@@ -118,8 +118,7 @@ const RenderRoutes = () => {
 
   return (
     <>
-      {isAuth &&
-        menus &&
+      { menus &&
         menus.map((menu) => {
           if (menu.name === "Dashboard") {
             return (

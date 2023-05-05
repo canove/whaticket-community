@@ -18,9 +18,8 @@ const useAuth = () => {
 	const [accountConnected, setAccountConnected] = useState(false);
 
 	api.interceptors.request.use(
-		async config => {
+		config => {
 			const token = localStorage.getItem("token");
-			// console.log("REQUEST");
 
 			if (token) {
 				config.headers["Authorization"] = `Bearer ${JSON.parse(token)}`;
@@ -40,7 +39,6 @@ const useAuth = () => {
 		async error => {
 			const originalRequest = error.config;
 			if (error?.response?.status === 403 && !originalRequest._retry) {
-				// console.log("RESPONSE 403");
 				originalRequest._retry = true;
 
 				const { data } = await api.post("/auth/refresh_token");
@@ -56,7 +54,6 @@ const useAuth = () => {
 				return Promise.reject(error);
 			}
 			if (error?.response?.status === 401) {
-				// console.log("RESPONSE 401");
 				localStorage.removeItem("token");
 				api.defaults.headers.Authorization = undefined;
 				setIsAuth(false);
@@ -71,7 +68,6 @@ const useAuth = () => {
 			if (token) {
 				try {
 					const { data } = await api.post("/auth/refresh_token");
-					// console.log("TOKEN REFRESH -> ", data.token);
 
 					localStorage.setItem("token", JSON.stringify(data.token));
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
@@ -109,7 +105,6 @@ const useAuth = () => {
 
 			const { data } = await api.post("/auth/login", userData);
 
-			// console.log("LOGIN -> ", data.accountConnected);
 			if (data.accountConnected) {
 				setAccountConnected(true);
 			} else {
@@ -128,7 +123,6 @@ const useAuth = () => {
 
 			setLoading(false);
 		} catch (err) {
-			// console.log("LOGIN ERROR: ", err);
 			toastError(err);
 			setLoading(false);
 		}
