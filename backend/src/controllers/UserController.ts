@@ -41,12 +41,11 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const transferList = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, queueId } = req.query as IndexQuery;
+  const { searchParam } = req.query as IndexQuery;
   const { companyId } = req.user;
 
   const users = await ListTransferUsersService({
     searchParam,
-    queueId,
     companyId
   });
 
