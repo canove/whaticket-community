@@ -314,19 +314,19 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     const importData = {
       name,
       mapping: JSON.stringify(mapping),
-      template: template,
+      template: template ? template : null,
       connections: connections,
       connectionType,
       officialConnectionId: offConnection ? offConnection : null,
       officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
       requiredItems: required.length > 0 ? JSON.stringify(required) : null,
-      connectionFileIds: selectedConnectionFile.length > 1 ? selectedConnectionFile.toString() : null,
+      connectionFileIds: selectedConnectionFile.length > 0 ? selectedConnectionFile.toString() : null,
     };
 
-    if ((connectionType && !importData.officialTemplatesId) || (!connectionType && !template)) {
-      toast.error("Template is required.");
-      return;
-    }
+    // if ((connectionType && !importData.officialTemplatesId) || (!connectionType && !template)) {
+    //   toast.error("Template is required.");
+    //   return;
+    // }
 
     try {
       if (exposedImportId) {
