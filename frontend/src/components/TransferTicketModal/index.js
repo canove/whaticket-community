@@ -38,7 +38,7 @@ const filterOptions = createFilterOptions({
 const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const history = useHistory();
 	const classes = useStyles();
-	const { user } = useContext(AuthContext);
+
 	const { i18n } = useTranslation();
 
 	const [options, setOptions] = useState([]);
@@ -54,14 +54,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const { findAll: findAllQueues } = useQueues();
 
 	useEffect(() => {
-		
 		const loadQueues = async () => {
-			if (user.profileId !== 1) {
-				setQueues(user.queues);
-				setAllQueues(user.queues);
-				return;
-			}
-
 			const list = await findAllQueues();
 			setAllQueues(list);
 			setQueues(list);
@@ -79,8 +72,8 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
-					const { data } = await api.get("/users/transferList/", {
-						params: { searchParam, queueId },
+					const { data } = await api.get("/users/transferList", {
+						params: { searchParam },
 					});
 					setOptions(data);
 					setLoading(false);
@@ -93,7 +86,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 			fetchUsers();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchParam, queueId, modalOpen]);
+	}, [searchParam, modalOpen]);
 
 	const handleClose = () => {
 		onClose();
@@ -109,11 +102,12 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 			let data = {};
 
 			if (selectedUser) {
-				data.userId = selectedUser.id
+				data.userId = selectedUser.id;
+				data.queueId = null;
 			}
 
-			if (selectedQueue && selectedQueue !== null) {
-				data.queueId = selectedQueue
+			if (selectedQueue) {
+				data.queueId = selectedQueue;
 
 				if (!selectedUser) {
 					data.status = 'pending';
@@ -143,11 +137,11 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 						getOptionLabel={option => `${option.name}`}
 						onChange={(e, newValue) => {
 							setSelectedUser(newValue);
+							setSelectedQueue('');
 							if (newValue != null && Array.isArray(newValue.queues)) {
 								setQueues(newValue.queues);
 							} else {
 								setQueues(allQueues);
-								setSelectedQueue('');
 							}
 						}}
 						options={options}
@@ -156,13 +150,11 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 						autoHighlight
 						noOptionsText={i18n.t("transferTicketModal.noOptions")}
 						loading={loading}
-						disabled={selectedQueue}
 						renderInput={params => (
 							<TextField
 								{...params}
 								label={i18n.t("transferTicketModal.fieldLabel")}
 								variant="outlined"
-								disabled={selectedQueue}
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
 								InputProps={{
@@ -185,7 +177,6 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 							value={selectedQueue}
 							onChange={(e) => setSelectedQueue(e.target.value)}
 							label={i18n.t("transferTicketModal.fieldQueuePlaceholder")}
-							disabled={selectedUser}
 						>
 							<MenuItem value={''}>&nbsp;</MenuItem>
 							{queues && queues.map((queue) => (
