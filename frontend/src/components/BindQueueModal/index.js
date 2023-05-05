@@ -79,12 +79,11 @@ const BindQueueModal = ({ open, onClose, connectionFile }) => {
 
     try {
       await api.post("/connectionFiles/bind-queue/", body);
-      toast.success("Fila da categoria alterada com sucesso.");
+      toast.success("Filas alteradas com sucesso.");
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   return (

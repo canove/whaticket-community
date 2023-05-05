@@ -87,12 +87,11 @@ const WhatsConfigModal = ({ open, onClose, whatsappId }) => {
 		}
 
 		try {
-			const { data } = await api.put(`/whatsapp/config/${whatsappId}`, formData);
+			await api.put(`/whatsapp/config/${whatsappId}`, formData);
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
-
-        handleClose();
 	};
 
 	const handleWhatsNameChange = (e) => {

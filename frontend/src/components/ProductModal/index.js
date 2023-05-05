@@ -151,10 +151,10 @@ const ProductModal = ({ open, onClose, productId }) => {
                 await api.post("/products/", productData);
                 toast.success(i18n.t("product.confirmation.created"));
             }
-            } catch (err) {
-                toastError(err);
+			handleClose();
+        } catch (err) {
+            toastError(err);
         }
-        handleClose();
 	};
 
 	const currencyConfig = {

@@ -196,11 +196,10 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
           await api.post(`/flows/`, flowData);
           toast.success(i18n.t("flows.confirmation.create"));
         }
+        handleClose();
       } catch (err) {
         toastError(err);
       }
-
-      handleClose();
     };
 
     return (

@@ -336,11 +336,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         await api.post("/exposedImports/", importData);
         toast.success(i18n.t("exposedImports.modal.createSuccess"));
       }
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   useEffect(() => {

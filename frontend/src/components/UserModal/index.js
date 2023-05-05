@@ -186,10 +186,10 @@ const UserModal = ({ open, onClose, userId }) => {
 				await api.post("/users", userData);
 			}
 			toast.success(i18n.t("userModal.success"));
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
-		handleClose();
 	};
 
 	return (

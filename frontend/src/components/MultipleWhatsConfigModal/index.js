@@ -102,11 +102,10 @@ const MultipleWhatsConfigModal = ({ open, onClose, selectedWhatsapps }) => {
 
 		try {
 			await api.put(`/whatsapp/config/multiple`, formData);
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
-
-        handleClose();
 	};
 
 	const handleWhatsappsChange = (e) => {

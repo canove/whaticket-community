@@ -118,11 +118,10 @@ const CopyOfficialTemplateModal = ({ open, onClose, officialTemplate, connection
     try {
       await api.post(`/whatsappTemplate/createOfficialTemplate/`, body);
       toast.success(i18n.t("templates.templateModal.success"));
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   const handleClose = () => {

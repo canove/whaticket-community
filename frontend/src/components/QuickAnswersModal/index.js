@@ -113,17 +113,16 @@ const QuickAnswersModal = ({
     try {
       if (quickAnswerId) {
         await api.put(`/quickAnswers/${quickAnswerId}`, values);
-          toast.success(i18n.t("quickAnswersModal.edited"));
+        toast.success(i18n.t("quickAnswersModal.edited"));
         handleClose();
       } else {
         const { data } = await api.post("/quickAnswers", values);
-          toast.success(i18n.t("quickAnswersModal.success"));
+        toast.success(i18n.t("quickAnswersModal.success"));
         if (onSave) {
           onSave(data);
         }
         handleClose();
       }
-
     } catch (err) {
       toastError(err);
     }

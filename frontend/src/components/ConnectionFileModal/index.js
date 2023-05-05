@@ -131,11 +131,10 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
         await api.post("/connectionFiles/", connectionFileData);
         toast.success("Criado com sucesso!");
       }
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   const handleIntervalSliderChange = (event, newValue) => {

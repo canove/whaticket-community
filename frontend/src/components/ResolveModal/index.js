@@ -120,12 +120,11 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
       });
 
       history.push("/tickets");
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
     setLoading(false);
-    handleClose();
 	};
 
   const handleClose = () => {
