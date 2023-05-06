@@ -9,6 +9,7 @@ interface Request {
   requiredItems: string;
   connectionType: string | boolean;
   connectionFileId: string | number;
+  connectionFileIds: string;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
   companyId: number;
@@ -22,6 +23,7 @@ const CreateExposedImportService = async ({
   requiredItems,
   connectionType,
   connectionFileId,
+  connectionFileIds,
   officialTemplatesId,
   officialConnectionId,
   companyId,
@@ -46,6 +48,7 @@ const CreateExposedImportService = async ({
     whatsappIds,
     requiredItems,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
     templateId: template,

@@ -115,10 +115,10 @@ const ProfileModal = ({ open, onClose, profileId }) => {
         await api.post(`/profile/`, profileData);
         toast.success("Perfil criado com sucesso!");
       }
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-    handleClose();
   };
 
   return (

@@ -52,6 +52,15 @@ class Billings extends Model<Billings> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @Column
+  totalInboundSessionValue: number;
+
+  @Column
+  totalOutboundSessionValue: number;
+
+  @Column
+  totalConnectedWhatsappsValue: number;
 }
 
 export default Billings;

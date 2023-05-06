@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
+
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 import {
@@ -8,19 +9,13 @@ import {
   DialogTitle,
   Button,
   DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  FormControlLabel,
-  Checkbox,
   Typography,
 } from "@material-ui/core";
+
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import QueueSelectSingle from "../QueueSelectSingle";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,42 +60,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const BindFlowModal = ({ open, onClose, connectionFile }) => {
+const BindQueueModal = ({ open, onClose, connectionFile }) => {
   const { i18n } = useTranslation();
   const classes = useStyles();
 
-  const [flows, setFlows] = useState([]);
-  const [flowId, setFlowId] = useState("");
-
-  useEffect(() => {
-    const fetchFlows = async () => {
-      try {
-        const { data } = await api.get("/flows", {
-          params: { type: "bits" },
-        });
-        setFlows(data);
-      } catch (err) {
-        toastError(err);
-      }
-    };
-
-    fetchFlows();
-  }, [open]);
+  const [queueId, setQueueId] = useState("");
 
   const handleClose = () => {
     onClose();
-    setFlowId("");
+    setQueueId("");
   };
 
   const handleSubmit = async () => {
     const body = { 
-      flowId: flowId,
+      queueId,
       connectionFileId: connectionFile.id
     };
 
     try {
-      await api.post("/connectionFiles/bind/", body);
-      toast.success("Fluxos alterados com sucesso.");
+      await api.post("/connectionFiles/bind-queue/", body);
+      toast.success("Filas alteradas com sucesso.");
       handleClose();
     } catch (err) {
       toastError(err);
@@ -116,33 +95,19 @@ const BindFlowModal = ({ open, onClose, connectionFile }) => {
         fullWidth
         scroll="paper"
       >
-        <DialogTitle id="form-dialog-title">Vincular Números da Categoria com Fluxo</DialogTitle>
+        <DialogTitle id="form-dialog-title">Vincular Números da Categoria com Fila</DialogTitle>
         <DialogContent dividers>
-          <div className={classes.multFieldLine}>
+          <div>
             <Typography variant="subtitle1">
               Categoria: {connectionFile?.name}
             </Typography>
           </div>
-          <div className={classes.multFieldLine}>
-            <FormControl
-							variant="outlined"
-							margin="dense"
-							fullWidth
-						>
-							<InputLabel>Fluxo</InputLabel>
-							<Select
-								value={flowId}
-								onChange={(e) => { setFlowId(e.target.value) }}
-								label="Fluxo"
-							>
-								<MenuItem value={null}>Nenhum</MenuItem>
-								{ flows && flows.map(flow => {
-									return (
-										<MenuItem value={flow.id} key={flow.id}>{flow.name}</MenuItem>
-									)
-								}) }
-							</Select>
-						</FormControl>
+          <div>
+            <QueueSelectSingle
+							label={"Fila"}
+							selectedQueue={queueId}
+							onChange={value => setQueueId(value)}
+						/>
           </div>
         </DialogContent>
         <DialogActions>
@@ -164,4 +129,4 @@ const BindFlowModal = ({ open, onClose, connectionFile }) => {
   );
 };
 
-export default BindFlowModal;
+export default BindQueueModal;

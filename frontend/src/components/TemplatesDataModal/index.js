@@ -137,12 +137,11 @@ const TemplatesDataModal = ({ open, onClose, templatesId }) => {
           toast.success(i18n.t("templatesData.modalConfirm.successAdd"));
         }
         setLoading(false);
+        handleClose();
 			} catch (err) {
 				toastError(err);
         setLoading(false);
 			}
-
-      handleClose();
     };
 
     const handleOpenBodyModal = () => {

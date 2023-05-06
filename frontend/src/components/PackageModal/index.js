@@ -113,10 +113,10 @@ const PackageModal = ({ open, onClose, packageId }) => {
                 await api.post("/packages/", packageData);
                 toast.success('Pacote criado com sucesso.');
             }
-            } catch (err) {
-                toastError(err);
+			handleClose();
+        } catch (err) {
+            toastError(err);
         }
-        handleClose();
 	};
 
 	const currencyConfig = {

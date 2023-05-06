@@ -17,7 +17,9 @@ import {
 	FormControl,
 	TextField,
 	InputAdornment,
-	IconButton
+	IconButton,
+	FormControlLabel,
+	Checkbox
   } from '@material-ui/core';
 
 import { Visibility, VisibilityOff } from '@material-ui/icons';
@@ -91,6 +93,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [companies, setCompanies] = useState([]);
 	const [selectedCompany, setSelectedCompany] = useState();
 	const [profiles, setProfiles] = useState([]);
+	const [superAdmin, setSuperAdmin] = useState(false);
 
 	const handleLanguageChange = (e) => {
 		setLanguage(e.target.value);
@@ -110,9 +113,12 @@ const UserModal = ({ open, onClose, userId }) => {
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
+				setSuperAdmin(data.superAdmin);
 				setLanguage(data.lang)
+
 				const userQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(userQueueIds);
+
 				if (loggedInUser.companyId === 1) {
 					setSelectedCompany(data.companyId);
 				}
@@ -157,6 +163,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		setSelectedCompany("");
 		setSelectedQueueIds([]);
 		setLanguage("");
+		setSuperAdmin(false);
 	};
 
 	const handleCompanyChange = (e) => {
@@ -164,7 +171,14 @@ const UserModal = ({ open, onClose, userId }) => {
 	}
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, lang: language, queueIds: selectedQueueIds, companyId: selectedCompany};
+		const userData = { 
+			...values, 
+			lang: language, 
+			queueIds: selectedQueueIds, 
+			companyId: selectedCompany,
+			superAdmin
+		};
+
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -172,10 +186,10 @@ const UserModal = ({ open, onClose, userId }) => {
 				await api.post("/users", userData);
 			}
 			toast.success(i18n.t("userModal.success"));
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
-		handleClose();
 	};
 
 	return (
@@ -329,29 +343,43 @@ const UserModal = ({ open, onClose, userId }) => {
 									</FormControl>
 								</div>
 								{ loggedInUser.companyId === 1 &&
-									<div>
-										<FormControl
-											variant="outlined"
-											margin="dense"
-											fullWidth
-										>
-											<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
-											<Select
-												label="Empresa"
-												name="company"
-												labelId="company-selection-label"
-												id="company-selection"
-												value={selectedCompany}
-												onChange={(e) => {handleCompanyChange(e)}}
+									<>
+										<div>
+											<FormControl
+												variant="outlined"
+												margin="dense"
+												fullWidth
 											>
-												{ companies && companies.map(company => {
-													return (
-														<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
-													)
-												}) }
-											</Select>
-										</FormControl>
-									</div>
+												<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
+												<Select
+													label="Empresa"
+													name="company"
+													labelId="company-selection-label"
+													id="company-selection"
+													value={selectedCompany}
+													onChange={(e) => {handleCompanyChange(e)}}
+												>
+													{ companies && companies.map(company => {
+														return (
+															<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
+														)
+													}) }
+												</Select>
+											</FormControl>
+										</div>
+										<div>
+											<FormControlLabel
+												label={"Super Admin"}
+												control={
+													<Checkbox
+														color="primary" 
+														checked={superAdmin} 
+														onChange={() => setSuperAdmin(prev => !prev)} 
+													/>
+												}
+											/>
+										</div>
+									</>
 								}
 								<Can
 									permission="user-modal:editQueues"

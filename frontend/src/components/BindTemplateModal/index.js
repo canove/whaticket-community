@@ -132,11 +132,10 @@ const BindTemplateModal = ({ open, onClose, templateId }) => {
     try {
       await api.post("/whatsappTemplate/bind", body);
       toast.success("Vinculando números...");
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   const handleConnectionsChange = (e) => {

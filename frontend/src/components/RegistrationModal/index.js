@@ -240,10 +240,10 @@ const RegistrationModal = ({ open, onClose, registrationId }) => {
                 await api.post("/menus/", menuData);
                 toast.success(i18n.t("registration.confirmation.created"));
             }
-            } catch (err) {
-                toastError(err);
+            handleClose();
+        } catch (err) {
+            toastError(err);
         }
-        handleClose();
     };
 
     const handleNameChange = (e) => {

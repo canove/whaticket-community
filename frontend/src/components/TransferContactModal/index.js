@@ -125,12 +125,11 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
         }
 
         try {
-            api.put('/whatsapp/transfer/', transferData);
+            await api.put('/whatsapp/transfer/', transferData);
+            handleClose();
         } catch (err) {
             toastError(err);
         }
-
-        handleClose();
     }
 
 	return (

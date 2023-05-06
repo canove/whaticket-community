@@ -21,6 +21,7 @@ import {
 	Edit,
 	DeleteOutline,
 	Timeline,
+	AccountTreeOutlined,
 } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
@@ -36,6 +37,7 @@ import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import ConnectionFileModal from "../../components/ConnectionFileModal";
 import BindFlowModal from "../../components/BindFlowModal";
+import BindQueueModal from "../../components/BindQueueModal";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -129,6 +131,7 @@ const ConnectionFiles = () => {
 	);
 	const { user } = useContext(AuthContext);
 	const [openBindFlowModal, setOpenBindFlowModal] = useState(false);
+	const [openBindQueueModal, setOpenBindQueueModal] = useState(false);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -216,8 +219,18 @@ const ConnectionFiles = () => {
 		setSelectedConnectionFile(connectionFile);
 	}
 
+	const handleOpenQueueModal = async (connectionFile) => {
+		setOpenBindQueueModal(true);
+		setSelectedConnectionFile(connectionFile);
+	}
+
 	const handleCloseFlowModal = async () => {
 		setOpenBindFlowModal(false);
+		setSelectedConnectionFile(null);
+	}
+
+	const handleCloseQueueModal = async () => {
+		setOpenBindQueueModal(false);
 		setSelectedConnectionFile(null);
 	}
 
@@ -239,6 +252,11 @@ const ConnectionFiles = () => {
 			<BindFlowModal
 				open={openBindFlowModal}
 				onClose={handleCloseFlowModal}
+				connectionFile={selectedConnectionFile}
+			/>
+			<BindQueueModal
+				open={openBindQueueModal}
+				onClose={handleCloseQueueModal}
 				connectionFile={selectedConnectionFile}
 			/>
 			<MainHeader>
@@ -304,6 +322,12 @@ const ConnectionFiles = () => {
 									</IconButton>
 									<IconButton
 										size="small"
+										onClick={() => handleOpenQueueModal(connectionFile)}
+									>
+										<AccountTreeOutlined />
+									</IconButton>
+									<IconButton
+										size="small"
 										onClick={e => {
 											handleOpenConfirmationModal("delete", connectionFile.id);
 										}}
@@ -313,7 +337,7 @@ const ConnectionFiles = () => {
 								</TableCell>
 							</TableRow>
 						))}
-						{ loading && <TableRowSkeleton columns={3} /> }
+						{ loading && <TableRowSkeleton columns={6} /> }
 					</TableBody>
 				</Table>
 			</Paper>

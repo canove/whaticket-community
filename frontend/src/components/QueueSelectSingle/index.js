@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QueueSelectSingle = ({ selectedQueue, onChange, excludedQueue }) => {
+const QueueSelectSingle = ({ selectedQueue, onChange, excludedQueue, label }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const [queues, setQueues] = useState([]);
@@ -42,9 +42,9 @@ const QueueSelectSingle = ({ selectedQueue, onChange, excludedQueue }) => {
 	return (
 		<div style={{ marginTop: 6 }}>
 			<FormControl fullWidth margin="dense" variant="outlined">
-				<InputLabel>{"Fila de Transbordo"}</InputLabel>
+				<InputLabel>{label}</InputLabel>
 				<Select
-					label={"Fila de Transbordo"}
+					label={label}
 					value={selectedQueue}
 					onChange={handleChange}
 					defaultValue=""

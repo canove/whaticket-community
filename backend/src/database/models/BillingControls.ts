@@ -67,6 +67,18 @@ class BillingControls extends Model<BillingControls> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @Column
+  inboundSessionFee: number;
+
+  @Column
+  inboundSessionQuantity: number;
+
+  @Column
+  outboundSessionFee: number;
+
+  @Column
+  outboundSessionQuantity: number;
 }
 
 export default BillingControls;

@@ -613,10 +613,10 @@ const ImportationtModal = ({
           await api.post("/integratedImport/", importData);
           toast.success(i18n.t("integratedImport.confirmation.createdAt"));
         }
+        handleClose();
       } catch (err) {
         toastError(err);
       }
-      handleClose();
     }
   };
 
@@ -649,11 +649,10 @@ const ImportationtModal = ({
     try {
       await api.post("/integratedImport/", importData);
       toast.success("Copiado com sucesso!");
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   const handleOffConnectionChange = (e) => {

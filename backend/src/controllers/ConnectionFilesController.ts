@@ -11,6 +11,7 @@ import ShowConnectionFileService from "../services/ConnectionFileService/ShowCon
 import DeleteConnectionFileService from "../services/ConnectionFileService/DeleteConnectionFileService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import BindFlowToConnectionFilesService from "../services/ConnectionFileService/BindFlowToConnectionFilesService";
+import BindQueueToConnectionFilesService from "../services/ConnectionFileService/BindQueueToConnectionFilesService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
@@ -67,6 +68,15 @@ export const bind = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
   await BindFlowToConnectionFilesService({ connectionFileId, flowId, companyId });
+
+  return res.status(200).json("OK");
+};
+
+export const bindQueue = async (req: Request, res: Response): Promise<Response> => {
+  const { connectionFileId, queueId } = req.body;
+  const { companyId } = req.user;
+
+  await BindQueueToConnectionFilesService({ connectionFileId, queueId, companyId });
 
   return res.status(200).json("OK");
 };

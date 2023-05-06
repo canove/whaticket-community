@@ -114,11 +114,10 @@ const TemplateModal = ({ open, onClose }) => {
     try {
       await api.post(`/whatsappTemplate/create/`, templateData);
       toast.success(i18n.t("templates.templateModal.success"));
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   const handleClose = () => {

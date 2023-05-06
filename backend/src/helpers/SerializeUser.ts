@@ -14,6 +14,7 @@ interface SerializedUser {
   company?: Company;
   profileId: number;
   profiles?: Profiles;
+  superAdmin?: boolean;
 }
 
 export const SerializeUser = (user: User): SerializedUser => {
@@ -25,6 +26,7 @@ export const SerializeUser = (user: User): SerializedUser => {
     lang: user.lang,
     queues: user.queues,
     companyId: user.companyId,
-    profileId: user.profileId
+    profileId: user.profileId,
+    superAdmin: user.superAdmin
   };
 };
