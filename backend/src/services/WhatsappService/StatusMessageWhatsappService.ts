@@ -19,9 +19,10 @@ import Whatsapp from "../../database/models/Whatsapp";
 import ConnectionFiles from "../../database/models/ConnectionFile";
 import OfficialTemplates from "../../database/models/OfficialTemplates";
 import OfficialTemplatesStatus from "../../database/models/OfficialTemplatesStatus";
+
 interface Request {
-  msgId: number;
-  statusType: string;
+  msgId?: number;
+  statusType?: string;
   messageType?: string;
   msgWhatsId?: string;
   errorMessage?: string;
@@ -30,6 +31,7 @@ interface Request {
 interface Response {
   success: boolean;
 }
+
 const StatusMessageWhatsappService = async ({
   msgId,
   statusType,
@@ -75,7 +77,6 @@ const StatusMessageWhatsappService = async ({
     });
 
    if(msgRegister) {
-    console.log("update Message statusmessageservice 71");
     switch(statusType.toLowerCase()){
       case "sent":
         if (msgRegister?.ack === 2 || msgRegister?.ack === 3) break;
@@ -108,7 +109,6 @@ const StatusMessageWhatsappService = async ({
     return { success: true };
   }
 
-  console.log("update FileRegister statusmessageservice 103");
   switch(statusType.toLowerCase()){
     case "sent":
       await register?.update({ sentAt: new Date(), msgWhatsId: msgWhatsId, haveWhatsapp: true });
