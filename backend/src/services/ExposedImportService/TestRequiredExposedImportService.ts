@@ -109,6 +109,8 @@ const TestRequiredExposedImportService = async ({
           const var4 = getRelationValue(mapping.var4, obj);
           const var5 = getRelationValue(mapping.var5, obj);
           const phoneNumberFrom = getRelationValue(mapping.phoneNumberFrom, obj);
+          const category = getRelationValue(mapping.category, obj);
+
           // let whatsappId = null;
 
           // if (phoneNumberFrom) {
@@ -134,7 +136,9 @@ const TestRequiredExposedImportService = async ({
             var5,
             companyId,
             phoneNumberFrom,
-            // whatsappId
+            category,
+            // whatsappId,
+            // connectionFileId,
           };
 
           const requiredItem = requiredItems.find((item) => (!register[item] || register[item] === 'undefined' || register[item] === '""'));
@@ -182,6 +186,8 @@ const TestRequiredExposedImportService = async ({
       const var4 = getRelationValue(mapping.var4, payload);
       const var5 = getRelationValue(mapping.var5, payload);
       const phoneNumberFrom = getRelationValue(mapping.phoneNumberFrom, payload);
+      const category = getRelationValue(mapping.category, payload);
+
       // let whatsappId = null;
 
       // if (phoneNumberFrom) {
@@ -207,7 +213,9 @@ const TestRequiredExposedImportService = async ({
         var5,
         companyId,
         phoneNumberFrom,
+        category,
         // whatsappId,
+        // connectionFileId,
       }
 
       let requiredItem = "";

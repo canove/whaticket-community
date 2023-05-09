@@ -138,6 +138,14 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
   const payload = req.body;
 
+  // const exposedImport = await StartExposedImportService({
+  //   exposedImportId,
+  //   companyId,
+  //   payload
+  // });
+
+  // return res.status(200).json({ message: "success" }); 
+
   const response = await TestRequiredExposedImportService({ exposedImportId, companyId, payload });
 
   if (!response) {

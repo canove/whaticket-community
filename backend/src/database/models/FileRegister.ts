@@ -18,6 +18,7 @@ import File from "./File";
 import IntegratedImport from "./IntegratedImport";
 import Message from "./Message";
 import Whatsapp from "./Whatsapp";
+import ConnectionFiles from "./ConnectionFile";
 
 @Table
 class FileRegister extends Model<FileRegister> {
@@ -180,6 +181,16 @@ class FileRegister extends Model<FileRegister> {
   @AllowNull(true)
   @Column
   fishingProcessedAt: Date;
+
+  @ForeignKey(() => ConnectionFiles)
+  @Column
+  connectionFileId: number;
+
+  @BelongsTo(() => ConnectionFiles)
+  connectionFile: ConnectionFiles;
+
+  @Column
+  batchId: string;
 }
 
 export default FileRegister;
