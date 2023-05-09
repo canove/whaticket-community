@@ -14,6 +14,7 @@ import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 
 import { v4 as uuidv4 } from "uuid";
+import FindCreateOrUpdateContactService from "../ContactServices/FindCreateOrUpdateContactService";
 
 interface Request {
   media: Express.Multer.File;
@@ -29,7 +30,6 @@ const SendWhatsAppMedia = async ({
   body
 }: Request): Promise<void> => {
   try {
-
     const connnection = await Whatsapp.findOne({
       where: {
         id: ticket.whatsappId
@@ -76,9 +76,19 @@ const SendWhatsAppMedia = async ({
       limit: 1
     });
 
-    const contact = await Contact.findOne({ where: {
-      id:  message[0] ? message[0].contactId : ticket.contactId
-    }});
+    const contact = await FindCreateOrUpdateContactService({
+      id: (message[0] && message[0].contactId) ? message[0].contactId : ticket.contactId,
+      companyId,
+      message: message[0],
+      ticket
+    });
+
+    // const contact = await Contact.findOne({ 
+    //   where: {
+    //     id: (message[0] && message[0].contactId) ? message[0].contactId : ticket.contactId,
+    //     companyId
+    //   }
+    // });
   
     const messageSended = await FileRegister.findOne({
       where: {

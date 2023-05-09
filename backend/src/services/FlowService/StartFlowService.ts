@@ -802,20 +802,17 @@ const processNode = async (node: any, session: any, body: any) => {
 
     const contact = await Contact.findOne({
       where: {
-        [Op.or]: [
-          { number: session.id } ,
-          { number: 
-            { 
-              [Op.or]: [
-                removePhoneNumberWith9Country(session.id),
-                preparePhoneNumber9Digit(session.id),
-                removePhoneNumber9Digit(session.id),
-                removePhoneNumberCountry(session.id),
-                removePhoneNumber9DigitCountry(session.id)
-              ],
-            }
-          }
-        ],
+        companyId: session.companyId,
+        number: { 
+          [Op.or]: [
+            session.id,
+            removePhoneNumberWith9Country(session.id),
+            preparePhoneNumber9Digit(session.id),
+            removePhoneNumber9Digit(session.id),
+            removePhoneNumberCountry(session.id),
+            removePhoneNumber9DigitCountry(session.id)
+          ],
+        }
       },
       attributes: ["id"],
     });

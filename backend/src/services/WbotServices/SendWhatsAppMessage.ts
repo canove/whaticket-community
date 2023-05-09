@@ -21,6 +21,7 @@ import {
 import OfficialWhatsapp from "../../database/models/OfficialWhatsapp";
 
 import { v4 as uuidv4 } from "uuid";
+import FindCreateOrUpdateContactService from "../ContactServices/FindCreateOrUpdateContactService";
 
 interface Request {
   body: string;
@@ -87,9 +88,19 @@ const SendWhatsAppMessage = async ({
     limit: 1
   });
 
-  const contact = await Contact.findOne({ where: {
-    id: contactId > 0 ? contactId : message[0] ? message[0].contactId : ticket.contactId
-  }});
+  let contact = await FindCreateOrUpdateContactService({
+    id: (contactId > 0) ? contactId : (message[0] && message[0].contactId) ? message[0].contactId : ticket.contactId,
+    companyId,
+    message: message[0],
+    ticket
+  });
+
+  // let contact = await Contact.findOne({ 
+  //   where: {
+  //     id: (contactId > 0) ? contactId : (message[0] && message[0].contactId) ? message[0].contactId : ticket.contactId,
+  //     companyId
+  //   }
+  // });
 
   const messageSended = await FileRegister.findOne({
     where: {

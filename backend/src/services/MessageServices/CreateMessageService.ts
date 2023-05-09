@@ -84,12 +84,12 @@ const CreateMessageService = async ({
     });
 
     const contact = await Contact.findOne({
-      where: { id: ticket.contactId },
+      where: { id: ticket.contactId, companyId: ticket.companyId },
       attributes: ["id", "number"]
     });
 
     const whatsapp = await Whatsapp.findOne({
-      where: { id: ticket.whatsappId },
+      where: { id: ticket.whatsappId, companyId: ticket.companyId },
       attributes: ["id", "name", "official"]
     });
 

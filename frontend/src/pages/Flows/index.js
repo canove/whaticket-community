@@ -269,6 +269,7 @@ const Flows = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("flows.grid.name")}</TableCell>
+              <TableCell align="center">{"Oficial"}</TableCell>
               <TableCell align="center">
                 {i18n.t("flows.grid.createdAt")}
               </TableCell>
@@ -287,6 +288,7 @@ const Flows = () => {
                   return (
                     <TableRow key={flow.id}>
                       <TableCell align="center">{flow.name}</TableCell>
+                      <TableCell align="center">{flow.official === null ? "Fluxo Desatualizado" : flow.official ? "SIM" : "NÃO" }</TableCell>
                       <TableCell align="center">
                         {formatDate(flow.createdAt)}
                       </TableCell>

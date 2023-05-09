@@ -29,13 +29,14 @@ const GetContactService = async ({ name, number, companyId }: Request): Promise<
             companyId
         })
 
-        if (contact == null)
-            throw new AppError("CONTACT_NOT_FIND")
-        else
-            return contact
+        if (contact == null) {
+            throw new AppError("CONTACT_NOT_FIND");
+        } else {
+            return contact;
+        }
     }
 
-    return numberExists
+    return numberExists;
 };
 
 export default GetContactService;
