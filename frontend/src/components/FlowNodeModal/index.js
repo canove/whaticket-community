@@ -259,29 +259,31 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
                       </Select>
                   </FormControl>
                 </div>
-                <div className={classes.selectStyle}>
-                    <FormControl
-                      variant="outlined"
-                      margin="normal"
-                      fullWidth
-                    >
-                      <InputLabel id="official-select-label">
-                        Oficial
-                      </InputLabel>
-                      <Select
-                        labelId="official-select-label"
-                        id="official-select"
-                        value={official}
-                        label="Oficial"
-                        onChange={(e) => setOfficial(e.target.value)}
-                        fullWidth
+                {!flowId &&
+                  <div className={classes.selectStyle}>
+                      <FormControl
                         variant="outlined"
+                        margin="normal"
+                        fullWidth
                       >
-                        <MenuItem value={"off"}>Oficial</MenuItem>
-                        <MenuItem value={"nooff"}>Não Oficial</MenuItem>
-                      </Select>
-                  </FormControl>
-                </div>
+                        <InputLabel id="official-select-label">
+                          Oficial
+                        </InputLabel>
+                        <Select
+                          labelId="official-select-label"
+                          id="official-select"
+                          value={official}
+                          label="Oficial"
+                          onChange={(e) => setOfficial(e.target.value)}
+                          fullWidth
+                          variant="outlined"
+                        >
+                          <MenuItem value={"off"}>Oficial</MenuItem>
+                          <MenuItem value={"nooff"}>Não Oficial</MenuItem>
+                        </Select>
+                    </FormControl>
+                  </div>
+                }
                 {/* <div>
                   <FormControlLabel
                     label="Fluxo automático"
