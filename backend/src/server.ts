@@ -22,21 +22,11 @@ console.log('\n\nWelcome to SQS BOT MESSAGE CONSUMER');
 initMessageResponseConsumer();
 console.log('\n\nWelcome to SQS MESSAGE RESPONSE CONSUMER');
 
-const MAX_CONSUMER_QUANTITY = 20;
+for(let i = 0; i < 5; i++) {
+  initMessageStatusConsumer(i);
+}
 
-let consumerQuantity = 0;
 
-cron.schedule('* */1 * * * *', async () => {
-  try {
-    if (consumerQuantity < MAX_CONSUMER_QUANTITY) {
-      consumerQuantity += 1;
-      await initMessageStatusConsumer();
-      consumerQuantity -= 1;
-    }
-  } catch (err) {
-    consumerQuantity -= 1;
-  }
-},{ timezone: 'America/Sao_Paulo' });
 
 // !StartAllWhatsAppsSessions();
 
