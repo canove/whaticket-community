@@ -813,7 +813,8 @@ export const botMessageCustomer = async (
   let { bot } = req.body;
 
   const fromMe = true;
-  bot = true;
+
+  if (bot != true && bot != false) bot = true;
 
   const whatsapp = await Whatsapp.findOne({
     where: {
