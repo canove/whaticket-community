@@ -1390,6 +1390,18 @@ const messages = {
         none: "None",
       },
 
+      batch: {
+        title: "Batches",
+        yes: "Yes",
+        no: "No",
+        id: "ID",
+        status: "Status",
+        total: "Total",
+        processed: "Processed",
+        isBillet: "Is Billet?",
+        actions: "Actions",
+      },
+
       backendErrors: {
         LOGGED_USERS_REACHED_THE_LIMIT: "Exceeded simultaneous logged in account limit.",
         ERR_SESSION_ENDED:

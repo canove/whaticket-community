@@ -1394,6 +1394,18 @@ const messages = {
         none: "Nenhum",
       },
 
+      batch: {
+        title: "Lotes",
+        yes: "Sim",
+        no: "Não",
+        id: "ID",
+        status: "Status",
+        total: "Qtde. Registros",
+        processed: "Qtde. Registros Processados",
+        isBillet: "É boleto?",
+        actions: "Ações",
+      },
+
       backendErrors: {
         LOGGED_USERS_REACHED_THE_LIMIT: "Limite de contas logadas simultâneamente excedido.",
         ERR_SESSION_ENDED:

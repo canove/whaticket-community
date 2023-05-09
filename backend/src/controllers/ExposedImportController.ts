@@ -158,6 +158,8 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
   } else {
     const { requiredItems, registersWithError, newPayload } = response;
 
+    // if (newPayload.length > 0) SEND SQS
+
     await sendSqs({
       MessageBody: JSON.stringify({ payload: newPayload, exposedImportId, companyId }),
       QueueUrl: process.env.SQS_DISPATCH_QUEUE,

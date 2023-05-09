@@ -44,6 +44,7 @@ import supervisorRoutes from "./supervisorRoutes";
 import satisfactionSurveyRoutes from "./satisfactionSurveyRoutes";
 import packageRoutes from "./packageRoutes";
 import companySettingsRoutes from "./companySettingsRoutes";
+import batchRoutes from "./batchRoutes";
 
 const routes = Router();
 
@@ -91,5 +92,6 @@ routes.use(supervisorRoutes);
 routes.use(satisfactionSurveyRoutes);
 routes.use(packageRoutes);
 routes.use(companySettingsRoutes);
+routes.use(batchRoutes);
 
 export default routes;
