@@ -31,8 +31,8 @@ const CreateConnectionFileService = async ({
     icon,
     companyId,
     triggerInterval: triggerInterval === "null" ? null : triggerInterval,
-    greetingMessage, 
-    farewellMessage,
+    greetingMessage: greetingMessage === "null" ? null : greetingMessage, 
+    farewellMessage: farewellMessage === "null" ? null : farewellMessage,
   });
 
   return connectionFile;

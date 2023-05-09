@@ -46,8 +46,8 @@ const UpdateConnectionFileService = async ({
     name,
     icon,
     triggerInterval: triggerInterval === "null" ? null : triggerInterval,
-    greetingMessage, 
-    farewellMessage,
+    greetingMessage: greetingMessage === "null" ? null : greetingMessage, 
+    farewellMessage: farewellMessage === "null" ? null : farewellMessage,
   });
 
   await connectionFile.reload();

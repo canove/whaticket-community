@@ -810,8 +810,11 @@ export const botMessageCustomer = async (
 ) => {
   const { companyId } = req.user;
   const { to, body, cation, contactName, session, id, type } = req.body;
+  let { bot } = req.body;
+
   const fromMe = true;
-  const bot = true;
+
+  if (bot != true && bot != false) bot = true;
 
   const whatsapp = await Whatsapp.findOne({
     where: {

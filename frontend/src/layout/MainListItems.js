@@ -106,6 +106,7 @@ const menuTranslation = {
   "Supervisor": "Supervisor",
   "Satisfaction Survey": "Pesquisa de Satisfação",
   "Packages": "Pacotes",
+  "Batch": "batch.title",
 }
 
 function getIcon(icon, isParent) {
