@@ -25,13 +25,14 @@ interface FlowsData {
 type IndexQuery = {
   searchParam: string;
   type: string;
+  official: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
-  const { searchParam, type } = req.query as IndexQuery;
+  const { searchParam, type, official } = req.query as IndexQuery;
 
-  const flows = await ListFlowsService({ companyId, searchParam, type });
+  const flows = await ListFlowsService({ companyId, searchParam, type, official });
 
   return res.status(200).json(flows);
 };
