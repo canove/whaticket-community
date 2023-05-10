@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
 
-import * as SRD from '@projectstorm/react-diagrams';
+// import * as SRD from '@projectstorm/react-diagrams';
 import { BodyWidget } from './components/BodyWidget.jsx'; 
 import { Application } from './Application';
 
@@ -17,6 +17,8 @@ const app = new Application();
 
 const CreateFlows = () => {
   const { flowId } = useParams();
+
+  const [official, setOfficial] = useState(false);
 
   const saveFlow = async () => {
     const allLinks = app.getActiveDiagram().getLinks();
@@ -30,8 +32,6 @@ const CreateFlows = () => {
 
     const save = JSON.stringify(app.getActiveDiagram().serialize());
 
-    // console.log(save);
-
     try {
       await api.put(`/flowsNodes/${flowId}`, { json: save });
       toast.success('Fluxo salvo com sucesso.');
@@ -44,9 +44,10 @@ const CreateFlows = () => {
     const fetchFlow = async () => {
       try {
         const { data } = await api.get(`/flowsNodes/${flowId}`);
+        setOfficial(data.official);
 
-        if (data.json) {
-          app.getActiveDiagram().deserializeModel(JSON.parse(data.json), app.getDiagramEngine());
+        if (data.nodes) {
+          app.getActiveDiagram().deserializeModel(JSON.parse(data.nodes.json), app.getDiagramEngine());
           app.getDiagramEngine().setModel(app.getActiveDiagram());
         } else {
           app.newModel();
@@ -62,7 +63,7 @@ const CreateFlows = () => {
   return (
     <MainContainer>
       <Button onClick={saveFlow}>Salvar</Button>
-      <BodyWidget app={app} />
+      <BodyWidget app={app} official={official} />
     </MainContainer>
   );
 };

@@ -73,6 +73,7 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
 
     const [name, setName] = useState("");
     const [status, setStatus] = useState("active");
+    const [official, setOfficial] = useState("nooff");
     // const [useAutoFlow, setUseAutoFlow] = useState(false);
     // const [days, setDays] = useState(initialDays);
     // const [hours, setHours] = useState("");
@@ -85,6 +86,7 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
           const { data } = await api.get(`/flows/${flowId}`);
           setName(data.name)
           setStatus(data.status);
+          setOfficial(data.official ? "off" : "nooff");
         } catch (err) {
           toastError(err);
         }
@@ -103,6 +105,7 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
     const handleClose = () => {
       setName("");
       setStatus("active");
+      setOfficial("nooff");
       // setDays(initialDays);
       // setHours("");
       // setCrons([]);
@@ -185,7 +188,8 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
       const flowData = {
           name: name,
           status: status,
-          type: "bits"
+          type: "bits",
+          official: official === "off" ? true : false
       };
 
       try {
@@ -254,6 +258,54 @@ const FlowNodeModal = ({ open, onClose, flowId }) => {
                       </Select>
                   </FormControl>
                 </div>
+                {/* {!flowId &&
+                  <div className={classes.selectStyle}>
+                      <FormControl
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                      >
+                        <InputLabel id="official-select-label">
+                          Oficial
+                        </InputLabel>
+                        <Select
+                          labelId="official-select-label"
+                          id="official-select"
+                          value={official}
+                          label="Oficial"
+                          onChange={(e) => setOfficial(e.target.value)}
+                          fullWidth
+                          variant="outlined"
+                        >
+                          <MenuItem value={"off"}>Oficial</MenuItem>
+                          <MenuItem value={"nooff"}>Não Oficial</MenuItem>
+                        </Select>
+                    </FormControl>
+                  </div>
+                } */}
+                <div className={classes.selectStyle}>
+                      <FormControl
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                      >
+                        <InputLabel id="official-select-label">
+                          Oficial
+                        </InputLabel>
+                        <Select
+                          labelId="official-select-label"
+                          id="official-select"
+                          value={official}
+                          label="Oficial"
+                          onChange={(e) => setOfficial(e.target.value)}
+                          fullWidth
+                          variant="outlined"
+                        >
+                          <MenuItem value={"off"}>Oficial</MenuItem>
+                          <MenuItem value={"nooff"}>Não Oficial</MenuItem>
+                        </Select>
+                    </FormControl>
+                  </div>
                 {/* <div>
                   <FormControlLabel
                     label="Fluxo automático"

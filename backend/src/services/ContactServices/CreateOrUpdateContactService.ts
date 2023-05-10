@@ -37,28 +37,32 @@ const CreateOrUpdateContactService = async ({
   const number = isGroup ? rawNumber : rawNumber.replace(/[^0-9]/g, "");
 
   const io = getIO();
-  let contact: Contact | null;
+  let contact = null;
 
   contact = await Contact.findOne({
     where: {
-     number: 
-        { 
-          [Op.or]: [
-            removePhoneNumberWith9Country(number),
-            preparePhoneNumber9Digit(number),
-            removePhoneNumber9Digit(number),
-            removePhoneNumberCountry(number),
-            removePhoneNumber9DigitCountry(number)
-          ],
-        }
+      companyId,
+      number: { 
+        [Op.or]: [
+          removePhoneNumberWith9Country(number),
+          preparePhoneNumber9Digit(number),
+          removePhoneNumber9Digit(number),
+          removePhoneNumberCountry(number),
+          removePhoneNumber9DigitCountry(number)
+        ],
+      }
    }});
 
   if (contact) {
     const oldName = contact.name;
 
+    const isGroupNumber = (number && number.length > 15);
+    const allowedNames = (name && name !== "" && name !== "undefined" && name !== "Empty");
+
     console.log("update contact contactService 42");
+
     await contact.update({ 
-      name: (number && number.length < 15) && (name && name !== "" && name !== "undefined" && name !== "Empty") ? name : oldName,
+      name: (!isGroupNumber) && (allowedNames) ? name : oldName,
       profilePicUrl 
     });
 
@@ -67,12 +71,15 @@ const CreateOrUpdateContactService = async ({
       contact
     });
   } else {
+    const disallowedNames = (name && (name === "" || name === "undefined" || name === "Empty"));
+    const isGroupNumber = (number && number.length > 15);
+
     contact = await Contact.create({
-      name: (number.length > 15 && name === "Empty") ? "GRUPO" : name,
+      name: (isGroupNumber && disallowedNames) ? "GRUPO" : name,
       number,
       profilePicUrl,
       email,
-      isGroup: number.length > 15,
+      isGroup: isGroupNumber,
       extraInfo,
       companyId
     });

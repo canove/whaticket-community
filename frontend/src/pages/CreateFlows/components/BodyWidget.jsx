@@ -76,9 +76,11 @@ export class BodyWidget extends React.Component {
 				</Header>
 				<Content>
 					<TrayWidget>
-						{/* <TrayItemWidget model={{ type: 'in' }} name="In Node" color="rgb(192,255,0)" />
+						{/* 
+						<TrayItemWidget model={{ type: 'in' }} name="In Node" color="rgb(192,255,0)" />
 						<TrayItemWidget model={{ type: 'out' }} name="Out Node" color="rgb(0,192,255)" />
-						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" /> */}
+						<TrayItemWidget model={{ type: 'custom' }} name="Custom" color="rgb(255,0,0)" /> 
+						*/}
 						<TrayItemWidget
 							model={{ type: 'chat' }}
 							name="Chat"
@@ -163,24 +165,29 @@ export class BodyWidget extends React.Component {
 							color="#BFBFBF" 
 							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
 						/>
-						<TrayItemWidget
-							model={{ type: 'button-message' }}
-							name="Button Message"
-							color="#25D366"
-							icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/>
-						<TrayItemWidget
-							model={{ type: 'satisfaction-survey' }}
-							name="Pesquisa de Satisfação"
-							color="#25D366"
-							icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/>
-						<TrayItemWidget
-							model={{ type: 'template' }}
-							name="Templates"
-							color="#25D366"
-							icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
-						/>
+
+						{!this.props.official &&
+							<>
+								<TrayItemWidget
+									model={{ type: 'button-message' }}
+									name="Button Message"
+									color="#25D366"
+									icon={<Chat style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+								/>
+								<TrayItemWidget
+									model={{ type: 'satisfaction-survey' }}
+									name="Pesquisa de Satisfação"
+									color="#25D366"
+									icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+								/>
+								<TrayItemWidget
+									model={{ type: 'template' }}
+									name="Templates"
+									color="#25D366"
+									icon={<RiSurveyLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>}
+								/>
+							</>
+						}
 					</TrayWidget>
 					<Layer
 						onDrop={(event) => {

@@ -19,6 +19,7 @@ interface FlowsData {
   clientEmail: string;
   privateKey: string;
   type: string;
+  official: boolean;
 }
 
 type IndexQuery = {
@@ -46,7 +47,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     location,
     clientEmail,
     privateKey,
-    type
+    type,
+    official,
   }: FlowsData = req.body;
 
   const flow = await CreateFlowService({
@@ -58,7 +60,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     location,
     clientEmail,
     privateKey,
-    type
+    type,
+    official,
   });
 
   const io = getIO();

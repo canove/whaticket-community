@@ -736,6 +736,7 @@ const verifyContact = async (
       where: { phoneNumber: contactNumber, companyId },
       limit: 1
     });
+
     if (contact.length > 0) contactName = contact[0].name;
   }
 

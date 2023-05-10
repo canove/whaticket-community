@@ -55,7 +55,7 @@ const CreateTicketService = async ({
 
     queueId = ticket.queueId;
   } else {
-    const { name, number } = await ShowContactService(contactId);
+    const { name, number } = await ShowContactService(contactId, companyId);
 
     if (official === true) {
       const { data } = await SendOfficialTemplateMessage({
@@ -85,7 +85,7 @@ const CreateTicketService = async ({
 
   await CheckContactOpenTickets(contactId, companyId);
 
-  const { isGroup } = await ShowContactService(contactId);
+  const { isGroup } = await ShowContactService(contactId, companyId);
 
   const { id }: Ticket = await defaultWhatsapp.$create("ticket", {
     contactId,
