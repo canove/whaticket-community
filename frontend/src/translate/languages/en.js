@@ -1445,6 +1445,7 @@ const messages = {
         ERR_NO_COMPANY_FOUND: "Error deleting the Company.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "There is already a company with this CNPJ.",
         ERR_NO_CATEGORY_FOUND : "Error category not found!",
+        ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
       },
     },
   },

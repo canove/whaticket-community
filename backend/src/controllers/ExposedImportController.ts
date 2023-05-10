@@ -156,19 +156,20 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
 
     return res.status(200).json({ message: "request was received with success" }); 
   } else {
-    const { requiredItems, registersWithError, newPayload } = response;
+    const { requiredItems, registersWithError, newPayload, registersWithNonExistentCategory } = response;
 
-    // if (newPayload.length > 0) SEND SQS
-
-    await sendSqs({
-      MessageBody: JSON.stringify({ payload: newPayload, exposedImportId, companyId }),
-      QueueUrl: process.env.SQS_DISPATCH_QUEUE,
-    });
+    if (newPayload.length > 0) {
+      await sendSqs({
+        MessageBody: JSON.stringify({ payload: newPayload, exposedImportId, companyId }),
+        QueueUrl: process.env.SQS_DISPATCH_QUEUE,
+      });
+    }
 
     return res.status(200).json({ 
       message: "request was received with success, but some items weren't sent.",
       required: requiredItems,
-      payloadWithError: registersWithError
+      payloadWithError: registersWithError,
+      payloadWithNonExistentCategory: registersWithNonExistentCategory
     }); 
   }
 };

@@ -143,7 +143,10 @@ const StartExposedImportService = async ({
 
         if (categoryName) {
           const category = await ConnectionFiles.findOne({
-            where: { name: categoryName, companyId }
+            where: { 
+              [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+              companyId 
+            }
           });
 
           connectionFileId = category ? category.id : null;

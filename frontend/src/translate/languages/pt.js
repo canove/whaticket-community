@@ -1449,6 +1449,7 @@ const messages = {
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Já existe uma empresa com esse CNPJ.",
         ERR_NO_CATEGORY_FOUND : "Erro categoria não encontrada!",
         ERR_QUEUE_CREATES_A_LOOP: "Essa fila já possuí um redirecionamento.",
+        ERR_NAME_OR_CODE_ALREADY_EXISTS: "Nome ou código já existem.",
       },
     },
   },
