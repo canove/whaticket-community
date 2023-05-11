@@ -79,7 +79,7 @@ const AuthUserService = async ({
   }
 
   const settings = await ListCompanySettingsService(companyDb.id);
-  const allowedIPs = settings.allowedIPs;
+  const allowedIPs = settings.allowedIPs ? settings.allowedIPs : [];
 
   if (allowedIPs.length > 0 && !allowedIPs.includes(userIp) && !user.superAdmin) {
       throw new AppError("ERR_IP_NOT_ALLOWED");
