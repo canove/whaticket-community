@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { Box, Button, Checkbox, FormControlLabel } from "@material-ui/core";
+import { Box, Button, Checkbox, FormControlLabel, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
@@ -15,6 +15,7 @@ import Title from "../../components/Title";
 import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
+import AllowedIPModal from "../../components/AllowedIPModal";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -48,10 +49,15 @@ const Settings = () => {
 		hours: "",
 		message: "",
 		useWorkTime: false,
-		//    | dom | seg | ter | qua | qui | sex | sab |
+	//? dias: | dom | seg | ter | qua | qui | sex | sab |
 		days: [false,false,false,false,false,false,false],
+		allowedIPs: [],
 	}
 	const [settings, setSettings] = useState(initialSettings);
+
+	const [allowedIPModalOpen, setAllowedIPModalOpen] = useState(false);
+	const [selectedAllowedIP, setSelectedAllowedIP] = useState("");
+	const [selectedAllowedIPIndex, setSelectedAllowedIPIndex] = useState(null);
 
 	useEffect(() => {
 		const fetchSettings = async () => {
@@ -131,11 +137,12 @@ const Settings = () => {
 			days: settings.days.map(day => day ? true : false),
 			hours: settings.hours,
 			message: settings.message,
+			allowedIPs: settings.allowedIPs
 		};
 
 		try {
 			await api.post("/companySettings/", body);
-			toast.success("Horário de Atendimento salvo com sucesso.");
+			toast.success("Configurações salvas com sucesso.");
 		} catch (err) {
 			toastError(err);
 		}
@@ -160,14 +167,79 @@ const Settings = () => {
 		setSettings(prevSettings => ({ ...prevSettings, [settingName]: value }))
 	}
 
+	const handleCloseAllowedIPModal = () => {
+		setSelectedAllowedIP("");
+		setSelectedAllowedIPIndex(null);
+		setAllowedIPModalOpen(false);
+	}
+
+	const handleCreateAllowedIP = () => {
+		setSelectedAllowedIP("");
+		setSelectedAllowedIPIndex(null);
+		setAllowedIPModalOpen(true);
+	}
+
+	const handleEditAllowedIP = (ip, index) => {
+		setSelectedAllowedIP(ip);
+		setSelectedAllowedIPIndex(index);
+		setAllowedIPModalOpen(true);
+	}
+
+	const handleDeleteAllowedIP = (index) => {
+		const newAllowedIPs = settings.allowedIPs;
+		newAllowedIPs.splice(index, 1);
+
+		setSettings(prevSettings => ({
+			...prevSettings,
+			allowedIPs: newAllowedIPs
+		}));
+	}
+
+	const saveIP = (ip, index) => {
+		if (typeof index === "number") {
+			let newAllowedIPs = settings.allowedIPs;
+			newAllowedIPs[index] = ip;
+
+			setSettings(prevSettings => ({
+				...prevSettings,
+				allowedIPs: newAllowedIPs
+			}));
+		} else {
+			const newAllowedIPs = settings.allowedIPs;
+			newAllowedIPs.push(ip);
+
+			setSettings(prevSettings => ({
+				...prevSettings,
+				allowedIPs: newAllowedIPs
+			}));
+		}
+	}
+
 	return (
 		<div className={classes.root}>
+			<AllowedIPModal
+				open={allowedIPModalOpen}
+				onClose={handleCloseAllowedIPModal}
+				allowedIP={selectedAllowedIP}
+				index={selectedAllowedIPIndex}
+                saveIP={saveIP}
+			/>
 			<Container className={classes.container} maxWidth="sm">
-				<Title>{i18n.t("settings.title")}</Title>
+				<div>
+					<Title>{i18n.t("settings.title")}</Title>
+					<Button
+						color="primary"
+						variant="contained"
+						onClick={handleSaveSettings}
+					>
+						Salvar
+					</Button>
+				</div>
 				<Paper className={classes.paper}>
 					<div>
+						<Typography variant="subtitle1" color="primary" gutterBottom>Horário de Atendimento:</Typography>
 						<FormControlLabel
-							label="Horário de Atendimento"
+							label="Ativar"
 							control={
 							<Checkbox
 								checked={settings.useWorkTime}
@@ -233,15 +305,54 @@ const Settings = () => {
 								/>
 							</>
 						}
-						<Button
-							color="primary"
-							variant="contained"
-							onClick={handleSaveSettings}
-						>
-							Salvar
-						</Button>
 					</div>
 				</Paper>
+				<Paper className={classes.paper}>
+					<div>
+						<Typography variant="subtitle1" color="primary" gutterBottom>IPs Permitidos:</Typography>
+						<Button
+                            variant="contained"
+                            color="primary"
+                            onClick={ handleCreateAllowedIP }
+                        >
+                           {i18n.t("settingsWhats.buttons.created")}
+                        </Button>
+						<Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>{"IP"}</TableCell>
+                                    <TableCell>{"Ações"}</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+								{ settings.allowedIPs && settings.allowedIPs.map((allowedIP, index) => {
+									return (
+										<TableRow key={index}>
+											<TableCell>{allowedIP}</TableCell>
+											<TableCell>
+												<Button
+													onClick={() => { handleEditAllowedIP(allowedIP, index) }}
+												>
+													{"Editar"}
+												</Button>
+												<Button
+													onClick={() => { handleDeleteAllowedIP(index) }}
+												>
+													{"Deletar"}
+												</Button>
+											</TableCell>
+										</TableRow>
+									)
+								})}
+                            </TableBody>
+                        </Table>
+					</div>
+				</Paper>
+				{/* <Paper className={classes.paper}>
+					<div>
+						<Typography variant="subtitle1" color="primary" gutterBottom>Configurações do CHAT:</Typography>
+					</div>
+				</Paper> */}
 			</Container>
 		</div>
 	);

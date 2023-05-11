@@ -55,6 +55,7 @@
     "random-words": "1.2.0",
     "redis": "^4.6.4",
     "reflect-metadata": "^0.1.13",
+    "request-ip": "^3.3.0",
     "sequelize": "5.22.3",
     "sequelize-cli": "5.5.1",
     "sequelize-typescript": "1.1.0",
