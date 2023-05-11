@@ -179,7 +179,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 		if (newValue?.number) {
 			setSelectedContact(newValue);
 		} else if (newValue?.name) {
-			setNewContact({ name: newValue.name });
+			setNewContact({ number: newValue.name });
 			setContactModalOpen(true);
 		} else {
 			setSelectedContact(null);
@@ -327,7 +327,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 										}}
 									>
 										<MenuItem value={""}>Nenhum</MenuItem>
-										{queues.map(queue => {
+										{queues && queues.map(queue => {
 											return (
 												<MenuItem key={queue.id} value={queue.id}>
 													{queue.name}
