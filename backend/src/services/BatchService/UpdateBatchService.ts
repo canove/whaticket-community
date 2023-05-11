@@ -13,7 +13,7 @@ const UpdateBatchService = async (batchId: string, companyId: number): Promise<B
     if (!batch) throw new AppError("ERR_BATCH_NOT_FOUND");
 
     const count = await FileRegister.count({ 
-        where: { batchId, processedAt: { [Op.ne]: null } } 
+        where: { batchId: batch.batchId, processedAt: { [Op.ne]: null } } 
     });
 
     await batch.update({ processedQuantity: count });
