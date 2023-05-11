@@ -138,8 +138,11 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 						onChange={(e, newValue) => {
 							setSelectedUser(newValue);
 							setSelectedQueue('');
+
 							if (newValue != null && Array.isArray(newValue.queues)) {
 								setQueues(newValue.queues);
+
+								if (newValue.queues.length === 1) setSelectedQueue(newValue.queues[0].id);
 							} else {
 								setQueues(allQueues);
 							}
