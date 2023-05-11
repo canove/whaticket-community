@@ -37,7 +37,7 @@ const ListCompanySettingsService = async (
 
   if (!settings) settings = initialSettings;
 
-  return JSON.parse(settings);
+  return typeof settings == 'object'? settings: JSON.parse(settings);
 };
 
 export default ListCompanySettingsService;

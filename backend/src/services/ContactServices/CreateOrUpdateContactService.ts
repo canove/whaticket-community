@@ -8,6 +8,7 @@ import {
   removePhoneNumberCountry,
   removePhoneNumber9DigitCountry
 } from "../../utils/common";
+import Ticket from "../../database/models/Ticket";
 
 /*eslint-disable */
 interface ExtraInfo {
@@ -38,23 +39,32 @@ const CreateOrUpdateContactService = async ({
 
   const io = getIO();
   let contact: Contact | null;
+  let where = {
+    companyId,
+    number: 
+       { 
+         [Op.or]: [
+           removePhoneNumberWith9Country(number),
+           preparePhoneNumber9Digit(number),
+           removePhoneNumber9Digit(number),
+           removePhoneNumberCountry(number),
+           removePhoneNumber9DigitCountry(number)
+         ],
+       }
+  };
 
-  contact = await Contact.findOne({
-    where: {
-     number: 
-        { 
-          [Op.or]: [
-            removePhoneNumberWith9Country(number),
-            preparePhoneNumber9Digit(number),
-            removePhoneNumber9Digit(number),
-            removePhoneNumberCountry(number),
-            removePhoneNumber9DigitCountry(number)
-          ],
-        }
-   }});
-
+  contact = await Contact.findOne({ where });
+ 
   if (contact) {
     const oldName = contact.name;
+
+    delete where.companyId;
+    let oldContact = await Contact.findOne({ where });
+    
+    //se encontrat ticket com contato errado atualiza os tickets com o novo contato
+    if (oldContact) {
+      await Ticket.update({ contactId: contact.id }, { where: { companyId: companyId, contactId: oldContact.id}});
+    }
 
     console.log("update contact contactService 42");
     await contact.update({ 
@@ -76,6 +86,15 @@ const CreateOrUpdateContactService = async ({
       extraInfo,
       companyId
     });
+
+    
+    delete where.companyId;
+    let oldContact = await Contact.findOne({ where });
+    
+    //se encontrat ticket com contato errado atualiza os tickets com o novo contato
+    if (oldContact) {
+      await Ticket.update({ contactId: contact.id }, { where: { companyId: companyId, contactId: oldContact.id}});
+    }
 
     io.emit(`contact${companyId}`, {
       action: "create",
