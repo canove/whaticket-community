@@ -53,7 +53,7 @@ export const transferList = async (req: Request, res: Response): Promise<Respons
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin } = req.body;
+  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin, nickname } = req.body;
   const userCompanyId = req.user.companyId;
 
   // if (
@@ -74,7 +74,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       profileId,
       queueIds,
       companyId: companyId || userCompanyId,
-      superAdmin
+      superAdmin,
+      nickname,
     });
 
     const io = getIO();
@@ -93,7 +94,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     profile,
     profileId: profileId ? profileId : req.user.profile,
     queueIds,
-    companyId: userCompanyId
+    companyId: userCompanyId,
+    nickname
   });
 
   const io = getIO();

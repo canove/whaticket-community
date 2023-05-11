@@ -32,7 +32,7 @@ const ListTransferUsersService = async ({
 
   const users = await User.findAll({
     where: whereCondition,
-    attributes: ["name", "id", "email", "profileId", "createdAt"],
+    attributes: ["nickname", "name", "id", "email", "profileId", "createdAt"],
     order: [["createdAt", "DESC"]],
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] }

@@ -240,6 +240,7 @@ const Users = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
+              <TableCell align="center">{"Apelido"}</TableCell>
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.email")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.profile")}</TableCell>
@@ -251,6 +252,7 @@ const Users = () => {
             <>
               {users.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell align="center">{user.nickname}</TableCell>
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user["profiles.name"] || user.profiles.name}</TableCell>

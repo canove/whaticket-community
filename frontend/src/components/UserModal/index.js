@@ -69,6 +69,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const { i18n } = useTranslation();
 
 	const initialState = {
+		nickname: "",
 		name: "",
 		email: "",
 		password: "",
@@ -258,6 +259,19 @@ const UserModal = ({ open, onClose, userId }) => {
 											</InputAdornment>
 										)
 										}}
+										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label={"Apelido"}
+										name="nickname"
+										error={touched.nickname && Boolean(errors.nickname)}
+										helperText={touched.nickname && errors.nickname}
+										variant="outlined"
+										margin="dense"
+										autoComplete="off"
 										fullWidth
 									/>
 								</div>
