@@ -7,7 +7,7 @@ import { SendRefreshToken } from "../helpers/SendRefreshToken";
 import User from "../database/models/User";
 import { decrypt, encrypt } from "../utils/encriptor";
 
-const externalip = require("external-ip");
+const requestIp = require('request-ip');
 const firebase = require("../utils/Firebase");
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
@@ -16,9 +16,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   let userIp = "";
 
   try {
-    externalip(function (err, ip) {
-      userIp = ip;
-    });
+    userIp = requestIp.getClientIp(req); 
   } catch {}
 
   const { token, serializedUser, refreshToken, accountConnected } = await AuthUserService({

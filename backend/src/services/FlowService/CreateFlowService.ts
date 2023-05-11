@@ -11,6 +11,7 @@ interface Request {
   clientEmail: string;
   privateKey: string;
   type: string;
+  official: boolean;
 }
 
 const CreateFlowService = async ({
@@ -22,7 +23,8 @@ const CreateFlowService = async ({
   location,
   clientEmail,
   privateKey,
-  type
+  type,
+  official,
 }: Request): Promise<Flows> => {
   const flow = await Flows.create({
     name,
@@ -33,7 +35,8 @@ const CreateFlowService = async ({
     location,
     clientEmail,
     privateKey,
-    type
+    type,
+    official
   });
 
   if (type === "bits") {

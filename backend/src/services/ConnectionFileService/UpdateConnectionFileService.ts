@@ -4,11 +4,12 @@ import AppError from "../../errors/AppError";
 import ShowConnectionFileService from "./ShowConnectionFileService";
 
 interface ConnectionFileData {
-  name?: string;
+  name: string;
   icon?: string;
   triggerInterval?: string;
   greetingMessage?: string; 
   farewellMessage?: string;
+  uniqueCode?: string;
 }
 
 interface Request {
@@ -22,18 +23,28 @@ const UpdateConnectionFileService = async ({
   connectionFileId,
   companyId
 }: Request): Promise<ConnectionFiles> => {
-  const { name, icon, triggerInterval,greetingMessage, farewellMessage } = connectionFileData;
+  const { name, icon, triggerInterval,greetingMessage, farewellMessage, uniqueCode } = connectionFileData;
+
+  let nameExists = [];
+
+  nameExists.push({ name: name });
+  nameExists.push({ uniqueCode: name });
+
+  if (uniqueCode) {
+    nameExists.push({ name: uniqueCode });
+    nameExists.push({ uniqueCode: uniqueCode });
+  }
 
   const exists = await ConnectionFiles.findOne({
     where: {
-      name,
+      [Op.or]: nameExists,
+      id: { [Op.ne]: connectionFileId },
       companyId,
-      id: { [Op.ne]: connectionFileId }
     }
   });
 
   if (exists || name === "No Category") {
-    throw new AppError("ERR_NAME_ALREADY_EXISTS");
+    throw new AppError("ERR_NAME_OR_CODE_ALREADY_EXISTS");
   }
 
   const connectionFile = await ShowConnectionFileService(
@@ -48,6 +59,7 @@ const UpdateConnectionFileService = async ({
     triggerInterval: triggerInterval === "null" ? null : triggerInterval,
     greetingMessage: greetingMessage === "null" ? null : greetingMessage, 
     farewellMessage: farewellMessage === "null" ? null : farewellMessage,
+    uniqueCode
   });
 
   await connectionFile.reload();

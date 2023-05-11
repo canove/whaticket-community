@@ -113,6 +113,7 @@ const StartExposedImportService = async ({
 
   if (Array.isArray(payload)) {
     let registersToInsert = [];
+    let categoryDictionary = {};
 
     for (const obj of payload) {
       try {
@@ -142,11 +143,23 @@ const StartExposedImportService = async ({
         }
 
         if (categoryName) {
-          const category = await ConnectionFiles.findOne({
-            where: { name: categoryName, companyId }
-          });
+          if (!categoryDictionary[categoryName]) {
+            categoryDictionary[categoryName] = await ConnectionFiles.findOne({
+              where: { 
+                [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+                companyId 
+              }
+            });
+          }
 
-          connectionFileId = category ? category.id : null;
+          // const category = await ConnectionFiles.findOne({
+          //   where: { 
+          //     [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+          //     companyId 
+          //   }
+          // });
+
+          connectionFileId = categoryDictionary[categoryName] ? categoryDictionary[categoryName].id : null;
         }
 
         const register = {
@@ -260,7 +273,10 @@ const StartExposedImportService = async ({
 
     if (categoryName) {
       const category = await ConnectionFiles.findOne({
-        where: { name: categoryName, companyId }
+        where: { 
+          [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+          companyId 
+        }
       });
 
       connectionFileId = category ? category.id : null;

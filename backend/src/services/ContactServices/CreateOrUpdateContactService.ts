@@ -54,21 +54,14 @@ const CreateOrUpdateContactService = async ({
   };
 
   contact = await Contact.findOne({ where });
- 
+  const isGroupNumber = (number && number.length > 15);
+
   if (contact) {
     const oldName = contact.name;
-
-    delete where.companyId;
-    let oldContact = await Contact.findOne({ where });
-    
-    //se encontrat ticket com contato errado atualiza os tickets com o novo contato
-    if (oldContact) {
-      await Ticket.update({ contactId: contact.id }, { where: { companyId: companyId, contactId: oldContact.id}});
-    }
-
-    console.log("update contact contactService 42");
+    const allowedNames = (name && name !== "" && name !== "undefined" && name !== "Empty");
+   
     await contact.update({ 
-      name: (number && number.length < 15) && (name && name !== "" && name !== "undefined" && name !== "Empty") ? name : oldName,
+      name: (!isGroupNumber) && (allowedNames) ? name : oldName,
       profilePicUrl 
     });
 
@@ -77,25 +70,18 @@ const CreateOrUpdateContactService = async ({
       contact
     });
   } else {
+    const disallowedNames = (name && (name === "" || name === "undefined" || name === "Empty"));
+
     contact = await Contact.create({
-      name: (number.length > 15 && name === "Empty") ? "GRUPO" : name,
+      name: (isGroupNumber && disallowedNames) ? "GRUPO" : name,
       number,
       profilePicUrl,
       email,
-      isGroup: number.length > 15,
+      isGroup: isGroupNumber,
       extraInfo,
       companyId
     });
-
-    
-    delete where.companyId;
-    let oldContact = await Contact.findOne({ where });
-    
-    //se encontrat ticket com contato errado atualiza os tickets com o novo contato
-    if (oldContact) {
-      await Ticket.update({ contactId: contact.id }, { where: { companyId: companyId, contactId: oldContact.id}});
-    }
-
+   
     io.emit(`contact${companyId}`, {
       action: "create",
       contact

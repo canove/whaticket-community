@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 const useAuth = () => {
 	const { i18n } = useTranslation();
 	const history = useHistory();
-	const [isAuth, setIsAuth] = useState(false);
+	const [isAuth, setIsAuth] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [user, setUser] = useState({});
 	

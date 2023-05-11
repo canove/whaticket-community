@@ -62,6 +62,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
   const [farewellMessage, setFarewellMessage] = useState("");
   const [triggerInterval, setTriggerInterval] = useState(2);
   const [useTriggerInterval, setUseTriggerInterval] = useState(false);
+  const [uniqueCode, setUniqueCode] = useState("");
 
   const handleClose = () => {
     setName("");
@@ -70,6 +71,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
     setFarewellMessage("");
     setTriggerInterval(2);
     setUseTriggerInterval(false);
+    setUniqueCode("");
     onClose();
   };
 
@@ -86,13 +88,15 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
   };
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchConnectionFile = async () => {
+      if (!connectionFileId) return;
       try {
         const { data } = await api.get(`/connectionFiles/${connectionFileId}`);
         setName(data.name);
         setIcon(data.icon);
         setGreetingMessage(data.greetingMessage);
         setFarewellMessage(data.farewellMessage);
+        setUniqueCode(data.uniqueCode);
 
         if (data.triggerInterval) {
           setUseTriggerInterval(true);
@@ -103,22 +107,18 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
       }
     };
 
-    if (connectionFileId) {
-      fetchProduct();
-    }
+    fetchConnectionFile();
   }, [open, connectionFileId]);
 
   const handleSubmit = async () => {
     const connectionFileData = new FormData();
 
-    connectionFileData.set("name", name);
-    connectionFileData.set("greetingMessage", greetingMessage);
-    connectionFileData.set("farewellMessage", farewellMessage);
-    connectionFileData.set("icon", icon);
-    connectionFileData.set(
-      "triggerInterval",
-      useTriggerInterval ? triggerInterval : null
-    );
+    if (name) connectionFileData.set("name", name);
+    if (icon) connectionFileData.set("icon", icon);
+    if (greetingMessage) connectionFileData.set("greetingMessage", greetingMessage);
+    if (farewellMessage) connectionFileData.set("farewellMessage", farewellMessage);
+    if (useTriggerInterval) connectionFileData.set("triggerInterval", triggerInterval);
+    if (uniqueCode) connectionFileData.set("uniqueCode", uniqueCode);
 
     try {
       if (connectionFileId) {
@@ -172,7 +172,6 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
         <DialogContent dividers>
           <div className={classes.multFieldLine}>
             <TextField
-              as={TextField}
               name="name"
               variant="outlined"
               margin="dense"
@@ -180,6 +179,17 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
               fullWidth
               value={name}
               onChange={handleNameChange}
+            />
+          </div>
+          <div className={classes.multFieldLine}>
+            <TextField
+              name="uniqueCode"
+              variant="outlined"
+              margin="dense"
+              label={"Código"}
+              fullWidth
+              value={uniqueCode}
+              onChange={(e) => setUniqueCode(e.target.value)}
             />
           </div>
           <div>
@@ -294,7 +304,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
           <Button onClick={handleClose} color="secondary" variant="outlined">
             {i18n.t("connectionsFiles.modal.cancel")}
           </Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained">
+          <Button onClick={handleSubmit} disabled={!name} color="primary" variant="contained">
             {connectionFileId
               ? `${i18n.t("connectionsFiles.modal.save")}`
               : `${i18n.t("connectionsFiles.modal.create")}`}

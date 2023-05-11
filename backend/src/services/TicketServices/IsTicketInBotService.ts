@@ -32,18 +32,19 @@ export const IsTicketInBotPostService = async (session: string, contactNumber: s
     where: {
       name: session,
       deleted: 0
-     }});
+    }
+  });
 
   if (!connnection) {
     return true;
   }
 
-
   const contact = await Contact.findOne({
     where: {
       number: preparePhoneNumber9Digit(contactNumber),
       companyId: connnection.companyId
-   }});
+    }
+  });
 
    if (!contact) {
     return true;

@@ -1402,6 +1402,7 @@ const messages = {
         processed: "Processados",
         isBillet: "É boleto?",
         actions: "Ações",
+        createdAt: "Criado em",
       },
 
       backendErrors: {
@@ -1447,6 +1448,7 @@ const messages = {
         ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
         ERR_NO_CATEGORY_FOUND : "¡Categoría de error no encontrada!",
+        ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
       },
     },
   },

@@ -126,8 +126,9 @@ export const blacklist = async (req: Request, res: Response): Promise<Response> 
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { contactId } = req.params;
+  const { companyId } = req.user;
 
-  const contact = await ShowContactService(contactId);
+  const contact = await ShowContactService(contactId, companyId);
 
   return res.status(200).json(contact);
 };
@@ -155,7 +156,7 @@ export const update = async (
 
   const { contactId } = req.params;
 
-  const contact = await UpdateContactService({ contactData, contactId });
+  const contact = await UpdateContactService({ contactData, contactId, companyId });
 
   const io = getIO();
   io.emit(`contact${companyId}`, {
@@ -173,7 +174,7 @@ export const remove = async (
   const { contactId } = req.params;
   const { companyId } = req.user;
 
-  await DeleteContactService(contactId);
+  await DeleteContactService(contactId, companyId);
 
   const io = getIO();
   io.emit(`contact${companyId}`, {

@@ -1,4 +1,5 @@
 import FlowsNodes from "../../database/models/FlowsNodes";
+import AppError from "../../errors/AppError";
 import ShowFlowNodesService from "./ShowFlowNodesService";
 
 interface FlowsNodesData {
@@ -16,18 +17,20 @@ const UpdateFlowNodesService = async ({
   flowId,
   companyId
 }: Request): Promise<FlowsNodes> => {
-  const flowNode = await ShowFlowNodesService(flowId, companyId);
+  const nodes = await FlowsNodes.findOne({
+    where: { flowId, companyId }
+  });
+
+  if (!nodes) throw new AppError("ERR_NO_FLOW_FOUND");
 
   const { json } = flowNodesData;
 
   console.log("update flowNode flowNodeService 23");
-  await flowNode.update({
-    json
-  });
+  await nodes.update({ json });
 
-  flowNode.reload();
+  nodes.reload();
 
-  return flowNode;
+  return nodes;
 };
 
 export default UpdateFlowNodesService;

@@ -40,6 +40,9 @@ class ConnectionFiles extends Model<ConnectionFiles> {
   @Column
   companyId: number;
 
+  @Column
+  uniqueCode: string;
+
   @HasMany(() => Whatsapp, "connectionFileId")
   whatsapps: Whatsapp[];
 
