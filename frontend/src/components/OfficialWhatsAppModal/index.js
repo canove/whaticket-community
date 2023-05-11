@@ -99,7 +99,9 @@ const OfficialWhatsAppModal = ({ open, onClose, whatsAppId, connectionId }) => {
 
 		const fetchFlows = async () => {
 			try {
-				const { data } = await api.get('flows');
+				const { data } = await api.get('/flows', {
+					params: { official: true }
+				});
 				setFlows(data);
 			} catch (err) {
 				toastError(err);

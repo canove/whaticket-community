@@ -184,7 +184,7 @@ export const update = async (
   const whatsappData = req.body;
   const { companyId } = req.user;
 
-  const { whatsapp, oldDefaultWhatsapp } = await UpdateWhatsAppService({
+  const { whatsapp, oldDefaultWhatsapp, isConnectionFileIdChanged } = await UpdateWhatsAppService({
     whatsappData,
     whatsappId,
     companyId
@@ -201,6 +201,13 @@ export const update = async (
       action: "update",
       whatsapp: oldDefaultWhatsapp
     });
+  }
+
+  if (isConnectionFileIdChanged) {
+    io.emit(`whatsapp${companyId}`, {
+      action: "delete",
+      whatsappId: +whatsappId
+    }); 
   }
 
   return res.status(200).json(whatsapp);
@@ -804,6 +811,7 @@ export const botMessageCustomer = async (
 ) => {
   const { companyId } = req.user;
   const { to, body, cation, contactName, session, id, type } = req.body;
+
   const fromMe = true;
   const bot = true;
 

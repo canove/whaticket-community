@@ -36,6 +36,7 @@ interface ExposedImportData {
   requiredItems: string;
   connectionType: string | boolean;
   connectionFileId: string | number;
+  connectionFileIds: string;
   officialTemplatesId: string | number;
   officialConnectionId: string | number;
 }
@@ -49,6 +50,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     requiredItems,
     connectionType,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
   }: ExposedImportData = req.body;
@@ -64,6 +66,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     requiredItems,
     connectionType,
     connectionFileId,
+    connectionFileIds,
     officialTemplatesId,
     officialConnectionId,
   });
@@ -135,6 +138,14 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
   const payload = req.body;
 
+  // const exposedImport = await StartExposedImportService({
+  //   exposedImportId,
+  //   companyId,
+  //   payload
+  // });
+
+  // return res.status(200).json({ message: "success" }); 
+
   const response = await TestRequiredExposedImportService({ exposedImportId, companyId, payload });
 
   if (!response) {
@@ -145,17 +156,20 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
 
     return res.status(200).json({ message: "request was received with success" }); 
   } else {
-    const { requiredItems, registersWithError, newPayload } = response;
+    const { requiredItems, registersWithError, newPayload, registersWithNonExistentCategory } = response;
 
-    await sendSqs({
-      MessageBody: JSON.stringify({ payload: newPayload, exposedImportId, companyId }),
-      QueueUrl: process.env.SQS_DISPATCH_QUEUE,
-    });
+    if (newPayload.length > 0) {
+      await sendSqs({
+        MessageBody: JSON.stringify({ payload: newPayload, exposedImportId, companyId }),
+        QueueUrl: process.env.SQS_DISPATCH_QUEUE,
+      });
+    }
 
     return res.status(200).json({ 
       message: "request was received with success, but some items weren't sent.",
       required: requiredItems,
-      payloadWithError: registersWithError
+      payloadWithError: registersWithError,
+      payloadWithNonExistentCategory: registersWithNonExistentCategory
     }); 
   }
 };

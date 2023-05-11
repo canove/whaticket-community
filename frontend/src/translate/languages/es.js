@@ -1392,6 +1392,19 @@ const messages = {
         none: "None",
       },
 
+      batch: {
+        title: "Lotes",
+        yes: "Sim",
+        no: "Não",
+        id: "ID",
+        status: "Status",
+        total: "Total",
+        processed: "Processados",
+        isBillet: "É boleto?",
+        actions: "Ações",
+        createdAt: "Criado em",
+      },
+
       backendErrors: {
         LOGGED_USERS_REACHED_THE_LIMIT: "Limite de contas logadas simultâneamente excedido.",
         ERR_SESSION_ENDED:
@@ -1435,6 +1448,7 @@ const messages = {
         ERR_NO_COMPANY_FOUND: "Error al eliminar empresa.",
         ERR__SHORTCUT_DUPLICATED_COMPANY: "Ya hay una empresa con este CNPJ.",
         ERR_NO_CATEGORY_FOUND : "¡Categoría de error no encontrada!",
+        ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
       },
     },
   },

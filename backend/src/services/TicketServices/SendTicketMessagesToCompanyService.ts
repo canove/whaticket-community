@@ -45,13 +45,13 @@ const SendTicketMessagesToCompanyService = async ({
       ],
       order: [["createdAt", "ASC"]],
     });
-    
+
     const userId = (messages[0] && messages[0].ticket) ? messages[0].ticket.userId : null;
 
     const user = await User.findOne({
-      where: { id: userId }
+        where: { id: userId }
     });
-
+    
     let reg = null;
   
     reg = await FileRegister.findOne({
@@ -105,7 +105,7 @@ const SendTicketMessagesToCompanyService = async ({
       "CNPJ_CPF": reg.documentNumber,
       "telefone": reg.phoneNumber,
       "contrato": reg.var1,
-      "dadosAdicionais": reg.var2,
+      "dadosAdicionais": user ? user.email : reg.var2,
       "dataEvento": formatDate(new Date()),
       "var1": reg.var1,
       "var2": reg.var2,

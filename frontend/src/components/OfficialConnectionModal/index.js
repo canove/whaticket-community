@@ -128,11 +128,10 @@ const OfficialConnectionModal = ({ open, onClose, connectionId }) => {
           await api.post(`/officialWhatsapps/`, connectionData);
           toast.success(i18n.t("officialPages.officialModal.createToast"));
         }
+        handleClose();
       } catch (err) {
         toastError(err);
       }
-
-      handleClose();
     };
 
     const handleConnectionTest = async () => {

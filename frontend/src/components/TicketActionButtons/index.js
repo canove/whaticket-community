@@ -106,6 +106,35 @@ const TicketActionButtons = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.reopen")}
 				</ButtonWithSpinner>
 			)}
+			{ticket.status === "inbot" &&
+				<>
+					<ButtonWithSpinner
+						loading={loading}
+						startIcon={<Replay />}
+						size="small"
+						onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
+					>
+						{"Abrir"}
+					</ButtonWithSpinner>
+					<Button
+						size="small"
+						variant="contained"
+						color="primary"
+						onClick= {handleOpenHistoricModal}
+					>
+						{i18n.t("historicTicket.button")}
+					</Button>
+					<IconButton onClick={handleOpenTicketOptionsMenu}>
+						<MoreVert />
+					</IconButton>
+					<TicketOptionsMenu
+						ticket={ticket}
+						anchorEl={anchorEl}
+						menuOpen={ticketOptionsMenuOpen}
+						handleClose={handleCloseTicketOptionsMenu}
+					/>
+				</>
+			}
 			{ticket.status === "open" && (
 				<>
 					<ButtonWithSpinner

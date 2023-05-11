@@ -46,6 +46,9 @@ class SessionMessages extends Model<SessionMessages> {
   @BelongsTo(() => Company)
   company: Company;
 
+  @Column
+  processedAt: Date;
+
   @CreatedAt
   createdAt: Date;
 

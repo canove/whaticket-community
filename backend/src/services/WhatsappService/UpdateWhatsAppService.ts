@@ -40,6 +40,7 @@ interface Request {
 interface Response {
   whatsapp: Whatsapp;
   oldDefaultWhatsapp: Whatsapp | null;
+  isConnectionFileIdChanged: boolean;
 }
 
 const UpdateWhatsAppService = async ({
@@ -125,6 +126,8 @@ const UpdateWhatsAppService = async ({
     throw new AppError(err);
   }
 
+  const isConnectionFileIdChanged = whatsapp.connectionFileId != connectionFileId;
+
   await whatsapp.update({
     name,
     status,
@@ -150,7 +153,7 @@ const UpdateWhatsAppService = async ({
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
 
-  return { whatsapp, oldDefaultWhatsapp };
+  return { whatsapp, oldDefaultWhatsapp, isConnectionFileIdChanged };
 };
 
 export default UpdateWhatsAppService;

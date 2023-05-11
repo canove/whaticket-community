@@ -14,6 +14,7 @@ interface UserData {
   lang?: string;
   queueIds?: number[];
   companyId?: string | number;
+  superAdmin?: boolean;
 }
 
 interface Request {
@@ -42,10 +43,11 @@ const UpdateUserService = async ({
   });
 
   const { email, password, profile, profileId, name, lang, queueIds = [] } = userData;
-  let { companyId } = userData;
+  let { companyId, superAdmin } = userData;
 
   if (userCompanyId !== 1) {
     companyId = userCompanyId;
+    superAdmin = false;
   }
 
   const user = await ShowUserService(userId, companyId);
@@ -63,7 +65,8 @@ const UpdateUserService = async ({
     profileId,
     lang,
     name,
-    companyId
+    companyId,
+    superAdmin
   });
 
   await user.$set("queues", queueIds);

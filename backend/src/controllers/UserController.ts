@@ -11,10 +11,12 @@ import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 import UpdateUserLanguageService from "../services/UserServices/UpdateUserLanguageService";
 import ListAllUsersService from "../services/UserServices/ListAllUsersService";
+import ListTransferUsersService from "../services/UserServices/ListTransferUsersService";
 
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
+  queueId: string | number;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -38,8 +40,20 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
   return res.json(users);
 };
 
+export const transferList = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam } = req.query as IndexQuery;
+  const { companyId } = req.user;
+
+  const users = await ListTransferUsersService({
+    searchParam,
+    companyId
+  });
+
+  return res.json(users);
+};
+
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, profileId, queueIds, companyId } = req.body;
+  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin } = req.body;
   const userCompanyId = req.user.companyId;
 
   // if (
@@ -59,7 +73,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       profile,
       profileId,
       queueIds,
-      companyId: companyId || userCompanyId
+      companyId: companyId || userCompanyId,
+      superAdmin
     });
 
     const io = getIO();

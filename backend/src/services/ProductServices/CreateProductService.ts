@@ -7,6 +7,8 @@ interface Request {
   penaltyMount: number;
   receivedMessageFee: number;
   sentMessageFee: number;
+  inboundSessionFee: number;
+  outboundSessionFee: number;
 }
 
 const CreateProductService = async ({
@@ -15,7 +17,9 @@ const CreateProductService = async ({
   monthlyInterestRate,
   penaltyMount,
   receivedMessageFee,
-  sentMessageFee
+  sentMessageFee,
+  inboundSessionFee,
+  outboundSessionFee,
 }: Request): Promise<Product> => {
   const product = await Product.create({
     name,
@@ -23,7 +27,9 @@ const CreateProductService = async ({
     monthlyInterestRate,
     penaltyMount,
     receivedMessageFee,
-    sentMessageFee
+    sentMessageFee,
+    inboundSessionFee,
+    outboundSessionFee,
   });
 
   return product;

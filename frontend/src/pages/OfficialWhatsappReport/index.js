@@ -25,7 +25,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import { format, parseISO } from "date-fns";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { Typography } from "@material-ui/core";
+import { Tooltip, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +38,39 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "scroll",
     ...theme.scrollbarStyles,
   },
+  tooltip: {
+		backgroundColor: "#f5f5f9",
+		color: "rgba(0, 0, 0, 0.87)",
+		fontSize: theme.typography.pxToRem(14),
+		border: "1px solid #dadde9",
+		maxWidth: 450,
+	},
+	tooltipPopper: {
+		textAlign: "center",
+	},
 }));
+
+const CustomToolTip = ({ title, content, children }) => {
+	const classes = useStyles();
+
+	return (
+		<Tooltip
+			arrow
+			classes={{
+				tooltip: classes.tooltip,
+				popper: classes.tooltipPopper,
+			}}
+			title={
+				<React.Fragment>
+					{title && <Typography gutterBottom color="inherit">{title}</Typography>}
+					{content && <Typography>{content}</Typography>}
+				</React.Fragment>
+			}
+		>
+			{children}
+		</Tooltip>
+	);
+};
 
 const OfficialWhatsappReport = () => {
   const classes = useStyles();
@@ -325,7 +357,14 @@ const OfficialWhatsappReport = () => {
                     <TableCell align="center">{report.status}</TableCell>
                     <TableCell align="center">{report.direction}</TableCell>
                     <TableCell align="center">{report.session}</TableCell>
-                    <TableCell align="center">{report.content}</TableCell>
+                    <TableCell align="center">
+                      <CustomToolTip
+                        title={""}
+                        content={report.content}
+                      >
+                        <div>{ (report.content && report.content.length > 30) ? report.content.slice(0, 30) + "..." : report.content }</div>
+                      </CustomToolTip>
+                    </TableCell>
                     <TableCell align="center">
                       {report.create_at_message
                         ? format(

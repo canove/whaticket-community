@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
@@ -23,6 +23,7 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   maxWidth: {
@@ -34,18 +35,23 @@ const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
+const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const history = useHistory();
+	const classes = useStyles();
+
+	const { i18n } = useTranslation();
+
 	const [options, setOptions] = useState([]);
 	const [queues, setQueues] = useState([]);
 	const [allQueues, setAllQueues] = useState([]);
+
 	const [loading, setLoading] = useState(false);
+
 	const [searchParam, setSearchParam] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [selectedQueue, setSelectedQueue] = useState('');
-	const classes = useStyles();
+
 	const { findAll: findAllQueues } = useQueues();
-	const { i18n } = useTranslation();
 
 	useEffect(() => {
 		const loadQueues = async () => {
@@ -53,8 +59,8 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 			setAllQueues(list);
 			setQueues(list);
 		}
+
 		loadQueues();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -66,10 +72,10 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
-					const { data } = await api.get("/users/", {
+					const { data } = await api.get("/users/transferList", {
 						params: { searchParam },
 					});
-					setOptions(data.users);
+					setOptions(data);
 					setLoading(false);
 				} catch (err) {
 					setLoading(false);
@@ -96,12 +102,12 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 			let data = {};
 
 			if (selectedUser) {
-				data.userId = selectedUser.id
+				data.userId = selectedUser.id;
 				data.queueId = null;
 			}
 
-			if (selectedQueue && selectedQueue !== null) {
-				data.queueId = selectedQueue
+			if (selectedQueue) {
+				data.queueId = selectedQueue;
 
 				if (!selectedUser) {
 					data.status = 'pending';
@@ -131,11 +137,11 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 						getOptionLabel={option => `${option.name}`}
 						onChange={(e, newValue) => {
 							setSelectedUser(newValue);
+							setSelectedQueue('');
 							if (newValue != null && Array.isArray(newValue.queues)) {
 								setQueues(newValue.queues);
 							} else {
 								setQueues(allQueues);
-								setSelectedQueue('');
 							}
 						}}
 						options={options}
@@ -144,13 +150,11 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 						autoHighlight
 						noOptionsText={i18n.t("transferTicketModal.noOptions")}
 						loading={loading}
-						disabled={selectedQueue}
 						renderInput={params => (
 							<TextField
 								{...params}
 								label={i18n.t("transferTicketModal.fieldLabel")}
 								variant="outlined"
-								disabled={selectedQueue}
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
 								InputProps={{
@@ -173,10 +177,9 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 							value={selectedQueue}
 							onChange={(e) => setSelectedQueue(e.target.value)}
 							label={i18n.t("transferTicketModal.fieldQueuePlaceholder")}
-							disabled={selectedUser}
 						>
 							<MenuItem value={''}>&nbsp;</MenuItem>
-							{queues.map((queue) => (
+							{queues && queues.map((queue) => (
 								<MenuItem key={queue.id} value={queue.id}>{queue.name}</MenuItem>
 							))}
 						</Select>

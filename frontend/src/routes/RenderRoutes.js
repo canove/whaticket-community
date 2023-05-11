@@ -48,6 +48,7 @@ import ContactBlacklist from "../pages/ContactBlacklist";
 import Supervisor from "../pages/Supervisor";
 import SatisfactionSurvey from "../pages/SatisfactionSurvey";
 import Packages from "../pages/Packages";
+import Batch from "../pages/Batch";
 
 const pages = {
   "Dashboard": Dashboard,
@@ -93,10 +94,11 @@ const pages = {
   "Supervisor": Supervisor,
   "Satisfaction Survey": SatisfactionSurvey,
   "Packages": Packages,
+  "Batch": Batch
 };
 
 const RenderRoutes = () => {
-  const { isAuth, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [menus, setMenus] = useState([]);
 
   useEffect(() => {
@@ -110,7 +112,7 @@ const RenderRoutes = () => {
     };
 
     fetchMenus();
-  }, [isAuth]);
+  }, [user]);
 
   const getComponent = (name) => {
     return pages[name];
@@ -118,8 +120,7 @@ const RenderRoutes = () => {
 
   return (
     <>
-      {isAuth &&
-        menus &&
+      { menus &&
         menus.map((menu) => {
           if (menu.name === "Dashboard") {
             return (

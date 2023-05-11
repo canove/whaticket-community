@@ -7,6 +7,7 @@ import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 import { removePhoneNumberWith9Country, preparePhoneNumber9Digit, removePhoneNumber9Digit,removePhoneNumberCountry, removePhoneNumber9DigitCountry } from "../../utils/common";
 import { createClient } from 'redis';
+import ConnectionFiles from "../../database/models/ConnectionFile";
 
 interface Request {
   exposedImportId: string;
@@ -112,6 +113,7 @@ const StartExposedImportService = async ({
 
   if (Array.isArray(payload)) {
     let registersToInsert = [];
+    let categoryDictionary = {};
 
     for (const obj of payload) {
       try {
@@ -127,7 +129,10 @@ const StartExposedImportService = async ({
         const var4 = getRelationValue(mapping.var4, obj);
         const var5 = getRelationValue(mapping.var5, obj);
         const whatsappName = getRelationValue(mapping.phoneNumberFrom, obj);
+        const categoryName = getRelationValue(mapping.category, obj);
+
         let whatsappId = null;
+        let connectionFileId = null;
 
         if (whatsappName) {
           const whatsapp = await Whatsapp.findOne({
@@ -135,6 +140,26 @@ const StartExposedImportService = async ({
           });
 
           whatsappId = whatsapp ? whatsapp.id : null;
+        }
+
+        if (categoryName) {
+          if (!categoryDictionary[categoryName]) {
+            categoryDictionary[categoryName] = await ConnectionFiles.findOne({
+              where: { 
+                [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+                companyId 
+              }
+            });
+          }
+
+          // const category = await ConnectionFiles.findOne({
+          //   where: { 
+          //     [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+          //     companyId 
+          //   }
+          // });
+
+          connectionFileId = categoryDictionary[categoryName] ? categoryDictionary[categoryName].id : null;
         }
 
         const register = {
@@ -151,7 +176,8 @@ const StartExposedImportService = async ({
           var4,
           var5,
           companyId,
-          whatsappId
+          whatsappId,
+          connectionFileId
         };
 
         registersToInsert.push(register);
@@ -232,7 +258,10 @@ const StartExposedImportService = async ({
     const var4 = getRelationValue(mapping.var4, payload);
     const var5 = getRelationValue(mapping.var5, payload);
     const whatsappName = getRelationValue(mapping.phoneNumberFrom, payload);
+    const categoryName = getRelationValue(mapping.category, payload);
+
     let whatsappId = null;
+    let connectionFileId = null;
 
     if (whatsappName) {
       const whatsapp = await Whatsapp.findOne({
@@ -240,6 +269,17 @@ const StartExposedImportService = async ({
       });
 
       whatsappId = whatsapp ? whatsapp.id : null;
+    }
+
+    if (categoryName) {
+      const category = await ConnectionFiles.findOne({
+        where: { 
+          [Op.or]: [ { name: categoryName }, { uniqueCode: categoryName } ],
+          companyId 
+        }
+      });
+
+      connectionFileId = category ? category.id : null;
     }
 
     const register = {
@@ -256,7 +296,8 @@ const StartExposedImportService = async ({
       var4,
       var5,
       companyId,
-      whatsappId
+      whatsappId,
+      connectionFileId,
     }
 
     if (client) {

@@ -908,7 +908,7 @@ const Connections = () => {
 									<TableCell align="center">
 										{i18n.t("Business")}
 									</TableCell>
-									{ user.email === 'r64bits@gmail.com' &&
+									{ user.superAdmin &&
 										<TableCell align="center">
 											Qualidade
 										</TableCell>
@@ -920,7 +920,7 @@ const Connections = () => {
 							</TableHead>
 							<TableBody>
 								{loading ? (
-									<TableRowSkeleton columns={user.email === 'r64bits@gmail.com' ? 9 : 8} />
+									<TableRowSkeleton columns={user.superAdmin ? 9 : 8} />
 								) : (
 									<>
 										{whatsApps?.length > 0 &&
@@ -943,7 +943,7 @@ const Connections = () => {
 														{format(parseISO(whatsApp.createdAt), "dd/MM/yy HH:mm")}
 													</TableCell>
 													<TableCell align="center">{clickOn(whatsApp.business)}</TableCell>
-													{ user.email === 'r64bits@gmail.com' &&
+													{ user.superAdmin &&
 														<TableCell align="center">
 															<div style={{ display: "flex", flexWrap: "nowrap", justifyContent: "center" }}>
 																{renderQuality(whatsApp.currentTriggerQuantity)}
@@ -952,7 +952,7 @@ const Connections = () => {
 													}
 													<TableCell align="center">
 														<div style={{ display: "flex", flexWrap: "nowrap"}}>
-															{ user.email === 'r64bits@gmail.com' &&
+															{ user.superAdmin &&
 																<>
 																	{ whatsApp.maturing &&
 																		<CustomToolTip title={"Pausar maturação"}>

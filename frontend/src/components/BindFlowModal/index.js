@@ -100,12 +100,11 @@ const BindFlowModal = ({ open, onClose, connectionFile }) => {
 
     try {
       await api.post("/connectionFiles/bind/", body);
-      toast.success("Fluxo alterado com sucesso.");
+      toast.success("Fluxos alterados com sucesso.");
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   return (

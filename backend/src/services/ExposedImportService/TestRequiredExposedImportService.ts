@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import ExposedImport from "../../database/models/ExposedImport";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
+import ConnectionFiles from "../../database/models/ConnectionFile";
 
 interface Request {
   exposedImportId: string;
@@ -66,6 +67,7 @@ interface Response {
   requiredItems: string[];
   registersWithError: string[];
   newPayload: string[];
+  registersWithNonExistentCategory: string[];
 }
 
 const TestRequiredExposedImportService = async ({
@@ -93,7 +95,10 @@ const TestRequiredExposedImportService = async ({
     if (Array.isArray(payload)) {
       let newPayload = [];
       let registersWithError = [];
+      let registersWithNonExistentCategory = [];
       let newRequiredItems = [];
+
+      let categoryDictionary = {};
 
       for (const obj of payload) {
         try {
@@ -109,6 +114,8 @@ const TestRequiredExposedImportService = async ({
           const var4 = getRelationValue(mapping.var4, obj);
           const var5 = getRelationValue(mapping.var5, obj);
           const phoneNumberFrom = getRelationValue(mapping.phoneNumberFrom, obj);
+          const category = getRelationValue(mapping.category, obj);
+
           // let whatsappId = null;
 
           // if (phoneNumberFrom) {
@@ -134,7 +141,9 @@ const TestRequiredExposedImportService = async ({
             var5,
             companyId,
             phoneNumberFrom,
-            // whatsappId
+            category,
+            // whatsappId,
+            // connectionFileId,
           };
 
           const requiredItem = requiredItems.find((item) => (!register[item] || register[item] === 'undefined' || register[item] === '""'));
@@ -154,21 +163,38 @@ const TestRequiredExposedImportService = async ({
             continue;
           }
 
+          if (requiredItems.includes("category")) {
+            if (!categoryDictionary[category]) {
+              categoryDictionary[category] = await ConnectionFiles.findOne({
+                where: { 
+                  [Op.or]: [ { name: category }, { uniqueCode: category } ],
+                  companyId 
+                }
+              });
+            }
+    
+            if (!categoryDictionary[category]) {
+              registersWithNonExistentCategory.push(obj);
+              continue;
+            }
+          }
+
           newPayload.push(obj);
         } catch (err) {
           console.log(err);
         }
       }
 
-      if (registersWithError.length > 0) {
+      if (registersWithError.length > 0 || registersWithNonExistentCategory.length > 0) {
         return {
           requiredItems: newRequiredItems,
-          registersWithError: registersWithError,
-          newPayload: newPayload
+          registersWithError,
+          newPayload,
+          registersWithNonExistentCategory,
         };
-      } else {
-        return null;
       }
+
+      return null;
     } else {
       const name = getRelationValue(mapping.name, payload);
       const phoneNumber = getRelationValue(mapping.phoneNumber, payload);
@@ -182,6 +208,8 @@ const TestRequiredExposedImportService = async ({
       const var4 = getRelationValue(mapping.var4, payload);
       const var5 = getRelationValue(mapping.var5, payload);
       const phoneNumberFrom = getRelationValue(mapping.phoneNumberFrom, payload);
+      const category = getRelationValue(mapping.category, payload);
+
       // let whatsappId = null;
 
       // if (phoneNumberFrom) {
@@ -207,7 +235,9 @@ const TestRequiredExposedImportService = async ({
         var5,
         companyId,
         phoneNumberFrom,
+        category,
         // whatsappId,
+        // connectionFileId,
       }
 
       let requiredItem = "";
@@ -221,6 +251,17 @@ const TestRequiredExposedImportService = async ({
       });
 
       if (requiredItem) throw new AppError(`${requiredItem} is required.`);
+
+      if (requiredItems.includes("category")) {
+        const categoryExists = await ConnectionFiles.findOne({
+          where: { 
+            [Op.or]: [ { name: category }, { uniqueCode: category } ],
+            companyId 
+          }
+        });
+
+        if (!categoryExists) throw new AppError(`category ${category} do not exists.`);
+      }
     }
   }
 

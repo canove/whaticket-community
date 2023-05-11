@@ -228,6 +228,8 @@ const Products = () => {
                             <TableCell align="center">{i18n.t("product.grid.tripCostValue")}</TableCell>
                             <TableCell align="center">{"Valor por Mensagem Recebida"}</TableCell>
                             <TableCell align="center">{"Valor por Mensagem Enviada"}</TableCell>
+                            <TableCell align="center">{"Custo por Sessão (inbound)"}</TableCell>
+                            <TableCell align="center">{"Custo por Sessão (outbound)"}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.monthlyInterestRate")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.penaltyMount")}</TableCell>
                             <TableCell align="center">{i18n.t("product.grid.actions")}</TableCell>
@@ -241,6 +243,8 @@ const Products = () => {
                                 <TableCell align="center">{formatToBRL(product.triggerFee)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.receivedMessageFee)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.sentMessageFee)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.inboundSessionFee)}</TableCell>
+                                <TableCell align="center">{formatToBRL(product.outboundSessionFee)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.monthlyInterestRate)}</TableCell>
                                 <TableCell align="center">{formatToBRL(product.penaltyMount)}</TableCell>
                                 <TableCell align="center">

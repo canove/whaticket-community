@@ -13,6 +13,7 @@ import Company from "../../database/models/Company";
 import { decrypt, encrypt } from "../../utils/encriptor";
 import Packages from "../../database/models/Packages";
 import Pricing from "../../database/models/Pricing";
+import ListCompanySettingsService from "../SettingServices/ListCompanySettingsService";
 
 const firebase = require("../../utils/Firebase");
 
@@ -30,8 +31,8 @@ interface Request {
   email: string;
   password: string;
   company: string;
-  userIp: string;
   retry: boolean;
+  userIp: string;
 }
 
 interface Response {
@@ -45,8 +46,8 @@ const AuthUserService = async ({
   email,
   password,
   company,
-  userIp,
-  retry
+  retry,
+  userIp
 }: Request): Promise<Response> => {
   const whereCondition = {
     "$Company.name$": Sequelize.where(
@@ -75,6 +76,13 @@ const AuthUserService = async ({
 
   if (!(await user.checkPassword(password))) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+  }
+
+  const settings = await ListCompanySettingsService(companyDb.id);
+  const allowedIPs = settings.allowedIPs;
+
+  if (allowedIPs.length > 0 && !allowedIPs.includes(userIp) && !user.superAdmin) {
+      throw new AppError("ERR_IP_NOT_ALLOWED");
   }
 
   const token = createAccessToken(user);
@@ -126,8 +134,8 @@ const AuthUserService = async ({
         companyId: user.companyId,
         email: user.email,
         isAuth: true,
-        origin: userIp,
-        token: encrypt(token)
+        token: encrypt(token),
+        userIp
       },
     );
   }

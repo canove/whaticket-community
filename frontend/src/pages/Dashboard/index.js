@@ -929,7 +929,7 @@ const Dashboard = () => {
               </Paper>
             </Grid>
           }
-          { user.companyId !== 1 && user.email === 'r64bits@gmail.com' &&
+          { user.companyId !== 1 && user.superAdmin &&
             <Grid item xs={12}>
               <Paper className={classes.paperTime}>
                 <Typography component="h3" variant="h6" color="primary">

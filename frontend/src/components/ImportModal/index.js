@@ -211,10 +211,10 @@ const ImportModal = ({ open, onClose }) => {
         }
 
         await api.post("file/upload", formData);
+        handleClose();
       } catch (err) {
         toastError(err);
       }
-      handleClose();
     }
     setLoading(false);
   };

@@ -12,6 +12,7 @@ import ConnectionFiles from "../../database/models/ConnectionFile";
 import BillingControls from "../../database/models/BillingControls";
 import Pricing from "../../database/models/Pricing";
 import Product from "../../database/models/Products";
+import Packages from "../../database/models/Packages";
 
 interface Request {
     companyId?: string;
@@ -94,7 +95,13 @@ const ListOperationsService = async ({
                         as: "product",
                         attributes: ["monthlyFee"],
                         required: false,
-                    }
+                    },
+                    {
+                        model: Packages,
+                        as: "package",
+                        attributes: ["monthlyFee"],
+                        required: false,
+                    },
                 ]
             }
         ],
@@ -161,7 +168,7 @@ const ListOperationsService = async ({
             where: whereConditionFileRegister,
             attributes: [
               [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
-              [ Sequelize.fn('sum', Sequelize.literal("sentAt IS NOT NULL AND msgWhatsId IS NOT NULL")), 'sent' ],
+              [ Sequelize.fn('sum', Sequelize.literal("(sentAt IS NOT NULL AND msgWhatsId IS NOT NULL) OR (fileId IS NULL AND exposedImportId IS NULL AND integratedImportId IS NULL)")), 'sent' ],
               [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND (haveWhatsapp = 0 OR msgWhatsId IS NULL)")), 'noWhats' ],
               [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL")), 'queue' ],
             ],

@@ -151,10 +151,10 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 			try {
 				await api.post('/pricings/', pricingData);
 				toast.success(i18n.t("pricing.confirmation.create"));
+				handleClose();
 			} catch (err) {
 				toastError(err);
 			}
-			handleClose();
 		}
 	};
 
@@ -170,11 +170,10 @@ const ProductModal = ({ open, onClose, pricingId }) => {
 		try {
 			await api.put(`/pricings/${pricingId}`, pricingData);
 			toast.success(i18n.t("pricing.confirmation.edit"));
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
-
-		handleClose();
 	}
 
 	const handleCompanyChange = (e) => {

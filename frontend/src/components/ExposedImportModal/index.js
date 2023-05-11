@@ -86,6 +86,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     var4: "",
     var5: "",
     phoneNumberFrom: "",
+    category: "",
   };
   const [mapping, setMapping] = useState(initialMapping);
   const [mappingValues, setMappingValues] = useState(initialMapping);
@@ -107,7 +108,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   const [selectedOffTemplate, setSelectedOffTemplate] = useState("");
 
   const [connectionFiles, setConnectionFiles] = useState([]);
-  const [selectedConnectionFile, setSelectedConnectionFile] = useState("Nenhum");
+  const [selectedConnectionFile, setSelectedConnectionFile] = useState([]);
 
   const initialRequiredItems = {
     name: false,
@@ -122,6 +123,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     var4: false,
     var5: false,
     phoneNumberFrom: false,
+    category: false,
   };
   const [requiredItems, setRequiredItems] = useState(initialRequiredItems);
 
@@ -136,7 +138,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         setTemplate(data.templateId);
         setSelectedOffTemplate(data.officialTemplatesId);
         setOffConnection(data.officialConnectionId);
-        setSelectedConnectionFile(data.connectionFileId);
+
+        let connectionFileIds = data.connectionFileIds ? data.connectionFileIds.split(",") : [];
+        connectionFileIds = connectionFileIds.map(idString => parseInt(idString));
+        setSelectedConnectionFile(connectionFileIds);
 
         let newConnections = data.whatsappIds ? data.whatsappIds.split(",") : ["Todos"];
 
@@ -294,7 +299,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     setConnections([]);
     setOffConnection("");
     setSelectedOffTemplate("");
-    setSelectedConnectionFile("Nenhum");
+    setSelectedConnectionFile([]);
 
     setRequiredItems(initialRequiredItems);
 
@@ -311,19 +316,19 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     const importData = {
       name,
       mapping: JSON.stringify(mapping),
-      template: template,
+      template: template ? template : null,
       connections: connections,
       connectionType,
       officialConnectionId: offConnection ? offConnection : null,
       officialTemplatesId: selectedOffTemplate ? selectedOffTemplate : null,
       requiredItems: required.length > 0 ? JSON.stringify(required) : null,
-      connectionFileId: selectedConnectionFile !== "Nenhum" ? selectedConnectionFile : null,
+      connectionFileIds: selectedConnectionFile.length > 0 ? selectedConnectionFile.toString() : null,
     };
 
-    if ((connectionType && !importData.officialTemplatesId) || (!connectionType && !template)) {
-      toast.error("Template is required.");
-      return;
-    }
+    // if ((connectionType && !importData.officialTemplatesId) || (!connectionType && !template)) {
+    //   toast.error("Template is required.");
+    //   return;
+    // }
 
     try {
       if (exposedImportId) {
@@ -333,11 +338,10 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
         await api.post("/exposedImports/", importData);
         toast.success(i18n.t("exposedImports.modal.createSuccess"));
       }
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   };
 
   useEffect(() => {
@@ -354,6 +358,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       handleRelationChange(mapping.var4, "var4");
       handleRelationChange(mapping.var5, "var5");
       handleRelationChange(mapping.phoneNumberFrom, "phoneNumberFrom");
+      handleRelationChange(mapping.category, "category");
     }
   }, [payload]);
 
@@ -469,7 +474,19 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   }
 
   const handleChangeConnectionFile = (e) => {
-    setSelectedConnectionFile(e.target.value);
+    const value = e.target.value;
+    const noneIndex = value.indexOf("Nenhum");
+    console.log(value);
+    if (noneIndex !== -1 && noneIndex === value.length - 1) {
+      setSelectedConnectionFile([]);
+    } else {
+      if (noneIndex !== -1) {
+        value.splice(noneIndex, 1);
+      }
+
+      setSelectedConnectionFile(typeof value === "string" ? value.split(",") : value);
+    }
+
     setConnections([]);
   }
 
@@ -616,6 +633,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                 onChange={(e) => {
                   handleChangeConnectionFile(e);
                 }}
+                multiple
                 style={{ width: "100%" }}
               >
                 <MenuItem value={"Nenhum"}>
@@ -656,7 +674,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                     if (
                       whats.official === connectionType &&
                       whats.status === "CONNECTED" &&
-                      (selectedConnectionFile === "Nenhum" || whats.connectionFileId === selectedConnectionFile)
+                      (selectedConnectionFile.length === 0 || selectedConnectionFile.includes(whats.connectionFileId))
                     ) {
                       return (
                         <MenuItem key={whats.id} value={whats.id}>
@@ -1338,6 +1356,53 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                 <FormControlLabel
                   label={i18n.t("exposedImports.modal.required")}
                   control={<Checkbox color="primary" checked={requiredItems["phoneNumberFrom"]} onChange={(e) => { handleChangeRequiredItem(e, "phoneNumberFrom") }} />}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{
+                    width: "50%",
+                    margin: "0 5px 5px 10px",
+                  }}
+                >
+                  <TextField
+                    as={TextField}
+                    label="Categoria"
+                    value={mappingValues.category}
+                    name="category"
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    disabled
+                  />
+                </div>
+                <div
+                  style={{
+                    width: "50%",
+                    margin: "0 10px 5px 5px",
+                  }}
+                >
+                  <TextField
+                    as={TextField}
+                    label="Categoria Relation"
+                    value={mapping.category}
+                    name="categoryRelation"
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    onChange={(e) => {
+                      handleRelationChange(e.target.value, "category");
+                    }}
+                  />
+                </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["category"]} onChange={(e) => { handleChangeRequiredItem(e, "category") }} />}
                 />
               </div>
             </div>

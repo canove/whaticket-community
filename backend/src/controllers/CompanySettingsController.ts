@@ -13,7 +13,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
     const { companyId } = req.user;
-    const { days, hours, message, useWorkTime } = req.body;
+    const { days, hours, message, useWorkTime, allowedIPs } = req.body;
   
     try {
         const client = createClient({
@@ -23,7 +23,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         client.on('error', err => console.log('Redis Client Error', err));
         await client.connect();
     
-        await client.set(`settings-${companyId}`, JSON.stringify({ days, hours, message, useWorkTime }));
+        await client.set(`settings-${companyId}`, JSON.stringify({ days, hours, message, useWorkTime, allowedIPs }));
     
         await client.disconnect();
     } catch (err: any) {

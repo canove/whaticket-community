@@ -57,6 +57,8 @@ const ProductModal = ({ open, onClose, productId }) => {
 	const [penaltyMount, setPenaltyMount] = useState(0.0);
 	const [receivedMessageFee, setReceivedMessageFee] = useState(0.0); 
 	const [sentMessageFee, setSentMessageFee] = useState(0.0);
+	const [inboundSessionFee, setInboundSessionFee] = useState(0.0);
+	const [outboundSessionFee, setOutboundSessionFee] = useState(0.0);
 	
 	const handleClose = () => {
 		setName("");
@@ -65,6 +67,8 @@ const ProductModal = ({ open, onClose, productId }) => {
 		setPenaltyMount(0.0);
 		setReceivedMessageFee(0.0);
 		setSentMessageFee(0.0);
+		setInboundSessionFee(0.0);
+		setOutboundSessionFee(0.0);
 		onClose();
 	};
 
@@ -97,6 +101,16 @@ const ProductModal = ({ open, onClose, productId }) => {
 		setSentMessageFee(value);
 	};
 
+	const handleInboundSessionFee = (e, value) =>{
+		e.preventDefault();
+		setInboundSessionFee(value);
+	};
+
+	const handleOutboundSessionFee = (e, value) =>{
+		e.preventDefault();
+		setOutboundSessionFee(value);
+	};
+
 	useEffect(() => {
 		const fetchProduct = async () => {
 			if (!productId) return;
@@ -108,6 +122,8 @@ const ProductModal = ({ open, onClose, productId }) => {
 				setPenaltyMount(data.penaltyMount || 0.0);
 				setReceivedMessageFee(data.receivedMessageFee || 0.0);
 				setSentMessageFee(data.sentMessageFee || 0.0);
+				setInboundSessionFee(data.inboundSessionFee || 0.0);
+				setOutboundSessionFee(data.outboundSessionFee || 0.0);
 			} catch (err) {
 				toastError(err);
 			}
@@ -122,7 +138,9 @@ const ProductModal = ({ open, onClose, productId }) => {
 			monthlyInterestRate: monthlyInterestRate,
 			penaltyMount: penaltyMount,
 			receivedMessageFee: receivedMessageFee,
-			sentMessageFee: sentMessageFee
+			sentMessageFee: sentMessageFee,
+			inboundSessionFee: inboundSessionFee,
+			outboundSessionFee: outboundSessionFee,
 		};
 
 		 try {
@@ -133,10 +151,10 @@ const ProductModal = ({ open, onClose, productId }) => {
                 await api.post("/products/", productData);
                 toast.success(i18n.t("product.confirmation.created"));
             }
-            } catch (err) {
-                toastError(err);
+			handleClose();
+        } catch (err) {
+            toastError(err);
         }
-        handleClose();
 	};
 
 	const currencyConfig = {
@@ -223,6 +241,24 @@ const ProductModal = ({ open, onClose, productId }) => {
 						name="sentMessageFee"
 						value={sentMessageFee}
 						onChange={handleSentMessageFee}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+                  	/>
+					<Typography variant="subtitle1">{"Valor por Sessão (inbound)"}</Typography>
+					<IntlCurrencyInput
+						name="inboundSessionFee"
+						value={inboundSessionFee}
+						onChange={handleInboundSessionFee}
+						config={currencyConfig}
+						currency="BRL"
+						style={{width:"100%", padding:"10px", fontSize:"16px"}}
+                  	/>
+					<Typography variant="subtitle1">{"Valor por Sessão (outbound)"}</Typography>
+					<IntlCurrencyInput
+						name="outboundSessionFee"
+						value={outboundSessionFee}
+						onChange={handleOutboundSessionFee}
 						config={currencyConfig}
 						currency="BRL"
 						style={{width:"100%", padding:"10px", fontSize:"16px"}}

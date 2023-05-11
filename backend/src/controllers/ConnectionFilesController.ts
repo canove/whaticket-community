@@ -11,6 +11,7 @@ import ShowConnectionFileService from "../services/ConnectionFileService/ShowCon
 import DeleteConnectionFileService from "../services/ConnectionFileService/DeleteConnectionFileService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import BindFlowToConnectionFilesService from "../services/ConnectionFileService/BindFlowToConnectionFilesService";
+import BindQueueToConnectionFilesService from "../services/ConnectionFileService/BindQueueToConnectionFilesService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
@@ -41,7 +42,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       iconLink = await uploadToS3(fileName, companyId, buffer);
     }
 
-    const { name, icon, triggerInterval, greetingMessage, farewellMessage } = fields;
+    const { name, icon, triggerInterval, greetingMessage, farewellMessage, uniqueCode } = fields;
 
     const connectionFile = await CreateConnectionFileService({
       name,
@@ -50,6 +51,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       triggerInterval,
       greetingMessage, 
       farewellMessage,
+      uniqueCode,
     });
 
     const io = getIO();
@@ -67,6 +69,15 @@ export const bind = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
   await BindFlowToConnectionFilesService({ connectionFileId, flowId, companyId });
+
+  return res.status(200).json("OK");
+};
+
+export const bindQueue = async (req: Request, res: Response): Promise<Response> => {
+  const { connectionFileId, queueId } = req.body;
+  const { companyId } = req.user;
+
+  await BindQueueToConnectionFilesService({ connectionFileId, queueId, companyId });
 
   return res.status(200).json("OK");
 };
@@ -108,7 +119,7 @@ export const update = async (
       iconLink = await uploadToS3(fileName, companyId, buffer);
     }
 
-    const { name, icon, triggerInterval, greetingMessage, farewellMessage, } = fields;
+    const { name, icon, triggerInterval, greetingMessage, farewellMessage, uniqueCode } = fields;
 
     const connectionFileData = {
       name, 
@@ -116,6 +127,7 @@ export const update = async (
       icon: file ? iconLink : icon,
       greetingMessage, 
       farewellMessage,
+      uniqueCode,
     }
 
     const connectionFile = await UpdateConnectionFileService({

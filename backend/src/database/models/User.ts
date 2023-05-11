@@ -56,6 +56,9 @@ class User extends Model<User> {
   lang: string;
 
   @Column
+  superAdmin: boolean;
+
+  @Column
   deletedAt: Date;
 
   @CreatedAt

@@ -100,10 +100,10 @@ const CategoryModal = ({ open, onClose, categoryId }) => {
           await api.post(`/category/`, categoryData);
           toast.success(i18n.t("category.confirmation.addMsg"));
         }
+        handleClose();
       } catch (err) {
         toastError(err);
       }
-      handleClose();
     };
 
     return (

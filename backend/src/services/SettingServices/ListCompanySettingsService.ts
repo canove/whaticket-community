@@ -6,7 +6,16 @@ interface Response {
   hours: string; 
   message: string; 
   useWorkTime: boolean;
+  allowedIPs: string[];
 }
+
+const initialSettings = { 
+  days: [false,false,false,false,false,false,false], 
+  hours: "", 
+  message: "", 
+  useWorkTime: false,
+  allowedIPs: [],
+};
 
 const ListCompanySettingsService = async (
   companyId: number | string
@@ -28,7 +37,7 @@ const ListCompanySettingsService = async (
       throw new AppError(err);
   }
 
-  if (!settings) settings = { days: [false,false,false,false,false,false,false], hours: "", message: "", useWorkTime: false };
+  if (!settings) settings = initialSettings;
 
   return JSON.parse(settings);
 };

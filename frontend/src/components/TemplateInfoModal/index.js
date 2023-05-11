@@ -141,11 +141,10 @@ const TemplateInfoModal = ({ open, onClose, templateId }) => {
     try {
       await api.put(`/whatsappTemplate/${templateId}`, body);
       toast.success("Template atualizado com sucesso!");
+      handleClose();
     } catch (err) {
       toastError(err);
     }
-
-    handleClose();
   }
 
   const handleHeaderChange = (e, param) => {

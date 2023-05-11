@@ -8,6 +8,8 @@ interface ProductData {
   penaltyMount: number;
   receivedMessageFee: number;
   sentMessageFee: number;
+  inboundSessionFee: number;
+  outboundSessionFee: number;
 }
 
 interface Request {
@@ -27,7 +29,9 @@ const UpdateProductService = async ({
     monthlyInterestRate,
     penaltyMount,
     receivedMessageFee,
-    sentMessageFee
+    sentMessageFee,
+    inboundSessionFee,
+    outboundSessionFee,
   } = productData;
 
   await product.update({
@@ -36,7 +40,9 @@ const UpdateProductService = async ({
     monthlyInterestRate,
     penaltyMount,
     receivedMessageFee,
-    sentMessageFee
+    sentMessageFee,
+    inboundSessionFee,
+    outboundSessionFee,
   });
 
   await product.reload();
