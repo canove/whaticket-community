@@ -17,6 +17,7 @@ interface UserData {
   companyId?: string | number;
   superAdmin?: boolean;
   nickname?: string;
+  useNickname?: boolean;
 }
 
 interface Request {
@@ -44,7 +45,7 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, profileId, name, lang, nickname, queueIds = [] } = userData;
+  const { email, password, profile, profileId, name, lang, nickname, useNickname, queueIds = [] } = userData;
   let { companyId, superAdmin } = userData;
 
   if (userCompanyId !== 1) {
@@ -70,6 +71,7 @@ const UpdateUserService = async ({
     companyId,
     superAdmin,
     nickname,
+    useNickname,
   });
 
   await user.$set("queues", queueIds);

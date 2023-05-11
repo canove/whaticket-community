@@ -74,7 +74,8 @@ const UserModal = ({ open, onClose, userId }) => {
 		email: "",
 		password: "",
 		profile: "user",
-		profileId: ""
+		profileId: "",
+		useNickname: false,
 	};
 
 	const UserSchema = Yup.object().shape({
@@ -221,7 +222,7 @@ const UserModal = ({ open, onClose, userId }) => {
 						}, 400);
 					}}
 				>
-					{({ touched, errors, isSubmitting }) => (
+					{({ values, touched, errors, isSubmitting, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
 								<div className={classes.multFieldLine}>
@@ -273,6 +274,20 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 										autoComplete="off"
 										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<FormControlLabel
+										label={"Usar apelido como assinatura."}
+										name="useNickname"
+										control={
+											<Checkbox 
+												color="primary" 
+												name="useNickname"
+												checked={values.useNickname} 
+												onChange={() => setFieldValue("useNickname", !values.useNickname)} 
+											/>
+										}
 									/>
 								</div>
 								<div className={classes.multFieldLine}>

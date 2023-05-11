@@ -26,6 +26,7 @@ const ShowUserService = async (
       "companyId",
       "superAdmin",
       "nickname",
+      "useNickname",
     ],
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] },

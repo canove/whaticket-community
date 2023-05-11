@@ -62,6 +62,9 @@ class User extends Model<User> {
   superAdmin: boolean;
 
   @Column
+  useNickname: boolean;
+
+  @Column
   deletedAt: Date;
 
   @CreatedAt

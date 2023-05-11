@@ -17,7 +17,7 @@ const ListAllUsersService = async ({
 
   const users = await User.findAll({
     where: whereCondition,
-    attributes: ["nickname", "name", "id"],
+    attributes: ["nickname", "name", "id", "useNickname"],
     order: [["createdAt", "DESC"]],
   });
 

@@ -17,6 +17,7 @@ interface Request {
   companyId: number | string;
   superAdmin?: boolean;
   nickname?: string;
+  useNickname?: boolean;
 }
 
 interface Response {
@@ -35,7 +36,8 @@ const CreateUserService = async ({
   profileId,
   companyId,
   superAdmin = false,
-  nickname
+  nickname,
+  useNickname,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().required().min(2),
@@ -71,7 +73,8 @@ const CreateUserService = async ({
       profileId,
       companyId,
       superAdmin,
-      nickname
+      nickname,
+      useNickname,
     },
     { include: ["queues"] }
   );
