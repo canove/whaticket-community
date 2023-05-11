@@ -376,11 +376,8 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 										</MenuItem>
 										{whatsApps &&
 											whatsApps.map((whats) => {
-												const whatsQueue = whats.queues.length > 0 ? whats.queues[0] : null;
-												const queueCondition = (!queueId || (queueId && whatsQueue && whatsQueue.id === queueId));
-
 												if (official) {
-													if (whats.official === true && whats.deleted === false && queueCondition) {
+													if (whats.official === true && whats.deleted === false) {
 														return (
 															<MenuItem key={whats.id} value={whats.id}>
 																{whats.name}
@@ -388,7 +385,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 														);
 													}
 												} else {
-													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false && queueCondition) {
+													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false) {
 														return (
 															<MenuItem key={whats.id} value={whats.id}>
 																{whats.name}
