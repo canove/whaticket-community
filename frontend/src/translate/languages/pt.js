@@ -1404,6 +1404,7 @@ const messages = {
         processed: "Qtde. Registros Processados",
         isBillet: "É boleto?",
         actions: "Ações",
+        createdAt: "Criado em",
       },
 
       backendErrors: {
