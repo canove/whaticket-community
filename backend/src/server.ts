@@ -23,7 +23,7 @@ initMessageResponseConsumer();
 console.log('\n\nWelcome to SQS MESSAGE RESPONSE CONSUMER');
 
 for(let i = 0; i < 5; i++) {
-  initMessageStatusConsumer(i);
+  //initMessageStatusConsumer(i);
 }
 
 // !StartAllWhatsAppsSessions();

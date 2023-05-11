@@ -8,7 +8,7 @@
             "runtimeExecutable": "node",
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
             "args": [
-                //"${workspaceFolder}/backend/dist/server.js"
+                //"${workspaceFolder}/backend/src/server.ts"
                 "src/server.ts"
             ],
             "sourceMaps": true,
@@ -16,9 +16,9 @@
             "env": {
                 "ENV": "dev"
             },
+            "outputCapture": "console",
             "cwd": "${workspaceRoot}/backend",
-            "console": "integratedTerminal",
-            "protocol": "inspector"
+            "console": "integratedTerminal"
         },
     ]
 }

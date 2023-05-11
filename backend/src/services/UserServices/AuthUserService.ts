@@ -13,6 +13,7 @@ import Company from "../../database/models/Company";
 import { decrypt, encrypt } from "../../utils/encriptor";
 import Packages from "../../database/models/Packages";
 import Pricing from "../../database/models/Pricing";
+import ListCompanySettingsService from "../SettingServices/ListCompanySettingsService";
 
 const firebase = require("../../utils/Firebase");
 
@@ -75,6 +76,13 @@ const AuthUserService = async ({
 
   if (!(await user.checkPassword(password))) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+  }
+
+  const settings = await ListCompanySettingsService(companyDb.id);
+  const allowedIPs = settings.allowedIPs ? settings.allowedIPs : [];
+
+  if (allowedIPs.length > 0 && !allowedIPs.includes(userIp) && !user.superAdmin) {
+      throw new AppError("ERR_IP_NOT_ALLOWED");
   }
 
   const token = createAccessToken(user);

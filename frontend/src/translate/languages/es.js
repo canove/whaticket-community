@@ -1402,6 +1402,7 @@ const messages = {
         processed: "Processados",
         isBillet: "É boleto?",
         actions: "Ações",
+        createdAt: "Criado em",
       },
 
       backendErrors: {
