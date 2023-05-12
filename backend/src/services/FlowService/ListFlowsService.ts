@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import Flows from "../../database/models/Flows";
+import { Op } from "sequelize";
 
 interface Request {
   companyId: number;
@@ -18,7 +19,10 @@ const ListFlowsService = async ({
 
   whereCondition = { 
     companyId,
-    official: official === "true" ? true : false
+    [Op.or]: [
+      { official: official === "true" ? true : false },
+      { official: null }
+    ],
   };
 
   if (type) {

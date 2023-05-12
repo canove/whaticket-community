@@ -273,7 +273,7 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
     formData.append("fromMe", true);
     medias.forEach((media) => {
       formData.append("medias", media);
-      formData.append("body", media.name);
+      // formData.append("body", media.name);
     });
 
     try {
@@ -295,7 +295,7 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
       fromMe: true,
       mediaUrl: "",
       body: signMessage
-        ? `*${user?.name}:*\n${inputMessage.trim()}`
+        ? `*${user?.useNickname ? user?.nickname : user?.name}:*\n${inputMessage.trim()}`
         : inputMessage.trim(),
       quotedMsg: replyingMessage,
     };
@@ -433,7 +433,14 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
           </div>
         ) : (
           <span>
-            {medias[0]?.name}
+            {medias.map(media => {
+              return (
+                <>
+                  {media.name}<br />
+                </>
+              )
+            })}
+            {/* {medias[0]?.name} */}
             {/* <img src={media.preview} alt=""></img> */}
           </span>
         )}

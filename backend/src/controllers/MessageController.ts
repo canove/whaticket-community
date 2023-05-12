@@ -52,7 +52,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {
-        await SendWhatsAppMedia({ media, ticket, companyId, body });
+        await SendWhatsAppMedia({ media, ticket, companyId, body: media.originalname });
       })
     );
   } else {
@@ -121,7 +121,7 @@ export const resend = async (req: Request, res: Response): Promise<Response> => 
   await SendWhatsAppMessage({ 
     body: message.body, 
     mediaUrl: message.mediaUrl ? message.mediaUrl : null, 
-    type: message.type,
+    type: message.mediaType,
     ticket, 
     companyId, 
     fromMe: true, 

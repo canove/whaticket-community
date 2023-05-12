@@ -179,7 +179,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 		if (newValue?.number) {
 			setSelectedContact(newValue);
 		} else if (newValue?.name) {
-			setNewContact({ name: newValue.name });
+			setNewContact({ number: newValue.name });
 			setContactModalOpen(true);
 		} else {
 			setSelectedContact(null);
@@ -327,7 +327,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 										}}
 									>
 										<MenuItem value={""}>Nenhum</MenuItem>
-										{queues.map(queue => {
+										{queues && queues.map(queue => {
 											return (
 												<MenuItem key={queue.id} value={queue.id}>
 													{queue.name}
@@ -376,11 +376,8 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 										</MenuItem>
 										{whatsApps &&
 											whatsApps.map((whats) => {
-												const whatsQueue = whats.queues.length > 0 ? whats.queues[0] : null;
-												const queueCondition = (!queueId || (queueId && whatsQueue && whatsQueue.id === queueId));
-
 												if (official) {
-													if (whats.official === true && whats.deleted === false && queueCondition) {
+													if (whats.official === true && whats.deleted === false) {
 														return (
 															<MenuItem key={whats.id} value={whats.id}>
 																{whats.name}
@@ -388,7 +385,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 														);
 													}
 												} else {
-													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false && queueCondition) {
+													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false) {
 														return (
 															<MenuItem key={whats.id} value={whats.id}>
 																{whats.name}

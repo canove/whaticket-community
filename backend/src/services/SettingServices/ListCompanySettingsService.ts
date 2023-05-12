@@ -7,6 +7,7 @@ interface Response {
   message: string; 
   useWorkTime: boolean;
   allowedIPs: string[];
+  transferRequiredQueue: boolean;
 }
 
 const initialSettings = { 
@@ -15,6 +16,8 @@ const initialSettings = {
   message: "", 
   useWorkTime: false,
   allowedIPs: [],
+  transferRequiredQueue: false,
+  defaultSurvey: ""
 };
 
 const ListCompanySettingsService = async (
@@ -30,7 +33,8 @@ const ListCompanySettingsService = async (
       client.on('error', err => console.log('Redis Client Error', err));
       await client.connect();
 
-      settings = await client.get(`settings-${companyId}`);
+      const redisSettings = await client.get(`settings-${companyId}`);
+      settings = { ...initialSettings, ...JSON.parse(redisSettings) };
 
       await client.disconnect();
   } catch (err: any) {
@@ -39,7 +43,7 @@ const ListCompanySettingsService = async (
 
   if (!settings) return initialSettings;
 
-  return JSON.parse(settings);
+  return settings;
 };
 
 export default ListCompanySettingsService;

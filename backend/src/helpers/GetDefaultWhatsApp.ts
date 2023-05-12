@@ -23,15 +23,15 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
     whereCondition = { ...whereCondition, id: whatsappId };
   }
 
-  if (queueId) {
-    includeCondition.push({
-      model: Queue,
-      as: "queues",
-      attributes: ["id", "name", "color", "greetingMessage"],
-      where: { id: queueId },
-      required: true
-    });
-  }
+  // if (queueId) {
+  //   includeCondition.push({
+  //     model: Queue,
+  //     as: "queues",
+  //     attributes: ["id", "name", "color", "greetingMessage"],
+  //     where: { id: queueId },
+  //     required: true
+  //   });
+  // }
 
   const defaultWhatsapp = await Whatsapp.findOne({
     where: whereCondition,
