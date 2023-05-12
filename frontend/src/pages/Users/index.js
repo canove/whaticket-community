@@ -30,6 +30,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -98,11 +99,13 @@ const Users = () => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [users, dispatch] = useReducer(reducer, []);
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState("");
 
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
-  }, [searchParam]);
+  }, [searchParam, selectedCompanyId]);
 
   useEffect(() => {
     setLoading(true);
@@ -110,7 +113,7 @@ const Users = () => {
       const fetchUsers = async () => {
         try {
           const { data } = await api.get("/users/", {
-            params: { searchParam, pageNumber },
+            params: { searchParam, pageNumber, selectedCompanyId },
           });
           dispatch({ type: "LOAD_USERS", payload: data.users });
           setHasMore(data.hasMore);
@@ -122,7 +125,21 @@ const Users = () => {
       fetchUsers();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [searchParam, pageNumber]);
+  }, [searchParam, pageNumber, selectedCompanyId]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      if (user.companyId !== 1) return;
+
+      try {
+        const { data } = await api.get(`/company/`);
+        setCompanies(data.companies);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+    fetchCompanies();
+	}, [user]);
 
   useEffect(() => {
     const socket = openSocket();
@@ -210,26 +227,55 @@ const Users = () => {
       <MainHeader>
         <Title>{i18n.t("users.title")}</Title>
         <MainHeaderButtonsWrapper>
-          <TextField
-            placeholder={i18n.t("contacts.searchPlaceholder")}
-            type="search"
-            value={searchParam}
-            onChange={handleSearch}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon style={{ color: "gray" }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenUserModal}
-          >
-            {i18n.t("users.buttons.add")}
-          </Button>
+          <div style={{ display: "flex", alignItems: "flex-end" }}>
+            { user.companyId === 1 && companies.length > 0 && 
+              <div>
+                <FormControl
+                  variant="outlined"
+                  margin="dense"
+                  style={{ width: "250px", marginRight: "10px" }}
+                >
+                  <InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
+                  <Select
+                    label="Empresa"
+                    name="company"
+                    labelId="company-selection-label"
+                    id="company-selection"
+                    value={selectedCompanyId}
+                    onChange={(e) => { setSelectedCompanyId(e.target.value) }}
+                  >
+                    <MenuItem value={""}>&nbsp;</MenuItem>
+                    { companies && companies.map(company => {
+                      return (
+                        <MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
+                      )
+                    }) }
+                  </Select>
+                </FormControl>
+              </div>
+            }
+            <TextField
+            style={{ marginRight: "10px" }}
+              placeholder={i18n.t("contacts.searchPlaceholder")}
+              type="search"
+              value={searchParam}
+              onChange={handleSearch}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon style={{ color: "gray" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenUserModal}
+            >
+              {i18n.t("users.buttons.add")}
+            </Button>
+          </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper

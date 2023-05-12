@@ -17,16 +17,18 @@ type IndexQuery = {
   searchParam: string;
   pageNumber: string;
   queueId: string | number;
+  selectedCompanyId: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { searchParam, pageNumber, selectedCompanyId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
     pageNumber,
-    companyId
+    companyId,
+    selectedCompanyId,
   });
 
   return res.json({ users, count, hasMore });

@@ -7,6 +7,7 @@ import User from "../../database/models/User";
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
+  selectedCompanyId?: string;
   companyId: number;
 }
 
@@ -19,7 +20,8 @@ interface Response {
 const ListUsersService = async ({
   searchParam = "",
   pageNumber = "1",
-  companyId
+  companyId,
+  selectedCompanyId,
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -44,11 +46,12 @@ const ListUsersService = async ({
     deletedAt: null
   };
 
+  if (selectedCompanyId) {
+    whereCondition = { ...whereCondition, companyId: selectedCompanyId };
+  }
+
   if (companyId !== 1) {
-    whereCondition = {
-      ...whereCondition,
-      companyId
-    };
+    whereCondition = { ...whereCondition, companyId };
   }
 
   const limit = 20;
