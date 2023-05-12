@@ -121,7 +121,7 @@ export const resend = async (req: Request, res: Response): Promise<Response> => 
   await SendWhatsAppMessage({ 
     body: message.body, 
     mediaUrl: message.mediaUrl ? message.mediaUrl : null, 
-    type: message.type,
+    type: message.mediaType,
     ticket, 
     companyId, 
     fromMe: true, 
