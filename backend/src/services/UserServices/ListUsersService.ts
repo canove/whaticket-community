@@ -7,6 +7,7 @@ import User from "../../database/models/User";
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
+  selectedCompanyId?: string;
   companyId: number;
 }
 
@@ -19,7 +20,8 @@ interface Response {
 const ListUsersService = async ({
   searchParam = "",
   pageNumber = "1",
-  companyId
+  companyId,
+  selectedCompanyId,
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -32,16 +34,24 @@ const ListUsersService = async ({
           `%${searchParam.toLowerCase()}%`
         )
       },
+      {
+        "$User.nickname$": Sequelize.where(
+          Sequelize.fn("LOWER", Sequelize.col("User.nickname")),
+          "LIKE",
+          `%${searchParam.toLowerCase()}%`
+        )
+      },
       { email: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
     ],
     deletedAt: null
   };
 
+  if (selectedCompanyId) {
+    whereCondition = { ...whereCondition, companyId: selectedCompanyId };
+  }
+
   if (companyId !== 1) {
-    whereCondition = {
-      ...whereCondition,
-      companyId
-    };
+    whereCondition = { ...whereCondition, companyId };
   }
 
   const limit = 20;
@@ -49,7 +59,7 @@ const ListUsersService = async ({
 
   const { count, rows: users } = await User.findAndCountAll({
     where: whereCondition,
-    attributes: ["name", "id", "email", "profileId", "createdAt"],
+    attributes: ["nickname", "name", "id", "email", "profileId", "createdAt", "useNickname"],
     limit,
     offset,
     order: [["createdAt", "DESC"]],

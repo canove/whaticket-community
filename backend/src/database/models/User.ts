@@ -35,6 +35,9 @@ class User extends Model<User> {
   name: string;
 
   @Column
+  nickname: string;
+
+  @Column
   email: string;
 
   @Column(DataType.VIRTUAL)
@@ -57,6 +60,9 @@ class User extends Model<User> {
 
   @Column
   superAdmin: boolean;
+
+  @Column
+  useNickname: boolean;
 
   @Column
   deletedAt: Date;

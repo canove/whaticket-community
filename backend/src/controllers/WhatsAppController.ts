@@ -283,7 +283,12 @@ export const automaticControl = async (
 
   const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
 
-  await whatsapp.update({ automaticControl: !automaticControl });
+  let update = null;
+
+  update = { automaticControl: !automaticControl };
+  if (!automaticControl === false) update = { ...update, lastSendDate: null };
+
+  await whatsapp.update(update);
 
   const io = getIO();
   io.emit(`whatsapp${companyId}`, {

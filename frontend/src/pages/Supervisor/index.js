@@ -908,14 +908,16 @@ const Supervisor = () => {
                       </TableCell>
                       <TableCell align="center">
                         <IconButton
-                          onClick={() => { history.push(`tickets/${ticket.id}`); }}
+                          // onClick={() => { history.push(`tickets/${ticket.id}`); }}
+                          href={`tickets/${ticket.id}`}
+                          target="_blank"
                         >
                           <Visibility />
                         </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
-                  {loading && <TableRowSkeleton columns={10} />}
+                  {loading && <TableRowSkeleton columns={11} />}
                 </>
               </TableBody>
             </Table>

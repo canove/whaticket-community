@@ -4,6 +4,7 @@ import AppError from "../../errors/AppError";
 import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import ShowProfileService from "../ProfileServices/ShowProfileService";
 import ShowUserService from "./ShowUserService";
+import { SerializeUser } from "../../helpers/SerializeUser";
 
 interface UserData {
   email?: string;
@@ -15,6 +16,8 @@ interface UserData {
   queueIds?: number[];
   companyId?: string | number;
   superAdmin?: boolean;
+  nickname?: string;
+  useNickname?: boolean;
 }
 
 interface Request {
@@ -42,7 +45,7 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, profileId, name, lang, queueIds = [] } = userData;
+  const { email, password, profile, profileId, name, lang, nickname, useNickname, queueIds = [] } = userData;
   let { companyId, superAdmin } = userData;
 
   if (userCompanyId !== 1) {
@@ -66,27 +69,21 @@ const UpdateUserService = async ({
     lang,
     name,
     companyId,
-    superAdmin
+    superAdmin,
+    nickname,
+    useNickname,
   });
 
   await user.$set("queues", queueIds);
 
   await user.reload();
 
+  let serializedUser = SerializeUser(user);
+
   const company = await ShowCompanyService(companyId);
   const profiles = await ShowProfileService(profileId, companyId);
 
-  const serializedUser = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    profile: user.profile,
-    profileId: user.profileId,
-    queues: user.queues,
-    companyId: user.companyId,
-    company,
-    profiles
-  };
+  serializedUser = { ...serializedUser, company, profiles };
 
   return serializedUser;
 };

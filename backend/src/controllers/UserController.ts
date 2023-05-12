@@ -17,16 +17,18 @@ type IndexQuery = {
   searchParam: string;
   pageNumber: string;
   queueId: string | number;
+  selectedCompanyId: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { searchParam, pageNumber, selectedCompanyId } = req.query as IndexQuery;
   const { companyId } = req.user;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
     pageNumber,
-    companyId
+    companyId,
+    selectedCompanyId,
   });
 
   return res.json({ users, count, hasMore });
@@ -53,7 +55,7 @@ export const transferList = async (req: Request, res: Response): Promise<Respons
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin } = req.body;
+  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin, nickname, useNickname } = req.body;
   const userCompanyId = req.user.companyId;
 
   // if (
@@ -74,7 +76,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       profileId,
       queueIds,
       companyId: companyId || userCompanyId,
-      superAdmin
+      superAdmin,
+      nickname,
+      useNickname,
     });
 
     const io = getIO();
@@ -93,7 +97,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     profile,
     profileId: profileId ? profileId : req.user.profile,
     queueIds,
-    companyId: userCompanyId
+    companyId: userCompanyId,
+    nickname,
+    useNickname,
   });
 
   const io = getIO();

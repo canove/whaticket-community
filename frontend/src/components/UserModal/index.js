@@ -69,11 +69,13 @@ const UserModal = ({ open, onClose, userId }) => {
 	const { i18n } = useTranslation();
 
 	const initialState = {
+		nickname: "",
 		name: "",
 		email: "",
 		password: "",
 		profile: "user",
-		profileId: ""
+		profileId: "",
+		useNickname: false,
 	};
 
 	const UserSchema = Yup.object().shape({
@@ -220,7 +222,7 @@ const UserModal = ({ open, onClose, userId }) => {
 						}, 400);
 					}}
 				>
-					{({ touched, errors, isSubmitting }) => (
+					{({ values, touched, errors, isSubmitting, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
 								<div className={classes.multFieldLine}>
@@ -259,6 +261,33 @@ const UserModal = ({ open, onClose, userId }) => {
 										)
 										}}
 										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<Field
+										as={TextField}
+										label={"Apelido"}
+										name="nickname"
+										error={touched.nickname && Boolean(errors.nickname)}
+										helperText={touched.nickname && errors.nickname}
+										variant="outlined"
+										margin="dense"
+										autoComplete="off"
+										fullWidth
+									/>
+								</div>
+								<div className={classes.multFieldLine}>
+									<FormControlLabel
+										label={"Usar apelido como assinatura."}
+										name="useNickname"
+										control={
+											<Checkbox 
+												color="primary" 
+												name="useNickname"
+												checked={values.useNickname} 
+												onChange={() => setFieldValue("useNickname", !values.useNickname)} 
+											/>
+										}
 									/>
 								</div>
 								<div className={classes.multFieldLine}>

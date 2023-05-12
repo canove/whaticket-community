@@ -16,6 +16,26 @@ import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import { v4 as uuidv4 } from "uuid";
 import FindCreateOrUpdateContactService from "../ContactServices/FindCreateOrUpdateContactService";
 
+const mediaTypes = {
+  'audio/aac': 'audio',
+  'audio/mp4': 'audio',
+  'audio/mpeg': 'audio',
+  'audio/amr': 'audio',
+  'audio/ogg': 'audio',
+  'text/plain': 'document',
+  'application/pdf': 'document',
+  'application/vnd.ms-powerpoint': 'document',
+  'application/msword': 'document',
+  'application/vnd.ms-excel': 'document',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'document',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'document',
+  'image/jpeg': 'image',
+  'image/png': 'image',
+  'video/mp4': 'video',
+  'video/3gp': 'video',
+};
+
 interface Request {
   media: Express.Multer.File;
   ticket: Ticket;
@@ -221,7 +241,7 @@ const SendWhatsAppMedia = async ({
           fromMe: true,
           read: true,
           mediaUrl: mediaUrl,
-          mediaType: media.mimetype.split('/')[0],
+          mediaType: mediaTypes[media.mimetype], // media.mimetype.split('/')[0],
           quotedMsgId: null,
           companyId,
           userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
@@ -235,7 +255,8 @@ const SendWhatsAppMedia = async ({
           "number": phoneNumber,
           "text": media.originalname,//(body == '' || body == null?'':formatBody(body, ticket.contact)),
           "path": mediaUrl, //`data:${media.mimetype};base64,${base64file}`
-          "type": media.mimetype.split('/')[0],
+          "mimetype": media.mimetype,
+          "type": mediaTypes[media.mimetype],
           "messageId": createdMessage.id
         };
 

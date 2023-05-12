@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { Box, Button, Checkbox, FormControlLabel, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
+import { Box, Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
@@ -35,10 +35,18 @@ const useStyles = makeStyles(theme => ({
 	settingOption: {
 		marginLeft: "auto",
 	},
+
 	margin: {
 		margin: theme.spacing(1),
 	},
 
+	multFieldLine: {
+		display: "flex",
+		"& > *:not(:last-child)": {
+			marginRight: theme.spacing(1),
+		},
+		marginBottom: "5px"
+	},
 }));
 
 const Settings = () => {
@@ -52,8 +60,12 @@ const Settings = () => {
 	//? dias: | dom | seg | ter | qua | qui | sex | sab |
 		days: [false,false,false,false,false,false,false],
 		allowedIPs: [],
+		transferRequiredQueue: false,
+		defaultSurvey: ""
 	}
 	const [settings, setSettings] = useState(initialSettings);
+
+	const [surveys, setSurveys] = useState([]);
 
 	const [allowedIPModalOpen, setAllowedIPModalOpen] = useState(false);
 	const [selectedAllowedIP, setSelectedAllowedIP] = useState("");
@@ -69,6 +81,18 @@ const Settings = () => {
 			}
 		}
 
+		const fetchSurveys = async () => {
+			try {
+				const { data } = await api.get('/satisfactionSurvey', {
+					params: { limit: -1 }
+				});
+			  	setSurveys(data.surveys);
+			} catch (err) {
+			  	toastError(err);
+			}
+		}
+
+		fetchSurveys();
 		fetchSettings();
 	}, []);
 
@@ -137,7 +161,9 @@ const Settings = () => {
 			days: settings.days.map(day => day ? true : false),
 			hours: settings.hours,
 			message: settings.message,
-			allowedIPs: settings.allowedIPs
+			allowedIPs: settings.allowedIPs,
+			transferRequiredQueue: settings.transferRequiredQueue,
+			defaultSurvey: settings.defaultSurvey
 		};
 
 		try {
@@ -225,16 +251,7 @@ const Settings = () => {
                 saveIP={saveIP}
 			/>
 			<Container className={classes.container} maxWidth="sm">
-				<div>
-					<Title>{i18n.t("settings.title")}</Title>
-					<Button
-						color="primary"
-						variant="contained"
-						onClick={handleSaveSettings}
-					>
-						Salvar
-					</Button>
-				</div>
+				<Title>{i18n.t("settings.title")}</Title>
 				<Paper className={classes.paper}>
 					<div>
 						<Typography variant="subtitle1" color="primary" gutterBottom>Horário de Atendimento:</Typography>
@@ -309,50 +326,94 @@ const Settings = () => {
 				</Paper>
 				<Paper className={classes.paper}>
 					<div>
-						<Typography variant="subtitle1" color="primary" gutterBottom>IPs Permitidos:</Typography>
-						<Button
-                            variant="contained"
-                            color="primary"
-                            onClick={ handleCreateAllowedIP }
-                        >
-                           {i18n.t("settingsWhats.buttons.created")}
-                        </Button>
-						<Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>{"IP"}</TableCell>
-                                    <TableCell>{"Ações"}</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-								{ settings.allowedIPs && settings.allowedIPs.map((allowedIP, index) => {
-									return (
-										<TableRow key={index}>
-											<TableCell>{allowedIP}</TableCell>
-											<TableCell>
-												<Button
-													onClick={() => { handleEditAllowedIP(allowedIP, index) }}
-												>
-													{"Editar"}
-												</Button>
-												<Button
-													onClick={() => { handleDeleteAllowedIP(index) }}
-												>
-													{"Deletar"}
-												</Button>
-											</TableCell>
-										</TableRow>
-									)
-								})}
-                            </TableBody>
-                        </Table>
+						<div className={classes.multFieldLine}>
+							<Typography variant="subtitle1" color="primary" gutterBottom>IPs Permitidos:</Typography>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={ handleCreateAllowedIP }
+							>
+							{"Adicionar IP"}
+							</Button>
+						</div>
+						{ settings.allowedIPs && settings.allowedIPs.length > 0 &&
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell>{"IP"}</TableCell>
+										<TableCell>{"Ações"}</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{ settings.allowedIPs.map((allowedIP, index) => {
+										return (
+											<TableRow key={index}>
+												<TableCell>{allowedIP}</TableCell>
+												<TableCell>
+													<Button
+														onClick={() => { handleEditAllowedIP(allowedIP, index) }}
+													>
+														{"Editar"}
+													</Button>
+													<Button
+														onClick={() => { handleDeleteAllowedIP(index) }}
+													>
+														{"Deletar"}
+													</Button>
+												</TableCell>
+											</TableRow>
+										)
+									})}
+								</TableBody>
+							</Table>
+						}
 					</div>
 				</Paper>
-				{/* <Paper className={classes.paper}>
+				<Paper className={classes.paper}>
 					<div>
-						<Typography variant="subtitle1" color="primary" gutterBottom>Configurações do CHAT:</Typography>
+						<Typography variant="subtitle1" color="primary" gutterBottom>Chat:</Typography>
+						<FormControlLabel
+							label="Transferir conversa: Selecionar fila obrigatório."
+							control={
+								<Checkbox
+									checked={settings.transferRequiredQueue}
+									onChange={(e) => handleSettingsChange(!settings.transferRequiredQueue, "transferRequiredQueue")}
+									color="primary"
+								/>
+							}
+						/>
+						{ surveys && surveys.length > 0 &&
+							<div>
+								<FormControl
+									variant="outlined"
+									margin="dense"
+									fullWidth
+								>
+									<InputLabel>{"Pesquisa de Satisfação Padrão"}</InputLabel>
+									<Select
+										variant="outlined"
+										label="Pesquisa de Satisfação Padrão"
+										value={settings.defaultSurvey}
+										onChange={(e) =>  handleSettingsChange(e.target.value, "defaultSurvey")}
+										fullWidth
+									>
+										<MenuItem value={""}>&nbsp;</MenuItem>
+										{surveys.map((survey) => (
+											<MenuItem key={survey.id} value={survey.id}>{survey.name}</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+							</div>
+						}
 					</div>
-				</Paper> */}
+				</Paper>
+				<Button
+					color="primary"
+					variant="contained"
+					onClick={handleSaveSettings}
+				>
+					Salvar Alterações
+				</Button>
 			</Container>
 		</div>
 	);

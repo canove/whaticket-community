@@ -9,6 +9,7 @@ import ListCompanyService from "../services/CompanyService/ListCompanyService";
 import UpdateCompanyService from "../services/CompanyService/UpdateCompanyService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import DeleteCompanyService from "../services/CompanyService/DeleteCompanyService";
+import AppError from "../errors/AppError";
 
 type IndexQuery = {
   searchParam: string;
@@ -17,6 +18,9 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { companyId } = req.user;
+
+  if (companyId !== 1) throw new AppError("NO_PERMISSION");
 
   const { companies, count, hasMore } = await ListCompanyService({
     searchParam,
