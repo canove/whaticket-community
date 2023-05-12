@@ -1451,6 +1451,7 @@ const messages = {
         ERR_NO_CATEGORY_FOUND : "Erro categoria não encontrada!",
         ERR_QUEUE_CREATES_A_LOOP: "Essa fila já possuí um redirecionamento.",
         ERR_NAME_OR_CODE_ALREADY_EXISTS: "Nome ou código já existem.",
+        ERR_IP_NOT_ALLOWED: "IP origem da requisição não permitido.",
       },
     },
   },

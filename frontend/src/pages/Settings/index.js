@@ -35,10 +35,18 @@ const useStyles = makeStyles(theme => ({
 	settingOption: {
 		marginLeft: "auto",
 	},
+
 	margin: {
 		margin: theme.spacing(1),
 	},
 
+	multFieldLine: {
+		display: "flex",
+		"& > *:not(:last-child)": {
+			marginRight: theme.spacing(1),
+		},
+		marginBottom: "5px"
+	},
 }));
 
 const Settings = () => {
@@ -225,16 +233,7 @@ const Settings = () => {
                 saveIP={saveIP}
 			/>
 			<Container className={classes.container} maxWidth="sm">
-				<div>
-					<Title>{i18n.t("settings.title")}</Title>
-					<Button
-						color="primary"
-						variant="contained"
-						onClick={handleSaveSettings}
-					>
-						Salvar
-					</Button>
-				</div>
+				<Title>{i18n.t("settings.title")}</Title>
 				<Paper className={classes.paper}>
 					<div>
 						<Typography variant="subtitle1" color="primary" gutterBottom>Horário de Atendimento:</Typography>
@@ -309,45 +308,56 @@ const Settings = () => {
 				</Paper>
 				<Paper className={classes.paper}>
 					<div>
-						<Typography variant="subtitle1" color="primary" gutterBottom>IPs Permitidos:</Typography>
-						<Button
-                            variant="contained"
-                            color="primary"
-                            onClick={ handleCreateAllowedIP }
-                        >
-                           {i18n.t("settingsWhats.buttons.created")}
-                        </Button>
-						<Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>{"IP"}</TableCell>
-                                    <TableCell>{"Ações"}</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-								{ settings.allowedIPs && settings.allowedIPs.map((allowedIP, index) => {
-									return (
-										<TableRow key={index}>
-											<TableCell>{allowedIP}</TableCell>
-											<TableCell>
-												<Button
-													onClick={() => { handleEditAllowedIP(allowedIP, index) }}
-												>
-													{"Editar"}
-												</Button>
-												<Button
-													onClick={() => { handleDeleteAllowedIP(index) }}
-												>
-													{"Deletar"}
-												</Button>
-											</TableCell>
-										</TableRow>
-									)
-								})}
-                            </TableBody>
-                        </Table>
+						<div className={classes.multFieldLine}>
+							<Typography variant="subtitle1" color="primary" gutterBottom>IPs Permitidos:</Typography>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={ handleCreateAllowedIP }
+							>
+							{"Adicionar IP"}
+							</Button>
+						</div>
+						{ settings.allowedIPs && settings.allowedIPs.length > 0 &&
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell>{"IP"}</TableCell>
+										<TableCell>{"Ações"}</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{ settings.allowedIPs.map((allowedIP, index) => {
+										return (
+											<TableRow key={index}>
+												<TableCell>{allowedIP}</TableCell>
+												<TableCell>
+													<Button
+														onClick={() => { handleEditAllowedIP(allowedIP, index) }}
+													>
+														{"Editar"}
+													</Button>
+													<Button
+														onClick={() => { handleDeleteAllowedIP(index) }}
+													>
+														{"Deletar"}
+													</Button>
+												</TableCell>
+											</TableRow>
+										)
+									})}
+								</TableBody>
+							</Table>
+						}
 					</div>
 				</Paper>
+				<Button
+					color="primary"
+					variant="contained"
+					onClick={handleSaveSettings}
+				>
+					Salvar Alterações
+				</Button>
 				{/* <Paper className={classes.paper}>
 					<div>
 						<Typography variant="subtitle1" color="primary" gutterBottom>Configurações do CHAT:</Typography>
