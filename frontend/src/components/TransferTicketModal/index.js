@@ -51,6 +51,8 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [selectedQueue, setSelectedQueue] = useState('');
 
+	const [requiredQueue, setRequiredQueue] = useState(false);
+
 	const { findAll: findAllQueues } = useQueues();
 
 	useEffect(() => {
@@ -60,7 +62,14 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 			setQueues(list);
 		}
 
+		const fetchSettings = async () => {
+			const { data } = await api.get("/companySettings");
+
+			setRequiredQueue(data.transferRequiredQueue);
+		}
+
 		loadQueues();
+		fetchSettings();
 	}, []);
 
 	useEffect(() => {
@@ -68,7 +77,9 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 			setLoading(false);
 			return;
 		}
+
 		setLoading(true);
+
 		const delayDebounceFn = setTimeout(() => {
 			const fetchUsers = async () => {
 				try {
@@ -85,6 +96,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 
 			fetchUsers();
 		}, 500);
+
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);
 
@@ -202,6 +214,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 						type="submit"
 						color="primary"
 						loading={loading}
+						disabled={requiredQueue && !selectedQueue}
 					>
 						{i18n.t("transferTicketModal.buttons.ok")}
 					</ButtonWithSpinner>

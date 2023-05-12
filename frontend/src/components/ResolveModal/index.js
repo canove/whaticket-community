@@ -104,6 +104,17 @@ const ResolveModal = ({ open, onClose, ticketId, userId }) => {
       }
     }
 
+    const fetchSettings = async () => {
+      try {
+        const { data } = await api.get("/companySettings");
+
+        if (data.defaultSurvey) setSelectedSurvey(data.defaultSurvey);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+    fetchSettings();
     checkCanUseSurveys();
     fetchCategories();
     fetchSurveys();
