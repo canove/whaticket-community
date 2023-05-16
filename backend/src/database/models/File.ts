@@ -49,6 +49,9 @@ class File extends Model<File> {
   CreatedAt: Date;
 
   @Column
+  sendByAllConnections: boolean;
+
+  @Column
   official: boolean;
 
   @ForeignKey(() => Templates)

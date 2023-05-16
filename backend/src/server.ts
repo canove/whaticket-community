@@ -22,8 +22,8 @@ console.log('\n\nWelcome to SQS BOT MESSAGE CONSUMER');
 initMessageResponseConsumer();
 console.log('\n\nWelcome to SQS MESSAGE RESPONSE CONSUMER');
 
-for(let i = 0; i < 5; i++) {
-  //initMessageStatusConsumer(i);
+for(let i = 0; i < 2; i++) {
+  initMessageStatusConsumer(i);
 }
 
 // !StartAllWhatsAppsSessions();
