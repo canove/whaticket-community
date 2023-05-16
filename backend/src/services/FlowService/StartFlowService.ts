@@ -924,20 +924,16 @@ const processNode = async (node: any, session: any, body: any) => {
     if (!value) {
       value = await FileRegister.findOne({
         where: {
-          [Op.or]: [
-            { phoneNumber: session.id } ,
-            { phoneNumber: 
-              { 
-                [Op.or]: [
-                  removePhoneNumberWith9Country(session.id),
-                  preparePhoneNumber9Digit(session.id),
-                  removePhoneNumber9Digit(session.id),
-                  removePhoneNumberCountry(session.id),
-                  removePhoneNumber9DigitCountry(session.id)
-                ],
-              }
-            }
-          ],
+          phoneNumber: { 
+            [Op.or]: [
+              session.id,
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ] 
+          },
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
