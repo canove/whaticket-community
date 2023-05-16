@@ -19,6 +19,7 @@ import FindCreateOrUpdateContactService from "../ContactServices/FindCreateOrUpd
 const mediaTypes = {
   'audio/aac': 'audio',
   'audio/mp4': 'audio',
+  'audio/mp3': 'audio',
   'audio/mpeg': 'audio',
   'audio/amr': 'audio',
   'audio/ogg': 'audio',
