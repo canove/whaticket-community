@@ -21,6 +21,7 @@ import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import IntlCurrencyInput from "react-intl-currency-input";
 import { Field } from "formik";
+import QueueSelectSingle from "../QueueSelectSingle";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +61,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
   const [icon, setIcon] = useState("");
   const [greetingMessage, setGreetingMessage] = useState("");
   const [farewellMessage, setFarewellMessage] = useState("");
+  const [queueId, setQueueId] = useState("");
   const [triggerInterval, setTriggerInterval] = useState(2);
   const [useTriggerInterval, setUseTriggerInterval] = useState(false);
   const [uniqueCode, setUniqueCode] = useState("");
@@ -72,6 +74,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
     setTriggerInterval(2);
     setUseTriggerInterval(false);
     setUniqueCode("");
+    setQueueId("");
     onClose();
   };
 
@@ -97,6 +100,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
         setGreetingMessage(data.greetingMessage);
         setFarewellMessage(data.farewellMessage);
         setUniqueCode(data.uniqueCode);
+        setQueueId(data.queueId);
 
         if (data.triggerInterval) {
           setUseTriggerInterval(true);
@@ -119,6 +123,7 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
     if (farewellMessage) connectionFileData.set("farewellMessage", farewellMessage);
     if (useTriggerInterval) connectionFileData.set("triggerInterval", triggerInterval);
     if (uniqueCode) connectionFileData.set("uniqueCode", uniqueCode);
+    if (queueId) connectionFileData.set("queueId", queueId);
 
     try {
       if (connectionFileId) {
@@ -220,6 +225,13 @@ const ConnectionFileModal = ({ open, onClose, connectionFileId }) => {
               margin="dense"
               value={farewellMessage}
               onChange={(e) => setFarewellMessage(e.target.value)}
+            />
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <QueueSelectSingle
+              label={"Fila"}
+              selectedQueue={queueId}
+              onChange={value => setQueueId(value)}
             />
           </div>
           <div className={classes.multFieldLine}>
