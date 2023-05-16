@@ -9,6 +9,7 @@ import FileRegister from "../../database/models/FileRegister";
 import { Op } from "sequelize";
 import { preparePhoneNumber9Digit, removePhoneNumber9Digit, removePhoneNumber9DigitCountry, removePhoneNumberCountry, removePhoneNumberWith9Country } from "../../utils/common";
 import SessionMessages from "../../database/models/SessionMessages";
+import User from "../../database/models/User";
 /*eslint-disable */
 interface MessageData {
   id: string;
@@ -62,6 +63,12 @@ const CreateMessageService = async ({
         model: Message,
         as: "quotedMsg",
         include: ["contact"]
+      },
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name", "nickname"],
+        required: false,
       }
     ]
   });
