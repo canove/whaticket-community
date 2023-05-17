@@ -101,7 +101,7 @@ class File extends Model<File> {
   connectionFile: ConnectionFiles;
 
   @Column
-  sendByAllConnections: boolean;
+  sendByAnyConnections: boolean;
 }
 
 export default File;

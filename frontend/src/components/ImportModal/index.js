@@ -96,7 +96,7 @@ const ImportModal = ({ open, onClose }) => {
   const [connectionFiles, setConnectionFiles] = useState([]);
   const [selectedConnectionFile, setSelectedConnectionFile] = useState("Nenhum");
 
-  const [sendByAllConnections, setSendByAllConnections] = useState(false);
+  const [sendByAnyConnections, setsendByAnyConnections] = useState(false);
 
   useEffect(() => {
     const fetchMenus = async () => {
@@ -176,7 +176,7 @@ const ImportModal = ({ open, onClose }) => {
     setSelectedTemplate("Nenhum");
     setSelectedOffTemplate("Nenhum");
     setSelectedConnectionFile("Nenhum");
-    setSendByAllConnections(false);
+    setsendByAnyConnections(false);
   };
 
   const handleFile = (e) => {
@@ -187,7 +187,7 @@ const ImportModal = ({ open, onClose }) => {
     setLoading(true);
     if (selectedConnection.length === 0 && !file) {
       toast.error(i18n.t("importModal.confirmation.errors"));
-    } else if (selectedConnection.length === 0 && !sendByAllConnections) {
+    } else if (selectedConnection.length === 0 && !sendByAnyConnections) {
       toast.error(i18n.t("importModal.confirmation.errorConnection"));
     } else if (!file) {
       toast.error(i18n.t("importModal.confirmation.errorShots"));
@@ -214,8 +214,8 @@ const ImportModal = ({ open, onClose }) => {
         if (selectedConnectionFile !== "Nenhum") {
           formData.set("connectionFileId", selectedConnectionFile);
         }
-        if (sendByAllConnections) {
-          formData.set("sendByAllConnections", sendByAllConnections);
+        if (sendByAnyConnections) {
+          formData.set("sendByAnyConnections", sendByAnyConnections);
         }
 
         await api.post("file/upload", formData);
@@ -495,8 +495,8 @@ const ImportModal = ({ open, onClose }) => {
                   <FormControlLabel
                       control={
                         <Checkbox
-                          checked={sendByAllConnections}
-                          onChange={() => setSendByAllConnections(prev => !prev)}
+                          checked={sendByAnyConnections}
+                          onChange={() => setsendByAnyConnections(prev => !prev)}
                           name="useExternalAccount"
                           color="primary"
                         />
