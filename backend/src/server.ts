@@ -15,16 +15,14 @@ const server = app.listen(process.env.PORT, () => {
 
 initIO(server);
 
-initConsumer();
-console.log('\n\nWelcome to SQS CONSUMER');
-initBotMessageConsumer();
-console.log('\n\nWelcome to SQS BOT MESSAGE CONSUMER');
-initMessageResponseConsumer();
-console.log('\n\nWelcome to SQS MESSAGE RESPONSE CONSUMER');
+  initConsumer();
+  console.log('\n\nWelcome to SQS CONSUMER');
+  initBotMessageConsumer();
+  console.log('\n\nWelcome to SQS BOT MESSAGE CONSUMER');
+  initMessageResponseConsumer();
+  console.log('\n\nWelcome to SQS MESSAGE RESPONSE CONSUMER');
 
-for(let i = 0; i < 2; i++) {
-  initMessageStatusConsumer(i);
-}
+  initMessageStatusConsumer(0);
 
 // !StartAllWhatsAppsSessions();
 

@@ -49,7 +49,7 @@ class File extends Model<File> {
   CreatedAt: Date;
 
   @Column
-  sendByAllConnections: boolean;
+  sendByAnyConnections: boolean;
 
   @Column
   official: boolean;

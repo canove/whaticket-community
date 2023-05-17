@@ -2,9 +2,30 @@ import { createClient } from "redis";
 import GetInfo from "../services/FileRegisterService/GetInfo";
 import axios from "axios";
 import GetCallbackService from "../services/WhatsappService/GetCallbackService";
+import domain from "domain";
 
 /*eslint-disable */
 const AWS = require("aws-sdk");
+
+const getRedisClient = async (): Promise<any> => {
+  const d = domain.create();
+
+  d.on('error', (err) => {
+    console.error('Erro na conexão com o Redis:', err.message);
+  });
+
+  return await new Promise(async (resolve, reject) => {
+    try {
+      const client = createClient({
+          url: process.env.REDIS_URL
+      });
+      await client.connect();
+      resolve(client);
+    }catch (err){ 
+      reject(null);
+    }
+  });  
+};
 
 const preparePhoneNumber = (phone: string): string => {
   let phoneNumber = phone.replace("+", "");
@@ -306,6 +327,7 @@ const getRedisValue = async (
 };
 
 export {
+  getRedisClient,
   preparePhoneNumber,
   preparePhoneNumber9Digit,
   isValidHttpUrl,

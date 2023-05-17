@@ -57,6 +57,7 @@ const SendWhatsAppMessage = async ({
     }}
   );
 
+  let nofSessionIsOK = false;
   if (connnection.official === false && connnection.status !== "CONNECTED") {
     try {
       const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
@@ -72,7 +73,16 @@ const SendWhatsAppMessage = async ({
           "sessionkey": process.env.WPPNOF_SESSION_KEY,
         }
       });
+      if (Array.isArray(result)) {
+        for (const item of result) {
+          if (item.exists) {
+            nofSessionIsOK = true;
+            break;
+          }
+        }
+      }
     } catch (err: any) {
+      nofSessionIsOK = false;
       console.log(err?.message);
     }
   }
@@ -250,7 +260,7 @@ const SendWhatsAppMessage = async ({
 
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
-        ack: 0,
+        ack: nofSessionIsOK ? 0 :5,
         ticketId: ticket.id,
         contactId: contact ? contact.id : undefined,
         body: newBody,
@@ -271,7 +281,7 @@ const SendWhatsAppMessage = async ({
       });
       const createdMessage = await CreateMessageService({ messageData });
 
-      if (whatsMsgId == '' || whatsMsgId == null) {
+      if (whatsMsgId == '' || whatsMsgId == null && nofSessionIsOK) {
         const payload = {
           "messageId": createdMessage.id,
           "session": connnection.name,

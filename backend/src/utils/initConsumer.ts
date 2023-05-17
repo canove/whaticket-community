@@ -20,6 +20,7 @@ export const initConsumer = () => {
           secretAccessKey: CONSTANT.secret
         }
     }),
+    batchSize: 1,
     queueUrl: process.env.SQS_DISPATCH_QUEUE,
     handleMessageBatch: async records => {
       records.forEach(async record => {
