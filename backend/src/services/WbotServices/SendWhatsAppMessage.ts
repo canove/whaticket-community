@@ -57,7 +57,7 @@ const SendWhatsAppMessage = async ({
     }}
   );
 
-  let nofSessionIsOK = false;
+  let nofSessionIsOK = (connnection.status === 'CONNECTED');
   if (connnection.official === false && connnection.status !== "CONNECTED") {
     try {
       const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
