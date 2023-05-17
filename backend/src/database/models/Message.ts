@@ -83,6 +83,9 @@ class Message extends Model<Message> {
   @Column
   userId: number;
 
+  @BelongsTo(() => User)
+  user: User;
+
   @BelongsTo(() => Contact, "contactId")
   contact: Contact;
 

@@ -15,113 +15,81 @@ const ShowMenuLayoutService = async (companyId: number, userId: string | number)
   }
 
   let whereCondition = null;
-  let whereConditionChildren1 = null;
-  let whereConditionChildren2 = null;
-
-  whereCondition = { parentId: null };
-  whereConditionChildren1 = { isParent: false };
-  whereConditionChildren2 = { isParent: true };
 
   if (menuList !== null) {
-    whereCondition = { 
-      ...whereCondition,
-      [Op.or]: [
-        { 
-          id: { [Op.or]: menuList },
-          isParent: false
-        },
-        {
-          isParent: true
-        }
-      ]
-    };
-
-    whereConditionChildren1 = { ...whereConditionChildren1, id: { [Op.or]: menuList } };
+    whereCondition = { id: { [Op.or]: menuList } }
   }
 
   const menus1 = await Menu.findAll({
-    where: { ...whereCondition, isParent: false },
+    where: { ...whereCondition, isParent: false, parentId: null },
     include: [
       {
         model: Company,
         as: "companies",
+        attributes: ["id"],
         where: { id: companyId },
         required: true
       },
-    ]
+    ],
   });
 
   const menus2 = await Menu.findAll({
-    where: { ...whereCondition, isParent: true },
+    where: { isParent: true, parentId: null },
     include: [
       {
         model: Menu,
-        as: "childrenMenus1",
-        where: whereConditionChildren1,
+        as: "childrenMenus",
+        where: whereCondition,
         include: [
           {
             model: Company,
             as: "companies",
+            attributes: ["id"],
             where: { id: companyId },
             required: true
           },
         ],
-        required: true
-      },
-      {
-        model: Menu,
-        as: "childrenMenus2",
-        where: whereConditionChildren2,
-        include: [
-          {
-            model: Menu,
-            as: "childrenMenus1",
-            where: whereConditionChildren1,
-            include: [
-              {
-                model: Company,
-                as: "companies",
-                where: { id: companyId },
-                required: true
-              },
-            ],
-            required: true
-          },
-          {
-            model: Menu,
-            as: "childrenMenus2",
-            where: whereConditionChildren2,
-            include: [
-              {
-                model: Menu,
-                as: "childrenMenus1",
-                where: whereConditionChildren1,
-                include: [
-                  {
-                    model: Company,
-                    as: "companies",
-                    where: { id: companyId },
-                    required: true
-                  },
-                ],
-                required: true
-              },
-              {
-                model: Menu,
-                as: "childrenMenus2",
-                where: whereConditionChildren2,
-                required: false
-              }
-            ],
-            required: false
-          }
-        ],
-        required: false
-      },
+        required: true,
+      }
     ]
   });
 
-  return menus1.concat(menus2);
+  const menus3 = await Menu.findAll({
+    where: { isParent: true, parentId: { [Op.ne]: null } },
+    include: [
+      {
+        model: Menu,
+        as: "childrenMenus",
+        where: whereCondition,
+        include: [
+          {
+            model: Company,
+            as: "companies",
+            attributes: ["id"],
+            where: { id: companyId },
+            required: true
+          },
+        ],
+        required: true,
+      }
+    ]
+  });
+
+  for (const menu of menus2) {
+    const parentId = menu.id;
+
+    const newChildren = menus3.filter(menu => parentId === menu.parentId);
+    const childrenMenus = menu["childrenMenus"];
+
+    menu.setDataValue("childrenMenus", childrenMenus.concat(newChildren));
+    // menu["childrenMenus"] = childrenMenus.concat(newChildren);
+  }
+
+  if (menus2.length > 0) {
+    return menus1.concat(menus2);
+  }
+
+  return menus1.concat(menus3);
 };
 
 export default ShowMenuLayoutService;

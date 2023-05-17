@@ -35,9 +35,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { companyId } = req.user;
+  const { id: loggedInUserId, companyId } = req.user;
 
-  const users = await ListAllUsersService({ companyId });
+  const users = await ListAllUsersService({ companyId, loggedInUserId });
 
   return res.json(users);
 };

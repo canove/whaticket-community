@@ -221,7 +221,7 @@ function ListParentItemLink(props) {
                     key={child.id}
                     icon={child.icon}
                     primary={translation(child.name)}
-                    childrenMenus={child.childrenMenus1.concat(child.childrenMenus2)}
+                    childrenMenus={child.childrenMenus}
                     translation={translation}
                     drawerOpen={drawerOpen}
                   />
@@ -342,7 +342,7 @@ const MainListItems = (props) => {
                 key={menu.id}
                 icon={menu.icon}
                 primary={getTranslation(menu.name)}
-                childrenMenus={menu.childrenMenus1.concat(menu.childrenMenus2)}
+                childrenMenus={menu.childrenMenus}
                 translation={getTranslation}
                 drawerOpen={drawerOpen}
               />
