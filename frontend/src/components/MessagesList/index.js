@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme) => ({
   messageRight: {
     marginLeft: 20,
     marginTop: 2,
-    minWidth: 100,
+    minWidth: 150,
     maxWidth: 600,
     height: "auto",
     display: "block",
