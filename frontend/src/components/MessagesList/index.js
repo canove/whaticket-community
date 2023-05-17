@@ -521,6 +521,17 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
 				/>
       );
       // return <ModalVideoCors videoUrl={message.mediaUrl} />;
+    } else if (message.mediaType === "text") {
+      return (
+        <div 
+          style={{ 
+            overflowWrap: "break-word",
+            padding: "0px 80px 0px 6px", 
+          }}
+        >
+          <MarkdownWrapper>{message.mediaUrl}</MarkdownWrapper>
+        </div>
+      );
     } else {
       return (
         <>
