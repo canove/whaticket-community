@@ -18,6 +18,7 @@ import { FaDatabase } from 'react-icons/fa';
 import { AiOutlineMessage } from 'react-icons/ai';
 import { TfiHeadphoneAlt } from "react-icons/tfi"
 import { RiSurveyLine } from "react-icons/ri"
+import { Ri24HoursLine } from "react-icons/ri"
 
 import { JSCustomNodeModel } from '../nodes/Custom/JSCustomNodeModel';
 import { AdvancedPortModel } from '../ports/AdvancedPort/AdvancedPortModel';
@@ -38,6 +39,7 @@ import { ButtonMessageNodeModel } from '../nodes/ButtonMessage/ButtonMessageNode
 import { SatisfactionSurveyNodeModel } from '../nodes/SatisfactionSurvey/SatisfactionSurveyNodeModel';
 import { TemplateNodeModel } from '../nodes/Template/TemplateNodeModel';
 import { DatabaseCondition2NodeModel } from '../nodes/DatabaseCondition2/DatabaseCondition2NodeModel';
+import { SessionNodeModel } from '../nodes/Session/SessionNodeModel';
 
 export const Body = styled.div`
 	flex-grow: 1;
@@ -165,6 +167,12 @@ export class BodyWidget extends React.Component {
 							color="#BFBFBF" 
 							icon={<FaDatabase style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
 						/>
+						<TrayItemWidget
+							model={{ type: 'session' }} 
+							name="Sessão" 
+							color="#A30000" 
+							icon={<Ri24HoursLine style={{ verticalAlign: "middle", marginRight: "5px", width: "24px", height: "24px" }}/>} 
+						/>
 
 						{!this.props.official &&
 							<>
@@ -289,6 +297,12 @@ export class BodyWidget extends React.Component {
 									node = new TemplateNodeModel();
 									node.addPort(new AdvancedPortModel(true, 'in'));
 									node.addPort(new AdvancedPortModel(false, 'out'));
+								break;
+								case 'session':
+									node = new SessionNodeModel();
+									node.addPort(new AdvancedPortModel(true, 'in'));
+									node.addPort(new AdvancedPortModel(false, 'out-true'));
+									node.addPort(new AdvancedPortModel(false, 'out-false'));
 								break;
 							}
 

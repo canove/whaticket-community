@@ -14,6 +14,7 @@ interface Request {
   officialConnectionId?: string | number;
   offTemplateId?: string | number;
   connectionFileId?: string | number;
+  sendByAnyConnections?: string;
 }
 
 const CreateUploadFileService = async ({
@@ -27,6 +28,7 @@ const CreateUploadFileService = async ({
   officialConnectionId = null,
   offTemplateId = null,
   connectionFileId = null,
+  sendByAnyConnections = null,
 }: Request): Promise<File> => {
   const s3 = new AWS.S3({
     apiVersion: "2006-03-01",
@@ -49,6 +51,7 @@ const CreateUploadFileService = async ({
 
   const data = await s3.upload(params).promise();
   const url = data.Location;
+  
   const file = await File.create({
     url,
     name,
@@ -60,7 +63,8 @@ const CreateUploadFileService = async ({
     templateId,
     officialConnectionId,
     officialTemplatesId: offTemplateId,
-    connectionFileId
+    connectionFileId,
+    sendByAnyConnections: (sendByAnyConnections === "true") ? true : false,
   });
 
   return file;

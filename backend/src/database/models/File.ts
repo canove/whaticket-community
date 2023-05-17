@@ -102,6 +102,9 @@ class File extends Model<File> {
 
   @BelongsTo(() => ConnectionFiles)
   connectionFile: ConnectionFiles;
+
+  @Column
+  sendByAnyConnections: boolean;
 }
 
 export default File;

@@ -10,6 +10,7 @@ interface ConnectionFileData {
   greetingMessage?: string; 
   farewellMessage?: string;
   uniqueCode?: string;
+  queueId?: string;
 }
 
 interface Request {
@@ -23,7 +24,7 @@ const UpdateConnectionFileService = async ({
   connectionFileId,
   companyId
 }: Request): Promise<ConnectionFiles> => {
-  const { name, icon, triggerInterval,greetingMessage, farewellMessage, uniqueCode } = connectionFileData;
+  const { name, icon, triggerInterval,greetingMessage, farewellMessage, uniqueCode, queueId } = connectionFileData;
 
   let nameExists = [];
 
@@ -56,10 +57,11 @@ const UpdateConnectionFileService = async ({
   await connectionFile.update({
     name,
     icon,
-    triggerInterval: triggerInterval === "null" ? null : triggerInterval,
-    greetingMessage: greetingMessage === "null" ? null : greetingMessage, 
-    farewellMessage: farewellMessage === "null" ? null : farewellMessage,
-    uniqueCode
+    triggerInterval: (triggerInterval && triggerInterval !== "null") ? triggerInterval : null,
+    greetingMessage: (greetingMessage && greetingMessage !== "null") ? greetingMessage : null, 
+    farewellMessage: (farewellMessage && farewellMessage !== "null") ? farewellMessage : null,
+    uniqueCode,
+    queueId: queueId ? queueId : null,
   });
 
   await connectionFile.reload();

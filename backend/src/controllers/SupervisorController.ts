@@ -6,12 +6,15 @@ import { Op } from "sequelize";
 import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
 
+import { endOfDay, startOfDay } from "date-fns";
+
+import ShowUserService from "../services/UserServices/ShowUserService";
+
 import Ticket from "../database/models/Ticket";
 import Queue from "../database/models/Queue";
 import User from "../database/models/User";
 import Message from "../database/models/Message";
 import Category from "../database/models/Category";
-import { endOfDay, startOfDay } from "date-fns";
 import TicketHistorics from "../database/models/TicketHistorics";
 import Contact from "../database/models/Contact";
 
@@ -27,7 +30,10 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
     const { tab, status, queueId, userId, pageNumber, categoryId, contactNumber } = req.query as IndexQuery;
-    const { companyId } = req.user;
+    const { id: loggedInUserId, companyId } = req.user;
+
+    const loggedInUser = await ShowUserService(loggedInUserId, companyId);
+    const userQueues = loggedInUser?.queues?.map((q) => q.id);;
 
     let info = null;
 
@@ -43,7 +49,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
             info = [];
     
             const queues: any = await Queue.findAll({
-                where: { companyId },
+                where: { id: userQueues, companyId },
                 attributes: [
                     "id", 
                     "name", 
@@ -99,6 +105,15 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 attributes: [
                     "id", 
                     "name",
+                ],
+                include: [
+                    {
+                        model: Queue,
+                        as: "queues",
+                        attributes: ["id"],
+                        where: { id: userQueues },
+                        required: true,
+                    },
                 ],
             });
 
@@ -202,7 +217,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
             let whereCondition = null;
             let includeCondition = [];
 
-            whereCondition = { companyId, updatedAt: dateFilter };
+            whereCondition = { 
+                companyId, 
+                updatedAt: dateFilter, 
+                queueId: { [Op.or]: [userQueues, null] },
+            };
+
             includeCondition = [
                 {
                     model: Queue,

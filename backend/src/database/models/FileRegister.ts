@@ -88,6 +88,9 @@ class FileRegister extends Model<FileRegister> {
   @Column
   processedAt: Date;
 
+  @Column
+  reprocessed: number;
+
   @AllowNull(true)
   @Column
   interactionAt: Date;

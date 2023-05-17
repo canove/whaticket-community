@@ -8,10 +8,12 @@ import {
   AutoIncrement,
   ForeignKey,
   AllowNull,
-  HasMany
+  HasMany,
+  BelongsTo
 } from "sequelize-typescript";
 import Company from "./Company";
 import Whatsapp from "./Whatsapp";
+import Queue from "./Queue";
 
 @Table
 class ConnectionFiles extends Model<ConnectionFiles> {
@@ -39,6 +41,13 @@ class ConnectionFiles extends Model<ConnectionFiles> {
   @ForeignKey(() => Company)
   @Column
   companyId: number;
+
+  @ForeignKey(() => Queue)
+  @Column
+  queueId: number;
+
+  @BelongsTo(() => Queue)
+  queue: Queue;
 
   @Column
   uniqueCode: string;

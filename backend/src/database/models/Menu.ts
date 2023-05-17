@@ -32,10 +32,7 @@ class Menu extends Model<Menu> {
   parentId: number;
 
   @HasMany(() => Menu, "parentId")
-  childrenMenus1: Menu[];
-
-  @HasMany(() => Menu, "parentId")
-  childrenMenus2: Menu[];
+  childrenMenus: Menu[];
 
   @BelongsTo(() => Menu)
   parentMenu: Menu;

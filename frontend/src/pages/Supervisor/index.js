@@ -66,6 +66,7 @@ const Supervisor = () => {
   const searchParams = new URLSearchParams(search);
 
   const { i18n } = useTranslation();
+  const { user } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
   
@@ -84,8 +85,6 @@ const Supervisor = () => {
   
   const [pageNumber, setPageNumber] = useState(1);
   const [count, setCount] = useState(0);
-
-  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const loadSearchParams = () => {
@@ -120,12 +119,14 @@ const Supervisor = () => {
     }
 
     const fetchQueues = async () => {
-      try {
-        const { data } = await api.get("/queue");
-				setQueues(data);
-      } catch (err) {
-        toastError(err);
-      }
+      const userQueues = user?.queues;
+      setQueues(userQueues);
+      // try {
+      //   const { data } = await api.get("/queue");
+			// 	setQueues(data);
+      // } catch (err) {
+      //   toastError(err);
+      // }
     }
 
     const fetchCategories = async () => {

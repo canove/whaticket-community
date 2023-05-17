@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme) => ({
   messageRight: {
     marginLeft: 20,
     marginTop: 2,
-    minWidth: 100,
+    minWidth: 150,
     maxWidth: 600,
     height: "auto",
     display: "block",
@@ -195,7 +195,7 @@ const useStyles = makeStyles((theme) => ({
 
   textContentItem: {
     overflowWrap: "break-word",
-    padding: "3px 80px 6px 6px",
+    padding: "3px 80px 18px 6px",
   },
 
   textContentItemDeleted: {
@@ -223,11 +223,30 @@ const useStyles = makeStyles((theme) => ({
     color: "#999",
   },
 
+  timestampUser: {
+    fontSize: 12,
+    position: "absolute",
+    top: 0,
+    right: 5,
+    color: "#999",
+  },
+
   dailyTimestamp: {
     alignItems: "center",
     textAlign: "center",
     alignSelf: "center",
     width: "110px",
+    backgroundColor: "#e1f3fb",
+    margin: "10px",
+    borderRadius: "10px",
+    boxShadow: "0 1px 1px #b3b3b3",
+  },
+
+  transferTimestamp: {
+    alignItems: "center",
+    textAlign: "center",
+    alignSelf: "center",
+    width: "220px",
     backgroundColor: "#e1f3fb",
     margin: "10px",
     borderRadius: "10px",
@@ -349,6 +368,9 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
   const currentTicketId = useRef(ticketId);
   const { user } = useContext(AuthContext);
 
+  // const [ticketHistoric, setTicketHistoric] = useState([]);
+  // const transferList = [];
+
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
@@ -374,6 +396,8 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
           if (pageNumber === 1 && data.messages.length > 1) {
             scrollToBottom();
           }
+
+          // setTicketHistoric(data.historic);
         } catch (err) {
           setLoading(false);
           toastError(err);
@@ -681,6 +705,48 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
     );
   }
 
+  const renderTransferTimestamps = (message, index) => {
+    // if (index === 0) {}
+
+    // if (index < messagesList.length - 1) {
+    //   const date1 = parseISO(messagesList[index].createdAt);
+    //   const date2 = parseISO(messagesList[index + 1].createdAt);
+
+    //   const historics = ticketHistoric.filter(historic => {
+    //     const historicDate = parseISO(historic.transferedAt);
+
+    //     return (date1 < historicDate && historicDate < date2);
+    //   });
+
+    //   return (
+    //     <>
+    //       {historics.map(historic => {
+    //         if (!transferList.includes[historic.id]) {
+    //           transferList.push(historic.id);
+    //           transferList.push(historic.id + 1);
+
+    //           return (
+    //             <span
+    //               className={classes.transferTimestamp}
+    //               key={`transfer-timestamp-${message.id}`}
+    //             >
+    //               <div className={classes.dailyTimestampText}>
+    //                 Transferido: <br />
+    //                 Fila: {historic.queue ? historic.queue.name : "SEM FILA"} <br />
+    //                 User: {historic.user ? historic.user.name : "SEM USER"} <br />
+    //                 {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy HH:mm")}
+    //               </div>
+    //             </span>
+    //           )
+    //         }
+    //       })}
+    //     </>
+    //   );
+    // }
+
+    // if (index === messagesList.length - 1) {}
+  }
+
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
@@ -712,10 +778,11 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   <span className={classes.timestamp}>
-                    {format(parseISO(message.createdAt), "HH:mm")}
+                    {format(parseISO(message.createdAt), "dd/MM/yyyy HH:mm")}
                   </span>
                 </div>
               </div>
+              {/* {renderTransferTimestamps(message, index)} */}
             </React.Fragment>
           );
         } else {
@@ -753,11 +820,15 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   {message.footer && renderFooter(message)}
                   <span className={classes.timestamp}>
-                    {format(parseISO(message.createdAt), "HH:mm")}
+                    {format(parseISO(message.createdAt), "dd/MM/yyyy - HH:mm")}
                     {renderMessageAck(message)}
+                  </span>
+                  <span className={classes.timestampUser}>
+                    {message?.user?.nickname || message?.user?.name}
                   </span>
                 </div>
               </div>
+              {/* {renderTransferTimestamps(message, index)} */}
             </React.Fragment>
           );
         }

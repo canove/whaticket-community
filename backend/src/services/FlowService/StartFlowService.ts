@@ -17,6 +17,8 @@ import { createClient } from 'redis';
 import formatMessage from "../../helpers/Mustache";
 import ShowSatisfactionSurveyService from "../SatisfactionSurveyService/ShowSatisfactionSurveyService";
 import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurveyResponses";
+import Sessions from "../../database/models/Sessions";
+import Whatsapp from "../../database/models/Whatsapp";
 
 interface Request {
   flowNodeId?: string;
@@ -922,20 +924,16 @@ const processNode = async (node: any, session: any, body: any) => {
     if (!value) {
       value = await FileRegister.findOne({
         where: {
-          [Op.or]: [
-            { phoneNumber: session.id } ,
-            { phoneNumber: 
-              { 
-                [Op.or]: [
-                  removePhoneNumberWith9Country(session.id),
-                  preparePhoneNumber9Digit(session.id),
-                  removePhoneNumber9Digit(session.id),
-                  removePhoneNumberCountry(session.id),
-                  removePhoneNumber9DigitCountry(session.id)
-                ],
-              }
-            }
-          ],
+          phoneNumber: { 
+            [Op.or]: [
+              session.id,
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ] 
+          },
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
@@ -1013,6 +1011,76 @@ const processNode = async (node: any, session: any, body: any) => {
     return { condition: response ? response : "ELSE" };
   }
 
+  if (node.type === "session-node") {
+    const reg = await FileRegister.findOne({
+      where: {
+        phoneNumber: { 
+          [Op.or]: [
+            session.id,
+            removePhoneNumberWith9Country(session.id),
+            preparePhoneNumber9Digit(session.id),
+            removePhoneNumber9Digit(session.id),
+            removePhoneNumberCountry(session.id),
+            removePhoneNumber9DigitCountry(session.id)
+          ],
+        },
+        companyId: session.companyId,
+        processedAt: { [Op.ne]: null }
+      },
+      order: [["createdAt", "DESC"]]
+    });
+
+    const whats = await Whatsapp.findOne({
+      where: { id: reg.whatsappId }
+    });
+
+    let ticketSession = null;
+
+    try {
+      const client = createClient({
+        url: process.env.REDIS_URL
+      });
+
+      client.on('error', err => console.log('Redis Client Error', err));
+
+      await client.connect();
+
+      ticketSession = await client.get(`session-${session.companyId}-${session.id}-${whats.name}`);
+
+      await client.disconnect();
+    } catch (err) {
+      console.log("REDIS ERR - Session Node", err);
+    }
+
+    if (!ticketSession) {
+      const now = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      ticketSession = await Sessions.findOne({
+        where: {
+          phoneNumber: { 
+            [Op.or]: [
+              session.id,
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ],
+          },
+          session: whats.name,
+          companyId: session.companyId,
+          expirationDate: { [Op.between]: [+yesterday, +now] }
+        }
+      });
+    }
+
+    if (ticketSession) return { condition: true };
+
+    return { condition: false };
+  }
+
   return {};
 }
 
@@ -1065,7 +1133,7 @@ const getLink = (name: string, node: any, nodeResponse: any) => {
     }
   }
 
-  if (node.type === "database-condition-node") {
+  if (node.type === "database-condition-node" || node.type === "session-node") {
     const portName = `${name}-${nodeResponse.condition.toString().toLowerCase()}`;
     for (const port of node.ports) {
       if (port.name === portName) {
@@ -1231,7 +1299,7 @@ const StartFlowService = async ({
     })
   }
 
-  if (node.type === "conditional-node" || node.type === "database-condition-2-node") {
+  if (node.type === "conditional-node" || node.type === "database-condition-2-node" || node.type === "session-node") {
     return await StartFlowService({
       flowNodeId,
       sessionId,
