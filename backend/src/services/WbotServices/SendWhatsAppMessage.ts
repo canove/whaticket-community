@@ -57,7 +57,7 @@ const SendWhatsAppMessage = async ({
     }}
   );
 
-  let nofSessionIsOK = false;
+  let nofSessionIsOK = (connnection.status === "CONNECTED");
   if (connnection.official === false && connnection.status !== "CONNECTED") {
     try {
       const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
@@ -260,7 +260,7 @@ const SendWhatsAppMessage = async ({
 
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
-        ack: nofSessionIsOK ? 0 :5,
+        ack: nofSessionIsOK ? 0 : 5,
         ticketId: ticket.id,
         contactId: contact ? contact.id : undefined,
         body: newBody,
