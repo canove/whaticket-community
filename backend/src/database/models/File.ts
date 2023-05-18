@@ -49,6 +49,9 @@ class File extends Model<File> {
   CreatedAt: Date;
 
   @Column
+  sendByAnyConnections: boolean;
+
+  @Column
   official: boolean;
 
   @ForeignKey(() => Templates)
@@ -99,6 +102,9 @@ class File extends Model<File> {
 
   @BelongsTo(() => ConnectionFiles)
   connectionFile: ConnectionFiles;
+
+  @Column
+  sendByAnyConnections: boolean;
 }
 
 export default File;

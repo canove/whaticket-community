@@ -41,6 +41,7 @@ export const initMessageResponseConsumer = () => {
       }
     }),
     queueUrl: process.env.SQS_ORQUESTRATOR_RESPONSE_URL,
+    batchSize: 1,
     handleMessageBatch: async records => {
       records.forEach(async record => {
         const { response, code, message } = JSON.parse(record.Body);
@@ -156,7 +157,7 @@ export const initMessageResponseConsumer = () => {
                 });
               }
             }
-          } else {
+          } else if(typeof message == 'object') {
             const whats = await Whatsapp.findOne({
               where: {
                 name: message.session,
@@ -213,7 +214,7 @@ export const initMessageResponseConsumer = () => {
               if (
                 retry ||
                 (whats &&
-                  (response.message == "sessão inválida ou inexistente" ||
+                  (response.message != "sessão inválida ou inexistente" ||
                     code == 500))
               ) {
                 const headers = {

@@ -10,6 +10,7 @@ interface Request {
   greetingMessage?: string; 
   farewellMessage?: string;
   uniqueCode?: string;
+  queueId?: string;
 }
 
 const CreateConnectionFileService = async ({
@@ -20,6 +21,7 @@ const CreateConnectionFileService = async ({
   greetingMessage = null, 
   farewellMessage = null,
   uniqueCode = null,
+  queueId = null,
 }: Request): Promise<ConnectionFiles> => {
   let nameExists = [];
 
@@ -46,10 +48,11 @@ const CreateConnectionFileService = async ({
     name,
     icon,
     companyId,
-    triggerInterval: triggerInterval === "null" ? null : triggerInterval,
-    greetingMessage: greetingMessage === "null" ? null : greetingMessage, 
-    farewellMessage: farewellMessage === "null" ? null : farewellMessage,
-    uniqueCode
+    triggerInterval: (triggerInterval && triggerInterval !== "null") ? triggerInterval : null,
+    greetingMessage: (greetingMessage && greetingMessage !== "null") ? greetingMessage : null, 
+    farewellMessage: (farewellMessage && farewellMessage !== "null") ? farewellMessage : null,
+    uniqueCode,
+    queueId: queueId ? queueId : null,
   });
 
   return connectionFile;

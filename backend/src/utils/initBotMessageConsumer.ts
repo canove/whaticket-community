@@ -21,6 +21,7 @@ export const initBotMessageConsumer = () => {
           secretAccessKey: CONSTANT.secret
         }
     }),
+    batchSize: 1,
     queueUrl: process.env.SQS_BOT_MESSAGE_URL,
     handleMessageBatch: async records => {
       records.forEach(async record => {

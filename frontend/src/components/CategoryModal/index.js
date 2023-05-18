@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import QueueSelectSingle from "../QueueSelectSingle";
 import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
@@ -55,22 +56,24 @@ const useStyles = makeStyles((theme) => ({
 const CategoryModal = ({ open, onClose, categoryId }) => {
     const { i18n } = useTranslation();
     const classes = useStyles();
+
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
     useEffect(() => {
       const fetchCategory = async () => {
+        if (!categoryId) return;
+  
         try {
           const { data } = await api.get(`/category/${categoryId}`);
-              setName(data.name)
-              setDescription(data.description)
+          setName(data.name);
+          setDescription(data.description);
         } catch (err) {
           toastError(err);
         }
       };
-        if(categoryId){
-          fetchCategory();
-        };
+
+      fetchCategory();
     }, [open, categoryId]);
 
     const handleClose = () => {
@@ -92,6 +95,7 @@ const CategoryModal = ({ open, onClose, categoryId }) => {
           name: name,
           description: description,
       };
+
       try {
         if (categoryId) {
           await api.put(`/category/${categoryId}`, categoryData);

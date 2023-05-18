@@ -24,7 +24,7 @@ type MessageData = {
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const { pageNumber } = req.query as IndexQuery;
-  const { companyId } = req.user;
+  const { id: loggedInUserId, companyId } = req.user;
 
   const { count, messages, ticket, hasMore } = await ListMessagesService({
     pageNumber,
@@ -32,7 +32,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     companyId
   });
 
-  if (ticket.status === "open") {
+  if (ticket.status === "open" && ticket.userId === loggedInUserId) {
     SetTicketMessagesAsRead(ticket);
   }
 
