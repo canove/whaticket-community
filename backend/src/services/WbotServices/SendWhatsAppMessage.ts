@@ -260,7 +260,7 @@ const SendWhatsAppMessage = async ({
 
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
-        ack: nofSessionIsOK ? 0 :5,
+        ack: nofSessionIsOK ? 0 : 5,
         ticketId: ticket.id,
         contactId: contact ? contact.id : undefined,
         body: newBody,
