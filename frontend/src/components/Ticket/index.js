@@ -3,6 +3,7 @@ import { useParams, useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
+import openSQSSocket from "../../services/socket-sqs-io";
 import clsx from "clsx";
 
 import { Paper, Typography, makeStyles } from "@material-ui/core";
@@ -140,6 +141,39 @@ const Ticket = () => {
       socket.disconnect();
     };
   }, [ticketId, history]);
+
+  useEffect(() => {
+    const socket = openSQSSocket();
+
+    socket.on("connect", () => socket.emit("joinChatBox", ticketId));
+
+    socket.on(`ticket${user.companyId}`, (data) => {
+      if (data.action === "update") {
+        setTicket(data.ticket);
+      }
+
+      if (data.action === "delete") {
+        toast.success("tickets.toasts.confirmDelete");
+        history.push("/tickets");
+      }
+    });
+
+    socket.on(`contact${user.companyId}`, (data) => {
+      if (data.action === "update") {
+        setContact((prevState) => {
+          if (prevState.id === data.contact?.id) {
+            return { ...prevState, ...data.contact };
+          }
+          return prevState;
+        });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [ticketId, history]);
+
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
