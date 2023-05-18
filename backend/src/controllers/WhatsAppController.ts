@@ -799,7 +799,7 @@ export const botMessage = async (payload) => {
     companyId: ticket.companyId,
     fromMe,
     bot,
-    contactId: contact.id,
+    contactId: ticket.contactId,
     whatsMsgId: id,
     cation,
     type,

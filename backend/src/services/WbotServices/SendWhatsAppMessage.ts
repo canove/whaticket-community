@@ -57,35 +57,44 @@ const SendWhatsAppMessage = async ({
     }}
   );
 
-  let nofSessionIsOK = (connnection.status === 'CONNECTED');
-  if (connnection.official === false && connnection.status !== "CONNECTED") {
-    try {
-      const CHECK_NUMBER_URL = "http://orquestrator.kankei.com.br:8080/checkNumber";
+  // let nofSessionIsOK = false;
+  // if (connnection.official === false) {
+  //   try {
+  //     const CHECK_NUMBER_URL =
+  //       "http://orquestrator.kankei.com.br:8080/checkNumber";
 
-      const payload = {
-        "session": connnection.name,
-        "number": connnection.name,
-      }    
-  
-      const result = await axios.post(CHECK_NUMBER_URL, payload, {
-        headers: {
-          "api-key": process.env.WPPNOF_API_TOKEN,
-          "sessionkey": process.env.WPPNOF_SESSION_KEY,
-        }
-      });
-      if (Array.isArray(result)) {
-        for (const item of result) {
-          if (item.exists) {
-            nofSessionIsOK = true;
-            break;
-          }
-        }
-      }
-    } catch (err: any) {
-      nofSessionIsOK = false;
-      console.log(err?.message);
-    }
-  }
+  //     const payload = {
+  //       session: connnection.name,
+  //       number: connnection.name
+  //     };
+
+  //     const source = axios.CancelToken.source();
+  //     setTimeout(() => {
+  //       nofSessionIsOK = false;
+  //       source.cancel();
+  //     }, 8000);
+
+  //     const result = await axios.post(CHECK_NUMBER_URL, payload, {
+  //       headers: {
+  //         "api-key": process.env.WPPNOF_API_TOKEN,
+  //         sessionkey: process.env.WPPNOF_SESSION_KEY
+  //       },
+  //       cancelToken: source.token,
+  //     });
+
+  //     if (Array.isArray(result)) {
+  //       for (const item of result) {
+  //         if (item.exists) {
+  //           nofSessionIsOK = true;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //   } catch (err: any) {
+  //     nofSessionIsOK = false;
+  //     console.log(err?.message);
+  //   }
+  // }
 
   const message = await Message.findAll({
     where: {
@@ -260,7 +269,7 @@ const SendWhatsAppMessage = async ({
 
       const messageData = {
         id: whatsMsgId ? whatsMsgId : uuidv4(),
-        ack: nofSessionIsOK ? 0 : 5,
+        ack: 0,
         ticketId: ticket.id,
         contactId: contact ? contact.id : undefined,
         body: newBody,
@@ -281,7 +290,7 @@ const SendWhatsAppMessage = async ({
       });
       const createdMessage = await CreateMessageService({ messageData });
 
-      if (whatsMsgId == '' || whatsMsgId == null && nofSessionIsOK) {
+      if (whatsMsgId == '' || whatsMsgId == null) {
         const payload = {
           "messageId": createdMessage.id,
           "session": connnection.name,
