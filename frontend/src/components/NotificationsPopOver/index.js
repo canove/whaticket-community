@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import openSocket from "../../services/socket-io";
+import openSQSSocket from "../../services/socket-sqs-io";
 import useSound from "use-sound";
 
 import Popover from "@material-ui/core/Popover";
@@ -138,7 +139,68 @@ const NotificationsPopOver = () => {
 		return () => {
 			socket.disconnect();
 		};
-// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user]);
+
+	useEffect(() => {
+		const socket = openSQSSocket();
+		socket.on("connect", () => socket.emit("joinNotification"));
+
+		socket.on(`ticket${user.companyId}`, data => {
+			if (data.action === "updateUnread" || data.action === "delete") {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticketId);
+					if (ticketIndex !== -1) {
+						prevState.splice(ticketIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+
+				setDesktopNotifications(prevState => {
+					const notfiticationIndex = prevState.findIndex(
+						n => n.tag === String(data.ticketId)
+					);
+					if (notfiticationIndex !== -1) {
+						prevState[notfiticationIndex].close();
+						prevState.splice(notfiticationIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+			}
+		});
+
+		socket.on(`appMessage${user.companyId}`, data => {
+			if (
+				data.action === "create" &&
+				(!data.message.read || data.ticket.status === "pending") &&
+				(data.ticket.userId === user?.id || !data.ticket.userId) &&
+				(user?.queues?.some(queue => (queue.id === data.ticket.queueId)) || !data.ticket.queueId)
+			) {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticket.id);
+					if (ticketIndex !== -1) {
+						prevState[ticketIndex] = data.ticket;
+						return [...prevState];
+					}
+					return [data.ticket, ...prevState];
+				});
+
+				const shouldNotNotificate =
+					(data.message.ticketId === ticketIdRef.current &&
+						document.visibilityState === "visible") ||
+					(data.ticket.userId && data.ticket.userId !== user?.id) ||
+					data.ticket.isGroup;
+
+				if (shouldNotNotificate) return;
+
+				handleNotifications(data);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
 	}, [user]);
 
 	const handleNotifications = data => {
