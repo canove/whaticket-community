@@ -112,34 +112,14 @@ const FileImport = () => {
   const [cancelingModalOpen, setCancelingModalOpen] = useState(false);
 
   const { user } = useContext(AuthContext);
-  const [users, dispatchUsers] = useReducer(reducer, []);
   const [imports, dispatchImports] = useReducer(reducer, []);
   const [hasMore, setHasMore] = useState(false);
   const [count, setCount] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
 
   useEffect(() => {
-    dispatchUsers({ type: "RESET" });
     dispatchImports({ type: "RESET" });
   }, [pageNumber, status, date]);
-
-  useEffect(() => {
-    setLoading(true);
-    const delayDebounceFn = setTimeout(() => {
-      const fetchUsers = async () => {
-        try {
-          const { data } = await api.get("/users/");
-          dispatchUsers({ type: "LOAD_USERS", payload: data.users });
-          setLoading(false);
-        } catch (err) {
-          toastError(err);
-          setLoading(false);
-        }
-      };
-      fetchUsers();
-    }, 500);
-    return () => clearTimeout(delayDebounceFn);
-  }, []);
 
   const renderOptionLabel = (option) => {
     return option;
@@ -220,17 +200,6 @@ const FileImport = () => {
     } else {
       return id;
     }
-  };
-
-  const getUserById = (userId) => {
-    let response = "";
-    users.map((user) => {
-      if (user.id === userId) {
-        response = user.name;
-      }
-      return null
-    });
-    return response;
   };
 
   const getOfficial = (official) => {
@@ -498,7 +467,7 @@ const FileImport = () => {
                       {item.connectionFile ? item.connectionFile.name : ""}
                     </TableCell>
                     <TableCell align="center">
-                      {getUserById(item.ownerid)}
+                      {item.user ? item.user.name : ""}
                     </TableCell>
                     <TableCell align="center">{item.QtdeRegister}</TableCell>
                     <TableCell align="center">
@@ -558,7 +527,7 @@ const FileImport = () => {
                   </TableRow>
                 );
               })}
-              {loading && <TableRowSkeleton columns={7} />}
+              {loading && <TableRowSkeleton columns={9} />}
             </>
           </TableBody>
         </Table>

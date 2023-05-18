@@ -74,7 +74,7 @@ const SendWhatsAppMessage = async ({
   //       source.cancel();
   //     }, 8000);
 
-  //     const result = await axios.post(CHECK_NUMBER_URL, payload, {
+  //     const { data } = await axios.post(CHECK_NUMBER_URL, payload, {
   //       headers: {
   //         "api-key": process.env.WPPNOF_API_TOKEN,
   //         sessionkey: process.env.WPPNOF_SESSION_KEY
@@ -82,8 +82,8 @@ const SendWhatsAppMessage = async ({
   //       cancelToken: source.token,
   //     });
 
-  //     if (Array.isArray(result)) {
-  //       for (const item of result) {
+  //     if (Array.isArray(data)) {
+  //       for (const item of data) {
   //         if (item.exists) {
   //           nofSessionIsOK = true;
   //           break;
