@@ -28,13 +28,31 @@ const FindOrCreateTicketService = async (
 ): Promise<Response> => {
   let isCreated = false;
 
+  const contacts = await Contact.findAll({
+    where: {
+      number: { 
+        [Op.or]: [
+          contact.number,
+          removePhoneNumberWith9Country(contact.number),
+          preparePhoneNumber9Digit(contact.number),
+          removePhoneNumber9Digit(contact.number),
+          removePhoneNumberCountry(contact.number),
+          removePhoneNumber9DigitCountry(contact.number)
+        ]
+      },
+      companyId
+    }
+  });
+
+  const contactIds = contacts.map(contact => contact.id);
+
   let ticket = await Ticket.findOne({
     where: {
       status: {
         [Op.or]: ["open", "pending", "dispatcher", "inbot"]
       },
       whatsappId,
-      contactId: groupContact ? groupContact.id : contact.id,
+      contactId: groupContact ? groupContact.id : contactIds,
       companyId
     }
   });
