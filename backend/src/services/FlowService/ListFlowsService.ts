@@ -19,11 +19,17 @@ const ListFlowsService = async ({
 
   whereCondition = { 
     companyId,
-    [Op.or]: [
-      { official: official === "true" ? true : false },
-      { official: null }
-    ],
   };
+
+  if (official) {
+    whereCondition = {
+      ...whereCondition,
+      [Op.or]: [
+        { official: official === "true" ? true : false },
+        { official: null }
+      ],
+    }
+  }
 
   if (type) {
     whereCondition = {
