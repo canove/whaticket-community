@@ -14,6 +14,7 @@ export class TransferQueueNodeWidget extends React.Component {
 		this.state = {
 		  modalOpen: false,
 		  queueId: props.node.queueId ? props.node.queueId : "",
+		  queueType: props.node.queueType ? props.node.queueType : "queue",
 		  queues: []
 		};
 	}
@@ -21,6 +22,11 @@ export class TransferQueueNodeWidget extends React.Component {
 	handleQueueChange = async (e) => {
 		this.setState({ queueId: e.target.value });
 		this.props.node.queueId = e.target.value;
+	};
+
+	handleQueueTypeChange = async (e) => {
+		this.setState({ queueType: e.target.value });
+		this.props.node.queueType = e.target.value;
 	};
 
 	componentDidMount() { 
@@ -55,21 +61,45 @@ export class TransferQueueNodeWidget extends React.Component {
 						fullWidth
 					>
 						<InputLabel id="method-select-label">
-							Queues
+							Tipo
 						</InputLabel>
 						<Select
 							labelId="method-select-label"
 							id="method-select"
-							value={this.state.queueId}
-							label="Method"
-							onChange={(e) => { this.handleQueueChange(e) }}
+							value={this.state.queueType}
+							label="Tipo"
+							onChange={(e) => { this.handleQueueTypeChange(e) }}
 							variant="outlined"
 						>
-							{ this.state.queues.map((queue) => (
-								<MenuItem key={queue.id} value={queue.id}>{queue.name}</MenuItem>
-							)) }
+							<MenuItem value={"queue"}>Selecionar Fila</MenuItem>
+							<MenuItem value={"whatsapp"}>Usar Fila do Número (Whats)</MenuItem>
+							<MenuItem value={"category"}>Usar Fila da Categoria</MenuItem>
 						</Select>
 					</FormControl>
+					{ (!this.state.queueType || this.state.queueType === "queue") &&
+						<FormControl
+							variant="outlined"
+							margin="normal"
+							fullWidth
+						>
+							<InputLabel id="method-select-label">
+								Queues
+							</InputLabel>
+							<Select
+								labelId="method-select-label"
+								id="method-select"
+								value={this.state.queueId}
+								label="Queues"
+								onChange={(e) => { this.handleQueueChange(e) }}
+								variant="outlined"
+							>
+								<MenuItem value={""}>SEM FILA</MenuItem>
+								{ this.state.queues.map((queue) => (
+									<MenuItem key={queue.id} value={queue.id}>{queue.name}</MenuItem>
+								)) }
+							</Select>
+						</FormControl>
+					}
 				</DialogContent>
 				<DialogActions>
 					<Button
