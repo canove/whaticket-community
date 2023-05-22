@@ -193,6 +193,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Default(false)
   @Column
   maturing: boolean;
+
+  @Column
+  timeoutQuantity: number;
 }
 
 export default Whatsapp;
