@@ -22,6 +22,7 @@ import {
 	DeleteOutline,
 	Timeline,
 	AccountTreeOutlined,
+	SyncAlt,
 } from "@material-ui/icons";
 
 import MainContainer from "../../components/MainContainer";
@@ -38,6 +39,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import ConnectionFileModal from "../../components/ConnectionFileModal";
 import BindFlowModal from "../../components/BindFlowModal";
 import BindQueueModal from "../../components/BindQueueModal";
+import BindCallbackModal from "../../components/BindCallbackModal";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -132,6 +134,7 @@ const ConnectionFiles = () => {
 	const { user } = useContext(AuthContext);
 	const [openBindFlowModal, setOpenBindFlowModal] = useState(false);
 	const [openBindQueueModal, setOpenBindQueueModal] = useState(false);
+	const [openBindCallbackModal, setOpenBindCallbackModal] = useState(false);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -224,6 +227,11 @@ const ConnectionFiles = () => {
 		setSelectedConnectionFile(connectionFile);
 	}
 
+	const handleOpenCallbackModal = async (connectionFile) => {
+		setOpenBindCallbackModal(true);
+		setSelectedConnectionFile(connectionFile);
+	}
+
 	const handleCloseFlowModal = async () => {
 		setOpenBindFlowModal(false);
 		setSelectedConnectionFile(null);
@@ -231,6 +239,11 @@ const ConnectionFiles = () => {
 
 	const handleCloseQueueModal = async () => {
 		setOpenBindQueueModal(false);
+		setSelectedConnectionFile(null);
+	}
+
+	const handleCloseCallbackModal = async () => {
+		setOpenBindCallbackModal(false);
 		setSelectedConnectionFile(null);
 	}
 
@@ -257,6 +270,11 @@ const ConnectionFiles = () => {
 			<BindQueueModal
 				open={openBindQueueModal}
 				onClose={handleCloseQueueModal}
+				connectionFile={selectedConnectionFile}
+			/>
+			<BindCallbackModal
+				open={openBindCallbackModal}
+				onClose={handleCloseCallbackModal}
 				connectionFile={selectedConnectionFile}
 			/>
 			<MainHeader>
@@ -325,6 +343,12 @@ const ConnectionFiles = () => {
 										onClick={() => handleOpenQueueModal(connectionFile)}
 									>
 										<AccountTreeOutlined />
+									</IconButton>
+									<IconButton
+										size="small"
+										onClick={() => handleOpenCallbackModal(connectionFile)}
+									>
+										<SyncAlt />
 									</IconButton>
 									<IconButton
 										size="small"

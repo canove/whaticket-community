@@ -10,18 +10,21 @@ export class TransferQueueNodeModel extends NodeModel {
 			type: 'transfer-queue-node'
 		});
 		this.queueId = "";
+		this.queueType = "queue";
 	}
 
 	serialize() {
 		return {
 			...super.serialize(),
 			queueId: this.queueId,
+			queueType: this.queueType,
 		};
 	}
 
 	deserialize(ob, engine) {
 		super.deserialize(ob, engine);
 		this.queueId = ob.data.queueId;
+		this.queueType = ob.data.queueType;
 
 		this.updatePorts();
 	}

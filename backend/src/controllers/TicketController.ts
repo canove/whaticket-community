@@ -178,7 +178,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     companyId,
     ticketId,
     queueId,
-    whatsappId, official, templateId, templateVariables, templateHeader
+    whatsappId, 
+    official, 
+    templateId, 
+    templateVariables, 
+    templateHeader
   });
 
   const io = getIO();

@@ -30,6 +30,12 @@ connectionFilesRoutes.post(
 );
 
 connectionFilesRoutes.post(
+  "/connectionFiles/callback/",
+  isAuth,
+  ConnectionFilesController.callback
+);
+
+connectionFilesRoutes.post(
   "/connectionFiles/bind-queue/",
   isAuth,
   ConnectionFilesController.bindQueue
