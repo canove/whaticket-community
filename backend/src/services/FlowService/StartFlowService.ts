@@ -1268,25 +1268,6 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_NODES", 404);
   }
 
-  try {
-    await FileRegister.update({ interactionAt: new Date() }, { 
-      where: { 
-        companyId: companyId,
-        phoneNumber: 
-        { 
-          [Op.or]: [
-            removePhoneNumberWith9Country(sessionId),
-            preparePhoneNumber9Digit(sessionId),
-            removePhoneNumber9Digit(sessionId),
-            removePhoneNumberCountry(sessionId),
-            removePhoneNumber9DigitCountry(sessionId)
-          ],
-        },
-        interactionAt: null
-      }
-    });
-  } catch (err) { console.log('ocorreu um erro ao tentar salvar a data de interacao ', sessionId)}
-
   const session = await FlowsSessions.findOne({
     where: {
       updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
