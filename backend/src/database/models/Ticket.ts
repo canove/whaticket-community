@@ -34,6 +34,9 @@ class Ticket extends Model<Ticket> {
   unreadMessages: number;
 
   @Column
+  fileRegisterId: number;
+
+  @Column
   lastMessage: string;
 
   @Column
