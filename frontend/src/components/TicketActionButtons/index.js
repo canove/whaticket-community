@@ -124,6 +124,15 @@ const TicketActionButtons = ({ ticket }) => {
 					>
 						{i18n.t("historicTicket.button")}
 					</Button>
+					<ButtonWithSpinner
+						loading={loading}
+						size="small"
+						variant="contained"
+						color="primary"
+						onClick={handleOpenResolveModal}
+					>
+						{i18n.t("messagesList.header.buttons.resolve")}
+					</ButtonWithSpinner>
 					<IconButton onClick={handleOpenTicketOptionsMenu}>
 						<MoreVert />
 					</IconButton>
