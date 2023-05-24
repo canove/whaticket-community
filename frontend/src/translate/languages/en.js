@@ -1449,6 +1449,8 @@ const messages = {
         ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
         ERR_IP_NOT_ALLOWED: "Request source IP not allowed.",
         ERR_NO_NICKNAME: "You cannot use this nickname as signature.",
+        ERR_WHATSAPP_DISCONNECTED: "Whatsapp disconnected.",
+        ERR_INVALID_NUMBER: "Invalid phone number."
       },
     },
   },

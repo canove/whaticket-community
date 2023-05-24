@@ -58,7 +58,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 
 	const initialState = {
 		name: "",
-		number: "",
+		number: "55",
 		email: "",
 	};
 
@@ -144,7 +144,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 						}, 400);
 					}}
 				>
-					{({ values, errors, touched, isSubmitting }) => (
+					{({ values, errors, touched, isSubmitting, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
 								<Typography variant="subtitle1" gutterBottom>
@@ -167,9 +167,18 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 									name="number"
 									error={touched.number && Boolean(errors.number)}
 									helperText={touched.number && errors.number}
-									placeholder="5513912344321"
+									placeholder="+55 (13) 91234-4321"
 									variant="outlined"
 									margin="dense"
+									onChange={(e) => {
+										let newValue = e.target.value;
+										newValue = newValue.replace(/\D/g,'')
+										newValue = newValue.replace(/(\d{1,2})(\d)/,"+$1 $2");
+										newValue = newValue.replace(/(\d{2})(\d)/,"($1) $2")
+										newValue = newValue.replace(/(\d)(\d{4})$/,"$1-$2")
+
+										setFieldValue("number", newValue);
+									}}
 								/>
 								<div>
 									<Field

@@ -1451,6 +1451,8 @@ const messages = {
         ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
         ERR_IP_NOT_ALLOWED: "IP origem da requisição não permitido.",
         ERR_NO_NICKNAME: "Não é possível este apelido como assinatura.",
+        ERR_WHATSAPP_DISCONNECTED: "Whatsapp desconectado.",
+        ERR_INVALID_NUMBER: "Número de telefone inválido."
       },
     },
   },
