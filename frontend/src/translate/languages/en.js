@@ -1448,6 +1448,7 @@ const messages = {
         ERR_NO_CATEGORY_FOUND : "Error category not found!",
         ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
         ERR_IP_NOT_ALLOWED: "Request source IP not allowed.",
+        ERR_NO_NICKNAME: "You cannot use this nickname as signature.",
       },
     },
   },

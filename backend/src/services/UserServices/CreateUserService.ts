@@ -64,6 +64,8 @@ const CreateUserService = async ({
     throw new AppError(err.message);
   }
 
+  if (useNickname && !nickname) throw new AppError("ERR_NO_NICKNAME");
+
   const user = await User.create(
     {
       email,
