@@ -301,6 +301,7 @@ const processNode = async (node: any, session: any, body: any) => {
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
+        attributes: ["id", "whatsappId"],
         order: [["createdAt", "DESC"]]
       });
 
