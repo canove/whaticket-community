@@ -1402,6 +1402,7 @@ const messages = {
         status: "Status",
         total: "Qtde. Registros",
         processed: "Qtde. Registros Processados",
+        interaction: "Qtde. Interações",
         isBillet: "É boleto?",
         actions: "Ações",
         createdAt: "Criado em",

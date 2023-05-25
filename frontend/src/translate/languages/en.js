@@ -1398,6 +1398,7 @@ const messages = {
         status: "Status",
         total: "Total",
         processed: "Processed",
+        interaction: "Interaction",
         isBillet: "Is Billet?",
         actions: "Actions",
         createdAt: "Created At",

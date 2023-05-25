@@ -19,6 +19,7 @@ import IntegratedImport from "./IntegratedImport";
 import Message from "./Message";
 import Whatsapp from "./Whatsapp";
 import ConnectionFiles from "./ConnectionFile";
+import BatchIntegrations from "./BatchIntegrations";
 
 @Table
 class FileRegister extends Model<FileRegister> {
@@ -192,8 +193,12 @@ class FileRegister extends Model<FileRegister> {
   @BelongsTo(() => ConnectionFiles)
   connectionFile: ConnectionFiles;
 
+  @ForeignKey(() => BatchIntegrations)
   @Column
   batchId: string;
+
+  @BelongsTo(() => BatchIntegrations)
+  batch: BatchIntegrations;
 }
 
 export default FileRegister;

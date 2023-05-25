@@ -1400,6 +1400,7 @@ const messages = {
         status: "Status",
         total: "Total",
         processed: "Processados",
+        interaction: "Interações",
         isBillet: "É boleto?",
         actions: "Ações",
         createdAt: "Criado em",
