@@ -20,6 +20,7 @@ import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurve
 import Sessions from "../../database/models/Sessions";
 import Whatsapp from "../../database/models/Whatsapp";
 import ConnectionFiles from "../../database/models/ConnectionFile";
+import Message from "../../database/models/Message";
 
 interface Request {
   flowNodeId?: string;
@@ -210,11 +211,118 @@ const processNode = async (node: any, session: any, body: any) => {
     let nodeHeader = jsonStringToObj(node.header);
     let nodeBody = jsonStringToObj(node.body);
 
+    let variables = [];
+    let variablesMapping = {};
+    Object.keys(nodeBody).forEach((varName: any) => {
+      const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+
+      if (param && param[0]) {
+        variables.push(param[0]);
+        variablesMapping = { ...variablesMapping, [varName]: param[0] };
+      }
+    });
+
+    if (variables.length > 0) {
+      let ticket = null;
+      let messages = null;
+      // let register = null;
+      let contact = null;
+
+      // register = await FileRegister.findOne({
+      //   where: {
+      //     phoneNumber: { 
+      //       [Op.or]: [
+      //         session.id,
+      //         removePhoneNumberWith9Country(session.id),
+      //         preparePhoneNumber9Digit(session.id),
+      //         removePhoneNumber9Digit(session.id),
+      //         removePhoneNumberCountry(session.id),
+      //         removePhoneNumber9DigitCountry(session.id)
+      //       ],
+      //     },
+      //     companyId: session.companyId,
+      //     processedAt: { [Op.ne]: null }
+      //   },
+      //   order: [["createdAt", "DESC"]]
+      // });
+  
+      contact = await Contact.findOne({
+        where: {
+          companyId: session.companyId,
+          number: { 
+            [Op.or]: [
+              session.id,
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ],
+          }
+        },
+        attributes: ["id"],
+      });
+
+      if (variables.includes("{{ticket.id}}")) {
+
+        ticket = await Ticket.findOne({
+          where: {
+            status: "inbot",
+            contactId: contact.id,
+            companyId: session.companyId,
+          },
+          attributes: ["id"],
+          order: [["createdAt", "DESC"]]
+        });
+      }
+
+      if (variables.includes("{{ticket.messages}}")) {
+        if (!ticket) {
+          ticket = await Ticket.findOne({
+            where: {
+              status: "inbot",
+              contactId: contact.id,
+              companyId: session.companyId,
+              // whatsappId: register.whatsappId,
+            },
+            attributes: ["id"],
+            order: [["createdAt", "DESC"]]
+          });
+        }
+
+        const msgs = await Message.findAll({
+          where: { ticketId: ticket.id },
+          attributes: ["id", "fromMe", "body", "mediaUrl"],
+          order: [["createdAt", "ASC"]],
+        });
+
+        messages = msgs.map(msg => {
+          const role = msg.fromMe ? "assistant" : "user";
+          const content = msg.body ? msg.body : msg.mediaUrl;
+
+          return { role, content };
+        });
+      }
+
+      Object.keys(variablesMapping).forEach((varName: any) => {
+        const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+  
+        switch (param[0]) {
+          case "{{ticket.id}}":
+            nodeBody[varName] = ticket.id;
+          break;
+          case "{{ticket.messages}}": 
+            nodeBody[varName] = messages;
+          break;
+        }
+      });
+    }
+
     if (!nodeHeader) {
       nodeHeader = "";
     }
 
-    if (node.method === "POST" || !nodeBody) {
+    if (node.method === "GET" || !nodeBody) {
       nodeBody = "";
     }
 
@@ -563,26 +671,21 @@ const processNode = async (node: any, session: any, body: any) => {
     const blocks = [];
 
     let value = null;
-    let client = null;
 
     try {
-      client = createClient({
+      const client = createClient({
         url: process.env.REDIS_URL
       });
-    } catch (err) {
-      console.log("REDIS", err);
-    }
 
-    if (client) {
-      try {
-        client.on('error', err => console.log('Redis Client Error', err));
-        await client.connect();
-        value = await getRedisValue(session.id,session.companyId, client);
-      } catch (err) {
-        console.log("REDIS", err);
-      }
-  
+      client.on('error', err => console.log('Redis Client Error', err));
+
+      await client.connect();
+
+      value = await getRedisValue(session.id,session.companyId, client);
+
       await client.disconnect();
+    } catch (err) {
+      console.log("Flow Multiple Messages Node - REDIS Error", err);
     }
 
     if (!value) {
@@ -608,7 +711,13 @@ const processNode = async (node: any, session: any, body: any) => {
     node.messages.forEach(message => {
       if (message.messageType === "text") {
         let newText = message.messageContent;
-        newText = formatMessage(newText, value);
+
+        if (body.response) {
+          newText = formatMessage(newText, body);
+          newText = formatMessage(newText, value);
+        } else {
+          newText = formatMessage(newText, value);
+        }
 
         const newMessage = {
           text: newText.replace(/&#x2F;/g, '/'),
@@ -839,20 +948,16 @@ const processNode = async (node: any, session: any, body: any) => {
       client = createClient({
         url: process.env.REDIS_URL
       });
-    } catch (err) {
-      console.log("REDIS", err);
-    }
 
-    if (client) {
-      try {
-        client.on('error', err => console.log('Redis Client Error', err));
-        await client.connect();
-        value = await getRedisValue(session.id, session.companyId, client);
-      } catch (err) {
-        console.log("REDIS", err);
-      }
+      client.on('error', err => console.log('Redis Client Error', err));
+
+      await client.connect();
+
+      value = await getRedisValue(session.id, session.companyId, client);
 
       await client.disconnect();
+    } catch (err) {
+      console.log("REDIS", err);
     }
 
     if (!value) {
