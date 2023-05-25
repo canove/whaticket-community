@@ -475,6 +475,7 @@ const RegistersReports = () => {
                         <TableRow>
                             <TableCell align="center">{i18n.t("logReport.grid.name")}</TableCell>
                             <TableCell align="center">{"Telefone"}</TableCell>
+                            <TableCell align="center">{"CPF/CNPJ"}</TableCell>
                             <TableCell align="center">{"Categoria"}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.status")}</TableCell>
                             <TableCell align="center">{i18n.t("logReport.grid.sent")}</TableCell>
@@ -494,6 +495,7 @@ const RegistersReports = () => {
                                     <TableRow key={index}>
                                         <TableCell align="center">{register.name}</TableCell>
                                         <TableCell align="center">{register.phoneNumber}</TableCell>
+                                        <TableCell align="center">{register.documentNumber}</TableCell>
                                         <TableCell align="center">{getCategory(register)}</TableCell>
                                         <TableCell align="center">{getStatus(register)}</TableCell>
                                         <TableCell align="center">{formatDate(register.sentAt)}</TableCell>
@@ -507,7 +509,7 @@ const RegistersReports = () => {
                                     </TableRow>
                                 )
                             }))}
-                            {loading && <TableRowSkeleton columns={12} />}
+                            {loading && <TableRowSkeleton columns={13} />}
                         </>
                     </TableBody>
                 </Table>
