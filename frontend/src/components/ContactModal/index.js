@@ -88,13 +88,13 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 
 				if (initialValues.number) {
 					newNumber = newNumber.replace(/\D/g,'');
-					newNumber = newNumber.replace(/(\d{1,2})(\d)/,"+$1 $2");
+					newNumber = newNumber.replace(/(\d{2})(\d)/,"+$1 $2");
 					newNumber = newNumber.replace(/(\d{2})(\d)/,"($1) $2");
 					newNumber = newNumber.replace(/(\d)(\d{4})$/,"$1-$2");
 				} else {
 					newNumber = "55";
 					newNumber = newNumber.replace(/\D/g,'');
-					newNumber = newNumber.replace(/(\d{1,2})(\d)/,"+$1 $2");
+					newNumber = newNumber.replace(/(\d{2})(\d)/,"+$1 $2");
 				}
 				
 				setContact(prevState => {
@@ -188,7 +188,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 									onChange={(e) => {
 										let newValue = e.target.value;
 										newValue = newValue.replace(/\D/g,'')
-										newValue = newValue.replace(/(\d{1,2})(\d)/,"+$1 $2");
+										newValue = newValue.replace(/(\d{2})(\d)/,"+$1 $2");
 										newValue = newValue.replace(/(\d{2})(\d)/,"($1) $2")
 										newValue = newValue.replace(/(\d)(\d{4})$/,"$1-$2")
 
