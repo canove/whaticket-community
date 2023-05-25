@@ -36,6 +36,8 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import NewTicketModal from "../NewTicketModal";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -221,6 +223,9 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
 
   const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
 
+  const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+  const [contactId, setContactId] = useState("");
+
   useEffect(() => {
     inputRef.current.focus();
   }, [replyingMessage]);
@@ -300,7 +305,12 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
       quotedMsg: replyingMessage,
     };
     try {
-      await api.post(`/messages/${ticketId}`, message);
+      const { data } = await api.post(`/messages/${ticketId}`, message);
+
+      if (data.err) {
+        setContactId(data.contactId);
+        setNewTicketModalOpen(true);
+      }
     } catch (err) {
       toastError(err);
     }
@@ -419,6 +429,13 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
   if (medias.length > 0)
     return (
       <Paper elevation={0} square className={classes.viewMediaInputWrapper}>
+        <NewTicketModal
+          modalOpen={newTicketModalOpen}
+          onClose={(e) => setNewTicketModalOpen(false)}
+          contactId={contactId}
+          ticketId={ticketId}
+          message={"O whatsapp usado para essa conversa está desconectado. Deseja criar uma nova conversa usando outro número? Esta conversa será finalizada e um nova conversa será criada."}
+        />
         <IconButton
           aria-label="cancel-upload"
           component="span"
@@ -457,6 +474,13 @@ const MessageInput = ({ ticketStatus, sessionClosed }) => {
   else {
     return (
       <Paper square elevation={0} className={classes.mainWrapper}>
+        <NewTicketModal
+          modalOpen={newTicketModalOpen}
+          onClose={(e) => setNewTicketModalOpen(false)}
+          contactId={contactId}
+          ticketId={ticketId}
+          message={"O whatsapp usado para essa conversa está desconectado. Deseja criar uma nova conversa usando outro número? Esta conversa será finalizada e um nova conversa será criada."}
+        />
         {replyingMessage && renderReplyingMessage(replyingMessage)}
         <div className={classes.newMessageBox}>
           <Hidden only={["sm", "xs"]}>

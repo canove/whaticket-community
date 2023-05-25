@@ -234,6 +234,7 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
             <tr>
               <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Nome</td>
               <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Telefone</td>
+              <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">CPF/CNPJ</td>
               <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Categoria</td>
               <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Status</td>
               <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Processado</td>
@@ -296,6 +297,7 @@ const getRegistersData = registers => {
   registers.forEach(register => {
     const name = register.name;
     const phoneNumber = register.phoneNumber;
+    const documentNumber = register.documentNumber;
 
     const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
     const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
@@ -321,6 +323,7 @@ const getRegistersData = registers => {
       <tr>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${name}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${phoneNumber}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${documentNumber}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${category}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${status}</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${processedAt}</td>
@@ -360,10 +363,10 @@ export const exportCsv = async (
     isProcessed
   });
 
-  const rows = [["Nome", "Telefone", "Categoria", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];
+  const rows = [["Nome", "Telefone", "CPF/CNPJ", "Categoria", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];
 
   registers.forEach(register => {
-    const { name, phoneNumber } = register;
+    const { name, phoneNumber, documentNumber } = register;
 
     const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
     const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
@@ -391,6 +394,7 @@ export const exportCsv = async (
 
     columns.push(name);
     columns.push(phoneNumber);
+    columns.push(documentNumber);
     columns.push(category);
     columns.push(status);
     columns.push(processedAt);

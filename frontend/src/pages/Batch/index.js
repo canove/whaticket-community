@@ -86,7 +86,6 @@ const Batch = () => {
 
   const [batches, dispatch] = useReducer(reducer, []);
   const [loading, setLoading] = useState(false);
-  const [refreshingBatch, setRefreshingBatch] = useState({});
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -99,14 +98,6 @@ const Batch = () => {
       try {
         const { data } = await api.get("/batch/");
         dispatch({ type: "LOAD_BATCHES", payload: data });
-
-        let refreshing = {};
-        for (const batch of data) {
-          if (batch.batchQuantity === batch.processedQuantity) break;
-
-          refreshing = {...refreshing, [batch.id]: false };
-        }
-        setRefreshingBatch(refreshing);
       } catch (err) {
         toastError(err);
       }
@@ -115,32 +106,6 @@ const Batch = () => {
 
     fetchBatches();
   }, []);
-
-  useEffect(() => {
-    const socket = openSocket();
-
-    socket.on(`batch${user.companyId}`, (data) => {
-      if (data.action === "update") {
-        dispatch({ type: "UPDATE_BATCH", payload: data.batch });
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [user]);
-
-  const refreshBatch = async (batchId) => {
-    setRefreshingBatch(prevRefresing => ({ ...prevRefresing, [batchId]: true }));
-
-    try {
-      await api.put(`/batch/${batchId}`);
-    } catch (err) {
-      toastError(err);
-    }
-
-    setRefreshingBatch(prevRefresing => ({ ...prevRefresing, [batchId]: false }));
-  }
 
   return (
     <MainContainer>
@@ -157,9 +122,8 @@ const Batch = () => {
               <TableCell align="center">{i18n.t("batch.id")}</TableCell>
               <TableCell align="center">{i18n.t("batch.total")}</TableCell>
               <TableCell align="center">{i18n.t("batch.processed")}</TableCell>
-              <TableCell align="center">{i18n.t("batch.isBillet")}</TableCell>
+              <TableCell align="center">{i18n.t("batch.interaction")}</TableCell>
               <TableCell align="center">{i18n.t("batch.createdAt")}</TableCell>
-              <TableCell align="center">{i18n.t("batch.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -168,17 +132,9 @@ const Batch = () => {
                 <TableRow key={batch.id}>
                   <TableCell align="center">{batch.batchId}</TableCell>
                   <TableCell align="center">{batch.batchQuantity}</TableCell>
-                  <TableCell align="center">{batch.processedQuantity ?? 0}</TableCell>
-                  <TableCell align="center">{batch.isBillet ? i18n.t("batch.yes") : i18n.t("batch.no")}</TableCell>
+                  <TableCell align="center">{(batch.registers && batch.registers.length > 0 && batch.registers[0].processedQuantity) ? batch.registers[0].processedQuantity : 0}</TableCell>
+                  <TableCell align="center">{(batch.registers && batch.registers.length > 0 && batch.registers[0].interactionQuantity) ? batch.registers[0].interactionQuantity : 0}</TableCell>
                   <TableCell align="center">{format(parseISO(batch.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
-                  <TableCell align="center">
-                    {refreshingBatch.hasOwnProperty(batch.id) &&
-                      <IconButton size="small" onClick={() => refreshBatch(batch.id)} disabled={refreshingBatch[batch.id]}>
-                        {!refreshingBatch[batch.id] && <GrUpdate />}
-                        {refreshingBatch[batch.id] && <CircularProgress />}
-                      </IconButton>
-                    }
-                  </TableCell>
                 </TableRow>
               ))}
               {loading && <TableRowSkeleton columns={5} />}

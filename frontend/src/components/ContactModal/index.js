@@ -58,7 +58,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 
 	const initialState = {
 		name: "",
-		number: "",
+		number: "55",
 		email: "",
 	};
 
@@ -67,7 +67,9 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 			.min(2, `${i18n.t("contacts.toasts.short")}`)
 			.max(50, `${i18n.t("contacts.toasts.long")}`)
 			.required(`${i18n.t("contacts.toasts.required")}`),
-		number: Yup.string().min(8,`${i18n.t("contacts.toasts.short")}`).max(50,`${i18n.t("contacts.toasts.long")}`),
+		number: Yup.string()
+			.min(17,`${i18n.t("contacts.toasts.short")}`)
+			.max(22,`${i18n.t("contacts.toasts.long")}`),
 		email: Yup.string().email(`${i18n.t("contacts.toasts.email")}`),
 	});
 
@@ -82,8 +84,21 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	useEffect(() => {
 		const fetchContact = async () => {
 			if (initialValues) {
+				let newNumber = initialValues.number;
+
+				if (initialValues.number) {
+					newNumber = newNumber.replace(/\D/g,'');
+					newNumber = newNumber.replace(/(\d{2})(\d)/,"+$1 $2");
+					newNumber = newNumber.replace(/(\d{2})(\d)/,"($1) $2");
+					newNumber = newNumber.replace(/(\d)(\d{4})$/,"$1-$2");
+				} else {
+					newNumber = "55";
+					newNumber = newNumber.replace(/\D/g,'');
+					newNumber = newNumber.replace(/(\d{2})(\d)/,"+$1 $2");
+				}
+				
 				setContact(prevState => {
-					return { ...prevState, ...initialValues };
+					return { ...prevState, ...initialValues, number: newNumber };
 				});
 			}
 
@@ -144,7 +159,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 						}, 400);
 					}}
 				>
-					{({ values, errors, touched, isSubmitting }) => (
+					{({ values, errors, touched, isSubmitting, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
 								<Typography variant="subtitle1" gutterBottom>
@@ -167,9 +182,18 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 									name="number"
 									error={touched.number && Boolean(errors.number)}
 									helperText={touched.number && errors.number}
-									placeholder="5513912344321"
+									placeholder="+55 (13) 91234-4321"
 									variant="outlined"
 									margin="dense"
+									onChange={(e) => {
+										let newValue = e.target.value;
+										newValue = newValue.replace(/\D/g,'')
+										newValue = newValue.replace(/(\d{2})(\d)/,"+$1 $2");
+										newValue = newValue.replace(/(\d{2})(\d)/,"($1) $2")
+										newValue = newValue.replace(/(\d)(\d{4})$/,"$1-$2")
+
+										setFieldValue("number", newValue);
+									}}
 								/>
 								<div>
 									<Field

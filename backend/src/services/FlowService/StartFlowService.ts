@@ -20,6 +20,7 @@ import SatisfactionSurveyResponses from "../../database/models/SatisfactionSurve
 import Sessions from "../../database/models/Sessions";
 import Whatsapp from "../../database/models/Whatsapp";
 import ConnectionFiles from "../../database/models/ConnectionFile";
+import Message from "../../database/models/Message";
 
 interface Request {
   flowNodeId?: string;
@@ -210,11 +211,118 @@ const processNode = async (node: any, session: any, body: any) => {
     let nodeHeader = jsonStringToObj(node.header);
     let nodeBody = jsonStringToObj(node.body);
 
+    let variables = [];
+    let variablesMapping = {};
+    Object.keys(nodeBody).forEach((varName: any) => {
+      const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+
+      if (param && param[0]) {
+        variables.push(param[0]);
+        variablesMapping = { ...variablesMapping, [varName]: param[0] };
+      }
+    });
+
+    if (variables.length > 0) {
+      let ticket = null;
+      let messages = null;
+      // let register = null;
+      let contact = null;
+
+      // register = await FileRegister.findOne({
+      //   where: {
+      //     phoneNumber: { 
+      //       [Op.or]: [
+      //         session.id,
+      //         removePhoneNumberWith9Country(session.id),
+      //         preparePhoneNumber9Digit(session.id),
+      //         removePhoneNumber9Digit(session.id),
+      //         removePhoneNumberCountry(session.id),
+      //         removePhoneNumber9DigitCountry(session.id)
+      //       ],
+      //     },
+      //     companyId: session.companyId,
+      //     processedAt: { [Op.ne]: null }
+      //   },
+      //   order: [["createdAt", "DESC"]]
+      // });
+  
+      contact = await Contact.findOne({
+        where: {
+          companyId: session.companyId,
+          number: { 
+            [Op.or]: [
+              session.id,
+              removePhoneNumberWith9Country(session.id),
+              preparePhoneNumber9Digit(session.id),
+              removePhoneNumber9Digit(session.id),
+              removePhoneNumberCountry(session.id),
+              removePhoneNumber9DigitCountry(session.id)
+            ],
+          }
+        },
+        attributes: ["id"],
+      });
+
+      if (variables.includes("{{ticket.id}}")) {
+
+        ticket = await Ticket.findOne({
+          where: {
+            status: "inbot",
+            contactId: contact.id,
+            companyId: session.companyId,
+          },
+          attributes: ["id"],
+          order: [["createdAt", "DESC"]]
+        });
+      }
+
+      if (variables.includes("{{ticket.messages}}")) {
+        if (!ticket) {
+          ticket = await Ticket.findOne({
+            where: {
+              status: "inbot",
+              contactId: contact.id,
+              companyId: session.companyId,
+              // whatsappId: register.whatsappId,
+            },
+            attributes: ["id"],
+            order: [["createdAt", "DESC"]]
+          });
+        }
+
+        const msgs = await Message.findAll({
+          where: { ticketId: ticket.id },
+          attributes: ["id", "fromMe", "body", "mediaUrl"],
+          order: [["createdAt", "ASC"]],
+        });
+
+        messages = msgs.map(msg => {
+          const role = msg.fromMe ? "assistant" : "user";
+          const content = msg.body ? msg.body : msg.mediaUrl;
+
+          return { role, content };
+        });
+      }
+
+      Object.keys(variablesMapping).forEach((varName: any) => {
+        const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+  
+        switch (param[0]) {
+          case "{{ticket.id}}":
+            nodeBody[varName] = ticket.id;
+          break;
+          case "{{ticket.messages}}": 
+            nodeBody[varName] = messages;
+          break;
+        }
+      });
+    }
+
     if (!nodeHeader) {
       nodeHeader = "";
     }
 
-    if (node.method === "POST" || !nodeBody) {
+    if (node.method === "GET" || !nodeBody) {
       nodeBody = "";
     }
 
@@ -285,8 +393,8 @@ const processNode = async (node: any, session: any, body: any) => {
       type: "TRANSFER_QUEUE"
     };
 
-    if (queueType === "whatsapp" || queueType === "category") {
-      const value = await FileRegister.findOne({
+    if (queueType === "whatsapp" || queueType === "category" || queueType === "register") {
+      const reg = await FileRegister.findOne({
         where: {
           phoneNumber: { 
             [Op.or]: [
@@ -301,60 +409,86 @@ const processNode = async (node: any, session: any, body: any) => {
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
-        attributes: ["id", "whatsappId"],
+        attributes: ["id", "whatsappId", "connectionFileId"],
         order: [["createdAt", "DESC"]]
       });
 
-      if (value && value.whatsappId) {
-        const whatsapp = await Whatsapp.findOne({
-          where: { id: value.whatsappId },
-          attributes: ["id", "name"],
-          include: [
-            {
-              model: Queue,
-              as: "queues",
-              attributes: ["id", "name"],
-              required: false,
-            },
-            {
-              model: ConnectionFiles,
-              as: "connectionFile",
-              attributes: ["id", "name"],
-              include: [
-                {
-                  model: Queue,
-                  as: "queue",
-                  attributes: ["id", "name"],
-                  required: false,
-                },
-              ],
-              required: false,
-            },
-          ]
-        });
-  
-        const whatsappQueueName = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].name : "NO_QUEUE";
-        const whatsappQueueId = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : "";
-        
-        const categoryQueueName = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.name : "NO_QUEUE";
-        const categoryQueueId = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.id : "";
-  
-        if (queueType === "whatsapp") {
-          response = {
-            queueName: whatsappQueueName,
-            queueId: whatsappQueueId,
-            type: "TRANSFER_QUEUE"
-          };
-        }
-  
-        if (queueType === "category") {
+      if (queueType === "register") {
+        if (reg && reg.connectionFileId) {
+          const connectionFile = await ConnectionFiles.findOne({
+            where: { id: reg.connectionFileId },
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Queue,
+                as: "queue",
+                attributes: ["id", "name"],
+                required: false,
+              },
+            ],
+          });
+
+          const categoryQueueName = (connectionFile && connectionFile.queue) ? connectionFile.queue.name : "NO_QUEUE";
+          const categoryQueueId = (connectionFile && connectionFile.queue) ? connectionFile.queue.id : "";
+
           response = {
             queueName: categoryQueueName,
             queueId: categoryQueueId,
             type: "TRANSFER_QUEUE"
           };
         }
-      }
+      } else {
+        if (reg && reg.whatsappId) {
+          const whatsapp = await Whatsapp.findOne({
+            where: { id: reg.whatsappId },
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Queue,
+                as: "queues",
+                attributes: ["id", "name"],
+                required: false,
+              },
+              {
+                model: ConnectionFiles,
+                as: "connectionFile",
+                attributes: ["id", "name"],
+                include: [
+                  {
+                    model: Queue,
+                    as: "queue",
+                    attributes: ["id", "name"],
+                    required: false,
+                  },
+                ],
+                required: false,
+              },
+            ]
+          });
+    
+          const whatsappQueueName = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].name : "NO_QUEUE";
+          const whatsappQueueId = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : "";
+          
+          const categoryQueueName = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.name : "NO_QUEUE";
+          const categoryQueueId = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.id : "";
+    
+          if (queueType === "whatsapp") {
+            response = {
+              queueName: whatsappQueueName,
+              queueId: whatsappQueueId,
+              type: "TRANSFER_QUEUE"
+            };
+          }
+    
+          if (queueType === "category") {
+            response = {
+              queueName: categoryQueueName,
+              queueId: categoryQueueId,
+              type: "TRANSFER_QUEUE"
+            };
+          }
+        }
+      } 
     } else if (!queueType || queueType === "queue") {
       const queue = await Queue.findOne({
         where: { id: node.queueId }
@@ -537,26 +671,21 @@ const processNode = async (node: any, session: any, body: any) => {
     const blocks = [];
 
     let value = null;
-    let client = null;
 
     try {
-      client = createClient({
+      const client = createClient({
         url: process.env.REDIS_URL
       });
-    } catch (err) {
-      console.log("REDIS", err);
-    }
 
-    if (client) {
-      try {
-        client.on('error', err => console.log('Redis Client Error', err));
-        await client.connect();
-        value = await getRedisValue(session.id,session.companyId, client);
-      } catch (err) {
-        console.log("REDIS", err);
-      }
-  
+      client.on('error', err => console.log('Redis Client Error', err));
+
+      await client.connect();
+
+      value = await getRedisValue(session.id,session.companyId, client);
+
       await client.disconnect();
+    } catch (err) {
+      console.log("Flow Multiple Messages Node - REDIS Error", err);
     }
 
     if (!value) {
@@ -582,7 +711,13 @@ const processNode = async (node: any, session: any, body: any) => {
     node.messages.forEach(message => {
       if (message.messageType === "text") {
         let newText = message.messageContent;
-        newText = formatMessage(newText, value);
+
+        if (body.response) {
+          newText = formatMessage(newText, body);
+          newText = formatMessage(newText, value);
+        } else {
+          newText = formatMessage(newText, value);
+        }
 
         const newMessage = {
           text: newText.replace(/&#x2F;/g, '/'),
@@ -813,20 +948,16 @@ const processNode = async (node: any, session: any, body: any) => {
       client = createClient({
         url: process.env.REDIS_URL
       });
-    } catch (err) {
-      console.log("REDIS", err);
-    }
 
-    if (client) {
-      try {
-        client.on('error', err => console.log('Redis Client Error', err));
-        await client.connect();
-        value = await getRedisValue(session.id, session.companyId, client);
-      } catch (err) {
-        console.log("REDIS", err);
-      }
+      client.on('error', err => console.log('Redis Client Error', err));
+
+      await client.connect();
+
+      value = await getRedisValue(session.id, session.companyId, client);
 
       await client.disconnect();
+    } catch (err) {
+      console.log("REDIS", err);
     }
 
     if (!value) {
@@ -932,7 +1063,7 @@ const processNode = async (node: any, session: any, body: any) => {
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
-      order: [["createdAt", "DESC"]]
+      order: [["processedAt", "DESC"]]
     });
 
     await reg.update({

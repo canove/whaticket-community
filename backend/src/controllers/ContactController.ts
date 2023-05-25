@@ -65,7 +65,7 @@ export const getContact = async (
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const newContact: ContactData = req.body;
-  newContact.number = newContact.number.replace("-", "").replace(" ", "");
+  newContact.number = newContact.number.replace("+", "").replace(" ", "").replace("(", "").replace(")", "").replace(" ", "").replace("-", "");
 
   const schema = Yup.object().shape({
     name: Yup.string().required(),
@@ -78,6 +78,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     await schema.validate(newContact);
   } catch (err: any) {
     throw new AppError(err.message);
+  }
+
+  if (newContact.number.length < 12) {
+    throw new AppError("ERR_INVALID_NUMBER");
   }
 
   // await CheckIsValidContact(newContact.number);
