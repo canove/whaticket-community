@@ -285,8 +285,8 @@ const processNode = async (node: any, session: any, body: any) => {
       type: "TRANSFER_QUEUE"
     };
 
-    if (queueType === "whatsapp" || queueType === "category") {
-      const value = await FileRegister.findOne({
+    if (queueType === "whatsapp" || queueType === "category" || queueType === "register") {
+      const reg = await FileRegister.findOne({
         where: {
           phoneNumber: { 
             [Op.or]: [
@@ -301,60 +301,86 @@ const processNode = async (node: any, session: any, body: any) => {
           companyId: session.companyId,
           processedAt: { [Op.ne]: null }
         },
-        attributes: ["id", "whatsappId"],
+        attributes: ["id", "whatsappId", "connectionFileId"],
         order: [["createdAt", "DESC"]]
       });
 
-      if (value && value.whatsappId) {
-        const whatsapp = await Whatsapp.findOne({
-          where: { id: value.whatsappId },
-          attributes: ["id", "name"],
-          include: [
-            {
-              model: Queue,
-              as: "queues",
-              attributes: ["id", "name"],
-              required: false,
-            },
-            {
-              model: ConnectionFiles,
-              as: "connectionFile",
-              attributes: ["id", "name"],
-              include: [
-                {
-                  model: Queue,
-                  as: "queue",
-                  attributes: ["id", "name"],
-                  required: false,
-                },
-              ],
-              required: false,
-            },
-          ]
-        });
-  
-        const whatsappQueueName = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].name : "NO_QUEUE";
-        const whatsappQueueId = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : "";
-        
-        const categoryQueueName = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.name : "NO_QUEUE";
-        const categoryQueueId = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.id : "";
-  
-        if (queueType === "whatsapp") {
-          response = {
-            queueName: whatsappQueueName,
-            queueId: whatsappQueueId,
-            type: "TRANSFER_QUEUE"
-          };
-        }
-  
-        if (queueType === "category") {
+      if (queueType === "register") {
+        if (reg && reg.connectionFileId) {
+          const connectionFile = await ConnectionFiles.findOne({
+            where: { id: reg.connectionFileId },
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Queue,
+                as: "queue",
+                attributes: ["id", "name"],
+                required: false,
+              },
+            ],
+          });
+
+          const categoryQueueName = (connectionFile && connectionFile.queue) ? connectionFile.queue.name : "NO_QUEUE";
+          const categoryQueueId = (connectionFile && connectionFile.queue) ? connectionFile.queue.id : "";
+
           response = {
             queueName: categoryQueueName,
             queueId: categoryQueueId,
             type: "TRANSFER_QUEUE"
           };
         }
-      }
+      } else {
+        if (reg && reg.whatsappId) {
+          const whatsapp = await Whatsapp.findOne({
+            where: { id: reg.whatsappId },
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Queue,
+                as: "queues",
+                attributes: ["id", "name"],
+                required: false,
+              },
+              {
+                model: ConnectionFiles,
+                as: "connectionFile",
+                attributes: ["id", "name"],
+                include: [
+                  {
+                    model: Queue,
+                    as: "queue",
+                    attributes: ["id", "name"],
+                    required: false,
+                  },
+                ],
+                required: false,
+              },
+            ]
+          });
+    
+          const whatsappQueueName = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].name : "NO_QUEUE";
+          const whatsappQueueId = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : "";
+          
+          const categoryQueueName = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.name : "NO_QUEUE";
+          const categoryQueueId = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.id : "";
+    
+          if (queueType === "whatsapp") {
+            response = {
+              queueName: whatsappQueueName,
+              queueId: whatsappQueueId,
+              type: "TRANSFER_QUEUE"
+            };
+          }
+    
+          if (queueType === "category") {
+            response = {
+              queueName: categoryQueueName,
+              queueId: categoryQueueId,
+              type: "TRANSFER_QUEUE"
+            };
+          }
+        }
+      } 
     } else if (!queueType || queueType === "queue") {
       const queue = await Queue.findOne({
         where: { id: node.queueId }
@@ -932,7 +958,7 @@ const processNode = async (node: any, session: any, body: any) => {
         companyId: session.companyId,
         processedAt: { [Op.ne]: null }
       },
-      order: [["createdAt", "DESC"]]
+      order: [["processedAt", "DESC"]]
     });
 
     await reg.update({
