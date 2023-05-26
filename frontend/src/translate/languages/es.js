@@ -1400,6 +1400,7 @@ const messages = {
         status: "Status",
         total: "Total",
         processed: "Processados",
+        interaction: "Interações",
         isBillet: "É boleto?",
         actions: "Ações",
         createdAt: "Criado em",
@@ -1450,6 +1451,9 @@ const messages = {
         ERR_NO_CATEGORY_FOUND : "¡Categoría de error no encontrada!",
         ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
         ERR_IP_NOT_ALLOWED: "IP origem da requisição não permitido.",
+        ERR_NO_NICKNAME: "Não é possível este apelido como assinatura.",
+        ERR_WHATSAPP_DISCONNECTED: "Whatsapp desconectado.",
+        ERR_INVALID_NUMBER: "Número de telefone inválido."
       },
     },
   },

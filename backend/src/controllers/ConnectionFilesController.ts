@@ -12,6 +12,7 @@ import DeleteConnectionFileService from "../services/ConnectionFileService/Delet
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import BindFlowToConnectionFilesService from "../services/ConnectionFileService/BindFlowToConnectionFilesService";
 import BindQueueToConnectionFilesService from "../services/ConnectionFileService/BindQueueToConnectionFilesService";
+import Whatsapp from "../database/models/Whatsapp";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
@@ -70,6 +71,29 @@ export const bind = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
   await BindFlowToConnectionFilesService({ connectionFileId, flowId, companyId });
+
+  return res.status(200).json("OK");
+};
+
+export const callback = async (req: Request, res: Response): Promise<Response> => {
+  const { connectionFileId, messageCallbackUrl, statusCallbackUrl, callbackAuthorization } = req.body;
+  const { companyId } = req.user;
+
+  await Whatsapp.update(
+    {
+      messageCallbackUrl, 
+      statusCallbackUrl, 
+      callbackAuthorization
+    }, 
+    {
+      where: {
+        official: false,
+        deleted: false,
+        connectionFileId,
+        companyId,
+      }
+    }
+  );
 
   return res.status(200).json("OK");
 };

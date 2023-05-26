@@ -8,6 +8,7 @@ import {
   removePhoneNumberCountry,
   removePhoneNumber9DigitCountry
 } from "../../utils/common";
+import Ticket from "../../database/models/Ticket";
 
 /*eslint-disable */
 interface ExtraInfo {
@@ -37,30 +38,28 @@ const CreateOrUpdateContactService = async ({
   const number = isGroup ? rawNumber : rawNumber.replace(/[^0-9]/g, "");
 
   const io = getIO();
-  let contact = null;
+  let contact: Contact | null;
+  let where = {
+    companyId,
+    number: 
+       { 
+         [Op.or]: [
+           removePhoneNumberWith9Country(number),
+           preparePhoneNumber9Digit(number),
+           removePhoneNumber9Digit(number),
+           removePhoneNumberCountry(number),
+           removePhoneNumber9DigitCountry(number)
+         ],
+       }
+  };
 
-  contact = await Contact.findOne({
-    where: {
-      companyId,
-      number: { 
-        [Op.or]: [
-          removePhoneNumberWith9Country(number),
-          preparePhoneNumber9Digit(number),
-          removePhoneNumber9Digit(number),
-          removePhoneNumberCountry(number),
-          removePhoneNumber9DigitCountry(number)
-        ],
-      }
-   }});
+  contact = await Contact.findOne({ where });
+  const isGroupNumber = (number && number.length > 15);
 
   if (contact) {
     const oldName = contact.name;
-
-    const isGroupNumber = (number && number.length > 15);
     const allowedNames = (name && name !== "" && name !== "undefined" && name !== "Empty");
-
-    console.log("update contact contactService 42");
-
+   
     await contact.update({ 
       name: (!isGroupNumber) && (allowedNames) ? name : oldName,
       profilePicUrl 
@@ -72,7 +71,6 @@ const CreateOrUpdateContactService = async ({
     });
   } else {
     const disallowedNames = (name && (name === "" || name === "undefined" || name === "Empty"));
-    const isGroupNumber = (number && number.length > 15);
 
     contact = await Contact.create({
       name: (isGroupNumber && disallowedNames) ? "GRUPO" : name,
@@ -83,7 +81,7 @@ const CreateOrUpdateContactService = async ({
       extraInfo,
       companyId
     });
-
+   
     io.emit(`contact${companyId}`, {
       action: "create",
       contact

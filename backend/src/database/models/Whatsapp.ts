@@ -133,6 +133,9 @@ class Whatsapp extends Model<Whatsapp> {
   lastSendDate: Date;
 
   @Column
+  lastResendDate: Date;
+
+  @Column
   lastPingDate: Date;
 
   @HasMany(() => Ticket)
@@ -190,6 +193,9 @@ class Whatsapp extends Model<Whatsapp> {
   @Default(false)
   @Column
   maturing: boolean;
+
+  @Column
+  timeoutQuantity: number;
 }
 
 export default Whatsapp;

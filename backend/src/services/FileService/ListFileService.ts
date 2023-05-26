@@ -4,6 +4,7 @@ import ConnectionFiles from "../../database/models/ConnectionFile";
 import File from "../../database/models/File";
 import OfficialTemplates from "../../database/models/OfficialTemplates";
 import Templates from "../../database/models/TemplatesData";
+import User from "../../database/models/User";
 
 interface Response {
   reports: File[];
@@ -98,6 +99,12 @@ const ListFileService = async ({
           as: "connectionFile",
           attributes: ["id", "name"],
           required: false,
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name"],
+          required: false 
         },
       ]
     });

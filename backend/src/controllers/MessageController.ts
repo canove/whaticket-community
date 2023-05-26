@@ -49,6 +49,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   if (ticket.userId != null && ticket.userId != id) throw new AppError("ERR_TICKET_ACCEPTED_BY_OTHER_USER");
 
+  const whatsapp = ticket.whatsapp;
+  if (whatsapp && (whatsapp.status != "CONNECTED" || whatsapp.deleted)) {
+    return res.status(200).json({ err: true, errorMsg: "ERR_WHATSAPP_DISCONNECTED", contactId: ticket.contactId });
+  }
+
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {

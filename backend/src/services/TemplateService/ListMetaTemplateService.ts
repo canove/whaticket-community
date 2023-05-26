@@ -23,7 +23,9 @@ const ListMetaTemplateService = async ({
       `https://graph.facebook.com/v16.0/${whatsappAccountId}/message_templates?access_token=${facebookAccessToken}&language=pt_BR`
     );
 
-    return data.data;
+    const templates = data.data;
+
+    return templates;
   } catch (err: any) {
     throw new AppError(err.message);
   }

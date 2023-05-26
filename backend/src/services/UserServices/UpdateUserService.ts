@@ -61,6 +61,8 @@ const UpdateUserService = async ({
     throw new AppError(err.message);
   }
 
+  if (useNickname && !nickname) throw new AppError("ERR_NO_NICKNAME");
+  
   await user.update({
     email,
     password,

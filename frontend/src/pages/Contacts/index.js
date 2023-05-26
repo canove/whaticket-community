@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
+import openSQSSocket from "../../services/socket-sqs-io";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
 
@@ -147,7 +148,24 @@ const Contacts = () => {
     return () => {
       socket.disconnect();
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const socket = openSQSSocket();
+
+    socket.on(`contact${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
+      }
+
+      if (data.action === "delete") {
+        dispatch({ type: "DELETE_CONTACT", payload: +data.contactId });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleSearch = (event) => {
@@ -262,13 +280,13 @@ const Contacts = () => {
               ),
             }}
           />
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             onClick={(e) => setConfirmOpen(true)}
           >
             {i18n.t("contacts.buttons.import")}
-          </Button>
+          </Button> */}
           <Button
             variant="contained"
             color="primary"

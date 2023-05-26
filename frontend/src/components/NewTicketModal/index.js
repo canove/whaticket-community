@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, officialWhatsappId, officialContact }) => {
+const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, officialWhatsappId, officialContact, message }) => {
 	const history = useHistory();
 	const classes = useStyles();
 
@@ -179,7 +179,11 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 		if (newValue?.number) {
 			setSelectedContact(newValue);
 		} else if (newValue?.name) {
-			setNewContact({ number: newValue.name });
+			if (isNaN(newValue.name)) {
+				setNewContact({ name: newValue.name });
+			} else {
+				setNewContact({ number: newValue.name });
+			}
 			setContactModalOpen(true);
 		} else {
 			setSelectedContact(null);
@@ -238,7 +242,14 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 				</DialogTitle>
 				<DialogContent dividers>
 					{ contactId &&
-						<Typography>Você tem certeza que deseja continuar esta conversa com outro número? Este ticket será finalizado e um novo ticket será criado.</Typography>
+						<>
+							{ message && <Typography>{message}</Typography> }
+							{ !message && 
+								<Typography>
+									Você tem certeza que deseja continuar esta conversa com outro número? Este ticket será finalizado e um novo ticket será criado.
+								</Typography>
+							}
+						</>
 					}
 					{ !contactId &&
 						<>

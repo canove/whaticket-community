@@ -1398,6 +1398,7 @@ const messages = {
         status: "Status",
         total: "Total",
         processed: "Processed",
+        interaction: "Interaction",
         isBillet: "Is Billet?",
         actions: "Actions",
         createdAt: "Created At",
@@ -1448,6 +1449,9 @@ const messages = {
         ERR_NO_CATEGORY_FOUND : "Error category not found!",
         ERR_NAME_OR_CODE_ALREADY_EXISTS: "Name or code already exists.",
         ERR_IP_NOT_ALLOWED: "Request source IP not allowed.",
+        ERR_NO_NICKNAME: "You cannot use this nickname as signature.",
+        ERR_WHATSAPP_DISCONNECTED: "Whatsapp disconnected.",
+        ERR_INVALID_NUMBER: "Invalid phone number."
       },
     },
   },

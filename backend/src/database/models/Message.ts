@@ -98,6 +98,9 @@ class Message extends Model<Message> {
   @Column
   footer: string
 
+  @Column
+  resendQuantity: number;
+
   // Para Relatório
   lastMessage: string;
 }

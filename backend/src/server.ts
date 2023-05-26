@@ -21,10 +21,7 @@ initIO(server);
 // console.log('\n\nWelcome to SQS BOT MESSAGE CONSUMER');
 // initMessageResponseConsumer();
 // console.log('\n\nWelcome to SQS MESSAGE RESPONSE CONSUMER');
-
-// for(let i = 0; i < 5; i++) {
-//   initMessageStatusConsumer(i);
-// }
+// initMessageStatusConsumer(0);
 
 // !StartAllWhatsAppsSessions();
 

@@ -102,9 +102,7 @@ const Batch = () => {
 
         let refreshing = {};
         for (const batch of data) {
-          if (batch.batchQuantity === batch.processedQuantity) break;
-
-          refreshing = {...refreshing, [batch.id]: false };
+          refreshing = { ...refreshing, [batch.id]: false };
         }
         setRefreshingBatch(refreshing);
       } catch (err) {
@@ -157,7 +155,7 @@ const Batch = () => {
               <TableCell align="center">{i18n.t("batch.id")}</TableCell>
               <TableCell align="center">{i18n.t("batch.total")}</TableCell>
               <TableCell align="center">{i18n.t("batch.processed")}</TableCell>
-              <TableCell align="center">{i18n.t("batch.isBillet")}</TableCell>
+              <TableCell align="center">{i18n.t("batch.interaction")}</TableCell>
               <TableCell align="center">{i18n.t("batch.createdAt")}</TableCell>
               <TableCell align="center">{i18n.t("batch.actions")}</TableCell>
             </TableRow>
@@ -169,10 +167,10 @@ const Batch = () => {
                   <TableCell align="center">{batch.batchId}</TableCell>
                   <TableCell align="center">{batch.batchQuantity}</TableCell>
                   <TableCell align="center">{batch.processedQuantity ?? 0}</TableCell>
-                  <TableCell align="center">{batch.isBillet ? i18n.t("batch.yes") : i18n.t("batch.no")}</TableCell>
+                  <TableCell align="center">{batch.interactionQuantity ?? 0}</TableCell>
                   <TableCell align="center">{format(parseISO(batch.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
                   <TableCell align="center">
-                    {refreshingBatch.hasOwnProperty(batch.id) &&
+                    {((batch.batchQuantity != batch.processedQuantity) || ((batch.batchQuantity != batch.interactionQuantity))) &&
                       <IconButton size="small" onClick={() => refreshBatch(batch.id)} disabled={refreshingBatch[batch.id]}>
                         {!refreshingBatch[batch.id] && <GrUpdate />}
                         {refreshingBatch[batch.id] && <CircularProgress />}
@@ -181,7 +179,7 @@ const Batch = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {loading && <TableRowSkeleton columns={5} />}
+              {loading && <TableRowSkeleton columns={6} />}
             </>
           </TableBody>
         </Table>

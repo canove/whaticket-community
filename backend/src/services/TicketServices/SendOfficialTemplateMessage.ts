@@ -73,7 +73,7 @@ const SendOfficialTemplateMessage = async ({
 
     return response;
   } catch (err: any) {
-    throw new AppError(err);
+    throw new AppError(err?.response?.data?.error?.message);
   }
 };
 

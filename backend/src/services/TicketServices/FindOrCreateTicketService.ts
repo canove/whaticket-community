@@ -28,13 +28,31 @@ const FindOrCreateTicketService = async (
 ): Promise<Response> => {
   let isCreated = false;
 
+  const contacts = await Contact.findAll({
+    where: {
+      number: { 
+        [Op.or]: [
+          contact.number,
+          removePhoneNumberWith9Country(contact.number),
+          preparePhoneNumber9Digit(contact.number),
+          removePhoneNumber9Digit(contact.number),
+          removePhoneNumberCountry(contact.number),
+          removePhoneNumber9DigitCountry(contact.number)
+        ]
+      },
+      companyId
+    }
+  });
+
+  const contactIds = contacts.map(contact => contact.id);
+
   let ticket = await Ticket.findOne({
     where: {
       status: {
         [Op.or]: ["open", "pending", "dispatcher", "inbot"]
       },
       whatsappId,
-      contactId: groupContact ? groupContact.id : contact.id,
+      contactId: groupContact ? groupContact.id : contactIds,
       companyId
     }
   });
@@ -118,17 +136,22 @@ const FindOrCreateTicketService = async (
       order: [['createdAt', 'DESC']]
     });
 
-    const category = await ConnectionFiles.findOne({
-      where: { id: reg.connectionFileId },
-      include: [
-        {
-          model: Queue,
-          as: "queue",
-          attributes: ["id", "limit", "overflowQueueId", "companyId"],
-          required: true,
-        }
-      ]
-    });
+    let category = null;
+
+    if(reg && reg.connectionFileId) {
+      category = await ConnectionFiles.findOne({
+        where: { id: reg.connectionFileId },
+        include: [
+          {
+            model: Queue,
+            as: "queue",
+            attributes: ["id", "limit", "overflowQueueId", "companyId"],
+            required: true,
+          }
+        ]
+      });
+    }
+    
 
     const whatsapp = await Whatsapp.findOne({
       where: { id: whatsappId, deleted: false, companyId },

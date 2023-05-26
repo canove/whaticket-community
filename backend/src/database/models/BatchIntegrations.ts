@@ -13,6 +13,7 @@ import {
 } from "sequelize-typescript";
 import Company from "./Company";
 import FlowsNodes from "./FlowsNodes";
+import FileRegister from "./FileRegister";
 
 @Table
 class BatchIntegrations extends Model<BatchIntegrations> {
@@ -31,11 +32,17 @@ class BatchIntegrations extends Model<BatchIntegrations> {
   processedQuantity: number;
 
   @Column
+  interactionQuantity: number;
+
+  @Column
   isBillet: boolean;
 
   @ForeignKey(() => Company)
   @Column
   companyId: number;
+
+  @HasMany(() => FileRegister, "batchId")
+  registers: FileRegister[];
 
   @CreatedAt
   createdAt: Date;

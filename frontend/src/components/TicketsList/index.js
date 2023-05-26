@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
+import openSQSSocket from "../../services/socket-sqs-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -188,6 +189,76 @@ const reducer = (state, action) => {
 
 	useEffect(() => {
 		const socket = openSocket();
+
+		const shouldUpdateTicket = ticket => !searchParam &&
+			(!pendingAnswer || pendingAnswer && ticket.lastMessageFromMe === false) &&
+			(!ticket.userId || ticket.userId === user?.id || showAll) &&
+			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+
+		const notBelongsToUserQueues = ticket =>
+			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+
+		socket.on("connect", () => {
+			if (status) {
+				socket.emit("joinTickets", status);
+			} else {
+				socket.emit("joinNotification");
+			}
+		});
+
+		socket.on(`ticket${user.companyId}`, data => {
+			if (data.action === "updateUnread") {
+				dispatch({
+					type: "RESET_UNREAD",
+					payload: data.ticketId,
+				});
+			}
+
+			if (data.action === "update" && shouldUpdateTicket(data.ticket)) {
+				dispatch({
+					type: "UPDATE_TICKET",
+					payload: data.ticket,
+				});
+			}
+
+			if (data.action === "update" && notBelongsToUserQueues(data.ticket)) {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
+			}
+
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
+			}
+
+			if (data.action === "deleteLastMessage" && pendingAnswer) {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
+			}
+		});
+
+		socket.on(`appMessage${user.companyId}`, data => {
+			if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
+				dispatch({
+					type: "UPDATE_TICKET_UNREAD_MESSAGES",
+					payload: data.ticket,
+				});
+			}
+		});
+
+		socket.on(`contact${user.companyId}`, data => {
+			if (data.action === "update") {
+				dispatch({
+					type: "UPDATE_TICKET_CONTACT",
+					payload: data.contact,
+				});
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer]);
+
+	useEffect(() => {
+		const socket = openSQSSocket();
 
 		const shouldUpdateTicket = ticket => !searchParam &&
 			(!pendingAnswer || pendingAnswer && ticket.lastMessageFromMe === false) &&

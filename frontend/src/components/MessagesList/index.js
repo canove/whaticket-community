@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer, useRef, useContext } from "reac
 
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "../../services/socket-io";
+import openSQSSocket from "../../services/socket-sqs-io";
 import clsx from "clsx";
 
 import { green, red } from "@material-ui/core/colors";
@@ -441,6 +442,37 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
     };
   }, [user, ticketId]);
 
+  useEffect(() => {
+    const socket = openSQSSocket();
+
+    socket.on("connect", () => socket.emit("joinChatBox", ticketId));
+
+    socket.on(`appMessage${user.companyId}`, (data) => {
+      if (data.action === "create") {
+        dispatch({ type: "ADD_MESSAGE", payload: data.message });
+        scrollToBottom();
+      }
+
+      if (data.action === "update") {
+        if (data.oldId) {
+          dispatch({ type: "UPDATE_MESSAGE_ID", payload: data });
+        } else {
+          dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+        }
+      }
+    });
+
+    socket.on(`whatsapp-message${user.companyId}`, (data) => {
+      if (data.action === "update") {
+        dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user, ticketId]);
+
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
   };
@@ -545,6 +577,17 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
 				/>
       );
       // return <ModalVideoCors videoUrl={message.mediaUrl} />;
+    } else if (message.mediaType === "text") {
+      return (
+        <div 
+          style={{ 
+            overflowWrap: "break-word",
+            padding: "0px 80px 0px 6px", 
+          }}
+        >
+          <MarkdownWrapper>{message.mediaUrl}</MarkdownWrapper>
+        </div>
+      );
     } else {
       return (
         <>
