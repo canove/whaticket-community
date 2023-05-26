@@ -9,7 +9,7 @@ import api from "../../services/api";
 
 const TicketsQueueSelect = ({
 	userQueues,
-	selectedQueueIds = [],
+	selectedQueueIds = ["NO_QUEUE"],
 	onChange,
 }) => {
 	const { i18n } = useTranslation();
@@ -67,6 +67,17 @@ const TicketsQueueSelect = ({
 					}}
 					renderValue={() => i18n.t("ticketsQueueSelect.placeholder")}
 				>
+					<MenuItem dense value={"NO_QUEUE"}>
+						<Checkbox
+							style={{
+								color: "#000",
+							}}
+							size="small"
+							color="primary"
+							checked={selectedQueueIds.indexOf("NO_QUEUE") > -1}
+						/>
+						<ListItemText primary={"Sem Fila"} />
+					</MenuItem>
 					{queues && queues.length > 0 && queues.map(queue => (
 						<MenuItem dense key={queue.id} value={queue.id}>
 							<Checkbox

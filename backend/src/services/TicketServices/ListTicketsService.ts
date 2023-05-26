@@ -17,7 +17,7 @@ interface Request {
   showAll?: string;
   userId: string | number;
   withUnreadMessages?: string;
-  queueIds?: number[];
+  queueIds?: number[] | string[];
   companyId?: number;
   categoryId?: string;
   loggedUserId?: string | number;
@@ -48,7 +48,7 @@ const ListTicketsService = async ({
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
-    queueId: { [Op.or]: [queueIds, null] },
+    queueId: { [Op.or]: queueIds.map(queueId => (queueId === "NO_QUEUE" ? null : queueId)) },
     companyId
   };
   let includeCondition: Includeable[];
@@ -167,7 +167,7 @@ const ListTicketsService = async ({
   const allTickets = await CheckProfilePermissionService({ userId: loggedUserId , companyId, permission: "tickets-manager:showall" });
 
   if (showAll === "true" && allTickets) {
-    whereCondition = { companyId, queueId: { [Op.or]: [queueIds, null] } };
+    whereCondition = { companyId, queueId: { [Op.or]: queueIds.map(queueId => (queueId === "NO_QUEUE" ? null : queueId)) } };
 
     if (status) whereCondition = { ...whereCondition, status };
     if (categoryId) whereCondition = { ...whereCondition, categoryId };
@@ -203,7 +203,7 @@ const ListTicketsService = async ({
     whereCondition = {
       ...whereCondition,
       userId: { [Op.or]: [loggedUserId, null]  },
-      queueId: { [Op.or]: [queueIds, null] },
+      queueId: { [Op.or]: queueIds.map(queueId => (queueId === "NO_QUEUE" ? null : queueId)) },
     }
   }
 
