@@ -32,6 +32,9 @@ class BatchIntegrations extends Model<BatchIntegrations> {
   processedQuantity: number;
 
   @Column
+  interactionQuantity: number;
+
+  @Column
   isBillet: boolean;
 
   @ForeignKey(() => Company)

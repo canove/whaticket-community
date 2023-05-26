@@ -1,8 +1,11 @@
 import Mustache from "mustache";
-import Contact from "../database/models/Contact";
-import FileRegister from "../database/models/FileRegister";
+const he = require('he');
 
-export default (body: string, reg: FileRegister): string => {
-  if (!reg) return body;
-  return Mustache.render(body, reg);
+export default (body: string, obj): string => {
+  if (!obj) return body;
+
+  let text = Mustache.render(body, obj);
+  text = he.decode(text);
+
+  return text;
 };

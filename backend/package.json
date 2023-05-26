@@ -40,6 +40,7 @@
     "firebase": "9.10.0",
     "firebase-admin": "11.0.1",
     "formidable": "2.0.1",
+    "he": "^1.2.0",
     "html-pdf-node": "^1.0.8",
     "http-graceful-shutdown": "2.3.2",
     "jsonwebtoken": "8.5.1",
