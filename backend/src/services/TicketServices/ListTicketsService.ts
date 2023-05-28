@@ -17,7 +17,7 @@ interface Request {
   showAll?: string;
   userId: string | number;
   withUnreadMessages?: string;
-  queueIds?: number[] | string[];
+  queueIds?: any[];
   companyId?: number;
   categoryId?: string;
   loggedUserId?: string | number;
