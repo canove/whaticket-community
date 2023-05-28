@@ -13,6 +13,7 @@ export class RequestNodeModel extends NodeModel {
 		this.method = "";
 		this.header = "";
 		this.body = "";
+		this.timeout = 0;
 	}
 
 	serialize() {
@@ -22,6 +23,7 @@ export class RequestNodeModel extends NodeModel {
 			method: this.method,
 			header: this.header,
 			body: this.body,
+			timeout: this.timeout,
 		};
 	}
 
@@ -31,6 +33,7 @@ export class RequestNodeModel extends NodeModel {
 		this.method = ob.data.method;
 		this.header = ob.data.header;
 		this.body = ob.data.body;
+		this.timeout = ob.data.timeout;
 
 		this.updatePorts();
 	}

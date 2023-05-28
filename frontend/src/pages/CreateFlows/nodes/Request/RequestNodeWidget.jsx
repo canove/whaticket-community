@@ -13,6 +13,7 @@ export class RequestNodeWidget extends React.Component {
 		  method: props.node.method ? props.node.method : "",
 		  header: props.node.header ? props.node.header : "",
 		  body: props.node.body ? props.node.body : "",
+		  timeout: props.node.timeout ? props.node.timeout : "",
 		};
 	}
 
@@ -41,6 +42,11 @@ export class RequestNodeWidget extends React.Component {
 		this.props.node.body = e.target.value;
 	};
 
+	handleTimeoutChange = async (e) => {
+		this.setState({ timeout: e.target.value });
+		this.props.node.timeout = e.target.value;
+	}
+
 	render() {
 		return (
 			<div>
@@ -55,16 +61,16 @@ export class RequestNodeWidget extends React.Component {
 				</DialogTitle>
 				<DialogContent>
 					<div>
-					<TextField
-						as={TextField}
-						name="url"
-						variant="outlined"
-						margin="normal"
-						label="URL"
-						fullWidth
-						value={this.state.url}
-						onChange={(e) => { this.handleUrlChange(e) }}
-					/>
+						<TextField
+							as={TextField}
+							name="url"
+							variant="outlined"
+							margin="normal"
+							label="URL"
+							fullWidth
+							value={this.state.url}
+							onChange={(e) => { this.handleUrlChange(e) }}
+						/>
 					</div>
 					<FormControl
 						variant="outlined"
@@ -118,6 +124,29 @@ export class RequestNodeWidget extends React.Component {
 							/>
 						</div>
 					}
+					<div style={{ marginBottom: "5px" }}>
+						<FormControl
+							variant="outlined"
+							margin="dense"
+							fullWidth
+						>
+							<TextField
+								id="timeout"
+								label="Timeout (seg)"
+								type="number"
+								variant="outlined"
+								value={this.state.timeout}
+								onChange={this.handleTimeoutChange}
+								fullWidth
+								inputProps={{
+									step: 1,
+									min: 0,
+									type: 'number',
+								}}
+							/>
+						</FormControl>
+						Timeout: Tempo em segundos para esperar pela próxima mensagem, se nenhuma mensagem nos proxímos X segundos. Request será feito.
+					</div>
 					<div>
 						Para usar os parametros da resposta do request, use: {'{{ response. }}'}
 					</div>

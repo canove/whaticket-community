@@ -68,7 +68,134 @@ const handleParams = (body: any, params: any) => {
   return value;
 }
 
-const processNode = async (node: any, session: any, body: any) => {
+const processRequestNode = async (node: any, session: any, body: any) => {
+  let nodeHeader = jsonStringToObj(node.header);
+  let nodeBody = jsonStringToObj(node.body);
+
+  let variables = [];
+  let variablesMapping = {};
+  Object.keys(nodeBody).forEach((varName: any) => {
+    const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+
+    if (param && param[0]) {
+      variables.push(param[0]);
+      variablesMapping = { ...variablesMapping, [varName]: param[0] };
+    }
+  });
+
+  if (variables.length > 0) {
+    let ticket = null;
+    let messages = null;
+    let contact = null;
+
+    contact = await Contact.findOne({
+      where: {
+        companyId: session.companyId,
+        number: { 
+          [Op.or]: [
+            session.id,
+            removePhoneNumberWith9Country(session.id),
+            preparePhoneNumber9Digit(session.id),
+            removePhoneNumber9Digit(session.id),
+            removePhoneNumberCountry(session.id),
+            removePhoneNumber9DigitCountry(session.id)
+          ],
+        }
+      },
+      attributes: ["id"],
+    });
+
+    if (variables.includes("{{ticket.id}}")) {
+
+      ticket = await Ticket.findOne({
+        where: {
+          status: ["inbot", "dispatcher"],
+          contactId: contact.id,
+          companyId: session.companyId,
+        },
+        attributes: ["id"],
+        order: [["createdAt", "DESC"]]
+      });
+    }
+
+    if (variables.includes("{{ticket.messages}}")) {
+      if (!ticket) {
+        ticket = await Ticket.findOne({
+          where: {
+            status: ["inbot", "dispatcher"],
+            contactId: contact.id,
+            companyId: session.companyId,
+            // whatsappId: register.whatsappId,
+          },
+          attributes: ["id"],
+          order: [["createdAt", "DESC"]]
+        });
+      }
+
+      const msgs = await Message.findAll({
+        where: { ticketId: ticket.id },
+        attributes: ["id", "fromMe", "body", "mediaUrl"],
+        order: [["createdAt", "ASC"]],
+      });
+
+      messages = msgs.map(msg => {
+        const role = msg.fromMe ? "assistant" : "user";
+        const content = msg.body ? msg.body : msg.mediaUrl;
+
+        return { role, content };
+      });
+    }
+
+    Object.keys(variablesMapping).forEach((varName: any) => {
+      const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+
+      switch (param[0]) {
+        case "{{ticket.id}}":
+          nodeBody[varName] = ticket.id;
+        break;
+        case "{{ticket.messages}}": 
+          nodeBody[varName] = messages;
+        break;
+      }
+    });
+  }
+
+  if (!nodeHeader) {
+    nodeHeader = "";
+  }
+
+  if (node.method === "GET" || !nodeBody) {
+    nodeBody = "";
+  }
+
+  let response: any;
+  let error: any;
+
+  await axios({
+      method: node.method,
+      url: node.url,
+      headers: {
+          ...nodeHeader
+      },
+      data: {
+          ...nodeBody
+      }
+  })
+  .then(res => {
+      response = res.data;
+  })
+  .catch(err => {
+      error = err;
+  });
+
+  if (response) {
+    return { response };
+  } else {
+    return { error };
+  }
+}
+
+const processNode = async (node: any, session: any, body: any, links: any, nodes: any, flowId: any, flowNodeId: any) => {
   if (node.type === "chat-node") {
     const messageJSON = node.data.content;
     const messageOBJ = JSON.parse(messageJSON);
@@ -208,148 +335,105 @@ const processNode = async (node: any, session: any, body: any) => {
   }
 
   if (node.type === "request-node") {
-    let nodeHeader = jsonStringToObj(node.header);
-    let nodeBody = jsonStringToObj(node.body);
+    console.log(node.timeout);
 
-    let variables = [];
-    let variablesMapping = {};
-    Object.keys(nodeBody).forEach((varName: any) => {
-      const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
-
-      if (param && param[0]) {
-        variables.push(param[0]);
-        variablesMapping = { ...variablesMapping, [varName]: param[0] };
-      }
-    });
-
-    if (variables.length > 0) {
-      let ticket = null;
-      let messages = null;
-      // let register = null;
-      let contact = null;
-
-      // register = await FileRegister.findOne({
-      //   where: {
-      //     phoneNumber: { 
-      //       [Op.or]: [
-      //         session.id,
-      //         removePhoneNumberWith9Country(session.id),
-      //         preparePhoneNumber9Digit(session.id),
-      //         removePhoneNumber9Digit(session.id),
-      //         removePhoneNumberCountry(session.id),
-      //         removePhoneNumber9DigitCountry(session.id)
-      //       ],
-      //     },
-      //     companyId: session.companyId,
-      //     processedAt: { [Op.ne]: null }
-      //   },
-      //   order: [["createdAt", "DESC"]]
-      // });
-  
-      contact = await Contact.findOne({
-        where: {
-          companyId: session.companyId,
-          number: { 
-            [Op.or]: [
-              session.id,
-              removePhoneNumberWith9Country(session.id),
-              preparePhoneNumber9Digit(session.id),
-              removePhoneNumber9Digit(session.id),
-              removePhoneNumberCountry(session.id),
-              removePhoneNumber9DigitCountry(session.id)
-            ],
-          }
-        },
-        attributes: ["id"],
-      });
-
-      if (variables.includes("{{ticket.id}}")) {
-
-        ticket = await Ticket.findOne({
-          where: {
-            status: "inbot",
-            contactId: contact.id,
-            companyId: session.companyId,
-          },
-          attributes: ["id"],
-          order: [["createdAt", "DESC"]]
+    if (node.timeout) {
+      try {
+        const client = createClient({
+          url: process.env.REDIS_URL
         });
+        client.on('error', err => console.log('Redis Client Error', err));
+  
+        await client.connect();
+  
+        const time = new Date();
+        time.setSeconds(time.getSeconds() + 10);
+  
+        await client.set(`${session.id}-${session.companyId}-time_node`, JSON.stringify({ date: time }));
+  
+        await client.disconnect();
+      } catch (err) {
+        console.log("Flow Request Node - REDIS Error", err);
       }
-
-      if (variables.includes("{{ticket.messages}}")) {
-        if (!ticket) {
-          ticket = await Ticket.findOne({
-            where: {
-              status: "inbot",
-              contactId: contact.id,
-              companyId: session.companyId,
-              // whatsappId: register.whatsappId,
-            },
-            attributes: ["id"],
-            order: [["createdAt", "DESC"]]
+  
+      setTimeout(async () => {
+        console.log("IN TIMEOUT");
+        try {
+          const client = createClient({
+            url: process.env.REDIS_URL
           });
-        }
-
-        const msgs = await Message.findAll({
-          where: { ticketId: ticket.id },
-          attributes: ["id", "fromMe", "body", "mediaUrl"],
-          order: [["createdAt", "ASC"]],
-        });
-
-        messages = msgs.map(msg => {
-          const role = msg.fromMe ? "assistant" : "user";
-          const content = msg.body ? msg.body : msg.mediaUrl;
-
-          return { role, content };
-        });
-      }
-
-      Object.keys(variablesMapping).forEach((varName: any) => {
-        const param = nodeBody[varName].match(/\{{(.*?)\}}/g);
+          client.on('error', err => console.log('Redis Client Error', err));
+    
+          await client.connect();
+    
+          const redisValue = await client.get(`${session.id}-${session.companyId}-time_node`);
   
-        switch (param[0]) {
-          case "{{ticket.id}}":
-            nodeBody[varName] = ticket.id;
-          break;
-          case "{{ticket.messages}}": 
-            nodeBody[varName] = messages;
-          break;
+          const now = new Date();
+          const value = JSON.parse(redisValue);
+  
+          if (now > new Date(value.date)) {
+            const nodeResponse = await processRequestNode(node, session, body);
+
+            const linkId = getLink("out", node, nodeResponse);
+            const link = links[linkId];
+          
+            if (!link) {
+              return {
+                sessionId: session.id,
+                status: "IN_FLOW",
+              };
+            }
+          
+            const { target } = link;
+            const nextNode = nodes[target];
+  
+            if (!session) {
+              await FlowsSessions.create({
+                id: session.id,
+                nodeId: nextNode.id,
+                companyId: session.companyId,
+                flowId: flowId
+              });
+            } else {
+              await session.update({
+                nodeId: nextNode.id,
+              });
+            }
+  
+            if (nextNode.type === "end-node") {
+              await session.update({
+                nodeId: null,
+                variables: null
+              });
+            }
+          
+            if (nextNode.type === "jump-node") {
+              await session.update({
+                nodeId: nextNode.jumpNodeId,
+              })
+            }
+  
+            await client.del(`${session.id}-${session.companyId}-time_node`);
+
+            const response = await StartFlowService({
+              flowNodeId,
+              sessionId: session.id,
+              companyId: session.companyId,
+              body: { ...nodeResponse, ...body }
+            });
+
+            console.log(response);
+          }
+  
+          await client.disconnect();
+        } catch (err) {
+          console.log("Flow Request Node - REDIS Error", err);
         }
-      });
-    }
-
-    if (!nodeHeader) {
-      nodeHeader = "";
-    }
-
-    if (node.method === "GET" || !nodeBody) {
-      nodeBody = "";
-    }
-
-    let response: any;
-    let error: any;
-
-    await axios({
-        method: node.method,
-        url: node.url,
-        headers: {
-            ...nodeHeader
-        },
-        data: {
-            ...nodeBody
-        }
-    })
-    .then(res => {
-        response = res.data;
-    })
-    .catch(err => {
-        error = err;
-    });
-
-    if (response) {
-      return { response };
+      }, node.timeout * 1000);
+  
+      return { inTimeout: true };
     } else {
-      return { error };
+      return await processRequestNode(node, session, body);
     }
   }
 
@@ -413,82 +497,78 @@ const processNode = async (node: any, session: any, body: any) => {
         order: [["createdAt", "DESC"]]
       });
 
-      if (queueType === "register") {
-        if (reg && reg.connectionFileId) {
-          const connectionFile = await ConnectionFiles.findOne({
-            where: { id: reg.connectionFileId },
-            attributes: ["id", "name"],
-            include: [
-              {
-                model: Queue,
-                as: "queue",
-                attributes: ["id", "name"],
-                required: false,
-              },
-            ],
-          });
+      if (queueType === "register" && reg && reg.connectionFileId) {
+        const connectionFile = await ConnectionFiles.findOne({
+          where: { id: reg.connectionFileId },
+          attributes: ["id", "name"],
+          include: [
+            {
+              model: Queue,
+              as: "queue",
+              attributes: ["id", "name"],
+              required: false,
+            },
+          ],
+        });
 
-          const categoryQueueName = (connectionFile && connectionFile.queue) ? connectionFile.queue.name : "NO_QUEUE";
-          const categoryQueueId = (connectionFile && connectionFile.queue) ? connectionFile.queue.id : "";
+        const categoryQueueName = (connectionFile && connectionFile.queue) ? connectionFile.queue.name : "NO_QUEUE";
+        const categoryQueueId = (connectionFile && connectionFile.queue) ? connectionFile.queue.id : "";
 
+        response = {
+          queueName: categoryQueueName,
+          queueId: categoryQueueId,
+          type: "TRANSFER_QUEUE"
+        };
+      } else if (reg && reg.whatsappId) {
+        const whatsapp = await Whatsapp.findOne({
+          where: { id: reg.whatsappId },
+          attributes: ["id", "name"],
+          include: [
+            {
+              model: Queue,
+              as: "queues",
+              attributes: ["id", "name"],
+              required: false,
+            },
+            {
+              model: ConnectionFiles,
+              as: "connectionFile",
+              attributes: ["id", "name"],
+              include: [
+                {
+                  model: Queue,
+                  as: "queue",
+                  attributes: ["id", "name"],
+                  required: false,
+                },
+              ],
+              required: false,
+            },
+          ]
+        });
+  
+        const whatsappQueueName = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].name : "NO_QUEUE";
+        const whatsappQueueId = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : "";
+        
+        const categoryQueueName = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.name : "NO_QUEUE";
+        const categoryQueueId = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.id : "";
+  
+        if (queueType === "category") {
           response = {
             queueName: categoryQueueName,
             queueId: categoryQueueId,
             type: "TRANSFER_QUEUE"
           };
         }
-      } else {
-        if (reg && reg.whatsappId) {
-          const whatsapp = await Whatsapp.findOne({
-            where: { id: reg.whatsappId },
-            attributes: ["id", "name"],
-            include: [
-              {
-                model: Queue,
-                as: "queues",
-                attributes: ["id", "name"],
-                required: false,
-              },
-              {
-                model: ConnectionFiles,
-                as: "connectionFile",
-                attributes: ["id", "name"],
-                include: [
-                  {
-                    model: Queue,
-                    as: "queue",
-                    attributes: ["id", "name"],
-                    required: false,
-                  },
-                ],
-                required: false,
-              },
-            ]
-          });
-    
-          const whatsappQueueName = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].name : "NO_QUEUE";
-          const whatsappQueueId = (whatsapp.queues && whatsapp.queues.length > 0) ? whatsapp.queues[0].id : "";
-          
-          const categoryQueueName = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.name : "NO_QUEUE";
-          const categoryQueueId = (whatsapp.connectionFile && whatsapp.connectionFile.queue) ? whatsapp.connectionFile.queue.id : "";
-    
-          if (queueType === "whatsapp") {
-            response = {
-              queueName: whatsappQueueName,
-              queueId: whatsappQueueId,
-              type: "TRANSFER_QUEUE"
-            };
-          }
-    
-          if (queueType === "category") {
-            response = {
-              queueName: categoryQueueName,
-              queueId: categoryQueueId,
-              type: "TRANSFER_QUEUE"
-            };
-          }
+
+        if (queueType === "whatsapp" || (queueType === "category" && !categoryQueueId)) {
+          response = {
+            queueName: whatsappQueueName,
+            queueId: whatsappQueueId,
+            type: "TRANSFER_QUEUE"
+          };
         }
-      } 
+      }
     } else if (!queueType || queueType === "queue") {
       const queue = await Queue.findOne({
         where: { id: node.queueId }
@@ -1399,12 +1479,12 @@ const StartFlowService = async ({
     throw new AppError("ERR_NO_START_NODE");
   }
 
-  const nodeResponse = await processNode(node, session, { ...body, variables });
+  const nodeResponse = await processNode(node, session, { ...body, variables }, links, nodes, flowNodes.flowId, flowNodeId);
 
   const linkId = getLink("out", node, nodeResponse);
   const link = links[linkId];
 
-  if (!link) {
+  if (!link || nodeResponse.inTimeout) {
     return {
       ...nodeResponse, 
       sessionId: session.id,
