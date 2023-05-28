@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import Can from "../Can";
+import { Assignment } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   ticketsWrapper: {
@@ -202,6 +203,12 @@ const TicketsManager = () => {
             label={i18n.t("tickets.tabs.closed.title")}
             classes={{ root: classes.tab }}
           />
+          {/* <Tab
+            value={"task"}
+            icon={<Assignment />}
+            label={"Tarefas"}
+            classes={{ root: classes.tab }}
+          /> */}
           <Tab
             value={"search"}
             icon={<SearchIcon />}

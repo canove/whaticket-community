@@ -73,8 +73,8 @@ export class TransferQueueNodeWidget extends React.Component {
 						>
 							<MenuItem value={"queue"}>Selecionar Fila</MenuItem>
 							<MenuItem value={"whatsapp"}>Usar Fila do Número (Whats)</MenuItem>
-							<MenuItem value={"category"}>Usar Fila da Categoria</MenuItem>
-							<MenuItem value={"register"}>Usar Fila do Disparo</MenuItem>
+							<MenuItem value={"category"}>Usar Fila da Categoria (Whats)</MenuItem>
+							<MenuItem value={"register"}>Usar Fila do Categoria (Disparo)</MenuItem>
 						</Select>
 					</FormControl>
 					{ (!this.state.queueType || this.state.queueType === "queue") &&

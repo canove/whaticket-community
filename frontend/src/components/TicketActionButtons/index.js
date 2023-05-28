@@ -106,7 +106,7 @@ const TicketActionButtons = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.reopen")}
 				</ButtonWithSpinner>
 			)}
-			{ticket.status === "inbot" &&
+			{(ticket.status === "inbot" || ticket.status === "dispatcher") &&
 				<>
 					<ButtonWithSpinner
 						loading={loading}

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { getIO } from "../libs/socket";
 import Message from "../database/models/Message";
 import Ticket from "../database/models/Ticket";
@@ -12,7 +13,7 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
       }
     }
   );
-  console.log('update ticket ticketMessageAsRead 15')
+  console.log("update ticket ticketMessageAsRead 15");
   await ticket.update({ unreadMessages: 0 });
 
   const io = getIO();
