@@ -9,6 +9,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
+import DeleteMessageService from "../services/MessageServices/DeleteMessageService";
 
 type IndexQuery = {
   pageNumber: string;
@@ -135,6 +136,21 @@ export const resend = async (req: Request, res: Response): Promise<Response> => 
   });
 
   SetTicketMessagesAsRead(ticket);
+
+  return res.status(200).json("OK");
+};
+
+export const remove = async (req: Request, res: Response): Promise<Response> => {
+  const { messageId } = req.params;
+  const { companyId } = req.user;
+
+  const message = await DeleteMessageService(messageId);
+
+  const io = getIO();
+  io.to(message.ticketId.toString()).emit("appMessage", {
+    action: "update",
+    message
+  });
 
   return res.status(200).json("OK");
 };

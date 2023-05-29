@@ -203,7 +203,7 @@ const useStyles = makeStyles((theme) => ({
     fontStyle: "italic",
     color: "rgba(0, 0, 0, 0.36)",
     overflowWrap: "break-word",
-    padding: "3px 80px 6px 6px",
+    padding: "3px 80px 18px 6px",
   },
 
   messageMedia: {
