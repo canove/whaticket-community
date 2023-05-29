@@ -8,6 +8,7 @@ import Queue from "../../database/models/Queue";
 import ShowUserService from "../UserServices/ShowUserService";
 import CheckProfilePermissionService from "../ProfileServices/CheckProfilePermissionService";
 import Whatsapp from "../../database/models/Whatsapp";
+import BlockedContacts from "../../database/models/BlockedContacts";
 
 interface Request {
   searchParam?: string;
@@ -57,7 +58,15 @@ const ListTicketsService = async ({
     {
       model: Contact,
       as: "contact",
-      attributes: ["id", "name", "number", "profilePicUrl"]
+      attributes: ["id", "name", "number", "profilePicUrl"],
+      include: [
+        {
+          model: BlockedContacts,
+          as: "blockedContacts",
+          attributes: ["id", "session"],
+          required: false,
+        }
+      ]
     },
     {
       model: Queue,

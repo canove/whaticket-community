@@ -44,12 +44,10 @@ const DeleteMessageService =
         }
     });
 
-    console.log(response.data);
+    await message.update({ isDeleted: true });
   } catch (err) {
     throw new AppError("ERR_DELETE_WAPP_MSG");
   }
-
-  await message.update({ isDeleted: true });
 
   return message;
 };

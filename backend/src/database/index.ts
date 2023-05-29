@@ -47,6 +47,7 @@ import ExtraUsersControls from "./models/ExtraUsersControls";
 import Sessions from "./models/Sessions";
 import SessionMessages from "./models/SessionMessages";
 import BatchIntegrations from "./models/BatchIntegrations";
+import BlockedContacts from "./models/BlockedContacts";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -101,7 +102,8 @@ const models = [
   ExtraUsersControls,
   Sessions,
   SessionMessages,
-  BatchIntegrations
+  BatchIntegrations,
+  BlockedContacts,
 ];
 
 sequelize.addModels(models);

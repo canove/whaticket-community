@@ -5,6 +5,7 @@ import User from "../../database/models/User";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 import { Op } from "sequelize";
+import BlockedContacts from "../../database/models/BlockedContacts";
 
 const ShowTicketService = async (
   id: string | number,
@@ -29,7 +30,15 @@ const ShowTicketService = async (
         model: Contact,
         as: "contact",
         attributes: ["id", "name", "number", "profilePicUrl"],
-        include: ["extraInfo"]
+        include: [
+          "extraInfo",
+          {
+            model: BlockedContacts,
+            as: "blockedContacts",
+            attributes: ["id", "session"],
+            required: false,
+          }
+        ]
       },
       {
         model: Whatsapp,

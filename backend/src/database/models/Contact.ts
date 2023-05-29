@@ -15,6 +15,7 @@ import {
 import Company from "./Company";
 import ContactCustomField from "./ContactCustomField";
 import Ticket from "./Ticket";
+import BlockedContacts from "./BlockedContacts";
 
 @Table
 class Contact extends Model<Contact> {
@@ -55,6 +56,9 @@ class Contact extends Model<Contact> {
 
   @HasMany(() => Ticket)
   tickets: Ticket[];
+
+  @HasMany(() => BlockedContacts)
+  blockedContacts: BlockedContacts[];
 
   @HasMany(() => ContactCustomField)
   extraInfo: ContactCustomField[];
