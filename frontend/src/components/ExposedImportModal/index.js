@@ -87,6 +87,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     var5: "",
     phoneNumberFrom: "",
     category: "",
+    queue: "",
   };
   const [mapping, setMapping] = useState(initialMapping);
   const [mappingValues, setMappingValues] = useState(initialMapping);
@@ -124,6 +125,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     var5: false,
     phoneNumberFrom: false,
     category: false,
+    queue: false,
   };
   const [requiredItems, setRequiredItems] = useState(initialRequiredItems);
 
@@ -359,6 +361,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
       handleRelationChange(mapping.var5, "var5");
       handleRelationChange(mapping.phoneNumberFrom, "phoneNumberFrom");
       handleRelationChange(mapping.category, "category");
+      handleRelationChange(mapping.queue, "queue");
     }
   }, [payload]);
 
@@ -1403,6 +1406,53 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                 <FormControlLabel
                   label={i18n.t("exposedImports.modal.required")}
                   control={<Checkbox color="primary" checked={requiredItems["category"]} onChange={(e) => { handleChangeRequiredItem(e, "category") }} />}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{
+                    width: "50%",
+                    margin: "0 5px 5px 10px",
+                  }}
+                >
+                  <TextField
+                    as={TextField}
+                    label="Fila"
+                    value={mappingValues.queue}
+                    name="queue"
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    disabled
+                  />
+                </div>
+                <div
+                  style={{
+                    width: "50%",
+                    margin: "0 10px 5px 5px",
+                  }}
+                >
+                  <TextField
+                    as={TextField}
+                    label="Fila Relation"
+                    value={mapping.queue}
+                    name="queueRelation"
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    onChange={(e) => {
+                      handleRelationChange(e.target.value, "queue");
+                    }}
+                  />
+                </div>
+                <FormControlLabel
+                  label={i18n.t("exposedImports.modal.required")}
+                  control={<Checkbox color="primary" checked={requiredItems["queue"]} onChange={(e) => { handleChangeRequiredItem(e, "queue") }} />}
                 />
               </div>
             </div>
