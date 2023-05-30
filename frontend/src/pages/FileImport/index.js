@@ -24,7 +24,7 @@ import ImportModal from "../../components/ImportModal";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { parseISO, format } from "date-fns";
-import { IconButton, Typography } from "@material-ui/core";
+import { IconButton, Tooltip, Typography } from "@material-ui/core";
 import { Cancel, Pause, PlayArrow, Visibility } from "@material-ui/icons";
 import WhatsAppIcon from '@material-ui/icons/WhatsApp';
 import RegisterFileModal from "../../components/RegisterFileModal";
@@ -94,6 +94,8 @@ const reducer = (state, action) => {
   }
 };
 
+const allowedStatuses = [2,3,4,5,6,7,10,11];
+
 const FileImport = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
@@ -117,6 +119,8 @@ const FileImport = () => {
   const [count, setCount] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
 
+  const [awaitingApprove, setAwaitingApprove] = useState(false);
+
   useEffect(() => {
     dispatchImports({ type: "RESET" });
   }, [pageNumber, status, date]);
@@ -139,6 +143,7 @@ const FileImport = () => {
   };
 
   const handleCloseRegisterFileModal = () => {
+    setAwaitingApprove(false);
     setRegisterFileModalOpen(false);
   };
 
@@ -336,15 +341,14 @@ const FileImport = () => {
         open={importModalOpen}
         onClose={handleCloseImportModal}
         aria-labelledby="form-dialog-title"
-      >
-      </ImportModal>
+      />
       <RegisterFileModal
         open={registerFileModalOpen}
         onClose={handleCloseRegisterFileModal}
         aria-labelledby="form-dialog-title"
         fileId={selectedFileId}
-      >
-      </RegisterFileModal>
+        awaitingApprove={awaitingApprove}
+      />
       <ConfirmationModal
         title={
           testingFile &&
@@ -477,14 +481,22 @@ const FileImport = () => {
                       {getOfficial(item.official)}
                     </TableCell>
                     <TableCell align="center">
-                        {item.status === 2 && (
-                          <>
+                        {allowedStatuses.includes(item.status) && (
+                          <Tooltip title={"Vizualizar Registros"}>
                             <IconButton
                               size="small"
-                              onClick={() => handleOpenRegisterFileModal(item.id)}
+                              onClick={() => {
+                                handleOpenRegisterFileModal(item.id)
+
+                                if (item.status === 2) setAwaitingApprove(true);
+                              }}
                             >
                               <Visibility />
                             </IconButton>
+                          </Tooltip>
+                        )}
+                        {item.status === 2 && (
+                          <Tooltip title={"Remover Números Sem Whatsapps"}>
                             <IconButton
                               size="small"
                               onClick={() => {
@@ -494,7 +506,7 @@ const FileImport = () => {
                             >
                               <WhatsAppIcon />
                             </IconButton>
-                          </>
+                          </Tooltip>
                         )}
                         {item.status === 5 && (
                           <IconButton

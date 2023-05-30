@@ -15,6 +15,8 @@ fileRoutes.post("/file/upload", isAuth, UploadFileController.store);
 
 fileRoutes.get("/file/listRegister", isAuth, FileRegisterController.store);
 
+fileRoutes.get("/file/exportCSV", isAuth, FileRegisterController.exportCSV);
+
 fileRoutes.put("/file/update/:fileId", isAuth, FileController.update);
 
 export default fileRoutes;

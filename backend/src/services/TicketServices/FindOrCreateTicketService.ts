@@ -54,7 +54,8 @@ const FindOrCreateTicketService = async (
       whatsappId,
       contactId: groupContact ? groupContact.id : contactIds,
       companyId
-    }
+    },
+    order: [["createdAt", "DESC"]]
   });
 
   if (ticket) {

@@ -1,7 +1,8 @@
+import { Op } from "sequelize";
 import File from "../../database/models/File";
 import FileRegister from "../../database/models/FileRegister";
 import Templates from "../../database/models/TemplatesData";
-/*eslint-disable*/
+
 interface Response {
   reports: FileRegister[];
   count: number;
@@ -12,21 +13,29 @@ const ListFileRegistersService = async ({
   fileId,
   companyId,
   integratedImportId,
-  pageNumber = "1"
+  pageNumber = "1",
+  haveWhatsapp,
 }): Promise<Response> => {
-  const whereCondition = { 
+  let whereCondition = null;
+
+  whereCondition = { 
     fileId: fileId ? fileId : null,
     integratedImportId: integratedImportId ? integratedImportId : null,
-    companyId
+    companyId,
+    haveWhatsapp: { [Op.or]: [true, null] }
   };
+
+  if (haveWhatsapp === "false") {
+    whereCondition = { ...whereCondition, haveWhatsapp: false };
+  }
 
   const limit = 10;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: reports } = await FileRegister.findAndCountAll({
     where: whereCondition,
-    limit,
-    offset,
+    limit: +pageNumber > 0 ? +limit : null,
+    offset: +pageNumber > 0 ? offset : null,
     order: [["createdAt", "DESC"]],
   });
 
@@ -47,7 +56,6 @@ const ListFileRegistersService = async ({
       });    
     }
   }
-  
 
   const hasMore = count > offset + reports.length;
 
