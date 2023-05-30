@@ -24,7 +24,7 @@ import ImportModal from "../../components/ImportModal";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { parseISO, format } from "date-fns";
-import { IconButton, Typography } from "@material-ui/core";
+import { IconButton, Tooltip, Typography } from "@material-ui/core";
 import { Cancel, Pause, PlayArrow, Visibility } from "@material-ui/icons";
 import WhatsAppIcon from '@material-ui/icons/WhatsApp';
 import RegisterFileModal from "../../components/RegisterFileModal";
@@ -336,15 +336,13 @@ const FileImport = () => {
         open={importModalOpen}
         onClose={handleCloseImportModal}
         aria-labelledby="form-dialog-title"
-      >
-      </ImportModal>
+      />
       <RegisterFileModal
         open={registerFileModalOpen}
         onClose={handleCloseRegisterFileModal}
         aria-labelledby="form-dialog-title"
         fileId={selectedFileId}
-      >
-      </RegisterFileModal>
+      />
       <ConfirmationModal
         title={
           testingFile &&
@@ -479,21 +477,25 @@ const FileImport = () => {
                     <TableCell align="center">
                         {item.status === 2 && (
                           <>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleOpenRegisterFileModal(item.id)}
-                            >
-                              <Visibility />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                setConfirmModalOpen(true);
-                                setTestingFile(item);
-                              }}
-                            >
-                              <WhatsAppIcon />
-                            </IconButton>
+                            <Tooltip title={"Vizualizar Registros"}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleOpenRegisterFileModal(item.id)}
+                              >
+                                <Visibility />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={"Remover Números Sem Whatsapps"}>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  setConfirmModalOpen(true);
+                                  setTestingFile(item);
+                                }}
+                              >
+                                <WhatsAppIcon />
+                              </IconButton>
+                            </Tooltip>
                           </>
                         )}
                         {item.status === 5 && (

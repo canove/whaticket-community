@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
-import { Table, TableRow, Typography } from "@material-ui/core";
+import { Checkbox, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Table, TableRow, Typography } from "@material-ui/core";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
@@ -110,13 +110,59 @@ const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
   const [fileRegister, dispatch] = useReducer(reducer, []);
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [haveWhatsapp, setHaveWhatsapp] = useState("true");
+
+  const [csv, setCSV] = useState("");
+  const [creatingCSV, setCreatingCSV] = useState(false);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
-  }, [fileId, integratedImportId]);
+  }, [fileId, integratedImportId, haveWhatsapp]);
+
+  useEffect(() => {
+    const handleFilter = async () => {
+      if (!open) return;
+
+      setLoading(true);
+      try {
+        const { data } = await api.get(`/file/listRegister`, {
+          params: { 
+            fileId, 
+            integratedImportId, 
+            pageNumber, 
+            haveWhatsapp,
+          },
+        });
+        dispatch({ type: "LOAD_REPORTS", payload: data.reports });
+        setHasMore(data.hasMore);
+        setLoading(false);
+      } catch (err) {
+        toastError(err);
+        setLoading(false);
+      }
+    };
+
+    handleFilter();
+  }, [open, fileId, integratedImportId, haveWhatsapp, pageNumber]);
+
+  useEffect(() => {
+    const socket = openSocket();
+
+    socket.on(`reports${user.companyId}`, (data) => {
+      if (data.action === "update" || data.action === "create") {
+        dispatch({ type: "UPDATE_REPORTS", payload: data.reports });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const handleClose = () => {
+    setCSV("");
+    setHaveWhatsapp("true");
     onClose();
   };
 
@@ -146,40 +192,51 @@ const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
     }
   }
 
-  useEffect(() => {
-    const handleFilter = async () => {
-      setLoading(true);
-      try {
-        setLoading(true);
-        const { data } = await api.get(`/file/listRegister`, {
-          params: { fileId, integratedImportId, pageNumber },
-        });
-        dispatch({ type: "LOAD_REPORTS", payload: data.reports });
-        setHasMore(data.hasMore);
-        setLoading(false);
-      } catch (err) {
-        toastError(err);
-        setLoading(false);
-      }
-    };
-    if (open) {
-      handleFilter();
+  const createCSV = async () => {
+    try {
+      const { data } = await api.get('/file/exportCSV', {
+        params: {
+          fileId, 
+          integratedImportId, 
+          haveWhatsapp,
+          pageNumber: "-1"
+        }
+      });
+    
+      setCSV(data);
+      return data;
+    } catch (err) {
+      toastError(err);
     }
-  }, [open, fileId, integratedImportId, pageNumber]);
 
-  useEffect(() => {
-    const socket = openSocket();
+    return null;
+  }
 
-    socket.on(`reports${user.companyId}`, (data) => {
-      if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_REPORTS", payload: data.reports });
-      }
-    });
+  const downloadCSV = async () => {
+    let newCSV = null;
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+    if (!csv) {
+      setCreatingCSV(true);
+      newCSV = await createCSV();
+      setCreatingCSV(false);
+    }
+
+    const file = new Blob([newCSV ? newCSV : csv], { type: 'text/csv;charset=utf-8;' });
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(file, "report.csv");
+    } else {
+        const link = document.createElement("a"),
+        url = URL.createObjectURL(file);
+        link.href = url;
+        link.download = "report.csv";
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function() {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
+  }
 
   const loadNextPage = () => {
     dispatch({ type: "RESET" });
@@ -211,41 +268,57 @@ const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
   return (
     <div className={classes.root}>
       <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
-        <DialogTitle id="form-dialog-title">{i18n.t("importation.registryModal.title")}
-          <DialogContent dividers>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">{i18n.t("importation.registryModal.id")}</TableCell>
-                    <TableCell align="center">{i18n.t("importation.registryModal.name")}</TableCell>
-                    <TableCell align="center">{i18n.t("importation.registryModal.template")}</TableCell>
-                    <TableCell align="center">{i18n.t("importation.registryModal.message")}</TableCell>
-                    <TableCell align="center">{i18n.t("importation.registryModal.phoneNumber")}</TableCell>
-                    <TableCell align="center">{i18n.t("importation.registryModal.documentNumber")}</TableCell>
-                  </TableRow>
-                </TableHead>
-                  <TableBody>
-                    <>
-                      {fileRegister && fileRegister.map((item, index) => {
-                        return (
-                          <TableRow key={index}>
-                            <TableCell align="center">{item.id}</TableCell>
-                            <TableCell align="center">{item.name}</TableCell>
-                            <TableCell align="center">{item.template}</TableCell>
-                            <TableCell align="center">{getMessage(item.message)}</TableCell>
-                            <TableCell align="center">{item.phoneNumber}</TableCell>
-                            <TableCell align="center">{item.documentNumber}</TableCell>
-                          </TableRow>
-                        );
-                        })}
-                      {loading}
-                    </>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </DialogContent>
-          </DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          {i18n.t("importation.registryModal.title")}
+        </DialogTitle>
+        <div style={{ margin: "15px" }}>
+          <FormControl>
+            <FormLabel id="filter-group-label">Filtrar por:</FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="filter-group-label"
+              name="row-radio-buttons-group"
+              value={haveWhatsapp}
+              onChange={(e) => setHaveWhatsapp(e.target.value)}
+            >
+              <FormControlLabel value="true" control={<Radio />} label="Com Whatsapp" />
+              <FormControlLabel value="false" control={<Radio />} label="Sem Whatsapp" />
+            </RadioGroup>
+          </FormControl>
+        </div>
+        <DialogContent dividers>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">{i18n.t("importation.registryModal.id")}</TableCell>
+                  <TableCell align="center">{i18n.t("importation.registryModal.name")}</TableCell>
+                  <TableCell align="center">{i18n.t("importation.registryModal.template")}</TableCell>
+                  <TableCell align="center">{i18n.t("importation.registryModal.message")}</TableCell>
+                  <TableCell align="center">{i18n.t("importation.registryModal.phoneNumber")}</TableCell>
+                  <TableCell align="center">{i18n.t("importation.registryModal.documentNumber")}</TableCell>
+                </TableRow>
+              </TableHead>
+                <TableBody>
+                  <>
+                    {fileRegister && fileRegister.map((item, index) => {
+                      return (
+                        <TableRow key={index}>
+                          <TableCell align="center">{item.id}</TableCell>
+                          <TableCell align="center">{item.name}</TableCell>
+                          <TableCell align="center">{item.template}</TableCell>
+                          <TableCell align="center">{getMessage(item.message)}</TableCell>
+                          <TableCell align="center">{item.phoneNumber}</TableCell>
+                          <TableCell align="center">{item.documentNumber}</TableCell>
+                        </TableRow>
+                      );
+                      })}
+                    {loading}
+                  </>
+                </TableBody>
+              </Table>
+            </TableContainer>
+        </DialogContent>
         <DialogActions>
           {pageNumber > 1 && (
             <>
@@ -273,26 +346,42 @@ const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
           >
             {i18n.t("importation.registryModal.cancel")}
           </Button>
-          <Button
-            type="submit"
-            color="primary"
-            variant="contained"
-            className={classes.btnWrapper}
-            onClick={handleRefuse}
-            disabled={loading}
-          >
-            {i18n.t("importation.registryModal.refuse")}
-          </Button>
-          <Button
-            type="submit"
-            color="primary"
-            variant="contained"
-            className={classes.btnWrapper}
-            onClick={handleApprove}
-            disabled={loading}
-          >
-            {i18n.t("importation.registryModal.approve")}
-          </Button>
+          {(haveWhatsapp === "true") && 
+            <>
+              <Button
+                type="submit"
+                color="primary"
+                variant="contained"
+                className={classes.btnWrapper}
+                onClick={handleRefuse}
+                disabled={loading}
+              >
+                {i18n.t("importation.registryModal.refuse")}
+              </Button>
+              <Button
+                type="submit"
+                color="primary"
+                variant="contained"
+                className={classes.btnWrapper}
+                onClick={handleApprove}
+                disabled={loading}
+              >
+                {i18n.t("importation.registryModal.approve")}
+              </Button>
+            </>
+          }
+          {(haveWhatsapp === "false") &&
+            <Button
+              type="submit"
+              color="primary"
+              variant="contained"
+              className={classes.btnWrapper}
+              onClick={downloadCSV}
+              disabled={creatingCSV}
+            >
+              {"Exportar CSV"}
+            </Button>
+          }
         </DialogActions>
       </Dialog>
     </div>
