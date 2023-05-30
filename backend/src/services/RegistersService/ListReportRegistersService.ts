@@ -19,6 +19,7 @@ interface Request {
   limit?: string;
   categoryIds?: Array<any>;
   isProcessed?: string;
+  varSearch?: string;
 }
 
 interface Response {
@@ -38,7 +39,8 @@ const ListReportRegistersService = async ({
   phoneNumber = "",
   limit = "20",
   categoryIds,
-  isProcessed = "true"
+  isProcessed = "true",
+  varSearch = "",
 }: Request): Promise<Response> => {
   let whereCondition = null;
   let whereConditionCategory = null;
@@ -87,6 +89,19 @@ const ListReportRegistersService = async ({
       createdAt: {
         [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
       },
+    }
+  }
+
+  if (varSearch) {
+    whereCondition = {
+      ...whereCondition,
+      [Op.or]: [
+        { var1: { [Op.like]: `%${varSearch}%` } },
+        { var2: { [Op.like]: `%${varSearch}%` } },
+        { var3: { [Op.like]: `%${varSearch}%` } },
+        { var4: { [Op.like]: `%${varSearch}%` } },
+        { var5: { [Op.like]: `%${varSearch}%` } },
+      ]
     }
   }
 

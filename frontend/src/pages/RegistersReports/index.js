@@ -61,6 +61,7 @@ const RegistersReports = () => {
     const [creatingCSV, setCreatingCSV] = useState(false);
     const [creatingPDF, setCreatingPDF] = useState(false);
     const [isProcessed, setIsProcessed] = useState(true);
+    const [varSearch, setVarSearch] = useState("");
 
     const [categories, setCategories] = useState([]);
     const [categoryIds, setCategoryIds] = useState([]);
@@ -105,7 +106,8 @@ const RegistersReports = () => {
                     name,
                     phoneNumber,
                     categoryIds,
-                    isProcessed
+                    isProcessed,
+                    varSearch,
                 }
             });
 
@@ -129,7 +131,8 @@ const RegistersReports = () => {
                     name,
                     phoneNumber,
                     categoryIds,
-                    isProcessed
+                    isProcessed,
+                    varSearch,
                 }
             });
             setPdf(data);
@@ -156,7 +159,8 @@ const RegistersReports = () => {
                     phoneNumber,
                     limit: 20,
                     categoryIds,
-                    isProcessed
+                    isProcessed,
+                    varSearch,
                 }
             });
             setRegisters(data.registers);
@@ -338,6 +342,13 @@ const RegistersReports = () => {
                                     />
                                     <TextField
                                         style={{ marginLeft: "8px" }}
+                                        placeholder={"Variáveis"}
+                                        type="search"
+                                        value={varSearch}
+                                        onChange={(e) => setVarSearch(e.target.value)}
+                                    />
+                                    <TextField
+                                        style={{ marginLeft: "8px" }}
                                         onChange={(e) => { setInitialDate(e.target.value) }}
                                         label={i18n.t("reports.form.initialDate")}
                                         InputLabelProps={{ shrink: true, required: true }}
@@ -486,6 +497,11 @@ const RegistersReports = () => {
                             <TableCell align="center">Processado</TableCell>
                             <TableCell align="center">Importado</TableCell>
                             <TableCell align="center">Tem Whatsapp?</TableCell>
+                            <TableCell align="center">Var 1</TableCell>
+                            <TableCell align="center">Var 2</TableCell>
+                            <TableCell align="center">Var 3</TableCell>
+                            <TableCell align="center">Var 4</TableCell>
+                            <TableCell align="center">Var 5</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -506,10 +522,15 @@ const RegistersReports = () => {
                                         <TableCell align="center">{formatDate(register.processedAt)}</TableCell>
                                         <TableCell align="center">{formatDate(register.createdAt)}</TableCell>
                                         <TableCell align="center">{getHaveWhatsapp(register)}</TableCell>
+                                        <TableCell align="center">{register.var1}</TableCell>
+                                        <TableCell align="center">{register.var2}</TableCell>
+                                        <TableCell align="center">{register.var3}</TableCell>
+                                        <TableCell align="center">{register.var4}</TableCell>
+                                        <TableCell align="center">{register.var5}</TableCell>
                                     </TableRow>
                                 )
                             }))}
-                            {loading && <TableRowSkeleton columns={13} />}
+                            {loading && <TableRowSkeleton columns={18} />}
                         </>
                     </TableBody>
                 </Table>
