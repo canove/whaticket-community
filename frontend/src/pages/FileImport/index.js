@@ -94,6 +94,8 @@ const reducer = (state, action) => {
   }
 };
 
+const allowedStatuses = [2,3,4,5,6,7,10,11];
+
 const FileImport = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
@@ -117,6 +119,8 @@ const FileImport = () => {
   const [count, setCount] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
 
+  const [awaitingApprove, setAwaitingApprove] = useState(false);
+
   useEffect(() => {
     dispatchImports({ type: "RESET" });
   }, [pageNumber, status, date]);
@@ -139,6 +143,7 @@ const FileImport = () => {
   };
 
   const handleCloseRegisterFileModal = () => {
+    setAwaitingApprove(false);
     setRegisterFileModalOpen(false);
   };
 
@@ -342,6 +347,7 @@ const FileImport = () => {
         onClose={handleCloseRegisterFileModal}
         aria-labelledby="form-dialog-title"
         fileId={selectedFileId}
+        awaitingApprove={awaitingApprove}
       />
       <ConfirmationModal
         title={
@@ -475,28 +481,32 @@ const FileImport = () => {
                       {getOfficial(item.official)}
                     </TableCell>
                     <TableCell align="center">
+                        {allowedStatuses.includes(item.status) && (
+                          <Tooltip title={"Vizualizar Registros"}>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                handleOpenRegisterFileModal(item.id)
+
+                                if (item.status === 2) setAwaitingApprove(true);
+                              }}
+                            >
+                              <Visibility />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                         {item.status === 2 && (
-                          <>
-                            <Tooltip title={"Vizualizar Registros"}>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleOpenRegisterFileModal(item.id)}
-                              >
-                                <Visibility />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={"Remover Números Sem Whatsapps"}>
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  setConfirmModalOpen(true);
-                                  setTestingFile(item);
-                                }}
-                              >
-                                <WhatsAppIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </>
+                          <Tooltip title={"Remover Números Sem Whatsapps"}>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setConfirmModalOpen(true);
+                                setTestingFile(item);
+                              }}
+                            >
+                              <WhatsAppIcon />
+                            </IconButton>
+                          </Tooltip>
                         )}
                         {item.status === 5 && (
                           <IconButton

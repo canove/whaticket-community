@@ -101,7 +101,7 @@ const reducer = (state, action) => {
   }
 };
 
-const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
+const RegisterFileModal = ({ open, onClose, fileId, integratedImportId, awaitingApprove }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
@@ -346,7 +346,7 @@ const RegisterFileModal = ({ open, onClose, fileId, integratedImportId }) => {
           >
             {i18n.t("importation.registryModal.cancel")}
           </Button>
-          {(haveWhatsapp === "true") && 
+          {(haveWhatsapp === "true" && awaitingApprove) && 
             <>
               <Button
                 type="submit"
