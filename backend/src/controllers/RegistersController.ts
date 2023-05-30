@@ -37,6 +37,7 @@ type ListQuery = {
   limit: string;
   categoryIds: Array<any>;
   isProcessed: string;
+  varSearch: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -172,7 +173,7 @@ export const chart = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed } = req.query as ListQuery;
+  const { statuses, fileIds, pageNumber, limit, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed, varSearch } = req.query as ListQuery;
   const { companyId } = req.user;
 
   if (!initialDate || !finalDate) {
@@ -190,14 +191,15 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     phoneNumber,
     limit,
     categoryIds,
-    isProcessed
+    isProcessed,
+    varSearch,
   });
 
   return res.json({ registers, count, hasMore });
 };
 
 export const exportPdf = async (req: Request, res: Response): Promise<void> => {
-  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed, varSearch } = req.query as ListQuery;
   const { companyId } = req.user;
 
   if (!initialDate || !finalDate) {
@@ -214,7 +216,8 @@ export const exportPdf = async (req: Request, res: Response): Promise<void> => {
     name,
     phoneNumber,
     categoryIds,
-    isProcessed
+    isProcessed,
+    varSearch,
   });
 
   const html = `
@@ -343,7 +346,7 @@ export const exportCsv = async (
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed } = req.query as ListQuery;
+  const { statuses, fileIds, initialDate, finalDate, name, phoneNumber, categoryIds, isProcessed, varSearch } = req.query as ListQuery;
   const { companyId } = req.user;
 
   if (!initialDate || !finalDate) {
@@ -360,7 +363,8 @@ export const exportCsv = async (
     name, 
     phoneNumber,
     categoryIds,
-    isProcessed
+    isProcessed,
+    varSearch,
   });
 
   const rows = [["Nome", "Telefone", "CPF/CNPJ", "Categoria", "Status", "Processado", "Enviado", "Entregue", "Lido", "Interação", "Erro", "Tem Whatsapp?", "VAR 1", "VAR 2", "VAR 3", "VAR 4", "VAR 5"]];

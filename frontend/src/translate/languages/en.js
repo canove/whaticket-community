@@ -1451,7 +1451,8 @@ const messages = {
         ERR_IP_NOT_ALLOWED: "Request source IP not allowed.",
         ERR_NO_NICKNAME: "You cannot use this nickname as signature.",
         ERR_WHATSAPP_DISCONNECTED: "Whatsapp disconnected.",
-        ERR_INVALID_NUMBER: "Invalid phone number."
+        ERR_INVALID_NUMBER: "Invalid phone number.",
+        ERR_MAX_AUTOMATIC_CONTROL: "According to automatic control, this whatsapp has reached maximum number of shots.",
       },
     },
   },

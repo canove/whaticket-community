@@ -3,6 +3,7 @@ import ExposedImport from "../../database/models/ExposedImport";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
 import ConnectionFiles from "../../database/models/ConnectionFile";
+import Queue from "../../database/models/Queue";
 
 interface Request {
   exposedImportId: string;
@@ -68,6 +69,7 @@ interface Response {
   registersWithError: string[];
   newPayload: string[];
   registersWithNonExistentCategory: string[];
+  registersWithNonExistentQueue: string[];
 }
 
 const TestRequiredExposedImportService = async ({
@@ -96,9 +98,11 @@ const TestRequiredExposedImportService = async ({
       let newPayload = [];
       let registersWithError = [];
       let registersWithNonExistentCategory = [];
+      let registersWithNonExistentQueue = [];
       let newRequiredItems = [];
 
       let categoryDictionary = {};
+      let queueDictionary = {};
 
       for (const obj of payload) {
         try {
@@ -115,6 +119,7 @@ const TestRequiredExposedImportService = async ({
           const var5 = getRelationValue(mapping.var5, obj);
           const phoneNumberFrom = getRelationValue(mapping.phoneNumberFrom, obj);
           const category = getRelationValue(mapping.category, obj);
+          const queue = getRelationValue(mapping.queue, obj);
 
           // let whatsappId = null;
 
@@ -142,6 +147,7 @@ const TestRequiredExposedImportService = async ({
             companyId,
             phoneNumberFrom,
             category,
+            queue,
             // whatsappId,
             // connectionFileId,
           };
@@ -179,18 +185,32 @@ const TestRequiredExposedImportService = async ({
             }
           }
 
+          if (requiredItems.includes("queue")) {
+            if (!queueDictionary[queue]) {
+              queueDictionary[queue] = await Queue.findOne({
+                where: {  name: queue, companyId }
+              });
+            }
+    
+            if (!queueDictionary[queue]) {
+              registersWithNonExistentQueue.push(obj);
+              continue;
+            }
+          }
+
           newPayload.push(obj);
         } catch (err) {
           console.log(err);
         }
       }
 
-      if (registersWithError.length > 0 || registersWithNonExistentCategory.length > 0) {
+      if (registersWithError.length > 0 || registersWithNonExistentCategory.length > 0 || registersWithNonExistentQueue.length > 0) {
         return {
           requiredItems: newRequiredItems,
           registersWithError,
           newPayload,
           registersWithNonExistentCategory,
+          registersWithNonExistentQueue,
         };
       }
 
@@ -209,6 +229,7 @@ const TestRequiredExposedImportService = async ({
       const var5 = getRelationValue(mapping.var5, payload);
       const phoneNumberFrom = getRelationValue(mapping.phoneNumberFrom, payload);
       const category = getRelationValue(mapping.category, payload);
+      const queue = getRelationValue(mapping.queue, payload);
 
       // let whatsappId = null;
 
@@ -236,6 +257,7 @@ const TestRequiredExposedImportService = async ({
         companyId,
         phoneNumberFrom,
         category,
+        queue,
         // whatsappId,
         // connectionFileId,
       }
@@ -261,6 +283,14 @@ const TestRequiredExposedImportService = async ({
         });
 
         if (!categoryExists) throw new AppError(`category ${category} do not exists.`);
+      }
+
+      if (requiredItems.includes("queue")) {
+        const queueExists = await Queue.findOne({
+          where: { name: queue, companyId }
+        });
+
+        if (!queueExists) throw new AppError(`queue ${queue} do not exists.`);
       }
     }
   }

@@ -11,6 +11,7 @@ import DeleteContactService from "../services/ContactServices/DeleteContactServi
 import AppError from "../errors/AppError";
 import GetContactService from "../services/ContactServices/GetContactService";
 import ContactBlacklist from "../database/models/ContactBlacklist";
+import BlockOrUnblockContactService from "../services/ContactServices/BlockOrUnblockContactService";
 
 type IndexQuery = {
   searchParam: string;
@@ -161,6 +162,25 @@ export const update = async (
   const { contactId } = req.params;
 
   const contact = await UpdateContactService({ contactData, contactId, companyId });
+
+  const io = getIO();
+  io.emit(`contact${companyId}`, {
+    action: "update",
+    contact
+  });
+
+  return res.status(200).json(contact);
+};
+
+export const block = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { session } = req.body;
+  const { contactId } = req.params;
+  const { companyId } = req.user;
+
+  const contact = await BlockOrUnblockContactService({ contactId, session, companyId });
 
   const io = getIO();
   io.emit(`contact${companyId}`, {

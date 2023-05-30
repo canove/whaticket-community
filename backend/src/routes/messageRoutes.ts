@@ -20,4 +20,6 @@ messageRoutes.post(
   MessageController.store
 );
 
+messageRoutes.delete("/messages/:messageId", isAuth, MessageController.remove);
+
 export default messageRoutes;

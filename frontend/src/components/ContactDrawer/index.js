@@ -11,11 +11,14 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 
+import ConfirmationModal from "../ConfirmationModal";
 import ContactModal from "../ContactModal";
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { useTranslation } from "react-i18next";
 import NewTicketModal from "../NewTicketModal";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
 
 const drawerWidth = 320;
 
@@ -81,12 +84,39 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, ticketId, loading }) => {
+const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, ticketId, loading, setContact }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
 	const [modalOpen, setModalOpen] = useState(false);
+	const [blockModalOpen, setBlockModalOpen] = useState(false);
 	const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+
+	const [loadingBlock, setLoadingBlock] = useState(false);
+
+	const handleBlockContact = async () => {
+		setLoadingBlock(true);
+
+		try {
+			const { data } = await api.put(`/contacts/block/${contact.id}`, {
+				session: whatsapp.name
+			});
+
+			setContact(data);
+		} catch (err) {
+			toastError(err);
+		}
+
+		setLoadingBlock(false);
+	}
+
+	const checkBlockedList = () => {
+		if (contact.blockedContacts && contact.blockedContacts.some(block => (block.session === whatsapp.name))) {
+			return true;
+		}
+
+		return false;
+	}
 
 	return (
 		<Drawer
@@ -140,8 +170,25 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, whatsapp, ticketId, l
 						>
 							{i18n.t("contactDrawer.buttons.edit")}
 						</Button>
+						<Button
+							variant="outlined"
+							color="secondary"
+							onClick={() => setBlockModalOpen(true)}
+							disabled={loadingBlock}
+						>
+							{checkBlockedList() ? "Desbloquear contato" : "Bloquear contato"}
+						</Button>
 					</Paper>
 					<Paper square variant="outlined" className={classes.contactDetails}>
+						<ConfirmationModal
+        					title={checkBlockedList() ? "Desbloquear contato" : "Bloquear contato"}
+        					open={blockModalOpen}
+        					onClose={setBlockModalOpen}
+       						onConfirm={handleBlockContact}
+      					>
+							{(!checkBlockedList()) && <>Você realmente deseja bloquear esse contato? Você não receberá mais nenhuma mensagem dele.</>}
+							{checkBlockedList() && <>Você realmente deseja desbloquear esse contato? Você poderá começar a receber mensagem dele.</>}
+      					</ConfirmationModal>
 						<ContactModal
 							open={modalOpen}
 							onClose={() => setModalOpen(false)}

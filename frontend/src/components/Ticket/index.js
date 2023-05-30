@@ -198,6 +198,7 @@ const Ticket = () => {
               contact={contact}
               ticket={ticket}
               onClick={handleDrawerOpen}
+              isBlocked={(contact.blockedContacts && contact.blockedContacts.some(block => (block.session === whatsapp.name)))}
             />
           </div>
           <div className={classes.ticketActionButtons}>
@@ -224,6 +225,7 @@ const Ticket = () => {
         whatsapp={whatsapp}
         ticketId={ticket.id}
         loading={loading}
+        setContact={setContact}
       />
     </div>
   );

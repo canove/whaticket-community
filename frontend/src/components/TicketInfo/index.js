@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Avatar, CardHeader } from "@material-ui/core";
 
-const TicketInfo = ({ contact, ticket, onClick }) => {
+const TicketInfo = ({ contact, ticket, onClick, isBlocked }) => {
 	const { i18n } = useTranslation();
 
 	return (
@@ -13,7 +13,7 @@ const TicketInfo = ({ contact, ticket, onClick }) => {
 			titleTypographyProps={{ noWrap: true }}
 			subheaderTypographyProps={{ noWrap: true }}
 			avatar={<Avatar src={contact.profilePicUrl} alt="contact_image" />}
-			title={`${contact.name} #${ticket.id}`}
+			title={`${contact.name}${isBlocked ? " [BLOQUEADO] " : " "}#${ticket.id}`}
 			subheader={
 				ticket.user &&
 				`${i18n.t("messagesList.header.assignedTo")} ${ticket.user.name}`

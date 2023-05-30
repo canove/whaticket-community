@@ -156,7 +156,7 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
 
     return res.status(200).json({ message: "request was received with success" }); 
   } else {
-    const { requiredItems, registersWithError, newPayload, registersWithNonExistentCategory } = response;
+    const { requiredItems, registersWithError, newPayload, registersWithNonExistentCategory, registersWithNonExistentQueue } = response;
 
     if (newPayload.length > 0) {
       await sendSqs({
@@ -169,7 +169,8 @@ export const start = async (req: Request, res: Response): Promise<Response> => {
       message: "request was received with success, but some items weren't sent.",
       required: requiredItems,
       payloadWithError: registersWithError,
-      payloadWithNonExistentCategory: registersWithNonExistentCategory
+      payloadWithNonExistentCategory: registersWithNonExistentCategory,
+      registersWithNonExistentQueue: registersWithNonExistentQueue,
     }); 
   }
 };

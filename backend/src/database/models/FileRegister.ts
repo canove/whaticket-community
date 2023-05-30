@@ -20,6 +20,7 @@ import Message from "./Message";
 import Whatsapp from "./Whatsapp";
 import ConnectionFiles from "./ConnectionFile";
 import BatchIntegrations from "./BatchIntegrations";
+import Queue from "./Queue";
 
 @Table
 class FileRegister extends Model<FileRegister> {
@@ -192,6 +193,13 @@ class FileRegister extends Model<FileRegister> {
 
   @BelongsTo(() => ConnectionFiles)
   connectionFile: ConnectionFiles;
+
+  @ForeignKey(() => Queue)
+  @Column
+  queueId: number;
+
+  @BelongsTo(() => Queue)
+  queue: Queue;
 
   @ForeignKey(() => BatchIntegrations)
   @Column

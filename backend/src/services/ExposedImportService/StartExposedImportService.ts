@@ -8,6 +8,7 @@ import AppError from "../../errors/AppError";
 import { removePhoneNumberWith9Country, preparePhoneNumber9Digit, removePhoneNumber9Digit,removePhoneNumberCountry, removePhoneNumber9DigitCountry } from "../../utils/common";
 import { createClient } from 'redis';
 import ConnectionFiles from "../../database/models/ConnectionFile";
+import Queue from "../../database/models/Queue";
 
 interface Request {
   exposedImportId: string;
@@ -93,17 +94,11 @@ const StartExposedImportService = async ({
     client = createClient({
       url: process.env.REDIS_URL
     });
+    
+    client.on('error', err => console.log('Redis Client Error', err));
+    await client.connect();
   } catch (err) {
     console.log("REDIS ERR - START EXPOSED IMPORT", err);
-  }
-
-  if (client) {
-    try {
-      client.on('error', err => console.log('Redis Client Error', err));
-      await client.connect();
-    } catch (err) {
-      console.log("REDIS ERR - START EXPOSED IMPORT", err);
-    }
   }
 
   const mapping = JSON.parse(exposedImport.mapping);
@@ -114,6 +109,7 @@ const StartExposedImportService = async ({
   if (Array.isArray(payload)) {
     let registersToInsert = [];
     let categoryDictionary = {};
+    let queueDictionary = {};
 
     for (const obj of payload) {
       try {
@@ -130,9 +126,11 @@ const StartExposedImportService = async ({
         const var5 = getRelationValue(mapping.var5, obj);
         const whatsappName = getRelationValue(mapping.phoneNumberFrom, obj);
         const categoryName = getRelationValue(mapping.category, obj);
+        const queueName = getRelationValue(mapping.queue, obj);
 
         let whatsappId = null;
         let connectionFileId = null;
+        let queueId = null;
 
         if (whatsappName) {
           const whatsapp = await Whatsapp.findOne({
@@ -162,6 +160,16 @@ const StartExposedImportService = async ({
           connectionFileId = categoryDictionary[categoryName] ? categoryDictionary[categoryName].id : null;
         }
 
+        if (queueName) {
+          if (!queueDictionary[queueName]) {
+            queueDictionary[queueName] = await Queue.findOne({
+              where: { name: queueName, companyId }
+            });
+          }
+
+          queueId = queueDictionary[queueName] ? queueDictionary[queueName].id : null;
+        }
+
         const register = {
           name,
           phoneNumber,
@@ -177,7 +185,8 @@ const StartExposedImportService = async ({
           var5,
           companyId,
           whatsappId,
-          connectionFileId
+          connectionFileId,
+          queueId,
         };
 
         registersToInsert.push(register);
@@ -259,9 +268,11 @@ const StartExposedImportService = async ({
     const var5 = getRelationValue(mapping.var5, payload);
     const whatsappName = getRelationValue(mapping.phoneNumberFrom, payload);
     const categoryName = getRelationValue(mapping.category, payload);
+    const queueName = getRelationValue(mapping.queue, payload);
 
     let whatsappId = null;
     let connectionFileId = null;
+    let queueId = null;
 
     if (whatsappName) {
       const whatsapp = await Whatsapp.findOne({
@@ -282,6 +293,17 @@ const StartExposedImportService = async ({
       connectionFileId = category ? category.id : null;
     }
 
+    if (queueName) {
+      const queue = await Queue.findOne({
+        where: { 
+          name: queueName,
+          companyId 
+        }
+      });
+
+      queueId = queue ? queue.id : null;
+    }
+
     const register = {
       name,
       phoneNumber,
@@ -298,6 +320,7 @@ const StartExposedImportService = async ({
       companyId,
       whatsappId,
       connectionFileId,
+      queueId,
     }
 
     if (client) {
