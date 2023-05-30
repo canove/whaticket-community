@@ -790,12 +790,45 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
     // if (index === messagesList.length - 1) {}
   }
 
+  const renderTicket = (message, index) => {
+    if (index === 0) {
+      return (
+        <span
+          className={classes.dailyTimestamp}
+          key={`ticket-${message.id}`}
+        >
+          <div className={classes.dailyTimestampText}>
+            TICKET: {message.ticketId}
+          </div>
+        </span>
+      );
+    }
+    if (index < messagesList.length) {
+      let messageTicket = messagesList[index].ticketId;
+      let previousMessageTicket = messagesList[index - 1].ticketId;
+
+      if (messageTicket != previousMessageTicket) {
+        return (
+          <span
+            className={classes.dailyTimestamp}
+            key={`ticket-${message.id}`}
+          >
+            <div className={classes.dailyTimestampText}>
+              TICKET: {message.ticketId}
+            </div>
+          </span>
+        );
+      }
+    }
+  }
+
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
         if (!message.fromMe) {
           return (
             <React.Fragment key={message.id}>
+              {renderTicket(message, index)}
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
               <div className={classes.messageLeft}>
@@ -831,6 +864,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
         } else {
           return (
             <React.Fragment key={message.id}>
+              {renderTicket(message, index)}
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
               <div className={classes.messageRight}>

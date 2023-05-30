@@ -18,7 +18,6 @@ interface Response {
   ticket: Ticket;
   count: number;
   hasMore: boolean;
-  // historic: TicketHistorics[];
 }
 
 const ListMessagesService = async ({
@@ -32,34 +31,22 @@ const ListMessagesService = async ({
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
-  // const historic = await TicketHistorics.findAll({
-  //   where: { 
-  //     ticketId, 
-  //     transferedAt: { [Op.ne]: null } 
-  //   },
-  //   include: [
-  //     {
-  //       model: Queue,
-  //       as: "queue",
-  //       attributes: ["id", "name"],
-  //       required: false,
-  //     },
-  //     {
-  //       model: User,
-  //       as: "user",
-  //       attributes: ["id", "name"],
-  //       required: false,
-  //     },
-  //   ],
-  //   order: [["createdAt", "DESC"]],
-  // });
+  const tickets = await Ticket.findAll({
+    where: { 
+      id: { [Op.lte]: ticket.id },
+      contactId: ticket.contactId,
+      companyId,
+    },
+    attributes: ["id"],
+  });
 
-  // await setMessagesAsRead(ticket);
+  const ticketIds = tickets.map(ticket => ticket.id);
+
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: messages } = await Message.findAndCountAll({
-    where: { ticketId },
+    where: { ticketId: ticketIds },
     limit,
     include: [
       "contact",
@@ -86,7 +73,6 @@ const ListMessagesService = async ({
     ticket,
     count,
     hasMore,
-    // historic,
   };
 };
 
