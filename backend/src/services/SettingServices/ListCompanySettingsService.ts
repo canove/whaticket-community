@@ -8,6 +8,7 @@ interface Response {
   useWorkTime: boolean;
   allowedIPs: string[];
   transferRequiredQueue: boolean;
+  autoCloseTickets?: string;
 }
 
 const initialSettings = { 
@@ -17,7 +18,8 @@ const initialSettings = {
   useWorkTime: false,
   allowedIPs: [],
   transferRequiredQueue: false,
-  defaultSurvey: ""
+  defaultSurvey: "",
+  autoCloseTickets: "never",
 };
 
 const ListCompanySettingsService = async (
@@ -43,7 +45,7 @@ const ListCompanySettingsService = async (
 
   if (!settings) return initialSettings;
 
-  return typeof settings == 'object'? settings: JSON.parse(settings);
+  return (typeof settings == 'object') ? settings : JSON.parse(settings);
 };
 
 export default ListCompanySettingsService;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { Box, Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
+import { Box, Button, Checkbox, FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
@@ -61,7 +61,8 @@ const Settings = () => {
 		days: [false,false,false,false,false,false,false],
 		allowedIPs: [],
 		transferRequiredQueue: false,
-		defaultSurvey: ""
+		defaultSurvey: "",
+		autoCloseTickets: "never", 
 	}
 	const [settings, setSettings] = useState(initialSettings);
 
@@ -163,7 +164,8 @@ const Settings = () => {
 			message: settings.message,
 			allowedIPs: settings.allowedIPs,
 			transferRequiredQueue: settings.transferRequiredQueue,
-			defaultSurvey: settings.defaultSurvey
+			defaultSurvey: settings.defaultSurvey,
+			autoCloseTickets: settings.autoCloseTickets,
 		};
 
 		try {
@@ -252,7 +254,7 @@ const Settings = () => {
 			/>
 			<Container className={classes.container} maxWidth="sm">
 				<Title>{i18n.t("settings.title")}</Title>
-				<Paper className={classes.paper}>
+				<Paper className={classes.paper}> {/* Horário de Atendimento */}
 					<div>
 						<Typography variant="subtitle1" color="primary" gutterBottom>Horário de Atendimento:</Typography>
 						<FormControlLabel
@@ -324,7 +326,7 @@ const Settings = () => {
 						}
 					</div>
 				</Paper>
-				<Paper className={classes.paper}>
+				<Paper className={classes.paper}> {/* IPs Permitidos */}
 					<div>
 						<div className={classes.multFieldLine}>
 							<Typography variant="subtitle1" color="primary" gutterBottom>IPs Permitidos:</Typography>
@@ -369,7 +371,7 @@ const Settings = () => {
 						}
 					</div>
 				</Paper>
-				<Paper className={classes.paper}>
+				<Paper className={classes.paper}> {/* Chat */}
 					<div>
 						<Typography variant="subtitle1" color="primary" gutterBottom>Chat:</Typography>
 						<FormControlLabel
@@ -405,6 +407,24 @@ const Settings = () => {
 								</FormControl>
 							</div>
 						}
+						<div style={{ marginTop: "10px" }}>
+							<FormControl>
+								<FormLabel>
+									Finalizar tickets abertos após: {(settings.autoCloseTickets !== "never") ? `${settings.autoCloseTickets} de inatividade.` : "Nunca" }
+								</FormLabel>
+								<RadioGroup
+									name="autoCloseTickets"
+									value={settings.autoCloseTickets}
+									onChange={(e) => handleSettingsChange(e.target.value, "autoCloseTickets")}
+								>
+									<FormControlLabel value="never" control={<Radio />} label="Nunca" />
+									<FormControlLabel value="8h" control={<Radio />} label="8h" />
+									<FormControlLabel value="12h" control={<Radio />} label="12h" />
+									<FormControlLabel value="24h" control={<Radio />} label="24h" />
+									<FormControlLabel value="48h" control={<Radio />} label="48h" />
+								</RadioGroup>
+							</FormControl>
+						</div>
 					</div>
 				</Paper>
 				<Button
