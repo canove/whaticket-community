@@ -1453,7 +1453,8 @@ const messages = {
         ERR_IP_NOT_ALLOWED: "IP origem da requisição não permitido.",
         ERR_NO_NICKNAME: "Não é possível este apelido como assinatura.",
         ERR_WHATSAPP_DISCONNECTED: "Whatsapp desconectado.",
-        ERR_INVALID_NUMBER: "Número de telefone inválido."
+        ERR_INVALID_NUMBER: "Número de telefone inválido.",
+        ERR_MAX_AUTOMATIC_CONTROL: "De acordo com o controle automático, este whatsapp atingiu número máximo de disparos.",
       },
     },
   },
