@@ -43,17 +43,9 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
       if (!canUseWhats) throw new AppError("ERR_MAX_AUTOMATIC_CONTROL");
     }
 
-    if (defaultWhatsapp.automaticControl && defaultWhatsapp.currentTriggerInterval) {
-      let lastSendDate = new Date();
+    let lastSendDate = new Date();
 
-      if (defaultWhatsapp.currentTriggerInterval % 1 != 0) {
-        lastSendDate.setSeconds(lastSendDate.getSeconds() + 30);
-      } else {
-        lastSendDate.setMinutes(lastSendDate.getMinutes() + defaultWhatsapp.currentTriggerInterval);
-      }
-
-      await defaultWhatsapp.update({ lastSendDate });
-    }
+    await defaultWhatsapp.update({ lastSendDate });
   }
 
   return defaultWhatsapp;
