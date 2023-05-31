@@ -4,6 +4,8 @@ import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "./ShowTicketService";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import CreateTicketHistoricService from "../TicketHistoricsServices/CreateTicketHistoricService";
+import ShowUserService from "../UserServices/ShowUserService";
+import AppError from "../../errors/AppError";
 
 interface TicketData {
   status?: string;
@@ -37,6 +39,16 @@ const UpdateTicketService = async ({
   const oldStatus = ticket.status;
   const oldUserId = ticket.user?.id;
   const oldQueueId = ticket.queueId;
+
+  if (ticket.queueId && oldStatus === "pending" && status === "open") {
+    const user = await ShowUserService(userId, companyId);
+
+    const userQueues = user?.queues?.map(queue => queue.id);
+
+    if (!userQueues.includes(ticket.queueId)) {
+      throw new AppError("ERR_USER_CANNOT_ACCEPT_TICKETS_FROM_THIS_QUEUE");
+    }
+  }
 
   let reopen = false;
   if (oldStatus === "closed") {
