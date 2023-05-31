@@ -192,7 +192,7 @@ const Ticket = () => {
           [classes.mainWrapperShift]: drawerOpen,
         })}
       >
-        <TicketHeader loading={loading}>
+        <TicketHeader loading={loading} queue={ticket.queue}>
           <div className={classes.ticketInfo}>
             <TicketInfo
               contact={contact}
