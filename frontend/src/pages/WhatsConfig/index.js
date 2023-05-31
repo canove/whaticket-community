@@ -535,7 +535,7 @@ const WhatsConfig = () => {
                         <CustomToolTip
                             title={"Percentual de Interação Mínima"}
                             contents={[
-                                "(?) Percentual minímo para efetuar o disparo.", 
+                                "(?) Percentual mínimo para efetuar o disparo.", 
                                 "(?) Calculado diariamente.",
                                 "(?) Calculo é iniciado a partir de 10 disparos ou 10% da quantidade de disparos que número pode fazer no dia.",
                             ]}
