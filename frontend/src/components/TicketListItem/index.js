@@ -183,7 +183,7 @@ const TicketListItem = ({ ticket }) => {
 									color="primary"
 								/>
 							)}
-							{ticket.lastMessage && (
+							{(ticket.lastMessage != null) && (
 								<Typography
 									className={classes.lastMessageTime}
 									component="span"
