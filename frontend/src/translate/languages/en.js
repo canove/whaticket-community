@@ -1453,6 +1453,7 @@ const messages = {
         ERR_WHATSAPP_DISCONNECTED: "Whatsapp disconnected.",
         ERR_INVALID_NUMBER: "Invalid phone number.",
         ERR_MAX_AUTOMATIC_CONTROL: "According to automatic control, this whatsapp has reached maximum number of shots.",
+        ERR_USER_CANNOT_ACCEPT_TICKETS_FROM_THIS_QUEUE: "User cannot accept ticket from this queue.",
       },
     },
   },
