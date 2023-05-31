@@ -9,6 +9,7 @@ interface Request {
   greetingMessages?: GreetingMessages[];
   active?: boolean;
   companyId: string | number;
+  interactionPercentage?: number;
 }
 
 const CreateWhatsConfigService = async ({
@@ -17,7 +18,8 @@ const CreateWhatsConfigService = async ({
   useGreetingMessages,
   greetingMessages,
   active,
-  companyId
+  companyId,
+  interactionPercentage,
 }: Request): Promise<WhatsappsConfig> => {
   try {
     const config = await WhatsappsConfig.create({
@@ -25,7 +27,8 @@ const CreateWhatsConfigService = async ({
       whatsappIds,
       active,
       companyId,
-      useGreetingMessages
+      useGreetingMessages,
+      interactionPercentage,
     });
 
     const configId = config.id;
@@ -40,7 +43,7 @@ const CreateWhatsConfigService = async ({
     }
 
     return config;
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 };

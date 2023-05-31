@@ -15,6 +15,7 @@ interface ConfigData {
   useGreetingMessages?: boolean;
   greetingMessages?: GreetingMessages[];
   active?: boolean;
+  interactionPercentage?: number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -31,7 +32,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     whatsappIds,
     useGreetingMessages,
     greetingMessages,
-    active
+    active,
+    interactionPercentage,
   } = req.body as ConfigData;
 
   const { companyId } = req.user;
@@ -42,7 +44,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     useGreetingMessages,
     greetingMessages,
     active,
-    companyId
+    companyId,
+    interactionPercentage,
   });
 
   const io = getIO();

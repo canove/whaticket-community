@@ -43,6 +43,9 @@ class WhatsappsConfig extends Model<WhatsappsConfig> {
 
   @Column
   useGreetingMessages: boolean;
+
+  @Column
+  interactionPercentage: number;
 }
 
 export default WhatsappsConfig;

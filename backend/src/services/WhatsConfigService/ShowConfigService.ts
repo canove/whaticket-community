@@ -6,7 +6,7 @@ const ShowConfigService = async (
   id: string | number
 ): Promise<WhatsappsConfig> => {
   const config = await WhatsappsConfig.findByPk(id, {
-    attributes: ["id", "triggerInterval", "whatsappIds"],
+    attributes: ["id", "triggerInterval", "whatsappIds", "interactionPercentage"],
     include: [
       {
         model: GreetingMessages,
