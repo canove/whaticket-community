@@ -55,7 +55,9 @@ const useStyles = makeStyles((theme) => ({
 const statusTranslation = {
   "open": "Em Atendimento",
   "pending": "Aguardando",
-  "closed": "Finalizado"
+  "closed": "Finalizado",
+  "inbot": "Em Bot",
+  "dispatcher": "Disparo",
 }
 
 const Supervisor = () => {
@@ -600,6 +602,8 @@ const Supervisor = () => {
                     <MenuItem value={"pending"}>{"Aguardando"}</MenuItem>
                     <MenuItem value={"open"}>{"Em Atendimento"}</MenuItem>
                     <MenuItem value={"closed"}>{"Finalizado"}</MenuItem>
+                    <MenuItem value={"inbot"}>{"Em Bot"}</MenuItem>
+                    <MenuItem value={"dispatch"}>{"Disparo"}</MenuItem>
                   </Select>
                 </FormControl>
               </>

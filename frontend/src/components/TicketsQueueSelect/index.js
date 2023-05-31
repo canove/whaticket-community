@@ -70,7 +70,7 @@ const TicketsQueueSelect = ({
 					<MenuItem dense value={"NO_QUEUE"}>
 						<Checkbox
 							style={{
-								color: "#000",
+								color: "#7C7C7C",
 							}}
 							size="small"
 							color="primary"

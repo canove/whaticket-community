@@ -19,7 +19,8 @@ const UpdateConfigService = async ({
     whatsappIds,
     active,
     useGreetingMessages,
-    greetingMessages = []
+    greetingMessages = [],
+    interactionPercentage,
   } = configData;
 
   await config.update({
@@ -27,7 +28,8 @@ const UpdateConfigService = async ({
     triggerInterval,
     whatsappIds,
     active,
-    useGreetingMessages
+    useGreetingMessages,
+    interactionPercentage,
   });
 
   greetingMessages.forEach(async greetingMessage => {

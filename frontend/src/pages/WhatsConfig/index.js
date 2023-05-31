@@ -8,6 +8,7 @@ import {
     Button,
     Checkbox,
     Grid,
+    IconButton,
     Input,
     MenuItem,
     Select,
@@ -17,6 +18,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
+    Tooltip,
     Typography
 } from "@material-ui/core";
 
@@ -32,6 +34,7 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import HelpIcon from '@material-ui/icons/Help';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -109,6 +112,30 @@ const reducer = (state, action) => {
     }
   };
 
+  const CustomToolTip = ({ title, contents, children }) => {
+	const classes = useStyles();
+
+	return (
+		<Tooltip
+			arrow
+			classes={{
+				tooltip: classes.tooltip,
+				popper: classes.tooltipPopper,
+			}}
+			title={
+				<React.Fragment>
+					<Typography gutterBottom color="inherit">
+						{title}
+					</Typography>
+					{contents && contents.map((content, index) => <Typography key={index}>{content}</Typography>)}
+				</React.Fragment>
+			}
+		>
+			{children}
+		</Tooltip>
+	);
+};
+
 const WhatsConfig = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
@@ -126,9 +153,28 @@ const WhatsConfig = () => {
     const [saving, setSaving] = useState(false);
     const [isActive, setIsActive] = useState(false);
 
+    const [interactionPercentage, setInteractionPercentage] = useState(0);
+
     useEffect(() => {
 		dispatch({ type: "RESET" });
 	}, []);
+
+    // Interaction Percentage
+    const handleInteractionPercentageSliderChange = (event, newValue) => {
+        setInteractionPercentage(newValue);
+    };
+
+    const handleInteractionPercentageInputChange = (event) => {
+        setInteractionPercentage(event.target.value === '' ? '' : Number(event.target.value));
+    };
+
+    const handleInteractionPercentageBlur = () => {
+        if (interactionPercentage < 0) {
+            setInteractionPercentage(0);
+        } else if (interactionPercentage > 100) {
+            setInteractionPercentage(100);
+        }
+    };
 
     // Interval
     const handleIntervalSliderChange = (event, newValue) => {
@@ -240,11 +286,12 @@ const WhatsConfig = () => {
             useGreetingMessages: useGreetingMessage,
             greetingMessages: greetingMessages,
             active: isActive,
+            interactionPercentage: interactionPercentage,
         }
         try {
             if (config.length > 0) {
                 await api.put(`/whatsconfig/${config[0].id}`, configData);
-                toast.success(i18n.t("settingsWhats.confirmation.update"));
+                toast.success(i18n.t("settingsWhats.confirmation.updated"));
             } else {
                 await api.post(`/whatsconfig/`, configData);
                 toast.success(i18n.t("settingsWhats.confirmation.saved"));
@@ -264,6 +311,7 @@ const WhatsConfig = () => {
             setIntervalValue(config[0].triggerInterval);
             setGreetingMessages(config[0].greetingMessages);
             setUseGreetingMessage(config[0].useGreetingMessages);
+            setInteractionPercentage(config[0].interactionPercentage);
 
             if (config[0].whatsappIds === null) {
                 setSelectedConnection(['all']);
@@ -327,7 +375,6 @@ const WhatsConfig = () => {
         return () => {
           socket.disconnect();
         };
-// eslint-disable-next-line react-hooks/exhaustive-deps
       }, []);
 
 	return (
@@ -363,6 +410,7 @@ const WhatsConfig = () => {
                 className={classes.mainPaper}
                 variant="outlined"
             >
+                {/* Use Config */}
                 <Paper
                     className={classes.paper}
                     variant="outlined"
@@ -378,6 +426,7 @@ const WhatsConfig = () => {
                         checked={isActive}
                     />
                 </Paper>
+                {/* Connections */}
                 <Paper
                     className={classes.mainPaper}
                     variant="outlined"
@@ -439,7 +488,8 @@ const WhatsConfig = () => {
                         </Paper>
                     }
                 </Paper>
-                <Paper
+                {/* Trigger Time */}
+                <Paper 
                     className={classes.paper}
                     variant="outlined"
                 >
@@ -475,7 +525,57 @@ const WhatsConfig = () => {
                         </Grid>
                     </Grid>
                 </Paper>
-                <Paper
+                {/* Interaction Percentual */}
+                <Paper 
+                    className={classes.paper}
+                    variant="outlined"
+                >
+                    <Typography id="input-slider" gutterBottom>
+                        Percentual de interação mínima (0% - 100%)
+                        <CustomToolTip
+                            title={"Percentual de Interação Mínima"}
+                            contents={[
+                                "(?) Percentual mínimo para efetuar o disparo.", 
+                                "(?) Calculado diariamente.",
+                                "(?) Calculo é iniciado a partir de 10 disparos ou 10% da quantidade de disparos que número pode fazer no dia.",
+                            ]}
+                        >
+                            <IconButton color="primary">
+                                <HelpIcon />
+                            </IconButton>
+                        </CustomToolTip>
+                    </Typography>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs>
+                            <Slider
+                                value={typeof interactionPercentage === 'number' ? interactionPercentage : 0}
+                                onChange={handleInteractionPercentageSliderChange}
+                                aria-labelledby="input-slider"
+                                step={1}
+                                min={0}
+                                max={100}
+                                valueLabelDisplay="auto"
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Input
+                                value={interactionPercentage}
+                                margin="dense"
+                                onChange={handleInteractionPercentageInputChange}
+                                onBlur={handleInteractionPercentageBlur}
+                                inputProps={{
+                                step: 1,
+                                min: 0,
+                                max: 100,
+                                type: 'number',
+                                'aria-labelledby': 'input-slider',
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </Paper>
+                {/* Use Greeting Message */}
+                <Paper 
                     className={classes.paper}
                     variant="outlined"
                 >
