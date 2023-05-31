@@ -27,10 +27,19 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
     whereCondition = { ...whereCondition, id: whatsappId };
   }
 
-  const defaultWhatsapp = await Whatsapp.findOne({
-    where: whereCondition,
+  let whereConditionQuality = { ...whereCondition, currentTriggerQuantity: { [Op.gte]: 80 } };
+
+  let defaultWhatsapp = await Whatsapp.findOne({
+    where: whereConditionQuality,
     order: order,
   });
+
+  if (!defaultWhatsapp) {
+    defaultWhatsapp = await Whatsapp.findOne({
+      where: whereCondition,
+      order: order,
+    });
+  }
 
   if (!defaultWhatsapp) {
     throw new AppError("ERR_NO_CONNECTED_WHATS_FOUND");
