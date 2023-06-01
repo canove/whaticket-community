@@ -79,10 +79,14 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const userId = req.user.id;
   const { companyId, id } = req.user;
 
-  let queueIds: number[] = [];
+  let queueIds = [];
 
   if (queueIdsStringified) {
     queueIds = JSON.parse(queueIdsStringified);
+  }
+
+  if (queueIds.length === 0) {
+    queueIds = ["NO_QUEUE"];
   }
 
   const { tickets, count, hasMore } = await ListTicketsService({
@@ -208,9 +212,9 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
     userQueueIds = user.queues.map(queue => queue.id);
   }
 
-  const contact = await ShowTicketService(ticketId, companyId, userQueueIds);
+  const ticket = await ShowTicketService(ticketId, companyId, userQueueIds);
 
-  return res.status(200).json(contact);
+  return res.status(200).json(ticket);
 };
 
 export const historic = async (req: Request, res: Response): Promise<Response> => {
