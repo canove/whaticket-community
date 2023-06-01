@@ -4,6 +4,7 @@ import Queue from "../database/models/Queue";
 import FileRegister from "../database/models/FileRegister";
 import { Op } from "sequelize";
 import { endOfDay, startOfDay } from "date-fns";
+import ListCompanySettingsService from "../services/SettingServices/ListCompanySettingsService";
 
 interface Request {
   companyId: number;
@@ -19,7 +20,7 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
   whereCondition = { companyId, deleted: false };
 
   if (!official) {
-    whereCondition = { ...whereCondition, status: "CONNECTED", official: false };
+    whereCondition = { ...whereCondition, status: "CONNECTED", official: false, currentTriggerQuantity: { [Op.gte]: 50 } };
     order = [["lastSendDate", "ASC"]];
   }
 
@@ -27,37 +28,37 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
     whereCondition = { ...whereCondition, id: whatsappId };
   }
 
-  let whereConditionQuality = { ...whereCondition, currentTriggerQuantity: { [Op.gte]: 80 } };
-
-  let defaultWhatsapp = await Whatsapp.findOne({
-    where: whereConditionQuality,
+  const whatsapp = await Whatsapp.findOne({
+    where: whereCondition,
     order: order,
   });
 
-  if (!defaultWhatsapp) {
-    defaultWhatsapp = await Whatsapp.findOne({
-      where: whereCondition,
-      order: order,
-    });
-  }
-
-  if (!defaultWhatsapp) {
-    throw new AppError("ERR_NO_CONNECTED_WHATS_FOUND");
+  if (!whatsapp) {
+    throw new AppError("ERR_NO_AVAILABLE_WHATS_FOUND");
   }
 
   if (!official) {
     if (whatsappId) {
-      const canUseWhats = await checkAutomaticControl(defaultWhatsapp, companyId);
+      const canUseWhats = await checkAutomaticControl(whatsapp, companyId);
 
       if (!canUseWhats) throw new AppError("ERR_MAX_AUTOMATIC_CONTROL");
     }
 
-    let lastSendDate = new Date();
+    const settings = await ListCompanySettingsService(whatsapp.companyId);
+    const now = new Date();
+    
+    if (whatsapp.lastSendDate && settings.createTicketInterval) {
+      const lastSendDate = new Date(whatsapp.lastSendDate);
 
-    await defaultWhatsapp.update({ lastSendDate });
+      if ((now.getTime() - lastSendDate.getTime()) < (settings.createTicketInterval * 60000)) {
+        throw new AppError("ERR_WHATSAPP_CREATE_TIME");
+      }
+    }
+
+    await whatsapp.update({ lastSendDate: now });
   }
 
-  return defaultWhatsapp;
+  return whatsapp;
 };
 
 const checkAutomaticControl = async (whatsapp, companyId) => {

@@ -573,13 +573,6 @@ const processNode = async (node: any, session: any, body: any, links: any, nodes
       const queue = await Queue.findOne({
         where: { id: node.queueId }
       });
-  
-      console.log("update session startFlowService 233");
-  
-      await session.update({
-        nodeId: null,
-        variables: null
-      });
 
       response = {
         queueName: queue ? queue.name : "NO_QUEUE",
@@ -587,6 +580,13 @@ const processNode = async (node: any, session: any, body: any, links: any, nodes
         type: "TRANSFER_QUEUE"
       };
     }
+
+    console.log("update session startFlowService 233");
+
+    await session.update({
+      nodeId: null,
+      variables: null
+    });
 
     return response;
   }

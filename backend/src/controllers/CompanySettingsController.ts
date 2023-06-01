@@ -13,7 +13,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
     const { companyId } = req.user;
-    const { days, hours, message, useWorkTime, allowedIPs, transferRequiredQueue, defaultSurvey, autoCloseTickets } = req.body;
+    const { days, hours, message, useWorkTime, allowedIPs, transferRequiredQueue, defaultSurvey, autoCloseTickets, createTicketInterval } = req.body;
   
     try {
         const client = createClient({
@@ -32,6 +32,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
             transferRequiredQueue,
             defaultSurvey,
             autoCloseTickets,
+            createTicketInterval,
         };
     
         await client.set(`settings-${companyId}`, JSON.stringify(settings));

@@ -1455,7 +1455,8 @@ const messages = {
         ERR_WHATSAPP_DISCONNECTED: "Whatsapp desconectado.",
         ERR_INVALID_NUMBER: "Número de telefone inválido.",
         ERR_MAX_AUTOMATIC_CONTROL: "De acordo com o controle automático, este whatsapp atingiu número máximo de disparos.",
-        ERR_USER_CANNOT_ACCEPT_TICKETS_FROM_THIS_QUEUE: "User cannot accept ticket from this queue.",
+        ERR_USER_CANNOT_ACCEPT_TICKETS_FROM_THIS_QUEUE: "Usuário não pode aceitar conversa dessa fila.",
+        ERR_WHATSAPP_CREATE_TIME: "Nenhum whatsapp disponivel foi encontrado para criar um ticket. Por favor, tente de novo mais tarde."
       },
     },
   },
