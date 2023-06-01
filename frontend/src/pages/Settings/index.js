@@ -63,6 +63,7 @@ const Settings = () => {
 		transferRequiredQueue: false,
 		defaultSurvey: "",
 		autoCloseTickets: "never", 
+		createTicketInterval: 0
 	}
 	const [settings, setSettings] = useState(initialSettings);
 
@@ -166,6 +167,7 @@ const Settings = () => {
 			transferRequiredQueue: settings.transferRequiredQueue,
 			defaultSurvey: settings.defaultSurvey,
 			autoCloseTickets: settings.autoCloseTickets,
+			createTicketInterval: settings.createTicketInterval
 		};
 
 		try {
@@ -424,6 +426,28 @@ const Settings = () => {
 									<FormControlLabel value="48h" control={<Radio />} label="48h" />
 								</RadioGroup>
 							</FormControl>
+						</div>
+						<div style={{ marginTop: "10px" }}>
+						<FormControl
+							variant="outlined"
+							margin="dense"
+							fullWidth
+						>
+							<TextField
+								id="create-ticket-interval"
+								label={"Intervalo para criar ticket (em minutos)"}
+								type="number"
+								variant="outlined"
+								value={settings.createTicketInterval}
+								onChange={(e) => handleSettingsChange(e.target.value, "createTicketInterval")}
+								fullWidth
+								inputProps={{
+									step: 1,
+									min: 0,
+									type: 'number',
+								}}
+							/>
+						</FormControl>
 						</div>
 					</div>
 				</Paper>

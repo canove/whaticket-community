@@ -8,7 +8,8 @@ interface Response {
   useWorkTime: boolean;
   allowedIPs: string[];
   transferRequiredQueue: boolean;
-  autoCloseTickets?: string;
+  autoCloseTickets: string;
+  createTicketInterval: number;
 }
 
 const initialSettings = { 
@@ -20,6 +21,7 @@ const initialSettings = {
   transferRequiredQueue: false,
   defaultSurvey: "",
   autoCloseTickets: "never",
+  createTicketInterval: 0,
 };
 
 const ListCompanySettingsService = async (

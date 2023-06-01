@@ -168,11 +168,11 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 				templateHeader: header ? JSON.stringify(header) : null,
 			});
 			history.push(`/tickets/${ticket.id}`);
+			handleClose();
 		} catch (err) {
 			toastError(err);
 		}
 		setLoading(false);
-		handleClose();
 	};
 
 	const handleSelectOption = (e, newValue) => {
@@ -563,7 +563,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 					<ButtonWithSpinner
 						variant="contained"
 						type="button"
-						disabled={(!selectedContact && !contactId) || (official && (!whatsappId || !selectedTemplate) || (selectedTemplate && (selectedTemplate.header || selectedTemplate.buttons)))}
+						disabled={loading || (!selectedContact && !contactId) || (official && (!whatsappId || !selectedTemplate) || (selectedTemplate && (selectedTemplate.header || selectedTemplate.buttons)))}
 						onClick={() => handleSaveTicket(selectedContact ? selectedContact.id : contactId)}
 						color="primary"
 						loading={loading}
