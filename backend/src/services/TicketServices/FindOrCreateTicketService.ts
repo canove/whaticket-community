@@ -62,11 +62,16 @@ const FindOrCreateTicketService = async (
     console.log("update ticket findOrCreateticketService 28");
     await ticket.update({ unreadMessages });
     if (!inBot && !isDispatcher && ticket.status != 'open') {
+      const oldTicket = {
+        oldStatus: ticket.status,
+        oldUserId: ticket.userId,
+        oldQueueId: ticket.queueId,
+      };
+
       console.log("update ticket findOrCreateticketService 31");
       await ticket.update({ status: "pending" });
 
-      // TICKET HISTORIC - UPDATE
-      await CreateTicketHistoricService(ticket, "UPDATE");
+      await CreateTicketHistoricService({ ticket, oldTicket, change: "UPDATE" }); //* TICKET HISTORIC - UPDATE
     }
   }
 
@@ -80,6 +85,12 @@ const FindOrCreateTicketService = async (
     });
 
     if (ticket) {
+      const oldTicket = {
+        oldStatus: ticket.status,
+        oldUserId: ticket.userId,
+        oldQueueId: ticket.queueId,
+      };
+
       console.log("update ticket findOrCreateticketService 46");
       await ticket.update({
         status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
@@ -87,8 +98,7 @@ const FindOrCreateTicketService = async (
         unreadMessages
       });
 
-      // TICKET HISTORIC - UPDATE
-      await CreateTicketHistoricService(ticket, "UPDATE");
+      await CreateTicketHistoricService({ ticket, oldTicket, change: "UPDATE" }); //* TICKET HISTORIC - UPDATE
     }
   }
 
@@ -107,6 +117,12 @@ const FindOrCreateTicketService = async (
     });
 
     if (ticket) {
+      const oldTicket = {
+        oldStatus: ticket.status,
+        oldUserId: ticket.userId,
+        oldQueueId: ticket.queueId,
+      };
+
       console.log("update ticket findOrCreateticketService 70");
       await ticket.update({
         status: (isDispatcher === true ? "dispatcher" : inBot ? "inbot" : "pending"),
@@ -114,8 +130,7 @@ const FindOrCreateTicketService = async (
         unreadMessages
       });
 
-      // TICKET HISTORIC - UPDATE
-      await CreateTicketHistoricService(ticket, "UPDATE");
+      await CreateTicketHistoricService({ ticket, oldTicket, change: "UPDATE" }); //* TICKET HISTORIC - UPDATE
     }
   }
 
@@ -194,8 +209,13 @@ const FindOrCreateTicketService = async (
 
     isCreated = true;
 
-    // TICKET HISTORIC - CREATE
-    await CreateTicketHistoricService(ticket, "CREATE");
+    const oldTicket = {
+      oldStatus: null,
+      oldUserId: null,
+      oldQueueId: null,
+    };
+  
+    await CreateTicketHistoricService({ ticket, oldTicket, change: "CREATE" }); //* TICKET HISTORIC - CREATE
   }
 
   ticket = await ShowTicketService(ticket.id, companyId);

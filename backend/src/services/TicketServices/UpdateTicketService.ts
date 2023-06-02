@@ -6,12 +6,15 @@ import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import CreateTicketHistoricService from "../TicketHistoricsServices/CreateTicketHistoricService";
 import ShowUserService from "../UserServices/ShowUserService";
 import AppError from "../../errors/AppError";
+import Message from "../../database/models/Message";
+import TicketChanges from "../../database/models/TicketChanges";
 
 interface TicketData {
   status?: string;
   userId?: number;
   queueId?: number;
   categoryId?: number;
+  observation?: string;
 }
 
 interface Request {
@@ -31,7 +34,7 @@ const UpdateTicketService = async ({
   ticketId,
   companyId
 }: Request): Promise<Response> => {
-  const { status, userId, queueId, categoryId } = ticketData;
+  const { status, userId, queueId, categoryId, observation } = ticketData;
 
   const ticket = await ShowTicketService(ticketId, companyId);
   await SetTicketMessagesAsRead(ticket);
@@ -56,11 +59,6 @@ const UpdateTicketService = async ({
     reopen = true;
   }
 
-  if ((!reopen) && (status !== "closed") && (!(oldStatus === "pending" && status === "open")) && (oldUserId != userId || oldQueueId != queueId)) {
-    // TICKET HISTORIC - TRANSFER
-    await CreateTicketHistoricService(ticket, "TRANSFER");
-  }
-
   console.log("update ticket updateticketservice 43");
   await ticket.update({
     status,
@@ -72,21 +70,22 @@ const UpdateTicketService = async ({
 
   await ticket.reload();
 
+  const oldTicket = {
+    oldStatus: oldStatus,
+    oldUserId: oldUserId,
+    oldQueueId: oldQueueId,
+  }
+
   if (reopen) {
-    // TICKET HISTORIC - REOPEN
-    await CreateTicketHistoricService(ticket, "REOPEN");
+    await CreateTicketHistoricService({ ticket, oldTicket, observation, change: "REOPEN" }); //* TICKET HISTORIC - REOPEN
   } else if (status === "closed") {
-    // TICKET HISTORIC - FINALIZE
-    await CreateTicketHistoricService(ticket, "FINALIZE");
+    await CreateTicketHistoricService({ ticket, oldTicket, observation, change: "FINALIZE" }); //* TICKET HISTORIC - FINALIZE
   } else if (oldStatus === "pending" && status === "open") {
-    // TICKET HISTORIC - ACCEPT
-    await CreateTicketHistoricService(ticket, "ACCEPT");
+    await CreateTicketHistoricService({ ticket, oldTicket, observation, change: "ACCEPT" }); //* TICKET HISTORIC - ACCEPT
   } else if (oldUserId != userId || oldQueueId != queueId) {
-    // TICKET HISTORIC - TRANSFER
-    await CreateTicketHistoricService(ticket, "TRANSFER");
-  } else {
-    // TICKET HISTORIC - UPDATE
-    await CreateTicketHistoricService(ticket, "UPDATE");
+    await CreateTicketHistoricService({ ticket, oldTicket, observation, change: "TRANSFER"} ); //* TICKET HISTORIC - TRANSFER
+  } else if (oldStatus != status) {
+    await CreateTicketHistoricService({ ticket, oldTicket, observation, change: "STATUS" }); //* TICKET HISTORIC - STATUS
   }
 
   const io = getIO();

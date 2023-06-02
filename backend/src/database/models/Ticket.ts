@@ -19,6 +19,7 @@ import Queue from "./Queue";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 import Sessions from "./Sessions";
+import TicketChanges from "./TicketChanges";
 
 @Table
 class Ticket extends Model<Ticket> {
@@ -90,6 +91,9 @@ class Ticket extends Model<Ticket> {
 
   @HasMany(() => Message)
   messages: Message[];
+
+  @HasMany(() => TicketChanges)
+  ticketChanges: TicketChanges[];
 
   @ForeignKey(() => Category)
   @Column

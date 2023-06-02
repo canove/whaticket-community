@@ -1,21 +1,38 @@
 import Ticket from "../../database/models/Ticket";
-import TicketHistorics from "../../database/models/TicketHistorics";
+import TicketChanges from "../../database/models/TicketChanges";
 
-const CreateTicketHistoricService = async (ticket: Ticket, change: string): Promise<void> => {
+interface OldTicket {
+  oldStatus: string;
+  oldUserId: number;
+  oldQueueId: number;
+}
+
+interface Request {
+  ticket: Ticket;
+  oldTicket: OldTicket;
+  change: string;
+  observation?: string;
+}
+
+const CreateTicketHistoricService = async ({
+  ticket, 
+  oldTicket, 
+  change,
+  observation
+}: Request): Promise<void> => {
   await ticket.reload();
 
-  await TicketHistorics.create({
+  await TicketChanges.create({
     ticketId: ticket.id,
-    userId: ticket.userId,
-    queueId: ticket.queueId,
     companyId: ticket.companyId,
-    status: ticket.status,
-    acceptedAt: change === "ACCEPT" ? ticket.updatedAt : null,
-    transferedAt: change === "TRANSFER" ? ticket.updatedAt : null,
-    finalizedAt: change === "FINALIZE" ? ticket.finalizedAt : null,
-    reopenedAt: change === "REOPEN" ? ticket.updatedAt : null,
-    ticketCreatedAt: change === "CREATE" ? ticket.createdAt : null,
-    ticketUpdatedAt: ticket.updatedAt,
+    newUserId: ticket.userId,
+    newQueueId: ticket.queueId,
+    newStatus: ticket.status,
+    oldUserId: oldTicket.oldUserId,
+    oldQueueId: oldTicket.oldQueueId,
+    oldStatus: oldTicket.oldStatus,
+    change: change,
+    observation: observation,
   });
 };
 

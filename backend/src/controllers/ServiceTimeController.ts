@@ -159,7 +159,7 @@ const getBodyData = (reports, tmaType) => {
 
   if (tmaType === "queue" || tmaType === "user") {
     for (const report of reports) {
-      const serviceTime = processHistorics(tmaType, report.ticketHistorics);
+      const serviceTime = processHistorics(report.historics);
 
       text += `
         <tr>
@@ -210,7 +210,7 @@ export const exportCSV = async (
 
   if (tmaType === "queue" || tmaType === "user") {
     for (const report of reports) {
-      const serviceTime = processHistorics(tmaType, report.ticketHistorics);
+      const serviceTime = processHistorics(report.historics);
 
       const columns = [];
       columns.push(report.name);
@@ -259,16 +259,16 @@ const formatTime = (milliseconds) => {
   return `${hoursString}:${minutesString}:${secondsString}`;
 };
 
-const getUserServiceTime = (hists) => {
+const getServiceTime = (hists) => {
   let currentID = 0;
 
-  const createdHist = hists.find(h => h.id > currentID);
-  currentID = createdHist.id;
+  const initialHist = hists.find(h => h.id > currentID);
+  currentID = initialHist.id;
 
-  const finalizedHist = hists.find(h => h.id > currentID);
+  const finalHist = hists.find(h => h.id > currentID);
 
-  const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-  const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
+  const createdAt = initialHist.createdAt;
+  const finalizedAt = finalHist.createdAt;
 
   if (!createdAt || !finalizedAt) return null;
 
@@ -280,28 +280,7 @@ const getUserServiceTime = (hists) => {
   return serviceTime;
 }
 
-const getQueueServiceTime = (hists) => {
-  let currentID = 0;
-
-  const createdHist = hists.find(h => h.id > currentID);
-  currentID = createdHist.id;
-
-  const finalizedHist = hists.find(h => h.id > currentID);
-
-  const createdAt = createdHist.ticketCreatedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-  const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
-
-  if (!createdAt || !finalizedAt) return null;
-
-  const createdAtDate = new Date(createdAt);
-  const finalizedAtDate = new Date(finalizedAt);
-
-  const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
-
-  return serviceTime;
-}
-
-const processHistorics = (tmaType, historics = []) => {    
+const processHistorics = (historics = []) => {    
   if (!historics || historics.length === 0) return "--:--:--";
 
   let tickets = [];
@@ -332,15 +311,7 @@ const processHistorics = (tmaType, historics = []) => {
     if (hists.length < 2) continue;
 
     if (hists.length === 2) {
-      let serviceTime = 0;
-
-      if (tmaType === "queue") {
-        serviceTime = getQueueServiceTime(hists);
-      }
-
-      if (tmaType === "user") {
-        serviceTime = getUserServiceTime(hists);
-      }
+      const serviceTime = getServiceTime(hists);
 
       if (serviceTime === null) continue;
 
@@ -358,15 +329,7 @@ const processHistorics = (tmaType, historics = []) => {
       for (const newHists of histsArray) {
         if (newHists.length % 2 !== 0) continue;
 
-        let serviceTime = 0;
-
-        if (tmaType === "queue") {
-          serviceTime = getQueueServiceTime(newHists);
-        }
-
-        if (tmaType === "user") {
-          serviceTime = getUserServiceTime(newHists);
-        }
+        const serviceTime = getServiceTime(hists);
 
         ticketsServiceTime.push(serviceTime);
         continue;

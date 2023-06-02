@@ -53,6 +53,8 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 
 	const [requiredQueue, setRequiredQueue] = useState(false);
 
+	const [observation, setObservation] = useState("");
+
 	const { findAll: findAllQueues } = useQueues();
 
 	useEffect(() => {
@@ -104,6 +106,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 		onClose();
 		setSearchParam("");
 		setSelectedUser(null);
+		setObservation("");
 	};
 
 	const handleSaveTicket = async e => {
@@ -126,6 +129,8 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 					data.userId = null;
 				}
 			}
+
+			if (observation) data.observation = observation;
 
 			await api.put(`/tickets/${ticketid}`, data);
 
@@ -199,6 +204,20 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 							))}
 						</Select>
 					</FormControl>
+					<div style={{ marginTop: "10px" }}>
+						<TextField
+							label="Observação"
+							name="observation"
+							variant="outlined"
+							margin="dense"
+							multiline
+							minRows={3}
+							maxRows={3}
+							value={observation}
+							onChange={(e) => setObservation(e.target.value)}
+							fullWidth
+						/>
+					</div>
 				</DialogContent>
 				<DialogActions>
 					<Button

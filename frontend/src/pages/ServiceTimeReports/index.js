@@ -148,6 +148,96 @@ const ServiceTimeReports = () => {
     }
   }
 
+  const processHistorics = (historics = []) => {
+    if (!historics || historics.length === 0) return "--:--:--";
+
+    let tickets = [];
+
+    for (const historic of historics) {
+      const ticketIndex = tickets.findIndex(ticket => ticket.ticketId === historic.ticketId);
+
+      if (ticketIndex === -1) {
+        tickets.push({
+          ticketId: historic.ticketId,
+          historics: [historic]
+        });
+      } else {
+        const newTicket = {
+          ticketId: tickets[ticketIndex].ticketId,
+          historics: [...tickets[ticketIndex].historics, historic]
+        }
+  
+        tickets[ticketIndex] = newTicket;
+      }
+    }
+
+    const ticketsServiceTime = [];
+
+    for (const ticket of tickets) {
+      const hists = ticket.historics;
+
+      if (hists.length < 2) continue;
+
+      if (hists.length === 2) {
+        const serviceTime = getServiceTime(hists);
+
+        if (serviceTime === null) continue;
+
+        ticketsServiceTime.push(serviceTime);
+        continue;
+      }
+
+      if (hists.length > 2) {
+        const histsArray = [];
+
+        for (let i = 0; i < hists.length; i += 2) {
+          histsArray.push(hists.slice(i, i + 2));
+        }
+
+        for (const newHists of histsArray) {
+          if (newHists.length % 2 !== 0) continue;
+
+          const serviceTime = getServiceTime(hists);
+
+          ticketsServiceTime.push(serviceTime);
+          continue;
+        }
+      }
+    }
+
+    let itemCount = 0;
+    let milliseconds = 0;
+    for (const time of ticketsServiceTime) {
+      milliseconds += time;
+      itemCount++;
+    }
+
+    const averageServiceTime = milliseconds / itemCount;
+
+    return formatTime(averageServiceTime);
+  }
+
+  const getServiceTime = (hists) => {
+    let currentID = 0;
+
+    const initialHist = hists.find(h => h.id > currentID);
+    currentID = initialHist.id;
+
+    const finalHist = hists.find(h => h.id > currentID);
+
+    const createdAt = initialHist.createdAt;
+    const finalizedAt = finalHist.createdAt;
+
+    if (!createdAt || !finalizedAt) return null;
+  
+    const createdAtDate = new Date(createdAt);
+    const finalizedAtDate = new Date(finalizedAt);
+
+    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
+
+    return serviceTime;
+  }
+
   const formatTime = (milliseconds) => {
     let seconds = milliseconds / 1000;
 
@@ -177,133 +267,6 @@ const ServiceTimeReports = () => {
 
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
-
-  const getUserServiceTime = (hists) => {
-    let currentID = 0;
-
-    const createdHist = hists.find(h => h.id > currentID);
-    currentID = createdHist.id;
-
-    const finalizedHist = hists.find(h => h.id > currentID);
-
-    const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-    const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
-
-    if (!createdAt || !finalizedAt) return null;
-  
-    const createdAtDate = new Date(createdAt);
-    const finalizedAtDate = new Date(finalizedAt);
-
-    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
-
-    return serviceTime;
-  }
-
-  const getQueueServiceTime = (hists) => {
-    let currentID = 0;
-
-    const createdHist = hists.find(h => h.id > currentID);
-    currentID = createdHist.id;
-
-    const finalizedHist = hists.find(h => h.id > currentID);
-
-    const createdAt = createdHist.ticketCreatedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-    const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
-
-    if (!createdAt || !finalizedAt) return null;
-
-    const createdAtDate = new Date(createdAt);
-    const finalizedAtDate = new Date(finalizedAt);
-
-    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
-
-    return serviceTime;
-  }
-
-  const processHistorics = (historics = []) => {   
-    if (!historics || historics.length === 0) return "--:--:--";
- 
-    let tickets = [];
-
-    for (const historic of historics) {
-      const ticketIndex = tickets.findIndex(ticket => ticket.ticketId === historic.ticketId);
-
-      if (ticketIndex === -1) {
-        tickets.push({
-          ticketId: historic.ticketId,
-          historics: [historic]
-        });
-      } else {
-        const newTicket = {
-          ticketId: tickets[ticketIndex].ticketId,
-          historics: [...tickets[ticketIndex].historics, historic]
-        }
-  
-        tickets[ticketIndex] = newTicket;
-      }
-    }
-
-    const ticketsServiceTime = [];
-
-    for (const ticket of tickets) {
-      const hists = ticket.historics;
-
-      if (hists.length < 2) continue;
-
-      if (hists.length === 2) {
-        let serviceTime = 0;
-
-        if (tmaType === "queue") {
-          serviceTime = getQueueServiceTime(hists);
-        }
-
-        if (tmaType === "user") {
-          serviceTime = getUserServiceTime(hists);
-        }
-
-        if (serviceTime === null) continue;
-
-        ticketsServiceTime.push(serviceTime);
-        continue;
-      }
-
-      if (hists.length > 2) {
-        const histsArray = [];
-
-        for (let i = 0; i < hists.length; i += 2) {
-          histsArray.push(hists.slice(i, i + 2));
-        }
-
-        for (const newHists of histsArray) {
-          if (newHists.length % 2 !== 0) continue;
-
-          let serviceTime = 0;
-
-          if (tmaType === "queue") {
-            serviceTime = getQueueServiceTime(newHists);
-          }
-
-          if (tmaType === "user") {
-            serviceTime = getUserServiceTime(newHists);
-          }
-
-          ticketsServiceTime.push(serviceTime);
-          continue;
-        }
-      }
-    }
-
-    let itemCount = 0;
-    let milliseconds = 0;
-    for (const time of ticketsServiceTime) {
-      milliseconds += time;
-      itemCount++;
-    }
-
-    const averageServiceTime = milliseconds / itemCount;
-
-    return formatTime(averageServiceTime);
-  }
 
   return (
     <MainContainer>
@@ -382,7 +345,7 @@ const ServiceTimeReports = () => {
                 {reports.map((report) => (
                   <TableRow key={`queue-${report.id}`}>
                     <TableCell align="center">{report.name}</TableCell>
-                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                    <TableCell align="center">{processHistorics(report.historics)}</TableCell>
                   </TableRow>
                 ))}
                 {loading && <TableRowSkeleton columns={2} />}
@@ -403,7 +366,7 @@ const ServiceTimeReports = () => {
                 {reports.map((report) => (
                   <TableRow key={`user-${report.id}`}>
                     <TableCell align="center">{report.name}</TableCell>
-                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                    <TableCell align="center">{processHistorics(report.historics)}</TableCell>
                   </TableRow>
                 ))}
                 {loading && <TableRowSkeleton columns={2} />}

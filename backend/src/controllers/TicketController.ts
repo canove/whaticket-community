@@ -60,6 +60,7 @@ interface TicketData {
   categoryId: number;
   createdAt: Date;
   finalizedAt: Date;
+  observation: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {

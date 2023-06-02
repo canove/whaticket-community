@@ -140,8 +140,13 @@ const CreateTicketService = async ({
     await CreateMessageService({ messageData });
   }
 
-  // TICKET HISTORIC - CREATE
-  await CreateTicketHistoricService(ticket, "CREATE");
+  const oldTicket = {
+    oldStatus: null,
+    oldUserId: null,
+    oldQueueId: null,
+  };
+
+  await CreateTicketHistoricService({ ticket, oldTicket, change: "CREATE" }); //* TICKET HISTORIC - CREATE
 
   if (!ticket) {
     throw new AppError("ERR_CREATING_TICKET");

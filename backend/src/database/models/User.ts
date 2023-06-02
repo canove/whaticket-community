@@ -21,8 +21,8 @@ import Queue from "./Queue";
 import UserQueue from "./UserQueue";
 import Company from "./Company";
 import Profiles from "./Profiles";
-import TicketHistorics from "./TicketHistorics";
 import Message from "./Message";
+import TicketChanges from "./TicketChanges";
 
 @Table
 class User extends Model<User> {
@@ -93,8 +93,8 @@ class User extends Model<User> {
   @BelongsTo(() => Profiles)
   profiles: Profiles;
 
-  @HasMany(() => TicketHistorics, "userId")
-  ticketHistorics: TicketHistorics[];
+  @HasMany(() => TicketChanges, "newUserId")
+  historics: TicketChanges[];
 
   @HasMany(() => Message, "userId")
   messages: Message[];

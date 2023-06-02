@@ -38,7 +38,6 @@ import OfficialTemplatesStatus from "./models/OfficialTemplatesStatus";
 import Profiles from "./models/Profiles";
 import WhatsAppLearning from "./models/WhatsappLearning";
 import GeneralReports from "./models/GeneralReports";
-import TicketHistorics from "./models/TicketHistorics";
 import ContactBlacklist from "./models/ContactBlacklist";
 import SatisfactionSurveys from "./models/SatisfactionSurveys";
 import SatisfactionSurveyResponses from "./models/SatisfactionSurveyResponses";
@@ -48,6 +47,7 @@ import Sessions from "./models/Sessions";
 import SessionMessages from "./models/SessionMessages";
 import BatchIntegrations from "./models/BatchIntegrations";
 import BlockedContacts from "./models/BlockedContacts";
+import TicketChanges from "./models/TicketChanges";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -94,7 +94,6 @@ const models = [
   Profiles,
   WhatsAppLearning,
   GeneralReports,
-  TicketHistorics,
   ContactBlacklist,
   SatisfactionSurveys,
   SatisfactionSurveyResponses,
@@ -104,6 +103,7 @@ const models = [
   SessionMessages,
   BatchIntegrations,
   BlockedContacts,
+  TicketChanges,
 ];
 
 sequelize.addModels(models);

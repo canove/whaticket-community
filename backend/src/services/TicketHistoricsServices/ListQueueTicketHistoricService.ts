@@ -1,7 +1,7 @@
 import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { Op } from "sequelize";
 import Queue from "../../database/models/Queue";
-import TicketHistorics from "../../database/models/TicketHistorics";
+import TicketChanges from "../../database/models/TicketChanges";
 
 interface Request {
     companyId: number;
@@ -29,22 +29,17 @@ const ListQueueTicketHistoricService = async ({
         attributes: ["id", "name"],
         include: [
             {
-                model: TicketHistorics,
-                as: "ticketHistorics",
+                model: TicketChanges,
+                as: "historics",
                 where: {
-                    [Op.or]: [
-                        { ticketCreatedAt: { [Op.ne]: null } },
-                        { transferedAt: { [Op.ne]: null } },
-                        { finalizedAt: { [Op.ne]: null } },
-                        { reopenedAt: { [Op.ne]: null } },
-                    ],
-                    ...dateFilter
+                    ...dateFilter,
+                    change: ["CREATE", "TRANSFER", "FINALIZE", "REOPEN", "ACCEPT"],
                 },
                 required: true,
                 order: [["createdAt", "ASC"]],
-            }
+            },
         ],
-    });
+    })
 
     return reports;
 };
