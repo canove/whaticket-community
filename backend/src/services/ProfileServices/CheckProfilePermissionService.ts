@@ -27,8 +27,8 @@ const CheckProfilePermissionService = async ({
     const profile = await Profiles.findOne({
         attributes: ["permissions"],
         where: {
-        id: userProfileId ? userProfileId : profileId,
-        companyId: { [Op.or]: [companyId, null] }
+            id: userProfileId ? userProfileId : profileId,
+            companyId: { [Op.or]: [companyId, null] }
         }
     });
 

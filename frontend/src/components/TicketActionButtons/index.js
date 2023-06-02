@@ -13,6 +13,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
 import HistoricModal from "../HistoricModal";
 import ResolveModal from "../ResolveModal";
+import Can from "../Can";
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -97,14 +98,19 @@ const TicketActionButtons = ({ ticket }) => {
 				userId={user?.id}
 			/>
 			{ticket.status === "closed" && (
-				<ButtonWithSpinner
-					loading={loading}
-					startIcon={<Replay />}
-					size="small"
-					onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
-				>
-					{i18n.t("messagesList.header.buttons.reopen")}
-				</ButtonWithSpinner>
+				<Can
+					permission="tickets:reopen"
+					item={
+						<ButtonWithSpinner
+							loading={loading}
+							startIcon={<Replay />}
+							size="small"
+							onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
+						>
+							{i18n.t("messagesList.header.buttons.reopen")}
+						</ButtonWithSpinner>
+					}
+				/>
 			)}
 			{(ticket.status === "inbot" || ticket.status === "dispatcher") &&
 				<>

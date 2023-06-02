@@ -10,6 +10,7 @@ import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
 import DeleteMessageService from "../services/MessageServices/DeleteMessageService";
+import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService";
 
 type IndexQuery = {
   pageNumber: string;
@@ -48,7 +49,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const ticket = await ShowTicketService(ticketId, companyId);
 
-  if (ticket.userId != null && ticket.userId != id) throw new AppError("ERR_TICKET_ACCEPTED_BY_OTHER_USER");
+  const sendPermission = await CheckProfilePermissionService({ userId: id, companyId, permission: "ticket:sendMessage"});
+
+  if (!sendPermission && ticket.userId != null && ticket.userId != id) throw new AppError("ERR_TICKET_ACCEPTED_BY_OTHER_USER");
 
   const whatsapp = ticket.whatsapp;
   if (whatsapp && (whatsapp.status != "CONNECTED" || whatsapp.deleted)) {
@@ -58,11 +61,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File) => {
-        await SendWhatsAppMedia({ media, ticket, companyId, body: media.originalname });
+        await SendWhatsAppMedia({ media, ticket, companyId, body: media.originalname, userId: id });
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null });
+    await SendWhatsAppMessage({ body, ticket, companyId, fromMe: true, bot: false, whatsMsgId: null, userId: id });
   }
 
   SetTicketMessagesAsRead(ticket);

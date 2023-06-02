@@ -1456,7 +1456,8 @@ const messages = {
         ERR_INVALID_NUMBER: "Número de telefone inválido.",
         ERR_MAX_AUTOMATIC_CONTROL: "De acordo com o controle automático, este whatsapp atingiu número máximo de disparos.",
         ERR_USER_CANNOT_ACCEPT_TICKETS_FROM_THIS_QUEUE: "Usuário não pode aceitar conversa dessa fila.",
-        ERR_WHATSAPP_CREATE_TIME: "Nenhum whatsapp disponivel foi encontrado para criar um ticket. Por favor, tente de novo mais tarde."
+        ERR_WHATSAPP_CREATE_TIME: "Nenhum whatsapp disponivel foi encontrado para criar um ticket. Por favor, tente de novo mais tarde.",
+        ERR_TICKET_ACCEPTED_BY_OTHER_USER: "Esse ticket foi aceito por outro usuário. Você não tem permissão para enviar esta mensagem.",
       },
     },
   },

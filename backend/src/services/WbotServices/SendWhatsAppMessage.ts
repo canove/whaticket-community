@@ -36,6 +36,7 @@ interface Request {
   type?: string;
   mediaUrl?: string;
   templateButtons?: any;
+  userId?: number | string;
 }
 /* eslint-disable */
 const SendWhatsAppMessage = async ({
@@ -50,6 +51,7 @@ const SendWhatsAppMessage = async ({
   type,
   mediaUrl,
   templateButtons,
+  userId,
 }: Request): Promise<void> => {
   const connnection = await Whatsapp.findOne({
     where: {
@@ -217,7 +219,7 @@ const SendWhatsAppMessage = async ({
             mediaType: null,
             quotedMsgId: null,
             companyId,
-            userId: ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
+            userId: userId ? userId : ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
           };
         
           await ticket.update({ lastMessage: body, lastMessageFromMe: fromMe });
@@ -281,7 +283,7 @@ const SendWhatsAppMessage = async ({
         bot: (ticket.status == 'inbot' || bot),
         companyId,
         footer,
-        userId: ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
+        userId: userId ? userId : ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
       };
 
       await ticket.update({ 
