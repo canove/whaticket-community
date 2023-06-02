@@ -72,6 +72,8 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 	const [header, setHeader] = useState(null);
 	const [newContact, setNewContact] = useState({});
 
+	const [canUseOfficial, setCanUseOfficial] = useState(false);
+
 	useEffect(() => {
 		const fetchQueues = async () => {
 			if (user.profileId !== 1) {
@@ -87,6 +89,19 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 			}
 		}
 
+		const checkCanUseOfficial = async () => {
+			try {
+				const { data } = await api.get('/menus/check', {
+					params: { menuName: "Official Connections" }
+				});
+	  
+			 	setCanUseOfficial(data);
+			} catch (err) {
+			  	setCanUseOfficial(false);
+			}
+		}
+
+		checkCanUseOfficial();
 		fetchQueues();
 	}, []);
 
@@ -348,25 +363,27 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 									</Select>
 								</FormControl>
 							</div>
-							<div>
-								<FormControlLabel
-									control={
-										<Checkbox
-											checked={official}
-											onChange={() => {
-												setOfficial(prevOfficial => !prevOfficial);
-												setWhatsappId("");
-												setSelectedTemplate(null);
-												setVariables(null);
-												setHeader(null);
-											}}
-											name="official"
-											color="primary"
-										/>
-									}
-									label="Whatsapp Oficial"
-								/>
-							</div>
+							{ canUseOfficial &&
+								<div>
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={official}
+												onChange={() => {
+													setOfficial(prevOfficial => !prevOfficial);
+													setWhatsappId("");
+													setSelectedTemplate(null);
+													setVariables(null);
+													setHeader(null);
+												}}
+												name="official"
+												color="primary"
+											/>
+										}
+										label="Whatsapp Oficial"
+									/>
+								</div>
+							}
 							<div>
 								<FormControl variant="outlined" margin="normal" fullWidth>
 									<InputLabel>Conexões</InputLabel>
