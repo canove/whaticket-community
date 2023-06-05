@@ -194,7 +194,7 @@ const verifyMessage = async (
     const isWorkTime = await verifyWorkTime(settings);
 
     if (!isWorkTime) {
-      if (settings.message) {
+      if (settings.message && ticket.status !== "open") {
         await SendWhatsAppMessage({
           body: settings.message,
           ticket: ticket,
@@ -208,7 +208,9 @@ const verifyMessage = async (
           mediaUrl: null,
           templateButtons: null
         });
-      } else if (settings.overflowQueueId && ticket.status !== "open") {
+      }
+
+      if (settings.overflowQueueId && ticket.status !== "open") {
         await ticket.update({
           queueId: settings.overflowQueueId,
           status: "pending",
