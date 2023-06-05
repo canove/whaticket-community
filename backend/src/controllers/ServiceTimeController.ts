@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import GetClientResponseTimeService from "../services/TicketHistoricsServices/GetClientResponseTimeService";
 import ListQueueTicketHistoricService from "../services/TicketHistoricsServices/ListQueueTicketHistoricService";
 import ListUserTicketHistoricService from "../services/TicketHistoricsServices/ListUserTicketHistoricService";
+import GetTicketResponseTimeService from "../services/TicketHistoricsServices/GetTicketResponseTimeService";
 
 const fs = require("fs");
 const pdf = require("pdf-creator-node");
@@ -17,7 +18,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const { tmaType, initialDate, finalDate } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  let reports = [];
+  let reports = null;
 
   if (tmaType === "queue") {
     reports = await ListQueueTicketHistoricService({ companyId, initialDate, finalDate });
@@ -27,9 +28,12 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     reports = await ListUserTicketHistoricService({ companyId, initialDate, finalDate });
   }
 
-  if (tmaType === "client") {
-    const response = await GetClientResponseTimeService({ companyId, initialDate, finalDate });
-    reports.push(response);
+  if (tmaType === "response") {
+    reports = await GetClientResponseTimeService({ companyId, initialDate, finalDate });
+  }
+
+  if (tmaType === "ticket") {
+    // reports = await GetTicketResponseTimeService({ companyId, initialDate, finalDate });
   }
 
   return res.status(200).json(reports);
@@ -39,7 +43,7 @@ export const exportPDF = async (req: Request, res: Response): Promise<void> => {
   const { tmaType, initialDate, finalDate } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  let reports = [];
+  let reports = null;
   let header = "";
 
   if (tmaType === "queue") {
@@ -59,18 +63,19 @@ export const exportPDF = async (req: Request, res: Response): Promise<void> => {
     header = `
       <tr>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Usuário</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Quantidade de Conversas</td>
         <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Tempo de Atendimento</td>
       </tr>
     `;
   }
 
-  if (tmaType === "client") {
-    const response = await GetClientResponseTimeService({ companyId, initialDate, finalDate });
-    reports.push(response);
+  if (tmaType === "response") {
+    reports = await GetClientResponseTimeService({ companyId, initialDate, finalDate });
 
     header = `
       <tr>
-        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Tempo de Resposta</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Tempo de Resposta (Cliente)</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; font-weight: bold">Tempo de Resposta (Operador)</td>
       </tr>
     `;
   }
@@ -78,7 +83,7 @@ export const exportPDF = async (req: Request, res: Response): Promise<void> => {
   const title = {
     "user": "Usuário",
     "queue": "Fila",
-    "client": "Cliente",
+    "response": "Resposta",
   }
 
   const html = `
@@ -147,12 +152,14 @@ export const exportPDF = async (req: Request, res: Response): Promise<void> => {
 const getBodyData = (reports, tmaType) => {
   let text = "";
 
-  if (tmaType === "client") {
-    const serviceTime = formatTime(reports[0]);
+  if (tmaType === "response") {
+    const clientServiceTime = formatTime(reports.clientResponseTime);
+    const userServiceTime = formatTime(reports.userResponseTime);
 
     text += `
       <tr>
-        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${serviceTime}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${clientServiceTime}</td>
+        <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${userServiceTime}</td>
       </tr>
     `;
   }
@@ -160,10 +167,12 @@ const getBodyData = (reports, tmaType) => {
   if (tmaType === "queue" || tmaType === "user") {
     for (const report of reports) {
       const serviceTime = processHistorics(report.historics);
+      const ticketQuantity = getTicketQuantity(report.historics);
 
       text += `
         <tr>
           <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${report.name}</td>
+          <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${ticketQuantity}</td>
           <td style="border: 1px solid black; text-align: center; min-width: 120px; max-width: 120px; padding: 5px; word-wrap: break-word">${serviceTime}</td>
         </tr>
       `;
@@ -180,40 +189,43 @@ export const exportCSV = async (
   const { tmaType, initialDate, finalDate } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  let reports = [];
+  let reports = null;
   let rows = [];
 
   if (tmaType === "queue") {
     reports = await ListQueueTicketHistoricService({ companyId, initialDate, finalDate });
 
-    rows.push(["Fila", "Tempo de Atendimento"]);
+    rows.push(["Fila", "Quantidade de Conversas", "Tempo de Atendimento"]);
   }
 
   if (tmaType === "user") {
     reports = await ListUserTicketHistoricService({ companyId, initialDate, finalDate });
 
-    rows.push(["Usuário", "Tempo de Atendimento"]);
+    rows.push(["Usuário", "Quantidade de Conversas", "Tempo de Atendimento"]);
   }
 
-  if (tmaType === "client") {
-    const response = await GetClientResponseTimeService({ companyId, initialDate, finalDate });
-    reports.push(response);
+  if (tmaType === "response") {
+    reports = await GetClientResponseTimeService({ companyId, initialDate, finalDate });
 
-    rows.push(["Tempo de Resposta"]);
+    rows.push(["Tempo de Resposta (Cliente)", "Tempo de Resposta (Operador)"]);
 
-    const serviceTime = formatTime(reports[0]);
+    const clientServiceTime = formatTime(reports.clientResponseTime);
+    const userServiceTime = formatTime(reports.userResponseTime);
 
     const columns = [];
-    columns.push(serviceTime);
+    columns.push(clientServiceTime);
+    columns.push(userServiceTime);
     rows.push(columns);
   }
 
   if (tmaType === "queue" || tmaType === "user") {
     for (const report of reports) {
       const serviceTime = processHistorics(report.historics);
+      const ticketQuantity = getTicketQuantity(report.historics);
 
       const columns = [];
       columns.push(report.name);
+      columns.push(ticketQuantity);
       columns.push(serviceTime);
       rows.push(columns);
     }
@@ -347,4 +359,30 @@ const processHistorics = (historics = []) => {
   const averageServiceTime = milliseconds / itemCount;
 
   return formatTime(averageServiceTime);
+}
+
+const getTicketQuantity = (historics = []) => {
+  if (!historics || historics.length === 0) return 0;
+
+  let tickets = [];
+
+  for (const historic of historics) {
+    const ticketIndex = tickets.findIndex(ticket => ticket.ticketId === historic.ticketId);
+
+    if (ticketIndex === -1) {
+      tickets.push({
+        ticketId: historic.ticketId,
+        historics: [historic]
+      });
+    } else {
+      const newTicket = {
+        ticketId: tickets[ticketIndex].ticketId,
+        historics: [...tickets[ticketIndex].historics, historic]
+      }
+
+      tickets[ticketIndex] = newTicket;
+    }
+  }
+
+  return tickets.length;
 }
