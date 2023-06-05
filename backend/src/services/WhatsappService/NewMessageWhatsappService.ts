@@ -190,23 +190,30 @@ const verifyMessage = async (
 
   const settings = await ListCompanySettingsService(ticket.companyId);
 
-  if (settings && settings.useWorkTime && settings.message && settings.hours) {
+  if (settings && settings.useWorkTime && settings.hours) {
     const isWorkTime = await verifyWorkTime(settings);
 
     if (!isWorkTime) {
-      await SendWhatsAppMessage({
-        body: settings.message,
-        ticket: ticket,
-        companyId: ticket.companyId,
-        fromMe: true,
-        bot: true,
-        contactId: ticket.contactId,
-        whatsMsgId: null,
-        cation: null,
-        type: "text",
-        mediaUrl: null,
-        templateButtons: null
-      });
+      if (settings.message) {
+        await SendWhatsAppMessage({
+          body: settings.message,
+          ticket: ticket,
+          companyId: ticket.companyId,
+          fromMe: true,
+          bot: true,
+          contactId: ticket.contactId,
+          whatsMsgId: null,
+          cation: null,
+          type: "text",
+          mediaUrl: null,
+          templateButtons: null
+        });
+      } else if (settings.overflowQueueId && ticket.status !== "open") {
+        await ticket.update({
+          queueId: settings.overflowQueueId,
+          status: "pending",
+        });
+      }
     }
   }
 };

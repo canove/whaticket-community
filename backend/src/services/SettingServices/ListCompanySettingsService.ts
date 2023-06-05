@@ -1,6 +1,11 @@
 import AppError from "../../errors/AppError";
 import { createClient } from "redis";
 
+interface TicketStatus {
+  inbot: boolean;
+  open: boolean;
+}
+
 interface Response { 
   days: boolean[]; 
   hours: string; 
@@ -10,6 +15,8 @@ interface Response {
   transferRequiredQueue: boolean;
   autoCloseTickets: string;
   createTicketInterval: number;
+  autoCloseTicketStatus: TicketStatus;
+  overflowQueueId: string | number;
 }
 
 const initialSettings = { 
@@ -22,6 +29,8 @@ const initialSettings = {
   defaultSurvey: "",
   autoCloseTickets: "never",
   createTicketInterval: 0,
+  autoCloseTicketStatus: { "inbot": false, "open": false },
+  overflowQueueId: "",
 };
 
 const ListCompanySettingsService = async (
