@@ -169,21 +169,11 @@ const Dashboard = () => {
   const [sentMessageCount, setSentMessageCount] = useState(0);
   const [receivedMessageCount, setReceivedMessageCount] = useState(0);
 
-  // const [files, setFiles] = useState([]);
-
   const [fileId, setFileId] = useState("");
   const [date, setDate] = useState("");
-  const [searchParam, setSearchParam] = useState("");
   const [initialDate, setInitialDate] = useState("");
   const [finalDate, setFinalDate] = useState("");
 
-  const [tickets, setTickets] = useState([]);
-  const [biggerTickets, setBiggerTickets] = useState([]);
-  const [smallerTickets, setSmallerTickets] = useState([]);
-  const [averageTime, setAverageTime] = useState(0);
-
-  // const [config, setConfig] = useState(null);
-  // const [connectedWhatsapps, setConnectedWhatsapps] = useState([]);
   const [loggedInUsersQuantity, setLoggedInUsersQuantity] = useState(0);
   
   const [updatingPage, setUpdatingPage] = useState(false);
@@ -216,15 +206,6 @@ const Dashboard = () => {
     return loading ? <CircularProgress /> : count;
   };
 
-  // const fetchQueueTime = async () => {
-  //   try {
-  //     const { data } = await api.get("/registers/queue");
-  //     console.log(data);
-  //   } catch (err) {
-  //     toastError(err);
-  //   }
-  // }
-
   const handleFilter = async () => {
     setLoading(true);
     setCategoryCount([]);
@@ -255,7 +236,6 @@ const Dashboard = () => {
       setQueueCount(data.reports.queue || "0");
 
       setCategoryCount(data.category);
-      // setConnectedWhatsapps(data.connectedWhatsapps);
 
       setSentMessageCount(data.messages.sent || "0");
       setReceivedMessageCount(data.messages.received || "0");
@@ -281,39 +261,6 @@ const Dashboard = () => {
     }
   }
 
-  // const fetchConfig = async () => {
-  //   try {
-  //     const { data } = await api.get("/whatsconfig/");
-  //     setConfig(data && data.length > 0 ? data[0] : null);
-  //   } catch (err) {
-  //     toastError(err);
-  //   }
-  // };
-
-  const fetchAverangeTime = async () => {
-    try {
-      const { data } = await api.get("/tickets/time", {
-        params: { searchParam },
-      });
-      setTickets(data.averageTimes);
-
-      if (data.averageTimes.length >= 6) {
-        setBiggerTickets(data.averageTimes.slice(0, 3));
-
-        const smallerTickets = data.averageTimes.slice(-3);
-        smallerTickets.sort((a, b) => {
-          return a.averageMilliseconds - b.averageMilliseconds;
-        });
-
-        setSmallerTickets(smallerTickets);
-      }
-
-      setAverageTime(data.totalAverageTime);
-    } catch (err) {
-      toastError(err);
-    }
-  };
-
   const fetchCategories = async () => {
     try {
       const { data } = await api.get("/connectionFiles/");
@@ -328,11 +275,6 @@ const Dashboard = () => {
   }, [fileId, date, initialDate, finalDate, categoryId]);
 
   useEffect(() => {
-    fetchAverangeTime();
-  }, [searchParam]);
-
-  useEffect(() => {
-    // fetchConfig();
     fetchCategories();
   }, []);
 
@@ -358,36 +300,12 @@ const Dashboard = () => {
     setUpdatingPage(true);
 
     await handleFilter();
-    await fetchAverangeTime();
     await fetchBilling();
-
-    // await fetchQueueTime()
-    // await handleFiles();
-    // await fetchConfig();
 
     setUpdatingPage(false);
   };
 
   const getGridSize = (index) => {
-    // if (categoryCount.length === 1) return 12;
-    // if (categoryCount.length === 2) return 6;
-    // if (categoryCount.length === 3) return 4;
-    // if (categoryCount.length === 4) return 3;
-
-    // if (!categoryCount[index+3] && ((index+1) % 4 === 1)) {
-    //   if (categoryCount[index+2]) {
-    //     lastGrid = 4;
-    //   } else if (categoryCount[index+1]) {
-    //     lastGrid = 6;
-    //   } else {
-    //     lastGrid = 12;
-    //   }
-    // }
-
-    // if (lastGrid) return lastGrid;
-
-    // return 3;
-
     if (categoryCount.length === 1) return 12;
     if (categoryCount.length === 2) return 6;
     if (categoryCount.length === 3) return 4;
@@ -404,82 +322,6 @@ const Dashboard = () => {
 
     return 4;
   };
-
-  const handleSearch = (e) => {
-    setSearchParam(e.target.value.toLowerCase());
-  };
-
-  const formatTime = (milliseconds) => {
-    let seconds = milliseconds / 1000;
-
-    let minutes = Math.floor(seconds / 60);
-    seconds = Math.floor((seconds / 60 - minutes) * 60);
-
-    let hours = Math.floor(minutes / 60);
-    minutes = Math.floor((minutes / 60 - hours) * 60);
-
-    let secondsString = seconds.toString();
-    let minutesString = minutes.toString();
-    let hoursString = hours.toString();
-
-    if (secondsString.length === 1) {
-      secondsString = `0${secondsString}`;
-    }
-
-    if (minutesString.length === 1) {
-      minutesString = `0${minutesString}`;
-    }
-
-    if (hoursString.length === 1) {
-      hoursString = `0${hoursString}`;
-    }
-
-    return `${hoursString}:${minutesString}:${secondsString}`;
-  };
-
-  // const getAverageDeliveryTime = () => {
-  //   if (!config || !config.active)
-  //     return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
-
-  //   let triggerIntervalCount = 0;
-  //   let connectedWhatsappsCount = 0;
-
-  //   let totalTriggerInterval = 0;
-
-  //   for (const whats of connectedWhatsapps) {
-  //     connectedWhatsappsCount += 1;
-  //     triggerIntervalCount += 1;
-
-  //     if (whats.automaticControl && whats.currentTriggerInterval) {
-  //       totalTriggerInterval += whats.currentTriggerInterval;
-  //       continue;
-  //     }
-
-  //     if (whats.connectionFile && whats.connectionFile.triggerInterval) {
-  //       totalTriggerInterval += whats.connectionFile.triggerInterval;
-  //       continue;
-  //     }
-
-  //     totalTriggerInterval += config.triggerInterval;
-  //   }
-
-  //   let queueCountInt = parseInt(queueCount);
-
-  //   if (queueCountInt > 0 && connectedWhatsappsCount === 0)
-  //     return i18n.t(
-  //       "dashboard.messages.averageDeliveryTime.noConnectedWhatsapps"
-  //     );
-  //   if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
-
-  //   const triggerInterval = totalTriggerInterval / triggerIntervalCount;
-
-  //   const averageDeliveryTimeMinutes =
-  //     (queueCountInt / connectedWhatsappsCount) * triggerInterval;
-  //   const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
-  //   const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
-
-  //   return averageDeliveryTime;
-  // };
 
   const formatToBRL = (quantity) => {
     if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
@@ -522,33 +364,6 @@ const Dashboard = () => {
       </MainHeader>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
-          {/* <Grid item xs={6}>
-            <Paper className={classes.customFixedHeightPaper}>
-              <Typography
-                style={{ display: "inlineBlock" }}
-                component="h3"
-                variant="h6"
-                color="primary"
-                paragraph
-              >
-                {i18n.t("dashboard.file")}
-              </Typography>
-              <Autocomplete
-                onChange={(e, newValue) => handleSelectOption(e, newValue)}
-                className={classes.selectStyle}
-                options={files}
-                value={files.find((f) => f.id === fileId) || null}
-                getOptionLabel={renderOptionLabel}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={i18n.t("dashboard.file")}
-                    InputLabelProps={{ required: true }}
-                  />
-                )}
-              />
-            </Paper>
-          </Grid> */}
           <Grid item xs={4}>
             <Paper className={classes.customFixedHeightPaper}>
               <Typography
@@ -995,105 +810,6 @@ const Dashboard = () => {
               <RegisterChart />
             </Paper>
           </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper className={classes.paperTime}>
-            <div>
-              <Typography component="h3" variant="h6" color="primary">
-                Tempo de Atendimento
-              </Typography>
-              <TextField
-                className={classes.search}
-                placeholder={"Pesquisar"}
-                type="search"
-                value={searchParam}
-                onChange={handleSearch}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon style={{ color: "gray" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </div>
-            {tickets && tickets.length < 6 && (
-              <div className={classes.averageTickets}>
-                {tickets.map((ticket, index) => (
-                  <Card
-                    className={classes.averageTicket}
-                    key={index}
-                    elevation={5}
-                  >
-                    <CardContent>
-                      <Typography align="center" variant="h6" component="h2">
-                        {ticket.user.name}
-                      </Typography>
-                      <br />
-                      <Typography align="center" variant="h5" component="h2">
-                        {formatTime(ticket.averageMilliseconds)}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-            {tickets && tickets.length >= 6 && (
-              <>
-                <Typography align="center" variant="h6" component="h2">
-                  Maiores Tempos Médios
-                </Typography>
-                <div className={classes.averageTickets}>
-                  {biggerTickets.map((ticket, index) => (
-                    <Card
-                      className={classes.averageTicket}
-                      key={index}
-                      elevation={5}
-                    >
-                      <CardContent>
-                        <Typography align="center" variant="h6" component="h2">
-                          {ticket.user.name}
-                        </Typography>
-                        <br />
-                        <Typography align="center" variant="h5" component="h2">
-                          {formatTime(ticket.averageMilliseconds)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-                <Typography align="center" variant="h6" component="h2">
-                  Menores Tempos Médios
-                </Typography>
-                <div className={classes.averageTickets}>
-                  {smallerTickets.map((ticket, index) => (
-                    <Card
-                      className={classes.averageTicket}
-                      key={index}
-                      elevation={5}
-                    >
-                      <CardContent>
-                        <Typography align="center" variant="h6" component="h2">
-                          {ticket.user.name}
-                        </Typography>
-                        <br />
-                        <Typography align="center" variant="h5" component="h2">
-                          {formatTime(ticket.averageMilliseconds)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </>
-            )}
-            <div style={{ marginTop: "10px" }}>
-              <Typography component="h3" variant="h6">
-                {tickets && tickets.length > 0
-                  ? `Tempo Médio de Atendimentos: ${formatTime(averageTime)}`
-                  : `Sem Tickets Resolvidos`}
-              </Typography>
-            </div>
-          </Paper>
         </Grid>
       </Container>
     </div>
