@@ -23,6 +23,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Tab,
+  Tabs,
   TextField,
 } from "@material-ui/core";
 import Title from "../../components/Title";
@@ -39,6 +41,15 @@ const useStyles = makeStyles((theme) => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
+  },
+  tab: {
+    minWidth: 120,
+    width: 120,
+  },
+  tabsHeader: {
+    flex: "none",
+    backgroundColor: "#eee",
+    marginBottom: "10px",
   },
   fixedHeightPaper: {
     padding: theme.spacing(2),
@@ -178,17 +189,12 @@ const Dashboard = () => {
   
   const [updatingPage, setUpdatingPage] = useState(false);
 
-  const [billingTotalMonthValue, setBillingTotalMonthValue] = useState(0);
-  const [lastMonthTotalValue, setLastMonthTotalValue] = useState(0);
-  const [expectedTotalMonthValue, setExpectedTotalMonthValue] = useState(0);
-
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const [companies, setCompanies] = useState([]);
-
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
+  const [tab, setTab] = useState("dispatch"); // ["operation", "dispatch"]
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -248,60 +254,30 @@ const Dashboard = () => {
     setLoading(false);
   };
 
-  const fetchBilling = async () => {
-    try {
-      const { data } = await api.get("/billings/dashboard", {
-        params: { selectedCompany }
-      });
-      setBillingTotalMonthValue(data.monthTotalValue);
-      setLastMonthTotalValue(data.lastMonthTotalValue);
-      setExpectedTotalMonthValue(data.expectedTotalMonthValue);
-    } catch (err) {
-      toastError(err);
-    }
-  }
-
   const fetchCategories = async () => {
     try {
       const { data } = await api.get("/connectionFiles/");
       setCategories(data);
     } catch (err) {
-      console.log(err);
+      toastError(err);
     }
   }
 
   useEffect(() => {
-    handleFilter();
+    if (!loading) {
+      handleFilter();
+    }
   }, [fileId, date, initialDate, finalDate, categoryId]);
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    fetchBilling();
-  }, [selectedCompany]);
-
-  useEffect(() => {
-		if (user.companyId === 1) {
-			const fetchCompanies = async () => {
-				try {
-					const { data } = await api.get(`/company/`);
-					setCompanies(data.companies);
-				} catch (err) {
-					toastError(err);
-				}
-			}
-			fetchCompanies();
-		}
-	}, [user]);
-
   const updatePage = async () => {
+    if (loading) return;
+
     setUpdatingPage(true);
-
     await handleFilter();
-    await fetchBilling();
-
     setUpdatingPage(false);
   };
 
@@ -323,13 +299,6 @@ const Dashboard = () => {
     return 4;
   };
 
-  const formatToBRL = (quantity) => {
-    if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
-
-    let money = quantity.toFixed(2);
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
-  }
-
   const handleSelectOption = (_, newValue) => {
     if (newValue) {
       setCategoryId(newValue.id);
@@ -344,6 +313,34 @@ const Dashboard = () => {
 
   return (
     <div>
+      <Paper elevation={0} square className={classes.tabsHeader}>
+        <Tabs
+          value={tab}
+          onChange={(e, newValue) => {
+            setTab(newValue);
+            // setFileId("");
+            // setInitialDate("");
+            // setFinalDate("");
+            // setCategoryId("");
+          }}
+          variant="fullWidth"
+          indicatorColor="primary"
+          textColor="primary"
+        >
+          <Tab
+            value={"dispatch"}
+            // icon={<CheckBoxIcon />}
+            label={"Disparo"}
+            classes={{ root: classes.tab }}
+          />
+          <Tab
+            value={"operation"}
+            // icon={<MoveToInboxIcon />}
+            label={"Operação"}
+            classes={{ root: classes.tab }}
+          />
+        </Tabs>
+      </Paper>
       <MainHeader>
         <Title>{i18n.t("dashboard.title")}</Title>
         <div
@@ -458,7 +455,7 @@ const Dashboard = () => {
               </div>
             </Paper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{ display: (tab === "operation") ? "block" : "none" }}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -473,7 +470,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{ display: (tab === "operation") ? "block" : "none" }}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -488,7 +485,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{ display: (tab === "operation") ? "block" : "none" }}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -503,313 +500,219 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.queue.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : queueCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {"Usuários Logados"}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : loggedInUsersQuantity}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.imported.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : registerCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.sent.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : sentCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.handedOut.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : deliveredCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.read.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : readCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.mistake.title")} / Blacklist
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : errorCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Interações
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : interactionCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Sem Whatsapp
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : noWhatsCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Mensagens Trafegadas Enviadas
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : sentMessageCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Mensagens Trafegadas Recebidas
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : receivedMessageCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          {categoryCount && categoryCount.length > 0 && (
-            <Grid item xs={12}>
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.category.title")}
-              </Typography>
-            </Grid>
-          )}
-          {categoryCount &&
-            categoryCount.map((category, index) => (
-              <Grid item xs={getGridSize(index)} key={category.name}>
+          {(tab === "operation") &&
+            <>
+              <Grid item xs={4}>
                 <Paper
-                  className={classes.categoryStyle}
+                  className={classes.customFixedHeightPaper}
                   style={{ overflow: "hidden" }}
                 >
-                  <Typography
-                    component="h3"
-                    variant="h6"
-                    color="primary"
-                    paragraph
-                  >
-                    {category.name}
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {"Usuários Logados"}
                   </Typography>
                   <Grid item>
                     <Typography component="h1" variant="h4">
-                      {category.count}
+                      {loading ? <CircularProgress /> : loggedInUsersQuantity}
                     </Typography>
                   </Grid>
                 </Paper>
               </Grid>
-            ))}
-          { user.companyId === 1 && 
-            <Grid item xs={12}>
-              <Paper className={classes.paperTime}>
-                <Typography component="h3" variant="h6" color="primary">
-                  Custos
-                </Typography>
-                <FormControl
-									variant="outlined"
-									margin="dense"
-									fullWidth
-								>
-									<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
-									<Select
-										label="Empresa"
-										name="company"
-										labelId="company-selection-label"
-										id="company-selection"
-										value={selectedCompany}
-										onChange={(e) => { setSelectedCompany(e.target.value) }}
-									>
-                    <MenuItem value={null}>{""}</MenuItem>
-										{ companies && companies.map(company => {
-											return (
-												<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
-											)
-										}) }
-									</Select>
-								</FormControl>
-                <Grid item>
-                  <Typography component="h2" variant="h6">
-                    Custo Mês Corrente: {formatToBRL(billingTotalMonthValue)}
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Mensagens Trafegadas Enviadas
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : sentMessageCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Mensagens Trafegadas Recebidas
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : receivedMessageCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              {categoryCount && categoryCount.length > 0 && (
+                <Grid item xs={12}>
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.category.title")}
                   </Typography>
                 </Grid>
-                <Grid item>
-                  <Typography component="h2" variant="h6">
-                  Custo Previsto: {formatToBRL(expectedTotalMonthValue)}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography component="h2" variant="h6">
-                    Ultimo Mês: {formatToBRL(lastMonthTotalValue)}
-                  </Typography>
-                </Grid>
-              </Paper>
-            </Grid>
+              )}
+              {categoryCount &&
+                categoryCount.map((category, index) => (
+                  <Grid item xs={getGridSize(index)} key={category.name}>
+                    <Paper
+                      className={classes.categoryStyle}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <Typography
+                        component="h3"
+                        variant="h6"
+                        color="primary"
+                        paragraph
+                      >
+                        {category.name}
+                      </Typography>
+                      <Grid item>
+                        <Typography component="h1" variant="h4">
+                          {category.count}
+                        </Typography>
+                      </Grid>
+                    </Paper>
+                  </Grid>
+                ))}
+              <Grid item xs={12}>
+                <Paper className={classes.fixedHeightPaper}>
+                  <Chart />
+                </Paper>
+              </Grid>
+            </>
           }
-          { user.companyId !== 1 && user.superAdmin &&
-            <Grid item xs={12}>
-              <Paper className={classes.paperTime}>
-                <Typography component="h3" variant="h6" color="primary">
-                  Custos
-                </Typography>
-                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly" }}>
-                  <Grid item xs={3}>
-                    <Paper
-                      className={classes.customFixedHeightBilling}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <Typography component="h3" variant="h6" color="primary" paragraph>
-                        Custo Mês Corrente
-                      </Typography>
-                      <Grid item>
-                        <Typography component="h1" variant="h4">
-                        {formatToBRL(billingTotalMonthValue)}
-                        </Typography>
-                      </Grid>
-                    </Paper>
+          {(tab === "dispatch") &&
+            <>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.queue.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : queueCount}
+                    </Typography>
                   </Grid>
-                  <Grid item xs={3}>
-                    <Paper
-                      className={classes.customFixedHeightBilling}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <Typography component="h3" variant="h6" color="primary" paragraph>
-                        Custo Previsto
-                      </Typography>
-                      <Grid item>
-                        <Typography component="h1" variant="h4">
-                        {formatToBRL(expectedTotalMonthValue)}
-                        </Typography>
-                      </Grid>
-                    </Paper>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.imported.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : registerCount}
+                    </Typography>
                   </Grid>
-                  <Grid item xs={3}>
-                    <Paper
-                      className={classes.customFixedHeightBilling}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <Typography component="h3" variant="h6" color="primary" paragraph>
-                        Ultimo Mês
-                      </Typography>
-                      <Grid item>
-                        <Typography component="h1" variant="h4">
-                        {formatToBRL(lastMonthTotalValue)}
-                        </Typography>
-                      </Grid>
-                    </Paper>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.sent.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : sentCount}
+                    </Typography>
                   </Grid>
-                </div>
-              </Paper>
-            </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.handedOut.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : deliveredCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.read.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : readCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.mistake.title")} / Blacklist
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : errorCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Interações
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : interactionCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Sem Whatsapp
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : noWhatsCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={12}>
+                <Paper className={classes.fixedHeightPaper}>
+                  <RegisterChart />
+                </Paper>
+              </Grid>
+            </>
           }
-          <Grid item xs={12}>
-            <Paper className={classes.fixedHeightPaper}>
-              <Chart />
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper className={classes.fixedHeightPaper}>
-              <RegisterChart />
-            </Paper>
-          </Grid>
         </Grid>
       </Container>
     </div>

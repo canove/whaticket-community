@@ -8,6 +8,7 @@ import {
 	YAxis,
 	Label,
 	ResponsiveContainer,
+	Tooltip,
 } from "recharts";
 import { startOfHour, parseISO, format } from "date-fns";
 
@@ -85,6 +86,7 @@ const Chart = () => {
 							{i18n.t("dashboard.charts.perDay.calls")}
 						</Label>
 					</YAxis>
+					<Tooltip />
 					<Bar dataKey="amount" fill={theme.palette.primary.main} />
 				</BarChart>
 			</ResponsiveContainer>
