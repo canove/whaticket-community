@@ -122,6 +122,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				onClose={handleCloseTransferTicketModal}
 				ticketid={ticket.id}
 				queueId={ticket.queueId}
+				task={ticket.task}
 			/>
 		</>
 	);

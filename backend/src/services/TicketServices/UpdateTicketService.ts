@@ -8,6 +8,8 @@ import ShowUserService from "../UserServices/ShowUserService";
 import AppError from "../../errors/AppError";
 import Message from "../../database/models/Message";
 import TicketChanges from "../../database/models/TicketChanges";
+import ShowTaskService from "../TaskServices/ShowTaskService";
+import FinalzeTaskService from "../TaskServices/FinalizeTaskService";
 
 interface TicketData {
   status?: string;
@@ -59,13 +61,17 @@ const UpdateTicketService = async ({
     reopen = true;
   }
 
+  if (ticket.taskId) {
+    await FinalzeTaskService({ taskId: ticket.taskId, ticketId: ticket.id, companyId: ticket.companyId });
+  }
+
   console.log("update ticket updateticketservice 43");
   await ticket.update({
     status,
     queueId,
     userId,
     categoryId,
-    finalizedAt: status === "closed" ? new Date() : null
+    finalizedAt: status === "closed" ? new Date() : null,
   });
 
   await ticket.reload();

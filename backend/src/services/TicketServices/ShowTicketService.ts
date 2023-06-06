@@ -6,6 +6,7 @@ import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 import { Op } from "sequelize";
 import BlockedContacts from "../../database/models/BlockedContacts";
+import Tasks from "../../database/models/Tasks";
 
 const ShowTicketService = async (
   id: string | number,
@@ -56,7 +57,13 @@ const ShowTicketService = async (
         model: Queue,
         as: "queue",
         attributes: ["id", "name", "color"]
-      }
+      },
+      {
+        model: Tasks,
+        as: "task",
+        attributes: ["id", "description", "dueDate", "userId"],
+        required: false,
+      },
     ]
   });
 

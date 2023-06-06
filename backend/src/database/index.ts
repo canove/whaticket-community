@@ -48,6 +48,7 @@ import SessionMessages from "./models/SessionMessages";
 import BatchIntegrations from "./models/BatchIntegrations";
 import BlockedContacts from "./models/BlockedContacts";
 import TicketChanges from "./models/TicketChanges";
+import Tasks from "./models/Tasks";
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
 // import dbConfig from "../config/database";
@@ -104,6 +105,7 @@ const models = [
   BatchIntegrations,
   BlockedContacts,
   TicketChanges,
+  Tasks,
 ];
 
 sequelize.addModels(models);

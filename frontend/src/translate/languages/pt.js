@@ -1460,6 +1460,8 @@ const messages = {
         ERR_USER_CANNOT_ACCEPT_TICKETS_FROM_THIS_QUEUE: "Usuário não pode aceitar conversa dessa fila.",
         ERR_WHATSAPP_CREATE_TIME: "Nenhum whatsapp disponivel foi encontrado para criar um ticket. Por favor, tente de novo mais tarde.",
         ERR_TICKET_ACCEPTED_BY_OTHER_USER: "Esse ticket foi aceito por outro usuário. Você não tem permissão para enviar esta mensagem.",
+        ERR_INVALID_DUE_DATE: "A data de expiração deve ser de agora até no máximo 7 dias.",
+        ERR_DUE_DATE_REQUIRED: "Data de expiração obrigatória.",
       },
     },
   },

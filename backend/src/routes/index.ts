@@ -45,6 +45,7 @@ import satisfactionSurveyRoutes from "./satisfactionSurveyRoutes";
 import packageRoutes from "./packageRoutes";
 import companySettingsRoutes from "./companySettingsRoutes";
 import batchRoutes from "./batchRoutes";
+import taskRoutes from "./taskRoutes";
 
 const routes = Router();
 
@@ -93,5 +94,6 @@ routes.use(satisfactionSurveyRoutes);
 routes.use(packageRoutes);
 routes.use(companySettingsRoutes);
 routes.use(batchRoutes);
+routes.use(taskRoutes);
 
 export default routes;

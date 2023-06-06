@@ -17,10 +17,11 @@ import Badge from "@material-ui/core/Badge";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
-import { Tooltip } from "@material-ui/core";
+import { IconButton, Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
+import AssignmentLateIcon from '@material-ui/icons/AssignmentLate';
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -99,6 +100,30 @@ const useStyles = makeStyles(theme => ({
 		left: "0%",
 	},
 }));
+
+const CustomToolTip = ({ title, contents, children }) => {
+	const classes = useStyles();
+
+	return (
+		<Tooltip
+			arrow
+			classes={{
+				tooltip: classes.tooltip,
+				popper: classes.tooltipPopper,
+			}}
+			title={
+				<React.Fragment>
+					<Typography gutterBottom color="inherit">
+						{title}
+					</Typography>
+					{contents && contents.map((content, index) => <Typography key={index}>{content}</Typography>)}
+				</React.Fragment>
+			}
+		>
+			{children}
+		</Tooltip>
+	);
+};
 
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
@@ -238,6 +263,16 @@ const TicketListItem = ({ ticket }) => {
 						{i18n.t("ticketsList.buttons.accept")}
 					</ButtonWithSpinner>
 				)}
+				{ticket.task && 
+					<CustomToolTip
+						title={"Tarefa"}
+						contents={[`Descrição: ${ticket.task.description}`, `Expiração: ${format(parseISO(ticket.task.dueDate), "dd/MM/yyyy HH:mm")}`]}
+					>
+						<IconButton onClick={() => {}}>
+							<AssignmentLateIcon color={isSameDay(parseISO(ticket.task.dueDate), new Date()) ? "error" : "inherit"} fontSize="small" />
+						</IconButton>
+					</CustomToolTip>
+				}
 			</ListItem>
 			<Divider variant="inset" component="li" />
 		</React.Fragment>

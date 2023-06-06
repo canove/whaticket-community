@@ -155,7 +155,7 @@ const reducer = (state, action) => {
 };
 
 	const TicketsList = (props) => {
-	const { status, searchParam, showAll, selectedQueueIds, updateCount, style, categoryId, pendingAnswer } = props;
+	const { status, searchParam, showAll, selectedQueueIds, updateCount, style, categoryId, pendingAnswer, isTask, searchTask, taskFilter } = props;
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const [pageNumber, setPageNumber] = useState(1);
@@ -166,7 +166,7 @@ const reducer = (state, action) => {
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
-	}, [status, searchParam, dispatch, showAll, selectedQueueIds, categoryId]);
+	}, [status, searchParam, dispatch, showAll, selectedQueueIds, categoryId, isTask, searchTask, taskFilter]);
 
 	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
@@ -175,7 +175,10 @@ const reducer = (state, action) => {
 		showAll,
 		queueIds: JSON.stringify(selectedQueueIds),
 		categoryId: status === "closed" ? categoryId : null,
-		pendingAnswer
+		pendingAnswer,
+		isTask,
+		searchTask,
+		taskFilter,
 	});
 
 	useEffect(() => {

@@ -20,6 +20,7 @@ import User from "./User";
 import Whatsapp from "./Whatsapp";
 import Sessions from "./Sessions";
 import TicketChanges from "./TicketChanges";
+import Tasks from "./Tasks";
 
 @Table
 class Ticket extends Model<Ticket> {
@@ -107,6 +108,13 @@ class Ticket extends Model<Ticket> {
 
   @Column
   finalizedAt: Date;
+
+  @ForeignKey(() => Tasks)
+  @Column
+  taskId: number;
+
+  @BelongsTo(() => Tasks)
+  task: Tasks;
 }
 
 export default Ticket;

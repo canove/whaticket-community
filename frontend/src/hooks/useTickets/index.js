@@ -15,6 +15,9 @@ const useTickets = ({
     categoryId,
     connectionFileId,
     pendingAnswer,
+    isTask,
+    searchTask,
+    taskFilter,
 }) => {
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(false);
@@ -37,7 +40,10 @@ const useTickets = ({
                             withUnreadMessages,
                             categoryId,
                             connectionFileId,
-                            pendingAnswer
+                            pendingAnswer,
+                            isTask,
+                            searchTask,
+                            taskFilter,
                         },
                     })
                     setTickets(data.tickets)
@@ -88,7 +94,10 @@ const useTickets = ({
         withUnreadMessages,
         categoryId,
         connectionFileId,
-        pendingAnswer
+        pendingAnswer,
+        isTask,
+        searchTask,
+        taskFilter,
     ])
 
     return { tickets, loading, hasMore, count };

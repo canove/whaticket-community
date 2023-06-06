@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import HistoricModal from "../HistoricModal";
 import ResolveModal from "../ResolveModal";
 import Can from "../Can";
+import TaskModal from "../TaskModal";
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -37,6 +38,7 @@ const TicketActionButtons = ({ ticket }) => {
 	const { user } = useContext(AuthContext);
 	const [historicModalOpen, setHistoricModalOpen] = useState(false);
 	const [resolveModalOpen, setResolveModalOpen] = useState(false);
+	const [taskModalOpen, setTaskModalOpen] = useState(false);
 
 	const handleOpenTicketOptionsMenu = e => {
 		setAnchorEl(e.currentTarget);
@@ -82,6 +84,14 @@ const TicketActionButtons = ({ ticket }) => {
 		setResolveModalOpen(false);
 	};
 
+	const handleOpenTaskModal = () => {
+		setTaskModalOpen(true);
+	}
+
+	const handleCloseTaskModal = () => {
+		setTaskModalOpen(false);
+	}
+
 	return (
 		<div className={classes.actionButtons}>
 			<HistoricModal
@@ -95,6 +105,13 @@ const TicketActionButtons = ({ ticket }) => {
 				onClose={handleClosedResolveModal}
 				ticketId={ticket.id}
 				aria-labelledby="form-dialog-title"
+				userId={user?.id}
+			/>
+			<TaskModal
+				open={taskModalOpen}
+				onClose={handleCloseTaskModal}
+				taskId={ticket.taskId}
+				ticketId={ticket.id}
 				userId={user?.id}
 			/>
 			{ticket.status === "closed" && (
@@ -160,7 +177,6 @@ const TicketActionButtons = ({ ticket }) => {
 					>
 						{i18n.t("messagesList.header.buttons.return")}
 					</ButtonWithSpinner>
-
 					<Button
 						size="small"
 						variant="contained"
@@ -178,6 +194,14 @@ const TicketActionButtons = ({ ticket }) => {
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
+					<Button
+						size="small"
+						variant="contained"
+						color="primary"
+						onClick= {handleOpenTaskModal}
+					>
+						{"Tarefa"}
+					</Button>
 					<IconButton onClick={handleOpenTicketOptionsMenu}>
 						<MoreVert />
 					</IconButton>
