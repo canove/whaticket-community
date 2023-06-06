@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
-import { Box, Button, Checkbox, FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
+import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Table, TableBody, TableCell, TableHead, TableRow } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
@@ -16,6 +16,7 @@ import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import AllowedIPModal from "../../components/AllowedIPModal";
+import QueueSelectSingle from "../../components/QueueSelectSingle";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -29,7 +30,6 @@ const useStyles = makeStyles(theme => ({
 		display: "flex",
 		alignItems: "center",
 		marginBottom: 12,
-
 	},
 
 	settingOption: {
@@ -63,7 +63,9 @@ const Settings = () => {
 		transferRequiredQueue: false,
 		defaultSurvey: "",
 		autoCloseTickets: "never", 
-		createTicketInterval: 0
+		createTicketInterval: 0,
+		autoCloseTicketStatus: { "inbot": false, "open": false },
+		overflowQueueId: "",
 	}
 	const [settings, setSettings] = useState(initialSettings);
 
@@ -167,7 +169,9 @@ const Settings = () => {
 			transferRequiredQueue: settings.transferRequiredQueue,
 			defaultSurvey: settings.defaultSurvey,
 			autoCloseTickets: settings.autoCloseTickets,
-			createTicketInterval: settings.createTicketInterval
+			createTicketInterval: settings.createTicketInterval,
+			autoCloseTicketStatus: settings.autoCloseTicketStatus,
+			overflowQueueId: settings.overflowQueueId,
 		};
 
 		try {
@@ -243,6 +247,10 @@ const Settings = () => {
 				allowedIPs: newAllowedIPs
 			}));
 		}
+	}
+
+	const handleAutoCloseTicketStatusChange = (status) => {
+		setSettings(prevSettings => ({ ...prevSettings, autoCloseTicketStatus: { ...prevSettings.autoCloseTicketStatus, [status]: !settings.autoCloseTicketStatus[status] } }))
 	}
 
 	return (
@@ -324,6 +332,11 @@ const Settings = () => {
 									onChange={(e) => { handleSettingsChange(e.target.value, "message") }}
 									fullWidth
 								/>
+								<QueueSelectSingle
+									selectedQueue={settings.overflowQueueId}
+									onChange={(value) => { handleSettingsChange(value, "overflowQueueId") }}
+									label={"Fila de Transbordo"}
+								/>
 							</>
 						}
 					</div>
@@ -374,7 +387,7 @@ const Settings = () => {
 					</div>
 				</Paper>
 				<Paper className={classes.paper}> {/* Chat */}
-					<div>
+					<div style={{ width: "100%" }}>
 						<Typography variant="subtitle1" color="primary" gutterBottom>Chat:</Typography>
 						<FormControlLabel
 							label="Transferir conversa: Selecionar fila obrigatório."
@@ -386,30 +399,34 @@ const Settings = () => {
 								/>
 							}
 						/>
+						<Divider style={{ margin: "10px 0" }} fullWidth />
 						{ surveys && surveys.length > 0 &&
-							<div>
-								<FormControl
-									variant="outlined"
-									margin="dense"
-									fullWidth
-								>
-									<InputLabel>{"Pesquisa de Satisfação Padrão"}</InputLabel>
-									<Select
+							<>
+								<div>
+									<FormControl
 										variant="outlined"
-										label="Pesquisa de Satisfação Padrão"
-										value={settings.defaultSurvey}
-										onChange={(e) =>  handleSettingsChange(e.target.value, "defaultSurvey")}
+										margin="dense"
 										fullWidth
 									>
-										<MenuItem value={""}>&nbsp;</MenuItem>
-										{surveys.map((survey) => (
-											<MenuItem key={survey.id} value={survey.id}>{survey.name}</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</div>
+										<InputLabel>{"Pesquisa de Satisfação Padrão"}</InputLabel>
+										<Select
+											variant="outlined"
+											label="Pesquisa de Satisfação Padrão"
+											value={settings.defaultSurvey}
+											onChange={(e) =>  handleSettingsChange(e.target.value, "defaultSurvey")}
+											fullWidth
+										>
+											<MenuItem value={""}>&nbsp;</MenuItem>
+											{surveys.map((survey) => (
+												<MenuItem key={survey.id} value={survey.id}>{survey.name}</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+								</div>
+								<Divider style={{ margin: "10px 0" }} fullWidth />
+							</>
 						}
-						<div style={{ marginTop: "10px" }}>
+						<div>
 							<FormControl>
 								<FormLabel>
 									Finalizar tickets abertos após: {(settings.autoCloseTickets !== "never") ? `${settings.autoCloseTickets} de inatividade.` : "Nunca" }
@@ -425,29 +442,41 @@ const Settings = () => {
 									<FormControlLabel value="24h" control={<Radio />} label="24h" />
 									<FormControlLabel value="48h" control={<Radio />} label="48h" />
 								</RadioGroup>
+								<FormLabel>
+									Status do ticket:
+								</FormLabel>
+								<FormControlLabel
+									label="Em Bot / Disparo"
+									control={<Checkbox color="primary" checked={settings.autoCloseTicketStatus["inbot"]} onChange={(e) => { handleAutoCloseTicketStatusChange("inbot") }} />}
+								/>
+								<FormControlLabel
+									label="Em Atendimento"
+									control={<Checkbox color="primary" checked={settings.autoCloseTicketStatus["open"]} onChange={(e) => { handleAutoCloseTicketStatusChange("open") }} />}
+								/>
 							</FormControl>
 						</div>
-						<div style={{ marginTop: "10px" }}>
-						<FormControl
-							variant="outlined"
-							margin="dense"
-							fullWidth
-						>
-							<TextField
-								id="create-ticket-interval"
-								label={"Intervalo para criar ticket (em minutos)"}
-								type="number"
+						<Divider style={{ margin: "10px 0" }} fullWidth />
+						<div>
+							<FormControl
 								variant="outlined"
-								value={settings.createTicketInterval}
-								onChange={(e) => handleSettingsChange(e.target.value, "createTicketInterval")}
+								margin="dense"
 								fullWidth
-								inputProps={{
-									step: 1,
-									min: 0,
-									type: 'number',
-								}}
-							/>
-						</FormControl>
+							>
+								<TextField
+									id="create-ticket-interval"
+									label={"Intervalo para criar ticket (em minutos)"}
+									type="number"
+									variant="outlined"
+									value={settings.createTicketInterval}
+									onChange={(e) => handleSettingsChange(e.target.value, "createTicketInterval")}
+									fullWidth
+									inputProps={{
+										step: 1,
+										min: 0,
+										type: 'number',
+									}}
+								/>
+							</FormControl>
 						</div>
 					</div>
 				</Paper>

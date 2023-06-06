@@ -1,6 +1,7 @@
 import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { Op } from "sequelize";
-import Queue from "../../database/models/Queue";
+import Message from "../../database/models/Message";
+import Ticket from "../../database/models/Ticket";
 import TicketChanges from "../../database/models/TicketChanges";
 
 interface Request {
@@ -9,11 +10,11 @@ interface Request {
     finalDate: string;
 }
 
-const ListQueueTicketHistoricService = async ({
+const GetTicketResponseTimeService = async ({
     companyId,
     initialDate,
     finalDate,
-}: Request): Promise<Queue[]> => {
+}: Request): Promise<Ticket[]> => {
     let dateFilter = null;
 
     if (initialDate && finalDate) {
@@ -24,24 +25,26 @@ const ListQueueTicketHistoricService = async ({
         }
     }
 
-    const reports = await Queue.findAll({
-        where: { companyId },
-        attributes: ["id", "name"],
+    const tickets = await Ticket.findAll({
+        where: { ...dateFilter },
+        attributes: ["id"],
         include: [
             {
                 model: TicketChanges,
-                as: "historics",
-                where: {
-                    ...dateFilter,
-                    change: ["CREATE", "TRANSFER", "FINALIZE", "REOPEN", "ACCEPT"],
-                },
+                as: "ticketChanges",
+                attributes: ["id", "change", "createdAt", "newStatus"],
                 required: true,
-                order: [["createdAt", "ASC"]],
+            },
+            {
+                model: Message,
+                as: "messages",
+                attributes: ["id", "fromMe", "responseTime"],
+                required: true,
             },
         ],
-    })
+    });
 
-    return reports;
+    return tickets;
 };
 
-export default ListQueueTicketHistoricService;
+export default GetTicketResponseTimeService;

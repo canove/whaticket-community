@@ -24,6 +24,7 @@ import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles((theme) => ({
   maxWidth: {
@@ -35,7 +36,7 @@ const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
+const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId, task }) => {
 	const history = useHistory();
 	const classes = useStyles();
 
@@ -52,6 +53,9 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 	const [selectedQueue, setSelectedQueue] = useState('');
 
 	const [requiredQueue, setRequiredQueue] = useState(false);
+	const [confirmationOpen, setConfirmationOpen] = useState(false);
+
+	const [observation, setObservation] = useState("");
 
 	const { findAll: findAllQueues } = useQueues();
 
@@ -104,41 +108,59 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 		onClose();
 		setSearchParam("");
 		setSelectedUser(null);
+		setObservation("");
 	};
 
-	const handleSaveTicket = async e => {
-		e.preventDefault();
+	const handleSaveTicket = async (event, taskConfirmated) => {
+		if (event) event.preventDefault();
+
 		if (!ticketid) return;
-		setLoading(true);
-		try {
-			let data = {};
 
-			if (selectedUser) {
-				data.userId = selectedUser.id;
-				data.queueId = null;
-			}
-
-			if (selectedQueue) {
-				data.queueId = selectedQueue;
-
-				if (!selectedUser) {
-					data.status = 'pending';
-					data.userId = null;
+		if (task && !taskConfirmated) {
+			setConfirmationOpen(true);
+		} else {
+			setLoading(true);
+			
+			try {
+				let data = {};
+	
+				if (selectedUser) {
+					data.userId = selectedUser.id;
+					data.queueId = null;
 				}
+	
+				if (selectedQueue) {
+					data.queueId = selectedQueue;
+	
+					if (!selectedUser) {
+						data.status = 'pending';
+						data.userId = null;
+					}
+				}
+	
+				if (observation) data.observation = observation;
+	
+				await api.put(`/tickets/${ticketid}`, data);
+	
+				setLoading(false);
+				history.push(`/tickets`);
+			} catch (err) {
+				setLoading(false);
+				toastError(err);
 			}
-
-			await api.put(`/tickets/${ticketid}`, data);
-
-			setLoading(false);
-			history.push(`/tickets`);
-		} catch (err) {
-			setLoading(false);
-			toastError(err);
 		}
 	};
 
 	return (
 		<Dialog open={modalOpen} onClose={handleClose} maxWidth="lg" scroll="paper">
+			<ConfirmationModal
+				title={"Aviso"}
+				open={confirmationOpen}
+				onClose={setConfirmationOpen}
+				onConfirm={() => handleSaveTicket(null, true)}
+			>
+				{"Ao transferir esta conversa, a tarefa será finalizada."}
+			</ConfirmationModal>
 			<form onSubmit={handleSaveTicket}>
 				<DialogTitle id="form-dialog-title">
 					{i18n.t("transferTicketModal.title")}
@@ -199,6 +221,20 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, queueId }) => {
 							))}
 						</Select>
 					</FormControl>
+					<div style={{ marginTop: "10px" }}>
+						<TextField
+							label="Observação"
+							name="observation"
+							variant="outlined"
+							margin="dense"
+							multiline
+							minRows={3}
+							maxRows={3}
+							value={observation}
+							onChange={(e) => setObservation(e.target.value)}
+							fullWidth
+						/>
+					</div>
 				</DialogContent>
 				<DialogActions>
 					<Button

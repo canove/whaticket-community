@@ -19,7 +19,7 @@ import TabPanel from "../TabPanel";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import TicketsQueueSelect from "../TicketsQueueSelect";
-import { Button, FormControl, ListItemText, MenuItem, Select } from "@material-ui/core";
+import { Button, FormControl, InputLabel, ListItemText, MenuItem, Select } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
@@ -99,12 +99,16 @@ const TicketsManager = () => {
   const { i18n } = useTranslation();
 
   const [searchParam, setSearchParam] = useState("");
+  const [searchTask, setSearchTask] = useState("");
   const [tab, setTab] = useState("open");
   const [tabOpen, setTabOpen] = useState("open");
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
   const [showAllTickets, setShowAllTickets] = useState(false);
   const searchInputRef = useRef();
+  const searchTaskInputRef = useRef();
   const { user } = useContext(AuthContext);
+
+  const [taskFilter, setTaskFilter] = useState("all");
 
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
@@ -158,6 +162,16 @@ const TicketsManager = () => {
     }, 500);
   };
 
+  const handleTaskSearch = (e) => {
+    const searchedTerm = e.target.value.toLowerCase();
+
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+      setSearchTask(searchedTerm);
+    }, 500);
+  };
+
   const handleChangeTab = (e, newValue) => {
     setTab(newValue);
   };
@@ -175,6 +189,10 @@ const TicketsManager = () => {
   const handleCategoryChange = e => {
 		setCategoryId(e.target.value);
 	};
+
+  const handleTaskFilterChange = (e) => {
+    setTaskFilter(e.target.value);
+  }
 
   return (
     <Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
@@ -203,12 +221,12 @@ const TicketsManager = () => {
             label={i18n.t("tickets.tabs.closed.title")}
             classes={{ root: classes.tab }}
           />
-          {/* <Tab
+          <Tab
             value={"task"}
             icon={<Assignment />}
             label={"Tarefas"}
             classes={{ root: classes.tab }}
-          /> */}
+          />
           <Tab
             value={"search"}
             icon={<SearchIcon />}
@@ -266,25 +284,6 @@ const TicketsManager = () => {
                   }
                 />
               }
-              // role={user.profiles}
-              // perform="tickets-manager:showall"
-              // yes={() => (
-                // <FormControlLabel
-                //   label={i18n.t("tickets.buttons.showAll")}
-                //   labelPlacement="start"
-                //   control={
-                //     <Switch
-                //       size="small"
-                //       checked={showAllTickets}
-                //       onChange={() =>
-                //         setShowAllTickets((prevState) => !prevState)
-                //       }
-                //       name="showAllTickets"
-                //       color="primary"
-                //     />
-                //   }
-                // />
-              // )}
             />
             <TicketsQueueSelect
               style={{ marginLeft: 6 }}
@@ -323,33 +322,6 @@ const TicketsManager = () => {
                   />
                 </div>
               }
-              // role={user.profiles}
-              // perform="tickets-manager:showall"
-              // yes={() => (
-              //   <div 
-              //     style={{ 
-              //       textAlign: "center", 
-              //       width: "100%", 
-              //       marginBottom: "10px",
-              //     }}
-              //   >
-              //     <FormControlLabel
-              //       label={i18n.t("tickets.buttons.showAll")}
-              //       labelPlacement="start"
-              //       control={
-              //         <Switch
-              //           size="small"
-              //           checked={showAllTickets}
-              //           onChange={() =>
-              //             setShowAllTickets((prevState) => !prevState)
-              //           }
-              //           name="showAllTickets"
-              //           color="primary"
-              //         />
-              //       }
-              //     />
-              //   </div>
-              // )}
             />
             <div 
               style={{ 
@@ -405,6 +377,88 @@ const TicketsManager = () => {
                 userQueues={user?.queues}
                 onChange={(values) => setSelectedQueueIds(values)}
               />
+            </div>
+          </div>
+        )}
+        {tab === "task" && (
+          <div style={{ width: "100%" }}>
+            <div 
+              style={{ 
+                display: "flex", 
+                flexWrap: "wrap", 
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px"
+              }}
+            >
+              <Can
+                permission="tickets-manager:showall"
+                item={
+                  <div style={{ width: "100%" }}>
+                    <FormControlLabel
+                      label={i18n.t("tickets.buttons.showAll")}
+                      labelPlacement="start"
+                      control={
+                        <Switch
+                          size="small"
+                          checked={showAllTickets}
+                          onChange={() =>
+                            setShowAllTickets((prevState) => !prevState)
+                          }
+                          name="showAllTickets"
+                          color="primary"
+                        />
+                      }
+                    />
+                  </div>
+                }
+              />
+              <div style={{ width: "100%" }}>
+                <div className={classes.serachInputWrapper}>
+                  <SearchIcon className={classes.searchIcon} />
+                  <InputBase
+                    className={classes.searchInput}
+                    inputRef={searchTaskInputRef}
+                    placeholder={i18n.t("tickets.search.placeholder")}
+                    type="search"
+                    onChange={handleTaskSearch}
+                  />
+                </div>
+              </div>
+              <div style={{ width: "100%" }}>
+                <div style={{ width: "100%" }}>
+                  <FormControl fullWidth margin="dense">
+                    <Select
+                      displayEmpty
+                      variant="outlined"
+                      value={taskFilter}
+                      onChange={handleTaskFilterChange}
+                      MenuProps={{
+                        anchorOrigin: {
+                          vertical: "bottom",
+                          horizontal: "left",
+                        },
+                        transformOrigin: {
+                          vertical: "top",
+                          horizontal: "left",
+                        },
+                        getContentAnchorEl: null,
+                      }}
+                      renderValue={() => "Filtro"}
+                    >
+                      <MenuItem dense value={"all"}>
+                        <ListItemText primary={"Todos"} />
+                      </MenuItem>
+                      <MenuItem dense value={"expiring"}>
+                        <ListItemText primary={"Expirando"} />
+                      </MenuItem>
+                      <MenuItem dense value={"expired"}>
+                        <ListItemText primary={"Expirados"} />
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -493,6 +547,15 @@ const TicketsManager = () => {
           searchParam={searchParam}
           showAll={true}
           selectedQueueIds={selectedQueueIds}
+        />
+      </TabPanel>
+      <TabPanel value={tab} name="task" className={classes.ticketsWrapper}>
+        <TicketsList
+          searchTask={searchTask}
+          showAll={true}
+          selectedQueueIds={selectedQueueIds}
+          isTask={true}
+          taskFilter={taskFilter}
         />
       </TabPanel>
     </Paper>

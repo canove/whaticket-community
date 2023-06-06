@@ -14,7 +14,6 @@ const useAuth = () => {
 	const [isAuth, setIsAuth] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [user, setUser] = useState({});
-	
 	const [accountConnected, setAccountConnected] = useState(false);
 
 	api.interceptors.request.use(
@@ -77,6 +76,8 @@ const useAuth = () => {
 				} catch (err) {
 					toastError(err);
 				}
+			} else {
+				setIsAuth(false);
 			}
 			setLoading(false);
 		})();

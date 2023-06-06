@@ -132,21 +132,20 @@ const UserModal = ({ open, onClose, userId }) => {
 	}, [userId, open]);
 
 	useEffect(() => {
-		if (loggedInUser.companyId === 1) {
-			const fetchCompanies = async () => {
-				try {
-					const { data } = await api.get(`/company/`);
-					setCompanies(data.companies);
-				} catch (err) {
-					toastError(err);
-				}
-			}
-			fetchCompanies();
-		}
-	}, [loggedInUser]);
+		const fetchCompanies = async () => {
+			if (loggedInUser.companyId !== 1) return;
 
-	useEffect(() => {
+			try {
+				const { data } = await api.get(`/company/`);
+				setCompanies(data.companies);
+			} catch (err) {
+				toastError(err);
+			}
+		}
+
 		const fetchProfiles = async () => {
+			if (!loggedInUser.name) return;
+
 			try {
 				const { data } = await api.get('/profile/', {
 					params: { limit: "-1" }
@@ -156,8 +155,10 @@ const UserModal = ({ open, onClose, userId }) => {
 				toastError(err);
 			}
 		}
+
 		fetchProfiles();
-	}, []);
+		fetchCompanies();
+	}, [loggedInUser]);
 
 	const handleClose = () => {
 		onClose();

@@ -361,24 +361,24 @@ const Supervisor = () => {
     return `${hoursString}:${minutesString}:${secondsString}`;
   };
 
-  const getUserServiceTime = (hists) => {
+  const getServiceTime = (hists) => {
     let currentID = 0;
 
-    const createdHist = hists.find(h => h.id > currentID);
-    currentID = createdHist.id;
-
-    const finalizedHist = hists.find(h => h.id > currentID);
-
-    const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-    const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
-
+    const initialHist = hists.find(h => h.id > currentID);
+    currentID = initialHist.id;
+  
+    const finalHist = hists.find(h => h.id > currentID);
+  
+    const createdAt = initialHist.createdAt;
+    const finalizedAt = finalHist.createdAt;
+  
     if (!createdAt || !finalizedAt) return null;
-
+  
     const createdAtDate = new Date(createdAt);
     const finalizedAtDate = new Date(finalizedAt);
-
+  
     const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
-
+  
     return serviceTime;
   }
 
@@ -413,9 +413,7 @@ const Supervisor = () => {
       if (hists.length < 2) continue;
 
       if (hists.length === 2) {
-        let serviceTime = 0;
-
-        serviceTime = getUserServiceTime(hists);
+        const serviceTime = getServiceTime(hists);
 
         ticketsServiceTime.push(serviceTime);
         continue;
@@ -431,9 +429,7 @@ const Supervisor = () => {
         for (const newHists of histsArray) {
           if (newHists.length % 2 !== 0) continue;
 
-          let serviceTime = 0;
-
-          serviceTime = getUserServiceTime(newHists);
+          const serviceTime = getServiceTime(newHists);
 
           if (serviceTime === null) continue;
 

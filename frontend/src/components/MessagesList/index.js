@@ -40,6 +40,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { i18n } from "../../translate/i18n";
 import ModalAudioCors from "../ModalAudioCors";
 import ModalVideoCors from "../ModalVideoCors";
+import { compareAsc } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
   messagesListWrapper: {
@@ -243,11 +244,22 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "0 1px 1px #b3b3b3",
   },
 
+  ticketTimestamp: {
+    alignItems: "center",
+    textAlign: "center",
+    alignSelf: "center",
+    width: "130px",
+    backgroundColor: "#e1f3fb",
+    margin: "10px",
+    borderRadius: "10px",
+    boxShadow: "0 1px 1px #b3b3b3",
+  },
+
   transferTimestamp: {
     alignItems: "center",
     textAlign: "center",
     alignSelf: "center",
-    width: "220px",
+    width: "90%",
     backgroundColor: "#e1f3fb",
     margin: "10px",
     borderRadius: "10px",
@@ -368,9 +380,6 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
   const { user } = useContext(AuthContext);
-
-  // const [ticketHistoric, setTicketHistoric] = useState([]);
-  // const transferList = [];
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -748,53 +757,144 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
     );
   }
 
-  const renderTransferTimestamps = (message, index) => {
-    // if (index === 0) {}
+  const renderTransferTimestampsBefore = (index) => {
+    const infos = messagesList[index].ticket?.ticketChanges;
 
-    // if (index < messagesList.length - 1) {
-    //   const date1 = parseISO(messagesList[index].createdAt);
-    //   const date2 = parseISO(messagesList[index + 1].createdAt);
+    if (infos) {
+      const messageDate = new Date(parseISO(messagesList[index].createdAt));
+      const previousMessage = messagesList[index-1] ? messagesList[index-1] : null;
+      let results = [];
 
-    //   const historics = ticketHistoric.filter(historic => {
-    //     const historicDate = parseISO(historic.transferedAt);
+      if (!previousMessage || previousMessage.ticketId !== messagesList[index].ticketId) {
+        for (const info of infos) {
+          const transferDate = new Date(parseISO(info.createdAt));
+          
+          if (transferDate < messageDate) {
+            results.push(info);
+          }
+        }
+      }
 
-    //     return (date1 < historicDate && historicDate < date2);
-    //   });
+      return (
+        <>
+          { results.map(info => {
+              const oldUser = info.oldUser ? info.oldUser.name : "SEM USER";
+              const newUser = info.newUser ? info.newUser.name : "SEM USER";
+        
+              const oldQueue = info.oldQueue ? info.oldQueue.name : "SEM FILA";
+              const newQueue = info.newQueue ? info.newQueue.name : "SEM FILA";
 
-    //   return (
-    //     <>
-    //       {historics.map(historic => {
-    //         if (!transferList.includes[historic.id]) {
-    //           transferList.push(historic.id);
-    //           transferList.push(historic.id + 1);
+              const change = info.change;
+              switch (change) {
+                case "CREATE":
+                  return (
+                    <span
+                      className={classes.transferTimestamp}
+                      key={`ticket-change-${info.id}`}
+                    >
+                      <div className={classes.dailyTimestampText}>
+                        Criado por: {`${newUser}`} | 
+                        {format(parseISO(info.createdAt), " dd/MM/yyyy HH:mm")}
+                      </div>
+                    </span>
+                  );
+              }
+            })
+          }
+        </>
+      )
+    }
+  }
 
-    //           return (
-    //             <span
-    //               className={classes.transferTimestamp}
-    //               key={`transfer-timestamp-${message.id}`}
-    //             >
-    //               <div className={classes.dailyTimestampText}>
-    //                 Transferido: <br />
-    //                 Fila: {historic.queue ? historic.queue.name : "SEM FILA"} <br />
-    //                 User: {historic.user ? historic.user.name : "SEM USER"} <br />
-    //                 {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy HH:mm")}
-    //               </div>
-    //             </span>
-    //           )
-    //         }
-    //       })}
-    //     </>
-    //   );
-    // }
+  const renderTransferTimestampsAfter = (index) => {
+    const infos = messagesList[index].ticket?.ticketChanges;
 
-    // if (index === messagesList.length - 1) {}
+    if (infos) {
+      const messageDate = new Date(parseISO(messagesList[index].createdAt));
+      const nextMessageDate = messagesList[index+1] ? new Date(parseISO(messagesList[index+1].createdAt)) : null;
+      let results = [];
+
+      if (nextMessageDate) {
+        for (const info of infos) {
+          const transferDate = new Date(parseISO(info.createdAt));
+          
+          if (nextMessageDate > transferDate && transferDate > messageDate) {
+            results.push(info);
+          }
+        }
+      } else {
+        for (const info of infos) {
+          const transferDate = new Date(parseISO(info.createdAt));
+          
+          if (transferDate > messageDate) {
+            results.push(info);
+          }
+        }
+      }
+
+      return (
+        <>
+          { results.map(info => {
+              const oldUser = info.oldUser ? info.oldUser.name : "SEM USER";
+              const newUser = info.newUser ? info.newUser.name : "SEM USER";
+        
+              const oldQueue = info.oldQueue ? info.oldQueue.name : "SEM FILA";
+              const newQueue = info.newQueue ? info.newQueue.name : "SEM FILA";
+
+              const change = info.change;
+              switch (change) {
+                case "TRANSFER":
+                  return (
+                    <span
+                      className={classes.transferTimestamp}
+                      key={`ticket-change-${info.id}`}
+                    >
+                      <div className={classes.dailyTimestampText}>
+                        Transferido: <br />
+                        {`Fila: ${oldQueue} ➡ ${newQueue} | `}
+                        {`User: ${oldUser} ➡ ${newUser} | `}
+                        {format(parseISO(info.createdAt), "dd/MM/yyyy HH:mm")} <br /> 
+                        {info.observation ? `Observação: ${info.observation}` : ""}
+                      </div>
+                    </span>
+                  );
+                // case "ACCEPT":
+                //   return (
+                //     <span
+                //       className={classes.transferTimestamp}
+                //       key={`ticket-change-${info.id}`}
+                //     >
+                //       <div className={classes.dailyTimestampText}>
+                //         Aceito por: {`${newUser}`} | 
+                //         {format(parseISO(info.createdAt), " dd/MM/yyyy HH:mm")}
+                //       </div>
+                //     </span>
+                //   );
+                // case "FINALIZE":
+                //   return (
+                //     <span
+                //       className={classes.transferTimestamp}
+                //       key={`ticket-change-${info.id}`}
+                //     >
+                //       <div className={classes.dailyTimestampText}>
+                //         Finalizado por: {`${newUser}`} | 
+                //         {format(parseISO(info.createdAt), " dd/MM/yyyy HH:mm")}
+                //       </div>
+                //     </span>
+                //   );
+              }
+            })
+          }
+        </>
+      )
+    }
   }
 
   const renderTicket = (message, index) => {
     if (index === 0) {
       return (
         <span
-          className={classes.dailyTimestamp}
+          className={classes.ticketTimestamp}
           key={`ticket-${message.id}`}
         >
           <div className={classes.dailyTimestampText}>
@@ -831,6 +931,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
               {renderTicket(message, index)}
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
+              {/* {renderTransferTimestampsBefore(index)} */}
               <div className={classes.messageLeft}>
                 <IconButton
                   variant="contained"
@@ -858,7 +959,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
                   </span>
                 </div>
               </div>
-              {/* {renderTransferTimestamps(message, index)} */}
+              {renderTransferTimestampsAfter(index)}
             </React.Fragment>
           );
         } else {
@@ -867,6 +968,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
               {renderTicket(message, index)}
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
+              {/* {renderTransferTimestampsBefore(index)} */}
               <div className={classes.messageRight}>
                 <IconButton
                   variant="contained"
@@ -905,7 +1007,7 @@ const MessagesList = ({ ticketId, isGroup, whatsapp }) => {
                   </span>
                 </div>
               </div>
-              {/* {renderTransferTimestamps(message, index)} */}
+              {renderTransferTimestampsAfter(index)}
             </React.Fragment>
           );
         }

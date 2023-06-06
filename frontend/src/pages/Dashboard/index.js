@@ -23,6 +23,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Tab,
+  Tabs,
   TextField,
 } from "@material-ui/core";
 import Title from "../../components/Title";
@@ -39,6 +41,15 @@ const useStyles = makeStyles((theme) => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
+  },
+  tab: {
+    minWidth: 120,
+    width: 120,
+  },
+  tabsHeader: {
+    flex: "none",
+    backgroundColor: "#eee",
+    marginBottom: "10px",
   },
   fixedHeightPaper: {
     padding: theme.spacing(2),
@@ -169,36 +180,21 @@ const Dashboard = () => {
   const [sentMessageCount, setSentMessageCount] = useState(0);
   const [receivedMessageCount, setReceivedMessageCount] = useState(0);
 
-  // const [files, setFiles] = useState([]);
-
   const [fileId, setFileId] = useState("");
   const [date, setDate] = useState("");
-  const [searchParam, setSearchParam] = useState("");
   const [initialDate, setInitialDate] = useState("");
   const [finalDate, setFinalDate] = useState("");
 
-  const [tickets, setTickets] = useState([]);
-  const [biggerTickets, setBiggerTickets] = useState([]);
-  const [smallerTickets, setSmallerTickets] = useState([]);
-  const [averageTime, setAverageTime] = useState(0);
-
-  // const [config, setConfig] = useState(null);
-  // const [connectedWhatsapps, setConnectedWhatsapps] = useState([]);
   const [loggedInUsersQuantity, setLoggedInUsersQuantity] = useState(0);
   
   const [updatingPage, setUpdatingPage] = useState(false);
-
-  const [billingTotalMonthValue, setBillingTotalMonthValue] = useState(0);
-  const [lastMonthTotalValue, setLastMonthTotalValue] = useState(0);
-  const [expectedTotalMonthValue, setExpectedTotalMonthValue] = useState(0);
-
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const [companies, setCompanies] = useState([]);
 
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
+  const [tab, setTab] = useState("dispatch"); // ["operation", "dispatch"]
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
@@ -215,15 +211,6 @@ const Dashboard = () => {
 
     return loading ? <CircularProgress /> : count;
   };
-
-  // const fetchQueueTime = async () => {
-  //   try {
-  //     const { data } = await api.get("/registers/queue");
-  //     console.log(data);
-  //   } catch (err) {
-  //     toastError(err);
-  //   }
-  // }
 
   const handleFilter = async () => {
     setLoading(true);
@@ -255,7 +242,6 @@ const Dashboard = () => {
       setQueueCount(data.reports.queue || "0");
 
       setCategoryCount(data.category);
-      // setConnectedWhatsapps(data.connectedWhatsapps);
 
       setSentMessageCount(data.messages.sent || "0");
       setReceivedMessageCount(data.messages.received || "0");
@@ -268,126 +254,34 @@ const Dashboard = () => {
     setLoading(false);
   };
 
-  const fetchBilling = async () => {
-    try {
-      const { data } = await api.get("/billings/dashboard", {
-        params: { selectedCompany }
-      });
-      setBillingTotalMonthValue(data.monthTotalValue);
-      setLastMonthTotalValue(data.lastMonthTotalValue);
-      setExpectedTotalMonthValue(data.expectedTotalMonthValue);
-    } catch (err) {
-      toastError(err);
-    }
-  }
-
-  // const fetchConfig = async () => {
-  //   try {
-  //     const { data } = await api.get("/whatsconfig/");
-  //     setConfig(data && data.length > 0 ? data[0] : null);
-  //   } catch (err) {
-  //     toastError(err);
-  //   }
-  // };
-
-  const fetchAverangeTime = async () => {
-    try {
-      const { data } = await api.get("/tickets/time", {
-        params: { searchParam },
-      });
-      setTickets(data.averageTimes);
-
-      if (data.averageTimes.length >= 6) {
-        setBiggerTickets(data.averageTimes.slice(0, 3));
-
-        const smallerTickets = data.averageTimes.slice(-3);
-        smallerTickets.sort((a, b) => {
-          return a.averageMilliseconds - b.averageMilliseconds;
-        });
-
-        setSmallerTickets(smallerTickets);
-      }
-
-      setAverageTime(data.totalAverageTime);
-    } catch (err) {
-      toastError(err);
-    }
-  };
-
   const fetchCategories = async () => {
     try {
       const { data } = await api.get("/connectionFiles/");
       setCategories(data);
     } catch (err) {
-      console.log(err);
+      toastError(err);
     }
   }
 
   useEffect(() => {
-    handleFilter();
+    if (!loading) {
+      handleFilter();
+    }
   }, [fileId, date, initialDate, finalDate, categoryId]);
 
   useEffect(() => {
-    fetchAverangeTime();
-  }, [searchParam]);
-
-  useEffect(() => {
-    // fetchConfig();
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    fetchBilling();
-  }, [selectedCompany]);
-
-  useEffect(() => {
-		if (user.companyId === 1) {
-			const fetchCompanies = async () => {
-				try {
-					const { data } = await api.get(`/company/`);
-					setCompanies(data.companies);
-				} catch (err) {
-					toastError(err);
-				}
-			}
-			fetchCompanies();
-		}
-	}, [user]);
-
   const updatePage = async () => {
+    if (loading) return;
+
     setUpdatingPage(true);
-
     await handleFilter();
-    await fetchAverangeTime();
-    await fetchBilling();
-
-    // await fetchQueueTime()
-    // await handleFiles();
-    // await fetchConfig();
-
     setUpdatingPage(false);
   };
 
   const getGridSize = (index) => {
-    // if (categoryCount.length === 1) return 12;
-    // if (categoryCount.length === 2) return 6;
-    // if (categoryCount.length === 3) return 4;
-    // if (categoryCount.length === 4) return 3;
-
-    // if (!categoryCount[index+3] && ((index+1) % 4 === 1)) {
-    //   if (categoryCount[index+2]) {
-    //     lastGrid = 4;
-    //   } else if (categoryCount[index+1]) {
-    //     lastGrid = 6;
-    //   } else {
-    //     lastGrid = 12;
-    //   }
-    // }
-
-    // if (lastGrid) return lastGrid;
-
-    // return 3;
-
     if (categoryCount.length === 1) return 12;
     if (categoryCount.length === 2) return 6;
     if (categoryCount.length === 3) return 4;
@@ -405,89 +299,6 @@ const Dashboard = () => {
     return 4;
   };
 
-  const handleSearch = (e) => {
-    setSearchParam(e.target.value.toLowerCase());
-  };
-
-  const formatTime = (milliseconds) => {
-    let seconds = milliseconds / 1000;
-
-    let minutes = Math.floor(seconds / 60);
-    seconds = Math.floor((seconds / 60 - minutes) * 60);
-
-    let hours = Math.floor(minutes / 60);
-    minutes = Math.floor((minutes / 60 - hours) * 60);
-
-    let secondsString = seconds.toString();
-    let minutesString = minutes.toString();
-    let hoursString = hours.toString();
-
-    if (secondsString.length === 1) {
-      secondsString = `0${secondsString}`;
-    }
-
-    if (minutesString.length === 1) {
-      minutesString = `0${minutesString}`;
-    }
-
-    if (hoursString.length === 1) {
-      hoursString = `0${hoursString}`;
-    }
-
-    return `${hoursString}:${minutesString}:${secondsString}`;
-  };
-
-  // const getAverageDeliveryTime = () => {
-  //   if (!config || !config.active)
-  //     return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
-
-  //   let triggerIntervalCount = 0;
-  //   let connectedWhatsappsCount = 0;
-
-  //   let totalTriggerInterval = 0;
-
-  //   for (const whats of connectedWhatsapps) {
-  //     connectedWhatsappsCount += 1;
-  //     triggerIntervalCount += 1;
-
-  //     if (whats.automaticControl && whats.currentTriggerInterval) {
-  //       totalTriggerInterval += whats.currentTriggerInterval;
-  //       continue;
-  //     }
-
-  //     if (whats.connectionFile && whats.connectionFile.triggerInterval) {
-  //       totalTriggerInterval += whats.connectionFile.triggerInterval;
-  //       continue;
-  //     }
-
-  //     totalTriggerInterval += config.triggerInterval;
-  //   }
-
-  //   let queueCountInt = parseInt(queueCount);
-
-  //   if (queueCountInt > 0 && connectedWhatsappsCount === 0)
-  //     return i18n.t(
-  //       "dashboard.messages.averageDeliveryTime.noConnectedWhatsapps"
-  //     );
-  //   if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
-
-  //   const triggerInterval = totalTriggerInterval / triggerIntervalCount;
-
-  //   const averageDeliveryTimeMinutes =
-  //     (queueCountInt / connectedWhatsappsCount) * triggerInterval;
-  //   const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
-  //   const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
-
-  //   return averageDeliveryTime;
-  // };
-
-  const formatToBRL = (quantity) => {
-    if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
-
-    let money = quantity.toFixed(2);
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
-  }
-
   const handleSelectOption = (_, newValue) => {
     if (newValue) {
       setCategoryId(newValue.id);
@@ -502,6 +313,34 @@ const Dashboard = () => {
 
   return (
     <div>
+      <Paper elevation={0} square className={classes.tabsHeader}>
+        <Tabs
+          value={tab}
+          onChange={(e, newValue) => {
+            setTab(newValue);
+            // setFileId("");
+            // setInitialDate("");
+            // setFinalDate("");
+            // setCategoryId("");
+          }}
+          variant="fullWidth"
+          indicatorColor="primary"
+          textColor="primary"
+        >
+          <Tab
+            value={"dispatch"}
+            // icon={<CheckBoxIcon />}
+            label={"Disparo"}
+            classes={{ root: classes.tab }}
+          />
+          <Tab
+            value={"operation"}
+            // icon={<MoveToInboxIcon />}
+            label={"Operação"}
+            classes={{ root: classes.tab }}
+          />
+        </Tabs>
+      </Paper>
       <MainHeader>
         <Title>{i18n.t("dashboard.title")}</Title>
         <div
@@ -522,33 +361,6 @@ const Dashboard = () => {
       </MainHeader>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
-          {/* <Grid item xs={6}>
-            <Paper className={classes.customFixedHeightPaper}>
-              <Typography
-                style={{ display: "inlineBlock" }}
-                component="h3"
-                variant="h6"
-                color="primary"
-                paragraph
-              >
-                {i18n.t("dashboard.file")}
-              </Typography>
-              <Autocomplete
-                onChange={(e, newValue) => handleSelectOption(e, newValue)}
-                className={classes.selectStyle}
-                options={files}
-                value={files.find((f) => f.id === fileId) || null}
-                getOptionLabel={renderOptionLabel}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={i18n.t("dashboard.file")}
-                    InputLabelProps={{ required: true }}
-                  />
-                )}
-              />
-            </Paper>
-          </Grid> */}
           <Grid item xs={4}>
             <Paper className={classes.customFixedHeightPaper}>
               <Typography
@@ -643,7 +455,7 @@ const Dashboard = () => {
               </div>
             </Paper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{ display: (tab === "operation") ? "block" : "none" }}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -658,7 +470,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{ display: (tab === "operation") ? "block" : "none" }}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -673,7 +485,7 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{ display: (tab === "operation") ? "block" : "none" }}>
             <Paper
               className={classes.customFixedHeightPaper}
               style={{ overflow: "hidden" }}
@@ -688,412 +500,219 @@ const Dashboard = () => {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.queue.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : queueCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {"Usuários Logados"}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : loggedInUsersQuantity}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.imported.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : registerCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.sent.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : sentCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.handedOut.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : deliveredCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.read.title")}
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : readCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.mistake.title")} / Blacklist
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : errorCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Interações
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : interactionCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Sem Whatsapp
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : noWhatsCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Mensagens Trafegadas Enviadas
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : sentMessageCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper
-              className={classes.customFixedHeightPaper}
-              style={{ overflow: "hidden" }}
-            >
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                Mensagens Trafegadas Recebidas
-              </Typography>
-              <Grid item>
-                <Typography component="h1" variant="h4">
-                  {loading ? <CircularProgress /> : receivedMessageCount}
-                </Typography>
-              </Grid>
-            </Paper>
-          </Grid>
-          {categoryCount && categoryCount.length > 0 && (
-            <Grid item xs={12}>
-              <Typography component="h3" variant="h6" color="primary" paragraph>
-                {i18n.t("dashboard.messages.category.title")}
-              </Typography>
-            </Grid>
-          )}
-          {categoryCount &&
-            categoryCount.map((category, index) => (
-              <Grid item xs={getGridSize(index)} key={category.name}>
+          {(tab === "operation") &&
+            <>
+              <Grid item xs={4}>
                 <Paper
-                  className={classes.categoryStyle}
+                  className={classes.customFixedHeightPaper}
                   style={{ overflow: "hidden" }}
                 >
-                  <Typography
-                    component="h3"
-                    variant="h6"
-                    color="primary"
-                    paragraph
-                  >
-                    {category.name}
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {"Usuários Logados"}
                   </Typography>
                   <Grid item>
                     <Typography component="h1" variant="h4">
-                      {category.count}
+                      {loading ? <CircularProgress /> : loggedInUsersQuantity}
                     </Typography>
                   </Grid>
                 </Paper>
               </Grid>
-            ))}
-          { user.companyId === 1 && 
-            <Grid item xs={12}>
-              <Paper className={classes.paperTime}>
-                <Typography component="h3" variant="h6" color="primary">
-                  Custos
-                </Typography>
-                <FormControl
-									variant="outlined"
-									margin="dense"
-									fullWidth
-								>
-									<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
-									<Select
-										label="Empresa"
-										name="company"
-										labelId="company-selection-label"
-										id="company-selection"
-										value={selectedCompany}
-										onChange={(e) => { setSelectedCompany(e.target.value) }}
-									>
-                    <MenuItem value={null}>{""}</MenuItem>
-										{ companies && companies.map(company => {
-											return (
-												<MenuItem key={company.id} value={company.id}>{company.name}</MenuItem>
-											)
-										}) }
-									</Select>
-								</FormControl>
-                <Grid item>
-                  <Typography component="h2" variant="h6">
-                    Custo Mês Corrente: {formatToBRL(billingTotalMonthValue)}
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Mensagens Trafegadas Enviadas
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : sentMessageCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Mensagens Trafegadas Recebidas
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : receivedMessageCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              {categoryCount && categoryCount.length > 0 && (
+                <Grid item xs={12}>
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.category.title")}
                   </Typography>
                 </Grid>
-                <Grid item>
-                  <Typography component="h2" variant="h6">
-                  Custo Previsto: {formatToBRL(expectedTotalMonthValue)}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography component="h2" variant="h6">
-                    Ultimo Mês: {formatToBRL(lastMonthTotalValue)}
-                  </Typography>
-                </Grid>
-              </Paper>
-            </Grid>
-          }
-          { user.companyId !== 1 && user.superAdmin &&
-            <Grid item xs={12}>
-              <Paper className={classes.paperTime}>
-                <Typography component="h3" variant="h6" color="primary">
-                  Custos
-                </Typography>
-                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly" }}>
-                  <Grid item xs={3}>
+              )}
+              {categoryCount &&
+                categoryCount.map((category, index) => (
+                  <Grid item xs={getGridSize(index)} key={category.name}>
                     <Paper
-                      className={classes.customFixedHeightBilling}
+                      className={classes.categoryStyle}
                       style={{ overflow: "hidden" }}
                     >
-                      <Typography component="h3" variant="h6" color="primary" paragraph>
-                        Custo Mês Corrente
+                      <Typography
+                        component="h3"
+                        variant="h6"
+                        color="primary"
+                        paragraph
+                      >
+                        {category.name}
                       </Typography>
                       <Grid item>
                         <Typography component="h1" variant="h4">
-                        {formatToBRL(billingTotalMonthValue)}
+                          {category.count}
                         </Typography>
                       </Grid>
                     </Paper>
                   </Grid>
-                  <Grid item xs={3}>
-                    <Paper
-                      className={classes.customFixedHeightBilling}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <Typography component="h3" variant="h6" color="primary" paragraph>
-                        Custo Previsto
-                      </Typography>
-                      <Grid item>
-                        <Typography component="h1" variant="h4">
-                        {formatToBRL(expectedTotalMonthValue)}
-                        </Typography>
-                      </Grid>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Paper
-                      className={classes.customFixedHeightBilling}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <Typography component="h3" variant="h6" color="primary" paragraph>
-                        Ultimo Mês
-                      </Typography>
-                      <Grid item>
-                        <Typography component="h1" variant="h4">
-                        {formatToBRL(lastMonthTotalValue)}
-                        </Typography>
-                      </Grid>
-                    </Paper>
-                  </Grid>
-                </div>
-              </Paper>
-            </Grid>
-          }
-          <Grid item xs={12}>
-            <Paper className={classes.fixedHeightPaper}>
-              <Chart />
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper className={classes.fixedHeightPaper}>
-              <RegisterChart />
-            </Paper>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper className={classes.paperTime}>
-            <div>
-              <Typography component="h3" variant="h6" color="primary">
-                Tempo de Atendimento
-              </Typography>
-              <TextField
-                className={classes.search}
-                placeholder={"Pesquisar"}
-                type="search"
-                value={searchParam}
-                onChange={handleSearch}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon style={{ color: "gray" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </div>
-            {tickets && tickets.length < 6 && (
-              <div className={classes.averageTickets}>
-                {tickets.map((ticket, index) => (
-                  <Card
-                    className={classes.averageTicket}
-                    key={index}
-                    elevation={5}
-                  >
-                    <CardContent>
-                      <Typography align="center" variant="h6" component="h2">
-                        {ticket.user.name}
-                      </Typography>
-                      <br />
-                      <Typography align="center" variant="h5" component="h2">
-                        {formatTime(ticket.averageMilliseconds)}
-                      </Typography>
-                    </CardContent>
-                  </Card>
                 ))}
-              </div>
-            )}
-            {tickets && tickets.length >= 6 && (
-              <>
-                <Typography align="center" variant="h6" component="h2">
-                  Maiores Tempos Médios
-                </Typography>
-                <div className={classes.averageTickets}>
-                  {biggerTickets.map((ticket, index) => (
-                    <Card
-                      className={classes.averageTicket}
-                      key={index}
-                      elevation={5}
-                    >
-                      <CardContent>
-                        <Typography align="center" variant="h6" component="h2">
-                          {ticket.user.name}
-                        </Typography>
-                        <br />
-                        <Typography align="center" variant="h5" component="h2">
-                          {formatTime(ticket.averageMilliseconds)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-                <Typography align="center" variant="h6" component="h2">
-                  Menores Tempos Médios
-                </Typography>
-                <div className={classes.averageTickets}>
-                  {smallerTickets.map((ticket, index) => (
-                    <Card
-                      className={classes.averageTicket}
-                      key={index}
-                      elevation={5}
-                    >
-                      <CardContent>
-                        <Typography align="center" variant="h6" component="h2">
-                          {ticket.user.name}
-                        </Typography>
-                        <br />
-                        <Typography align="center" variant="h5" component="h2">
-                          {formatTime(ticket.averageMilliseconds)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </>
-            )}
-            <div style={{ marginTop: "10px" }}>
-              <Typography component="h3" variant="h6">
-                {tickets && tickets.length > 0
-                  ? `Tempo Médio de Atendimentos: ${formatTime(averageTime)}`
-                  : `Sem Tickets Resolvidos`}
-              </Typography>
-            </div>
-          </Paper>
+              <Grid item xs={12}>
+                <Paper className={classes.fixedHeightPaper}>
+                  <Chart />
+                </Paper>
+              </Grid>
+            </>
+          }
+          {(tab === "dispatch") &&
+            <>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.queue.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : queueCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.imported.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : registerCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.sent.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : sentCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.handedOut.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : deliveredCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.read.title")}
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : readCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={4}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    {i18n.t("dashboard.messages.mistake.title")} / Blacklist
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : errorCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Interações
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : interactionCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={6}>
+                <Paper
+                  className={classes.customFixedHeightPaper}
+                  style={{ overflow: "hidden" }}
+                >
+                  <Typography component="h3" variant="h6" color="primary" paragraph>
+                    Sem Whatsapp
+                  </Typography>
+                  <Grid item>
+                    <Typography component="h1" variant="h4">
+                      {loading ? <CircularProgress /> : noWhatsCount}
+                    </Typography>
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={12}>
+                <Paper className={classes.fixedHeightPaper}>
+                  <RegisterChart />
+                </Paper>
+              </Grid>
+            </>
+          }
         </Grid>
       </Container>
     </div>

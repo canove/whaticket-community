@@ -38,6 +38,8 @@ const CreateTicketService = async ({
   templateVariables, 
   templateHeader,
 }: Request): Promise<Ticket> => {
+  let fileRegisterId = null;
+
   const defaultWhatsapp = await GetDefaultWhatsApp({ companyId, whatsappId, official, queueId });
 
   let msgId = null;
@@ -69,7 +71,7 @@ const CreateTicketService = async ({
       msgId = (data.messages && data.messages.length > 0) ? data.messages[0].id : null;
     }
 
-    await FileRegister.create({
+    const reg = await FileRegister.create({
       name,
       companyId,
       haveWhatsapp: true,
@@ -81,6 +83,8 @@ const CreateTicketService = async ({
       deliveredAt: new Date(),
       interactionAt: new Date(),
     });
+
+    fileRegisterId = reg.id;
   }
 
   await CheckContactOpenTickets(contactId, companyId);
@@ -94,6 +98,7 @@ const CreateTicketService = async ({
     userId,
     companyId,
     queueId,
+    fileRegisterId,
   });
 
   const ticket = await Ticket.findByPk(id, { 
@@ -140,8 +145,13 @@ const CreateTicketService = async ({
     await CreateMessageService({ messageData });
   }
 
-  // TICKET HISTORIC - CREATE
-  await CreateTicketHistoricService(ticket, "CREATE");
+  const oldTicket = {
+    oldStatus: null,
+    oldUserId: null,
+    oldQueueId: null,
+  };
+
+  await CreateTicketHistoricService({ ticket, oldTicket, change: "CREATE" }); //* TICKET HISTORIC - CREATE
 
   if (!ticket) {
     throw new AppError("ERR_CREATING_TICKET");

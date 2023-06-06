@@ -274,6 +274,8 @@ const MainListItems = (props) => {
 
   useEffect(() => {
     const fetchMenus = async () => {
+      if (!user.name) return;
+
       try {
         const { data } = await api.get("/menus/layout");
         setMenus(data);

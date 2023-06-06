@@ -31,22 +31,20 @@ interface Request {
 const CreateMessageService = async ({
   messageData
 }: Request): Promise<Message> => {
-  if (messageData.fromMe === false) {
-    const lastMessage = await Message.findOne({
-      where: {
-        fromMe: true,
-        ticketId: messageData.ticketId,
-      },
-      order: [["createdAt", "DESC"]]
-    });
+  const lastMessage = await Message.findOne({
+    where: {
+      fromMe: (messageData.fromMe === false) ? true : false,
+      ticketId: messageData.ticketId,
+    },
+    order: [["createdAt", "DESC"]]
+  });
 
-    if (lastMessage) {
-      const now = new Date();
-      const lastMessageDate = new Date(lastMessage.createdAt);
+  if (lastMessage) {
+    const now = new Date();
+    const lastMessageDate = new Date(lastMessage.createdAt);
 
-      const responseTime = now.getTime() - lastMessageDate.getTime();
-      messageData["responseTime"] = responseTime;
-    }
+    const responseTime = now.getTime() - lastMessageDate.getTime();
+    messageData["responseTime"] = responseTime;
   }
 
   await Message.upsert(messageData);

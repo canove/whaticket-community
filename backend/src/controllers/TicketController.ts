@@ -49,6 +49,9 @@ type IndexQuery = {
   categoryId: string;
   connectionFileId: string;
   pendingAnswer: string;
+  isTask: string;
+  searchTask: string;
+  taskFilter: string;
 };
 
 interface TicketData {
@@ -60,6 +63,7 @@ interface TicketData {
   categoryId: number;
   createdAt: Date;
   finalizedAt: Date;
+  observation: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -73,7 +77,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     withUnreadMessages,
     categoryId,
     connectionFileId,
-    pendingAnswer
+    pendingAnswer,
+    isTask,
+    searchTask,
+    taskFilter,
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -102,7 +109,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     categoryId,
     connectionFileId,
     loggedUserId: id,
-    pendingAnswer
+    pendingAnswer,
+    isTask: isTask === "true" ? true : false,
+    searchTask,
+    taskFilter,
   });
 
   return res.status(200).json({ tickets, count, hasMore });

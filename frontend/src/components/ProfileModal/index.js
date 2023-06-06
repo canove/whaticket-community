@@ -170,6 +170,12 @@ const ProfileModal = ({ open, onClose, profileId }) => {
                 <MenuItem value={"tickets-manager:showall"}>
                   Ver Todas as Chamadas
                 </MenuItem>
+                <MenuItem value={"ticket:sendMessage"}>
+                  Enviar Mensagens em Conversas <br /> Aceitas por Outro Usuário
+                </MenuItem>
+                <MenuItem value={"ticket:reopen"}>
+                  Reabrir Conversa Finalizada
+                </MenuItem>
                 {/* <MenuItem value={"ticket-options:deleteTicket"}>
                   Deletar Chamadas
                 </MenuItem> */}

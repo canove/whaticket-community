@@ -1,4 +1,4 @@
-import { Op, fn, where, col, Filterable, Includeable } from "sequelize";
+import { Op, fn, where, col, Filterable, Includeable, Sequelize } from "sequelize";
 import { startOfDay, endOfDay, parseISO } from "date-fns";
 
 import Ticket from "../../database/models/Ticket";
@@ -9,6 +9,7 @@ import ShowUserService from "../UserServices/ShowUserService";
 import CheckProfilePermissionService from "../ProfileServices/CheckProfilePermissionService";
 import Whatsapp from "../../database/models/Whatsapp";
 import BlockedContacts from "../../database/models/BlockedContacts";
+import Tasks from "../../database/models/Tasks";
 
 interface Request {
   searchParam?: string;
@@ -24,6 +25,9 @@ interface Request {
   loggedUserId?: string | number;
   connectionFileId?: string;
   pendingAnswer?: string;
+  isTask?: boolean;
+  searchTask?: string;
+  taskFilter?: string;
 }
 
 interface Response {
@@ -45,7 +49,10 @@ const ListTicketsService = async ({
   companyId,
   categoryId,
   loggedUserId,
-  pendingAnswer
+  pendingAnswer,
+  isTask,
+  searchTask,
+  taskFilter,
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
@@ -221,6 +228,52 @@ const ListTicketsService = async ({
       ...whereCondition,
       lastMessageFromMe: false
     }
+  }
+
+  if (isTask === true) {
+    delete whereCondition["queueId"];
+
+    let whereConditionTask = null;
+
+    if (showAll === "true" && allTickets) {
+    } else {
+      whereConditionTask = { userId };
+    }
+
+    const now = new Date();
+
+    if (taskFilter === "expiring") {
+      whereConditionTask = { dueDate: { [Op.between]: [+startOfDay(now), now] } }
+    }
+
+    if (taskFilter === "expired") {
+      whereConditionTask = { dueDate: { [Op.lte]: now } }
+    }
+
+    if (searchTask) {
+      whereConditionTask = {
+        "$task.description$": where(
+          fn("LOWER", col("task.description")),
+          "LIKE",
+          `%${searchTask.toLocaleLowerCase().trim()}%`
+        )
+      }
+    }
+
+    includeCondition.push({
+      model: Tasks,
+      as: "task",
+      attributes: ["id", "description", "dueDate", "userId"],
+      where: whereConditionTask,
+      required: true,
+    });
+  } else {
+    includeCondition.push({
+      model: Tasks,
+      as: "task",
+      attributes: ["id", "description", "dueDate", "userId"],
+      required: false,
+    });
   }
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({

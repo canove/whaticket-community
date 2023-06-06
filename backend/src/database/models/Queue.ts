@@ -15,12 +15,11 @@ import {
 } from "sequelize-typescript";
 import Company from "./Company";
 import Ticket from "./Ticket";
-import TicketHistorics from "./TicketHistorics";
 import User from "./User";
 import UserQueue from "./UserQueue";
-
 import Whatsapp from "./Whatsapp";
 import WhatsappQueue from "./WhatsappQueue";
+import TicketChanges from "./TicketChanges";
 
 @Table
 class Queue extends Model<Queue> {
@@ -62,8 +61,8 @@ class Queue extends Model<Queue> {
   @UpdatedAt
   updatedAt: Date;
 
-  @HasMany(() => TicketHistorics, "queueId")
-  ticketHistorics: TicketHistorics[];
+  @HasMany(() => TicketChanges, "newQueueId")
+  historics: TicketChanges[];
 
   @HasMany(() => Ticket, "queueId")
   tickets: Ticket[];

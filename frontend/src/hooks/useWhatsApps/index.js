@@ -58,19 +58,21 @@ const useWhatsApps = () => {
 	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
-		setLoading(true);
 		const fetchSession = async () => {
+			if (!user.name) return;
+
+			setLoading(true);
 			try {
 				const { data } = await api.get(`/whatsapp/`);
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
-				setLoading(false);
 			} catch (err) {
-				setLoading(false);
 				toastError(err);
 			}
+			setLoading(false);
 		};
+
 		fetchSession();
-	}, []);
+	}, [user]);
 
 	useEffect(() => {
 		const socket = openSocket();
@@ -96,8 +98,7 @@ const useWhatsApps = () => {
 		return () => {
 			socket.disconnect();
 		};
-// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [user]);
 
 	return { whatsApps, loading };
 };

@@ -3,9 +3,9 @@ import Message from "../../database/models/Message";
 import Ticket from "../../database/models/Ticket";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 import User from "../../database/models/User";
-import TicketHistorics from "../../database/models/TicketHistorics";
 import { Op } from "sequelize";
 import Queue from "../../database/models/Queue";
+import TicketChanges from "../../database/models/TicketChanges";
 
 interface Request {
   ticketId: string;
@@ -59,6 +59,46 @@ const ListMessagesService = async ({
         model: User,
         as: "user",
         attributes: ["id", "name", "nickname"],
+        required: false,
+      },
+      {
+        model: Ticket,
+        as: "ticket",
+        attributes: ["id"],
+        include: [
+          {
+            model: TicketChanges,
+            as: "ticketChanges",
+            attributes: ["id", "change", "observation", "createdAt"],
+            include: [
+              {
+                model: User,
+                as: "oldUser",
+                attributes: ["id", "name"],
+                required: false,
+              },
+              {
+                model: User,
+                as: "newUser",
+                attributes: ["id", "name"],
+                required: false,
+              },
+              {
+                model: Queue,
+                as: "oldQueue",
+                attributes: ["id", "name"],
+                required: false,
+              },
+              {
+                model: Queue,
+                as: "newQueue",
+                attributes: ["id", "name"],
+                required: false,
+              },
+            ],
+            required: false,
+          }
+        ],
         required: false,
       }
     ],

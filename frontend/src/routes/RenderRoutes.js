@@ -103,6 +103,8 @@ const RenderRoutes = () => {
 
   useEffect(() => {
     const fetchMenus = async () => {
+      if (!user.name) return;
+
       try {
         const { data } = await api.get(`/menus/company`);
         setMenus(data);

@@ -72,8 +72,11 @@ const ChangeQueueOrResolveTicketService = async ({
       }
     });
 
-    // TICKET HISTORIC - TRANSFER
-    await CreateTicketHistoricService(ticket, "TRANSFER");
+    const oldTicket = {
+      oldStatus: ticket.status,
+      oldUserId: ticket.userId,
+      oldQueueId: ticket.queueId,
+    };
 
     console.log("update ticket changequeueorresolve 71");
     await ticket.update({
@@ -81,8 +84,7 @@ const ChangeQueueOrResolveTicketService = async ({
       queueId: queue ? queue.id : null
     });
 
-    // TICKET HISTORIC - TRANSFER
-    await CreateTicketHistoricService(ticket, "TRANSFER");
+    await CreateTicketHistoricService({ ticket, oldTicket, change: "TRANSFER" }); //* TICKET HISTORIC - TRANSFER
 
     const io = getIO();
     io.to(message.ticketId.toString())
@@ -95,14 +97,19 @@ const ChangeQueueOrResolveTicketService = async ({
         contact: message.ticket.contact
       });
   } else {
+    const oldTicket = {
+      oldStatus: ticket.status,
+      oldUserId: ticket.userId,
+      oldQueueId: ticket.queueId,
+    };
+
     console.log("update ticket changequeueorresolve 88");
     await ticket.update({
       status: "closed",
       finalizedAt: new Date()
     });
 
-    // TICKET HISTORIC - FINALIZE
-    await CreateTicketHistoricService(ticket, "FINALIZE");
+    await CreateTicketHistoricService({ ticket, oldTicket, change: "FINALIZE" }); //* TICKET HISTORIC - FINALIZE
   }
 
   await ticket.reload();

@@ -3,9 +3,6 @@ import { Request, Response } from "express";
 import { Sequelize } from "sequelize-typescript";
 import { Op } from "sequelize";
 
-import { getIO } from "../libs/socket";
-import AppError from "../errors/AppError";
-
 import { endOfDay, startOfDay } from "date-fns";
 
 import ShowUserService from "../services/UserServices/ShowUserService";
@@ -15,8 +12,8 @@ import Queue from "../database/models/Queue";
 import User from "../database/models/User";
 import Message from "../database/models/Message";
 import Category from "../database/models/Category";
-import TicketHistorics from "../database/models/TicketHistorics";
 import Contact from "../database/models/Contact";
+import TicketChanges from "../database/models/TicketChanges";
 
 type IndexQuery = {
     tab: string,
@@ -122,18 +119,11 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 attributes: ["id"],
                 include: [
                     {
-                        model: TicketHistorics,
-                        as: "ticketHistorics",
-                        attributes: ["id", "ticketId", "ticketCreatedAt", "transferedAt", "finalizedAt", "reopenedAt", "acceptedAt", "createdAt"],
+                        model: TicketChanges,
+                        as: "historics",
                         where: {
-                            [Op.or]: [
-                                { ticketCreatedAt: { [Op.ne]: null } },
-                                { transferedAt: { [Op.ne]: null } },
-                                { finalizedAt: { [Op.ne]: null } },
-                                { reopenedAt: { [Op.ne]: null } },
-                                { acceptedAt: { [Op.ne]: null } },
-                            ],
-                            createdAt: dateFilter
+                            change: ["CREATE", "TRANSFER", "FINALIZE", "REOPEN", "ACCEPT"],
+                            createdAt: dateFilter,
                         },
                         required: true,
                         order: [["createdAt", "ASC"]],
@@ -186,7 +176,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 const newUser = {
                     ...user.dataValues,
                     ...ticket_count,
-                    ticketHistorics: serviceTime ? serviceTime.ticketHistorics : null,
+                    ticketHistorics: serviceTime ? serviceTime.historics : null,
                     lastSentMessage
                 };
 

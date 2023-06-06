@@ -42,13 +42,15 @@ interface Request {
   ticket: Ticket;
   companyId: number;
   body?: string;
+  userId?: number | string;
 }
 
 const SendWhatsAppMedia = async ({
   media,
   ticket,
   companyId,
-  body
+  body,
+  userId,
 }: Request): Promise<void> => {
   try {
     const connnection = await Whatsapp.findOne({
@@ -203,7 +205,7 @@ const SendWhatsAppMedia = async ({
               quotedMsgId: null,
               bot: ticket.status == 'inbot',
               companyId,
-              userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
+              userId: userId ? userId : ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
             };
           
             await ticket.update({ lastMessage: body, lastMessageFromMe: true });
@@ -245,7 +247,7 @@ const SendWhatsAppMedia = async ({
           mediaType: mediaTypes[media.mimetype], // media.mimetype.split('/')[0],
           quotedMsgId: null,
           companyId,
-          userId: ticket.userId ? ticket.userId : null // UserID para salvar usuário que enviou mensagem
+          userId: userId ? userId : ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
         };
       
         await ticket.update({ lastMessage: body, lastMessageFromMe: true });

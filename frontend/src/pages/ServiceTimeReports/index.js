@@ -21,7 +21,9 @@ import toastError from "../../errors/toastError";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import { FormControl, IconButton, InputLabel, MenuItem, Select } from "@material-ui/core";
+import InfoIcon from '@material-ui/icons/Info';
+import { Visibility } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,12 +53,6 @@ const ServiceTimeReports = () => {
   const [creatingPDF, setCreatingPDF] = useState(false);
   const [csv, setCSV] = useState("");
   const [creatingCSV, setCreatingCSV] = useState(false);
-
-  useEffect(() => {
-    setReports([]);
-    setPDF("");
-    setCSV("");
-  }, [tmaType])
 
   const fetchReports = async () => {
     setLoading(true);
@@ -148,81 +144,9 @@ const ServiceTimeReports = () => {
     }
   }
 
-  const formatTime = (milliseconds) => {
-    let seconds = milliseconds / 1000;
-
-    let minutes = Math.floor(seconds / 60);
-    seconds = Math.floor((seconds / 60 - minutes) * 60);
-
-    let hours = Math.floor(minutes / 60);
-    minutes = Math.floor((minutes / 60 - hours) * 60);
-
-    let secondsString = seconds.toString();
-    let minutesString = minutes.toString();
-    let hoursString = hours.toString();
-
-    if (secondsString.length === 1) {
-      secondsString = `0${secondsString}`;
-    }
-
-    if (minutesString.length === 1) {
-      minutesString = `0${minutesString}`;
-    }
-
-    if (hoursString.length === 1) {
-      hoursString = `0${hoursString}`;
-    }
-
-    if (hoursString === "NaN" || minutesString === "NaN" || secondsString === "NaN") return "00:00:00";
-
-    return `${hoursString}:${minutesString}:${secondsString}`;
-  };
-
-  const getUserServiceTime = (hists) => {
-    let currentID = 0;
-
-    const createdHist = hists.find(h => h.id > currentID);
-    currentID = createdHist.id;
-
-    const finalizedHist = hists.find(h => h.id > currentID);
-
-    const createdAt = createdHist.ticketCreatedAt ?? createdHist.acceptedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-    const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
-
-    if (!createdAt || !finalizedAt) return null;
-  
-    const createdAtDate = new Date(createdAt);
-    const finalizedAtDate = new Date(finalizedAt);
-
-    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
-
-    return serviceTime;
-  }
-
-  const getQueueServiceTime = (hists) => {
-    let currentID = 0;
-
-    const createdHist = hists.find(h => h.id > currentID);
-    currentID = createdHist.id;
-
-    const finalizedHist = hists.find(h => h.id > currentID);
-
-    const createdAt = createdHist.ticketCreatedAt ?? createdHist.reopenedAt ?? createdHist.transferedAt;
-    const finalizedAt = finalizedHist.finalizedAt ?? finalizedHist.transferedAt;
-
-    if (!createdAt || !finalizedAt) return null;
-
-    const createdAtDate = new Date(createdAt);
-    const finalizedAtDate = new Date(finalizedAt);
-
-    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
-
-    return serviceTime;
-  }
-
-  const processHistorics = (historics = []) => {   
+  const processHistorics = (historics = []) => {
     if (!historics || historics.length === 0) return "--:--:--";
- 
+
     let tickets = [];
 
     for (const historic of historics) {
@@ -251,15 +175,7 @@ const ServiceTimeReports = () => {
       if (hists.length < 2) continue;
 
       if (hists.length === 2) {
-        let serviceTime = 0;
-
-        if (tmaType === "queue") {
-          serviceTime = getQueueServiceTime(hists);
-        }
-
-        if (tmaType === "user") {
-          serviceTime = getUserServiceTime(hists);
-        }
+        const serviceTime = getServiceTime(hists);
 
         if (serviceTime === null) continue;
 
@@ -277,15 +193,7 @@ const ServiceTimeReports = () => {
         for (const newHists of histsArray) {
           if (newHists.length % 2 !== 0) continue;
 
-          let serviceTime = 0;
-
-          if (tmaType === "queue") {
-            serviceTime = getQueueServiceTime(newHists);
-          }
-
-          if (tmaType === "user") {
-            serviceTime = getUserServiceTime(newHists);
-          }
+          const serviceTime = getServiceTime(hists);
 
           ticketsServiceTime.push(serviceTime);
           continue;
@@ -305,6 +213,179 @@ const ServiceTimeReports = () => {
     return formatTime(averageServiceTime);
   }
 
+  const getServiceTime = (hists) => {
+    let currentID = 0;
+
+    const initialHist = hists.find(h => h.id > currentID);
+    currentID = initialHist.id;
+
+    const finalHist = hists.find(h => h.id > currentID);
+
+    const createdAt = initialHist.createdAt;
+    const finalizedAt = finalHist.createdAt;
+
+    if (!createdAt || !finalizedAt) return null;
+  
+    const createdAtDate = new Date(createdAt);
+    const finalizedAtDate = new Date(finalizedAt);
+
+    const serviceTime = finalizedAtDate.getTime() - createdAtDate.getTime();
+
+    return serviceTime;
+  }
+
+  const getTicketQuantity = (historics = []) => {
+    if (!historics || historics.length === 0) return 0;
+
+    let tickets = [];
+
+    for (const historic of historics) {
+      const ticketIndex = tickets.findIndex(ticket => ticket.ticketId === historic.ticketId);
+
+      if (ticketIndex === -1) {
+        tickets.push({
+          ticketId: historic.ticketId,
+          historics: [historic]
+        });
+      } else {
+        const newTicket = {
+          ticketId: tickets[ticketIndex].ticketId,
+          historics: [...tickets[ticketIndex].historics, historic]
+        }
+  
+        tickets[ticketIndex] = newTicket;
+      }
+    }
+
+    return tickets.length;
+  }
+
+  const formatTime = (milliseconds) => {
+    let seconds = milliseconds / 1000;
+
+    let minutes = Math.floor(seconds / 60);
+    seconds = Math.floor((seconds / 60 - minutes) * 60);
+
+    let hours = Math.floor(minutes / 60);
+    minutes = Math.floor((minutes / 60 - hours) * 60);
+
+    let days = Math.floor((hours / 24));
+    hours = Math.floor((hours / 24 - days) * 24);
+
+    let secondsString = seconds.toString();
+    let minutesString = minutes.toString();
+    let hoursString = hours.toString();
+    let daysString = days.toString();
+
+    if (secondsString.length === 1) {
+      secondsString = `0${secondsString}`;
+    }
+
+    if (minutesString.length === 1) {
+      minutesString = `0${minutesString}`;
+    }
+
+    if (hoursString.length === 1) {
+      hoursString = `0${hoursString}`;
+    }
+
+    if (daysString.length === 1) {
+      daysString = `0${daysString}`;
+    }
+
+    if (hoursString === "NaN" || minutesString === "NaN" || secondsString === "NaN" || daysString === "NaN") return "00:00:00:00";
+
+    return `${daysString}:${hoursString}:${minutesString}:${secondsString}`;
+  };
+
+  const getTicketServiceTime = (ticket) => {
+    const ticketChanges = ticket.ticketChanges;
+
+    const initServiceTime = ["ACCEPT", "REOPEN"];
+    const finalizeServiceTime = ["FINALIZE"];
+
+    const initial = ticketChanges.filter(ticketChange => (initServiceTime.includes(ticketChange.change)));
+    const finalize = ticketChanges.filter(ticketChange => (finalizeServiceTime.includes(ticketChange.change)));
+
+    let totalServiceTime = 0;
+    let totalServiceQuantity = 0;
+
+    for (let i = 0; i < initial.length; i++) {
+      if (!finalize[i]) break;
+      
+      const initialDate = new Date(initial[i].createdAt);
+      const finalDate = new Date(finalize[i].createdAt);
+
+      totalServiceQuantity += 1;
+
+      totalServiceTime += finalDate.getTime() - initialDate.getTime();
+    }
+
+    if (!totalServiceQuantity) return "--:--:--";
+
+    return formatTime(totalServiceTime / totalServiceQuantity);
+  }
+
+  const getTicketAwaitingTime = (ticket) => {
+    const ticketChanges = ticket.ticketChanges ?? [];
+
+    const finalizeAwaitingTime = ["ACCEPT"];
+
+    const initial = ticketChanges.filter(ticketChange => (ticketChange.newStatus === "pending"));
+    const finalize = ticketChanges.filter(ticketChange => (finalizeAwaitingTime.includes(ticketChange.change)));
+
+    let totalAwaitingTime = 0;
+    let totalAwaitingQuantity = 0;
+
+    for (let i = 0; i < initial.length; i++) {
+      if (!finalize[i]) break;
+      
+      const initialDate = new Date(initial[i].createdAt);
+      const finalDate = new Date(finalize[i].createdAt);
+
+      totalAwaitingQuantity += 1;
+
+      totalAwaitingTime += finalDate.getTime() - initialDate.getTime();
+    }
+
+    if (!totalAwaitingQuantity) return "--:--:--";
+
+    return formatTime(totalAwaitingTime / totalAwaitingQuantity);
+  }
+
+  const getUserResponseTime = (ticket) => {
+    const messages = ticket.messages ? ticket.messages.filter(message => (message.fromMe === true)) : [];
+    const count = messages.length;
+
+    if (!count) return "--:--:--";
+
+    const sum = messages.reduce((accumulator, message) => {
+        return accumulator + message.responseTime;
+    }, 0);
+
+    return formatTime(sum / count);
+  }
+
+  const getClientResponseTime = (ticket) => {
+    const messages = ticket.messages ? ticket.messages.filter(message => (message.fromMe === false)) : [];
+    const count = messages.length;
+
+    if (!count) return "--:--:--";
+
+    const sum = messages.reduce((accumulator, message) => {
+        return accumulator + message.responseTime;
+    }, 0);
+
+    return formatTime(sum / count);
+  }
+
+  const handleTMATypeChange = (e) => {
+    setReports([]);
+    setPDF("");
+    setCSV("");
+    setTMAType(e.target.value);
+  }
+
   return (
     <MainContainer>
       <MainHeader>
@@ -316,11 +397,12 @@ const ServiceTimeReports = () => {
               <Select
                 value={tmaType}
                 defaultValue="queue"
-                onChange={(e) => setTMAType(e.target.value)}
+                onChange={(e) => handleTMATypeChange(e)}
               >
                 <MenuItem value={"queue"}>{"Fila"}</MenuItem>
                 <MenuItem value={"user"}>{"Operador"}</MenuItem>
-                <MenuItem value={"client"}>{"Cliente"}</MenuItem>
+                <MenuItem value={"response"}>{"Resposta"}</MenuItem>
+                {/* <MenuItem value={"ticket"}>{"Conversa"}</MenuItem> */}
               </Select>
             </FormControl>
             <TextField
@@ -347,24 +429,28 @@ const ServiceTimeReports = () => {
             >
               {"Filtrar"}
             </Button>
-            <Button
-              style={{ marginLeft: "8px" }}
-              variant="contained"
-              color="primary"
-              onClick={downloadPDF}
-              disabled={creatingPDF}
-            >
-              {"Exportar PDF"}
-            </Button>
-            <Button
-              style={{ marginLeft: "8px" }}
-              variant="contained"
-              color="primary"
-              onClick={downloadCSV}
-              disabled={creatingCSV}
-            >
-              {"Exportar CSV"}
-            </Button>
+            { tmaType !== "ticket" && 
+              <>
+                <Button
+                  style={{ marginLeft: "8px" }}
+                  variant="contained"
+                  color="primary"
+                  onClick={downloadPDF}
+                  disabled={creatingPDF}
+                >
+                  {"Exportar PDF"}
+                </Button>
+                <Button
+                  style={{ marginLeft: "8px" }}
+                  variant="contained"
+                  color="primary"
+                  onClick={downloadCSV}
+                  disabled={creatingCSV}
+                >
+                  {"Exportar CSV"}
+                </Button>
+              </>
+            }
           </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -374,6 +460,7 @@ const ServiceTimeReports = () => {
             <TableHead>
               <TableRow>
                 <TableCell align="center">{"Fila"}</TableCell>
+                <TableCell align="center">{"Quantidade de Conversas"}</TableCell>
                 <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
               </TableRow>
             </TableHead>
@@ -382,10 +469,11 @@ const ServiceTimeReports = () => {
                 {reports.map((report) => (
                   <TableRow key={`queue-${report.id}`}>
                     <TableCell align="center">{report.name}</TableCell>
-                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                    <TableCell align="center">{getTicketQuantity(report.historics)}</TableCell>
+                    <TableCell align="center">{processHistorics(report.historics)}</TableCell>
                   </TableRow>
                 ))}
-                {loading && <TableRowSkeleton columns={2} />}
+                {loading && <TableRowSkeleton columns={3} />}
               </>
             </TableBody>
           </Table>
@@ -395,7 +483,8 @@ const ServiceTimeReports = () => {
             <TableHead>
               <TableRow>
                 <TableCell align="center">{"Usuário"}</TableCell>
-                <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
+                <TableCell align="center">{"Quantidade de Conversas"}</TableCell>
+                <TableCell align="center">{"Tempo Médio de Atendimento"}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -403,28 +492,71 @@ const ServiceTimeReports = () => {
                 {reports.map((report) => (
                   <TableRow key={`user-${report.id}`}>
                     <TableCell align="center">{report.name}</TableCell>
-                    <TableCell align="center">{processHistorics(report.ticketHistorics)}</TableCell>
+                    <TableCell align="center">{getTicketQuantity(report.historics)}</TableCell>
+                    <TableCell align="center">{processHistorics(report.historics)}</TableCell>
                   </TableRow>
                 ))}
-                {loading && <TableRowSkeleton columns={2} />}
+                {loading && <TableRowSkeleton columns={3} />}
               </>
             </TableBody>
           </Table>
         }
-        { tmaType === "client" &&
+        { tmaType === "response" &&
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell align="center">{"Tempo de Resposta"}</TableCell>
+                <TableCell align="center">{"Tempo de Resposta (Cliente)"}</TableCell>
+                <TableCell align="center">{"Tempo de Resposta (Operador)"}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell align="center">{formatTime(reports[0])}</TableCell>
-              </TableRow>
+              {!loading &&
+                <TableRow>
+                  <TableCell align="center">{formatTime(reports.clientResponseTime)}</TableCell>
+                  <TableCell align="center">{formatTime(reports.userResponseTime)}</TableCell>
+                </TableRow>
+              }
+              {loading && <TableRowSkeleton columns={2} />}
             </TableBody>
           </Table>
         }
+        {/* { tmaType === "ticket" &&
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">{"ID da Conversa"}</TableCell>
+                <TableCell align="center">{"Tempo de Atendimento"}</TableCell>
+                <TableCell align="center">{"Tempo de Espera"}</TableCell>
+                <TableCell align="center">{"Tempo de Resposta (Operador)"}</TableCell>
+                <TableCell align="center">{"Tempo de Resposta (Cliente)"}</TableCell>
+                <TableCell align="center">{"Ações"}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              { reports.map(ticket => (
+                <TableRow key={ticket.id}>
+                  <TableCell align="center">{ticket.id}</TableCell>
+                  <TableCell align="center">{getTicketServiceTime(ticket)}</TableCell>
+                  <TableCell align="center">{getTicketAwaitingTime(ticket)}</TableCell>
+                  <TableCell align="center">{getUserResponseTime(ticket)}</TableCell>
+                  <TableCell align="center">{getClientResponseTime(ticket)}</TableCell>
+                  <TableCell align="center">
+                    <IconButton>
+                      <InfoIcon />
+                    </IconButton>
+                    <IconButton
+                      href={`tickets/${ticket.id}`}
+                      target="_blank"
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {loading && <TableRowSkeleton columns={6} />}
+            </TableBody>
+          </Table>
+        } */}
       </Paper>
     </MainContainer>
   );
