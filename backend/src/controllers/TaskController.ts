@@ -3,7 +3,7 @@ import { getIO } from "../libs/socket";
 import CreateTaskService from "../services/TaskServices/CreateTaskService";
 import ShowTaskService from "../services/TaskServices/ShowTaskService";
 import UpdateTaskService from "../services/TaskServices/UpdateTaskService";
-import FinalzeTaskService from "../services/TaskServices/FinalizeTaskService";
+import FinalizeTaskService from "../services/TaskServices/FinalizeTaskService";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
     const { description, dueDate, ticketId } = req.body;
@@ -72,7 +72,7 @@ export const finalize = async (
     const { taskId } = req.params;
     const { companyId } = req.user;
   
-    const { task, ticket } = await FinalzeTaskService({ taskId, ticketId, companyId });
+    const { task, ticket } = await FinalizeTaskService({ taskId, ticketId, companyId });
   
     const io = getIO();
     io.emit(`task${companyId}`, {
