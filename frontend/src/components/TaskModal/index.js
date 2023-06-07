@@ -106,6 +106,8 @@ const TaskModal = ({ open, onClose, ticketId, taskId }) => {
         await api.post("/task", taskData);
       }
 
+      history.push(`/tickets/${ticketId}`);
+
       toast.success("Tarefa salva com sucesso.");
 
       handleClose();

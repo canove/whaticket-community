@@ -265,7 +265,7 @@ const TicketListItem = ({ ticket }) => {
 				)}
 				{ticket.task && 
 					<CustomToolTip
-						title={"Tarefa"}
+						title={`Tarefa ${ticket.task.finalizedAt ? "[FINALIZADA]" : ""}`}
 						contents={[`Descrição: ${ticket.task.description}`, `Expiração: ${format(parseISO(ticket.task.dueDate), "dd/MM/yyyy HH:mm")}`]}
 					>
 						<IconButton onClick={() => {}}>

@@ -23,7 +23,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         task
     });
 
-    io.to(ticket.status).emit(`ticket${companyId}`, {
+    io.to(ticket.status)
+    .to(ticket.id.toString())
+    .emit(`ticket${companyId}`, {
       action: "update",
       ticket
     });
@@ -56,7 +58,9 @@ export const update = async (
         task
     });
 
-    io.to(ticket.status).emit(`ticket${companyId}`, {
+    io.to(ticket.status)
+    .to(ticket.id.toString())
+    .emit(`ticket${companyId}`, {
         action: "update",
         ticket
     });
@@ -80,7 +84,9 @@ export const finalize = async (
         task
     });
   
-    io.to(ticket.status).emit(`ticket${companyId}`, {
+    io.to(ticket.status)
+    .to(ticket.id.toString())
+    .emit(`ticket${companyId}`, {
         action: "update",
         ticket
     });
