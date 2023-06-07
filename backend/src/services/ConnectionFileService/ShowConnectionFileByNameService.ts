@@ -1,15 +1,17 @@
 import AppError from "../../errors/AppError";
 import ConnectionFiles from "../../database/models/ConnectionFile";
 
-const ShowConnectionFileByNameService = async (
-  name: string | number,
-  companyId: string | number
-): Promise<ConnectionFiles> => {
+interface Request {
+  name: string | number;
+  companyId: string | number;
+}
+
+const ShowConnectionFileByNameService = async ({
+  name,
+  companyId
+}: Request): Promise<ConnectionFiles> => {
   const connectionFile = await ConnectionFiles.findOne({
-    where: {
-      name,
-      companyId
-    }
+    where: { name, companyId }
   });
 
   if (!connectionFile) {

@@ -73,6 +73,7 @@ import { useTranslation } from 'react-i18next'
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import WhatsConfigModal from "../../components/WhatsConfigModal";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -231,6 +232,9 @@ const Connections = () => {
 	const [config, setConfig] = useState(null);
 	const [showDispatchQuantity, setShowDispatchQuantity] = useState(false);
 
+	const [company, setCompany] = useState("");
+	const [companies, setCompanies] = useState([]);
+
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 	}, [pageNumber, searchParam, status]);
@@ -249,7 +253,8 @@ const Connections = () => {
 						pageNumber,
 						connectionFileName,
 						searchParam,
-						status
+						status,
+						companyId: company,
 					}
 				});
 				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
@@ -269,12 +274,14 @@ const Connections = () => {
 			setSearchParam("");
 			setStatus("");
 		}
-	}, [pageNumber, searchParam, connectionFileName, status]);
+	}, [pageNumber, searchParam, connectionFileName, status, company]);
 
 	useEffect(() => {
 		const fetchConnectionFiles = async () => {
 			try {
-				const { data } = await api.get(`/connectionFiles/`);
+				const { data } = await api.get(`/connectionFiles/`, {
+					params: { companyId: company }
+				});
 				setConnectionFiles(data);
 				setLoading(false);
 			} catch (err) {
@@ -283,6 +290,10 @@ const Connections = () => {
 			}
 		};
 
+		fetchConnectionFiles();
+	}, [company]);
+
+	useEffect(() => {
 		const fetchServices = async () => {
 			if (user.companyId !== 1) return;
 			try {
@@ -302,8 +313,19 @@ const Connections = () => {
             }
         }
 
+		const fetchCompanies = async () => {
+			if (user.companyId !== 1) return;
+
+            try {
+                const { data } = await api.get("/company");
+                setCompanies(data.companies);
+            } catch (err) {
+                toastError(err);
+            }
+        }
+
+        fetchCompanies();
         fetchConfig();
-		fetchConnectionFiles();
 		fetchServices();
 	}, []);
 
@@ -331,7 +353,7 @@ const Connections = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, []);
+	}, [user]);
 
 	const handleStartWhatsAppSession = async whatsAppId => {
 		try {
@@ -697,13 +719,27 @@ const Connections = () => {
 		)
 	}
 
+	const handleCompanySelectOption = (newValue) => {
+		setShowDispatchQuantity(false);
+
+        if (newValue === null) {
+            setCompany("");
+        } else {
+            setCompany(newValue.id);
+        }
+    }
+	
+	const renderOptionLabel = (option) => {
+        return option.name;
+    };
+
 	return (
 		<>
 			{ !connectionFileName &&
 				<MainContainer>
 					<MainHeader>
-						<Title>Conexões</Title>
-						{ user.profileId === 1 &&
+						<Title>Conexões{company ? `: ${companies.find(comp => comp.id == company)["alias"]}` : ""}</Title>
+						{ (user.profileId === 1 && !company) &&
 							<IconButton
 								size="small"
 								onClick={() => setShowDispatchQuantity(prevShow => !prevShow)}
@@ -711,10 +747,40 @@ const Connections = () => {
 								<Visibility />
 							</IconButton>
 						}
+						{ (user.superAdmin && user.companyId === 1) &&
+							<Autocomplete
+								style={{
+									margin: "0 10px",
+									width: "300px",
+									display: "inline-flex"
+								}}
+								options={companies}
+								getOptionLabel={renderOptionLabel}
+								onChange={(e, newValue) => handleCompanySelectOption(newValue)}
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label={i18n.t("operations.companies")}
+										InputLabelProps={{ required: true }}
+									/>
+								)}
+							/>
+						}
 					</MainHeader>
 					<Paper className={classes.cardsPaper} variant="outlined">
 						{ connectionFiles && connectionFiles.map(connectionFile => (
-							<Card key={connectionFile.id} className={classes.cardRoot} onClick={() => { history.push(`/Connections/${connectionFile.name}`); }}>
+							<Card 
+								key={connectionFile.id} 
+								className={classes.cardRoot} 
+								onClick={() => { 
+									history.push({
+										pathname: `/Connections/${connectionFile.name}`,
+										// search: '?name=sudheer',
+										state: { company: company },
+									});
+									// history.push(`/Connections/${connectionFile.name}`); 
+								}}
+							>
 								<CardActionArea style={{ height: "100%" }}>
 									{ connectionFile.icon &&
 										<CardMedia
@@ -763,6 +829,7 @@ const Connections = () => {
 						onClose={handleCloseWhatsAppModal}
 						whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
 						connectionFileId={connectionFileId}
+						company={company}
 					/>
 					<WhatsConfigModal
 						open={editWhatsModalOpen}

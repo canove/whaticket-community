@@ -6,10 +6,15 @@ import ListQueuesService from "../services/QueueService/ListQueuesService";
 import ShowQueueService from "../services/QueueService/ShowQueueService";
 import UpdateQueueService from "../services/QueueService/UpdateQueueService";
 
+type IndexQuery = {
+  companyId: string,
+}
+
 export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId: selectedCompany } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const queues = await ListQueuesService(companyId);
+  const queues = await ListQueuesService({ companyId, selectedCompany });
 
   return res.status(200).json(queues);
 };

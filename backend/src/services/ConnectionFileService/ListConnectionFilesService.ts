@@ -1,12 +1,24 @@
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import ConnectionFiles from "../../database/models/ConnectionFile";
 import Whatsapp from "../../database/models/Whatsapp";
 
-const ListConnectionFilesService = async (
-  companyId: number
-): Promise<ConnectionFiles[]> => {
+interface Request {
+  companyId: number;
+  selectedCompany?: string;
+}
+
+const ListConnectionFilesService = async ({
+  companyId,
+  selectedCompany,
+}: Request): Promise<ConnectionFiles[]> => {
+  let whereCondition = null;
+
+  whereCondition = { companyId };
+
+  if (companyId === 1 && selectedCompany) whereCondition = { companyId: selectedCompany };
+
   const connectionFiles = await ConnectionFiles.findAll({
-    where: { companyId },
+    where: whereCondition,
     include: [
       {
         model: Whatsapp,

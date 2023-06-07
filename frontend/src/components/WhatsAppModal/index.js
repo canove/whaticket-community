@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 	  },
 }));
 
-const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
+const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
@@ -102,7 +102,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			if (!whatsAppId) return;
 
 			try {
-				const { data } = await api.get(`whatsapp/${whatsAppId}`);
+				const { data } = await api.get(`whatsapp/${whatsAppId}`, {
+					params: { companyId: company }
+				});
 				setWhatsApp(data);
 				setFlow(data.flowId);
 				setConnectionFile(data.connectionFileId);
@@ -116,7 +118,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		const fetchFlows = async () => {
 			try {
 				const { data } = await api.get('/flows', {
-					params: { official: false }
+					params: { official: false, companyId: company }
 				});
 				setFlows(data);
 			} catch (err) {
@@ -126,7 +128,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 
 		const fetchConnectionFiles = async () => {
 			try {
-				const { data } = await api.get('connectionFiles');
+				const { data } = await api.get('/connectionFiles', {
+					params: { companyId: company }
+				});
 				setConnectionFiles(data);
 			} catch (err) {
 				toastError(err);
@@ -135,6 +139,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 
 		const fetchServices = async () => {
 			if (user.companyId !== 1) return;
+
 			try {
 				const { data } = await api.get(`/firebase/company/${user.companyId}`);
 				setServices(data);
@@ -149,7 +154,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 		fetchFlows();
 		fetchConnectionFiles();
 		fetchServices();
-	}, [whatsAppId, connectionFileId, open]);
+	}, [whatsAppId, connectionFileId, open, company]);
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = {
@@ -157,7 +162,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 			queueIds: selectedQueueIds,
 			flowId: flow ? flow : null,
 			connectionFileId: connectionFile ? connectionFile : null,
-			service: service ? service : null
+			service: service ? service : null,
+			selectedCompany: company ? company : null,
 			// name: phoneNumber.replace("+", ""),
 		};
 
@@ -429,6 +435,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId }) => {
 								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
 									onChange={selectedIds => setSelectedQueueIds(selectedIds)}
+									company={company}
 								/>
 							</DialogContent>
 							<DialogActions>
