@@ -11,7 +11,7 @@ const ShowWhatsAppService = async (
 
   whereCondition = { id };
 
-  if (companyId !== 1) whereCondition = { companyId };
+  if (companyId !== 1) whereCondition = { ...whereCondition, companyId };
 
   const whatsapp = await Whatsapp.findOne({
     where: whereCondition,
