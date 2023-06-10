@@ -61,7 +61,7 @@ const ShowTicketService = async (
       {
         model: Tasks,
         as: "task",
-        attributes: ["id", "description", "dueDate", "userId"],
+        attributes: ["id", "description", "dueDate", "userId", "finalizedAt"],
         required: false,
       },
     ]

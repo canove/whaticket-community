@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const QueueSelect = ({ selectedQueueIds, onChange }) => {
+const QueueSelect = ({ selectedQueueIds, onChange, company }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 	const [queues, setQueues] = useState([]);
@@ -27,7 +27,9 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
 	useEffect(() => {
 		(async () => {
 			try {
-				const { data } = await api.get("/queue");
+				const { data } = await api.get("/queue", {
+					params: { companyId: company }
+				});
 				setQueues(data);
 			} catch (err) {
 				toastError(err);

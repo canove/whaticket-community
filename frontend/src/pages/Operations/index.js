@@ -49,15 +49,21 @@ const Operations = () => {
 
     const [operations, setOperations] = useState([]);
     const [companies, setCompanies] = useState([]);
-    const [company, setCompany] = useState(null);
     const [initialDate, setInitialDate] = useState("");
     const [finalDate, setFinalDate] = useState("");
 
+    const [selectedCompanies, setSelectedCompanies] = useState([]);
+
     const fetchOperations = async () => {
         setLoading(true);
+        setOperations([]);
         try {
             const { data } = await api.get("/operations/", {
-                params: { company, initialDate, finalDate }
+                params: { 
+                    initialDate, 
+                    finalDate, 
+                    companyIds: selectedCompanies.map(company => company.id) 
+                }
             });
             setOperations(data);
         } catch (err) {
@@ -67,12 +73,7 @@ const Operations = () => {
     }
 
     useEffect(() => {
-        fetchOperations();
-    }, []);
-
-    useEffect(() => {
         const fetchCompanies = async () => {
-            setLoading(true);
             try {
                 const { data } = await api.get("/company");
                 setCompanies(data.companies);
@@ -83,124 +84,30 @@ const Operations = () => {
         fetchCompanies();
     }, []);
 
-    const formatTime = (milliseconds) => {
-        let seconds = milliseconds / 1000;
-
-        let minutes = Math.floor(seconds / 60);
-        seconds = Math.floor((seconds / 60 - minutes) * 60);
-
-        let hours = Math.floor(minutes / 60);
-        minutes = Math.floor((minutes / 60 - hours) * 60);
-
-        let secondsString = seconds.toString();
-        let minutesString = minutes.toString();
-        let hoursString = hours.toString();
-
-        if (secondsString.length === 1) {
-        secondsString = `0${secondsString}`;
-        }
-
-        if (minutesString.length === 1) {
-        minutesString = `0${minutesString}`;
-        }
-
-        if (hoursString.length === 1) {
-        hoursString = `0${hoursString}`;
-        }
-
-        return `${hoursString}:${minutesString}:${secondsString}`;
-    };
-
-    const formatToBRL = (quantity) => {
-        if (!quantity) return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0);
-
-        let money = quantity.toFixed(2);
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(money);
-    }
-
-    const getProcessed = (sent, noWhats) => {
-        const s = sent ? parseInt(sent) : 0;
-        const nw = noWhats ? parseInt(noWhats) : 0;
-
-        return s + nw;
-    }
-
-    const getInQueue = (queue) => {
-        return queue ? parseInt(queue) : 0;
-    }
-
-    const getAverageDeliveryTime = (config, connectedWhatsapps, queueCount) => {
-        if (!config) return i18n.t("dashboard.messages.averageDeliveryTime.noConfig");
-    
-        let triggerIntervalCount = 0;
-        let connectedWhatsappsCount = 0;
-    
-        let totalTriggerInterval = 0;
-    
-        connectedWhatsapps.forEach((whats) => {
-          connectedWhatsappsCount += 1;
-          triggerIntervalCount += 1;
-    
-          if (whats.connectionFile && whats.connectionFile.triggerInterval) {
-            totalTriggerInterval += whats.connectionFile.triggerInterval;
-          } else {
-            totalTriggerInterval += config.triggerInterval;
-          }
-        });
-    
-        let queueCountInt = getInQueue(queueCount);
-    
-        if (queueCountInt > 0 && connectedWhatsappsCount === 0) return i18n.t("dashboard.messages.averageDeliveryTime.noConnectedWhatsapps");
-        if (queueCountInt === 0 && connectedWhatsappsCount === 0) return "00:00:00";
-    
-        const triggerInterval = totalTriggerInterval / triggerIntervalCount;
-    
-        const averageDeliveryTimeMinutes =
-          (queueCountInt / connectedWhatsappsCount) * triggerInterval;
-        const averageDeliveryTimeMilliseconds = averageDeliveryTimeMinutes * 60000;
-        const averageDeliveryTime = formatTime(averageDeliveryTimeMilliseconds);
-    
-        return averageDeliveryTime;
-    };
-
-    const getExpectedMonthTotalValue = (billingControls, pricing) => {
-        if (!pricing) return formatToBRL(0);
-
-        const now = new Date();
-        const today = now.getDate();
-      
-        let triggerTotal = 0;
-      
-        for (const billingControl of billingControls) {
-            const graceTriggers = billingControl.usedGraceTriggers;
-            const triggerFee = billingControl.triggerFee;
-            const quantity = billingControl.quantity;
-      
-            triggerTotal = triggerTotal + (triggerFee * (quantity - graceTriggers));
-        }
-        
-        const totalMonthValue = pricing.package ? pricing.package.monthlyFee : 0;
-        const totalTriggerValue = triggerTotal;
-        
-        const expectedTotalMonthValue = ((totalTriggerValue / today) * 30) + totalMonthValue;
-      
-        return formatToBRL(expectedTotalMonthValue);
-    }
-
-    const handleCompanySelectOption = (_, newValue) => {
-        if (newValue === null) {
-            setCompany("");
-        } else {
-            setCompany(newValue.id);
-        }
-      }
-    
     const renderOptionLabel = (option) => {
         return option.name;
     };
 
     const handleFilter = () => {
         fetchOperations();
+    }
+
+    const getActiveWhatsapps = (whatsapps = []) => {
+        const activeWhatsapps = whatsapps.filter(whats => (whats.status === "CONNECTED"));
+
+        return activeWhatsapps.length;
+    }
+    
+    const getSleepingWhatsapps = (whatsapps = []) => {
+        const sleepingWhatsapps = whatsapps.filter(whats => (whats.sleeping));
+
+        return sleepingWhatsapps.length;
+    }
+    
+    const getDisconnectedWhatsapps = (whatsapps = []) => {
+        const disconnectedWhatsapps = whatsapps.filter(whats => (whats.status !== "CONNECTED"));
+
+        return disconnectedWhatsapps.length;
     }
 
     return (
@@ -212,12 +119,14 @@ const Operations = () => {
                         <Autocomplete
                             style={{
                                 margin: "0 10px",
-                                width: "180px",
+                                width: "300px",
                                 display: "inline-flex"
                             }}
+                            limitTags={1}
+                            multiple
                             options={companies}
                             getOptionLabel={renderOptionLabel}
-                            onChange={(e, newValue) => handleCompanySelectOption(e, newValue)}
+                            onChange={(e, newValue) => setSelectedCompanies(newValue)}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -260,23 +169,77 @@ const Operations = () => {
                             <TableCell align="center">{i18n.t("operations.table.qtdeImports")}</TableCell>
                             <TableCell align="center">{i18n.t("operations.table.qtdeProcessed")}</TableCell>
                             <TableCell align="center">{i18n.t("operations.table.inQueue")}</TableCell>
-                            <TableCell align="center">{i18n.t("operations.table.averageDeliveryTime")}</TableCell>
-                            <TableCell align="center">{i18n.t("operations.table.expectedMonthValue")}</TableCell>
+                            <TableCell align="center">{"Números Ativos"}</TableCell>
+                            <TableCell align="center">{"Números Pausados"}</TableCell>
+                            <TableCell align="center">{"Números Desconectados"}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <>
+                            {loading && <TableRowSkeleton columns={7} />}
                             {operations && operations.map((operation) => (
-                                <TableRow key={operation.company.id}>
-                                <TableCell align="center">{operation.company.name}</TableCell>
-                                <TableCell align="center">{operation.fileRegisters.total}</TableCell>
-                                <TableCell align="center">{getProcessed(operation.fileRegisters.sent, operation.fileRegisters.noWhats)}</TableCell>
-                                <TableCell align="center">{getInQueue(operation.fileRegisters.queue)}</TableCell>
-                                <TableCell align="center">{getAverageDeliveryTime(operation.company.config, operation.company.whatsapps, operation.fileRegisters.queue)}</TableCell>
-                                <TableCell align="center">{getExpectedMonthTotalValue(operation.company.billingControls, operation.company.pricing)}</TableCell>
+                                <TableRow key={operation.company.id} hover>
+                                    <TableCell align="center">{operation.company.name}</TableCell>
+                                    <TableCell align="center">{operation.registers.total || 0}</TableCell>
+                                    <TableCell align="center">{operation.registers.processed || 0}</TableCell>
+                                    <TableCell align="center">{operation.registers.queue || 0}</TableCell>
+                                    <TableCell align="center">{getActiveWhatsapps(operation.company.whatsapps)}</TableCell>
+                                    <TableCell align="center">{getSleepingWhatsapps(operation.company.whatsapps)}</TableCell>
+                                    <TableCell 
+                                        align="center"
+                                        style={{ 
+                                            backgroundColor: (getDisconnectedWhatsapps(operation.company.whatsapps) > 0) ? "#E9967A" : null
+                                        }}
+                                    >
+                                        {getDisconnectedWhatsapps(operation.company.whatsapps)}
+                                    </TableCell>
                                 </TableRow>
                             ))}
-                            {loading && <TableRowSkeleton columns={6} />}
+                            <TableRow>
+                                <TableCell align="center">{"TOTAL"}</TableCell>
+                                <TableCell align="center">{/* Qtde. Importados */}
+                                    {operations && operations.reduce((accumulator, operation) => {
+                                        const value = operation.registers.total || 0
+
+                                        return accumulator + value;
+                                    }, 0)}
+                                </TableCell>
+                                <TableCell align="center">{/* Qtde. Processados */}
+                                    {operations && operations.reduce((accumulator, operation) => {
+                                        const value = operation.registers.processed || 0;
+
+                                        return accumulator + value;
+                                    }, 0)}
+                                </TableCell>
+                                <TableCell align="center">{/* Qtde. na Fila */}
+                                    {operations && operations.reduce((accumulator, operation) => {
+                                        const value = operation.registers.queue || 0;
+
+                                        return accumulator + value;
+                                    }, 0)}
+                                </TableCell>
+                                <TableCell align="center">{/* Números Ativos */}
+                                    {operations && operations.reduce((accumulator, operation) => {
+                                        const value = getActiveWhatsapps(operation.company.whatsapps);
+
+                                        return accumulator + value;
+                                    }, 0)}
+                                </TableCell>
+                                <TableCell align="center">{/* Números Pausados */}
+                                    {operations && operations.reduce((accumulator, operation) => {
+                                        const value = getSleepingWhatsapps(operation.company.whatsapps);
+
+                                        return accumulator + value;
+                                    }, 0)}
+                                </TableCell>
+                                <TableCell align="center">{/* Números Desconectados */}
+                                    {operations && operations.reduce((accumulator, operation) => {
+                                        const value = getDisconnectedWhatsapps(operation.company.whatsapps);
+
+                                        return accumulator + value;
+                                    }, 0)}
+                                </TableCell>
+                            </TableRow>
                         </>
                     </TableBody>
                 </Table>

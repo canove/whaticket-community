@@ -263,7 +263,7 @@ const ListTicketsService = async ({
     includeCondition.push({
       model: Tasks,
       as: "task",
-      attributes: ["id", "description", "dueDate", "userId"],
+      attributes: ["id", "description", "dueDate", "userId", "finalizedAt"],
       where: whereConditionTask,
       required: true,
     });
@@ -271,7 +271,7 @@ const ListTicketsService = async ({
     includeCondition.push({
       model: Tasks,
       as: "task",
-      attributes: ["id", "description", "dueDate", "userId"],
+      attributes: ["id", "description", "dueDate", "userId", "finalizedAt"],
       required: false,
     });
   }

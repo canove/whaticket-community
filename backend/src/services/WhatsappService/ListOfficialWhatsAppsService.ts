@@ -15,6 +15,7 @@ interface Request {
   connectionName?: string;
   limit?: string;
   officialWhatsappId?: string;
+  selectedCompany?: string;
 }
 
 interface Response {
@@ -33,13 +34,15 @@ const ListWhatsAppsService = async ({
   status,
   connectionName,
   limit = "10",
-  officialWhatsappId
+  officialWhatsappId,
+  selectedCompany,
 }: Request): Promise<Response> => {
   let whereCondition = null;
+  const usedCompany = (companyId === 1 && selectedCompany) ? selectedCompany : companyId;
 
   whereCondition = {
     official: official === "true",
-    companyId,
+    companyId: usedCompany,
     deleted: false,
   }
 
@@ -47,10 +50,10 @@ const ListWhatsAppsService = async ({
 
   let connectionFileId = null;
   if (connectionFileName && connectionFileName !== "No Category") {
-    const connectionFile = await ShowConnectionFileByNameService(
-      connectionFileName,
-      companyId
-    );
+    const connectionFile = await ShowConnectionFileByNameService({
+      name: connectionFileName,
+      companyId: usedCompany
+    });
 
     connectionFileId = connectionFile ? connectionFile.id : null
 
