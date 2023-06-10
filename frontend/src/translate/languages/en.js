@@ -1458,6 +1458,7 @@ const messages = {
         ERR_TICKET_ACCEPTED_BY_OTHER_USER: "This ticket was accepted by other user. You do not have permission to send this message.",
         ERR_INVALID_DUE_DATE: "The due date only accept dates from now to 7 days.",
         ERR_DUE_DATE_REQUIRED: "Due date required.",
+        ERR_NO_AVAILABLE_WHATS_FOUND: "No available whatsapp found.",
       },
     },
   },
