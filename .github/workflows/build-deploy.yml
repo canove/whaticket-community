@@ -21,6 +21,7 @@ jobs:
 
       - name: Build and push Docker image
         env:
+          REGION: us-east-1
           ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
           ECR_REPOSITORY: whatsapp-portal-api
           IMAGE_TAG: ${{ github.sha }}
