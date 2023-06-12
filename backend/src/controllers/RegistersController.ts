@@ -46,7 +46,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const reports = await ListRegistersService({ fileId, date, companyId, initialDate, finalDate, categoryId });
 
-  const category = await DashboardCategoryService({ companyId, date, categoryId });
+  const category = await DashboardCategoryService({ companyId, date, categoryId, initialDate, finalDate });
 
   // const connectedWhatsapps = await GetConnectedWhatsAppsService(companyId);
 

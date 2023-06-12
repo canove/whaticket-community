@@ -7,79 +7,94 @@ import Whatsapp from "../../database/models/Whatsapp";
 
 interface Request {
   companyId: string | number;
-  date: string;
-  categoryId: string;
+  categoryId?: string;
+  date?: string;
+  initialDate?: string;
+  finalDate?: string;
 }
 
 const DashboardCategoryService = async ({
   companyId,
   date,
-  categoryId
+  categoryId,
+  initialDate, 
+  finalDate,
 }: Request): Promise<Category[]> => {
-  let whereCondition = null;
+  let whereConditionTicket = null;
 
-  whereCondition = { companyId };
+  whereConditionTicket = { companyId };
 
   if (date) {
-    whereCondition = {
-      ...whereCondition,
-      createdAt: {
+    whereConditionTicket = {
+      ...whereConditionTicket,
+      finalizedAt: {
         [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))]
       },
     };
   }
 
-  let ticketInclude = null;
+  // if (initialDate && finalDate) {
+  //   const i = new Date(+startOfDay(parseISO(initialDate)));
+  //   const f = new Date(+endOfDay(parseISO(finalDate)));
+
+  //   const thirtyDays = 31 * 24 * 60 * 60 * 1000; // dia * horas * minutos * segundos * milisegundos
+
+  //   if (!(f.getTime() - i.getTime() >= thirtyDays)) {
+  //     whereConditionTicket = {
+  //       ...whereConditionTicket,
+  //       finalizedAt: {
+  //         [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+  //       },
+  //     };
+  //   }
+  // }
+
+  let ticketInclude = [];
   
   if (categoryId) {
-    ticketInclude = {
+    ticketInclude = [
+      {
+        model: Whatsapp,
+        as: "whatsapp",
+        where: { connectionFileId: categoryId },
+        required: true,
+      }
+    ]
+  }
+
+  if (date) {
+    const categories = await Category.findAll({
+      where: { companyId },
+      attributes: ["id", "name"],
       include: [
         {
-          model: Whatsapp,
-          as: "whatsapp",
-          where: { connectionFileId: categoryId },
+          model: Ticket,
+          as: "tickets",
+          where: whereConditionTicket,
+          attributes: ["id"],
+          include: ticketInclude,
           required: true,
         }
-      ]
-    }
-  }
-
-  const categories = await Category.findAll({ where: whereCondition });
-  const arrayQuantity = [];
-
-  for (const category of categories) {
-    const { count } = await Ticket.findAndCountAll({
-      where: { categoryId: category.id },
-      ...ticketInclude
+      ],
     });
 
-    if (count > 0) {
-      arrayQuantity.push({ count, name: category.name });
-    }
+    const result = [];
+
+    for (const category of categories) {
+      const tickets = category.tickets;
+
+      const count = tickets.length;
+      const name = category.name;
+
+      if (count === 0) continue;
+
+      result.push({ count, name });
+    } 
+
+    return result;
   }
 
-  if (arrayQuantity.length === 0) {
-    return [];
-  }
-
-  if (arrayQuantity.length >= 3) {
-    const response = [];
-
-    for (const quantity of arrayQuantity) {
-      if (response.length >= 3) {
-        for (const res of response) {
-          if (quantity.count > res.count) {
-            const index = response.indexOf(res);
-            response[index] = quantity;
-          }
-        }
-      } else {
-        response.push(quantity);
-      }
-    }
-  }
-
-  return arrayQuantity;
+  return [];
 };
 
 export default DashboardCategoryService;
