@@ -18,10 +18,11 @@ jobs:
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          region: us-east-1
 
       - name: Build and push Docker image
         env:
-          REGION: us-east-1
           ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
           ECR_REPOSITORY: whatsapp-portal-api
           IMAGE_TAG: ${{ github.sha }}
