@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@master
         with:
           role-to-assume: arn:aws:iam::387274513997:oidc-provider/token.actions.githubusercontent.com
           aws-region: us-east-1
