@@ -21,11 +21,11 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          ECR_REGISTRY: whatsapp-portal-api:latest 387274513997.dkr.ecr.us-east-2.amazonaws.com
+          ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
           ECR_REPOSITORY: whatsapp-portal-api
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ../../backend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: SSH into EC2 instance
@@ -35,7 +35,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker stop my-app || true
-            docker rm my-app || true
+            docker stop whatsapp-api || true
+            docker rm whatsapp-api || true
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            docker run -d --name my-app -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker run -d --name whatsapp-api -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
