@@ -3,11 +3,11 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
