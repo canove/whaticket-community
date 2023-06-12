@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: homolog
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
