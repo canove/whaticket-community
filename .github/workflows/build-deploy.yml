@@ -10,13 +10,18 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2 # More information on this action can be found below in the 'AWS Credentials' section
-        with:
-          aws-region: us-east-1
+      - name: Set up AWS CLI
+        run: |
+          echo "[default]" >> $HOME/.aws/credentials
+          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $HOME/.aws/credentials
+          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $HOME/.aws/credentials
+          chmod 600 $HOME/.aws/credentials
+
+      - name: Configure AWS region
+        run: aws configure set region ${{ secrets.AWS_REGION }}
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
