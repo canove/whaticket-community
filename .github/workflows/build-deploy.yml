@@ -113,4 +113,4 @@ jobs:
             docker stop whatsapp-portal-frontend || true
             docker rm whatsapp-portal-frontend || true
             docker pull 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
-            docker run -d --name whatsapp-portal-frontend -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
+            docker run -d -e REACT_APP_BACKEND_URL=secrets.REACT_APP_BACKEND_URL -e REACT_APP_WORKER_URL=secrets.REACT_APP_WORKER_URL -e REACT_APP_SQS_URL=secrets.REACT_APP_SQS_URL --name whatsapp-portal-frontend -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
