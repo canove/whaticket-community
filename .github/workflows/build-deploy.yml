@@ -41,6 +41,7 @@ jobs:
           ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
           ECR_REPOSITORY: whatsapp-portal-api
           IMAGE_TAG: ${{ github.sha }}
+          DB_HOST: ${{ env.DB_HOST }}
         run: |
           docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}} ./backend
           docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
