@@ -12,7 +12,8 @@ RUN npm install --legacy-peer-deps
 RUN npm install react-scripts@3.3.1 -g
 RUN react-scripts --max_old_space_size=4096 build
 
-#FROM nginx:alpine
+FROM nginx:alpine
+RUN apk add --update nodejs npm
 COPY .docker/nginx /etc/nginx/
 
 COPY --from=build-deps /app/build /usr/share/nginx/html
