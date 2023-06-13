@@ -12,6 +12,14 @@ jobs:
   build-and-deploy-api:
     runs-on: self-hosted
     environment: homolog
+    env:
+      ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
+      ECR_REPOSITORY: whatsapp-portal-api
+      IMAGE_TAG: ${{ github.sha }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_USER: ${{ secrets.DB_USER }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -36,14 +44,6 @@ jobs:
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Build and push Docker image
-        env:
-          ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
-          ECR_REPOSITORY: whatsapp-portal-api
-          IMAGE_TAG: ${{ github.sha }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_PASS: ${{ secrets.DB_PASS }}
-          DB_USER: ${{ secrets.DB_USER }}
         run: |
           docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}} ./backend
           docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
@@ -62,6 +62,18 @@ jobs:
   build-and-deploy-frontend:
       runs-on: self-hosted
       environment: homolog
+      needs: build-and-deploy-api
+      env:
+        ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
+        ECR_REPOSITORY: whatsapp-portal-frontend
+        IMAGE_TAG: ${{ github.sha }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_PASS: ${{ secrets.DB_PASS }}
+        DB_USER: ${{ secrets.DB_USER }}
+        REACT_APP_BACKEND_URL: ${{ env.REACT_APP_BACKEND_URL }}
+        REACT_APP_WORKER_URL: ${{ env.REACT_APP_WORKER_URL }}
+        REACT_APP_SQS_URL: ${{ env.REACT_APP_SQS_URL }}
       steps:
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
@@ -86,14 +98,6 @@ jobs:
             password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
         - name: Build and push Docker image
-          env:
-            ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
-            ECR_REPOSITORY: whatsapp-portal-frontend
-            IMAGE_TAG: ${{ github.sha }}
-            DB_HOST: ${{ secrets.DB_HOST }}
-            DB_NAME: ${{ secrets.DB_NAME }}
-            DB_PASS: ${{ secrets.DB_PASS }}
-            DB_USER: ${{ secrets.DB_USER }}
           run: |
             docker build -t 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}} ./frontend
             docker push 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}}
@@ -108,4 +112,4 @@ jobs:
               docker stop whatsapp-api || true
               docker rm whatsapp-api || true
               docker pull 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
-              docker run -d -e --name whatsapp-api -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
+              docker run -d --name whatsapp-api -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
