@@ -10,14 +10,6 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   build-and-deploy-api:
-    env:
-      ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
-      ECR_REPOSITORY: whatsapp-portal-api
-      IMAGE_TAG: ${{ github.sha }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_PASS: ${{ secrets.DB_PASS }}
-      DB_USER: ${{ secrets.DB_USER }}
     runs-on: self-hosted
     environment: homolog
     steps:
@@ -62,8 +54,8 @@ jobs:
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASS=${{ secrets.DB_PASS }} \
             -e DB_NAME=${{ secrets.DB_NAME }} \ 
-            -e BACKEND_URL=${{ env.BACKEND_URL }} \ 
-            -e FRONTEND_URL=${{ env.FRONTEND_URL }} \ 
+            -e BACKEND_URL=${{ vars.BACKEND_URL }} \ 
+            -e FRONTEND_URL=${{ vars.FRONTEND_URL }} \ 
             --name whatsapp-api -p 8443:3000 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
   build-and-deploy-frontend:
     env:
