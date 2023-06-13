@@ -67,6 +67,7 @@ jobs:
             JWT_SECRET=${{ vars.JWT_SECRET }} -e \
             JWT_REFRESH_SECRET=${{ vars.JWT_REFRESH_SECRET }} -e \
             ENV_AWS_REGION=${{ vars.ENV_AWS_REGION }} -e \
+            AWS_REGION=${{ secrets.ENV_AWS_REGION }} -e \
             ENV_AWS_ACCOUNT_ID= ${{ vars.ENV_AWS_ACCOUNT_ID }} -e \
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e \
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e \
