@@ -19,8 +19,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
     const io = getIO();
     io.emit(`task${companyId}`, {
-        action: "update",
-        task
+        action: "create",
+        ticket
     });
 
     io.to(ticket.status)
@@ -55,7 +55,7 @@ export const update = async (
     const io = getIO();
     io.emit(`task${companyId}`, {
         action: "update",
-        task
+        ticket
     });
 
     io.to(ticket.status)
@@ -80,8 +80,8 @@ export const finalize = async (
   
     const io = getIO();
     io.emit(`task${companyId}`, {
-        action: "update",
-        task
+        action: "delete",
+        ticket
     });
   
     io.to(ticket.status)
