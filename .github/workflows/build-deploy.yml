@@ -12,15 +12,15 @@ jobs:
   build-and-deploy-api:
     runs-on: self-hosted
     environment: homolog
-    env:
-      ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
-      ECR_REPOSITORY: whatsapp-portal-api
-      IMAGE_TAG: ${{ github.sha }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_PASS: ${{ secrets.DB_PASS }}
-      DB_USER: ${{ secrets.DB_USER }}
     steps:
+      env:
+        ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
+        ECR_REPOSITORY: whatsapp-portal-api
+        IMAGE_TAG: ${{ github.sha }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_PASS: ${{ secrets.DB_PASS }}
+        DB_USER: ${{ secrets.DB_USER }}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -63,18 +63,19 @@ jobs:
       runs-on: self-hosted
       environment: homolog
       needs: build-and-deploy-api
-      env:
-        ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
-        ECR_REPOSITORY: whatsapp-portal-frontend
-        IMAGE_TAG: ${{ github.sha }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_PASS: ${{ secrets.DB_PASS }}
-        DB_USER: ${{ secrets.DB_USER }}
-        REACT_APP_BACKEND_URL: ${{ env.REACT_APP_BACKEND_URL }}
-        REACT_APP_WORKER_URL: ${{ env.REACT_APP_WORKER_URL }}
-        REACT_APP_SQS_URL: ${{ env.REACT_APP_SQS_URL }}
       steps:
+        env:
+          ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
+          ECR_REPOSITORY: whatsapp-portal-frontend
+          IMAGE_TAG: ${{ github.sha }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_USER: ${{ secrets.DB_USER }}
+          REACT_APP_BACKEND_URL: ${{ env.REACT_APP_BACKEND_URL }}
+          REACT_APP_WORKER_URL: ${{ env.REACT_APP_WORKER_URL }}
+          REACT_APP_SQS_URL: ${{ env.REACT_APP_SQS_URL }}
+
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
           with:
