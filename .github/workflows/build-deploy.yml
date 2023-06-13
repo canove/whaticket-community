@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-
+    environment: main
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
