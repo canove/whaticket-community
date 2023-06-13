@@ -264,9 +264,10 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    if (!loading) {
+    const delayDebounceFn = setTimeout(() => {
       handleFilter();
-    }
+    }, 1000);
+    return () => clearTimeout(delayDebounceFn);
   }, [fileId, date, initialDate, finalDate, categoryId]);
 
   useEffect(() => {
