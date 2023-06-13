@@ -23,7 +23,7 @@ RUN react-scripts --max_old_space_size=4096 build
 EXPOSE 80
 
 #ENTRYPOINT ["dumb-init", "--"]
-CMD node app/src/server.js
+CMD ["npm", "start"]
 
 #COPY .docker/add-env-vars.sh /docker-entrypoint.d/01-add-env-vars.sh
 #RUN chmod +x /docker-entrypoint.d/01-add-env-vars.sh
