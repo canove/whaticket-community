@@ -57,6 +57,7 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import SmsFailedIcon from '@material-ui/icons/SmsFailed';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -306,6 +307,9 @@ function getIcon(icon) {
   }
   else if (icon === "ShoppingCartIcon") {
         return <ShoppingCartIcon />
+  }
+  else if (icon === "SmsFailedIcon") {
+    return <SmsFailedIcon />; 
   }
   else {
     return null;

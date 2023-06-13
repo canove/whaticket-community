@@ -1459,6 +1459,7 @@ const messages = {
         ERR_INVALID_DUE_DATE: "The due date only accept dates from now to 7 days.",
         ERR_DUE_DATE_REQUIRED: "Due date required.",
         ERR_NO_AVAILABLE_WHATS_FOUND: "No available whatsapp found.",
+        ERR_DATE_FILTER_REQUIRED: "Date filter is required.",
       },
     },
   },

@@ -11,6 +11,10 @@ import AppError from "../errors/AppError";
 import { getIO } from "../libs/socket";
 import DeleteMessageService from "../services/MessageServices/DeleteMessageService";
 import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService";
+import Ticket from "../database/models/Ticket";
+import { Op } from "sequelize";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
+import Whatsapp from "../database/models/Whatsapp";
 
 type IndexQuery = {
   pageNumber: string;
@@ -156,4 +160,67 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
   });
 
   return res.status(200).json("OK");
+};
+
+type ErrorQuery = {
+  pageNumber: string,
+  date: string, 
+  ticketId: string,
+}
+
+export const errorMessages = async (req: Request, res: Response): Promise<Response> => {
+  const { date } = req.query as ErrorQuery;
+  const { companyId } = req.user;
+
+  if (!date) throw new AppError("ERR_DATE_FILTER_REQUIRED");
+
+  let whereCondition = null;
+
+  whereCondition = {
+    ack: 5,
+    fromMe: true,
+    createdAt: { [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))] },
+  };
+
+  const messages = await Message.findAll({
+    where: whereCondition,
+    include: [
+      {
+        model: Ticket,
+        as: "ticket",
+        where: { companyId },
+        required: true,
+        include: [
+          {
+            model: Whatsapp,
+            as: "whatsapp",
+            where: { status: "CONNECTED" },
+            required: true
+          }
+        ]
+      }
+    ],
+    order: [["createdAt", "DESC"]]
+  });
+
+  return res.json(messages);
+};
+
+export const errorMessagesResend = async (req: Request, res: Response): Promise<Response> => {
+  const { messageIds } = req.body;
+
+  await Message.update(
+    {
+      ack: 0,
+      resendQuantity: 0,
+    }, 
+    {
+      where: { 
+        id: messageIds,
+        ack: 5,
+      }
+    }
+  );
+
+  return res.json("OK");
 };
