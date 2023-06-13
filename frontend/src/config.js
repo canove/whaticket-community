@@ -1,6 +1,5 @@
 function getConfig(name, defaultValue=null) {
     // If inside a docker container, use window.ENV
-    console.log('AQUIIII', window?.ENV);
     if( window.ENV !== undefined ) {
         return window.ENV[name] || defaultValue;
     }
