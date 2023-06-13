@@ -29,14 +29,21 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Login to ECR
+        uses: docker/login-action@v2
+        with:
+          registry: 387274513997.dkr.ecr.us-east-2.amazonaws.com
+          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Build and push Docker image
         env:
           ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
           ECR_REPOSITORY: whatsapp-portal-api
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest ./backend
-          docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest
+          docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}} ./backend
+          docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
 
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@master
@@ -47,5 +54,5 @@ jobs:
           script: |
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
-            docker pull ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest
-            docker run -d --name whatsapp-api -p 80:80 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest
+            docker pull ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+            docker run -d --name whatsapp-api -p 80:80 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
