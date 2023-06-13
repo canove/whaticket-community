@@ -52,7 +52,7 @@ jobs:
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@master
         with:
-          host: ec2-3-142-132-4.us-east-2.compute.amazonaws.com
+          host: ec2-3-19-137-63.us-east-2.compute.amazonaws.com
           username: ubuntu
           key: ${{secrets.KEY}}
           script: |
