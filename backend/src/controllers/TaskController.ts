@@ -3,7 +3,7 @@ import { getIO } from "../libs/socket";
 import CreateTaskService from "../services/TaskServices/CreateTaskService";
 import ShowTaskService from "../services/TaskServices/ShowTaskService";
 import UpdateTaskService from "../services/TaskServices/UpdateTaskService";
-import FinalzeTaskService from "../services/TaskServices/FinalizeTaskService";
+import FinalizeTaskService from "../services/TaskServices/FinalizeTaskService";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
     const { description, dueDate, ticketId } = req.body;
@@ -23,7 +23,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         task
     });
 
-    io.to(ticket.status).emit(`ticket${companyId}`, {
+    io.to(ticket.status)
+    .to(ticket.id.toString())
+    .emit(`ticket${companyId}`, {
       action: "update",
       ticket
     });
@@ -56,7 +58,9 @@ export const update = async (
         task
     });
 
-    io.to(ticket.status).emit(`ticket${companyId}`, {
+    io.to(ticket.status)
+    .to(ticket.id.toString())
+    .emit(`ticket${companyId}`, {
         action: "update",
         ticket
     });
@@ -72,7 +76,7 @@ export const finalize = async (
     const { taskId } = req.params;
     const { companyId } = req.user;
   
-    const { task, ticket } = await FinalzeTaskService({ taskId, ticketId, companyId });
+    const { task, ticket } = await FinalizeTaskService({ taskId, ticketId, companyId });
   
     const io = getIO();
     io.emit(`task${companyId}`, {
@@ -80,7 +84,9 @@ export const finalize = async (
         task
     });
   
-    io.to(ticket.status).emit(`ticket${companyId}`, {
+    io.to(ticket.status)
+    .to(ticket.id.toString())
+    .emit(`ticket${companyId}`, {
         action: "update",
         ticket
     });

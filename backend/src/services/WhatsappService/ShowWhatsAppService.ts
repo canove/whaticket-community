@@ -5,10 +5,16 @@ import Flows from "../../database/models/Flows";
 
 const ShowWhatsAppService = async (
   id: string | number,
-  companyId: string | number
+  companyId: string | number,
 ): Promise<Whatsapp> => {
+  let whereCondition = null;
+
+  whereCondition = { id };
+
+  if (companyId !== 1) whereCondition = { ...whereCondition, companyId };
+
   const whatsapp = await Whatsapp.findOne({
-    where: { id, companyId },
+    where: whereCondition,
     include: [
       {
         model: Queue,

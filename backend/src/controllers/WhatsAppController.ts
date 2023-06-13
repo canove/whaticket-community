@@ -57,6 +57,7 @@ interface WhatsappData {
   statusCallbackUrl?: string;
   callbackAuthorization?: string;
   useGroup?: boolean;
+  selectedCompany?: string | number;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -90,13 +91,16 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     messageCallbackUrl,
     statusCallbackUrl,
     callbackAuthorization,
-    useGroup
+    useGroup,
+    selectedCompany,
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
   const { companyId } = req.user;
 
-  const availableWhatsapps = await CheckAvailableWhatsapps(companyId);
+  const usedCompany = (companyId === 1 && selectedCompany) ? selectedCompany : companyId;
+
+  const availableWhatsapps = await CheckAvailableWhatsapps(usedCompany);
 
   if (!availableWhatsapps) throw new AppError("ERR_MAX_WHATSAPPS_REACHED");
 
@@ -138,7 +142,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     facebookPhoneNumberId,
     facebookBusinessId,
     phoneNumber,
-    companyId,
+    companyId: usedCompany,
     flowId,
     connectionFileId,
     business,
@@ -146,7 +150,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     messageCallbackUrl,
     statusCallbackUrl,
     callbackAuthorization,
-    useGroup
+    useGroup,
   });
 
   if (!official) StartWhatsAppSession(whatsapp, null);
@@ -586,10 +590,11 @@ type ListQuery = {
   connectionName?: string;
   limit?: string;
   officialWhatsappId?: string;
+  companyId?: string;
 };
 
 export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official, pageNumber, connectionFileName, searchParam, status, connectionName, limit, officialWhatsappId } = req.query as ListQuery;
+  const { official, pageNumber, connectionFileName, searchParam, status, connectionName, limit, officialWhatsappId, companyId: selectedCompany } = req.query as ListQuery;
   const { companyId } = req.user;
 
   const { whatsapps, count, hasMore, connectionFileId } = await ListOfficialWhatsAppsService({
@@ -601,7 +606,8 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
     status,
     connectionName,
     limit,
-    officialWhatsappId
+    officialWhatsappId,
+    selectedCompany,
   });
 
   return res.status(200).json({

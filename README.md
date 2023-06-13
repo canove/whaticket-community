@@ -524,4 +524,14 @@ This project is not affiliated, associated, authorized, endorsed by, or in any w
 
 
 ## Deploy command
-docker buildx build --platform linux/amd64 -t whatsapp-portal-api . 
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 902218626431.dkr.ecr.us-east-1.amazonaws.com
+
+sudo docker buildx build --platform linux/amd64 -t whatsapp-portal-api . 
+docker tag whatsapp-portal-api 902218626431.dkr.ecr.us-east-1.amazonaws.com/whatsapp-portal-api:latest
+docker push 902218626431.dkr.ecr.us-east-1.amazonaws.com/whatsapp-portal-api:latest;
+
+
+sudo docker buildx build --platform linux/amd64 -t whatsapp-portal-frontend . 
+docker tag whatsapp-portal-frontend 902218626431.dkr.ecr.us-east-1.amazonaws.com/whatsapp-portal-frontend:latest
+docker push 902218626431.dkr.ecr.us-east-1.amazonaws.com/whatsapp-portal-frontend:latest;
+

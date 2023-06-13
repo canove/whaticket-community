@@ -58,7 +58,7 @@ const CreateWhatsAppService = async ({
   messageCallbackUrl,
   statusCallbackUrl,
   callbackAuthorization,
-  useGroup
+  useGroup,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()

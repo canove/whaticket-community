@@ -107,6 +107,7 @@ const menuTranslation = {
   "Satisfaction Survey": "Pesquisa de Satisfação",
   "Packages": "Pacotes",
   "Batch": "batch.title",
+  "Operations": "operations.title",
 }
 
 function getIcon(icon, isParent) {

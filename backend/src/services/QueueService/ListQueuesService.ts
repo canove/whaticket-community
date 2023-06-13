@@ -1,10 +1,22 @@
 import Queue from "../../database/models/Queue";
 
-const ListQueuesService = async (
-  companyId: string | number
-): Promise<Queue[]> => {
+interface Request {
+  companyId: string | number;
+  selectedCompany: string;
+}
+
+const ListQueuesService = async ({
+  companyId,
+  selectedCompany,
+}: Request): Promise<Queue[]> => {
+  let whereCondition = null;
+
+  whereCondition = { companyId };
+
+  if (companyId === 1 && selectedCompany) whereCondition = { companyId: selectedCompany };
+
   const queues = await Queue.findAll({
-    where: { companyId },
+    where: whereCondition,
     order: [["name", "ASC"]],
     include: [
       {

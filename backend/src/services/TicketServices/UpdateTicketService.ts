@@ -9,7 +9,7 @@ import AppError from "../../errors/AppError";
 import Message from "../../database/models/Message";
 import TicketChanges from "../../database/models/TicketChanges";
 import ShowTaskService from "../TaskServices/ShowTaskService";
-import FinalzeTaskService from "../TaskServices/FinalizeTaskService";
+import FinalizeTaskService from "../TaskServices/FinalizeTaskService";
 
 interface TicketData {
   status?: string;
@@ -62,7 +62,7 @@ const UpdateTicketService = async ({
   }
 
   if (ticket.taskId) {
-    await FinalzeTaskService({ taskId: ticket.taskId, ticketId: ticket.id, companyId: ticket.companyId });
+    await FinalizeTaskService({ taskId: ticket.taskId, ticketId: ticket.id, companyId: ticket.companyId });
   }
 
   console.log("update ticket updateticketservice 43");
