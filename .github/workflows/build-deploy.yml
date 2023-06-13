@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-    environment: master
+    environment: homolog
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -50,7 +50,7 @@ jobs:
         with:
           host: ec2-18-218-140-72.us-east-2.compute.amazonaws.com
           username: ubuntu
-          key: ${{secrets.SSH_PRIVATE_KEY}}
+          key: ${{secrets.KEY}}
           script: |
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
