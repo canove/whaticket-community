@@ -3,6 +3,7 @@ import Message from "../../database/models/Message";
 import Ticket from "../../database/models/Ticket";
 import Whatsapp from "../../database/models/Whatsapp";
 import AppError from "../../errors/AppError";
+import { getIO } from "../../libs/socket";
 
 const DeleteMessageService =
  async (messageId: string): Promise<Message> => {
@@ -29,6 +30,8 @@ const DeleteMessageService =
 
   const { ticket } = message;
 
+  await message.update({ isDeleted: true });
+
   try {
     const DELETE_MESSAGE_URL = "http://omni.kankei.com.br:8080/delete";
 
@@ -37,14 +40,28 @@ const DeleteMessageService =
         "chatid": message.id
     }
 
-    const response = await axios.post(DELETE_MESSAGE_URL, payload, {
+    axios.post(DELETE_MESSAGE_URL, payload, {
         headers: {
             "api-key": process.env.WPPNOF_API_TOKEN,
             "sessionkey": process.env.WPPNOF_SESSION_KEY,
         }
-    });
+    }).then(async (response) => {
+      await message.update({ isDeleted: true });
 
-    await message.update({ isDeleted: true });
+      const io = getIO();
+      io.to(message.ticketId.toString()).emit("appMessage", {
+        action: "update",
+        message
+      });
+    }).catch(async (err) => {
+      await message.update({ isDeleted: false });
+
+      const io = getIO();
+      io.to(message.ticketId.toString()).emit("appMessage", {
+        action: "update",
+        message
+      });
+    });
   } catch (err) {
     throw new AppError("ERR_DELETE_WAPP_MSG");
   }
