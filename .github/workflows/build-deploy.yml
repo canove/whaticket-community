@@ -50,7 +50,6 @@ jobs:
         with:
           host: ec2-3-142-132-4.us-east-2.compute.amazonaws.com
           username: ubuntu
-          port: 22
           key: ${{secrets.KEY}}
           script: |
             docker stop whatsapp-api || true
