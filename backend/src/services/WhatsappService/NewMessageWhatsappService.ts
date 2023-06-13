@@ -150,7 +150,8 @@ const verifyMessage = async (
     mediaType: msg.type,
     read: msg.fromMe,
     companyId: ticket.companyId,
-    author: contactName ? contactName : "DESCONHECIDO"
+    author: contactName ? contactName : "DESCONHECIDO",
+    dispatcher: (ticket.status === "dispatcher") ? true : false, 
   };
 
   await ticket.update({ lastMessage: msg.body, lastMessageFromMe: msg.fromMe });
@@ -557,7 +558,8 @@ const verifyMediaMessage = async (
     mediaUrl: mediaUrl,
     mediaType: type,
     companyId: ticket.companyId,
-    author: contactName ? contactName : "DESCONHECIDO"
+    author: contactName ? contactName : "DESCONHECIDO",
+    dispatcher: (ticket.status === "dispatcher") ? true : false, 
   };
 
   await ticket.update({ lastMessage: msg.file, lastMessageFromMe: msg.fromMe });

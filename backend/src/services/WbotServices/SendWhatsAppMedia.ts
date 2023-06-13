@@ -206,6 +206,7 @@ const SendWhatsAppMedia = async ({
               bot: ticket.status == 'inbot',
               companyId,
               userId: userId ? userId : ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
+              dispatcher: (ticket.status === "dispatcher") ? true : false, 
             };
           
             await ticket.update({ lastMessage: body, lastMessageFromMe: true });
@@ -248,6 +249,7 @@ const SendWhatsAppMedia = async ({
           quotedMsgId: null,
           companyId,
           userId: userId ? userId : ticket.userId ? ticket.userId : null, // UserID para salvar usuário que enviou mensagem
+          dispatcher: (ticket.status === "dispatcher") ? true : false, 
         };
       
         await ticket.update({ lastMessage: body, lastMessageFromMe: true });

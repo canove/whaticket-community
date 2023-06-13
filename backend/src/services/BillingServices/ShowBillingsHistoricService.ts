@@ -4,7 +4,8 @@ const ShowBillingsHistoricService = async (
   billingId: number | string
 ): Promise<BillingControls[]> => {
   const billings = await BillingControls.findAll({
-    where: { billingId }
+    where: { billingId },
+    order: [["fromDate", "ASC"]]
   });
 
   return billings;

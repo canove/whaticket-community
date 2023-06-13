@@ -137,7 +137,8 @@ const CreateTicketService = async ({
       mediaType: null,
       quotedMsgId: null,
       companyId,
-      userId: ticket.userId ? ticket.userId : null
+      userId: ticket.userId ? ticket.userId : null,
+      dispatcher: (ticket.status === "dispatcher") ? true : false, 
     };
 
     await ticket.update({ lastMessage: body, lastMessageFromMe: true });

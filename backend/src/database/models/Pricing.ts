@@ -58,6 +58,9 @@ class Pricing extends Model<Pricing> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @Column
+  ticketCounter: number;
 }
 
 export default Pricing;

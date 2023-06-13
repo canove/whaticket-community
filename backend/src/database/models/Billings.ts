@@ -61,6 +61,9 @@ class Billings extends Model<Billings> {
 
   @Column
   totalConnectedWhatsappsValue: number;
+
+  @Column
+  fromDate: Date;
 }
 
 export default Billings;

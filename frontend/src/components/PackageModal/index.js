@@ -98,6 +98,7 @@ const PackageModal = ({ open, onClose, packageId }) => {
 		const packageData = {
 			name: name,
 			maxUsers: maxUsers,
+			monthlyFee: monthlyFee,
 			extraUserPrice: extraUserPrice,
 			maxTicketsByMonth: maxTicketsByMonth,
 			extraTicketPrice: extraTicketPrice,
