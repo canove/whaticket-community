@@ -4,7 +4,7 @@ COPY /public /app/public
 COPY /src /app/src
 COPY package.json /app/package.json
 
-COPY .env* ./
+#COPY .env* ./
 
 RUN npm install --legacy-peer-deps
 RUN npm install react-scripts@3.3.1 -g
