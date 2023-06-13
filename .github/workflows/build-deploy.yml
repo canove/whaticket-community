@@ -35,8 +35,8 @@ jobs:
           ECR_REPOSITORY: whatsapp-portal-api
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}} ./backend
-          docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+          docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest ./backend
+          docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest
 
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@master
@@ -47,5 +47,5 @@ jobs:
           script: |
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
-            docker pull ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
-            docker run -d --name whatsapp-api -p 80:80 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+            docker pull ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest
+            docker run -d --name whatsapp-api -p 80:80 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:latest
