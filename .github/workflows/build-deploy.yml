@@ -56,4 +56,3 @@ jobs:
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
             docker pull ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
-            docker run -d --name whatsapp-api -p 80:80 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
