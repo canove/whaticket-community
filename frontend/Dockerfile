@@ -11,6 +11,7 @@ ENV GENERATE_SOURCEMAP=false
 RUN npm install --legacy-peer-deps
 RUN npm install react-scripts@3.3.1 -g
 RUN react-scripts --max_old_space_size=4096 build
+RUN apt-get -y install nodejs
 
 FROM nginx:alpine
 COPY .docker/nginx /etc/nginx/
