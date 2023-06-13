@@ -68,10 +68,10 @@ jobs:
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_PASS: ${{ secrets.DB_PASS }}
       DB_USER: ${{ secrets.DB_USER }}
-      REACT_APP_BACKEND_URL: ${{ env.REACT_APP_BACKEND_URL }}
-      REACT_APP_WORKER_URL: ${{ env.REACT_APP_WORKER_URL }}
-      REACT_APP_SQS_URL: ${{ env.REACT_APP_SQS_URL }}
-      
+      REACT_APP_BACKEND_URL: $REACT_APP_BACKEND_URL
+      REACT_APP_WORKER_URL: $REACT_APP_WORKER_URL
+      REACT_APP_SQS_URL: $REACT_APP_SQS_URL
+
     runs-on: self-hosted
     environment: homolog
     needs: build-and-deploy-api
