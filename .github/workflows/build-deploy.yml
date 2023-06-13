@@ -59,4 +59,4 @@ jobs:
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
             docker pull ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
-            docker run -d -e DB_HOST=${{secrets.DB_HOST}} --name whatsapp-api -p 8443:8443 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
+            docker run -d -e DB_HOST=${{secrets.DB_HOST}} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASS=${{ secrets.DB_PASS }} -e DB_NAME=${{ secrets.DB_NAME }}  --name whatsapp-api -p 8443:8443 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
