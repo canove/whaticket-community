@@ -101,9 +101,9 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build \
-          --build-arg REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 \
-          --build-arg REACT_APP_WORKER_URL=$REACT_APP_WORKER_URL \
-          --build-arg REACT_APP_SQS_URL=$REACT_APP_SQS_URL \
+          -e REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 \
+          -e REACT_APP_WORKER_URL=$REACT_APP_WORKER_URL \
+          -e REACT_APP_SQS_URL=$REACT_APP_SQS_URL \
           -t 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}} ./frontend 
           docker push 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}}
 
