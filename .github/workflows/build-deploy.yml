@@ -100,7 +100,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}} -f ./frontend/DockerfileHom \
+          docker build -t 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}} -f ./frontend/homolog \
           docker push 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{env.IMAGE_TAG}}
 
       - name: SSH into EC2 instance
