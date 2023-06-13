@@ -20,7 +20,13 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
   whereCondition = { companyId, deleted: false };
 
   if (!official) {
-    whereCondition = { ...whereCondition, status: "CONNECTED", official: false, currentTriggerQuantity: { [Op.gte]: 50 } };
+    whereCondition = { 
+      ...whereCondition, 
+      status: "CONNECTED", 
+      official: false, 
+      currentTriggerQuantity: { [Op.gte]: 50 },
+      [Op.or]: [{ sleeping: false }, { sleeping: null }],
+    };
     order = [["lastSendDate", "ASC"]];
   }
 
