@@ -12,18 +12,12 @@ RUN npm install --legacy-peer-deps
 RUN npm install react-scripts@3.3.1 -g
 RUN react-scripts --max_old_space_size=4096 build
 
-#FROM nginx:alpine
-#RUN apk add --update nodejs npm
-#COPY .docker/nginx /etc/nginx/
+FROM nginx:alpine
+COPY .docker/nginx /etc/nginx/
 
-#COPY --from=build-deps /app/build /usr/share/nginx/html
-#CMD ["nginx", "-g", "daemon off;"]
-#EXPOSE 80
-
+COPY --from=build-deps /app/build /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
 EXPOSE 80
-
-#ENTRYPOINT ["dumb-init", "--"]
-CMD ["npm", "start"]
 
 #COPY .docker/add-env-vars.sh /docker-entrypoint.d/01-add-env-vars.sh
 #RUN chmod +x /docker-entrypoint.d/01-add-env-vars.sh
