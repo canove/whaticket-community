@@ -4,7 +4,7 @@ COPY /public /app/public
 COPY /src /app/src
 COPY package.json /app/package.json
 
-COPY .env* ./
+#COPY .env* ./
 
 ENV GENERATE_SOURCEMAP=false
 
