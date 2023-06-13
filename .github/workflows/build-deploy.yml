@@ -59,6 +59,7 @@ jobs:
             docker rm whatsapp-api || true
             docker pull ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
             docker run -d -e \
+            IMAGE_TAG=${{env.IMAGE_TAG}} -e \
             DB_HOST=${{secrets.DB_HOST}} -e \
             DB_USER=${{ secrets.DB_USER }} -e \
             DB_PASS=${{ secrets.DB_PASS }} -e \
