@@ -57,7 +57,7 @@ jobs:
           script: |
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
-            docker pull ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+            docker pull ${{vars.ECR_REGISTRY}}/${{vars.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
             docker run -d -e \
             IMAGE_TAG=${{env.IMAGE_TAG}} -e \
             DB_HOST=${{secrets.DB_HOST}} -e \
@@ -93,7 +93,8 @@ jobs:
             BELLINATI_TOKEN=${{ vars.BELLINATI_TOKEN }} -e \
             BELLINATI_ID_FORNECEDOR=${{ vars.BELLINATI_ID_FORNECEDOR }} -e \
             BELLINATI_ID=${{ vars.BELLINATI_ID }} -e \
-            FRONTEND_URL=${{ vars.FRONTEND_URL }} --name whatsapp-api -p 8443:3000 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+            FRONTEND_URL=${{ vars.FRONTEND_URL }} --name \
+            whatsapp-api -p 8443:3000 ${{vars.ECR_REGISTRY}}/${{vars.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
   build-and-deploy-frontend:
     env:
       ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
