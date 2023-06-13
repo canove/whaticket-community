@@ -6,9 +6,11 @@ COPY package.json /app/package.json
 
 #COPY .env* ./
 
+ENV GENERATE_SOURCEMAP=false
+
 RUN npm install --legacy-peer-deps
 RUN npm install react-scripts@3.3.1 -g
-RUN react-scripts --max_old_space_size=3072 build
+RUN react-scripts --max_old_space_size=4096 build
 
 FROM nginx:alpine
 COPY .docker/nginx /etc/nginx/
