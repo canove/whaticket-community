@@ -1,8 +1,8 @@
 FROM node:14-alpine as build-deps
 WORKDIR /app
-COPY ../public /app/public
-COPY ../src /app/src
-COPY ../package.json /app/package.json
+COPY public /app/public
+COPY src /app/src
+COPY package.json /app/package.json
 
 #COPY .env* ./
 RUN echo "REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443/" >> ./.env
