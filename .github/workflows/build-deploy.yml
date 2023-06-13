@@ -58,9 +58,41 @@ jobs:
             docker stop whatsapp-api || true
             docker rm whatsapp-api || true
             docker pull ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
-            docker run -d -e DB_HOST=${{secrets.DB_HOST}} -e \
+            docker run -d -e \
+            DB_HOST=${{secrets.DB_HOST}} -e \
             DB_USER=${{ secrets.DB_USER }} -e \
-            DB_PASS=${{ secrets.DB_PASS }} -e DB_NAME=${{ secrets.DB_NAME }}  -e BACKEND_URL=${{ vars.BACKEND_URL }} -e FRONTEND_URL=${{ vars.FRONTEND_URL }} --name whatsapp-api -p 8443:3000 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
+            DB_PASS=${{ secrets.DB_PASS }} -e \
+            DB_NAME=${{ secrets.DB_NAME }}  -e \
+            BACKEND_URL=${{ vars.BACKEND_URL }} -e \
+            JWT_SECRET=${{ vars.JWT_SECRET }} -e \
+            JWT_REFRESH_SECRET=${{ vars.JWT_REFRESH_SECRET }} -e \
+            ENV_AWS_REGION=${{ vars.ENV_AWS_REGION }} -e \
+            ENV_AWS_ACCOUNT_ID= ${{ vars.ENV_AWS_ACCOUNT_ID }} -e \
+            AWS_ACCESS_KEY_ID=${{ vars.AWS_ACCESS_KEY_ID }} -e \
+            AWS_SECRET_ACCESS_KEY=${{ vars.AWS_SECRET_ACCESS_KEY }} -e \
+            ENV_AWS_ACCESS_KEY_ID=${{ vars.ENV_AWS_ACCESS_KEY_ID }} -e \
+            ENV_AWS_SECRET_ACCESS_KEY=${{ vars.ENV_AWS_SECRET_ACCESS_KEY }} -e \
+            AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }} -e \
+            WPPNOF_URL=${{ vars.WPPNOF_URL }} -e \
+            WPPNOF_API_TOKEN=${{ vars.WPPNOF_API_TOKEN }} -e \
+            WPPNOF_SESSION_KEY=${{ vars.WPPNOF_SESSION_KEY }} -e \
+            WPP_OFFICIAL_URL=${{ vars.WPP_OFFICIAL_URL }} -e \
+            WPP_OFFICIAL_API_KEY=${{ vars.WPP_OFFICIAL_API_KEY }} -e \
+            WPP_NOF_WEBHOOK_URL=${{ vars.WPP_NOF_WEBHOOK_URL }} -e \
+            WPP_NOF_URL=${{ vars.WPP_NOF_URL }} -e \
+            WPP_NOF_API_KEY=${{ vars.WPP_NOF_API_KEY }} -e \
+            REDIS_URL=${{ vars.REDIS_URL }} -e \
+            REDIS_SAVE_TIME=${{ vars.REDIS_SAVE_TIME }} -e \
+            SQS_DISPATCH_QUEUE=${{ vars.SQS_DISPATCH_QUEUE }} -e \
+            SQS_BOT_MESSAGE_URL=${{ vars.SQS_BOT_MESSAGE_URL }} -e \
+            SQS_ORQUESTRATOR_URL=${{ vars.SQS_ORQUESTRATOR_URL }} -e \
+            SQS_ORQUESTRATOR_RESPONSE_URL=${{ vars.SQS_ORQUESTRATOR_RESPONSE_URL }} -e \
+            SQS_MESSAGE_STATUS=${{ vars.SQS_MESSAGE_STATUS }} -e \
+            BELLINATI_URL=${{ vars.BELLINATI_URL }} -e \
+            BELLINATI_TOKEN=${{ vars.BELLINATI_TOKEN }} -e \
+            BELLINATI_ID_FORNECEDOR=${{ vars.BELLINATI_ID_FORNECEDOR }} -e \
+            BELLINATI_ID=${{ vars.BELLINATI_ID }} -e \
+            FRONTEND_URL=${{ vars.FRONTEND_URL }} --name whatsapp-api -p 8443:3000 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
   build-and-deploy-frontend:
     env:
       ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
