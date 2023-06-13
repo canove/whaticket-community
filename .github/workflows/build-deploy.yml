@@ -10,7 +10,6 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   build-and-deploy-api:
-    name: apijob
     runs-on: self-hosted
     environment: homolog
     steps:
@@ -61,7 +60,6 @@ jobs:
             docker pull ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
             docker run -d -e DB_HOST=${{secrets.DB_HOST}} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASS=${{ secrets.DB_PASS }} -e DB_NAME=${{ secrets.DB_NAME }}  --name whatsapp-api -p 8443:3000 ${{secrets.ECR_REGISTRY}}/${{secrets.ECR_REPOSITORY}}:${{github.sha}}
   build-and-deploy-frontend:
-      needs: apijob
       runs-on: self-hosted
       environment: homolog
       steps:
