@@ -65,6 +65,12 @@ jobs:
             DB_NAME=${{ secrets.DB_NAME }}  -e \
             BUCKET_CREDENTIAL=${{vars.BUCKET_CREDENTIAL}} -e \
             BACKEND_URL=${{ vars.BACKEND_URL }} -e \
+            ENV_AWS_REGION=us-east-2 -e \
+            ENV_AWS_ACCOUNT_ID=387274513997 -e \
+            AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e \
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e \
+            ENV_AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e \
+            ENV_AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e \
             JWT_SECRET=${{ vars.JWT_SECRET }} -e \
             JWT_REFRESH_SECRET=${{ vars.JWT_REFRESH_SECRET }} -e \
             AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }} -e \
