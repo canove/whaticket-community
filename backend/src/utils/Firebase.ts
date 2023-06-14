@@ -14,7 +14,7 @@ module.exports = {
     })
 
     var options = {
-      Bucket: 'kankei-credentials/whaticket',
+      Bucket:  `${process.env.BUCKET_CREDENTIAL}/whaticket`,
       Key: 'key.json',
     };
     const fstream = require('fs');

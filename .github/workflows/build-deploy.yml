@@ -63,6 +63,7 @@ jobs:
             DB_USER=${{ secrets.DB_USER }} -e \
             DB_PASS=${{ secrets.DB_PASS }} -e \
             DB_NAME=${{ secrets.DB_NAME }}  -e \
+            BUCKET_CREDENTIAL=${{vars.BUCKET_CREDENTIAL}} -e \
             BACKEND_URL=${{ vars.BACKEND_URL }} -e \
             JWT_SECRET=${{ vars.JWT_SECRET }} -e \
             JWT_REFRESH_SECRET=${{ vars.JWT_REFRESH_SECRET }} -e \
