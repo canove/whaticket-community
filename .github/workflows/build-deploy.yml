@@ -18,7 +18,7 @@ jobs:
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_PASS: ${{ secrets.DB_PASS }}
       DB_USER: ${{ secrets.DB_USER }}
-    runs-on: self-hosted
+    runs-on: whaticket
     environment: homolog
     steps:
       - name: Configure AWS credentials
@@ -94,7 +94,7 @@ jobs:
       ECR_REPOSITORY: whatsapp-portal-frontend
       IMAGE_TAG: ${{ github.sha }}
 
-    runs-on: self-hosted
+    runs-on: whaticket
     environment: homolog
     needs: build-and-deploy-api
     steps:
