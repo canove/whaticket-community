@@ -29,6 +29,7 @@ interface WhatsappData {
   statusCallbackUrl?: string;
   callbackAuthorization?: string;
   useGroup?: boolean;
+  selectedCompany?: string | number;
 }
 
 interface Request {
@@ -75,8 +76,11 @@ const UpdateWhatsAppService = async ({
     messageCallbackUrl,
     statusCallbackUrl,
     callbackAuthorization,
-    useGroup
+    useGroup,
+    selectedCompany,
   } = whatsappData;
+
+  const usedCompany = (companyId === 1 && selectedCompany) ? selectedCompany : companyId;
 
   try {
     await schema.validate({ name, status, isDefault });
@@ -92,7 +96,7 @@ const UpdateWhatsAppService = async ({
 
   if (isDefault) {
     oldDefaultWhatsapp = await Whatsapp.findOne({
-      where: { isDefault: true, id: { [Op.not]: whatsappId }, companyId }
+      where: { isDefault: true, id: { [Op.not]: whatsappId }, companyId: usedCompany }
     });
     if (oldDefaultWhatsapp) {
       await oldDefaultWhatsapp.update({ isDefault: false });
@@ -103,7 +107,7 @@ const UpdateWhatsAppService = async ({
     throw new AppError("ERRO!");
   }
 
-  const whatsapp = await ShowWhatsAppService(whatsappId, companyId);
+  const whatsapp = await ShowWhatsAppService(whatsappId, usedCompany);
 
   try {
     const client = createClient({

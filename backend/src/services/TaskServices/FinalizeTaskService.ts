@@ -15,7 +15,7 @@ interface Response {
   task: Tasks;
 }
 
-const FinalzeTaskService = async ({
+const FinalizeTaskService = async ({
   taskId,
   ticketId,
   companyId,
@@ -32,4 +32,4 @@ const FinalzeTaskService = async ({
   return { task, ticket };
 };
 
-export default FinalzeTaskService;
+export default FinalizeTaskService;

@@ -1460,6 +1460,7 @@ const messages = {
         ERR_TICKET_ACCEPTED_BY_OTHER_USER: "Esse ticket foi aceito por outro usuário. Você não tem permissão para enviar esta mensagem.",
         ERR_INVALID_DUE_DATE: "A data de expiração deve ser de agora até no máximo 7 dias.",
         ERR_DUE_DATE_REQUIRED: "Data de expiração obrigatória.",
+        ERR_NO_AVAILABLE_WHATS_FOUND: "Nenhum whatsapp disponivel foi encontrado.",
       },
     },
   },

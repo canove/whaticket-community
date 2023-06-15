@@ -14,10 +14,15 @@ import BindFlowToConnectionFilesService from "../services/ConnectionFileService/
 import BindQueueToConnectionFilesService from "../services/ConnectionFileService/BindQueueToConnectionFilesService";
 import Whatsapp from "../database/models/Whatsapp";
 
+type IndexQuery = {
+  companyId: string;
+}
+
 export const index = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId: selectedCompany } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const connectionFiles = await ListConnectionFilesService(companyId);
+  const connectionFiles = await ListConnectionFilesService({ companyId, selectedCompany });
 
   return res.json(connectionFiles);
 };

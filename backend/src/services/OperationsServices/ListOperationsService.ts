@@ -2,32 +2,23 @@
 import FileRegister from "../../database/models/FileRegister";
 import { Op, Sequelize } from "sequelize"
 import File from "../../database/models/File";
-import { FileStatus } from "../../enum/FileStatus";
-import sequelize from "../../database";
 import { endOfDay, parseISO, startOfDay } from "date-fns";
 import Company from "../../database/models/Company";
 import Whatsapp from "../../database/models/Whatsapp";
-import WhatsappsConfig from "../../database/models/WhatsappsConfig";
-import ConnectionFiles from "../../database/models/ConnectionFile";
-import BillingControls from "../../database/models/BillingControls";
-import Pricing from "../../database/models/Pricing";
-import Product from "../../database/models/Products";
-import Packages from "../../database/models/Packages";
+import AppError from "../../errors/AppError";
 
 interface Request {
-    companyId?: string;
     initialDate?: string;
     finalDate?: string;
+    companyIds?: string[];
 }
 
 const ListOperationsService = async ({
-  companyId,
   initialDate,
-  finalDate
+  finalDate,
+  companyIds
 }: Request) => {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
+    if (!initialDate || !finalDate) throw new AppError("ERR_DATE_FILTER_REQUIRED");
 
     let whereCondition = null;
 
@@ -35,10 +26,10 @@ const ListOperationsService = async ({
         status: "ativo"
     }
 
-    if (companyId) {
+    if (companyIds) {
         whereCondition = {
             ...whereCondition,
-            id: companyId
+            id: companyIds
         }
     }
 
@@ -49,72 +40,22 @@ const ListOperationsService = async ({
             {
                 model: Whatsapp,
                 as: "whatsapps",
-                attributes: ["id", "name"],
+                attributes: ["id", "name", "status", "sleeping"],
                 required: false,
-                where: {
-                    official: false,
-                    deleted: false,
-                    status: "CONNECTED",
-                },
-                include: [
-                    {
-                        model: ConnectionFiles,
-                        as: "connectionFile",
-                        attributes: ["triggerInterval"],
-                        required: false
-                    }
-                ],
+                where: { official: false, deleted: false },
             },
-            {
-                model: WhatsappsConfig,
-                as: "config",
-                attributes: ["triggerInterval"],
-                required: false,
-                where: {
-                    active: true
-                }
-            },
-            {
-                model: BillingControls,
-                as: "billingControls",
-                attributes: ["usedGraceTriggers", "triggerFee", "quantity"],
-                required: false,
-                where: { 
-                    "$billingControls.month$": Sequelize.where(Sequelize.fn("MONTH", Sequelize.col("billingControls.createdAt")), month.toString()),
-                    "$billingControls.year$": Sequelize.where(Sequelize.fn("YEAR", Sequelize.col("billingControls.createdAt")), year.toString()),
-                },
-            },
-            {
-                model: Pricing,
-                as: "pricing",
-                attributes: ["id"],
-                required: false,
-                include: [
-                    {
-                        model: Product,
-                        as: "product",
-                        attributes: ["monthlyFee"],
-                        required: false,
-                    },
-                    {
-                        model: Packages,
-                        as: "package",
-                        attributes: ["monthlyFee"],
-                        required: false,
-                    },
-                ]
-            }
         ],
+        order: [["name", "ASC"]],
     });
 
     let response = [];
 
     for (const company of companies) {
-        let whereConditionFileRegister = null;
+        let whereCondition = null;
+        let whereConditionCreatedAt = null;
+        let whereConditionProcessedAt = null;
 
-        whereConditionFileRegister = {
-            companyId: company.id
-        }
+        whereCondition = { companyId: company.id };
         
         const files = await File.findAll({
             where: { 
@@ -122,15 +63,17 @@ const ListOperationsService = async ({
                     { status: 7 },
                     { status: 2 }, 
                 ],
-                companyId: company.id
-            }
+                companyId: company.id,
+                // updatedAt: { [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))] },
+            },
+            attributes: ["id"],
         });
       
         if (files.length > 0) {
             const filesArray = files.map(file => file.id);
-            whereConditionFileRegister = {
-              ...whereConditionFileRegister,
-              fileId: { [Op.notIn]: filesArray },
+            whereCondition = {
+                ...whereCondition,
+                fileId: { [Op.notIn]: filesArray },
             }
         }
 
@@ -141,41 +84,83 @@ const ListOperationsService = async ({
             const thirtyDays = 31 * 24 * 60 * 60 * 1000;
         
             if (!(f.getTime() - i.getTime() >= thirtyDays)) {
-                whereConditionFileRegister = {
-                    ...whereConditionFileRegister,
+                whereConditionCreatedAt = {
+                    ...whereCondition,
                     createdAt: {
                         [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
                     },
                 };
+
+                whereConditionProcessedAt = {
+                    ...whereCondition,
+                    processedAt: {
+                        [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+                    },
+                }
             }
-        } else if (initialDate) {
-            whereConditionFileRegister = {
-                ...whereConditionFileRegister,
-                createdAt: {
-                    [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(initialDate))]
-                },
-            };
-        } else if (finalDate) {
-            whereConditionFileRegister = {
-                ...whereConditionFileRegister,
-                createdAt: {
-                    [Op.between]: [+startOfDay(parseISO(finalDate)), +endOfDay(parseISO(finalDate))]
-                },
-            };
         }
 
-        const fileRegisters = await FileRegister.findOne({
-            where: whereConditionFileRegister,
-            attributes: [
-              [ Sequelize.fn('count', Sequelize.col("FileRegister.id")), 'total' ],
-              [ Sequelize.fn('sum', Sequelize.literal("(sentAt IS NOT NULL AND msgWhatsId IS NOT NULL) OR (fileId IS NULL AND exposedImportId IS NULL AND integratedImportId IS NULL)")), 'sent' ],
-              [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NOT NULL AND (haveWhatsapp = 0 OR msgWhatsId IS NULL)")), 'noWhats' ],
-              [ Sequelize.fn('sum', Sequelize.literal("processedAt IS NULL")), 'queue' ],
-            ],
-            raw: true
+        const total = await FileRegister.count({
+            where: whereConditionCreatedAt
         });
 
-        response.push({ company, fileRegisters });
+        const processed = await FileRegister.count({
+            where: {
+                ...whereConditionProcessedAt,
+                [Op.or]: [
+                    {
+                        [Op.or]: [
+                            {
+                                sentAt: { [Op.ne]: null },
+                                msgWhatsId: { [Op.ne]: null },
+                            },
+                            {
+                                fileId: null,
+                                exposedImportId: null,
+                                integratedImportId: null,
+                            },
+                        ],
+                    },
+                    {
+                        msgWhatsId: null,
+                        processedAt: { [Op.ne]: null },
+                        [Op.or]: [
+                            { haveWhatsapp: false },
+                            { haveWhatsapp: null },
+                        ],
+                    },
+                ],
+            }
+        });
+
+        const queue1 = await FileRegister.count({
+            where: {
+                ...whereCondition,
+                processedAt: null,
+                fileId: null,
+            },
+        });
+
+        const queue2 = await FileRegister.count({
+            where: {
+                ...whereCondition,
+                processedAt: null,
+            },
+            include: [
+                {
+                    model: File,
+                    as: "file",
+                    where: { status: 5 },
+                    required: true,
+                },
+            ],
+        });
+
+        const queue = queue1 + queue2;
+
+        const registers = { processed, total, queue };
+        
+        response.push({ company, registers });
     }
 
     return response;
