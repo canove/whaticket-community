@@ -302,7 +302,7 @@ const getRegistersData = registers => {
     const phoneNumber = register.phoneNumber;
     const documentNumber = register.documentNumber;
 
-    const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
+    const sentAt = (register.sentAt && register.msgWhatsId) ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
     const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
     const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
     const errorAt = register.errorAt ? format(register.errorAt, "dd/MM/yyyy HH:mm") : "";
@@ -373,7 +373,7 @@ export const exportCsv = async (
     const { name, phoneNumber, documentNumber } = register;
 
     const processedAt = register.processedAt ? format(register.processedAt, "dd/MM/yyyy HH:mm") : "";
-    const sentAt = register.sentAt ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
+    const sentAt = (register.sentAt && register.msgWhatsId) ? format(register.sentAt, "dd/MM/yyyy HH:mm") : "";
     const deliveredAt = register.deliveredAt ? format(register.deliveredAt, "dd/MM/yyyy HH:mm") : "";
     const readAt = register.readAt ? format(register.readAt, "dd/MM/yyyy HH:mm") : "";
     const interactionAt = register.interactionAt ? format(register.interactionAt, "dd/MM/yyyy HH:mm") : "";
