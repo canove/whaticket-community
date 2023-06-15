@@ -28,10 +28,10 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-ENV NODE_ENV=production
+#ENV NODE_ENV=production
 ENV PORT=3000
-ENV CHROME_BIN=google-chrome-stable
-ENV DB_HOST=database-1.ce9bysdko7zw.us-east-1.rds.amazonaws.com
+#ENV CHROME_BIN=google-chrome-stable
+#ENV DB_HOST=database-1.ce9bysdko7zw.us-east-1.rds.amazonaws.com
 
 EXPOSE 3000
 
