@@ -284,7 +284,7 @@ const Pricing = () => {
                                 </TableRow>
                             )
                         })}
-                        {loading && <TableRowSkeleton columns={6} />}
+                        {loading && <TableRowSkeleton columns={8} />}
                     </TableBody>
                 </Table>
         </Paper>

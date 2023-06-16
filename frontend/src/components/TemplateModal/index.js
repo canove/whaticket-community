@@ -20,7 +20,6 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(() => ({
   root: {

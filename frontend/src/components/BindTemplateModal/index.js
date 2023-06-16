@@ -20,7 +20,7 @@ import {
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,8 +69,6 @@ const BindTemplateModal = ({ open, onClose, templateId }) => {
   const { i18n } = useTranslation();
   const classes = useStyles();
 
-  const { whatsApps } = useContext(WhatsAppsContext);
-
   const [connections, setConnections] = useState([]);
   const [openConnectionsSelect, setOpenConnectionsSelect] = useState(false);
 
@@ -78,6 +76,12 @@ const BindTemplateModal = ({ open, onClose, templateId }) => {
   const [officialWhatsapps, setOfficialWhatsapps] = useState([]);
   const [template, setTemplate] = useState(null);
   const [templateStatuses, setTemplateStatuses] = useState([]);
+
+  const { whatsapps } = useWhatsApps2({
+    official: true,
+    officialWhatsappId: selectedOfficialWhats,
+    limit: -1,
+  });
 
   useEffect(() => {
     const fetchOfficialWhats = async () => {
@@ -228,19 +232,11 @@ const BindTemplateModal = ({ open, onClose, templateId }) => {
                   <MenuItem value={"all"}>
                     {i18n.t("importModal.form.all")}
                   </MenuItem>
-                  {whatsApps.map((whats) => {
-                    if (
-                      whats.official &&
-                      whats.officialWhatsappId === selectedOfficialWhats
-                    ) {
-                      return (
-                        <MenuItem value={whats.id} key={whats.id}>
-                          {whats.name}
-                        </MenuItem>
-                      );
-                    }
-                    return null;
-                  })}
+                  {whatsapps.map((whats) => (
+                    <MenuItem value={whats.id} key={whats.id}>
+                      {whats.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>

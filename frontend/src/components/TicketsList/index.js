@@ -195,10 +195,10 @@ const reducer = (state, action) => {
 		const shouldUpdateTicket = ticket => !searchParam &&
 			(!pendingAnswer || pendingAnswer && ticket.lastMessageFromMe === false) &&
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&
-			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1) && !isTask;
 
 		const notBelongsToUserQueues = ticket =>
-			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1 && !isTask;
 
 		socket.on("connect", () => {
 			if (status) {
@@ -236,6 +236,25 @@ const reducer = (state, action) => {
 			}
 		});
 
+		socket.on(`task${user.companyId}`, data => {
+			if (!isTask) return;
+
+			const belongsToUser = ticket => (ticket.userId === user?.id || showAll);
+
+			if (!belongsToUser(data.ticket));
+
+			if (data.action === "create" || data.action === "update") {
+				dispatch({
+					type: "UPDATE_TICKET",
+					payload: data.ticket,
+				});
+			}
+
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
+			}
+		});
+
 		socket.on(`appMessage${user.companyId}`, data => {
 			if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
@@ -257,7 +276,7 @@ const reducer = (state, action) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer]);
+	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer, isTask]);
 
 	useEffect(() => {
 		const socket = openSQSSocket();
@@ -265,10 +284,10 @@ const reducer = (state, action) => {
 		const shouldUpdateTicket = ticket => !searchParam &&
 			(!pendingAnswer || pendingAnswer && ticket.lastMessageFromMe === false) &&
 			(!ticket.userId || ticket.userId === user?.id || showAll) &&
-			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1) && !isTask;
 
 		const notBelongsToUserQueues = ticket =>
-			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1 && !isTask;
 
 		socket.on("connect", () => {
 			if (status) {
@@ -306,6 +325,25 @@ const reducer = (state, action) => {
 			}
 		});
 
+		socket.on(`task${user.companyId}`, data => {
+			if (!isTask) return;
+
+			const belongsToUser = ticket => (ticket.userId === user?.id || showAll);
+
+			if (!belongsToUser(data.ticket));
+
+			if (data.action === "create" || data.action === "update") {
+				dispatch({
+					type: "UPDATE_TICKET",
+					payload: data.ticket,
+				});
+			}
+
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
+			}
+		});
+
 		socket.on(`appMessage${user.companyId}`, data => {
 			if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
 				dispatch({
@@ -327,7 +365,7 @@ const reducer = (state, action) => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer]);
+	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer, isTask]);
 
 	useEffect(() => {
 		if (typeof updateCount === "function") {

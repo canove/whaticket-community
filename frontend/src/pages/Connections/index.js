@@ -74,6 +74,7 @@ import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import WhatsConfigModal from "../../components/WhatsConfigModal";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -143,59 +144,10 @@ const CustomToolTip = ({ title, content, children }) => {
 	);
 };
 
-const reducer = (state, action) => {
-	if (action.type === "LOAD_WHATSAPPS") {
-		const whatsApps = action.payload;
-		return [...whatsApps];
-	}
-
-	if (action.type === "UPDATE_WHATSAPPS") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-		if (whatsAppIndex !== -1 || whatsApp.official === true) {
-			state[whatsAppIndex] = whatsApp;
-			return [...state];
-		} else {
-			return [whatsApp, ...state];
-		}
-	}
-
-	if (action.type === "UPDATE_SESSION") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex].status = whatsApp.status;
-			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
-			state[whatsAppIndex].qrcode = whatsApp.qrcode;
-			state[whatsAppIndex].retries = whatsApp.retries;
-			return [...state];
-		} else {
-			return [...state];
-		}
-	}
-
-	if (action.type === "DELETE_WHATSAPPS") {
-		const whatsAppId = action.payload;
-
-		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
-		if (whatsAppIndex !== -1) {
-			state.splice(whatsAppIndex, 1);
-		}
-		return [...state];
-	}
-
-	if (action.type === "RESET") {
-		return [];
-	}
-};
-
 const Connections = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
-	const [whatsApps, dispatch] = useReducer(reducer, []);
-	const [loading, setLoading] = useState(false);
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [qrModalOpen, setQrModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
@@ -211,14 +163,11 @@ const Connections = () => {
 		confirmationModalInitialState
 	);
 	const [pageNumber, setPageNumber] = useState(1);
-	const [count, setCount] = useState(1);
-	const [hasMore, setHasMore] = useState(false);
 	const { user } = useContext(AuthContext);
 
 	const { connectionFileName } = useParams();
 	const history = useHistory();
 	const [connectionFiles, setConnectionFiles] = useState([]);
-	const [connectionFileId, setConnectionFileId] = useState("");
 	const [searchParam, setSearchParam] = useState("");
 	const [status, setStatus] = useState("");
 
@@ -235,46 +184,18 @@ const Connections = () => {
 	const [company, setCompany] = useState("");
 	const [companies, setCompanies] = useState([]);
 
-	useEffect(() => {
-		dispatch({ type: "RESET" });
-	}, [pageNumber, searchParam, status]);
+	const { whatsapps, count, hasMore, loading } = useWhatsApps2({
+		official: false,
+		pageNumber,
+		connectionFileName,
+		name: searchParam,
+		status: status ? status : null,
+		selectedCompanyId: company
+	});
 
 	useEffect(() => {
 		setPageNumber(1);
-	  }, [searchParam, status]);
-
-	useEffect(() => {
-		setLoading(true);
-		const fetchWhats = async () => {
-			try {
-				const { data } = await api.get(`/whatsapp/list/`, {
-					params: {
-						official: false,
-						pageNumber,
-						connectionFileName,
-						searchParam,
-						status,
-						companyId: company,
-					}
-				});
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
-				setCount(data.count);
-				setHasMore(data.hasMore);
-				setConnectionFileId(data.connectionFileId ? data.connectionFileId : "");
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
-				toastError(err);
-			}
-		};
-
-		if (connectionFileName) {
-			fetchWhats();
-		} else {
-			setSearchParam("");
-			setStatus("");
-		}
-	}, [pageNumber, searchParam, connectionFileName, status, company]);
+	}, [searchParam, status, company, connectionFileName]);
 
 	useEffect(() => {
 		const fetchConnectionFiles = async () => {
@@ -283,9 +204,7 @@ const Connections = () => {
 					params: { companyId: company }
 				});
 				setConnectionFiles(data);
-				setLoading(false);
 			} catch (err) {
-				setLoading(false);
 				toastError(err);
 			}
 		};
@@ -328,32 +247,6 @@ const Connections = () => {
         fetchConfig();
 		fetchServices();
 	}, []);
-
-	useEffect(() => {
-		const socket = openSocket();
-
-		socket.on(`whatsapp${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-			}
-		});
-
-		socket.on(`whatsapp${user.companyId}`, data => {
-			if (data.action === "delete") {
-				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-			}
-		});
-
-		socket.on(`whatsappSession${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_SESSION", payload: data.session });
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, [user]);
 
 	const handleStartWhatsAppSession = async whatsAppId => {
 		try {
@@ -828,7 +721,7 @@ const Connections = () => {
 						open={whatsAppModalOpen}
 						onClose={handleCloseWhatsAppModal}
 						whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
-						connectionFileId={connectionFileId}
+						connectionFileName={connectionFileName}
 						company={company}
 					/>
 					<WhatsConfigModal
@@ -990,8 +883,8 @@ const Connections = () => {
 									<TableRowSkeleton columns={user.superAdmin ? 9 : 8} />
 								) : (
 									<>
-										{whatsApps?.length > 0 &&
-											whatsApps.map(whatsApp => (
+										{whatsapps?.length > 0 &&
+											whatsapps.map(whatsApp => (
 												<TableRow key={whatsApp.id}>
 													<TableCell align="center">{whatsApp.name}</TableCell>
 													<TableCell align="center">

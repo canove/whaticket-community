@@ -309,7 +309,8 @@ const StatusMessageWhatsappService = async ({
             mediaUrl: mediaUrl,
             mediaType: messageType,
             quotedMsgId: null,
-            companyId: (file ? file.companyId : exposed.companyId)
+            companyId: (file ? file.companyId : exposed.companyId),
+            dispatcher: (createTicket.status === "dispatcher") ? true : false, 
           };
         
           await createTicket.update({ 

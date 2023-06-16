@@ -49,6 +49,7 @@ import Supervisor from "../pages/Supervisor";
 import SatisfactionSurvey from "../pages/SatisfactionSurvey";
 import Packages from "../pages/Packages";
 import Batch from "../pages/Batch";
+import ErrorMessages from "../pages/ErrorMessages";
 
 const pages = {
   "Dashboard": Dashboard,
@@ -94,7 +95,8 @@ const pages = {
   "Supervisor": Supervisor,
   "Satisfaction Survey": SatisfactionSurvey,
   "Packages": Packages,
-  "Batch": Batch
+  "Batch": Batch,
+  "Error Messages": ErrorMessages,
 };
 
 const RenderRoutes = () => {

@@ -79,6 +79,9 @@ class BillingControls extends Model<BillingControls> {
 
   @Column
   outboundSessionQuantity: number;
+
+  @Column
+  fromDate: Date;
 }
 
 export default BillingControls;

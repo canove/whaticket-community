@@ -66,6 +66,7 @@ const Settings = () => {
 		createTicketInterval: 0,
 		autoCloseTicketStatus: { "inbot": false, "open": false },
 		overflowQueueId: "",
+		createTicketWhatsappType: "",
 	}
 	const [settings, setSettings] = useState(initialSettings);
 
@@ -172,6 +173,7 @@ const Settings = () => {
 			createTicketInterval: settings.createTicketInterval,
 			autoCloseTicketStatus: settings.autoCloseTicketStatus,
 			overflowQueueId: settings.overflowQueueId,
+			createTicketWhatsappType: settings.createTicketWhatsappType,
 		};
 
 		try {
@@ -476,6 +478,27 @@ const Settings = () => {
 										type: 'number',
 									}}
 								/>
+							</FormControl>
+						</div>
+						<Divider style={{ margin: "10px 0" }} fullWidth />
+						<div>
+							<FormControl
+								variant="outlined"
+								margin="dense"
+								fullWidth
+							>
+								<InputLabel>{"Tipo de Whatsapp para Criar Conversa Nova"}</InputLabel>
+								<Select
+									variant="outlined"
+									label="Tipo de Whatsapp para Criar Conversa Nova"
+									value={settings.createTicketWhatsappType}
+									onChange={(e) =>  handleSettingsChange(e.target.value, "createTicketWhatsappType")}
+									fullWidth
+								>
+									<MenuItem value={""}>Ambos</MenuItem>
+									<MenuItem value={"active"}>Ativo</MenuItem>
+									<MenuItem value={"receptive"}>Receptivo</MenuItem>
+								</Select>
 							</FormControl>
 						</div>
 					</div>

@@ -101,6 +101,9 @@ class Message extends Model<Message> {
   @Column
   resendQuantity: number;
 
+  @Column
+  dispatcher: boolean;
+
   // Para Relatório
   lastMessage: string;
 }

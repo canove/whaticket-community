@@ -22,4 +22,8 @@ messageRoutes.post(
 
 messageRoutes.delete("/messages/:messageId", isAuth, MessageController.remove);
 
+messageRoutes.get("/error/messages", isAuth, MessageController.errorMessages);
+
+messageRoutes.post("/error/messages/resend", isAuth, MessageController.errorMessagesResend)
+
 export default messageRoutes;

@@ -36,53 +36,7 @@ import { FormControl, InputLabel, MenuItem, Select, TableSortLabel, Typography }
 import TransferContactModal from "../../components/TransferContactModal";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import MultipleWhatsConfigModal from "../../components/MultipleWhatsConfigModal";
-
-const reducer = (state, action) => {
-	if (action.type === "LOAD_WHATSAPPS") {
-		const whatsApps = action.payload;
-		return [...whatsApps];
-	}
-
-	if (action.type === "UPDATE_WHATSAPPS") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-		if (whatsAppIndex !== -1 || whatsApp.official === true) {
-			state[whatsAppIndex] = whatsApp;
-			return [...state];
-		} else {
-			return [whatsApp, ...state];
-		}
-	}
-
-	if (action.type === "UPDATE_SESSION") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex].status = whatsApp.status;
-			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
-			state[whatsAppIndex].qrcode = whatsApp.qrcode;
-			state[whatsAppIndex].retries = whatsApp.retries;
-			return [...state];
-		} else {
-			return [...state];
-		}
-	}
-
-	// if (action.type === "DELETE_WHATSAPPS") {
-	// 	const whatsAppId = action.payload;
-
-	// 	const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
-	// 	if (whatsAppIndex !== -1) {
-	// 		state.splice(whatsAppIndex, 1);
-	// 	}
-	// 	return [...state];
-	// }
-
-	if (action.type === "RESET") {
-		return [];
-	}
-};
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -97,99 +51,52 @@ const ContactTransfer = () => {
   const classes = useStyles();
   const { i18n } = useTranslation();
 
-  const [loading, setLoading] = useState(false);
   const [contactTransferModalOpen, setContactTransferModalOpen] = useState(false);
   const [selectedWhatsapps, setSelectedWhatsapps] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [company, setCompany] = useState("");
   const [searchParam, setSearchParam] = useState("");
-  const [hasMore, setHasMore] = useState(false);
-  const [count, setCount] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [isBusiness, setIsBusiness] = useState(false);
 
   const [allSelected, setAllSelected] = useState(false);
   const [editWhatsModalOpen, setEditWhatsModalOpen] = useState(false);
 
-  const [whatsapps, dispatch] = useReducer(reducer, []);
   const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-		dispatch({ type: "RESET" });
-	}, [searchParam, company, pageNumber, isBusiness]);
+  const { whatsapps, count, hasMore, loading } = useWhatsApps2({
+		official: false,
+		pageNumber,
+		name: searchParam,
+		selectedCompanyId: company,
+    business: isBusiness,
+	});
 
   useEffect(() => {
     setPageNumber(1);
   }, [company, searchParam, isBusiness]);
 
 	useEffect(() => {
-		const fetchWhats = async () => {
-      setLoading(true);
-			try {
-				const { data } = await api.get(`/whatsapp/listAll/`, {
-          params: { searchParam, company, pageNumber, isBusiness }
-        });
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
-        setHasMore(data.hasMore);
-        setCount(data.count);
-				setLoading(false);
-
-        for (const whats of data.whatsapps) {
-          if (selectedWhatsapps.indexOf(whats.id) === -1) {
-            setAllSelected(false);
-            break;
-          }
-        }
-			} catch (err) {
-        toastError(err);
-				setLoading(false);
-			}
-		};
-
-		fetchWhats();
-	}, [pageNumber, searchParam, company, isBusiness, editWhatsModalOpen]);
+		for (const whats of whatsapps) {
+      if (selectedWhatsapps.indexOf(whats.id) === -1) {
+        setAllSelected(false);
+        break;
+      }
+    }
+	}, [whatsapps]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      setLoading(true);
       try {
           const { data } = await api.get("/company");
           setCompanies(data.companies);
-          setLoading(false);
       } catch (err) {
           toastError(err);
-          setLoading(false);
       }
     }
 
     fetchCompanies();
   }, []);
-
-  useEffect(() => {
-		const socket = openSocket();
-
-		socket.on(`whatsapp${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-			}
-		});
-
-		// socket.on(`whatsapp${user.companyId}`, data => {
-		// 	if (data.action === "delete") {
-		// 		dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-		// 	}
-		// });
-
-		socket.on(`whatsappSession${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_SESSION", payload: data.session });
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
 
   const handleOpenContactTransferModal = (whats) => {
     if (whats && whats.id) {
@@ -212,7 +119,9 @@ const ContactTransfer = () => {
   }
 
   const renderOptionLabel = (option) => {
-    return option.name;
+    if (option.name) return option.name;
+
+    return ""
   };
 
   const handleSearch = (event) => {
@@ -412,7 +321,7 @@ const ContactTransfer = () => {
           </TableHead>
           <TableBody>
             <>
-              {whatsapps.map((whats) => {
+              {whatsapps && whatsapps.map((whats) => {
                 const isItemSelected = isSelected(whats.id);
                 
                 return (

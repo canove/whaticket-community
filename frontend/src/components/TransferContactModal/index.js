@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next";
 
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input/input'
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -66,23 +67,17 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 
-    const [whatsapps, setWhatsapps] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [whatsappsId, setWhatsappsId] = useState([]);
     const [companyId, setCompanyId] = useState("");
 
-    useEffect(() => {
-        const fetchWhats = async () => {
-            try {
-                const { data } = await api.get("/whatsapp/listAll/", {
-                    params: { all: true }
-                });
-                setWhatsapps(data.whatsapps);
-            } catch (err) {
-                toastError(err);
-            }
-        }
+    const { whatsapps } = useWhatsApps2({
+		official: false,
+		limit: -1,
+        anyCompany: true,
+	});
 
+    useEffect(() => {
         const fetchCompanies = async () => {
             try {
                 const { data } = await api.get("/company");
@@ -92,7 +87,6 @@ const TransferContactModal = ({ open, onClose, selectedWhatsapps }) => {
             }
         }
 
-        fetchWhats();
         fetchCompanies();
 
         if (selectedWhatsapps) {

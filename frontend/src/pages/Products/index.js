@@ -272,7 +272,7 @@ const Products = () => {
                                 </TableCell>
                             </TableRow>
                             ))}
-                        {loading && <TableRowSkeleton columns={7} />}
+                        {loading && <TableRowSkeleton columns={9} />}
                     </TableBody>
                 </Table>
         </Paper>

@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
 import ConfirmationModal from "../ConfirmationModal";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,7 +70,6 @@ const ImportationtModal = ({
 }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
-  const { whatsApps } = useContext(WhatsAppsContext);
 
   const [name, setName] = useState("");
   const [method, setMethod] = useState("");
@@ -113,6 +112,12 @@ const ImportationtModal = ({
 
   const [offTemplates, setOffTemplates] = useState([]);
   const [selectedOffTemplate, setSelectedOffTemplate] = useState("");
+
+  const { whatsapps } = useWhatsApps2({
+    official: connectionType,
+    limit: -1,
+    type: "receptive",
+  });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -819,20 +824,13 @@ const ImportationtModal = ({
                 <MenuItem value={"Todos"}>
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
-                {whatsApps &&
-                  whatsApps.map((whats) => {
-                    if (
-                      whats.official === connectionType &&
-                      whats.status === "CONNECTED"
-                    ) {
-                      return (
-                        <MenuItem key={whats.id} value={whats.id}>
-                          {whats.name}
-                        </MenuItem>
-                      );
-                    }
-                    return null;
-                  })}
+                {whatsapps &&
+                  whatsapps.map((whats) => (
+                    <MenuItem key={whats.id} value={whats.id}>
+                      {whats.name}
+                    </MenuItem>
+                  ))
+                }
               </Select>
             </FormControl>
           )}

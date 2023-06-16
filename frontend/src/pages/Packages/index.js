@@ -218,6 +218,7 @@ const Packages = () => {
                             <TableCell align="center">{"Nome"}</TableCell>
                             <TableCell align="center">{"Mensalidade"}</TableCell>
                             <TableCell align="center">{"Máx. Usuários"}</TableCell>
+                            <TableCell align="center">{"Usuários Extras"}</TableCell>
                             <TableCell align="center">{"Preço por Usuário Extra"}</TableCell>
                             <TableCell align="center">{"Máx. Tickets por Mês"}</TableCell>
                             <TableCell align="center">{"Preço por Ticket Extra"}</TableCell>
@@ -233,6 +234,7 @@ const Packages = () => {
                                 <TableCell align="center">{pack.name}</TableCell>
                                 <TableCell align="center">{formatToBRL(pack.monthlyFee)}</TableCell>
                                 <TableCell align="center">{pack.maxUsers}</TableCell>
+                                <TableCell align="center">{pack.extraUsers || 0}</TableCell>
                                 <TableCell align="center">{formatToBRL(pack.extraUserPrice)}</TableCell>
                                 <TableCell align="center">{pack.maxTicketsByMonth}</TableCell>
                                 <TableCell align="center">{formatToBRL(pack.extraTicketPrice)}</TableCell>
@@ -263,7 +265,7 @@ const Packages = () => {
                                 </TableCell>
                             </TableRow>
                             ))}
-                        {loading && <TableRowSkeleton columns={9} />}
+                        {loading && <TableRowSkeleton columns={10} />}
                     </TableBody>
                 </Table>
         </Paper>

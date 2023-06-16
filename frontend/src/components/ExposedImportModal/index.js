@@ -25,7 +25,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
 import ConfirmationModal from "../ConfirmationModal";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,7 +67,6 @@ const useStyles = makeStyles((theme) => ({
 const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
-  const { whatsApps } = useContext(WhatsAppsContext);
 
   const [name, setName] = useState("");
   const [token, setToken] = useState("");
@@ -128,6 +127,13 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     queue: false,
   };
   const [requiredItems, setRequiredItems] = useState(initialRequiredItems);
+
+  const { whatsapps } = useWhatsApps2({
+    official: connectionType,
+    connectionFileId: selectedConnectionFile.length > 0 ? selectedConnectionFile : null,
+    limit: -1,
+    type: "receptive",
+  });
 
   useEffect(() => {
     const fetchExposedImport = async () => {
@@ -672,21 +678,13 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
                 <MenuItem value={"Todos"}>
                   {i18n.t("importModal.form.all")}
                 </MenuItem>
-                {whatsApps &&
-                  whatsApps.map((whats) => {
-                    if (
-                      whats.official === connectionType &&
-                      whats.status === "CONNECTED" &&
-                      (selectedConnectionFile.length === 0 || selectedConnectionFile.includes(whats.connectionFileId))
-                    ) {
-                      return (
-                        <MenuItem key={whats.id} value={whats.id}>
-                          {whats.name}
-                        </MenuItem>
-                      );
-                    }
-                    return null;
-                  })}
+                {whatsapps &&
+                  whatsapps.map((whats) => (
+                    <MenuItem key={whats.id} value={whats.id}>
+                      {whats.name}
+                    </MenuItem>
+                  ))
+                }
               </Select>
             </FormControl>
           )}

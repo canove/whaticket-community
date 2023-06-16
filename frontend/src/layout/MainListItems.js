@@ -31,8 +31,8 @@ import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import PaymentIcon from "@material-ui/icons/Payment";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import SmsFailedIcon from '@material-ui/icons/SmsFailed';
 
-import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
 
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
@@ -108,6 +108,7 @@ const menuTranslation = {
   "Packages": "Pacotes",
   "Batch": "batch.title",
   "Operations": "operations.title",
+  "Error Messages": "Mensagens com Erro",
 }
 
 function getIcon(icon, isParent) {
@@ -169,6 +170,8 @@ function getIcon(icon, isParent) {
     return <PaymentIcon style={{ color }} />;
   } else if (icon === "ShoppingCartIcon") {
     return <ShoppingCartIcon style={{ color }} />;
+  } else if (icon === "SmsFailedIcon") {
+    return <SmsFailedIcon style={{ color }} />; 
   } else {
     return null;
   }
@@ -266,7 +269,6 @@ function ListItemLink(props) {
 
 const MainListItems = (props) => {
   const { drawerOpen, drawerClose } = props;
-  // const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const { i18n } = useTranslation();
 

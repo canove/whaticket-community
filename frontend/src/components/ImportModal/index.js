@@ -21,9 +21,9 @@ import {
   Paper,
   Select,
 } from "@material-ui/core";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -73,7 +73,6 @@ const ImportModal = ({ open, onClose }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const { user } = useContext(AuthContext);
-  const { whatsApps } = useContext(WhatsAppsContext);
 
   const [file, setFile] = useState();
   const [selectedType, setSelectedType] = useState(true);
@@ -97,6 +96,13 @@ const ImportModal = ({ open, onClose }) => {
   const [selectedConnectionFile, setSelectedConnectionFile] = useState("Nenhum");
 
   const [sendByAnyConnections, setsendByAnyConnections] = useState(false);
+
+  const { whatsapps } = useWhatsApps2({
+    official: selectedType,
+    connectionFileId: (selectedConnectionFile !== "Nenhum") ? [selectedConnectionFile] : null,
+    limit: -1,
+    type: "receptive",
+  });
 
   useEffect(() => {
     const fetchMenus = async () => {
@@ -473,21 +479,13 @@ const ImportModal = ({ open, onClose }) => {
                   <MenuItem value={"Todos"}>
                     {i18n.t("importModal.form.all")}
                   </MenuItem>
-                  {whatsApps &&
-                    whatsApps.map((whats) => {
-                      if (
-                        whats.official === selectedType &&
-                        whats.status === "CONNECTED" &&
-                        (selectedConnectionFile === "Nenhum" || whats.connectionFileId === selectedConnectionFile)
-                      ) {
-                        return (
-                          <MenuItem key={whats.id} value={whats.id}>
-                            {whats.name}
-                          </MenuItem>
-                        );
-                      }
-                      return null;
-                    })}
+                  {whatsapps &&
+                    whatsapps.map((whats) => (
+                      <MenuItem key={whats.id} value={whats.id}>
+                        {whats.name}
+                      </MenuItem>
+                    ))
+                  }
                 </Select>
               </div>
               { selectedConnectionFile !== "Nenhum" &&

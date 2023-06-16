@@ -51,6 +51,9 @@ class Packages extends Model<Packages> {
 
   @HasMany(() => Pricing, "packageId")
   pricings: Pricing[];
+
+  @Column
+  extraUsers: number;
 }
 
 export default Packages;

@@ -11,6 +11,8 @@ import { Op } from "sequelize";
 import Product from "../database/models/Products";
 import Pricing from "../database/models/Pricing";
 import Billings from "../database/models/Billings";
+import FileRegister from "../database/models/FileRegister";
+import { startOfDay } from "date-fns";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { user } = req;

@@ -14,6 +14,8 @@ interface Request {
 }
 
 const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: Request): Promise<Whatsapp> => {
+  const settings = await ListCompanySettingsService(companyId);
+
   let whereCondition = null;
   let order = null;
 
@@ -24,10 +26,23 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
       ...whereCondition, 
       status: "CONNECTED", 
       official: false, 
-      currentTriggerQuantity: { [Op.gte]: 50 },
       [Op.or]: [{ sleeping: false }, { sleeping: null }],
     };
     order = [["lastSendDate", "ASC"]];
+
+    if (settings.createTicketInterval) {
+      whereCondition = { 
+        ...whereCondition,
+        currentTriggerQuantity: { [Op.gte]: 50 },
+      }
+    }
+
+    if (settings.createTicketWhatsappType) {
+      whereCondition = {
+        ...whereCondition,
+        type: settings.createTicketWhatsappType
+      }
+    }
   }
 
   if (whatsappId) {
@@ -50,7 +65,6 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
       if (!canUseWhats) throw new AppError("ERR_MAX_AUTOMATIC_CONTROL");
     }
 
-    const settings = await ListCompanySettingsService(whatsapp.companyId);
     const now = new Date();
     
     if (whatsapp.lastSendDate && settings.createTicketInterval) {

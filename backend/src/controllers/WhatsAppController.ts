@@ -14,7 +14,6 @@ import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
 import NewMessageWhatsapp from "../services/WhatsappService/NewMessageWhatsappService";
 import StatusMessageWhatsappService from "../services/WhatsappService/StatusMessageWhatsappService";
-import ListOfficialWhatsAppsService from "../services/WhatsappService/ListOfficialWhatsAppsService";
 import QualityNumberWhatsappService from "../services/WhatsappService/QualityNumberWhatsappService";
 import NOFWhatsappQRCodeService from "../services/WhatsappService/NOFWhatsappQRCodeService";
 import NOFWhatsappSessionStatusService from "../services/WhatsappService/NOFWhatsappSessionStatusService";
@@ -25,13 +24,13 @@ import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTi
 import Contact from "../database/models/Contact";
 import FileRegister from "../database/models/FileRegister";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
-import ListAllWhatsAppsService from "../services/WhatsappService/ListAllWhatsAppsService";
 import TransferWhatsAppService from "../services/WhatsappService/TransferWhatsAppService";
 import ListReportWhatsAppsService from "../services/WhatsappService/ListReportWhatsAppsService";
 import ShowCompanyService from "../services/CompanyService/ShowCompanyService";
 import { Op } from "sequelize";
 import CheckAvailableWhatsapps from "../services/WhatsappService/CheckAvailableWhatsapps";
 import GetCallbackService from "../services/WhatsappService/GetCallbackService";
+import ListWhatsAppsService2 from "../services/WhatsappService/ListWhatsAppsService2";
 
 interface WhatsappData {
   name: string;
@@ -58,6 +57,7 @@ interface WhatsappData {
   callbackAuthorization?: string;
   useGroup?: boolean;
   selectedCompany?: string | number;
+  type?: string | null;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -66,6 +66,59 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const whatsapps = await ListWhatsAppsService(companyId);
 
   return res.status(200).json(whatsapps);
+};
+
+type IndexQuery = {
+  official: string,
+  officialWhatsappId: string,
+  connectionFileId: string[],
+  name: string,
+  status: string,
+  pageNumber: string,
+  limit: string,
+  selectedCompanyId: string,
+  connectionFileName: string,
+  business: string,
+  anyCompany: string,
+  type: string,
+  typePermission: string,
+}
+
+export const index2 = async (req: Request, res: Response): Promise<Response> => {
+  const { 
+    official, 
+    officialWhatsappId, 
+    connectionFileId, 
+    name, 
+    status, 
+    pageNumber, 
+    limit, 
+    selectedCompanyId,
+    connectionFileName,
+    business,
+    anyCompany,
+    type,
+    typePermission,
+  } = req.query as IndexQuery;
+  const { companyId } = req.user;
+
+  const { whatsapps, count, hasMore } = await ListWhatsAppsService2({ 
+    official: (official === "true"), 
+    officialWhatsappId, 
+    companyId: (companyId === 1 && selectedCompanyId) ? selectedCompanyId : companyId,
+    connectionFileId,
+    name,
+    status,
+    pageNumber,
+    limit,
+    connectionFileName,
+    business,
+    anyCompany: (companyId === 1 && anyCompany) ? (anyCompany === "true") : false,
+    type,
+    typePermission: (typePermission === "true"),
+  });
+
+  return res.status(200).json({ whatsapps, count, hasMore });
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
@@ -93,6 +146,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     callbackAuthorization,
     useGroup,
     selectedCompany,
+    type,
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -151,6 +205,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     statusCallbackUrl,
     callbackAuthorization,
     useGroup,
+    type,
   });
 
   if (!official) StartWhatsAppSession(whatsapp, null);
@@ -579,68 +634,6 @@ export const remove = async (
   });
 
   return res.status(200).json({ message: "Whatsapp deleted." });
-};
-
-type ListQuery = {
-  pageNumber: string | number;
-  official: string | boolean;
-  connectionFileName?: string;
-  searchParam?: string;
-  status?: string;
-  connectionName?: string;
-  limit?: string;
-  officialWhatsappId?: string;
-  companyId?: string;
-};
-
-export const list = async (req: Request, res: Response): Promise<Response> => {
-  const { official, pageNumber, connectionFileName, searchParam, status, connectionName, limit, officialWhatsappId, companyId: selectedCompany } = req.query as ListQuery;
-  const { companyId } = req.user;
-
-  const { whatsapps, count, hasMore, connectionFileId } = await ListOfficialWhatsAppsService({
-    companyId,
-    official,
-    connectionFileName,
-    pageNumber,
-    searchParam,
-    status,
-    connectionName,
-    limit,
-    officialWhatsappId,
-    selectedCompany,
-  });
-
-  return res.status(200).json({
-    whatsapps,
-    count,
-    hasMore,
-    connectionFileId
-  });
-};
-
-type ListAllQuery = {
-  searchParam: string;
-  company: string;
-  pageNumber: string;
-  isBusiness: string;
-  all: string;
-}
-
-export const listAll = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, company, pageNumber, isBusiness, all } = req.query as ListAllQuery;
-  const { companyId } = req.user;
-
-  if (companyId !== 1) {
-    throw new AppError("NO PERMISSION!");
-  }
-
-  const { whatsapps, count, hasMore } = await ListAllWhatsAppsService({ searchParam, company, pageNumber, isBusiness, all });
-
-  return res.status(200).json({
-    whatsapps, 
-    count, 
-    hasMore
-  });
 };
 
 type ListReportQuery = {

@@ -40,16 +40,15 @@ const Payments = () => {
     const [selectedBillingHistoric, setSelectedBillingHistoric] = useState(null);
 
     useEffect(() => {
-        setLoading(true);
         const fetchProducts = async () => {
+            setLoading(true);
             try {
                 const { data } = await api.get("/billings/");
                 setBillings(data);
-                setLoading(false);
             } catch (err) {
                 toastError(err);
-                setLoading(false);
             }
+            setLoading(false);
         };
         fetchProducts();
     }, []);
@@ -62,11 +61,14 @@ const Payments = () => {
     }
 
     const getMonth = (date) => {
-        const meses = [ 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
         let month = format(parseISO(date), "MM");
-
+    
         month = parseInt(month);
-
+    
+        if (month === 0) month = 12;
+    
         return meses[month-1];
     }
 
@@ -100,12 +102,16 @@ const Payments = () => {
                         <TableRow>
                             <TableCell align="center">{i18n.t("payments.grid.company")}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.month")}</TableCell>
-                            <TableCell align="center">{i18n.t("payments.grid.shotsValue")}</TableCell>
-                            <TableCell align="center">{"Valor Total das Mensagens Recebidas"}</TableCell>
-                            <TableCell align="center">{"Valor Total das Mensagens Enviadas"}</TableCell>
-                            <TableCell align="center">{i18n.t("payments.grid.monthValue")}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.amounth")}</TableCell>
-                            <TableCell align="center">{i18n.t("payments.grid.amounthPaind")}</TableCell>
+                            <TableCell align="center">{"Mensalidade"}</TableCell>
+                            <TableCell align="center">{"Disparos"}</TableCell>
+                            <TableCell align="center">{"Mensagens Recebidas"}</TableCell>
+                            <TableCell align="center">{"Mensagens Enviadas"}</TableCell>
+                            <TableCell align="center">{"Sessão (Inbound)"}</TableCell>
+                            <TableCell align="center">{"Sessão (Outbound)"}</TableCell>
+                            <TableCell align="center">{"Usuários Extras"}</TableCell>
+                            <TableCell align="center">{"Tickets Extras"}</TableCell>
+                            <TableCell align="center">{"Whatsapps"}</TableCell>
                             <TableCell align="center">{i18n.t("payments.grid.actions")}</TableCell>
                         </TableRow>
                     </TableHead>
@@ -114,13 +120,17 @@ const Payments = () => {
                             return (
                                 <TableRow key={billing.id}>
                                     <TableCell align="center">{billing.company.name}</TableCell>
-                                    <TableCell align="center">{getMonth(billing.createdAt)}</TableCell>
+                                    <TableCell align="center">{getMonth(billing.fromDate)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalMonthValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalTriggerValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalReceivedMessageValue)}</TableCell>
                                     <TableCell align="center">{formatToBRL(billing.totalSentMessageValue)}</TableCell>
-                                    <TableCell align="center">{formatToBRL(billing.totalMonthValue)}</TableCell>
-                                    <TableCell align="center">{formatToBRL(billing.totalValue)}</TableCell>
-                                    <TableCell align="center">{i18n.t("payments.grid.amounthPaind")}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalInboundSessionValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalOutboundSessionValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalExtraUserValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalExtraTicketValue)}</TableCell>
+                                    <TableCell align="center">{formatToBRL(billing.totalConnectedWhatsappsValue)}</TableCell>
                                     <TableCell align="center">
                                         <IconButton
                                             size="small"
@@ -132,7 +142,7 @@ const Payments = () => {
                                 </TableRow>
                             )
                         })}
-                        {loading && <TableRowSkeleton columns={9} />}
+                        {loading && <TableRowSkeleton columns={13} />}
                     </TableBody>
                 </Table>
         </Paper>

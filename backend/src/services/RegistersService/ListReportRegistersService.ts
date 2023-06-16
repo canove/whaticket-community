@@ -74,6 +74,28 @@ const ListReportRegistersService = async ({
       ...whereCondition,
       fileId: fileIds
     };
+  } else {
+    const files = await File.findAll({
+      where: { 
+        [Op.or]: [
+          { status: 7 }, // Recusado
+          { status: 2 }, // Esperando Aprovação
+        ],
+        companyId
+      }
+    });
+
+    if (files.length > 0) {
+      const filesArray = files.map(file => file.id);
+
+      whereCondition = {
+        ...whereCondition,
+        [Op.or]: [
+          { fileId: { [Op.notIn]: filesArray } },
+          { fileId: null }
+        ]
+      }
+    }
   }
 
   if (statuses) {
@@ -84,11 +106,20 @@ const ListReportRegistersService = async ({
   }
 
   if (initialDate && finalDate) {
-    whereCondition = {
-      ...whereCondition,
-      createdAt: {
-        [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
-      },
+    if (isProcessed === "true") {
+      whereCondition = {
+        ...whereCondition,
+        processedAt: {
+          [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+        },
+      }
+    } else {
+      whereCondition = {
+        ...whereCondition,
+        createdAt: {
+          [Op.between]: [+startOfDay(parseISO(initialDate)), +endOfDay(parseISO(finalDate))]
+        },
+      }
     }
   }
 
@@ -109,13 +140,6 @@ const ListReportRegistersService = async ({
     whereConditionCategory = {
       where: { id: categoryIds },
     }
-  }
-
-  if (isProcessed === "true") {
-    whereCondition = {
-      ...whereCondition,
-      processedAt: { [Op.ne]: null }
-    };
   }
 
   const offset = +limit * (+pageNumber - 1);
