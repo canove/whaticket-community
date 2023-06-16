@@ -58,6 +58,7 @@ interface WhatsappData {
   callbackAuthorization?: string;
   useGroup?: boolean;
   selectedCompany?: string | number;
+  type?: string | null;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -93,6 +94,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     callbackAuthorization,
     useGroup,
     selectedCompany,
+    type,
   }: WhatsappData = req.body;
 
   // FAZER VALIDAÇÃO PARA VER SE TEM SLOT DISPONIVEL PARA CRIAR O CHIP
@@ -151,6 +153,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     statusCallbackUrl,
     callbackAuthorization,
     useGroup,
+    type,
   });
 
   if (!official) StartWhatsAppSession(whatsapp, null);

@@ -36,6 +36,13 @@ const GetDefaultWhatsApp = async ({ companyId, whatsappId, official, queueId }: 
         currentTriggerQuantity: { [Op.gte]: 50 },
       }
     }
+
+    if (settings.createTicketWhatsappType) {
+      whereCondition = {
+        ...whereCondition,
+        type: settings.createTicketWhatsappType
+      }
+    }
   }
 
   if (whatsappId) {

@@ -29,6 +29,7 @@ interface Request {
   statusCallbackUrl?: string;
   callbackAuthorization?: string;
   useGroup?: boolean;
+  type?: string | null;
 }
 
 interface Response {
@@ -59,6 +60,7 @@ const CreateWhatsAppService = async ({
   statusCallbackUrl,
   callbackAuthorization,
   useGroup,
+  type,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -154,7 +156,8 @@ const CreateWhatsAppService = async ({
       messageCallbackUrl,
       statusCallbackUrl,
       callbackAuthorization,
-      useGroup
+      useGroup,
+      type,
     },
     { include: ["queues"] }
   );

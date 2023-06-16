@@ -96,6 +96,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 	const { user } = useContext(AuthContext);
 	const [service, setService] = useState("");
 	const [services, setServices] = useState([]);
+	const [type, setType] = useState("");
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -110,6 +111,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 				setConnectionFile(data.connectionFileId);
 				const whatsQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(whatsQueueIds);
+				setType(data.type || "");
 			} catch (err) {
 				toastError(err);
 			}
@@ -164,6 +166,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 			connectionFileId: connectionFile ? connectionFile : null,
 			service: service ? service : null,
 			selectedCompany: company ? company : null,
+			type: type ? type : null,
 			// name: phoneNumber.replace("+", ""),
 		};
 
@@ -184,6 +187,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 		setFlow("");
 		setConnectionFile("");
 		setService("");
+		setType("");
 		// setPhoneNumber("");
 		setWhatsApp(initialState);
 		onClose();
@@ -324,6 +328,25 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 										margin="dense"
 									/>
 								</div> */}
+								<div>
+									<FormControl
+										variant="outlined"
+										className={classes.multFieldLine}
+										margin="dense"
+										fullWidth
+									>
+										<InputLabel>Tipo</InputLabel>
+										<Select
+											value={type}
+											onChange={(e) => { setType(e.target.value) }}
+											label="Tipo"
+										>
+											<MenuItem value={""}>Ambos</MenuItem>
+											<MenuItem value={"active"}>Ativo</MenuItem>
+											<MenuItem value={"receptive"}>Receptivo</MenuItem>
+										</Select>
+									</FormControl>
+								</div>
 								<div className={classes.multFieldLine}>
 									<Field
 										as={TextField}

@@ -30,6 +30,7 @@ interface WhatsappData {
   callbackAuthorization?: string;
   useGroup?: boolean;
   selectedCompany?: string | number;
+  type?: string | null;
 }
 
 interface Request {
@@ -78,6 +79,7 @@ const UpdateWhatsAppService = async ({
     callbackAuthorization,
     useGroup,
     selectedCompany,
+    type,
   } = whatsappData;
 
   const usedCompany = (companyId === 1 && selectedCompany) ? selectedCompany : companyId;
@@ -152,7 +154,8 @@ const UpdateWhatsAppService = async ({
     messageCallbackUrl,
     statusCallbackUrl,
     callbackAuthorization,
-    useGroup
+    useGroup,
+    type,
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
