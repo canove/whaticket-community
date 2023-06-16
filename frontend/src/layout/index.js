@@ -138,7 +138,7 @@ const LoggedInLayout = ({ children }) => {
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
   const [logo, setLogo] = useState("");
-  const [language, setLanguage] = useState("");
+  const [changingLanguage, setChangingLanguage] = useState(false);
 
 // eslint-disable-next-line react-hooks/exhaustive-deps
   const mainListItems = useMemo(() => <MainListItems drawerOpen={drawerOpen} />, [user, drawerOpen])
@@ -173,25 +173,21 @@ const LoggedInLayout = ({ children }) => {
     }
   }, [drawerOpen]);
 
-  useEffect(() => {
-    const saveLanguage = async () => {
-      if (!user.id) return;
+  const handleChangeLanguage = async (language) => {
+    if (!user.id) return;
 
-      try {
-        await api.put(`/users/language/${user.id}`, { language });
-        i18n.changeLanguage(language);
-      } catch (err) {
-        toastError(err);
-      }
+    handleCloseLanguageMenu();
+
+    setChangingLanguage(true);
+
+    try {
+      await api.put(`/users/${user.id}`, { lang: language });
+      i18n.changeLanguage(language);
+    } catch (err) {
+      toastError(err);
     }
 
-    saveLanguage();
-  }, [language])
-
-  const handleChangeLanguage = (language) => {
-    // i18n.changeLanguage(language);
-    setLanguage(language);
-    handleCloseLanguageMenu();
+    setChangingLanguage(false);
   }
 
   const handleMenu = (event) => {
@@ -327,6 +323,7 @@ const LoggedInLayout = ({ children }) => {
           <div>
             <IconButton
               onClick={handleLanguageMenu}
+              disabled={changingLanguage}
             >
               {i18n.language === 'pt' &&
                 <IconFlagBR />

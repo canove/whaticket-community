@@ -99,7 +99,7 @@ const Operations = () => {
     }
     
     const getSleepingWhatsapps = (whatsapps = []) => {
-        const sleepingWhatsapps = whatsapps.filter(whats => (whats.sleeping));
+        const sleepingWhatsapps = whatsapps.filter(whats => (whats.sleeping && whats.status === "CONNECTED"));
 
         return sleepingWhatsapps.length;
     }

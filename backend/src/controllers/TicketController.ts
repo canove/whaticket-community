@@ -253,7 +253,8 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
   const { ticket } = await UpdateTicketService({
     ticketData,
     ticketId,
-    companyId
+    companyId,
+    loggedInUserId: userId,
   });
 
   if (ticket.status === "closed") {

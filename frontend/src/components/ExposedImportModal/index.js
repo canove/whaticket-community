@@ -132,7 +132,7 @@ const ExposedImportModal = ({ open, onClose, exposedImportId }) => {
     official: connectionType,
     connectionFileId: selectedConnectionFile.length > 0 ? selectedConnectionFile : null,
     limit: -1,
-    type: "receptive",
+    type: "active",
   });
 
   useEffect(() => {

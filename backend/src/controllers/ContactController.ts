@@ -12,6 +12,7 @@ import AppError from "../errors/AppError";
 import GetContactService from "../services/ContactServices/GetContactService";
 import ContactBlacklist from "../database/models/ContactBlacklist";
 import BlockOrUnblockContactService from "../services/ContactServices/BlockOrUnblockContactService";
+import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService";
 
 type IndexQuery = {
   searchParam: string;
@@ -196,7 +197,11 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const { contactId } = req.params;
-  const { companyId } = req.user;
+  const { id: userId, companyId } = req.user;
+
+  const permission = CheckProfilePermissionService({ userId, companyId, permission: "contacts-page:deleteContact" });
+  
+  if (!permission) throw new AppError("ERR_NO_PERMISSION", 403);
 
   await DeleteContactService(contactId, companyId);
 

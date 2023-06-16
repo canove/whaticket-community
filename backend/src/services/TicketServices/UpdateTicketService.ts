@@ -10,6 +10,7 @@ import Message from "../../database/models/Message";
 import TicketChanges from "../../database/models/TicketChanges";
 import ShowTaskService from "../TaskServices/ShowTaskService";
 import FinalizeTaskService from "../TaskServices/FinalizeTaskService";
+import CheckProfilePermissionService from "../ProfileServices/CheckProfilePermissionService";
 
 interface TicketData {
   status?: string;
@@ -23,6 +24,7 @@ interface Request {
   ticketData: TicketData;
   ticketId: string | number;
   companyId: string | number;
+  loggedInUserId?: string | number;
 }
 
 interface Response {
@@ -34,12 +36,12 @@ interface Response {
 const UpdateTicketService = async ({
   ticketData,
   ticketId,
-  companyId
+  companyId,
+  loggedInUserId,
 }: Request): Promise<Response> => {
   const { status, userId, queueId, categoryId, observation } = ticketData;
 
   const ticket = await ShowTicketService(ticketId, companyId);
-  await SetTicketMessagesAsRead(ticket);
 
   const oldStatus = ticket.status;
   const oldUserId = ticket.user?.id;
@@ -57,9 +59,15 @@ const UpdateTicketService = async ({
 
   let reopen = false;
   if (oldStatus === "closed") {
+    const permission = CheckProfilePermissionService({ userId: loggedInUserId, companyId, permission: "tickets:reopen" });
+
+    if (!permission) throw new AppError("ERR_NO_PERMISSION", 403);
+
     await CheckContactOpenTickets(ticket.contact.id, ticket.companyId);
     reopen = true;
   }
+
+  await SetTicketMessagesAsRead(ticket);
 
   if (ticket.taskId) {
     await FinalizeTaskService({ taskId: ticket.taskId, ticketId: ticket.id, companyId: ticket.companyId });

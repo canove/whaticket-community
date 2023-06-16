@@ -6,7 +6,7 @@ import ShowUserService from "../UserServices/ShowUserService";
 interface Request {
     userId?: string | number;
     profileId?: number;
-    companyId?: number;
+    companyId?: number | string;
     permission?: string;
 }
 
@@ -23,6 +23,8 @@ const CheckProfilePermissionService = async ({
 
         userProfileId = user.profileId
     }
+
+    if (!userProfileId && !profileId) return true;
 
     const profile = await Profiles.findOne({
         attributes: ["permissions"],

@@ -3,7 +3,7 @@ import Profiles from "../../database/models/Profiles";
 import AppError from "../../errors/AppError";
 
 const ShowProfileService = async (
-  id: string,
+  id: number | string,
   companyId: number | string
 ): Promise<Profiles> => {
   const profile = await Profiles.findOne({

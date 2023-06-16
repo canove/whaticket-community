@@ -116,7 +116,7 @@ const ImportationtModal = ({
   const { whatsapps } = useWhatsApps2({
     official: connectionType,
     limit: -1,
-    type: "receptive",
+    type: "active",
   });
 
   useEffect(() => {

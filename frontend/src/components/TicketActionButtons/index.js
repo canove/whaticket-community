@@ -116,6 +116,7 @@ const TicketActionButtons = ({ ticket }) => {
 			/>
 			{ticket.status === "closed" && (
 				<Can
+					profile={user.profiles}
 					permission="tickets:reopen"
 					item={
 						<ButtonWithSpinner
