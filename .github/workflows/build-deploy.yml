@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master
+      - homolog
 
 permissions:
   id-token: write # This is required for requesting the JWT
