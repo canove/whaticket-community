@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 	  },
 }));
 
-const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company }) => {
+const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileName, company }) => {
 	const { i18n } = useTranslation();
 	const classes = useStyles();
 	const initialState = {
@@ -134,6 +134,12 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 					params: { companyId: company }
 				});
 				setConnectionFiles(data);
+
+				if (!connectionFile) {
+					const newConnectionFile = data.find(d => d.name === connectionFileName);
+
+					if (newConnectionFile) setConnectionFile(newConnectionFile.id);
+				}
 			} catch (err) {
 				toastError(err);
 			}
@@ -150,13 +156,11 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, connectionFileId, company })
 			}
 		}
 
-		setConnectionFile(connectionFileId);
-
 		fetchSession();
 		fetchFlows();
 		fetchConnectionFiles();
 		fetchServices();
-	}, [whatsAppId, connectionFileId, open, company]);
+	}, [whatsAppId, open, company]);
 
 	const handleSaveWhatsApp = async values => {
 		const whatsappData = {

@@ -33,7 +33,6 @@ import PaymentIcon from "@material-ui/icons/Payment";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import SmsFailedIcon from '@material-ui/icons/SmsFailed';
 
-import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
 import { useTranslation } from "react-i18next";
 
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
@@ -270,7 +269,6 @@ function ListItemLink(props) {
 
 const MainListItems = (props) => {
   const { drawerOpen, drawerClose } = props;
-  // const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const { i18n } = useTranslation();
 

@@ -26,7 +26,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import TemplateModal from "../../components/TemplateModal";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { DeleteOutline } from "@material-ui/icons";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import ConfirmationModal from "../../components/ConfirmationModal";
@@ -34,6 +33,7 @@ import { toast } from "react-toastify";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import CopyOfficialTemplateModal from "../../components/CopyOfficialTemplateModal";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,7 +65,6 @@ const OfficialTemplates = () => {
   const { i18n } = useTranslation();
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [connection, setConnection] = useState("");
-  const { whatsApps } = useContext(WhatsAppsContext);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -81,6 +80,11 @@ const OfficialTemplates = () => {
   const [confirmModalInfo, setConfirmModalInfo] = useState(
     confirmationModalInitialState
   );
+
+  const { whatsapps } = useWhatsApps2({
+    official: true,
+    limit: -1,
+  });
 
   const handleTemplateModalOpen = (template) => {
     setSelectedTemplate(template);
@@ -200,46 +204,11 @@ const OfficialTemplates = () => {
               }}
               disablePortal
               id="combo-box-companies"
-              options={whatsApps.filter((whats) => whats.official)}
+              options={whatsapps}
               getOptionLabel={(option) => (option ? option.name : "")}
               style={{ marginRight: "10px", width: "200px" }}
               renderInput={(params) => <TextField {...params} label="Número" />}
             />
-            {/* <FormControl
-              style={{
-                marginRight: "10px",
-                width: "200px",
-              }}
-            >
-              <InputLabel id="demo-official-connections-label">
-                {i18n.t("templates.buttons.connection")}
-              </InputLabel>
-              <Select
-                labelId="demo-official-connections-label"
-                id="demo-official-connections"
-                value={connection}
-                onChange={handleChange}
-              >
-                {whatsApps &&
-                  whatsApps.map((whats) => {
-                    if (whats.official === true) {
-                      return (
-                        <MenuItem key={whats.id} value={whats.id}>
-                          {whats.name}
-                        </MenuItem>
-                      );
-                    }
-                    return null;
-                  })}
-              </Select>
-            </FormControl> */}
-            {/* <Button
-              variant="contained"
-              color="primary"
-              onClick={handleTemplateModal}
-            >
-              {i18n.t("templates.buttons.newTemplate")}
-            </Button> */}
           </div>
         </MainHeaderButtonsWrapper>
       </MainHeader>

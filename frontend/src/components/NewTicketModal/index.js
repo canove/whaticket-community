@@ -21,9 +21,9 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
 import { Checkbox, Chip, FormControl, FormControlLabel, InputLabel, makeStyles, MenuItem, Select, Tooltip, Typography } from "@material-ui/core";
 import QueueSelectSingle from "../QueueSelectSingle";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const filter = createFilterOptions({
 	trim: true,
@@ -52,7 +52,6 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 	const { i18n } = useTranslation();
 
 	const { user } = useContext(AuthContext);
-	const { whatsApps } = useContext(WhatsAppsContext);
 
 	const [options, setOptions] = useState([]);
 	const [queues, setQueues] = useState([]);
@@ -73,6 +72,11 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 	const [newContact, setNewContact] = useState({});
 
 	const [canUseOfficial, setCanUseOfficial] = useState(false);
+
+	const { whatsapps } = useWhatsApps2({
+		official,
+		limit: -1,
+	});
 
 	useEffect(() => {
 		const fetchQueues = async () => {
@@ -402,28 +406,12 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 										<MenuItem value={""}>
 											{"Qualquer Número"}
 										</MenuItem>
-										{whatsApps &&
-											whatsApps.map((whats) => {
-												if (official) {
-													if (whats.official === true && whats.deleted === false) {
-														return (
-															<MenuItem key={whats.id} value={whats.id}>
-																{whats.name}
-															</MenuItem>
-														);
-													}
-												} else {
-													if (whats.official === false && whats.status === "CONNECTED" && whats.deleted === false) {
-														return (
-															<MenuItem key={whats.id} value={whats.id}>
-																{whats.name}
-															</MenuItem>
-														);
-													}
-												}
-
-												return null;
-											})
+										{whatsapps &&
+											whatsapps.map((whats) => (
+												<MenuItem key={whats.id} value={whats.id}>
+													{whats.name}
+												</MenuItem>
+											))
 										}
 									</Select>
 								</FormControl>

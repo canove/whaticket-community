@@ -26,7 +26,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import TemplateModal from "../../components/TemplateModal";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import { DeleteOutline, Edit, Visibility } from "@material-ui/icons";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";

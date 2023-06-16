@@ -65,6 +65,7 @@ import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import WhatsConfigModal from "../../components/WhatsConfigModal";
 import OfficialWhatsAppModal from "../../components/OfficialWhatsAppModal";
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -134,59 +135,9 @@ const CustomToolTip = ({ title, content, children }) => {
 	);
 };
 
-const reducer = (state, action) => {
-	if (action.type === "LOAD_WHATSAPPS") {
-		const whatsApps = action.payload;
-		return [...whatsApps];
-	}
-
-	if (action.type === "UPDATE_WHATSAPPS") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-		if (whatsAppIndex !== -1 || whatsApp.official === true) {
-			state[whatsAppIndex] = whatsApp;
-			return [...state];
-		} else {
-			return [whatsApp, ...state];
-		}
-	}
-
-	if (action.type === "UPDATE_SESSION") {
-		const whatsApp = action.payload;
-		const whatsAppIndex = state.findIndex(s => s.id === whatsApp.id);
-
-		if (whatsAppIndex !== -1) {
-			state[whatsAppIndex].status = whatsApp.status;
-			state[whatsAppIndex].updatedAt = whatsApp.updatedAt;
-			state[whatsAppIndex].qrcode = whatsApp.qrcode;
-			state[whatsAppIndex].retries = whatsApp.retries;
-			return [...state];
-		} else {
-			return [...state];
-		}
-	}
-
-	if (action.type === "DELETE_WHATSAPPS") {
-		const whatsAppId = action.payload;
-
-		const whatsAppIndex = state.findIndex(s => s.id === whatsAppId);
-		if (whatsAppIndex !== -1) {
-			state.splice(whatsAppIndex, 1);
-		}
-		return [...state];
-	}
-
-	if (action.type === "RESET") {
-		return [];
-	}
-};
-
 const OfficialContacts = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
-
-	const [whatsApps, dispatch] = useReducer(reducer, []);
-	const [loading, setLoading] = useState(false);
 	
 	const { user } = useContext(AuthContext);
 
@@ -202,24 +153,19 @@ const OfficialContacts = () => {
 	const [count, setCount] = useState(1);
     const [pageNumber, setPageNumber] = useState(1);
 
-	useEffect(() => {
-		dispatch({ type: "RESET" });
-	}, [pageNumber, searchParam]);
+	const { whatsapps, loading } = useWhatsApps2({
+		official: true,
+		officialWhatsappId: connectionId,
+		limit: -1,
+	});
 
 	useEffect(() => {
-		setPageNumber(1);
-	}, [searchParam]);
-
-	 useEffect(() => {
-		setLoading(true);
 		const fetchWhats = async () => {
 			try {
 				const { data } = await api.get('/officialWhatsapps');
 				setConnections(data);
-				setLoading(false);
 			} catch (err) {
 				toastError(err);
-				setLoading(false);
 			}
 		};
 
@@ -238,61 +184,6 @@ const OfficialContacts = () => {
 
         if (connectionName) fetchWhats();
     }, [connectionName]);
-
-	useEffect(() => {
-		setLoading(true);
-		const fetchPhoneNumbers = async () => {
-			try {
-				const { data } = await api.get('/whatsapp/list/', {
-					params: {
-						official: true,
-						connectionId
-					}
-				});
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
-				setLoading(false);
-			} catch (err) {
-				toastError(err);
-				setLoading(false);
-			}
-		}
-
-		if (connectionId) fetchPhoneNumbers();
-	}, [connectionId]);
-
-    useEffect(() => {
-		const socket = openSocket();
-
-		socket.on(`officialwhatsapp${user.companyId}`, data => {
-			if (data.action === "update") {
-				dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-			}
-		});
-
-		socket.on(`officialwhatsapp${user.companyId}`, data => {
-			if (data.action === "delete") {
-				dispatch({ type: "DELETE_WHATSAPPS", payload: data.whatsappId });
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, [user]);
-
-	useEffect(() => {
-        const socket = openWorkerSocket();
-
-        socket.on(`officialwhatsapp${user.companyId}`, (data) => {
-            if (data.action === "update") {
-                dispatch({ type: "UPDATE_WHATSAPPS", payload: data.whatsapp });
-            }
-        });
-
-        return () => {
-            socket.disconnect();
-        };
-    }, [user]);
 
     const handleCloseWhatsAppModal = () => {
         setSelectedWhatsApp(null);
@@ -426,30 +317,26 @@ const OfficialContacts = () => {
 							</TableHead>
 							<TableBody>
 								{loading ? (
-									<TableRowSkeleton columns={4} />
+									<TableRowSkeleton columns={5} />
 								) : (
 									<>
-										{whatsApps?.length > 0 &&
-											whatsApps.map(whatsApp => {
-												if (whatsApp.official && whatsApp.officialWhatsappId === connectionId) {
-													return (
-														<TableRow key={whatsApp.id}>
-															<TableCell align="center">{whatsApp.name}</TableCell>
-															<TableCell align="center">{connectionName}</TableCell>
-															<TableCell align="center">{whatsApp.usedLimit} / X</TableCell>
-															<TableCell align="center">{format(parseISO(whatsApp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
-															<TableCell align="center">
-																<IconButton
-																	size="small"
-																	onClick={() => handleEditWhatsApp(whatsApp)}
-																>
-																	<Edit />
-																</IconButton>
-															</TableCell>
-														</TableRow>
-													)
-												}
-											}
+										{whatsapps?.length > 0 &&
+											whatsapps.map(whatsApp => (
+												<TableRow key={whatsApp.id}>
+													<TableCell align="center">{whatsApp.name}</TableCell>
+													<TableCell align="center">{connectionName}</TableCell>
+													<TableCell align="center">{whatsApp.usedLimit} / X</TableCell>
+													<TableCell align="center">{format(parseISO(whatsApp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
+													<TableCell align="center">
+														<IconButton
+															size="small"
+															onClick={() => handleEditWhatsApp(whatsApp)}
+														>
+															<Edit />
+														</IconButton>
+													</TableCell>
+												</TableRow>
+											)
 										)}
 									</>
 								)}

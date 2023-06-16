@@ -20,6 +20,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { useTranslation } from "react-i18next";
 import IntlCurrencyInput from "react-intl-currency-input"
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -58,23 +59,15 @@ const MultipleWhatsConfigModal = ({ open, onClose, selectedWhatsapps }) => {
 	const [whatsName, setWhatsName] = useState("");
 	const [whatsImage, setWhatsImage] = useState("");
 
-	const [whatsapps, setWhatsapps] = useState([]);
 	const [whatsappsId, setWhatsappsId] = useState([]);
 
+	const { whatsapps } = useWhatsApps2({
+		official: false,
+		limit: -1,
+        anyCompany: true,
+	});
+
 	useEffect(() => {
-        const fetchWhats = async () => {
-            try {
-                const { data } = await api.get("/whatsapp/listAll/", {
-                    params: { all: true }
-                });
-                setWhatsapps(data.whatsapps);
-            } catch (err) {
-                toastError(err);
-            }
-        }
-
-        fetchWhats();
-
         if (selectedWhatsapps) {
             setWhatsappsId(selectedWhatsapps);
         } else {

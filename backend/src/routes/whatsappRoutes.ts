@@ -7,11 +7,9 @@ const whatsappRoutes = express.Router();
 
 whatsappRoutes.get("/whatsapp/", isAuth, WhatsAppController.index);
 
+whatsappRoutes.get("/whatsapp2/", isAuth, WhatsAppController.index2);
+
 whatsappRoutes.post("/whatsapp/", isAuth, WhatsAppController.store);
-
-whatsappRoutes.get("/whatsapp/list/", isAuth, WhatsAppController.list);
-
-whatsappRoutes.get("/whatsapp/listAll/", isAuth, WhatsAppController.listAll);
 
 whatsappRoutes.get(
   "/whatsapp/listReport/",

@@ -30,11 +30,11 @@ import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper"
 import ConfirmationModal from "../../components/ConfirmationModal";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import HelpIcon from '@material-ui/icons/Help';
+import useWhatsApps2 from "../../hooks/useWhatsApps2";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -139,7 +139,6 @@ const reducer = (state, action) => {
 const WhatsConfig = () => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
-    const { whatsApps } = useContext(WhatsAppsContext);
     const { user } = useContext(AuthContext);
     const [intervalValue, setIntervalValue] = useState(1);
     const [selectedConnection, setSelectedConnection] = useState([]);
@@ -154,6 +153,11 @@ const WhatsConfig = () => {
     const [isActive, setIsActive] = useState(false);
 
     const [interactionPercentage, setInteractionPercentage] = useState(0);
+
+    const { whatsapps } = useWhatsApps2({
+        official: false,
+        limit: -1,
+    });
 
     useEffect(() => {
 		dispatch({ type: "RESET" });
@@ -325,7 +329,7 @@ const WhatsConfig = () => {
 
                 array.forEach(whatsId => {
                     let whatsExists = false;
-                    whatsApps.forEach(whats => {
+                    whatsapps.forEach(whats => {
                         if (whats.id === whatsId) {
                             whatsExists = true;
                             if (whats.status === "CONNECTED") {
@@ -345,7 +349,7 @@ const WhatsConfig = () => {
                 setDeletedWhatsapps(deletedArray);
             }
         }
-    }, [config, whatsApps]);
+    }, [config, whatsapps]);
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -448,15 +452,9 @@ const WhatsConfig = () => {
                             multiple
                         >
                             <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
-                            {whatsApps && whatsApps.map((whats, index) => {
-                                if (whats.official === false) {
-                                    if (whats.status === "CONNECTED") {
-                                        return (
-                                            <MenuItem key={index} value={whats.id}>{whats.name}</MenuItem>
-                                        )
-                                    }
-                                } return null
-                            })}
+                            {whatsapps && whatsapps.map((whats) => (
+                                <MenuItem key={whats.id} value={whats.id}>{whats.name}</MenuItem>
+                            ))}
                         </Select>
                     </Paper>
                     { disconnectedWhatsapps.length > 0 &&
