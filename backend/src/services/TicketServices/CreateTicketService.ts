@@ -10,6 +10,7 @@ import Queue from "../../database/models/Queue";
 import SendOfficialTemplateMessage from "./SendOfficialTemplateMessage";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import OfficialTemplates from "../../database/models/OfficialTemplates";
+import CheckNumberWhatsappService from "../ContactServices/CheckNumberWhatsappService";
 
 interface Request {
   contactId: number;
@@ -58,6 +59,8 @@ const CreateTicketService = async ({
     queueId = ticket.queueId;
   } else {
     const { name, number } = await ShowContactService(contactId, companyId);
+
+    await CheckNumberWhatsappService(number, defaultWhatsapp);
 
     if (official === true) {
       const { data } = await SendOfficialTemplateMessage({

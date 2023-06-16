@@ -1462,6 +1462,7 @@ const messages = {
         ERR_DUE_DATE_REQUIRED: "Data de expiração obrigatória.",
         ERR_NO_AVAILABLE_WHATS_FOUND: "Nenhum whatsapp disponivel foi encontrado.",
         ERR_DATE_FILTER_REQUIRED: "Filtro da data obrigatório.",
+        ERR_NUMBER_DOES_NOT_HAVE_WHATSAPP: "Telefone selecionado não está registrado no whatsapp.",
       },
     },
   },

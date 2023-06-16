@@ -1460,6 +1460,7 @@ const messages = {
         ERR_DUE_DATE_REQUIRED: "Due date required.",
         ERR_NO_AVAILABLE_WHATS_FOUND: "No available whatsapp found.",
         ERR_DATE_FILTER_REQUIRED: "Date filter is required.",
+        ERR_NUMBER_DOES_NOT_HAVE_WHATSAPP: "Selected phone number is not registered on whatsapp.",
       },
     },
   },
