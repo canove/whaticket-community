@@ -76,6 +76,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 	const { whatsapps } = useWhatsApps2({
 		official,
 		limit: -1,
+		typePermission: true,
 	});
 
 	useEffect(() => {

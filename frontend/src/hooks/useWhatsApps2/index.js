@@ -65,6 +65,8 @@ const useWhatsApps2 = ({
 	connectionFileName,
 	business,
 	anyCompany = false,
+	type,
+	typePermission = false,
 }) => {
 	const [whatsapps, dispatch] = useReducer(reducer, []);
 	const [count, setCount] = useState(0);
@@ -94,6 +96,8 @@ const useWhatsApps2 = ({
 							connectionFileName,
 							business,
 							anyCompany,
+							type,
+							typePermission,
 						}
 					});
 					dispatch({ type: "LOAD_WHATSAPPS", payload: data.whatsapps });
@@ -121,6 +125,8 @@ const useWhatsApps2 = ({
 		connectionFileName,
 		business,
 		anyCompany,
+		type,
+		typePermission,
 	]);
 
 	useEffect(() => {

@@ -1,8 +1,9 @@
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import Queue from "../../database/models/Queue";
 import Whatsapp from "../../database/models/Whatsapp";
 import ShowConnectionFileByNameService from "../ConnectionFileService/ShowConnectionFileByNameService";
 import Company from "../../database/models/Company";
+import ListCompanySettingsService from "../SettingServices/ListCompanySettingsService";
 
 interface Request {
   official?: boolean;
@@ -17,6 +18,8 @@ interface Request {
   connectionFileName?: string;
   business?: string;
   anyCompany?: boolean;
+  type?: string;
+  typePermission?: boolean;
 }
 
 interface Response {
@@ -27,17 +30,19 @@ interface Response {
 
 const ListWhatsAppsService2 = async ({ 
   official = false, 
-  officialWhatsappId = null, 
+  officialWhatsappId, 
   companyId,
   deleted = false,
-  connectionFileId = null,
+  connectionFileId,
   status = "CONNECTED",
   pageNumber = "1",
   limit = "10",
   name = "",
   connectionFileName = "",
-  business = null,
+  business,
   anyCompany = false,
+  type,
+  typePermission = false,
 }: Request): Promise<Response> => {
   let whereCondition = null;
 
@@ -81,6 +86,30 @@ const ListWhatsAppsService2 = async ({
 
   if (business) {
     whereCondition = { ...whereCondition, business: (business === "true") };
+  }
+
+  if (type) {
+    whereCondition = {
+      ...whereCondition,
+      [Op.or]: [
+        { type: null },
+        { type: type },
+      ],
+    };
+  }
+
+  if (typePermission) {
+    const permissions = await ListCompanySettingsService(companyId);
+
+    if (permissions.createTicketWhatsappType) {
+      whereCondition = {
+        ...whereCondition,
+        [Op.or]: [
+          { type: null },
+          { type: permissions.createTicketWhatsappType },
+        ],
+      }
+    }
   }
 
   const offset = +limit * (+pageNumber - 1);

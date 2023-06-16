@@ -80,6 +80,8 @@ type IndexQuery = {
   connectionFileName: string,
   business: string,
   anyCompany: string,
+  type: string,
+  typePermission: string,
 }
 
 export const index2 = async (req: Request, res: Response): Promise<Response> => {
@@ -95,6 +97,8 @@ export const index2 = async (req: Request, res: Response): Promise<Response> => 
     connectionFileName,
     business,
     anyCompany,
+    type,
+    typePermission,
   } = req.query as IndexQuery;
   const { companyId } = req.user;
 
@@ -110,6 +114,8 @@ export const index2 = async (req: Request, res: Response): Promise<Response> => 
     connectionFileName,
     business,
     anyCompany: (companyId === 1 && anyCompany) ? (anyCompany === "true") : false,
+    type,
+    typePermission: (typePermission === "true"),
   });
 
   return res.status(200).json({ whatsapps, count, hasMore });

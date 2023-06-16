@@ -101,6 +101,7 @@ const ImportModal = ({ open, onClose }) => {
     official: selectedType,
     connectionFileId: (selectedConnectionFile !== "Nenhum") ? [selectedConnectionFile] : null,
     limit: -1,
+    type: "receptive",
   });
 
   useEffect(() => {
