@@ -341,6 +341,7 @@ const Contacts = () => {
                       <EditIcon />
                     </IconButton>
                     <Can
+                      profile={user.profiles}
                       permission="contacts-page:deleteContact"
                       item={
                         <IconButton

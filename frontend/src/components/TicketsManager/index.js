@@ -266,6 +266,7 @@ const TicketsManager = () => {
               {i18n.t("ticketsManager.buttons.newTicket")}
             </Button>
             <Can
+              profile={user.profiles}
               permission="tickets-manager:showall"
               item={
                 <FormControlLabel
@@ -296,6 +297,7 @@ const TicketsManager = () => {
         {tab === "closed" && (
           <div style={{ width: "100%" }}>
             <Can
+              profile={user.profiles}
               permission="tickets-manager:showall"
               item={
                 <div 
@@ -392,6 +394,7 @@ const TicketsManager = () => {
               }}
             >
               <Can
+                profile={user.profiles}
                 permission="tickets-manager:showall"
                 item={
                   <div style={{ width: "100%" }}>

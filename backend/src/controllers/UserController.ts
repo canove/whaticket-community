@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
-import CheckSettingsHelper from "../helpers/CheckSettings";
 import AppError from "../errors/AppError";
 
 import CreateUserService from "../services/UserServices/CreateUserService";
@@ -9,9 +8,9 @@ import ListUsersService from "../services/UserServices/ListUsersService";
 import UpdateUserService from "../services/UserServices/UpdateUserService";
 import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
-import UpdateUserLanguageService from "../services/UserServices/UpdateUserLanguageService";
 import ListAllUsersService from "../services/UserServices/ListAllUsersService";
 import ListTransferUsersService from "../services/UserServices/ListTransferUsersService";
+import CheckProfilePermissionService from "../services/ProfileServices/CheckProfilePermissionService";
 
 type IndexQuery = {
   searchParam: string;
@@ -55,8 +54,8 @@ export const transferList = async (req: Request, res: Response): Promise<Respons
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, profileId, queueIds, companyId, superAdmin, nickname, useNickname } = req.body;
-  const userCompanyId = req.user.companyId;
+  const { email, password, name, profile, profileId, queueIds, companyId: selectedCompanyId, superAdmin, nickname, useNickname, lang } = req.body;
+  const { id: userId, companyId } = req.user;
 
   // if (
   //   req.url === "/signup" &&
@@ -67,43 +66,26 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   //   throw new AppError("ERR_NO_PERMISSION", 403);
   // }
 
-  if (userCompanyId === 1) {
-    const user = await CreateUserService({
-      email,
-      password,
-      name,
-      profile,
-      profileId,
-      queueIds,
-      companyId: companyId || userCompanyId,
-      superAdmin,
-      nickname,
-      useNickname,
-    });
+  const permission = CheckProfilePermissionService({ userId, companyId, permission: "user-modal:editProfile" });
 
-    const io = getIO();
-    io.emit(`user${userCompanyId}`, {
-      action: "create",
-      user
-    });
-
-    return res.status(200).json(user);
-  }
+  if (!permission) throw new AppError("ERR_NO_PERMISSION", 403);
 
   const user = await CreateUserService({
     email,
     password,
     name,
     profile,
-    profileId: profileId ? profileId : req.user.profile,
+    profileId: (profileId) ? profileId : req.user.profile,
     queueIds,
-    companyId: userCompanyId,
+    companyId: (companyId === 1 && selectedCompanyId) ? selectedCompanyId : companyId,
+    superAdmin,
     nickname,
     useNickname,
+    lang,
   });
 
   const io = getIO();
-  io.emit(`user${userCompanyId}`, {
+  io.emit(`user${(companyId === 1 && selectedCompanyId) ? selectedCompanyId : companyId}`, {
     action: "create",
     user
   });
@@ -130,32 +112,9 @@ export const update = async (
 
   const { userId } = req.params;
   const userData = req.body;
-  const userCompanyId = req.user.companyId;
-
-  const user = await UpdateUserService({ userData, userId, userCompanyId });
-
-  const io = getIO();
-  io.emit(`user${userCompanyId}`, {
-    action: "update",
-    user
-  });
-
-  return res.status(200).json(user);
-};
-
-export const updateLanguage = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  const { userId } = req.params;
-  const { language } = req.body;
   const { companyId } = req.user;
 
-  const user = await UpdateUserLanguageService({
-    userId,
-    language,
-    companyId
-  });
+  const user = await UpdateUserService({ userData, userId, userCompanyId: companyId });
 
   const io = getIO();
   io.emit(`user${companyId}`, {

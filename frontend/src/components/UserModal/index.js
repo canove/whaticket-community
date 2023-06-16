@@ -68,16 +68,6 @@ const UserModal = ({ open, onClose, userId }) => {
 	const classes = useStyles();
 	const { i18n } = useTranslation();
 
-	const initialState = {
-		nickname: "",
-		name: "",
-		email: "",
-		password: "",
-		profile: "user",
-		profileId: "",
-		useNickname: false,
-	};
-
 	const UserSchema = Yup.object().shape({
 		name: Yup.string()
 			.min(2, `${i18n.t("userModal.short")}`)
@@ -88,24 +78,25 @@ const UserModal = ({ open, onClose, userId }) => {
 	});
 
 	const { user: loggedInUser } = useContext(AuthContext);
+
+	const initialState = {
+		nickname: "",
+		name: "",
+		email: "",
+		password: "",
+		profile: "user",
+		profileId: "",
+		useNickname: false,
+		companyId: "",
+		superAdmin: false,
+		lang: "pt",
+	};
 	const [user, setUser] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 	const [showPassword, setShowPassword] = useState(false);
-	const [language, setLanguage] = useState('');
+
 	const [companies, setCompanies] = useState([]);
-	const [selectedCompany, setSelectedCompany] = useState();
 	const [profiles, setProfiles] = useState([]);
-	const [superAdmin, setSuperAdmin] = useState(false);
-
-	const handleLanguageChange = (e) => {
-		setLanguage(e.target.value);
-	};
-
-	useEffect(() => {
-		if (user.id === loggedInUser.id) {
-			i18n.changeLanguage(language);
-		}
-	}, [language, user, loggedInUser]);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -115,15 +106,9 @@ const UserModal = ({ open, onClose, userId }) => {
 				setUser(prevState => {
 					return { ...prevState, ...data };
 				});
-				setSuperAdmin(data.superAdmin);
-				setLanguage(data.lang)
 
 				const userQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(userQueueIds);
-
-				if (loggedInUser.companyId === 1) {
-					setSelectedCompany(data.companyId);
-				}
 			} catch (err) {
 				toastError(err);
 			}
@@ -163,23 +148,13 @@ const UserModal = ({ open, onClose, userId }) => {
 	const handleClose = () => {
 		onClose();
 		setUser(initialState);
-		setSelectedCompany("");
 		setSelectedQueueIds([]);
-		setLanguage("");
-		setSuperAdmin(false);
 	};
-
-	const handleCompanyChange = (e) => {
-		setSelectedCompany(e.target.value);
-	}
 
 	const handleSaveUser = async values => {
 		const userData = { 
-			...values, 
-			lang: language, 
+			...values,  
 			queueIds: selectedQueueIds, 
-			companyId: selectedCompany,
-			superAdmin
 		};
 
 		try {
@@ -187,6 +162,9 @@ const UserModal = ({ open, onClose, userId }) => {
 				await api.put(`/users/${userId}`, userData);
 			} else {
 				await api.post("/users", userData);
+			}
+			if (userId == loggedInUser.id && values.lang !== loggedInUser.lang) {
+				i18n.changeLanguage(values.lang);
 			}
 			toast.success(i18n.t("userModal.success"));
 			handleClose();
@@ -215,9 +193,6 @@ const UserModal = ({ open, onClose, userId }) => {
 					validationSchema={UserSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							if (user.id === loggedInUser.id) {
-								setLanguage(language);
-							}
 							handleSaveUser(values);
 							actions.setSubmitting(false);
 						}, 400);
@@ -309,6 +284,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 									>
 										<Can
+											profile={loggedInUser.profiles}
 											permission="user-modal:editProfile"
 											item={
 												<>
@@ -329,27 +305,6 @@ const UserModal = ({ open, onClose, userId }) => {
 													</Field>
 												</>
 											}
-											// role={loggedInUser.profiles}
-											// perform="user-modal:editProfile"
-											// yes={() => (
-											// 	<>
-											// 		<InputLabel id="profile-selection-input-label">
-											// 			{i18n.t("userModal.form.profile")}
-											// 		</InputLabel>
-											// 		<Field
-											// 			as={Select}
-											// 			label={i18n.t("userModal.form.profile")}
-											// 			name="profileId"
-											// 			labelId="profile-selection-label"
-											// 			id="profile-selection"
-											// 			required
-											// 		>
-											// 			{profiles && profiles.map(profile => (
-											// 				<MenuItem key={profile.id} value={profile.id}>{profile.name}</MenuItem>
-											// 			))}
-											// 		</Field>
-											// 	</>
-											// )}
 										/>
 									</FormControl>
 								</div>
@@ -361,10 +316,11 @@ const UserModal = ({ open, onClose, userId }) => {
 									>
 										<InputLabel id="language-selection-label">{i18n.t("userModal.form.language")}</InputLabel>
 										<Select
+											name="lang"
 											label={i18n.t("userModal.form.language")}
 											labelId="language-selection-label"
-											value={language}
-											onChange={handleLanguageChange}
+											value={values.lang}
+											onChange={(e) => setFieldValue("lang", e.target.value)}
 										>
 											<MenuItem value="pt">{i18n.t("userModal.form.languages.pt")}</MenuItem>
 											<MenuItem value="en">{i18n.t("userModal.form.languages.en")}</MenuItem>
@@ -383,11 +339,11 @@ const UserModal = ({ open, onClose, userId }) => {
 												<InputLabel id="company-selection-label">{i18n.t("userModal.form.company")}</InputLabel>
 												<Select
 													label="Empresa"
-													name="company"
+													name="companyId"
 													labelId="company-selection-label"
 													id="company-selection"
-													value={selectedCompany}
-													onChange={(e) => {handleCompanyChange(e)}}
+													value={values.companyId}
+													onChange={(e) => setFieldValue("companyId", e.target.value)}
 												>
 													{ companies && companies.map(company => {
 														return (
@@ -402,9 +358,10 @@ const UserModal = ({ open, onClose, userId }) => {
 												label={"Super Admin"}
 												control={
 													<Checkbox
+														name="superAdmin"
 														color="primary" 
-														checked={superAdmin} 
-														onChange={() => setSuperAdmin(prev => !prev)} 
+														checked={values.superAdmin} 
+														onChange={() => setFieldValue("superAdmin", !values.superAdmin)} 
 													/>
 												}
 											/>
@@ -412,6 +369,7 @@ const UserModal = ({ open, onClose, userId }) => {
 									</>
 								}
 								<Can
+									profile={loggedInUser.profiles}
 									permission="user-modal:editQueues"
 									item={
 										<QueueSelect

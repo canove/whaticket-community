@@ -5,6 +5,7 @@ import ShowCompanyService from "../CompanyService/ShowCompanyService";
 import ShowProfileService from "../ProfileServices/ShowProfileService";
 import ShowUserService from "./ShowUserService";
 import { SerializeUser } from "../../helpers/SerializeUser";
+import CheckProfilePermissionService from "../ProfileServices/CheckProfilePermissionService";
 
 interface UserData {
   email?: string;
@@ -36,7 +37,7 @@ interface Response {
 const UpdateUserService = async ({
   userData,
   userId,
-  userCompanyId
+  userCompanyId,
 }: Request): Promise<Response | undefined> => {
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
@@ -53,6 +54,8 @@ const UpdateUserService = async ({
     superAdmin = false;
   }
 
+  if (!companyId) companyId = userCompanyId
+
   const user = await ShowUserService(userId, companyId);
 
   try {
@@ -62,12 +65,15 @@ const UpdateUserService = async ({
   }
 
   if (useNickname && !nickname) throw new AppError("ERR_NO_NICKNAME");
+
+  const profilePermission = CheckProfilePermissionService({ userId, companyId: userCompanyId, permission: "user-modal:editProfile" });
+  const queuesPermission = CheckProfilePermissionService({ userId, companyId: userCompanyId, permission: "user-modal:editQueues" });
   
   await user.update({
     email,
     password,
     profile,
-    profileId,
+    profileId: (profilePermission) ? profileId : user.profileId,
     lang,
     name,
     companyId,
@@ -76,14 +82,16 @@ const UpdateUserService = async ({
     useNickname,
   });
 
-  await user.$set("queues", queueIds);
+  if (queuesPermission) {
+    await user.$set("queues", queueIds);
+  }
 
   await user.reload();
 
   let serializedUser = SerializeUser(user);
 
   const company = await ShowCompanyService(companyId);
-  const profiles = await ShowProfileService(profileId, companyId);
+  const profiles = await ShowProfileService(user.profileId, companyId);
 
   serializedUser = { ...serializedUser, company, profiles };
 

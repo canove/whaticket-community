@@ -18,6 +18,7 @@ interface Request {
   superAdmin?: boolean;
   nickname?: string;
   useNickname?: boolean;
+  lang?: string;
 }
 
 interface Response {
@@ -38,6 +39,7 @@ const CreateUserService = async ({
   superAdmin = false,
   nickname,
   useNickname,
+  lang,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().required().min(2),
@@ -77,6 +79,7 @@ const CreateUserService = async ({
       superAdmin,
       nickname,
       useNickname,
+      lang: (lang) ? lang : "pt",
     },
     { include: ["queues"] }
   );
