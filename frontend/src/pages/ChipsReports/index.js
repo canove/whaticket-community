@@ -131,6 +131,14 @@ const ChipsReports = () => {
 		}
 	}
 
+    const getInteractionPercentage = (total, interaction) => {
+        if (!total) return "-";
+
+        const percentage = (interaction / total) * 100;
+
+        return `${percentage.toFixed(2)}%`;
+    }
+
     return (
         <MainContainer>
             <MainHeader>
@@ -196,6 +204,8 @@ const ChipsReports = () => {
                         <TableRow>
                             <TableCell align="center">{i18n.t("chipReports.grid.phoneNumber")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.registerAmount")}</TableCell>
+                            <TableCell align="center">{"Qtde. de Interações"}</TableCell>
+                            <TableCell align="center">{"Porcentagem de Interação"}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.createdAt")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.updatedAt")}</TableCell>
                             <TableCell align="center">{i18n.t("chipReports.grid.actions")}</TableCell>
@@ -207,6 +217,8 @@ const ChipsReports = () => {
                                 <TableRow key={report.whatsappId}>
                                     <TableCell align="center">{report.whatsapp.name}</TableCell>
                                     <TableCell align="center">{report.qtdeRegisters}</TableCell>
+                                    <TableCell align="center">{report.interaction}</TableCell>
+                                    <TableCell align="center">{getInteractionPercentage(report.qtdeRegisters, report.interaction)}</TableCell>
                                     <TableCell align="center">{format(parseISO(report.whatsapp.createdAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                     <TableCell align="center">{format(parseISO(report.whatsapp.updatedAt), "dd/MM/yyyy HH:mm")}</TableCell>
                                     <TableCell align="center">
@@ -237,7 +249,7 @@ const ChipsReports = () => {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {loading && <TableRowSkeleton columns={5} />}
+                            {loading && <TableRowSkeleton columns={7} />}
                         </>
                     </TableBody>
                 </Table>

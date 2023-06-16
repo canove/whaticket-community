@@ -77,6 +77,7 @@ const ListReportWhatsAppsService = async ({
     attributes: [
       "whatsappId",
       [Sequelize.fn("COUNT", Sequelize.col("whatsappId")), "qtdeRegisters"],
+      [Sequelize.fn('sum', Sequelize.literal("interactionAt IS NOT NULL")), 'interaction'],
     ],
     include: [{
       model: Whatsapp,
