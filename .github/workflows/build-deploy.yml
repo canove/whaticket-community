@@ -86,6 +86,8 @@ jobs:
             REDIS_SAVE_TIME=${{ vars.REDIS_SAVE_TIME }} -e \
             SQS_DISPATCH_QUEUE=${{ vars.SQS_DISPATCH_QUEUE }} -e \
             SQS_BOT_MESSAGE_URL=${{ vars.SQS_BOT_MESSAGE_URL }} -e \
+            SQS_WH_CONNECT_URL=${{ vars.SQS_WH_CONNECT_URL }} -e \
+            WPP_NOF_WEBHOOK_QRCODE_URL=${{ vars.WPP_NOF_WEBHOOK_QRCODE_URL }} -e \
             SQS_ORQUESTRATOR_URL=${{ vars.SQS_ORQUESTRATOR_URL }} -e \
             SQS_ORQUESTRATOR_RESPONSE_URL=${{ vars.SQS_ORQUESTRATOR_RESPONSE_URL }} -e \
             SQS_MESSAGE_STATUS=${{ vars.SQS_MESSAGE_STATUS }} -e \
