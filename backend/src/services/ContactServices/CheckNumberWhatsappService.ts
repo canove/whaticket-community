@@ -12,7 +12,7 @@ const CheckNumberWhatsappService = async (number: string, whatsapp: Whatsapp): P
       source.cancel();
     }, 10000);
 
-    const apiUrl = "http://orquestrator.kankei.com.br:8080/checkNumber";
+    const apiUrl = `${process.env.WPPNOF_URL}/checkNumber`;
 
     await axios.post(apiUrl, 
       {

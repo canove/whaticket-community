@@ -95,6 +95,9 @@ jobs:
             BELLINATI_TOKEN=${{ vars.BELLINATI_TOKEN }} -e \
             BELLINATI_ID_FORNECEDOR=${{ vars.BELLINATI_ID_FORNECEDOR }} -e \
             BELLINATI_ID=${{ vars.BELLINATI_ID }} -e \
+            REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 -e \
+            REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 -e \
+            REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445
             FRONTEND_URL=${{ vars.FRONTEND_URL }} --name \
             whatsapp-api -p 8443:3000 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
   build-and-deploy-frontend:
@@ -144,4 +147,7 @@ jobs:
             docker stop whatsapp-portal-frontend || true
             docker rm whatsapp-portal-frontend || true
             docker pull 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
-            docker run -d -e REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 -e REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 -e REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445 --name whatsapp-portal-frontend -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
+            docker run -d -e \
+            REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 -e \
+            REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 -e \
+            REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445 --name whatsapp-portal-frontend -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}

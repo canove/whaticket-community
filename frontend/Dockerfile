@@ -5,9 +5,9 @@ COPY /src /app/src
 COPY package.json /app/package.json
 
 #COPY .env* ./
-RUN echo "REACT_APP_BACKEND_URL=https://omni.kankei.com.br:8443/" >> ./.env
-RUN echo "REACT_APP_WORKER_URL=https://omni.kankei.com.br:8444/" >> ./.env
-RUN echo "REACT_APP_SQS_URL=https://omni.kankei.com.br:8445/" >> ./.env
+# RUN echo "REACT_APP_BACKEND_URL=https://omni.kankei.com.br:8443/" >> ./.env
+# RUN echo "REACT_APP_WORKER_URL=https://omni.kankei.com.br:8444/" >> ./.env
+# RUN echo "REACT_APP_SQS_URL=https://omni.kankei.com.br:8445/" >> ./.env
 
 
 ENV GENERATE_SOURCEMAP=false
