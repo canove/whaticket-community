@@ -23,10 +23,10 @@ export const StartWhatsAppSession = async (
       service,
       session: whatsapp.name,
       companyId: whatsapp.companyId,
-      wh_status: process.env.WPP_NOF_WEBHOOK_URL,
-      wh_message: process.env.WPP_NOF_WEBHOOK_URL,
-      wh_qrcode: process.env.WPP_NOF_WEBHOOK_QRCODE_URL,
-      wh_connect: process.env.SQS_WH_CONNECT_URL
+      wh_status: `${process.env.WPP_NOF_URL}/webhook`,
+      wh_message:`${process.env.WPP_NOF_URL}/webhook`,
+      wh_qrcode: `${process.env.WPP_NOF_URL}/qrCode`,
+      wh_connect:`${process.env.WPP_NOF_URL}/wh_connect`,
     };
 
     await axios.post(apiUrl, payload, {
