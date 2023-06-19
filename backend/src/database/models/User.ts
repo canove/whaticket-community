@@ -99,6 +99,9 @@ class User extends Model<User> {
   @HasMany(() => Message, "userId")
   messages: Message[];
 
+  @Column
+  status: string;
+
   @BeforeUpdate
   @BeforeCreate
   static hashPassword = async (instance: User): Promise<void> => {

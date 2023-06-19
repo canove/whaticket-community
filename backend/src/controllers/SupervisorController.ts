@@ -102,6 +102,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 attributes: [
                     "id", 
                     "name",
+                    "updatedAt",
                 ],
                 include: [
                     {
@@ -150,34 +151,16 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
                 if (!pending && !open && !closed) continue;
 
-                let lastSentMessage = null;
+                const now = new Date();
+                const lastUpdate = new Date(user.updatedAt);
 
-                const lastMessage = await Message.findOne({
-                    where: { fromMe: true, userId: user.id },
-                    attributes: ["id", "fromMe", "createdAt"],
-                    include: [
-                        {
-                            model: Ticket,
-                            as: "ticket",
-                            where: { companyId },
-                            required: true
-                        }
-                    ],
-                    order: [["createdAt", "DESC"]],
-                });
-
-                if (lastMessage && lastMessage.createdAt) {
-                    const now = new Date();
-                    const messageDate = new Date(lastMessage.createdAt);
-
-                    lastSentMessage = now.getTime() - messageDate.getTime();
-                }
+                const lastUserUpdate = now.getTime() - lastUpdate.getTime();
 
                 const newUser = {
                     ...user.dataValues,
                     ...ticket_count,
                     ticketHistorics: serviceTime ? serviceTime.historics : null,
-                    lastSentMessage
+                    lastUserUpdate
                 };
 
                 info.push(newUser);

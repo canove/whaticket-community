@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "../errors/AppError";
 import authConfig from "../config/auth";
 import { firebaseAuthentication } from "../utils/firebaseAuthentication";
+import User from "../database/models/User";
 
 interface TokenPayload {
   id: string;
@@ -41,6 +42,8 @@ const isAuth = async (req: Request, res: Response, next: NextFunction): Promise<
       throw new AppError("ERR_SESSION_EXPIRED", 401);
     }
   
+    updateUser(id);
+
     req.user = {
       id,
       profile,
@@ -61,3 +64,17 @@ const isAuth = async (req: Request, res: Response, next: NextFunction): Promise<
 };
 
 export default isAuth;
+
+const updateUser = async (userId) => {
+  const user = await User.findOne({ where: { id: userId }, attributes: ["id", "status", "updatedAt"] });
+
+  user.changed('updatedAt', true);
+
+  let update = null;
+
+  update = { updatedAt: new Date() };
+
+  if (user.status === "offline") update = { ...update, status: "online" };
+
+  await user.update(update);
+}

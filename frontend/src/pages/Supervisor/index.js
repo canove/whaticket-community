@@ -451,7 +451,7 @@ const Supervisor = () => {
     return formatTime(averageServiceTime);
   }
 
-  const formatLastSentMessageDate = (time) => {
+  const formatLastUserUpdate = (time) => {
     const formattedTime = formatTime(time);
     const [hours_string, minutes_string, seconds_string] = formattedTime.split(":");
 
@@ -471,6 +471,8 @@ const Supervisor = () => {
       result = `${minutes} minuto(s) atrás.`;
     } else if (seconds) {
       result = `${seconds} segundo(s) atrás.`;
+    } else if (time > 0) {
+      result = "Agora";
     }
 
     return result;
@@ -773,7 +775,7 @@ const Supervisor = () => {
                     </TableCell>
                     <TableCell align="center">
                       <span>
-                        {formatLastSentMessageDate(user.lastSentMessage)}
+                        {formatLastUserUpdate(user.lastUserUpdate)}
                       </span>
                     </TableCell>
                   </TableRow>
