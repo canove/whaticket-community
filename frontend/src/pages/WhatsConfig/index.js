@@ -452,9 +452,15 @@ const WhatsConfig = () => {
                             multiple
                         >
                             <MenuItem value={"all"}>{i18n.t("settingsWhats.all")}</MenuItem>
-                            {whatsapps && whatsapps.map((whats) => (
-                                <MenuItem key={whats.id} value={whats.id}>{whats.name}</MenuItem>
-                            ))}
+                            {whatsapps && whatsapps.map((whats) => {
+                                if (whats.status === "CONNECTED") {
+                                    return (
+                                        <MenuItem key={whats.id} value={whats.id}>{whats.name}</MenuItem>
+                                    );
+                                }
+
+                                return null;
+                            })}
                         </Select>
                     </Paper>
                     { disconnectedWhatsapps.length > 0 &&

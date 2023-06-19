@@ -65,6 +65,7 @@ const MultipleWhatsConfigModal = ({ open, onClose, selectedWhatsapps }) => {
 		official: false,
 		limit: -1,
         anyCompany: true,
+		status: "CONNECTED",
 	});
 
 	useEffect(() => {

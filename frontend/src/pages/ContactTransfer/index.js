@@ -70,6 +70,7 @@ const ContactTransfer = () => {
 		name: searchParam,
 		selectedCompanyId: company,
     business: isBusiness,
+    status: "CONNECTED",
 	});
 
   useEffect(() => {
