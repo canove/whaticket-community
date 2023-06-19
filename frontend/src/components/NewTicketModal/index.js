@@ -77,6 +77,7 @@ const NewTicketModal = ({ modalOpen, onClose, contactId, ticketId, isOfficial, o
 		official,
 		limit: -1,
 		typePermission: true,
+		status: "CONNECTED",
 	});
 
 	useEffect(() => {

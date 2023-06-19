@@ -117,6 +117,7 @@ const ImportationtModal = ({
     official: connectionType,
     limit: -1,
     type: "active",
+    status: "CONNECTED",
   });
 
   useEffect(() => {

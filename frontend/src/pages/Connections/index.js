@@ -190,7 +190,7 @@ const Connections = () => {
 		connectionFileName,
 		name: searchParam,
 		status: status ? status : null,
-		selectedCompanyId: company
+		selectedCompanyId: company,
 	});
 
 	useEffect(() => {

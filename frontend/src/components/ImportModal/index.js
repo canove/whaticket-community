@@ -102,6 +102,7 @@ const ImportModal = ({ open, onClose }) => {
     connectionFileId: (selectedConnectionFile !== "Nenhum") ? [selectedConnectionFile] : null,
     limit: -1,
     type: "active",
+    status: "CONNECTED",
   });
 
   useEffect(() => {

@@ -34,7 +34,7 @@ const ListWhatsAppsService2 = async ({
   companyId,
   deleted = false,
   connectionFileId,
-  status = "CONNECTED",
+  status,
   pageNumber = "1",
   limit = "10",
   name = "",
@@ -52,7 +52,7 @@ const ListWhatsAppsService2 = async ({
     whereCondition = { ...whereCondition, companyId };
   }
 
-  if (!official) {
+  if (!official && status) {
     whereCondition = { ...whereCondition, status };
   }
 
