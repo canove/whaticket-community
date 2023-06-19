@@ -99,6 +99,8 @@ export const remove = async (
     where: { id }
   });
 
+  await user.update({ status: "offline" });
+
   const database = await firebase.database();
 
   await database

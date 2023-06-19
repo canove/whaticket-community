@@ -67,6 +67,7 @@ const Settings = () => {
 		autoCloseTicketStatus: { "inbot": false, "open": false },
 		overflowQueueId: "",
 		createTicketWhatsappType: "",
+		userInactiveTime: 30,
 	}
 	const [settings, setSettings] = useState(initialSettings);
 
@@ -162,18 +163,8 @@ const Settings = () => {
 		}
 
 		const body = {
-			useWorkTime: settings.useWorkTime,
+			...settings,
 			days: settings.days.map(day => day ? true : false),
-			hours: settings.hours,
-			message: settings.message,
-			allowedIPs: settings.allowedIPs,
-			transferRequiredQueue: settings.transferRequiredQueue,
-			defaultSurvey: settings.defaultSurvey,
-			autoCloseTickets: settings.autoCloseTickets,
-			createTicketInterval: settings.createTicketInterval,
-			autoCloseTicketStatus: settings.autoCloseTicketStatus,
-			overflowQueueId: settings.overflowQueueId,
-			createTicketWhatsappType: settings.createTicketWhatsappType,
 		};
 
 		try {
@@ -499,6 +490,33 @@ const Settings = () => {
 									<MenuItem value={"active"}>Ativo</MenuItem>
 									<MenuItem value={"receptive"}>Receptivo</MenuItem>
 								</Select>
+							</FormControl>
+						</div>
+					</div>
+				</Paper>
+				<Paper className={classes.paper}> {/* User */}
+					<div style={{ width: "100%" }}>
+						<Typography variant="subtitle1" color="primary" gutterBottom>Usuários:</Typography>
+						<div>
+							<FormControl
+								variant="outlined"
+								margin="dense"
+								fullWidth
+							>
+								<TextField
+									id="user-inactive-time"
+									label={"Tempo de inatividade (em minutos)"}
+									type="number"
+									variant="outlined"
+									value={settings.userInactiveTime}
+									onChange={(e) => handleSettingsChange(e.target.value, "userInactiveTime")}
+									fullWidth
+									inputProps={{
+										step: 1,
+										min: 0,
+										type: 'number',
+									}}
+								/>
 							</FormControl>
 						</div>
 					</div>

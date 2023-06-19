@@ -18,6 +18,7 @@ interface Response {
   autoCloseTicketStatus: TicketStatus;
   overflowQueueId: string | number;
   createTicketWhatsappType: string;
+  userInactiveTime: number;
 }
 
 const initialSettings = { 
@@ -33,6 +34,7 @@ const initialSettings = {
   autoCloseTicketStatus: { "inbot": false, "open": false },
   overflowQueueId: "",
   createTicketWhatsappType: "",
+  userInactiveTime: 30,
 };
 
 const ListCompanySettingsService = async (

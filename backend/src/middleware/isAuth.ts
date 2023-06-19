@@ -5,6 +5,7 @@ import AppError from "../errors/AppError";
 import authConfig from "../config/auth";
 import { firebaseAuthentication } from "../utils/firebaseAuthentication";
 import User from "../database/models/User";
+import { getIO } from "../libs/socket";
 
 interface TokenPayload {
   id: string;
@@ -74,7 +75,18 @@ const updateUser = async (userId) => {
 
   update = { updatedAt: new Date() };
 
-  if (user.status === "offline") update = { ...update, status: "online" };
+  if (user.status === "inactive" || user.status === "offline") {
+    update = { ...update, status: "online" };
+    await user.update(update);
 
-  await user.update(update);
+    await user.reload();
+
+    const io = getIO();
+    io.emit(`user${user.companyId}`, {
+      action: "update",
+      user
+    });
+  } else {
+    await user.update(update);
+  }
 }
