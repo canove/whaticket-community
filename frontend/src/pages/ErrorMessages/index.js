@@ -159,7 +159,7 @@ const ErrorMessages = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">{"ID da Covnersa"}</TableCell>
+              <TableCell align="center">{"ID da Conversa"}</TableCell>
               <TableCell align="center">{"Mensagem"}</TableCell>
               <TableCell align="center">{"URL da Mídia"}</TableCell>
               <TableCell align="center">{"Data"}</TableCell>
