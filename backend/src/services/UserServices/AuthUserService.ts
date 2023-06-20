@@ -14,6 +14,7 @@ import { decrypt, encrypt } from "../../utils/encriptor";
 import Packages from "../../database/models/Packages";
 import Pricing from "../../database/models/Pricing";
 import ListCompanySettingsService from "../SettingServices/ListCompanySettingsService";
+import ShowProfileService from "../ProfileServices/ShowProfileService";
 
 const firebase = require("../../utils/Firebase");
 
@@ -140,7 +141,11 @@ const AuthUserService = async ({
     );
   }
 
-  const serializedUser = SerializeUser(user);
+  let serializedUser = SerializeUser(user);
+
+  const profiles = await ShowProfileService(user.profileId, user.companyId);
+
+  serializedUser = { ...serializedUser, profiles };
 
   return {
     serializedUser,
