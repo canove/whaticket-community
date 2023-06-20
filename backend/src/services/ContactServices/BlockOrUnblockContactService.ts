@@ -38,7 +38,7 @@ const BlockOrUnblockContactService = async ({
   });
 
   try {
-    const BLOCK_UNBLOCK_NUMBER_URL = "http://omni.kankei.com.br:8080/block-unblock";
+    const BLOCK_UNBLOCK_NUMBER_URL = `${process.env.WPPNOF_URL}/block-unblock`;
 
     const payload = {
       "session": session,

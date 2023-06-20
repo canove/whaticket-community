@@ -50,109 +50,113 @@ const AuthUserService = async ({
   retry,
   userIp
 }: Request): Promise<Response> => {
-  const whereCondition = {
-    "$Company.name$": Sequelize.where(
-      Sequelize.fn("LOWER", Sequelize.col("Company.alias")),
-      "LIKE",
-      `%${company.toLowerCase()}%`
-    )
-  };
-
-  const companyDb = await Company.findOne({
-    where: whereCondition
-  });
-
-  if (!companyDb) {
-    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
-  }
-
-  const user = await User.findOne({
-    where: { email, companyId: companyDb.id, deletedAt: null },
-    include: ["queues"]
-  });
-
-  if (!user) {
-    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
-  }
-
-  if (!(await user.checkPassword(password))) {
-    throw new AppError("ERR_INVALID_CREDENTIALS", 401);
-  }
-
-  const settings = await ListCompanySettingsService(companyDb.id);
-  const allowedIPs = settings.allowedIPs ? settings.allowedIPs : [];
-
-  if (allowedIPs.length > 0 && !allowedIPs.includes(userIp) && !user.superAdmin) {
-      throw new AppError("ERR_IP_NOT_ALLOWED");
-  }
-
-  const token = createAccessToken(user);
-  const refreshToken = createRefreshToken(user);
-
-  const database = await firebase.database();
-
-  const firebaseUser = await database
-  .collection("Authentication")
-  .doc(`${user.companyId}-${user.email}`)
-  .get();
-
-  if (firebaseUser.exists && !retry) {
-    return { accountConnected: true };
-  } else {
-    if (!firebaseUser.exists) {
-      const allLoggedUsers = await database
-      .collection("Authentication")
-      .where("companyId", "==", user.companyId)
-      .get();
-
-      const loggedUsersQuantity = allLoggedUsers.docs.length;
-
-      const pack = await Packages.findOne({
-        include: [
-          {
-            model: Pricing,
-            as: "pricings",
-            where: { companyId: user.companyId },
-            required: true
-          }
-        ]
-      });
-
-      const loggedUsersLimit = pack ? pack.maxUsers : null;
-
-      if (loggedUsersLimit && loggedUsersLimit <= loggedUsersQuantity) {
-        throw new AppError("LOGGED_USERS_REACHED_THE_LIMIT");
-      }
+  try {
+    const whereCondition = {
+      "$Company.name$": Sequelize.where(
+        Sequelize.fn("LOWER", Sequelize.col("Company.alias")),
+        "LIKE",
+        `%${company.toLowerCase()}%`
+      )
+    };
+  
+    const companyDb = await Company.findOne({
+      where: whereCondition
+    });
+  
+    if (!companyDb) {
+      throw new AppError("ERR_INVALID_CREDENTIALS", 401);
     }
-    
-    await database
+  
+    const user = await User.findOne({
+      where: { email, companyId: companyDb.id, deletedAt: null },
+      include: ["queues"]
+    });
+  
+    if (!user) {
+      throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+    }
+  
+    if (!(await user.checkPassword(password))) {
+      throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+    }
+  
+    const settings = await ListCompanySettingsService(companyDb.id);
+    const allowedIPs = settings.allowedIPs ? settings.allowedIPs : [];
+  
+    if (allowedIPs.length > 0 && !allowedIPs.includes(userIp) && !user.superAdmin) {
+        throw new AppError("ERR_IP_NOT_ALLOWED");
+    }
+  
+    const token = createAccessToken(user);
+    const refreshToken = createRefreshToken(user);
+  
+    const database = await firebase.database();
+  
+    const firebaseUser = await database
     .collection("Authentication")
     .doc(`${user.companyId}-${user.email}`)
-    .set(
-      {
-        authDate: new Date(),
-        companyAlias: companyDb.alias,
-        companyId: user.companyId,
-        email: user.email,
-        isAuth: true,
-        token: encrypt(token),
-        userIp
-      },
-    );
-  }
+    .get();
+  
+    if (firebaseUser.exists && !retry) {
+      return { accountConnected: true };
+    } else {
+      if (!firebaseUser.exists) {
+        const allLoggedUsers = await database
+        .collection("Authentication")
+        .where("companyId", "==", user.companyId)
+        .get();
+  
+        const loggedUsersQuantity = allLoggedUsers.docs.length;
+  
+        const pack = await Packages.findOne({
+          include: [
+            {
+              model: Pricing,
+              as: "pricings",
+              where: { companyId: user.companyId },
+              required: true
+            }
+          ]
+        });
+  
+        const loggedUsersLimit = pack ? pack.maxUsers : null;
+  
+        if (loggedUsersLimit && loggedUsersLimit <= loggedUsersQuantity) {
+          throw new AppError("LOGGED_USERS_REACHED_THE_LIMIT");
+        }
+      }
+      
+      await database
+      .collection("Authentication")
+      .doc(`${user.companyId}-${user.email}`)
+      .set(
+        {
+          authDate: new Date(),
+          companyAlias: companyDb.alias,
+          companyId: user.companyId,
+          email: user.email,
+          isAuth: true,
+          token: encrypt(token),
+          userIp
+        },
+      );
+    }
+  
+    let serializedUser = SerializeUser(user);
 
-  let serializedUser = SerializeUser(user);
+    const profiles = await ShowProfileService(user.profileId, user.companyId);
 
-  const profiles = await ShowProfileService(user.profileId, user.companyId);
-
-  serializedUser = { ...serializedUser, profiles };
-
-  return {
-    serializedUser,
-    token,
-    refreshToken,
-    accountConnected: false,
-  };
+    serializedUser = { ...serializedUser, profiles };
+  
+    return {
+      serializedUser,
+      token,
+      refreshToken,
+      accountConnected: false,
+    };
+  } catch(err) {
+    throw(err)
+  }  
 };
 
 export default AuthUserService;

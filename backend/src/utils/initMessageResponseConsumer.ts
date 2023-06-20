@@ -169,8 +169,7 @@ export const initMessageResponseConsumer = () => {
             let retry = false;
 
             try {
-              const CHECK_NUMBER_URL =
-                "http://orquestrator.kankei.com.br:8080/checkNumber";
+              const CHECK_NUMBER_URL = `${process.env.WPPNOF_URL}/checkNumber`;
 
               const payload = {
                 session: message.session,

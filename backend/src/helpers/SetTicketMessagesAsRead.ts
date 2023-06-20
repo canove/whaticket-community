@@ -12,7 +12,8 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
       }
     });
 
-    const SEND_SEEN_URL = "http://omni.kankei.com.br:8080/sendSeen";
+    const SEND_SEEN_URL = `${process.env.WPPNOF_URL}/sendSeen`;
+    
 
     for (const message of messages) {
       const payload = {

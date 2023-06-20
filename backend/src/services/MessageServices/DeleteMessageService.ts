@@ -33,7 +33,7 @@ const DeleteMessageService =
   await message.update({ isDeleted: true });
 
   try {
-    const DELETE_MESSAGE_URL = "http://omni.kankei.com.br:8080/delete";
+    const DELETE_MESSAGE_URL = `${process.env.WPPNOF_URL}/delete`;
 
     const payload = {
         "session": ticket.whatsapp.name,

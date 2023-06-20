@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master
+      - homolog
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -63,7 +63,14 @@ jobs:
             DB_USER=${{ secrets.DB_USER }} -e \
             DB_PASS=${{ secrets.DB_PASS }} -e \
             DB_NAME=${{ secrets.DB_NAME }}  -e \
+            BUCKET_CREDENTIAL=${{vars.BUCKET_CREDENTIAL}} -e \
             BACKEND_URL=${{ vars.BACKEND_URL }} -e \
+            ENV_AWS_REGION=us-east-2 -e \
+            ENV_AWS_ACCOUNT_ID=387274513997 -e \
+            AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e \
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e \
+            ENV_AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e \
+            ENV_AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e \
             JWT_SECRET=${{ vars.JWT_SECRET }} -e \
             JWT_REFRESH_SECRET=${{ vars.JWT_REFRESH_SECRET }} -e \
             AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }} -e \
@@ -79,6 +86,8 @@ jobs:
             REDIS_SAVE_TIME=${{ vars.REDIS_SAVE_TIME }} -e \
             SQS_DISPATCH_QUEUE=${{ vars.SQS_DISPATCH_QUEUE }} -e \
             SQS_BOT_MESSAGE_URL=${{ vars.SQS_BOT_MESSAGE_URL }} -e \
+            SQS_WH_CONNECT_URL=${{ vars.SQS_WH_CONNECT_URL }} -e \
+            WPP_NOF_WEBHOOK_QRCODE_URL=${{ vars.WPP_NOF_WEBHOOK_QRCODE_URL }} -e \
             SQS_ORQUESTRATOR_URL=${{ vars.SQS_ORQUESTRATOR_URL }} -e \
             SQS_ORQUESTRATOR_RESPONSE_URL=${{ vars.SQS_ORQUESTRATOR_RESPONSE_URL }} -e \
             SQS_MESSAGE_STATUS=${{ vars.SQS_MESSAGE_STATUS }} -e \
@@ -86,8 +95,12 @@ jobs:
             BELLINATI_TOKEN=${{ vars.BELLINATI_TOKEN }} -e \
             BELLINATI_ID_FORNECEDOR=${{ vars.BELLINATI_ID_FORNECEDOR }} -e \
             BELLINATI_ID=${{ vars.BELLINATI_ID }} -e \
+            REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 -e \
+            REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 -e \
+            REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445 -e \
             FRONTEND_URL=${{ vars.FRONTEND_URL }} --name \
             whatsapp-api -p 8443:3000 ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+  
   build-and-deploy-frontend:
     env:
       ECR_REGISTRY: 387274513997.dkr.ecr.us-east-2.amazonaws.com
@@ -135,4 +148,7 @@ jobs:
             docker stop whatsapp-portal-frontend || true
             docker rm whatsapp-portal-frontend || true
             docker pull 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
-            docker run -d -e REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 -e REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 -e REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445 --name whatsapp-portal-frontend -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
+            docker run -d -e \
+            REACT_APP_BACKEND_URL=http://omni.brainitsolutions.com.br:8443 -e \
+            REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 -e \
+            REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445 --name whatsapp-portal-frontend -p 80:80 387274513997.dkr.ecr.us-east-2.amazonaws.com/whatsapp-portal-frontend:${{github.sha}}
