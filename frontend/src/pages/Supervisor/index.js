@@ -731,7 +731,7 @@ const Supervisor = () => {
                       {user.name}
                     </TableCell>
                     <TableCell align="center">
-                      {getUserStatus(user.status)}
+                      {(user.id === "NO_USER") ? "---" : getUserStatus(user.status)}
                     </TableCell>
                     <TableCell align="center">
                       <span
