@@ -75,7 +75,7 @@ const updateUser = async (userId) => {
 
   update = { updatedAt: new Date() };
 
-  if (user.status === "inactive" || user.status === "offline") {
+  if (!user.status || user.status === "inactive" || user.status === "offline") {
     update = { ...update, status: "online" };
     await user.update(update);
 
