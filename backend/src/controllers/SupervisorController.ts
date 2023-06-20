@@ -103,6 +103,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                     "id", 
                     "name",
                     "updatedAt",
+                    "status",
                 ],
                 include: [
                     {
@@ -206,7 +207,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
                 {
                     model: User,
                     as: "user",
-                    attributes: ["id", "name"],
+                    attributes: ["id", "name", "status"],
                     where: { deletedAt: null },
                     required: false,
                 },

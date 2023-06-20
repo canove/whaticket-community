@@ -514,6 +514,12 @@ const Supervisor = () => {
     });
   }
 
+  const getUserStatus = (status) => {
+    if (status === "online") return "Online";
+    if (status === "inactive") return "Inativo";
+    return "Offline";
+  }
+
   return (
     <MainContainer>
       <MainHeader>
@@ -709,6 +715,7 @@ const Supervisor = () => {
             <TableHead>
               <TableRow>
                 <TableCell align="left">{"User"}</TableCell>
+                <TableCell align="center">{"Status"}</TableCell>
                 <TableCell align="center">{"Tickets em Espera"}</TableCell>
                 <TableCell align="center">{"Tickets em Atendimento"}</TableCell>
                 <TableCell align="center">{"Tickets Finalizadas"}</TableCell>
@@ -722,6 +729,9 @@ const Supervisor = () => {
                   <TableRow key={user.id}>
                     <TableCell align="left">
                       {user.name}
+                    </TableCell>
+                    <TableCell align="center">
+                      {getUserStatus(user.status)}
                     </TableCell>
                     <TableCell align="center">
                       <span
@@ -780,7 +790,7 @@ const Supervisor = () => {
                     </TableCell>
                   </TableRow>
                 ))}
-                {loading && <TableRowSkeleton columns={6} />}
+                {loading && <TableRowSkeleton columns={7} />}
               </>
             </TableBody>
           </Table>
