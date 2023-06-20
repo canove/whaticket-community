@@ -19,6 +19,9 @@ interface Response {
   overflowQueueId: string | number;
   createTicketWhatsappType: string;
   userInactiveTime: number;
+  autoRouting: boolean;
+  autoRoutingProfiles: string[];
+  showPendingTickets: boolean;
 }
 
 const initialSettings = { 
@@ -35,6 +38,9 @@ const initialSettings = {
   overflowQueueId: "",
   createTicketWhatsappType: "",
   userInactiveTime: 30,
+  autoRouting: false,
+  autoRoutingProfiles: [],
+  showPendingTickets: false,
 };
 
 const ListCompanySettingsService = async (

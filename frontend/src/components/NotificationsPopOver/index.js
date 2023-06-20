@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import openSocket from "../../services/socket-io";
 import openSQSSocket from "../../services/socket-sqs-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 import useSound from "use-sound";
 
 import Popover from "@material-ui/core/Popover";
@@ -20,6 +21,8 @@ import useTickets from "../../hooks/useTickets";
 import alertSound from "../../assets/sound.mp3";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
+import api from "../../services/api";
+import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	tabContainer: {
@@ -53,6 +56,8 @@ const NotificationsPopOver = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [notifications, setNotifications] = useState([]);
 
+	const [showPendingTickets, setShowPendingTickets] = useState(true);
+
 	const [, setDesktopNotifications] = useState([]);
 
 	const { tickets } = useTickets({ withUnreadMessages: "true" });
@@ -60,6 +65,22 @@ const NotificationsPopOver = () => {
 	const soundAlertRef = useRef();
 
 	const historyRef = useRef(history);
+
+	useEffect(() => {
+		const fetchSettings = async () => {
+			try {
+				const { data } = await api.get("/companySettings");
+
+				if (data.autoRouting && !data.showPendingTickets) {
+					setShowPendingTickets(false);
+				}
+			} catch (err) {
+			  	toastError(err);
+			}
+		}
+	  
+		fetchSettings();
+	}, []);
 
 	useEffect(() => {
 		soundAlertRef.current = play;
@@ -72,7 +93,17 @@ const NotificationsPopOver = () => {
 	}, [play]);
 
 	useEffect(() => {
-		setNotifications(tickets);
+		const processNotifications = () => {
+			if (showPendingTickets) {
+				setNotifications(tickets);
+			} else {
+				const newNotifications = tickets.filter(ticket => ticket.status !== "pending");
+
+				setNotifications(newNotifications);
+			}
+		}
+
+		processNotifications();
 	}, [tickets]);
 
 	useEffect(() => {
@@ -111,6 +142,7 @@ const NotificationsPopOver = () => {
 		socket.on(`appMessage${user.companyId}`, data => {
 			if (
 				data.action === "create" &&
+				(data.ticket.status !== "pending" || (data.ticket.status === "pending" && showPendingTickets)) &&
 				(!data.message.read || data.ticket.status === "pending") &&
 				(data.ticket.userId === user?.id || !data.ticket.userId) &&
 				(user?.queues?.some(queue => (queue.id === data.ticket.queueId)) || !data.ticket.queueId)
@@ -139,7 +171,7 @@ const NotificationsPopOver = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [user]);
+	}, [user, showPendingTickets]);
 
 	useEffect(() => {
 		const socket = openSQSSocket();
@@ -173,6 +205,7 @@ const NotificationsPopOver = () => {
 		socket.on(`appMessage${user.companyId}`, data => {
 			if (
 				data.action === "create" &&
+				(data.ticket.status !== "pending" || (data.ticket.status === "pending" && showPendingTickets)) &&
 				(!data.message.read || data.ticket.status === "pending") &&
 				(data.ticket.userId === user?.id || !data.ticket.userId) &&
 				(user?.queues?.some(queue => (queue.id === data.ticket.queueId)) || !data.ticket.queueId)
@@ -201,7 +234,70 @@ const NotificationsPopOver = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [user]);
+	}, [user, showPendingTickets]);
+
+	useEffect(() => {
+		const socket = openWorkerSocket();
+		socket.on("connect", () => socket.emit("joinNotification"));
+
+		socket.on(`ticket${user.companyId}`, data => {
+			if (data.action === "updateUnread" || data.action === "delete") {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticketId);
+					if (ticketIndex !== -1) {
+						prevState.splice(ticketIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+
+				setDesktopNotifications(prevState => {
+					const notfiticationIndex = prevState.findIndex(
+						n => n.tag === String(data.ticketId)
+					);
+					if (notfiticationIndex !== -1) {
+						prevState[notfiticationIndex].close();
+						prevState.splice(notfiticationIndex, 1);
+						return [...prevState];
+					}
+					return prevState;
+				});
+			}
+		});
+
+		socket.on(`appMessage${user.companyId}`, data => {
+			if (
+				data.action === "create" &&
+				(data.ticket.status !== "pending" || (data.ticket.status === "pending" && showPendingTickets)) &&
+				(!data.message.read || data.ticket.status === "pending") &&
+				(data.ticket.userId === user?.id || !data.ticket.userId) &&
+				(user?.queues?.some(queue => (queue.id === data.ticket.queueId)) || !data.ticket.queueId)
+			) {
+				setNotifications(prevState => {
+					const ticketIndex = prevState.findIndex(t => t.id === data.ticket.id);
+					if (ticketIndex !== -1) {
+						prevState[ticketIndex] = data.ticket;
+						return [...prevState];
+					}
+					return [data.ticket, ...prevState];
+				});
+
+				const shouldNotNotificate =
+					(data.message.ticketId === ticketIdRef.current &&
+						document.visibilityState === "visible") ||
+					(data.ticket.userId && data.ticket.userId !== user?.id) ||
+					data.ticket.isGroup;
+
+				if (shouldNotNotificate) return;
+
+				handleNotifications(data);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [user, showPendingTickets]);
 
 	const handleNotifications = data => {
 		const { message, contact, ticket } = data;

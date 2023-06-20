@@ -125,7 +125,7 @@ const SendTicketMessagesToCompanyService = async ({
     }
   }
 
-  if (`${companyId}` == process.env.MLGOMES_ID) {
+  if (`${companyId}` == "1") {
     console.log("MLGOMES CALLBACK");
   
     try {

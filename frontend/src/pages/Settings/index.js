@@ -68,10 +68,14 @@ const Settings = () => {
 		overflowQueueId: "",
 		createTicketWhatsappType: "",
 		userInactiveTime: 30,
+		autoRouting: false,
+		autoRoutingProfiles: [],
+		showPendingTickets: false,
 	}
 	const [settings, setSettings] = useState(initialSettings);
 
 	const [surveys, setSurveys] = useState([]);
+	const [profiles, setProfiles] = useState([]);
 
 	const [allowedIPModalOpen, setAllowedIPModalOpen] = useState(false);
 	const [selectedAllowedIP, setSelectedAllowedIP] = useState("");
@@ -81,7 +85,11 @@ const Settings = () => {
 		const fetchSettings = async () => {
 			try {
 				const { data } = await api.get("/companySettings/");
-				setSettings(prevSettings => ({ ...prevSettings, ...data }));
+				setSettings(prevSettings => ({ 
+					...prevSettings, 
+					...data,
+					autoRoutingProfiles: (data.autoRoutingProfiles.length === 0) ? [""] : data.autoRoutingProfiles,
+				}));
 			} catch (err) {
 				toastError(err);
 			}
@@ -98,6 +106,18 @@ const Settings = () => {
 			}
 		}
 
+		const fetchProfiles = async () => {
+			try {
+				const { data } = await api.get('/profile', {
+					params: { limit: -1 }
+				});
+			  	setProfiles(data.profiles);
+			} catch (err) {
+			  	toastError(err);
+			}
+		}
+
+		fetchProfiles();
 		fetchSurveys();
 		fetchSettings();
 	}, []);
@@ -165,6 +185,7 @@ const Settings = () => {
 		const body = {
 			...settings,
 			days: settings.days.map(day => day ? true : false),
+			autoRoutingProfiles: (settings.autoRoutingProfiles.includes("")) ? [] : settings.autoRoutingProfiles,
 		};
 
 		try {
@@ -255,7 +276,7 @@ const Settings = () => {
 				index={selectedAllowedIPIndex}
                 saveIP={saveIP}
 			/>
-			<Container className={classes.container} maxWidth="sm">
+			<Container className={classes.container} maxWidth="md">
 				<Title>{i18n.t("settings.title")}</Title>
 				<Paper className={classes.paper}> {/* Horário de Atendimento */}
 					<div>
@@ -492,6 +513,94 @@ const Settings = () => {
 								</Select>
 							</FormControl>
 						</div>
+						<Divider style={{ margin: "10px 0" }} fullWidth />
+						<div>
+							<FormControl>
+								<FormControlLabel
+									label="Roteamento Automátivo"
+									control={
+										<Checkbox 
+											color="primary" 
+											checked={settings.autoRouting} 
+											onChange={(e) => { handleSettingsChange(!settings.autoRouting, "autoRouting") }} 
+										/>
+									}
+								/>
+								{/* 
+								<FormLabel>
+									Roteamento por:
+								</FormLabel>
+								<FormControlLabel
+									label="Quantidade de conversas abertas"
+									control={
+										<Checkbox 
+											color="primary" 
+											checked={settings.routingType["tickets"]} 
+											onChange={(e) => {}} 
+										/>
+									}
+								/>
+								<FormControlLabel
+									label="Tempo de inatividade"
+									control={
+										<Checkbox 
+											color="primary" 
+											checked={settings.routingType["inactiveTime"]} 
+											onChange={(e) => {}} 
+										/>
+									}
+								/> 
+								*/}
+							</FormControl>
+						</div>
+						{settings.autoRouting &&
+							<div>
+								<FormControl>
+									<FormControlLabel
+										label="Mostrar Conversas Pendentes (Operador pode aceitar conversa)"
+										control={
+											<Checkbox 
+												color="primary" 
+												checked={settings.showPendingTickets} 
+												onChange={(e) => { handleSettingsChange(!settings.showPendingTickets, "showPendingTickets") }} 
+											/>
+										}
+									/>
+								</FormControl>
+								<FormControl
+									variant="outlined"
+									margin="dense"
+									fullWidth
+								>
+									<InputLabel>{"Perfis para Roteamento Automático"}</InputLabel>
+									<Select
+										variant="outlined"
+										label="Perfis para Roteamento Automático"
+										value={settings.autoRoutingProfiles}
+										onChange={(e) =>  {
+											let value = e.target.value;
+
+											if (value.includes("")) {
+												if (value[value.length-1] === "") {
+													value = [""];
+												} else {
+													value.splice(value.indexOf(""), 1);
+												}
+											}
+
+											handleSettingsChange(value, "autoRoutingProfiles")
+										}}
+										fullWidth
+										multiple
+									>
+										<MenuItem value={""}>Todos</MenuItem>
+										{profiles.map((profile) => (
+											<MenuItem key={profile.id} value={profile.id}>{profile.name}</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+							</div>
+						}
 					</div>
 				</Paper>
 				<Paper className={classes.paper}> {/* User */}

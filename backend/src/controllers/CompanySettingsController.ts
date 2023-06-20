@@ -27,6 +27,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     overflowQueueId,
     createTicketWhatsappType,
     userInactiveTime,
+    autoRouting,
+    autoRoutingProfiles,
+    showPendingTickets,
   } = req.body;
 
   try {
@@ -51,6 +54,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       overflowQueueId,
       createTicketWhatsappType,
       userInactiveTime,
+      autoRouting,
+      autoRoutingProfiles,
+      showPendingTickets,
     };
 
     await client.set(`settings-${companyId}`, JSON.stringify(settings));
