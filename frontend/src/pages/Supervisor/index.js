@@ -451,7 +451,7 @@ const Supervisor = () => {
     return formatTime(averageServiceTime);
   }
 
-  const formatLastSentMessageDate = (time) => {
+  const formatLastUserUpdate = (time) => {
     const formattedTime = formatTime(time);
     const [hours_string, minutes_string, seconds_string] = formattedTime.split(":");
 
@@ -471,6 +471,8 @@ const Supervisor = () => {
       result = `${minutes} minuto(s) atrás.`;
     } else if (seconds) {
       result = `${seconds} segundo(s) atrás.`;
+    } else if (time > 0) {
+      result = "Agora";
     }
 
     return result;
@@ -510,6 +512,12 @@ const Supervisor = () => {
         tab: tab ?? "queue",
       }).toString()
     });
+  }
+
+  const getUserStatus = (status) => {
+    if (status === "online") return "Online";
+    if (status === "inactive") return "Inativo";
+    return "Offline";
   }
 
   return (
@@ -707,6 +715,7 @@ const Supervisor = () => {
             <TableHead>
               <TableRow>
                 <TableCell align="left">{"User"}</TableCell>
+                <TableCell align="center">{"Status"}</TableCell>
                 <TableCell align="center">{"Tickets em Espera"}</TableCell>
                 <TableCell align="center">{"Tickets em Atendimento"}</TableCell>
                 <TableCell align="center">{"Tickets Finalizadas"}</TableCell>
@@ -720,6 +729,9 @@ const Supervisor = () => {
                   <TableRow key={user.id}>
                     <TableCell align="left">
                       {user.name}
+                    </TableCell>
+                    <TableCell align="center">
+                      {getUserStatus(user.status)}
                     </TableCell>
                     <TableCell align="center">
                       <span
@@ -773,12 +785,12 @@ const Supervisor = () => {
                     </TableCell>
                     <TableCell align="center">
                       <span>
-                        {formatLastSentMessageDate(user.lastSentMessage)}
+                        {formatLastUserUpdate(user.lastUserUpdate)}
                       </span>
                     </TableCell>
                   </TableRow>
                 ))}
-                {loading && <TableRowSkeleton columns={6} />}
+                {loading && <TableRowSkeleton columns={7} />}
               </>
             </TableBody>
           </Table>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import openSocket from "../../services/socket-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { toast } from "react-toastify";
 
@@ -88,6 +89,20 @@ const useAuth = () => {
 
 	useEffect(() => {
 		const socket = openSocket();
+
+		socket.on(`user${user.companyId}`, data => {
+			if (data.action === "update" && data.user.id === user.id) {
+				setUser(data.user);
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [user]);
+
+	useEffect(() => {
+		const socket = openWorkerSocket();
 
 		socket.on(`user${user.companyId}`, data => {
 			if (data.action === "update" && data.user.id === user.id) {

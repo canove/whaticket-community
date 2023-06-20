@@ -13,6 +13,11 @@ import {
   MenuItem,
   IconButton,
   Menu,
+  Dialog,
+  Button,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
 } from "@material-ui/core";
 
 import MenuIcon from "@material-ui/icons/Menu";
@@ -220,6 +225,16 @@ const LoggedInLayout = ({ children }) => {
     handleLogout();
   };
 
+  // const handleUpdateUserStatus = async () => {
+  //   try {
+  //     if (!user) return;
+
+  //     await api.get(`/users/${user.id}`);
+  //   } catch (err) {
+  //     toastError(err);
+  //   }
+  // }
+
   // const drawerClose = () => {
   //   if (document.body.offsetWidth < 600) {
   //     setDrawerOpen(false);
@@ -232,6 +247,25 @@ const LoggedInLayout = ({ children }) => {
 
   return (
     <div className={classes.root}>
+      {/* <Dialog
+        open={(user.status === "inactive")}
+        onClose={() => handleUpdateUserStatus()}
+        aria-labelledby="confirm-dialog"
+      >
+			  <DialogTitle id="confirm-dialog">Usuário inativo</DialogTitle>
+			  <DialogContent dividers>
+				  <Typography>{"Usuário inativo. Clique em OK para voltar."}</Typography>
+			  </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={() => handleUpdateUserStatus()}
+            color="secondary"
+          >
+            {"OK"}
+          </Button>
+        </DialogActions>
+		  </Dialog> */}
       <Drawer
         variant={drawerVariant}
         className={drawerOpen ? classes.drawerPaper : classes.drawerPaperClose}

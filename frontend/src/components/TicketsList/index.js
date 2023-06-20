@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
 import openSQSSocket from "../../services/socket-sqs-io";
+import openWorkerSocket from "../../services/socket-worker-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -359,6 +360,47 @@ const reducer = (state, action) => {
 					type: "UPDATE_TICKET_CONTACT",
 					payload: data.contact,
 				});
+			}
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [status, searchParam, showAll, user, selectedQueueIds, categoryId, pendingAnswer, isTask]);
+
+	useEffect(() => {
+		const socket = openWorkerSocket();
+
+		const shouldUpdateTicket = ticket => !searchParam &&
+			(!pendingAnswer || pendingAnswer && ticket.lastMessageFromMe === false) &&
+			(!ticket.userId || ticket.userId === user?.id || showAll) &&
+			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1) && !isTask;
+
+		const notBelongsToUserQueues = ticket =>
+			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1 && !isTask;
+
+		socket.on("connect", () => {
+			if (status) {
+				socket.emit("joinTickets", status);
+			} else {
+				socket.emit("joinNotification");
+			}
+		});
+
+		socket.on(`ticket${user.companyId}`, data => {
+			if (data.action === "update" && shouldUpdateTicket(data.ticket)) {
+				dispatch({
+					type: "UPDATE_TICKET",
+					payload: data.ticket,
+				});
+			}
+
+			if (data.action === "update" && notBelongsToUserQueues(data.ticket)) {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
+			}
+
+			if (data.action === "delete") {
+				dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
 			}
 		});
 

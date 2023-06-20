@@ -120,6 +120,8 @@ const TicketsManager = () => {
   const [categories, setCategories] = useState([]);
   const [categoryId, setCategoryId] = useState("");
 
+  const [showPendingTickets, setShowPendingTickets] = useState(true);
+
   useEffect(() => {
     // if (user.profile.toUpperCase() === "ADMIN") {
     //   setShowAllTickets(true);
@@ -134,6 +136,19 @@ const TicketsManager = () => {
       }
     }
 
+    const fetchSettings = async () => {
+      try {
+        const { data } = await api.get("/companySettings");
+
+        if (data.autoRouting && !data.showPendingTickets) {
+          setShowPendingTickets(false);
+        }
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+    fetchSettings();
     fetchCategories();
   }, []);
 
@@ -487,19 +502,21 @@ const TicketsManager = () => {
             }
             value={"open"}
           />
-          <Tab
-            label={
-              <Badge
-                overlap="rectangular"
-                className={classes.badge}
-                badgeContent={pendingCount}
-                color="secondary"
-              >
-                {i18n.t("ticketsList.pendingHeader")}
-              </Badge>
-            }
-            value={"pending"}
-          />
+          { showPendingTickets &&
+            <Tab
+              label={
+                <Badge
+                  overlap="rectangular"
+                  className={classes.badge}
+                  badgeContent={pendingCount}
+                  color="secondary"
+                >
+                  {i18n.t("ticketsList.pendingHeader")}
+                </Badge>
+              }
+              value={"pending"}
+            />
+          }
           <Tab
             label={
               <Badge
@@ -529,12 +546,14 @@ const TicketsManager = () => {
             updateCount={(val) => setPendingAnswerCount(val)}
             style={applyPanelStyle("pendingAnswer")}
           />
-          <TicketsList
-            status="pending"
-            selectedQueueIds={selectedQueueIds}
-            updateCount={(val) => setPendingCount(val)}
-            style={applyPanelStyle("pending")}
-          />
+          { showPendingTickets &&
+            <TicketsList
+              status="pending"
+              selectedQueueIds={selectedQueueIds}
+              updateCount={(val) => setPendingCount(val)}
+              style={applyPanelStyle("pending")}
+            />
+          }
         </Paper>
       </TabPanel>
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>

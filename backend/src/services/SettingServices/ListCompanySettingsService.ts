@@ -18,6 +18,10 @@ interface Response {
   autoCloseTicketStatus: TicketStatus;
   overflowQueueId: string | number;
   createTicketWhatsappType: string;
+  userInactiveTime: number;
+  autoRouting: boolean;
+  autoRoutingProfiles: string[];
+  showPendingTickets: boolean;
 }
 
 const initialSettings = { 
@@ -33,6 +37,10 @@ const initialSettings = {
   autoCloseTicketStatus: { "inbot": false, "open": false },
   overflowQueueId: "",
   createTicketWhatsappType: "",
+  userInactiveTime: 30,
+  autoRouting: false,
+  autoRoutingProfiles: [],
+  showPendingTickets: false,
 };
 
 const ListCompanySettingsService = async (

@@ -258,9 +258,7 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
   });
 
   if (ticket.status === "closed") {
-    if (`${companyId}` == process.env.BELLINATI_ID) {
-      await SendTicketMessagesToCompanyService({ ticketId: ticket.id, categoryId, companyId });
-    }
+    await SendTicketMessagesToCompanyService({ ticket, categoryId, companyId });
 
     const connectionFile = await ConnectionFiles.findOne({
       where: { companyId },
