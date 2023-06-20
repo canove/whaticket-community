@@ -225,15 +225,15 @@ const LoggedInLayout = ({ children }) => {
     handleLogout();
   };
 
-  const handleUpdateUserStatus = async () => {
-    try {
-      if (!user) return;
+  // const handleUpdateUserStatus = async () => {
+  //   try {
+  //     if (!user) return;
 
-      await api.get(`/users/${user.id}`);
-    } catch (err) {
-      toastError(err);
-    }
-  }
+  //     await api.get(`/users/${user.id}`);
+  //   } catch (err) {
+  //     toastError(err);
+  //   }
+  // }
 
   // const drawerClose = () => {
   //   if (document.body.offsetWidth < 600) {
@@ -247,7 +247,7 @@ const LoggedInLayout = ({ children }) => {
 
   return (
     <div className={classes.root}>
-      <Dialog
+      {/* <Dialog
         open={(user.status === "inactive")}
         onClose={() => handleUpdateUserStatus()}
         aria-labelledby="confirm-dialog"
@@ -265,7 +265,7 @@ const LoggedInLayout = ({ children }) => {
             {"OK"}
           </Button>
         </DialogActions>
-		</Dialog>
+		  </Dialog> */}
       <Drawer
         variant={drawerVariant}
         className={drawerOpen ? classes.drawerPaper : classes.drawerPaperClose}
