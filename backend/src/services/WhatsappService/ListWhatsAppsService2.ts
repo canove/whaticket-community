@@ -4,6 +4,7 @@ import Whatsapp from "../../database/models/Whatsapp";
 import ShowConnectionFileByNameService from "../ConnectionFileService/ShowConnectionFileByNameService";
 import Company from "../../database/models/Company";
 import ListCompanySettingsService from "../SettingServices/ListCompanySettingsService";
+import Flows from "../../database/models/Flows";
 
 interface Request {
   official?: boolean;
@@ -126,6 +127,12 @@ const ListWhatsAppsService2 = async ({
       {
         model: Company,
         as: "company",
+        attributes: ["id", "name"],
+        required: false,
+      },
+      {
+        model: Flows,
+        as: "flow",
         attributes: ["id", "name"],
         required: false,
       }
