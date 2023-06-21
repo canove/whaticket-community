@@ -1,0 +1,62 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:902218626431:task-definition/whatsapp-portal-api:182",
+    "containerDefinitions": [
+        {
+            "name": "whatsapp-portal-api-container",
+            "image": "902218626431.dkr.ecr.us-east-1.amazonaws.com/whatsapp-portal-api:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [],
+            "command": [],
+            
+            "mountPoints": [],
+            "volumesFrom": []
+        }
+    ],
+    "family": "whatsapp-portal-api",
+    "taskRoleArn": "arn:aws:iam::902218626431:role/bits-ecstasksrole-aws",
+    "executionRoleArn": "arn:aws:iam::902218626431:role/bits-ecstasksrole-aws",
+    "networkMode": "awsvpc",
+    "revision": 182,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX"
+    },
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "registeredAt": "2023-06-10T11:59:14.685000-03:00",
+    "registeredBy": "arn:aws:iam::902218626431:root"
+}

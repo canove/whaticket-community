@@ -1,0 +1,150 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+jobs:
+  build-and-deploy-api:
+    env:
+      ECR_REGISTRY: 902218626431.dkr.ecr.us-east-1.amazonaws.com
+      ECR_REPOSITORY: whatsapp-portal-api
+      IMAGE_TAG: ${{ github.sha }}
+    runs-on: whaticket
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.PRD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image
+        id: build-image
+        run: |
+          docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}} ./backend
+          docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+          echo "image=${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}" >> $GITHUB_OUTPUT
+
+      - name: Download task definition  
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        id: task-def
+        with:
+          task-definition: backend/task-definitions/task-definition.json
+          container-name: whatsapp-portal-api-container
+          image: ${{ steps.build-image.outputs.image }}
+          environment-variables: |
+            DB_HOST=${{secrets.PRD_DB_HOST}} 
+            DB_USER=${{ secrets.PRD_DB_USER }} 
+            DB_PASS=${{ secrets.PRD_DB_PASS }} 
+            DB_NAME=${{ secrets.PRD_DB_NAME }} 
+            BACKEND_URL=https://omni.kankei.com.br:8443
+            ENV_AWS_REGION=us-east-1
+            TZ=America/Sao_Paulo
+            ENV_AWS_ACCOUNT_ID=902218626431
+            AWS_ACCESS_KEY_ID=${{secrets.PRD_AWS_ACCESS_KEY_ID}} 
+            AWS_SECRET_ACCESS_KEY=${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
+            ENV_AWS_ACCESS_KEY_ID=${{secrets.PRD_AWS_ACCESS_KEY_ID}}
+            ENV_AWS_SECRET_ACCESS_KEY=${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
+            JWT_SECRET=3123123213123
+            JWT_REFRESH_SECRET=75756756756
+            AWS_S3_BUCKET=kankei-nof-wpp-files
+            WPPNOF_URL=http://omni.kankei.com.br:8080
+            WPPNOF_API_TOKEN=${{ vars.PRD_WPPNOF_API_TOKEN }} 
+            WPPNOF_SESSION_KEY=${{ vars.PRD_WPPNOF_SESSION_KEY }} 
+            WPP_OFFICIAL_URL=http://omni.kankei.com.br:82/send
+            WPP_OFFICIAL_API_KEY=${{ vars.PRD_WPP_OFFICIAL_API_KEY }} 
+            WPP_NOF_WEBHOOK_URL=http://omni.kankei.com.br:82/webhook
+            WPP_NOF_URL=http://omni.kankei.com.br:82
+            WPP_NOF_API_KEY=${{ vars.PRD_WPP_NOF_API_KEY }}
+            REDIS_URL=redis://awsredis-kankei.wcaxrl.ng.0001.use1.cache.amazonaws.com:6379
+            REDIS_SAVE_TIME=172800đ
+            SQS_DISPATCH_QUEUE=https://sqs.us-east-1.amazonaws.com/902218626431/dispatchQueue
+            SQS_BOT_MESSAGE_URL=https://sqs.us-east-1.amazonaws.com/902218626431/botMessage
+            SQS_WH_CONNECT_URL=http://omni.kankei.com.br:82/wh_connect 
+            WPP_NOF_WEBHOOK_QRCODE_URL=http://omni.kankei.com.br:82/qrcode
+            SQS_ORQUESTRATOR_URL=https://sqs.us-east-1.amazonaws.com/902218626431/orquestrator
+            SQS_ORQUESTRATOR_RESPONSE_URL=https://sqs.us-east-1.amazonaws.com/902218626431/orquestrator_response
+            SQS_MESSAGE_STATUS=https://sqs.us-east-1.amazonaws.com/902218626431/messageStatus
+            BELLINATI_URL=https://api-digital.bellinatiperez.com.br/api/callback-sms/6c7cc53e-af67-4199-9927-5af68bb0b7be
+            BELLINATI_TOKEN=8ef99087-5d22-4c51-a1f1-020b552a7a4d 
+            BELLINATI_ID_FORNECEDOR=8
+            BELLINATI_ID=8
+            REACT_APP_BACKEND_URL=https://omni.kankei.com.br:8443
+            REACT_APP_WORKER_URL=http://omni.brainitsolutions.com.br:8444 
+            REACT_APP_SQS_URL=http://omni.brainitsolutions.com.br:8445
+            FRONTEND_URL=https://omni.kankei.com.br
+                        
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: whatsapp-portal-api
+          cluster: kankei-wpp-cluster-prod
+          wait-for-service-stability: true
+
+      
+  build-and-deploy-frontend:
+    env:
+      ECR_REGISTRY: 902218626431.dkr.ecr.us-east-1.amazonaws.com
+      ECR_REPOSITORY: whatsapp-portal-frontend
+      IMAGE_TAG: ${{ github.sha }}
+
+    runs-on: whaticket
+    needs: build-and-deploy-api
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::387274513997:role/gihub-cicd
+          aws-region: us-east-1
+
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image
+        id: build-image
+        run: |
+          docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}} ./frontend
+          docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+          echo "image=${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}" >> $GITHUB_OUTPUT
+
+      - name: Download task definition  
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        id: task-def
+        with:
+          task-definition: frontend/task-definitions/task-definition.json
+          container-name: frontend
+          image: ${{ steps.build-image.outputs.image }}
+          environment-variables: |
+            TZ=America/Sao_Paulo
+            REACT_APP_BACKEND_URL=https://omni.kankei.com.br:8443
+            REACT_APP_WORKER_URL=https://omni.kankei.com.br:8444
+            REACT_APP_SQS_URL=https://omni.kankei.com.br:8445
+                        
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: whatsapp-portal-front
+          cluster: kankei-wpp-cluster-prod
+          wait-for-service-stability: true
