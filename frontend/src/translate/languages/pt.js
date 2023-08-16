@@ -136,8 +136,8 @@ const messages = {
           importListMessage: "Deseja importar todos os contatos de uma lista?",
         },
         buttons: {
-          importlist: "Importar Lista de Contatos",
-          import: "Importar Contatos Telefone",
+          importlist: "Importar Contatos de Arquivo (CSV / XLS)",
+          import: "Importar Contatos do Telefone",
           add: "Adicionar Contato",
         },
         table: {

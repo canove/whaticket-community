@@ -2,6 +2,8 @@ import React, { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
+import csvtojson from "csvtojson";
+import * as XLSX from "xlsx";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -34,6 +36,7 @@ import MainContainer from "../../components/MainContainer";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../../components/Can";
+import Dropdown from "../../components/Dropdown";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_CONTACTS") {
@@ -102,7 +105,11 @@ const Contacts = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [deletingContact, setDeletingContact] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmOpenList, setConfirmOpenList] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  // const [file, setFile] = useState(null);
+  const [fileList, setFileList] = useState([]);
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -203,6 +210,20 @@ const Contacts = () => {
     }
   };
 
+  const handleimportListContact = async () => {
+    // console.log("está sendo chamada handleimportlistcontact?", fileList);
+    
+    try {
+      const {data} = await api.post("/contacts/import", fileList);
+      // console.log("vvvvvvvvvvariavelAwait", data);
+      setShowResults(data);
+      setFileList([]);
+      // history.go(0);
+    } catch (err) {
+      toastError(err);
+    }
+  };
+
   const loadMore = () => {
     setPageNumber((prevState) => prevState + 1);
   };
@@ -214,6 +235,29 @@ const Contacts = () => {
       loadMore();
     }
   };
+
+  const handleFileChange = async(e) => {
+    const file = e.target.files[0];
+    // setFile(e.target.files[0]);
+    if (file.name.toLowerCase().endsWith(".csv")) {
+      const newCsvFileReader = new FileReader();
+      newCsvFileReader.onload = function (e) {
+      csvtojson().fromString(e.target.result).then((json) => {
+        setFileList(json);
+      });
+    };
+    newCsvFileReader.readAsText(file);
+  }
+  if (file.name.toLowerCase().split(".").pop().startsWith("xls")) {
+    const data = await file.arrayBuffer();
+    // console.log("dataaaaaaa", data);
+    const workbook = XLSX.read(data);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    setFileList(XLSX.utils.sheet_to_json(worksheet));
+    console.log("filelistttttt", XLSX.utils.sheet_to_json(worksheet));
+  }
+    }
+    
 
   return (
     <MainContainer className={classes.mainContainer}>
@@ -243,6 +287,77 @@ const Contacts = () => {
           ? `${i18n.t("contacts.confirmationModal.deleteMessage")}`
           : `${i18n.t("contacts.confirmationModal.importMessage")}`}
       </ConfirmationModal>
+      <ConfirmationModal
+        title={
+          deletingContact
+            ? `${i18n.t("contacts.confirmationModal.deleteTitle")} ${
+                deletingContact.name
+              }?`
+            : `${i18n.t("contacts.confirmationModal.importTitleList")}`
+        }
+        open={confirmOpenList}
+        onClose={setConfirmOpenList}
+        onConfirm={(e) =>
+          deletingContact
+            ? handleDeleteContact(deletingContact.id)
+            // : handleimportContact()
+            : handleimportListContact()
+        }
+      >
+        <input
+        type="file"
+        onChange={handleFileChange}
+        />
+
+        <br/> Quantidade de Contatos a serem importados:<b> {fileList.length}</b>
+        <br/><br/> Serão Importados da sua Lista: o Nome do Seu Contato (<b>name</b>), o WhatsApp Vinculado a ele (<b>number</b>) e E-mail (<b>email</b>).<br/>
+        <br/>Serão Aceitos Telefones que Estiverem Completos com: <b>Código do País</b>,<b> DDD</b> e <b>WhatsApp Válido</b> (Sem Caracteres Especiais, Apenas Números) <br/><br/>
+
+        {deletingContact
+          ? `${i18n.t("contacts.confirmationModal.deleteMessage")}`
+          : `${i18n.t("contacts.confirmationModal.importListMessage")}`}
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        title={
+          deletingContact
+            ? `${i18n.t("contacts.confirmationModal.deleteTitle")} ${
+                deletingContact.name
+              }?`
+            : `${i18n.t("contacts.confirmationModal.importTitleList")}`
+        }
+        open={Boolean(showResults)}
+        onClose={setShowResults}
+        onConfirm={() => history.go(0)}
+      >
+
+            Contatos Importados:
+          <ol>
+            {showResults.validNumbersArray?.map((item) => (
+                <li
+                key={item}
+                >
+                  {item}
+                </li>
+            )
+          )}
+          </ol>
+          Contatos Não Importados:
+          <br/><br/> Ps: Caso hajam contatos nesta lista, os mesmos não foram adicionados pois não possuem um número de WhatsApp válidos ou já estão registrados na plataforma.
+    
+          <ol>
+
+            {showResults.invalidNumbersArray?.map((item) => (
+                <li
+                key={item}
+                >
+                  {item}
+                </li>
+            )
+          )}
+          </ol>
+      </ConfirmationModal>
+
       <MainHeader>
         <Title>{i18n.t("contacts.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -259,13 +374,22 @@ const Contacts = () => {
               ),
             }}
           />
+          <Dropdown>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={(e) => setConfirmOpen(true)}
+            >
+            {i18n.t("contacts.buttons.import")}
+          </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={(e) => setConfirmOpen(true)}
+            onClick={(e) => setConfirmOpenList(true)}
           >
-            {i18n.t("contacts.buttons.import")}
+            {i18n.t("contacts.buttons.importlist")}
           </Button>
+          </Dropdown>
           <Button
             variant="contained"
             color="primary"
