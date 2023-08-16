@@ -107,7 +107,6 @@ const Contacts = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmOpenList, setConfirmOpenList] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  // const [file, setFile] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
@@ -211,14 +210,10 @@ const Contacts = () => {
   };
 
   const handleimportListContact = async () => {
-    // console.log("está sendo chamada handleimportlistcontact?", fileList);
-    
     try {
       const {data} = await api.post("/contacts/import", fileList);
-      // console.log("vvvvvvvvvvariavelAwait", data);
       setShowResults(data);
       setFileList([]);
-      // history.go(0);
     } catch (err) {
       toastError(err);
     }
@@ -238,7 +233,6 @@ const Contacts = () => {
 
   const handleFileChange = async(e) => {
     const file = e.target.files[0];
-    // setFile(e.target.files[0]);
     if (file.name.toLowerCase().endsWith(".csv")) {
       const newCsvFileReader = new FileReader();
       newCsvFileReader.onload = function (e) {
@@ -250,11 +244,9 @@ const Contacts = () => {
   }
   if (file.name.toLowerCase().split(".").pop().startsWith("xls")) {
     const data = await file.arrayBuffer();
-    // console.log("dataaaaaaa", data);
     const workbook = XLSX.read(data);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     setFileList(XLSX.utils.sheet_to_json(worksheet));
-    console.log("filelistttttt", XLSX.utils.sheet_to_json(worksheet));
   }
     }
     
@@ -300,7 +292,6 @@ const Contacts = () => {
         onConfirm={(e) =>
           deletingContact
             ? handleDeleteContact(deletingContact.id)
-            // : handleimportContact()
             : handleimportListContact()
         }
       >

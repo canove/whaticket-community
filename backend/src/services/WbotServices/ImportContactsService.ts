@@ -55,7 +55,6 @@ const ImportContactsService = async (
             where: { number }
           });
 
-          console.log("numberrrrrr exist", numberExists);
           if (numberExists || validNumbersArray.includes(number)) return invalidNumbersArray.push(number);
           validNumbersArray.push(number);
           return Contact.create({ number, name, email });
