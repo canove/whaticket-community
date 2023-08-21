@@ -28,7 +28,7 @@ const VcardPreview = ({ contact, numbers }) => {
                     let contactObj = {
                         name: contact,
                         // number: numbers.replace(/\D/g, ""),
-                        number: numbers !== undefined && numbers.replace(/\D/g, ""),
+                        number: numbers?.replace(/\D/g, ""),
                         email: ""
                     }
                     const { data } = await api.post("/contact", contactObj);
