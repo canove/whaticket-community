@@ -2,7 +2,7 @@ import Whatsapp from "../../models/Whatsapp";
 import AppError from "../../errors/AppError";
 import Queue from "../../models/Queue";
 
-const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
+const showWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
   const whatsapp = await Whatsapp.findByPk(id, {
     include: [
       {
@@ -21,4 +21,4 @@ const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
   return whatsapp;
 };
 
-export default ShowWhatsAppService;
+export default showWhatsAppService;
