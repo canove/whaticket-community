@@ -64,6 +64,23 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
+const UserWhatsAppSelector = ({ classes, whatsappId, setWhatsappId, whatsApps }) => (
+	<FormControl variant="outlined" margin="dense" className={classes.maxWidth} fullWidth>
+		<InputLabel>{i18n.t("userModal.form.whatsapp")}</InputLabel>
+		<Field
+			as={Select}
+			value={whatsappId}
+			onChange={(e) => setWhatsappId(e.target.value)}
+			label={i18n.t("userModal.form.whatsapp")}
+		>
+			<MenuItem value={''}>&nbsp;</MenuItem>
+			{whatsApps.map((whatsapp) => (
+				<MenuItem key={whatsapp.id} value={whatsapp.id}>{whatsapp.name}</MenuItem>
+			))}
+		</Field>
+	</FormControl>
+);
+
 const UserSchema = Yup.object().shape({
 	name: Yup.string()
 		.min(2, "Too Short!")
@@ -249,20 +266,12 @@ const UserModal = ({ open, onClose, userId }) => {
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"
 									yes={() => (!loading &&
-										<FormControl variant="outlined" margin="dense" className={classes.maxWidth} fullWidth>
-											<InputLabel>{i18n.t("userModal.form.whatsapp")}</InputLabel>
-											<Field
-												as={Select}
-												value={whatsappId}
-												onChange={(e) => setWhatsappId(e.target.value)}
-												label={i18n.t("userModal.form.whatsapp")}
-											>
-												<MenuItem value={''}>&nbsp;</MenuItem>
-												{whatsApps.map((whatsapp) => (
-													<MenuItem key={whatsapp.id} value={whatsapp.id}>{whatsapp.name}</MenuItem>
-												))}
-											</Field>
-										</FormControl>
+										<UserWhatsAppSelector
+											classes={classes}
+											whatsappId={whatsappId}
+											setWhatsappId={setWhatsappId}
+											whatsApps={whatsApps}
+										/>
 									)}
 								/>
 							</DialogContent>
