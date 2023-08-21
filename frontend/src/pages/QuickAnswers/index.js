@@ -204,7 +204,7 @@ const QuickAnswers = () => {
         open={quickAnswersModalOpen}
         onClose={handleCloseQuickAnswersModal}
         aria-labelledby="form-dialog-title"
-        quickAnswerId={selectedQuickAnswers && selectedQuickAnswers.id}
+        quickAnswerId={selectedQuickAnswers?.id}
       ></QuickAnswersModal>
       <MainHeader>
         <Title>{i18n.t("quickAnswers.title")}</Title>
