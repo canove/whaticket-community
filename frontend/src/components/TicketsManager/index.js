@@ -91,6 +91,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const ShowAllTicketsSwtich = ({ showAllTickets, setShowAllTickets }) => (
+  <FormControlLabel
+    label={i18n.t("tickets.buttons.showAll")}
+    labelPlacement="start"
+    control={
+      <Switch
+        size="small"
+        checked={showAllTickets}
+        onChange={() => setShowAllTickets((prevState) => !prevState)}
+        name="showAllTickets"
+        color="primary"
+      />
+    }
+  />
+);
+
 const TicketsManager = () => {
   const classes = useStyles();
 
@@ -214,20 +230,9 @@ const TicketsManager = () => {
               role={user.profile}
               perform="tickets-manager:showall"
               yes={() => (
-                <FormControlLabel
-                  label={i18n.t("tickets.buttons.showAll")}
-                  labelPlacement="start"
-                  control={
-                    <Switch
-                      size="small"
-                      checked={showAllTickets}
-                      onChange={() =>
-                        setShowAllTickets((prevState) => !prevState)
-                      }
-                      name="showAllTickets"
-                      color="primary"
-                    />
-                  }
+                <ShowAllTicketsSwtich
+                  showAllTickets={showAllTickets}
+                  setShowAllTickets={setShowAllTickets}
                 />
               )}
             />
