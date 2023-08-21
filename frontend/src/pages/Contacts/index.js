@@ -88,6 +88,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const DeleteContactIconButton = ({ contact, setConfirmOpen, setDeletingContact }) => (
+  <IconButton
+    size="small"
+    onClick={(e) => {
+      setConfirmOpen(true);
+      setDeletingContact(contact);
+    }}
+  >
+    <DeleteOutlineIcon />
+  </IconButton>
+);
+
 const Contacts = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -323,15 +335,11 @@ const Contacts = () => {
                       role={user.profile}
                       perform="contacts-page:deleteContact"
                       yes={() => (
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            setConfirmOpen(true);
-                            setDeletingContact(contact);
-                          }}
-                        >
-                          <DeleteOutlineIcon />
-                        </IconButton>
+                        <DeleteContactIconButton
+                          contact={contact}
+                          setConfirmOpen={setConfirmOpen}
+                          setDeletingContact={setDeletingContact}
+                        />  
                       )}
                     />
                   </TableCell>
