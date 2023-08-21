@@ -37,6 +37,21 @@ const filterOptions = createFilterOptions({
 	trim: true,
 });
 
+const TransferWhatsappSelector = ({ classes, selectedWhatsapp, setSelectedWhatsapp, whatsApps }) => (
+	<FormControl variant="outlined" className={classes.maxWidth} style={{ marginTop: 20 }}>
+	<InputLabel>{i18n.t("transferTicketModal.fieldConnectionLabel")}</InputLabel>
+	<Select
+		value={selectedWhatsapp}
+		onChange={(e) => setSelectedWhatsapp(e.target.value)}
+		label={i18n.t("transferTicketModal.fieldConnectionPlaceholder")}
+	>
+		{whatsApps.map((whasapp) => (
+			<MenuItem key={whasapp.id} value={whasapp.id}>{whasapp.name}</MenuItem>
+		))}
+	</Select>
+	</FormControl>
+);
+
 const TransferTicketModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => {
 	const history = useHistory();
 	const [options, setOptions] = useState([]);
@@ -192,18 +207,12 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId })
 						role={loggedInUser.profile}
 						perform="ticket-options:transferWhatsapp"
 						yes={() => (!loadingWhatsapps && 
-							<FormControl variant="outlined" className={classes.maxWidth} style={{ marginTop: 20 }}>
-								<InputLabel>{i18n.t("transferTicketModal.fieldConnectionLabel")}</InputLabel>
-								<Select
-									value={selectedWhatsapp}
-									onChange={(e) => setSelectedWhatsapp(e.target.value)}
-									label={i18n.t("transferTicketModal.fieldConnectionPlaceholder")}
-								>
-									{whatsApps.map((whasapp) => (
-										<MenuItem key={whasapp.id} value={whasapp.id}>{whasapp.name}</MenuItem>
-									))}
-								</Select>
-							</FormControl>
+							<TransferWhatsappSelector
+								classes={classes}
+								selectedWhatsapp={selectedWhatsapp}
+								setSelectedWhatsapp={setSelectedWhatsapp}
+								whatsApps={whatsApps}
+							/>
 						)}
 					/>
 				</DialogContent>
