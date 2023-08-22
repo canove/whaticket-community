@@ -43,7 +43,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const args:String = process.env.CHROME_ARGS || "";
+      const args:string = process.env.CHROME_ARGS || "";
 
       const wbot: Session = new Client({
         session: sessionCfg,

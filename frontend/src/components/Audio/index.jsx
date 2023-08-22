@@ -1,7 +1,6 @@
 import { Button } from "@material-ui/core";
 import React, { useRef } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LS_NAME = 'audioMessageRate';
 

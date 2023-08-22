@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import toastError from "../../errors/toastError";
 
 import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
 
 import { Button, Divider, } from "@material-ui/core";
 

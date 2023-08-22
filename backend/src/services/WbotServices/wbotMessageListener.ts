@@ -327,18 +327,19 @@ const handleMessage = async (
         const array = msg.body.split("\n");
         const obj = [];
         let contact = "";
-        for (let index = 0; index < array.length; index++) {
-          const v = array[index];
+
+        for (const v of array) {
           const values = v.split(":");
-          for (let ind = 0; ind < values.length; ind++) {
-            if (values[ind].indexOf("+") !== -1) {
-              obj.push({ number: values[ind] });
+          for (const value of values) {
+            if (value.indexOf("+") !== -1) {
+              obj.push({ number: value });
             }
-            if (values[ind].indexOf("FN") !== -1) {
-              contact = values[ind + 1];
+            if (value.indexOf("FN") !== -1) {
+              contact = values[values.indexOf(value) + 1];
             }
           }
         }
+
         for await (const ob of obj) {
           await CreateContactService({
             name: contact,

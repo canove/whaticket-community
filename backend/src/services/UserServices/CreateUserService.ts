@@ -59,7 +59,7 @@ const CreateUserService = async ({
       password,
       name,
       profile,
-      whatsappId: whatsappId ? whatsappId : null
+      whatsappId: whatsappId || null
     },
     { include: ["queues", "whatsapp"] }
   );

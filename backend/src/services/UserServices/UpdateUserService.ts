@@ -51,7 +51,7 @@ const UpdateUserService = async ({
     password,
     profile,
     name,
-    whatsappId: whatsappId ? whatsappId : null
+    whatsappId: whatsappId || null
   });
 
   await user.$set("queues", queueIds);
