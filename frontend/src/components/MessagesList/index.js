@@ -416,85 +416,72 @@ const MessagesList = ({ ticketId, isGroup }) => {
   };
 
   const checkMessageMedia = (message) => {
-    if (message.mediaType === "location" && message.body.split('|').length >= 2) {
-      let locationParts = message.body.split('|')
-      let imageLocation = locationParts[0]
-      let linkLocation = locationParts[1]
 
-      let descriptionLocation = null
+    const { mediaType, body, mediaUrl } = message;
 
-      if (locationParts.length > 2)
-        descriptionLocation = message.body.split('|')[2]
-
-      return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation} />
+    if (mediaType === "location" && message.body.split('|').length >= 2) {
+      const [imageLocation, linkLocation, descriptionLocation] = body.split('|');
+      return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation || null}/>
     }
-    else if (message.mediaType === "vcard") {
-      //console.log("vcard")
-      //console.log(message)
-      let array = message.body.split("\n");
-      let obj = [];
+
+    if (mediaType === "vcard") {
+      const array = body.split("\n");
+      const obj = [];
       let contact = "";
-      for (let index = 0; index < array.length; index++) {
-        const v = array[index];
-        let values = v.split(":");
-        for (let ind = 0; ind < values.length; ind++) {
-          if (values[ind].indexOf("+") !== -1) {
-            obj.push({ number: values[ind] });
+
+      //forEach instead of traditional for Loop for better readability
+      array.forEach((v) => {
+        const values = v.split(":");
+        values.forEach((value, index) => {
+          //verify if "+" is present on current value
+          if (value.includes("+")) {
+            obj.push({ number: value });
           }
-          if (values[ind].indexOf("FN") !== -1) {
-            contact = values[ind + 1];
+
+          //verify if there's a "FN" on the array, and if there's a next record
+          if (value === "FN" && values[index + 1]) {
+            contact = values[index + 1];
           }
-        }
-      }
-      return <VcardPreview contact={contact} numbers={obj[0]?.number} />
+        });
+      });
+
+      return <VcardPreview contact={contact} numbers={obj[0]?.number} />;
     }
-    /*else if (message.mediaType === "multi_vcard") {
-      console.log("multi_vcard")
-      console.log(message)
-    	
-      if(message.body !== null && message.body !== "") {
-        let newBody = JSON.parse(message.body)
-        return (
-          <>
-            {
-            newBody.map(v => (
-              <VcardPreview contact={v.name} numbers={v.number} />
-            ))
-            }
-          </>
-        )
-      } else return (<></>)
-    }*/
-    else if ( /^.*\.(jpe?g|png|gif)?$/i.exec(message.mediaUrl) && message.mediaType === "image") {
-      return <ModalImageCors imageUrl={message.mediaUrl} />;
-    } else if (message.mediaType === "audio") {
-      return <Audio url={message.mediaUrl} />
-    } else if (message.mediaType === "video") {
+
+    if ( /^.*\.(jpe?g|png|gif)?$/i.exec(mediaUrl) && mediaType === "image") {
+      return <ModalImageCors imageUrl={mediaUrl} />;
+    } 
+    
+    if (mediaType === "audio") {
+      return <Audio url={mediaUrl} />
+    }
+    
+    if (mediaType === "video") {
       return (
         <video
           className={classes.messageMedia}
-          src={message.mediaUrl}
+          src={mediaUrl}
           controls
         />
       );
-    } else {
-      return (
-        <>
-          <div className={classes.downloadMedia}>
-            <Button
-              startIcon={<GetApp />}
-              color="primary"
-              variant="outlined"
-              target="_blank"
-              href={message.mediaUrl}
-            >
-              Download
-            </Button>
-          </div>
-          <Divider />
-        </>
-      );
-    }
+    } 
+    
+    return (
+      <>
+        <div className={classes.downloadMedia}>
+          <Button
+            startIcon={<GetApp />}
+            color="primary"
+            variant="outlined"
+            target="_blank"
+            href={mediaUrl}
+          >
+            Download
+          </Button>
+        </div>
+        <Divider />
+      </>
+    );
   };
 
   const renderMessageAck = (message) => {
