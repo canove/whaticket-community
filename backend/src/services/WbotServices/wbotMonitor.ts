@@ -2,9 +2,10 @@ import * as Sentry from "@sentry/node";
 import { Client } from "whatsapp-web.js";
 
 import { getIO } from "../../libs/socket";
-import Whatsapp from "../../models/Whatsapp";
 import { logger } from "../../utils/logger";
+
 import { StartWhatsAppSession } from "./StartWhatsAppSession";
+import Whatsapp from "../../models/Whatsapp";
 
 interface Session extends Client {
   id?: number;

@@ -18,13 +18,13 @@ interface WhatsappData {
   isDefault?: boolean;
 }
 
-export const index = async (req: Request, res: Response): Promise<Response> => {
+export const fetchAllWhatsAppEntries = async (req: Request, res: Response): Promise<Response> => {
   const whatsapps = await ListWhatsAppsService();
 
   return res.status(200).json(whatsapps);
 };
 
-export const store = async (req: Request, res: Response): Promise<Response> => {
+export const createWhatsAppEntry = async (req: Request, res: Response): Promise<Response> => {
   const {
     name,
     status,
@@ -61,7 +61,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(whatsapp);
 };
 
-export const show = async (req: Request, res: Response): Promise<Response> => {
+export const getAndShowWhatsAppDetails = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;
 
   const whatsapp = await ShowWhatsAppService(whatsappId);
@@ -69,7 +69,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(whatsapp);
 };
 
-export const update = async (
+export const updateAndNotifyWhatsApp = async (
   req: Request,
   res: Response
 ): Promise<Response> => {

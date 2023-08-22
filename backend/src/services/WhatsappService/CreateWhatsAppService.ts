@@ -4,7 +4,7 @@ import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
-interface Request {
+interface CreateWhatsAppRequest {
   name: string;
   queueIds?: number[];
   greetingMessage?: string;
@@ -13,19 +13,19 @@ interface Request {
   isDefault?: boolean;
 }
 
-interface Response {
+interface CreateWhatsAppResponse {
   whatsapp: Whatsapp;
   oldDefaultWhatsapp: Whatsapp | null;
 }
 
-const CreateWhatsAppService = async ({
+const createWhatsAppService = async ({
   name,
   status = "OPENING",
   queueIds = [],
   greetingMessage,
   farewellMessage,
   isDefault = false
-}: Request): Promise<Response> => {
+}: CreateWhatsAppRequest): Promise<CreateWhatsAppResponse> => {
   const schema = Yup.object().shape({
     name: Yup.string()
       .required()
@@ -85,4 +85,4 @@ const CreateWhatsAppService = async ({
   return { whatsapp, oldDefaultWhatsapp };
 };
 
-export default CreateWhatsAppService;
+export default createWhatsAppService;

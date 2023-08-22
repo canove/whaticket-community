@@ -1,7 +1,7 @@
 import Whatsapp from "../../models/Whatsapp";
 import AppError from "../../errors/AppError";
 
-const DeleteWhatsAppService = async (id: string): Promise<void> => {
+const deleteWhatsAppService = async (id: string): Promise<void> => {
   const whatsapp = await Whatsapp.findOne({
     where: { id }
   });
@@ -13,4 +13,4 @@ const DeleteWhatsAppService = async (id: string): Promise<void> => {
   await whatsapp.destroy();
 };
 
-export default DeleteWhatsAppService;
+export default deleteWhatsAppService;
