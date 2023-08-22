@@ -5,11 +5,14 @@ import { logger } from "../../utils/logger";
 
 const ImportContactsService = async (
   userId: number,
-  contactList: Array<object>
-) => {
+  contactList?: { number: string; name?: string; email?: string }[]
+): Promise<{
+  invalidNumbersArray: string[];
+  validNumbersArray: string[];
+} | void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp(userId);
   const wbot = getWbot(defaultWhatsapp.id);
-  let phoneContacts;
+  let phoneContacts: typeof contactList;
   try {
     if (contactList) {
       phoneContacts = contactList;
@@ -21,45 +24,33 @@ const ImportContactsService = async (
   }
 
   if (phoneContacts) {
-    const invalidNumbersArray: (string | number)[] = [];
-    const validNumbersArray: (string | number)[] = [];
+    const invalidNumbersArray: string[] = [];
+    const validNumbersArray: string[] = [];
 
     await Promise.all(
-      phoneContacts.map(
-        async ({
-          number,
-          name,
-          email
-        }: {
-          number: string;
-          name: string;
-          email: string;
-        }) => {
-          if (typeof number === "number") {
-            number = number.toString();
-          }
-          if (!number) {
-            return invalidNumbersArray.push(name);
-          }
-          if (!name) {
-            name = number;
-          }
-
-          if (!/^(55)([1-9]{2})(9?)([0-9]{4})([0-9]{4})$/.test(number)) {
-            return invalidNumbersArray.push(number);
-          }
-          if (number.length >= 13) {
-            number = number.replace("9", "");
-          }
-          const numberExists = await Contact.findOne({
-            where: { number }
-          });
-
-          if (numberExists || validNumbersArray.includes(number)) return invalidNumbersArray.push(number);
-          validNumbersArray.push(number);
-          return Contact.create({ number, name, email });
+      phoneContacts.map(async ({ number, name, email }) => {
+        if (!number && name) {
+          return invalidNumbersArray.push(name);
         }
-      )
+        if (!name) {
+          name = number;
+        }
+
+        if (!/^(55)([1-9]{2})(9?)([0-9]{4})([0-9]{4})$/.test(number)) {
+          return invalidNumbersArray.push(number);
+        }
+        if (number.length >= 13) {
+          number = number.replace("9", "");
+        }
+        const numberExists = await Contact.findOne({
+          where: { number }
+        });
+
+        if (numberExists || validNumbersArray.includes(number))
+          return invalidNumbersArray.push(number);
+        validNumbersArray.push(number);
+        return Contact.create({ number, name, email });
+      })
     );
     return { invalidNumbersArray, validNumbersArray };
   }

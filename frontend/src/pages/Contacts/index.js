@@ -246,7 +246,14 @@ const Contacts = () => {
     const data = await file.arrayBuffer();
     const workbook = XLSX.read(data);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    setFileList(XLSX.utils.sheet_to_json(worksheet));
+    const xlsxJson = XLSX.utils.sheet_to_json(worksheet).map((contact) => {
+      if (typeof contact.number === "number") {
+        contact.number = contact.number.toString();
+      }
+
+      return contact;
+    });
+    setFileList(xlsxJson);
   }
     }
     
