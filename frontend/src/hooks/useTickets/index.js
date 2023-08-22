@@ -20,58 +20,73 @@ const useTickets = ({
 
     useEffect(() => {
         setLoading(true);
-        const delayDebounceFn = setTimeout(() => {
-            const fetchTickets = async() => {
-                try {
-                    const { data } = await api.get("/tickets", {
-                        params: {
-                            searchParam,
-                            pageNumber,
-                            status,
-                            date,
-                            showAll,
-                            queueIds,
-                            withUnreadMessages,
-                        },
-                    })
-                    setTickets(data.tickets)
 
-                    let horasFecharAutomaticamente = getHoursCloseTicketsAuto(); 
+        const fetchTickets = async() => {
+            try {
+                const { data } = await api.get("/tickets", {
+                    params: {
+                        searchParam,
+                        pageNumber,
+                        status,
+                        date,
+                        showAll,
+                        queueIds,
+                        withUnreadMessages,
+                    },
+                });
 
-                    if (status === "open" && horasFecharAutomaticamente && horasFecharAutomaticamente !== "" &&
-                        horasFecharAutomaticamente !== "0" && Number(horasFecharAutomaticamente) > 0) {
+                setTickets(data.tickets);
+                updateTicketStatus(data.tickets);
 
-                        let dataLimite = new Date()
-                        dataLimite.setHours(dataLimite.getHours() - Number(horasFecharAutomaticamente))
+                setHasMore(data.hasMore);
+                setCount(data.count);
+            } catch (err) {
+                toastError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-                        data.tickets.forEach(ticket => {
+        const updateTicketStatus = (tickets) => {
+            if (status === "open") {
+                const automaticallyClosingHour = getHoursCloseTicketsAuto();
+
+                if (automaticallyClosingHour && automaticallyClosingHour !== "" &&
+                    automaticallyClosingHour !== "0" && Number(automaticallyClosingHour) > 0) {
+
+                        const limitDate = new Date();
+                        limitDate.setHours(limitDate.getHours() - Number(automaticallyClosingHour));
+
+                        tickets.forEach(ticket => {
                             if (ticket.status !== "closed") {
-                                let dataUltimaInteracaoChamado = new Date(ticket.updatedAt)
-                                if (dataUltimaInteracaoChamado < dataLimite)
-                                    closeTicket(ticket)
+                                const ticketLastInteractionDate = new Date(ticket.updatedAt);
+                                if (ticketLastInteractionDate < limitDate) {
+                                    closeTicket(ticket);
+                                }
                             }
-                        })
-                    }
-
-                    setHasMore(data.hasMore)
-                    setCount(data.count)
-                    setLoading(false)
-                } catch (err) {
-                    setLoading(false)
-                    toastError(err)
+                        });
                 }
             }
+        };
 
-            const closeTicket = async(ticket) => {
+        const closeTicket = async (ticket) => {
+            try {
                 await api.put(`/tickets/${ticket.id}`, {
                     status: "closed",
                     userId: ticket.userId || null,
-                })
+                });
+            } catch (err) {
+                toastError(err);
             }
+        };
 
-            fetchTickets()
-        }, 500)
-        return () => clearTimeout(delayDebounceFn)
+        fetchTickets();
+
+        const delayDebounceFn = setTimeout(() => {
+            fetchTickets();
+        }, 500);
+        
+        return () => clearTimeout(delayDebounceFn);
     }, [
         searchParam,
         pageNumber,
@@ -80,7 +95,7 @@ const useTickets = ({
         showAll,
         queueIds,
         withUnreadMessages,
-    ])
+    ]);
 
     return { tickets, loading, hasMore, count };
 };
