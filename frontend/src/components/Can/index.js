@@ -9,7 +9,7 @@ const check = (role, action, data) => {
 
 	const staticPermissions = permissions.static;
 
-	if (staticPermissions && staticPermissions.includes(action)) {
+	if (staticPermissions?.includes(action)) {
 		// static rule not provided for action
 		return true;
 	}

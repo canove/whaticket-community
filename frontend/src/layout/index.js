@@ -259,7 +259,7 @@ const LoggedInLayout = ({ children }) => {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
 
-        {children ? children : null}
+        {children ?? null}
       </main>
     </div>
   );

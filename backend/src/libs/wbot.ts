@@ -39,7 +39,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const sessionName = whatsapp.name;
       let sessionCfg;
 
-      if (whatsapp && whatsapp.session) {
+      if (whatsapp?.session) {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 

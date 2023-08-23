@@ -201,7 +201,7 @@ const Users = () => {
         open={userModalOpen}
         onClose={handleCloseUserModal}
         aria-labelledby="form-dialog-title"
-        userId={selectedUser && selectedUser.id}
+        userId={selectedUser?.id}
       />
       <MainHeader>
         <Title>{i18n.t("users.title")}</Title>

@@ -23,7 +23,7 @@ const CreateOrUpdateContactService = async ({
   email = "",
   extraInfo = []
 }: Request): Promise<Contact> => {
-  const number = isGroup ? rawNumber : rawNumber.replace(/[^0-9]/g, "");
+  const number = isGroup ? rawNumber : rawNumber.replace(/\D/g, "");
 
   const io = getIO();
   let contact: Contact | null;

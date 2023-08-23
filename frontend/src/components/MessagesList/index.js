@@ -421,7 +421,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 
     if (mediaType === "location" && message.body.split('|').length >= 2) {
       const [imageLocation, linkLocation, descriptionLocation] = body.split('|');
-      return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation || null}/>
+      return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation ?? null}/>
     }
 
     if (mediaType === "vcard") {
