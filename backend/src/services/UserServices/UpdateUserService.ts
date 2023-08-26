@@ -1,8 +1,9 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
-import { SerializeUser } from "../../helpers/SerializeUser";
 import ShowUserService from "./ShowUserService";
+
+import { SerializeUser } from "../../helpers/SerializeUser";
 
 interface UserData {
   email?: string;
@@ -49,6 +50,7 @@ const UpdateUserService = async ({
   await user.update({
     email,
     password,
+    passwordHash: user.passwordHash, //verify this
     profile,
     name,
     whatsappId: whatsappId || null

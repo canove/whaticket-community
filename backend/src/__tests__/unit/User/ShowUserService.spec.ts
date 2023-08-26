@@ -1,39 +1,53 @@
-import faker from "faker";
+import { expect } from 'chai';
+import sinon from 'sinon';
+
 import AppError from "../../../errors/AppError";
 import User from "../../../models/User";
 import CreateUserService from "../../../services/UserServices/CreateUserService";
 import ShowUserService from "../../../services/UserServices/ShowUserService";
 import { disconnect, truncate } from "../../utils/database";
 
-describe("User", () => {
+
+describe('ShowUserService', () => {
   beforeEach(async () => {
     await truncate();
   });
 
   afterEach(async () => {
     await truncate();
+    sinon.restore();
   });
 
   afterAll(async () => {
     await disconnect();
   });
 
-  it("should be able to find a user", async () => {
-    const newUser = await CreateUserService({
-      name: faker.name.findName(),
-      email: faker.internet.email(),
-      password: faker.internet.password()
+  it('should show user by id', async () => {
+    const userId = 1;
+
+    const user = new User({
+      id: userId,
+      name: 'John Doe',
+      email: 'john@example.com',
+      // ... other user attributes
     });
 
-    const user = await ShowUserService(newUser.id);
+    sinon.stub(User, 'findByPk').resolves(user);
 
-    expect(user).toHaveProperty("id");
-    expect(user).toBeInstanceOf(User);
+    const response = await ShowUserService(userId);
+
+    expect(response).to.deep.equal(user);
   });
 
-  it("should not be able to find a inexisting user", async () => {
-    expect(ShowUserService(faker.random.number())).rejects.toBeInstanceOf(
-      AppError
-    );
+  it('should throw error when user is not found', async () => {
+    const userId = 1;
+
+    try {
+      await ShowUserService(userId);
+    } catch (error) {
+      expect(error).to.be.instanceOf(AppError);
+      expect(error.statusCode).to.equal(404);
+      expect(error.message).to.equal('ERR_NO_USER_FOUND');
+    }
   });
 });

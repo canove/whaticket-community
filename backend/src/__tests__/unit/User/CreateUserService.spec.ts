@@ -1,47 +1,82 @@
-import faker from "faker";
-import AppError from "../../../errors/AppError";
-import CreateUserService from "../../../services/UserServices/CreateUserService";
+import { expect } from 'chai';
+import sinon from 'sinon';
+
+import CreateUserService from '../../../services/UserServices/CreateUserService';
+import AppError from '../../../errors/AppError';
 import { disconnect, truncate } from "../../utils/database";
 
-describe("User", () => {
+
+describe('CreateUserService', () => {
   beforeEach(async () => {
     await truncate();
   });
 
   afterEach(async () => {
     await truncate();
+    sinon.restore();
   });
 
   afterAll(async () => {
     await disconnect();
   });
 
-  it("should be able to create a new user", async () => {
-    const user = await CreateUserService({
-      name: faker.name.findName(),
-      email: faker.internet.email(),
-      password: faker.internet.password()
-    });
+  it('should create a new user successfully', async () => {
+    const validRequest = {
+      email: 'test@example.com',
+      password: 'password',
+      name: 'John Doe',
+    };
 
-    expect(user).toHaveProperty("id");
+    const fakeUser = {
+      id: 1,
+      ...validRequest,
+      profile: 'admin',
+      queues: [],
+      reload: sinon.stub().resolves(),
+      setQueues: sinon.stub().resolves(),
+    };
+
+    fakeUser.reload.resolves();
+
+    const result = await CreateUserService(validRequest);
+
+    expect(result).to.deep.equal({
+      email: fakeUser.email,
+      name: fakeUser.name,
+      id: fakeUser.id,
+      profile: fakeUser.profile,
+      queues: [],
+      whatsapp: null
+    });
   });
 
-  it("should not be able to create a user with duplicated email", async () => {
-    await CreateUserService({
-      name: faker.name.findName(),
-      email: "teste@sameemail.com",
-      password: faker.internet.password()
-    });
+  it('should throw an error if email already exists', async () => {
+    const existingEmail = 'existing@example.com';
+    const requestWithExistingEmail = {
+      email: existingEmail,
+      password: 'password',
+      name: 'Jane Doe',
+    };
 
     try {
-      await CreateUserService({
-        name: faker.name.findName(),
-        email: "teste@sameemail.com",
-        password: faker.internet.password()
-      });
-    } catch (err) {
-      expect(err).toBeInstanceOf(AppError);
-      expect(err.statusCode).toBe(400);
+      await CreateUserService(requestWithExistingEmail);
+    } catch (error) {
+      expect(error).to.be.instanceOf(AppError);
+      expect(error.message).to.equal('An user with this email already exists.');
+    }
+  });
+
+  it('should throw an error if validation fails', async () => {
+    const invalidRequest = {
+      email: 'invalidemail',
+      password: 'short',
+      name: '',
+    };
+
+    try {
+      await CreateUserService(invalidRequest);
+    } catch (error) {
+      expect(error).to.be.instanceOf(AppError);
     }
   });
 });

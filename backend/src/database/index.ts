@@ -13,7 +13,6 @@ import QuickAnswer from "../models/QuickAnswer";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
-// import dbConfig from "../config/database";
 
 const sequelize = new Sequelize(dbConfig);
 

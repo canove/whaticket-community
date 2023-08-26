@@ -1,68 +1,114 @@
-import faker from "faker";
+import { expect } from 'chai';
+import { hash } from "bcryptjs";
+import sinon from 'sinon';
+
 import AppError from "../../../errors/AppError";
-import CreateUserService from "../../../services/UserServices/CreateUserService";
+import * as ShowUserService from '../../../services/UserServices/ShowUserService'; // Import using * as
+
 import UpdateUserService from "../../../services/UserServices/UpdateUserService";
+import User from '../../../models/User';
 import { disconnect, truncate } from "../../utils/database";
 
-describe("User", () => {
+
+describe('UpdateUserService', () => {
   beforeEach(async () => {
     await truncate();
   });
 
   afterEach(async () => {
     await truncate();
+    sinon.restore();
   });
 
   afterAll(async () => {
     await disconnect();
   });
 
-  it("should be able to find a user", async () => {
-    const newUser = await CreateUserService({
-      name: faker.name.findName(),
-      email: faker.internet.email(),
-      password: faker.internet.password()
-    });
-
-    const updatedUser = await UpdateUserService({
-      userId: newUser.id,
-      userData: {
-        name: "New name",
-        email: "newmail@email.com"
-      }
-    });
-
-    expect(updatedUser).toHaveProperty("name", "New name");
-    expect(updatedUser).toHaveProperty("email", "newmail@email.com");
-  });
-
-  it("should not be able to updated a inexisting user", async () => {
-    const userId = faker.random.number();
+  it('should update user information', async () => {
+    const userId = 1;
     const userData = {
-      name: faker.name.findName(),
-      email: faker.internet.email()
+      email: 'newemail@example.com',
+      name: 'New Name',
+      profile: 'user',
+      password: 'updatingOldPassword',
     };
 
-    expect(UpdateUserService({ userId, userData })).rejects.toBeInstanceOf(
-      AppError
-    );
-  });
+    const hashedPassword = await hash('thisIsAPassword', 8); // Hash the password
 
-  it("should not be able to updated an user with invalid data", async () => {
-    const newUser = await CreateUserService({
-      name: faker.name.findName(),
-      email: faker.internet.email(),
-      password: faker.internet.password()
+    const user = new User({
+      id: userId,
+      name: 'Old Name',
+      email: 'oldemail@example.com',
+      profile: 'admin',
+      password: 'thisIsAPassword',
+      passwordHash: hashedPassword,
+      // ... other user attributes
     });
 
-    const userId = newUser.id;
+    // Stub the methods used in UpdateUserService
+    const setQueuesStub = sinon.stub(user, '$set').resolves();
+
+    // Stub ShowUserService to return the user object
+    sinon.stub(ShowUserService, 'default').resolves(user);
+
+    const response = await UpdateUserService({
+      userData,
+      userId,
+    });
+
+    expect(response).to.deep.equal({
+      id: user.id,
+      name: userData.name,
+      email: userData.email,
+      profile: userData.profile,
+      queues: undefined,
+      whatsapp: undefined,
+    });
+
+    sinon.assert.calledWith(setQueuesStub, 'queues', []);
+  });
+
+  it('should throw error if validation fails', async () => {
+    const userId = 1;
     const userData = {
-      name: faker.name.findName(),
-      email: "test.worgn.email"
+      email: 'invalidemail',
     };
 
-    expect(UpdateUserService({ userId, userData })).rejects.toBeInstanceOf(
-      AppError
-    );
+    const user = new User({
+      id: userId,
+      name: 'Old Name',
+      email: 'oldemail@example.com',
+      profile: 'admin',
+      // ... other user attributes
+    });
+
+    sinon.stub(ShowUserService, 'default').resolves(user);
+
+    try {
+      await UpdateUserService({
+        userData,
+        userId,
+      });
+    } catch (error) {
+      expect(error).to.be.instanceOf(AppError);
+    }
+  });
+
+  it('should throw error if user is not found', async () => {
+    const userId = 1;
+    const userData = {
+      email: 'newemail@example.com',
+      name: 'New Name',
+      profile: 'user',
+    };
+
+    try {
+      await UpdateUserService({
+        userData,
+        userId,
+      });
+    } catch (error) {
+      expect(error).to.be.instanceOf(AppError);
+    }
   });
 });
