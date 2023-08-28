@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug TypeScript",
+            "program": "${workspaceFolder}/backend/node_modules/ts-node/dist/bin.js",
+            "args": ["${relativeFile}"],
+            "cwd": "${workspaceFolder}/backend",
+            "protocol": "inspector",
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+            "sourceMaps": true,
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}
