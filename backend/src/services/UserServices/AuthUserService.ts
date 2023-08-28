@@ -43,18 +43,18 @@ const AuthUserService = async ({
     throw new AppError("ERR_COMPANY_NOT_SELECTED", 412);
   }
 
-  const allowCompany = user?.companies.some(it => it.id === parseInt(company));
-
-  if(!allowCompany){
-    throw new AppError("ERR_COMPANY_NOT_ALLOWED", 412);
-  }
-
   if (!user) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);
   }
 
   if (!(await user.checkPassword(password))) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);
+  }
+
+  const allowCompany = user?.companies.some(it => it.id === parseInt(company));
+
+  if(!allowCompany){
+    throw new AppError("ERR_COMPANY_NOT_ALLOWED", 412);
   }
 
   const token = createAccessToken(user);

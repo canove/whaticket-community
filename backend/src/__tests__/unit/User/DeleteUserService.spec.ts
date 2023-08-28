@@ -3,6 +3,7 @@ import AppError from "../../../errors/AppError";
 import CreateUserService from "../../../services/UserServices/CreateUserService";
 import DeleteUserService from "../../../services/UserServices/DeleteUserService";
 import { disconnect, truncate } from "../../utils/database";
+import CreateCompanyService from "../../../services/CompanyService/CreateCompanyService";
 
 describe("User", () => {
   beforeEach(async () => {
@@ -18,10 +19,14 @@ describe("User", () => {
   });
 
   it("should be delete a existing user", async () => {
+
+    const companyIds: number[] = [];
+    
     const { id } = await CreateUserService({
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      companyIds
     });
 
     expect(DeleteUserService(id)).resolves.not.toThrow();
