@@ -1,13 +1,11 @@
 import { useState, useEffect, useReducer } from "react";
 import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
-
-import api from "../../services/api";
+import api from "../../services/api"; 
 
 const reducer = (state, action) => {
 	if (action.type === "LOAD_WHATSAPPS") {
 		const whatsApps = action.payload;
-
 		return [...whatsApps];
 	}
 
@@ -56,20 +54,21 @@ const reducer = (state, action) => {
 const useWhatsApps = () => {
 	const [whatsApps, dispatch] = useReducer(reducer, []);
 	const [loading, setLoading] = useState(true);
-
+	const company = localStorage.getItem("company");
+		
 	useEffect(() => {
-		setLoading(true);
-		const fetchSession = async () => {
-			try {
-				const { data } = await api.get("/whatsapp/");
-				dispatch({ type: "LOAD_WHATSAPPS", payload: data });
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
-				toastError(err);
-			}
-		};
-		fetchSession();
+	  setLoading(true);
+	  const fetchSession = async () => {
+	  try {
+		const { data } = await api.get(`/whatsapp/companies/${company}`);
+		dispatch({ type: "LOAD_WHATSAPPS", payload: data });
+	    setLoading(false);
+	  } catch (err) {
+		setLoading(false);
+		toastError(err);
+	  }
+	};
+	fetchSession();
 	}, []);
 
 	useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useContext, useEffect, useReducer } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 
@@ -38,8 +38,8 @@ import WhatsAppModal from "../../components/WhatsAppModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
 import { i18n } from "../../translate/i18n";
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import toastError from "../../errors/toastError";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles(theme => ({
 	mainPaper: {
@@ -94,12 +94,12 @@ const CustomToolTip = ({ title, content, children }) => {
 
 const Connections = () => {
 	const classes = useStyles();
-
-	const { whatsApps, loading } = useContext(WhatsAppsContext);
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [qrModalOpen, setQrModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+	const { whatsApps, loading } = useContext(WhatsAppsContext);
+
 	const confirmationModalInitialState = {
 		action: "",
 		title: "",
@@ -118,7 +118,6 @@ const Connections = () => {
 			toastError(err);
 		}
 	};
-
 	const handleRequestNewQrCode = async whatsAppId => {
 		try {
 			await api.put(`/whatsappsession/${whatsAppId}`);
@@ -133,9 +132,9 @@ const Connections = () => {
 	};
 
 	const handleCloseWhatsAppModal = useCallback(() => {
-		setWhatsAppModalOpen(false);
-		setSelectedWhatsApp(null);
-	}, [setSelectedWhatsApp, setWhatsAppModalOpen]);
+    setWhatsAppModalOpen(false);
+    setSelectedWhatsApp(null);
+  }, [setSelectedWhatsApp, setWhatsAppModalOpen]);
 
 	const handleOpenQrModal = whatsApp => {
 		setSelectedWhatsApp(whatsApp);
@@ -145,7 +144,7 @@ const Connections = () => {
 	const handleCloseQrModal = useCallback(() => {
 		setSelectedWhatsApp(null);
 		setQrModalOpen(false);
-	}, [setQrModalOpen, setSelectedWhatsApp]);
+	  }, [setQrModalOpen, setSelectedWhatsApp]);
 
 	const handleEditWhatsApp = whatsApp => {
 		setSelectedWhatsApp(whatsApp);

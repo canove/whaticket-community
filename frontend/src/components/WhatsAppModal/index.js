@@ -67,7 +67,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
-
+	const companySelected = localStorage.getItem("company");
 	useEffect(() => {
 		const fetchSession = async () => {
 			if (!whatsAppId) return;
@@ -86,7 +86,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	}, [whatsAppId]);
 
 	const handleSaveWhatsApp = async values => {
-		const whatsappData = { ...values, queueIds: selectedQueueIds };
+		const whatsappData = { ...values, queueIds: selectedQueueIds, companySelected };
 
 		try {
 			if (whatsAppId) {
@@ -164,7 +164,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										label={i18n.t("queueModal.form.greetingMessage")}
 										type="greetingMessage"
 										multiline
-										rows={5}
+										minRows={5}
 										fullWidth
 										name="greetingMessage"
 										error={
@@ -183,7 +183,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										label={i18n.t("whatsappModal.form.farewellMessage")}
 										type="farewellMessage"
 										multiline
-										rows={5}
+										minRows={5}
 										fullWidth
 										name="farewellMessage"
 										error={
