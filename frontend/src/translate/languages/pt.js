@@ -22,6 +22,7 @@ const messages = {
         form: {
           email: "Email",
           password: "Senha",
+          company: "Empresa"
         },
         buttons: {
           submit: "Entrar",
@@ -209,6 +210,7 @@ const messages = {
           password: "Senha",
           profile: "Perfil",
           whatsapp: "Conexão Padrão",
+          company: "Loja"
         },
         buttons: {
           okAdd: "Adicionar",
@@ -321,6 +323,9 @@ const messages = {
       },
       queueSelect: {
         inputLabel: "Filas",
+      },
+      companySelect: {
+        inputLabel: "Lojas",
       },
       quickAnswers: {
         title: "Respostas Rápidas",
@@ -462,6 +467,10 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+        ERR_COMPANY_NOT_ALLOWED:
+          "A empresa não está habilitada para o usuário",
+          ERR_COMPANY_NOT_SELECTED:
+          "Nenhuma empresa foi selecionada"
       },
     },
   },

@@ -13,7 +13,6 @@ const useAuth = () => {
 	const [isAuth, setIsAuth] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [user, setUser] = useState({});
-
 	api.interceptors.request.use(
 		config => {
 			const token = localStorage.getItem("token");
@@ -75,7 +74,8 @@ const useAuth = () => {
 
 		socket.on("user", data => {
 			if (data.action === "update" && data.user.id === user.id) {
-				setUser(data.user);
+				const updatedUser = { ...data.user, company: user.company };
+    			setUser(updatedUser);
 			}
 		});
 
@@ -83,16 +83,18 @@ const useAuth = () => {
 			socket.disconnect();
 		};
 	}, [user]);
+ 
 
-	const handleLogin = async userData => {
+	const handleLogin  = async (userData) => {
 		setLoading(true);
-
 		try {
 			const { data } = await api.post("/auth/login", userData);
+			localStorage.setItem("company", JSON.stringify(userData.company));
 			localStorage.setItem("token", JSON.stringify(data.token));
 			api.defaults.headers.Authorization = `Bearer ${data.token}`;
-			setUser(data.user);
-			setIsAuth(true);
+			const updatedUser = { ...data.user, company: userData.company };
+    		setUser(updatedUser);
+			setIsAuth(true); 
 			toast.success(i18n.t("auth.toasts.success"));
 			history.push("/tickets");
 			setLoading(false);
@@ -104,12 +106,12 @@ const useAuth = () => {
 
 	const handleLogout = async () => {
 		setLoading(true);
-
 		try {
 			await api.delete("/auth/logout");
 			setIsAuth(false);
 			setUser({});
 			localStorage.removeItem("token");
+			localStorage.removeItem("company");
 			api.defaults.headers.Authorization = undefined;
 			setLoading(false);
 			history.push("/login");
@@ -119,7 +121,7 @@ const useAuth = () => {
 		}
 	};
 
-	return { isAuth, user, loading, handleLogin, handleLogout };
+	return { isAuth, user, loading, handleLogin, handleLogout};
 };
 
 export default useAuth;
