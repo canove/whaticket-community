@@ -19,7 +19,9 @@ import { hash, compare } from "bcryptjs";
 import Ticket from "./Ticket";
 import Queue from "./Queue";
 import UserQueue from "./UserQueue";
+import UserCompany from "./UserCompany";
 import Whatsapp from "./Whatsapp";
+import Company from "./Company";
 
 @Table
 class User extends Model<User> {
@@ -36,6 +38,9 @@ class User extends Model<User> {
 
   @Column(DataType.VIRTUAL)
   password: string;
+
+  @Column(DataType.VIRTUAL)
+  company: string;
 
   @Column
   passwordHash: string;
@@ -66,6 +71,9 @@ class User extends Model<User> {
 
   @BelongsToMany(() => Queue, () => UserQueue)
   queues: Queue[];
+
+  @BelongsToMany(() => Company, () => UserCompany)
+  companies: Company[];
 
   @BeforeUpdate
   @BeforeCreate

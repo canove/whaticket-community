@@ -1,5 +1,6 @@
 import { Sequelize, Op } from "sequelize";
 import Queue from "../../models/Queue";
+import Company from "../../models/Company";
 import User from "../../models/User";
 import Whatsapp from "../../models/Whatsapp";
 
@@ -42,6 +43,7 @@ const ListUsersService = async ({
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
       { model: Whatsapp, as: "whatsapp", attributes: ["id", "name"] },
+      { model: Company, as: "companies", attributes: ["id", "name"] }
     ]
   });
 

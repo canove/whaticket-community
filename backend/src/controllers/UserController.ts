@@ -17,7 +17,6 @@ type IndexQuery = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
-
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
     pageNumber
@@ -27,7 +26,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, queueIds, whatsappId } = req.body;
+  const { email, password, name, profile, queueIds, whatsappId, companyIds } = req.body;
 
   if (
     req.url === "/signup" &&
@@ -44,7 +43,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     name,
     profile,
     queueIds,
-    whatsappId
+    whatsappId,
+    companyIds
   });
 
   const io = getIO();
