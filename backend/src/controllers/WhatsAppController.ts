@@ -8,6 +8,7 @@ import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppSer
 import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
+import ListWhatsAppsByCompanyIdService from "../services/WhatsappService/ListWhatsAppsByCompanyIdService";
 
 interface WhatsappData {
   name: string;
@@ -16,11 +17,18 @@ interface WhatsappData {
   farewellMessage?: string;
   status?: string;
   isDefault?: boolean;
+  companySelected: number;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const whatsapps = await ListWhatsAppsService();
+  return res.status(200).json(whatsapps);
+};
 
+export const findByCompanyId = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.params;
+
+  const whatsapps = await ListWhatsAppsByCompanyIdService(companyId);
   return res.status(200).json(whatsapps);
 };
 
@@ -31,7 +39,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isDefault,
     greetingMessage,
     farewellMessage,
-    queueIds
+    queueIds,
+    companySelected
   }: WhatsappData = req.body;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
@@ -40,7 +49,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     isDefault,
     greetingMessage,
     farewellMessage,
-    queueIds
+    queueIds,
+    companySelected
   });
 
   StartWhatsAppSession(whatsapp);

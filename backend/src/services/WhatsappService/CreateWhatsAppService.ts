@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import Whatsapp from "../../models/Whatsapp";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
+import AssociateWhatsappCompany from "./AssociateWhatsappCompany";
 
 interface Request {
   name: string;
@@ -11,6 +12,7 @@ interface Request {
   farewellMessage?: string;
   status?: string;
   isDefault?: boolean;
+  companySelected: number;
 }
 
 interface Response {
@@ -24,7 +26,8 @@ const CreateWhatsAppService = async ({
   queueIds = [],
   greetingMessage,
   farewellMessage,
-  isDefault = false
+  isDefault = false,
+  companySelected
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -77,11 +80,11 @@ const CreateWhatsAppService = async ({
       farewellMessage,
       isDefault
     },
-    { include: ["queues"] }
+    { include: ["queues", "companies"] }
   );
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
-
+  await AssociateWhatsappCompany(whatsapp, [companySelected]);
   return { whatsapp, oldDefaultWhatsapp };
 };
 

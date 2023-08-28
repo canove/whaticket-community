@@ -7,6 +7,8 @@ const whatsappRoutes = express.Router();
 
 whatsappRoutes.get("/whatsapp/", isAuth, WhatsAppController.index);
 
+whatsappRoutes.get("/whatsapp/companies/:companyId", isAuth, WhatsAppController.findByCompanyId);
+
 whatsappRoutes.post("/whatsapp/", isAuth, WhatsAppController.store);
 
 whatsappRoutes.get("/whatsapp/:whatsappId", isAuth, WhatsAppController.show);
