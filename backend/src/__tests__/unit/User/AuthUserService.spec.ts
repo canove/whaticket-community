@@ -64,6 +64,7 @@ describe("Auth", () => {
 
     const extractedCompany = await createCompany();
     const companyIds: number[] = [extractedCompany];
+    
     await CreateUserService({
       name: faker.name.findName(),
       email: "mail@test.com",
