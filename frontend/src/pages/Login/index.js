@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link as RouterLink } from "react-router-dom";
-
+import api from "../../services/api";
 import {
   Avatar,
   Button,
@@ -12,7 +12,8 @@ import {
   Container,
   InputAdornment,
   IconButton,
-  Link
+  Link,
+  MenuItem
 } from '@material-ui/core';
 
 import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
@@ -57,15 +58,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Login = () => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await api.get("/companies");
+        setCompanies(response.data);
+      } catch (err) {
+        console.error("Error fetching companies:", err);
+      }
+    })();
+  }, []);
+  const [companies, setCompanies] = useState([]);
   const classes = useStyles();
-
-  const [user, setUser] = useState({ email: "", password: "" });
+  const [user, setUser] = useState({ email: "", password: "", company: "" });
   const [showPassword, setShowPassword] = useState(false);
 
   const { handleLogin } = useContext(AuthContext);
+  const [selectedCompany, setSelectedCompany] = useState("");
 
   const handleChangeInput = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setSelectedCompany(e.target.value);
+    setUser({ ...user, [e.target.name]: e.target.value});
   };
 
   const handlSubmit = (e) => {
@@ -84,6 +97,23 @@ const Login = () => {
           {i18n.t("login.title")}
         </Typography>
         <form className={classes.form} noValidate onSubmit={handlSubmit}>
+        <TextField
+          select
+          required
+          fullWidth
+          id="company"
+          label={i18n.t("login.form.company")}
+          name="company"
+          value={selectedCompany}
+          onChange={handleChangeInput}
+          variant="outlined"
+        >
+          {companies.map(company => (
+            <MenuItem key={company.id} value={company.id}>
+              {company.name}
+            </MenuItem>
+          ))}
+        </TextField>
           <TextField
             variant="outlined"
             margin="normal"

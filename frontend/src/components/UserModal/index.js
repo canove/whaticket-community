@@ -30,6 +30,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
+import CompanySelect from "../CompanySelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import useWhatsApps from "../../hooks/useWhatsApps";
@@ -87,6 +88,7 @@ const UserModal = ({ open, onClose, userId }) => {
 
 	const [user, setUser] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
+	const [selectedCompanyIds, setSelectedCompanyIds] = useState([]);
 	const [showPassword, setShowPassword] = useState(false);
 	const [whatsappId, setWhatsappId] = useState(false);
 	const {loading, whatsApps} = useWhatsApps();
@@ -101,7 +103,11 @@ const UserModal = ({ open, onClose, userId }) => {
 				});
 				const userQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(userQueueIds);
+				
 				setWhatsappId(data.whatsappId ? data.whatsappId : '');
+
+				const userCompanyIds = data.companies?.map(company => company.id);
+				setSelectedCompanyIds(userCompanyIds);
 			} catch (err) {
 				toastError(err);
 			}
@@ -116,7 +122,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, whatsappId, queueIds: selectedQueueIds };
+		const userData = { ...values, whatsappId, queueIds: selectedQueueIds, companyIds: selectedCompanyIds };
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -205,36 +211,17 @@ const UserModal = ({ open, onClose, userId }) => {
 										margin="dense"
 										fullWidth
 									/>
-									<FormControl
-										variant="outlined"
-										className={classes.formControl}
-										margin="dense"
-									>
-										<Can
-											role={loggedInUser.profile}
-											perform="user-modal:editProfile"
-											yes={() => (
-												<>
-													<InputLabel id="profile-selection-input-label">
-														{i18n.t("userModal.form.profile")}
-													</InputLabel>
-
-													<Field
-														as={Select}
-														label={i18n.t("userModal.form.profile")}
-														name="profile"
-														labelId="profile-selection-label"
-														id="profile-selection"
-														required
-													>
-														<MenuItem value="admin">Admin</MenuItem>
-														<MenuItem value="user">User</MenuItem>
-													</Field>
-												</>
-											)}
-										/>
-									</FormControl>
 								</div>
+								<Can
+									role={loggedInUser.profile}
+									perform="user-modal:editCompanies"
+									yes={() => (
+										<CompanySelect
+											selectedCompanyIds={selectedCompanyIds}
+											onChange={values => setSelectedCompanyIds(values)}
+										/>
+									)}
+								/>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"
