@@ -1,11 +1,17 @@
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getWbot } from "../../libs/wbot";
 import Contact from "../../models/Contact";
+import ContactCustomField from "../../models/ContactCustomField";
 import { logger } from "../../utils/logger";
 
 const ImportContactsService = async (
   userId: number,
-  contactList?: { number: string; name?: string; email?: string }[]
+  contactList?: {
+    number: string;
+    name?: string;
+    email?: string;
+    extraInfo?: { name: string; value: string }[];
+  }[]
 ): Promise<{
   invalidNumbersArray: string[];
   validNumbersArray: string[];
@@ -28,7 +34,7 @@ const ImportContactsService = async (
     const validNumbersArray: string[] = [];
 
     await Promise.all(
-      phoneContacts.map(async ({ number, name, email }) => {
+      phoneContacts.map(async ({ number, name, email, extraInfo }) => {
         if (!number && name) {
           return invalidNumbersArray.push(name);
         }
@@ -49,7 +55,14 @@ const ImportContactsService = async (
         if (numberExists || validNumbersArray.includes(number))
           return invalidNumbersArray.push(number);
         validNumbersArray.push(number);
-        return Contact.create({ number, name, email });
+        const contact = await Contact.create({ number, name, email });
+        console.log("cooooooontacts", contact.id);
+
+        if (extraInfo && extraInfo.length > 0) {
+          extraInfo.map(async info => {
+            await ContactCustomField.upsert({ ...info, contactId: contact.id });
+          });
+        }
       })
     );
     return { invalidNumbersArray, validNumbersArray };

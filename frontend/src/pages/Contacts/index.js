@@ -236,26 +236,31 @@ const Contacts = () => {
     if (file.name.toLowerCase().endsWith(".csv")) {
       const newCsvFileReader = new FileReader();
       newCsvFileReader.onload = function (e) {
-      csvtojson().fromString(e.target.result).then((json) => {
-        setFileList(json);
-      });
-    };
-    newCsvFileReader.readAsText(file);
-  }
-  if (file.name.toLowerCase().split(".").pop().startsWith("xls")) {
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    const xlsxJson = XLSX.utils.sheet_to_json(worksheet).map((contact) => {
-      if (typeof contact.number === "number") {
-        contact.number = contact.number.toString();
-      }
-
-      return contact;
-    });
-    setFileList(xlsxJson);
-  }
+        csvtojson().fromString(e.target.result).then((json) => {
+          const contactCsv = json.map(({name, number, email, ...customFields}) => {
+            const extraInfo = Object.entries(customFields).map(([name, value]) => ({name, value}));
+            return {name, number, email, extraInfo};
+          });
+          setFileList(contactCsv);
+        });
+      };
+     newCsvFileReader.readAsText(file);
     }
+    
+    if (file.name.toLowerCase().split(".").pop().startsWith("xls")) {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const xlsxJson = XLSX.utils.sheet_to_json(worksheet).map(({name, number, email, ...customFields}) => {
+        if (typeof number === "number") {
+          number = number.toString();
+        }
+        const extraInfo = Object.entries(customFields).map(([name, value]) => ({name, value}));
+        return {name, number, email, extraInfo};
+      });
+      setFileList(xlsxJson);
+    }
+  }
     
 
   return (
@@ -329,7 +334,8 @@ const Contacts = () => {
         onConfirm={() => history.go(0)}
       >
 
-            Contatos Importados:
+            <b>Contatos Importados:</b>
+            <br/>
           <ol>
             {showResults.validNumbersArray?.map((item) => (
                 <li
@@ -340,8 +346,8 @@ const Contacts = () => {
             )
           )}
           </ol>
-          Contatos Não Importados:
-          <br/><br/> Ps: Caso hajam contatos nesta lista, os mesmos não foram adicionados pois não possuem um número de WhatsApp válidos ou já estão registrados na plataforma.
+          <b>Contatos Não Importados </b>(Caso hajam contatos nesta lista, os mesmos não foram adicionados pois não possuem um número de WhatsApp válidos ou já estão registrados na plataforma)<b>:</b>
+          <br/>
     
           <ol>
 
