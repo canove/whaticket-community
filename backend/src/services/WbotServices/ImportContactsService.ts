@@ -58,9 +58,14 @@ const ImportContactsService = async (
         const contact = await Contact.create({ number, name, email });
 
         if (extraInfo && extraInfo.length > 0) {
-          extraInfo.forEach(async info => {
-            await ContactCustomField.upsert({ ...info, contactId: contact.id });
-          });
+          await Promise.all(
+            extraInfo.map(async info => {
+              await ContactCustomField.upsert({
+                ...info,
+                contactId: contact.id
+              });
+            })
+          );
         }
       })
     );
