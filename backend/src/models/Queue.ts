@@ -36,6 +36,12 @@ class Queue extends Model<Queue> {
   @Column
   greetingMessage: string;
 
+  @Column
+  awayMessage: string;
+
+  @Column
+  seconds: number;
+
   @CreatedAt
   createdAt: Date;
 
