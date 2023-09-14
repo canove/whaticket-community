@@ -240,7 +240,10 @@ const MessageInput = ({ ticketStatus }) => {
   };
 
   const handleQuickAnswersClick = (value) => {
-    setInputMessage(value);
+    const moreQuickMessages = `${value.split(',').join(' ')}`;
+    console.log(moreQuickMessages);
+    console.log(inputMessage);
+    setInputMessage( moreQuickMessages ? value : moreQuickMessages);
     setTypeBar(false);
   };
 

@@ -40,7 +40,13 @@ const reducer = (state, action) => {
       if (quickAnswerIndex !== -1) {
         state[quickAnswerIndex] = quickAnswer;
       } else {
-        newQuickAnswers.push(quickAnswer);
+        newQuickAnswers.push({
+          id: quickAnswer.id,
+          shortcut: quickAnswer.shortcut,
+          message: quickAnswer.message.split(','), 
+          createdAt: quickAnswer.createdAt,
+          updatedAt: quickAnswer.updatedAt
+        })
       }
     });
 
@@ -68,6 +74,18 @@ const reducer = (state, action) => {
     }
     return [...state];
   }
+
+  if (action.type === "ADD_MORE_QUICK_ANSWERS") {
+    const quickAnswer = action.payload;
+    const quickAnswerIndex = state.findIndex((q) => q.id === quickAnswer.id);
+
+    if (quickAnswerIndex !== -1) {
+      state[quickAnswerIndex] = quickAnswer;
+      return [...state];
+    } else {
+      return [quickAnswer, ...state];
+    }
+    };
 
   if (action.type === "RESET") {
     return [];
@@ -135,6 +153,11 @@ const QuickAnswers = () => {
           payload: +data.quickAnswerId,
         });
       }
+
+      if (data.action === "add_more") {
+        dispatch({ type: "ADD_MORE_QUICK_ANSWERS", payload: data.quickAnswer });
+      }
+
     });
 
     return () => {
@@ -146,19 +169,19 @@ const QuickAnswers = () => {
     setSearchParam(event.target.value.toLowerCase());
   };
 
+  const handleEditQuickAnswers = (quickAnswer) => {
+    setSelectedQuickAnswers(quickAnswer);
+    setQuickAnswersModalOpen(true);
+  };
+
   const handleOpenQuickAnswersModal = () => {
     setSelectedQuickAnswers(null);
     setQuickAnswersModalOpen(true);
   };
-
+  
   const handleCloseQuickAnswersModal = () => {
     setSelectedQuickAnswers(null);
     setQuickAnswersModalOpen(false);
-  };
-
-  const handleEditQuickAnswers = (quickAnswer) => {
-    setSelectedQuickAnswers(quickAnswer);
-    setQuickAnswersModalOpen(true);
   };
 
   const handleDeleteQuickAnswers = async (quickAnswerId) => {
@@ -205,7 +228,8 @@ const QuickAnswers = () => {
         onClose={handleCloseQuickAnswersModal}
         aria-labelledby="form-dialog-title"
         quickAnswerId={selectedQuickAnswers && selectedQuickAnswers.id}
-      ></QuickAnswersModal>
+      >
+      </QuickAnswersModal>
       <MainHeader>
         <Title>{i18n.t("quickAnswers.title")}</Title>
         <MainHeaderButtonsWrapper>
@@ -252,10 +276,11 @@ const QuickAnswers = () => {
           </TableHead>
           <TableBody>
             <>
+            {console.log("AAAAAAAAAAA", quickAnswers)}
               {quickAnswers.map((quickAnswer) => (
                 <TableRow key={quickAnswer.id}>
                   <TableCell align="center">{quickAnswer.shortcut}</TableCell>
-                  <TableCell align="center">{quickAnswer.message}</TableCell>
+                  <TableCell align="center">{quickAnswer.message.length >= 2 ? `${quickAnswer.message[0]}...` : quickAnswer.message}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
