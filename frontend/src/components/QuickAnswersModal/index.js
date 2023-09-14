@@ -7,13 +7,15 @@ import { toast } from "react-toastify";
 import {
   makeStyles,
   Button,
-  TextField,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  CircularProgress,
+  IconButton,
+  TextField,
 } from "@material-ui/core";
+import { DeleteOutline } from "@material-ui/icons";
 import { green } from "@material-ui/core/colors";
 import { i18n } from "../../translate/i18n";
 
@@ -72,7 +74,9 @@ const QuickAnswersModal = ({
     message: "",
   };
 
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [quickAnswer, setQuickAnswer] = useState(initialState);
+  let [moreQuickAnswers, setMoreQuickAnswers] = useState(["0"]);
 
   useEffect(() => {
     return () => {
@@ -108,13 +112,31 @@ const QuickAnswersModal = ({
     setQuickAnswer(initialState);
   };
 
+  const handleNewQuickAnswer = (e) => {
+    for(let i = 0; i < e.form.length; i += 1) {
+      const field = e.form[i].name;
+      if(field.length > 0 && field.includes("message")) {
+        // moreQuickAnswers.push(e.form[i].textContent)
+        setMoreQuickAnswers([...moreQuickAnswers, e.form[i].textContent])
+        console.log(field);
+        console.log(moreQuickAnswers);
+      }
+    }
+  };
+
+   const handleDeleteQuickAnswer = (quickMessageToDelete) => {
+    const excluded = moreQuickAnswers.filter((i) => i !== quickMessageToDelete);
+    console.log(excluded);
+    //setMoreQuickAnswers(excluded)
+  }
+
   const handleSaveQuickAnswer = async (values) => {
     try {
       if (quickAnswerId) {
         await api.put(`/quickAnswers/${quickAnswerId}`, values);
         handleClose();
       } else {
-        const { data } = await api.post("/quickAnswers", values);
+        const { data } = await api.post("/quickAnswers", { shortcut: values.shortcut, message: `${values.message}, ${values.addmessage}` });
         if (onSave) {
           onSave(data);
         }
@@ -128,6 +150,7 @@ const QuickAnswersModal = ({
 
   return (
     <div className={classes.root}>
+      
       <Dialog
         open={open}
         onClose={handleClose}
@@ -147,6 +170,7 @@ const QuickAnswersModal = ({
           onSubmit={(values, actions) => {
             setTimeout(() => {
               handleSaveQuickAnswer(values);
+              setMoreQuickAnswers(["0"])
               actions.setSubmitting(false);
             }, 400);
           }}
@@ -169,22 +193,67 @@ const QuickAnswersModal = ({
                   />
                 </div>
                 <div className={classes.textQuickAnswerContainer}>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("quickAnswersModal.form.message")}
-                    name="message"
-                    error={touched.message && Boolean(errors.message)}
-                    helperText={touched.message && errors.message}
-                    variant="outlined"
-                    margin="dense"
-                    className={classes.textField}
-                    multiline
-                    rows={5}
-                    fullWidth
-                  />
+                  { quickAnswerId ? quickAnswer.message.split(',').map((i, index) => (
+                    <Field
+                      key={index}
+                      as={TextField}
+                      label={i18n.t("quickAnswersModal.form.message")}
+                      name="message"
+                      error={touched.message && Boolean(errors.message)}
+                      helperText={touched.message && errors.message}
+                      variant="outlined"
+                      margin="dense"
+                      className={classes.textField}
+                      multiline
+                      minrows={5}
+                      fullWidth
+                      value={quickAnswerId && i}
+                    />
+                  )) : moreQuickAnswers.map((i) => (
+                    <div className={classes.textQuickAnswerContainer}>
+                      <Field
+                        key={i}
+                        as={TextField}
+                        label={i18n.t("quickAnswersModal.form.message")}
+                        name={`message${i}`}
+                        error={touched.message && Boolean(errors.message)}
+                        helperText={touched.message && errors.message}
+                        variant="outlined"
+                        margin="dense"
+                        className={classes.textField}
+                        multiline
+                        minrows={5}
+                      />
+                      { /* Botão excluir nova mensagem rápida */ }
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setConfirmModalOpen(true);
+                          handleDeleteQuickAnswer(i);
+                        }}
+                      >
+                        <DeleteOutline />
+                      </IconButton>
+                    </div>
+                    ))
+                     }
                 </div>
               </DialogContent>
               <DialogActions>
+
+              { !quickAnswerId && (
+                <Button
+                  type="button"
+                  color="primary"
+                  disabled={isSubmitting}
+                  variant="contained"
+                  className={classes.btnWrapper}
+                  onClick={ (e) => handleNewQuickAnswer(e.target.parentNode) }
+                >
+                  {`${i18n.t("+")}`}
+                </Button>
+                )
+              }
                 <Button
                   onClick={handleClose}
                   color="secondary"
@@ -195,7 +264,7 @@ const QuickAnswersModal = ({
                 </Button>
                 <Button
                   type="submit"
-                  color="primary"
+                  color="terciary"
                   disabled={isSubmitting}
                   variant="contained"
                   className={classes.btnWrapper}
