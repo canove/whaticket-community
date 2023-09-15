@@ -1,4 +1,3 @@
-
 import Ticket from "../models/Ticket";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
@@ -9,13 +8,13 @@ export const SendAwayMessageInterval = async (
 ) => {
   const lastMessage = ticket.messages[-1];
   const seconds = timeInput * 1000;
-  const timeoutId = setTimeout(() => {
+  const timeoutId = setTimeout(async () => {
     if (ticket.status === "open" && lastMessage.fromMe && timeInput > 0) {
       const now = new Date().getTime();
       const sentAt = new Date(lastMessage.createdAt).getTime();
       const timeElapsed = now - sentAt;
       if (timeElapsed > seconds) {
-        SendWhatsAppMessage({ body: message, ticket });
+        await SendWhatsAppMessage({ body: message, ticket });
       }
     }
   }, seconds);
