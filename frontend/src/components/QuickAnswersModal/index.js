@@ -122,11 +122,11 @@ const QuickAnswersModal = ({
   };
 
   const handleDeleteQuickAnswer = (values, fieldIndex) => {
-      const messages = Object.values(values).filter( (i) => i !== values.shortcut);
+      // const messages = Object.values(values).filter( (i) => i !== values.shortcut);
       const list = moreQuickAnswers.splice(1);
       console.log('estado', list);
       const filtered = list.filter((i, index) => i[index] !== fieldIndex)
-    setMoreQuickAnswers(filtered)
+      setMoreQuickAnswers(filtered)
   }
 
   const handleSaveQuickAnswer = async (values) => {
