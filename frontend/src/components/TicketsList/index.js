@@ -179,7 +179,7 @@ const reducer = (state, action) => {
 			type: "LOAD_TICKETS",
 			payload: tickets,
 		});
-	}, [tickets]);
+	}, [tickets, searchParam, status]);
 
 	useEffect(() => {
 		const socket = openSocket();
