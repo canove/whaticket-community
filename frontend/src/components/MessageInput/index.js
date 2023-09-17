@@ -292,6 +292,28 @@ const MessageInput = ({ ticketStatus }) => {
     if (inputMessage.trim() === "") return;
     setLoading(true);
 
+    if (!inputMessage.trim().includes('/:/')) {
+      const message = {
+        read: 1,
+        fromMe: true,
+        mediaUrl: "",
+        body: signMessage
+        ? `*${user?.name}:*\n${inputMessage.trim()}`
+        : inputMessage.trim(),
+        quotedMsg: replyingMessage,
+      }
+    try {
+      await api.post(`/messages/${ticketId}`, message);
+    } catch (err) {
+      toastError(err);
+    }
+  
+    setInputMessage("");
+    setShowEmoji(false);
+    setLoading(false);
+    setReplyingMessage(null); 
+    }
+
     if (inputMessage.trim().includes('/:/')) {
       const arrayMessages = inputMessage.split('/:/');
       const limit = arrayMessages.length;
@@ -316,30 +338,8 @@ const MessageInput = ({ ticketStatus }) => {
         setLoading(false);
         setReplyingMessage(null); 
       }
-
-    if (!inputMessage.trim().includes('/:/')) {
-      const message = {
-        read: 1,
-        fromMe: true,
-        mediaUrl: "",
-        body: signMessage
-        ? `*${user?.name}:*\n${inputMessage.trim()}`
-        : inputMessage.trim(),
-        quotedMsg: replyingMessage,
-      }
-    try {
-      await api.post(`/messages/${ticketId}`, message);
-    } catch (err) {
-      toastError(err);
     }
-  
-    setInputMessage("");
-    setShowEmoji(false);
-    setLoading(false);
-    setReplyingMessage(null); 
-    }
-    }
-  };
+  }
 
   const handleStartRecording = async () => {
     setLoading(true);
