@@ -74,7 +74,6 @@ const QuickAnswersModal = ({
     message: "",
   };
 
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [quickAnswer, setQuickAnswer] = useState(initialState);
   let [moreQuickAnswers, setMoreQuickAnswers] = useState(["0"]);
 
@@ -121,10 +120,8 @@ const QuickAnswersModal = ({
     }
   };
 
-  const handleDeleteQuickAnswer = (values, fieldIndex) => {
-      // const messages = Object.values(values).filter( (i) => i !== values.shortcut);
+  const handleDeleteQuickAnswer = (fieldIndex) => {
       const list = moreQuickAnswers.splice(1);
-      console.log('estado', list);
       const filtered = list.filter((i, index) => i[index] !== fieldIndex)
       setMoreQuickAnswers(filtered)
   }
@@ -236,8 +233,7 @@ const QuickAnswersModal = ({
                       <IconButton
                         size="small"
                         onClick={() => {
-                          // setConfirmModalOpen(true);
-                          handleDeleteQuickAnswer(values, i, index);
+                          handleDeleteQuickAnswer(index);
                         }}
                       >
                         <DeleteOutline />
@@ -263,8 +259,7 @@ const QuickAnswersModal = ({
                         <IconButton
                           size="small"
                           onClick={() => {
-                            // setConfirmModalOpen(true);
-                            handleDeleteQuickAnswer(values, i, index);
+                            handleDeleteQuickAnswer(index);
                           }}
                         >
                           <DeleteOutline />
