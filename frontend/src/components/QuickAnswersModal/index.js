@@ -131,9 +131,11 @@ const QuickAnswersModal = ({
 
   const handleSaveQuickAnswer = async (values) => {
     const messages = Object.values(values).filter( (i) => i !== values.shortcut);
+    const messagesString = messages.join('/:/');
     for(let i = 0; i <= messages.length; i += 1){
-      values = { shortcut: values.shortcut, message: `${messages}` }
+      values = { shortcut: values.shortcut, message: `${messagesString}` }
     }
+
     try {
       if (quickAnswerId) {
         await api.put(`/quickAnswers/${quickAnswerId}`, values);
