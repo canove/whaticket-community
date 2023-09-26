@@ -25,8 +25,7 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
-import { SendAwayMessageInterval } from "../../helpers/SendAwayMessageInterval";
-import ShowQueueService from "../QueueService/ShowQueueService";
+import { ResetResponseTimer, SendAwayMessageInterval } from "../../helpers/SendAwayMessageInterval";
 
 interface Session extends Client {
   id?: number;
@@ -133,7 +132,7 @@ const verifyMediaMessage = async (
   return newMessage;
 };
 
-const verifyMessage = async (
+export const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
@@ -456,6 +455,7 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
       action: "update",
       message: messageToUpdate
     });
+    return messageToUpdate;
   } catch (err) {
     Sentry.captureException(err);
     logger.error(`Error handling message ack. Err: ${err}`);
@@ -465,9 +465,8 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
     const ticket = await handleMessage(msg, wbot);
-    if (ticket) {
-      const showQueue = await ShowQueueService(ticket.queueId);
-      SendAwayMessageInterval(showQueue.awayMessage, ticket, showQueue.seconds);
+    if (ticket && ticket.queue) {
+      await ResetResponseTimer(ticket, msg);
     }
   });
 
@@ -476,7 +475,10 @@ const wbotMessageListener = (wbot: Session): void => {
   });
 
   wbot.on("message_ack", async (msg, ack) => {
-    handleMsgAck(msg, ack);
+    const message = await handleMsgAck(msg, ack);
+    if (message && message.ticketId) {
+      await SendAwayMessageInterval(wbot, message.ticketId, msg);
+    }
   });
 };
 
