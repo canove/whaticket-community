@@ -1,24 +1,40 @@
+import { Client, Message as WbotMessage } from "whatsapp-web.js";
 import Ticket from "../models/Ticket";
-import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import formatBody from "./Mustache";
+import ShowTicketService from "../services/TicketServices/ShowTicketService";
+import { verifyMessage } from "../services/WbotServices/wbotMessageListener";
+
+interface Timers {
+  [timeoutId: number]: NodeJS.Timeout
+}
+
+let timers: Timers = {};
 
 export const SendAwayMessageInterval = async (
-  message: string,
-  ticket: Ticket,
-  timeInput: number
+  wbot: Client,
+  ticketId: number,
+  msg: WbotMessage
 ) => {
-  const lastMessage = ticket.messages[-1];
-  const seconds = timeInput * 1000;
-  const timeoutId = setTimeout(async () => {
-    if (ticket.status === "open" && lastMessage.fromMe && timeInput > 0) {
-      const now = new Date().getTime();
-      const sentAt = new Date(lastMessage.createdAt).getTime();
-      const timeElapsed = now - sentAt;
-      if (timeElapsed > seconds) {
-        await SendWhatsAppMessage({ body: message, ticket });
-      }
-    }
-  }, seconds);
-  if (!lastMessage.fromMe) {
-    clearTimeout(timeoutId);
+  const ticket = await ShowTicketService(ticketId);
+  const { contact, queue } = ticket;
+
+  if (queue && ticket.status !== "closed" && msg.fromMe && !timers[contact.id] && queue.seconds > 0) {
+    timers[contact.id] = setTimeout(async () => {
+      const chatId = `${contact.number}@c.us`;
+      const body = formatBody(`\u200e${queue.awayMessage}`, contact);
+      const sentMessage = await wbot.sendMessage(chatId, body);
+      verifyMessage(sentMessage, ticket, contact);
+    }, queue.seconds * 1000);
+  }
+};
+
+export const ResetResponseTimer = async (
+  ticket: Ticket,
+  msg: WbotMessage
+) => {
+  const { contact } = ticket;
+
+  if (!msg.fromMe && timers[contact.id]) {
+    clearTimeout(timers[contact.id]);
   }
 };
