@@ -19,7 +19,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import ColorPicker from "../ColorPicker";
-import { IconButton, InputAdornment } from "@material-ui/core";
+import { FormControlLabel, IconButton, InputAdornment, Switch } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
 
 const useStyles = makeStyles(theme => ({
@@ -61,6 +61,8 @@ const QueueSchema = Yup.object().shape({
 		.required("Required"),
 	color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
 	greetingMessage: Yup.string(),
+	awayMessage: Yup.string(),
+	seconds: Yup.number().typeError("Only integers!").min(0, "No negative numbers!").integer("Only integers!").default(0)
 });
 
 const QueueModal = ({ open, onClose, queueId }) => {
@@ -70,11 +72,16 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		name: "",
 		color: "",
 		greetingMessage: "",
+		awayMessage: "",
+		seconds: 0,
+		checkAwayMessage: false
 	};
 
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
+	const [awayMessageModalOpen, setAwayMessageModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
 	const greetingRef = useRef();
+	const awayRef = useRef();
 
 	useEffect(() => {
 		(async () => {
@@ -82,7 +89,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 			try {
 				const { data } = await api.get(`/queue/${queueId}`);
 				setQueue(prevState => {
-					return { ...prevState, ...data };
+					return { ...prevState, ...data, checkAwayMessage: data.seconds > 0 };
 				});
 			} catch (err) {
 				toastError(err);
@@ -94,6 +101,9 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				name: "",
 				color: "",
 				greetingMessage: "",
+				awayMessage: "",
+				seconds: 0,
+				checkAwayMessage: false
 			});
 		};
 	}, [queueId, open]);
@@ -131,12 +141,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					validationSchema={QueueSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
+							values.seconds = values.checkAwayMessage ? values.seconds : 0; 
+							values.seconds = Number(values.seconds);
 							handleSaveQueue(values);
 							actions.setSubmitting(false);
 						}, 400);
 					}}
 				>
-					{({ touched, errors, isSubmitting, values }) => (
+					{({ touched, errors, isSubmitting, values, setFieldValue }) => (
 						<Form>
 							<DialogContent dividers>
 								<Field
@@ -212,8 +224,82 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										variant="outlined"
 										margin="dense"
 									/>
+									<Field
+										as={TextField}
+										label={"Mensagem de Ausência"}
+										type="awayMessage"
+										multiline
+										inputRef={awayRef}
+										rows={5}
+										fullWidth
+										name="awayMessage"
+										error={
+											touched.awayMessage && Boolean(errors.awayMessage)
+										}
+										helperText={
+											touched.awayMessage && errors.awayMessage
+										}
+										variant="outlined"
+										margin="dense"
+									/>
 								</div>
+								<FormControlLabel control={
+									<Field
+										as={Switch}
+										type="checkbox"
+										name="checkAwayMessage"
+										id="checkAwayMessage"
+										onChange={() => {
+											if (!values.checkAwayMessage) {
+												setAwayMessageModalOpen(true);
+											}
+											setFieldValue("checkAwayMessage", !values.checkAwayMessage);
+										}}
+									/>
+								} label="Enviar mensagem por inatividade do cliente" />
 							</DialogContent>
+							<Dialog
+								onClose={handleClose}
+								aria-labelledby="simple-dialog-title"
+								open={awayMessageModalOpen}
+							>
+								<DialogTitle>Selecione o tempo para enviar mensagem de ausência</DialogTitle>
+								<DialogContent>
+									<Field
+										as={TextField}
+										type="number"
+										name="seconds"
+										id="seconds"
+										label="Seconds"
+										InputProps={{
+											inputProps: {
+												min: 0
+											}
+										}}
+										error={touched.seconds && Boolean(errors.seconds)}
+										helperText={(touched.seconds && errors.seconds) || "0 = Desabilitado"}
+										variant="outlined"
+										margin="dense"
+									/>
+								</DialogContent>
+								<DialogActions>
+									<Button
+										type="button"
+										color="primary"
+										disabled={isSubmitting}
+										variant="contained"
+										className={classes.btnWrapper}
+										onClick={() => {
+											if (values.seconds <= 0) {
+												setFieldValue("checkAwayMessage", false);
+											}
+											setAwayMessageModalOpen(false);
+										}}
+									>
+										OK
+									</Button>
+								</DialogActions>
+    						</Dialog>
 							<DialogActions>
 								<Button
 									onClick={handleClose}

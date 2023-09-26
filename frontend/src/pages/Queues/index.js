@@ -204,6 +204,12 @@ const Queues = () => {
                 {i18n.t("queues.table.greeting")}
               </TableCell>
               <TableCell align="center">
+                Mensagem de Ausência
+              </TableCell>
+              <TableCell align="center">
+                Tempo em Segundos
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("queues.table.actions")}
               </TableCell>
             </TableRow>
@@ -236,6 +242,20 @@ const Queues = () => {
                       </Typography>
                     </div>
                   </TableCell>
+                  <TableCell align="center">
+                    <div className={classes.customTableCell}>
+                      <Typography
+                        style={{ width: 300, align: "center" }}
+                        noWrap
+                        variant="body2"
+                      >
+                        {queue.awayMessage}
+                      </Typography>
+                    </div>
+                  </TableCell>
+                  <TableCell align="center">
+                    {queue.seconds > 0? queue.seconds : "Desabilitado"}
+                    </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

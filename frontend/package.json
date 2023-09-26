@@ -10,6 +10,7 @@
     "@testing-library/react": "^11.0.4",
     "@testing-library/user-event": "^12.1.7",
     "axios": "^0.21.1",
+    "csvtojson": "^2.0.10",
     "date-fns": "^2.16.1",
     "emoji-mart": "^3.0.1",
     "formik": "^2.2.0",
@@ -28,6 +29,7 @@
     "recharts": "^2.0.2",
     "socket.io-client": "^3.0.5",
     "use-sound": "^2.0.1",
+    "xlsx": "^0.18.5",
     "yup": "^0.32.8"
   },
   "scripts": {

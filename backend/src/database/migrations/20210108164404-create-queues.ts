@@ -22,6 +22,12 @@ module.exports = {
       greetingMessage: {
         type: DataTypes.TEXT
       },
+      awayMessage: {
+        type: DataTypes.TEXT
+      },
+      seconds: {
+        type: DataTypes.INTEGER
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false
