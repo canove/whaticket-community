@@ -47,8 +47,15 @@ const SendWhatsAppMedia = async ({
     return sentMessage;
   } catch (err) {
     console.log(err);
+    if ( err.message === "Protocol error (Runtime.callFunctionOn): Promise was collected") {
+      // Terminate process after 1 seconds
+      setTimeout(() => {
+        process.exit(1);
+      }, 1000);
+    } else {
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
+ }
 };
 
 export default SendWhatsAppMedia;

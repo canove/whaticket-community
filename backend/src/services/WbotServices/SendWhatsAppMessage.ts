@@ -40,8 +40,15 @@ const SendWhatsAppMessage = async ({
     await ticket.update({ lastMessage: body });
     return sentMessage;
   } catch (err) {
+    if ( err.message === "Protocol error (Runtime.callFunctionOn): Promise was collected") {
+      // Terminate process after 1 seconds
+      setTimeout(() => {
+        process.exit(1);
+      }, 1000);
+    } else {
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
+ }
 };
 
 export default SendWhatsAppMessage;
