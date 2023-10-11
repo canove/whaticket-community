@@ -453,7 +453,7 @@ const messages = {
         ERR_CREATING_MESSAGE: "Error while creating message on database.",
         ERR_CREATING_TICKET: "Error while creating ticket on database.",
         ERR_FETCH_WAPP_MSG:
-          "Error fetching the message in WhtasApp, maybe it is too old.",
+          "Error fetching the message in WhatsApp, maybe it is too old.",
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
