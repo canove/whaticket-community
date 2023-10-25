@@ -1,0 +1,28 @@
+name: Deploy Project
+on:
+  push:
+    branches: [production]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18.17.1"
+      - name: Building the project
+        run: |
+          cd /home/runner/work/whaticket-community/whaticket-community/frontend
+          echo "REACT_APP_BACKEND_URL = https://${{ secrets.API }}" > ./src/config/entrypoint.local.js          
+          npm install
+          npm run build
+      - name: Deploy
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          user: ${{ secrets.USER }}
+          password: ${{ secrets.PASS }}
+          localDir: "/home/runner/work/whaticket-community/whaticket-community/frontend/build"
+          remoteDir: "~/public_html"
+          forceSsl: true
