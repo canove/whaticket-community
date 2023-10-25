@@ -14,7 +14,7 @@ jobs:
       - name: Building the project
         run: |
           cd /home/runner/work/whaticket-community/whaticket-community/frontend
-          echo "REACT_APP_BACKEND_URL = https://${{ secrets.API }}" > ./src/config/entrypoint.local.js          
+          echo "REACT_APP_BACKEND_URL = https://${{ secrets.API }}" > .env
           npm install
           npm run build
       - name: Deploy
