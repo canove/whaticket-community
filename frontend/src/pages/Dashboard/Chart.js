@@ -23,6 +23,13 @@ const Chart = () => {
 	const { tickets } = useTickets({ date: date.current });
 
 	const [chartData, setChartData] = useState([
+		{ time: "01:00", amount: 0 },
+		{ time: "02:00", amount: 0 },
+		{ time: "03:00", amount: 0 },
+		{ time: "04:00", amount: 0 },
+		{ time: "05:00", amount: 0 },
+		{ time: "06:00", amount: 0 },
+		{ time: "07:00", amount: 0 },
 		{ time: "08:00", amount: 0 },
 		{ time: "09:00", amount: 0 },
 		{ time: "10:00", amount: 0 },
@@ -35,6 +42,11 @@ const Chart = () => {
 		{ time: "17:00", amount: 0 },
 		{ time: "18:00", amount: 0 },
 		{ time: "19:00", amount: 0 },
+		{ time: "20:00", amount: 0 },
+		{ time: "21:00", amount: 0 },
+		{ time: "22:00", amount: 0 },
+		{ time: "23:00", amount: 0 },
+		{ time: "00:00", amount: 0 },
 	]);
 
 	useEffect(() => {

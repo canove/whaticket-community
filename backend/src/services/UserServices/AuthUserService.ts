@@ -6,6 +6,8 @@ import {
 } from "../../helpers/CreateTokens";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import Queue from "../../models/Queue";
+import Company from "../../models/Company";
+import Setting from "../../models/Setting";
 
 interface SerializedUser {
   id: number;
@@ -13,6 +15,7 @@ interface SerializedUser {
   email: string;
   profile: string;
   queues: Queue[];
+  companyId: number;
 }
 
 interface Request {
@@ -32,7 +35,7 @@ const AuthUserService = async ({
 }: Request): Promise<Response> => {
   const user = await User.findOne({
     where: { email },
-    include: ["queues"]
+    include: ["queues", { model: Company, include: [{ model: Setting }] }]
   });
 
   if (!user) {
@@ -46,7 +49,7 @@ const AuthUserService = async ({
   const token = createAccessToken(user);
   const refreshToken = createRefreshToken(user);
 
-  const serializedUser = SerializeUser(user);
+  const serializedUser = await SerializeUser(user);
 
   return {
     serializedUser,

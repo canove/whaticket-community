@@ -1,15 +1,39 @@
 import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import Queue from "../../models/Queue";
+import Company from "../../models/Company";
+import Plan from "../../models/Plan";
 
 interface QueueData {
   name: string;
   color: string;
+  companyId: number;
   greetingMessage?: string;
+  outOfHoursMessage?: string;
+  schedules?: any[];
 }
 
 const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
-  const { color, name } = queueData;
+  const { color, name, companyId } = queueData;
+
+  const company = await Company.findOne({
+    where: {
+      id: companyId
+    },
+    include: [{ model: Plan, as: "plan" }]
+  });
+
+  if (company !== null) {
+    const queuesCount = await Queue.count({
+      where: {
+        companyId
+      }
+    });
+
+    if (queuesCount >= company.plan.queues) {
+      throw new AppError(`Número máximo de filas já alcançado: ${queuesCount}`);
+    }
+  }
 
   const queueSchema = Yup.object().shape({
     name: Yup.string()
@@ -21,7 +45,7 @@ const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
         async value => {
           if (value) {
             const queueWithSameName = await Queue.findOne({
-              where: { name: value }
+              where: { name: value, companyId }
             });
 
             return !queueWithSameName;
@@ -44,7 +68,7 @@ const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
         async value => {
           if (value) {
             const queueWithSameColor = await Queue.findOne({
-              where: { color: value }
+              where: { color: value, companyId }
             });
             return !queueWithSameColor;
           }
@@ -55,7 +79,7 @@ const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
 
   try {
     await queueSchema.validate({ color, name });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useReducer } from "react";
 import { toast } from "react-toastify";
-import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -29,6 +28,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
+import { socketConnection } from "../../services/socket";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -122,9 +122,10 @@ const Users = () => {
   }, [searchParam, pageNumber]);
 
   useEffect(() => {
-    const socket = openSocket();
+    const companyId = localStorage.getItem("companyId");
+    const socket = socketConnection({ companyId });
 
-    socket.on("user", (data) => {
+    socket.on(`company-${companyId}-user`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_USERS", payload: data.user });
       }
@@ -244,9 +245,6 @@ const Users = () => {
                 {i18n.t("users.table.profile")}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("users.table.whatsapp")}
-              </TableCell>              
-              <TableCell align="center">
                 {i18n.t("users.table.actions")}
               </TableCell>
             </TableRow>
@@ -258,7 +256,6 @@ const Users = () => {
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
-                  <TableCell align="center">{user.whatsapp?.name}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

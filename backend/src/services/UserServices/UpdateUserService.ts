@@ -1,21 +1,24 @@
 import * as Yup from "yup";
 
 import AppError from "../../errors/AppError";
-import { SerializeUser } from "../../helpers/SerializeUser";
 import ShowUserService from "./ShowUserService";
+import Company from "../../models/Company";
+import User from "../../models/User";
 
 interface UserData {
   email?: string;
   password?: string;
   name?: string;
   profile?: string;
+  companyId?: number;
   queueIds?: number[];
-  whatsappId?: number;
 }
 
 interface Request {
   userData: UserData;
   userId: string | number;
+  companyId: number;
+  requestUserId: number;
 }
 
 interface Response {
@@ -27,9 +30,17 @@ interface Response {
 
 const UpdateUserService = async ({
   userData,
-  userId
+  userId,
+  companyId,
+  requestUserId
 }: Request): Promise<Response | undefined> => {
   const user = await ShowUserService(userId);
+
+  const requestUser = await User.findByPk(requestUserId);
+
+  if (requestUser.super === false && userData.companyId !== companyId) {
+    throw new AppError("O usuário não pertence à esta empresa");
+  }
 
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
@@ -38,11 +49,11 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, name, queueIds = [], whatsappId } = userData;
+  const { email, password, profile, name, queueIds = [] } = userData;
 
   try {
     await schema.validate({ email, password, profile, name });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
@@ -50,15 +61,26 @@ const UpdateUserService = async ({
     email,
     password,
     profile,
-    name,
-    whatsappId: whatsappId ? whatsappId : null
+    name
   });
 
   await user.$set("queues", queueIds);
 
   await user.reload();
 
-  return SerializeUser(user);
+  const company = await Company.findByPk(user.companyId);
+
+  const serializedUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    profile: user.profile,
+    companyId: user.companyId,
+    company,
+    queues: user.queues
+  };
+
+  return serializedUser;
 };
 
 export default UpdateUserService;

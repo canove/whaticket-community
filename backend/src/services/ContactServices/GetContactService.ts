@@ -1,38 +1,43 @@
 import AppError from "../../errors/AppError";
 import Contact from "../../models/Contact";
+import ContactCustomField from "../../models/ContactCustomField";
 import CreateContactService from "./CreateContactService";
 
-interface ExtraInfo {
-    name: string;
-    value: string;
+interface ExtraInfo extends ContactCustomField {
+  name: string;
+  value: string;
 }
 
 interface Request {
-    name: string;
-    number: string;
-    email?: string;
-    profilePicUrl?: string;
-    extraInfo?: ExtraInfo[];
+  name: string;
+  number: string;
+  companyId: number;
+  email?: string;
+  profilePicUrl?: string;
+  extraInfo?: ExtraInfo[];
 }
 
-const GetContactService = async ({ name, number }: Request): Promise<Contact> => {
-    const numberExists = await Contact.findOne({
-        where: { number }
+const GetContactService = async ({
+  name,
+  number,
+  companyId
+}: Request): Promise<Contact> => {
+  const numberExists = await Contact.findOne({
+    where: { number, companyId }
+  });
+
+  if (!numberExists) {
+    const contact = await CreateContactService({
+      name,
+      number,
+      companyId
     });
 
-    if (!numberExists) {
-        const contact = await CreateContactService({
-            name,
-            number,
-        })
+    if (contact == null) throw new AppError("CONTACT_NOT_FIND");
+    else return contact;
+  }
 
-        if (contact == null)
-            throw new AppError("CONTACT_NOT_FIND")
-        else
-            return contact
-    }
-
-    return numberExists
+  return numberExists;
 };
 
 export default GetContactService;

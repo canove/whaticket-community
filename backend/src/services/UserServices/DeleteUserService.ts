@@ -3,7 +3,10 @@ import AppError from "../../errors/AppError";
 import Ticket from "../../models/Ticket";
 import UpdateDeletedUserOpenTicketsStatus from "../../helpers/UpdateDeletedUserOpenTicketsStatus";
 
-const DeleteUserService = async (id: string | number): Promise<void> => {
+const DeleteUserService = async (
+  id: string | number,
+  companyId: number
+): Promise<void> => {
   const user = await User.findOne({
     where: { id }
   });
@@ -17,7 +20,7 @@ const DeleteUserService = async (id: string | number): Promise<void> => {
   });
 
   if (userOpenTickets.length > 0) {
-    UpdateDeletedUserOpenTicketsStatus(userOpenTickets);
+    UpdateDeletedUserOpenTicketsStatus(userOpenTickets, companyId);
   }
 
   await user.destroy();

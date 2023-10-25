@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer, useContext } from "react";
-import openSocket from "../../services/socket-io";
+
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
 
@@ -34,6 +34,8 @@ import MainContainer from "../../components/MainContainer";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../../components/Can";
+import NewTicketModal from "../../components/NewTicketModal";
+import { socketConnection } from "../../services/socket";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_CONTACTS") {
@@ -100,6 +102,8 @@ const Contacts = () => {
   const [contacts, dispatch] = useReducer(reducer, []);
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+  const [contactTicket, setContactTicket] = useState({});
   const [deletingContact, setDeletingContact] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -130,9 +134,10 @@ const Contacts = () => {
   }, [searchParam, pageNumber]);
 
   useEffect(() => {
-    const socket = openSocket();
+    const companyId = localStorage.getItem("companyId");
+    const socket = socketConnection({ companyId });
 
-    socket.on("contact", (data) => {
+    socket.on(`company-${companyId}-contact`, (data) => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_CONTACTS", payload: data.contact });
       }
@@ -161,20 +166,27 @@ const Contacts = () => {
     setContactModalOpen(false);
   };
 
-  const handleSaveTicket = async (contactId) => {
-    if (!contactId) return;
-    setLoading(true);
-    try {
-      const { data: ticket } = await api.post("/tickets", {
-        contactId: contactId,
-        userId: user?.id,
-        status: "open",
-      });
-      history.push(`/tickets/${ticket.id}`);
-    } catch (err) {
-      toastError(err);
+  // const handleSaveTicket = async contactId => {
+  // 	if (!contactId) return;
+  // 	setLoading(true);
+  // 	try {
+  // 		const { data: ticket } = await api.post("/tickets", {
+  // 			contactId: contactId,
+  // 			userId: user?.id,
+  // 			status: "open",
+  // 		});
+  // 		history.push(`/tickets/${ticket.id}`);
+  // 	} catch (err) {
+  // 		toastError(err);
+  // 	}
+  // 	setLoading(false);
+  // };
+
+  const handleCloseOrOpenTicket = (ticket) => {
+    setNewTicketModalOpen(false);
+    if (ticket !== undefined && ticket.uuid !== undefined) {
+      history.push(`/tickets/${ticket.uuid}`);
     }
-    setLoading(false);
   };
 
   const hadleEditContact = (contactId) => {
@@ -217,6 +229,13 @@ const Contacts = () => {
 
   return (
     <MainContainer className={classes.mainContainer}>
+      <NewTicketModal
+        modalOpen={newTicketModalOpen}
+        initialContact={contactTicket}
+        onClose={(ticket) => {
+          handleCloseOrOpenTicket(ticket);
+        }}
+      />
       <ContactModal
         open={contactModalOpen}
         onClose={handleCloseContactModal}
@@ -309,7 +328,10 @@ const Contacts = () => {
                   <TableCell align="center">
                     <IconButton
                       size="small"
-                      onClick={() => handleSaveTicket(contact.id)}
+                      onClick={() => {
+                        setContactTicket(contact);
+                        setNewTicketModalOpen(true);
+                      }}
                     >
                       <WhatsAppIcon />
                     </IconButton>

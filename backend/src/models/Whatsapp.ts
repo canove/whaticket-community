@@ -11,11 +11,14 @@ import {
   AllowNull,
   HasMany,
   Unique,
-  BelongsToMany
+  BelongsToMany,
+  ForeignKey,
+  BelongsTo
 } from "sequelize-typescript";
 import Queue from "./Queue";
 import Ticket from "./Ticket";
 import WhatsappQueue from "./WhatsappQueue";
+import Company from "./Company";
 
 @Table
 class Whatsapp extends Model<Whatsapp> {
@@ -47,11 +50,28 @@ class Whatsapp extends Model<Whatsapp> {
   @Column
   retries: number;
 
+  @Default("")
   @Column(DataType.TEXT)
   greetingMessage: string;
 
+  @Default("")
   @Column(DataType.TEXT)
   farewellMessage: string;
+
+  @Default("")
+  @Column(DataType.TEXT)
+  complationMessage: string;
+
+  @Default("")
+  @Column(DataType.TEXT)
+  outOfHoursMessage: string;
+
+  @Default("")
+  @Column(DataType.TEXT)
+  ratingMessage: string;
+
+  @Column({ defaultValue: "stable" })
+  provider: string;
 
   @Default(false)
   @AllowNull
@@ -72,6 +92,31 @@ class Whatsapp extends Model<Whatsapp> {
 
   @HasMany(() => WhatsappQueue)
   whatsappQueues: WhatsappQueue[];
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
+
+  @BelongsTo(() => Company)
+  company: Company;
+
+  @Column
+  token: string;
+  
+  @Column(DataType.TEXT)
+  facebookUserId: string;
+  
+  @Column(DataType.TEXT)
+  facebookUserToken: string;
+
+  @Column(DataType.TEXT)
+  facebookPageUserId: string;
+
+  @Column(DataType.TEXT)
+  tokenMeta: string;
+
+  @Column(DataType.TEXT)
+  channel: string;
 }
 
 export default Whatsapp;

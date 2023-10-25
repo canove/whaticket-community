@@ -19,7 +19,8 @@ const useStyles = makeStyles(theme => ({
 		alignSelf: "center",
 		marginLeft: "auto",
 		"& > *": {
-			margin: theme.spacing(1),
+			marginRight: theme.spacing(1),
+			marginLeft: theme.spacing(1),
 		},
 	},
 }));

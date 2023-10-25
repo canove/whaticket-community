@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useHistory } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -19,21 +18,30 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { Grid, ListItemText, MenuItem, Select } from "@material-ui/core";
+import { toast } from "react-toastify";
 
 const filter = createFilterOptions({
 	trim: true,
 });
 
-const NewTicketModal = ({ modalOpen, onClose }) => {
-	const history = useHistory();
+const NewTicketModal = ({ modalOpen, onClose, initialContact }) => {
 
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [selectedContact, setSelectedContact] = useState(null);
+	const [selectedQueue, setSelectedQueue] = useState("");
 	const [newContact, setNewContact] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
 	const { user } = useContext(AuthContext);
+
+	useEffect(() => {
+		if (initialContact?.id !== undefined) {
+			setOptions([initialContact]);
+			setSelectedContact(initialContact);
+		}
+	}, [initialContact]);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -68,19 +76,24 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 
 	const handleSaveTicket = async contactId => {
 		if (!contactId) return;
+		if (selectedQueue === "" && user.profile !== 'admin') {
+			toast.error("Selecione uma fila");
+			return;
+		}
 		setLoading(true);
 		try {
+			const queueId = selectedQueue !== "" ? selectedQueue : null;
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
+				queueId,
 				userId: user.id,
 				status: "open",
 			});
-			history.push(`/tickets/${ticket.id}`);
+			onClose(ticket);
 		} catch (err) {
 			toastError(err);
 		}
 		setLoading(false);
-		handleClose();
 	};
 
 	const handleSelectOption = (e, newValue) => {
@@ -128,23 +141,14 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		}
 	};
 
-	return (
-		<>
-			<ContactModal
-				open={contactModalOpen}
-				initialValues={newContact}
-				onClose={handleCloseContactModal}
-				onSave={handleAddNewContactTicket}
-			></ContactModal>
-			<Dialog open={modalOpen} onClose={handleClose}>
-				<DialogTitle id="form-dialog-title">
-					{i18n.t("newTicketModal.title")}
-				</DialogTitle>
-				<DialogContent dividers>
+	const renderContactAutocomplete = () => {
+		if (initialContact === undefined || initialContact.id === undefined) {
+			return (
+				<Grid xs={12} item>
 					<Autocomplete
+						fullWidth
 						options={options}
 						loading={loading}
-						style={{ width: 300 }}
 						clearOnBlur
 						autoHighlight
 						freeSolo
@@ -180,6 +184,64 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 							/>
 						)}
 					/>
+				</Grid>
+			)
+		}
+		return null;
+	}
+
+	return (
+		<>
+			<ContactModal
+				open={contactModalOpen}
+				initialValues={newContact}
+				onClose={handleCloseContactModal}
+				onSave={handleAddNewContactTicket}
+			></ContactModal>
+			<Dialog open={modalOpen} onClose={handleClose}>
+				<DialogTitle id="form-dialog-title">
+					{i18n.t("newTicketModal.title")}
+				</DialogTitle>
+				<DialogContent dividers>
+					<Grid style={{ width: 300 }} container spacing={2}>
+						{renderContactAutocomplete()}
+						<Grid xs={12} item>
+							<Select
+								fullWidth
+								displayEmpty
+								variant="outlined"
+								value={selectedQueue}
+								onChange={(e) => {
+									setSelectedQueue(e.target.value)
+								}}
+								MenuProps={{
+									anchorOrigin: {
+										vertical: "bottom",
+										horizontal: "left",
+									},
+									transformOrigin: {
+										vertical: "top",
+										horizontal: "left",
+									},
+									getContentAnchorEl: null,
+								}}
+								renderValue={() => {
+									if (selectedQueue === "") {
+										return "Selecione uma fila"
+									}
+									const queue = user.queues.find(q => q.id === selectedQueue)
+									return queue.name
+								}}
+							>
+								{user.queues?.length > 0 &&
+									user.queues.map((queue, key) => (
+										<MenuItem dense key={key} value={queue.id}>
+											<ListItemText primary={queue.name} />
+										</MenuItem>
+									))}
+							</Select>
+						</Grid>
+					</Grid>
 				</DialogContent>
 				<DialogActions>
 					<Button
