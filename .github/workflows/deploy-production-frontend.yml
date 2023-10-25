@@ -1,7 +1,7 @@
 name: Deploy Project
 on:
   push:
-    branches: [production]
+    branches: [master]
 jobs:
   build:
     runs-on: ubuntu-latest
