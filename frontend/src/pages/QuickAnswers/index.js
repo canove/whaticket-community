@@ -171,6 +171,7 @@ const QuickAnswers = () => {
 
   const handleEditQuickAnswers = (quickAnswer) => {
     setSelectedQuickAnswers(quickAnswer);
+    console.log(quickAnswer);
     setQuickAnswersModalOpen(true);
   };
 

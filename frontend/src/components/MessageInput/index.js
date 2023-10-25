@@ -318,25 +318,24 @@ const MessageInput = ({ ticketStatus }) => {
       const arrayMessages = inputMessage.split('/:/');
       const limit = arrayMessages.length;
       for(let i = 0; i < limit; i += 1){
-        const message = {
-          read: 1,
-          fromMe: true,
-          mediaUrl: "",
-          body: signMessage
-          ? `*${user?.name}:*\n${arrayMessages[i].trim()}`
-          : inputMessage.trim(),
-          quotedMsg: replyingMessage,
-        }
-        try {
-          await api.post(`/messages/${ticketId}`, message);
-        } catch (err) {
-          toastError(err);
-        }
-      
-        setInputMessage("");
-        setShowEmoji(false);
-        setLoading(false);
-        setReplyingMessage(null); 
+          const message = {
+            read: 1,
+            fromMe: true,
+            mediaUrl: "",
+            body: signMessage
+            ? `*${user?.name}:*\n${arrayMessages[i].trim()}`
+            : inputMessage.trim(),
+            quotedMsg: replyingMessage,
+          }
+          try {
+            await api.post(`/messages/${ticketId}`, message);
+          } catch (err) {
+            toastError(err);
+          }
+          setInputMessage("");
+          setShowEmoji(false);
+          setLoading(false);
+          setReplyingMessage(null); 
       }
     }
   }
