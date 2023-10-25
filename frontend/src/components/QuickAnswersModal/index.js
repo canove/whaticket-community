@@ -108,22 +108,24 @@ const QuickAnswersModal = ({
 
   const handleClose = () => {
     onClose();
-    setQuickAnswer(initialState);
+    setMoreQuickAnswers(["0"])
   };
 
-  const handleNewQuickAnswer = (e) => {
-    for(let i = 0; i < e.form.length; i += 1) {
-      const field = e.form[i].name;
-      if(field.length > 0 && field.includes("message")) {
-        setMoreQuickAnswers([...moreQuickAnswers, e.form[i].textContent])
+  const handleNewQuickAnswer = (values) => {
+    const messages = Object.values(values).filter( (i) => i !== values.shortcut);
+    messages.splice(0,1)
+    
+    for(let i = 0; i < moreQuickAnswers.length; i += 1) {
+      setMoreQuickAnswers([...moreQuickAnswers, messages[i]]);
       }
-    }
   };
 
-  const handleDeleteQuickAnswer = (fieldIndex) => {
-      const list = moreQuickAnswers.splice(1);
-      const filtered = list.filter((i, index) => i[index] !== fieldIndex)
-      setMoreQuickAnswers(filtered)
+  const handleDeleteQuickAnswer = (value) => {
+    console.log('NORMAL', moreQuickAnswers);
+    console.log('INDICE P EXCLUIR', value);
+    const excluded = moreQuickAnswers.filter((qm, index) => qm[index] !== value);
+    console.log('RESULTADO', excluded);
+      //setMoreQuickAnswers(filtered)
   }
 
   const handleSaveQuickAnswer = async (values) => {
@@ -171,8 +173,7 @@ const QuickAnswersModal = ({
           onSubmit={(values, actions) => {
             setTimeout(() => {
               handleSaveQuickAnswer(values);
-              setMoreQuickAnswers(["0"])
-              setMoreQuickAnswers(["0"])
+              setMoreQuickAnswers(["0"]);
               actions.setSubmitting(false);
             }, 400);
           }}
@@ -195,7 +196,7 @@ const QuickAnswersModal = ({
                   />
                 </div>
                 <div className={classes.textQuickAnswerContainer}>
-                  { quickAnswerId && quickAnswer.message.split(',').map((i, index) => (
+                  { quickAnswerId && quickAnswer.message.split('/:/').map((i, index) => (
                     <Field
                       key={index}
                       as={TextField}
@@ -213,13 +214,13 @@ const QuickAnswersModal = ({
                     />
                   ))
                   }
-                  { Object.values(values).filter((i) => i !== values.shortcut).length <= 1 ? moreQuickAnswers.map((i, index) => (
-                    <div className={classes.textQuickAnswerContainer}>
+                  { moreQuickAnswers.length <= 1 ? moreQuickAnswers.map((i, index) => (
+                    <div key={i} className={classes.textQuickAnswerContainer}>
                       <Field
                         key={i}
                         as={TextField}
                         label={i18n.t("quickAnswersModal.form.message")}
-                        name={moreQuickAnswers.length === 1 ? "message" : `message${[index]}`}
+                        name={quickAnswer.length === 1 ? "message" : `message${[index]}`}
                         error={touched.message && Boolean(errors.message)}
                         helperText={touched.message && errors.message}
                         variant="outlined"
@@ -240,9 +241,8 @@ const QuickAnswersModal = ({
                       </IconButton>
                     </div>
                     )) : moreQuickAnswers.map((i, index) => (
-                      <div className={classes.textQuickAnswerContainer}>
+                      <div key={i} className={classes.textQuickAnswerContainer}>
                         <Field
-                          key={i}
                           as={TextField}
                           label={i18n.t("quickAnswersModal.form.message")}
                           name={moreQuickAnswers.length === 1 ? "message" : `message${[index]}`}
@@ -278,7 +278,7 @@ const QuickAnswersModal = ({
                   disabled={isSubmitting}
                   variant="contained"
                   className={classes.btnWrapper}
-                  onClick={ (e) => handleNewQuickAnswer(e.target.parentNode) }
+                  onClick={ () => handleNewQuickAnswer(values) }
                 >
                   {`${i18n.t("+")}`}
                 </Button>

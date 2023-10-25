@@ -43,7 +43,7 @@ const reducer = (state, action) => {
         newQuickAnswers.push({
           id: quickAnswer.id,
           shortcut: quickAnswer.shortcut,
-          message: quickAnswer.message.split(','), 
+          message: quickAnswer.message.split('/:/'), 
           createdAt: quickAnswer.createdAt,
           updatedAt: quickAnswer.updatedAt
         })
