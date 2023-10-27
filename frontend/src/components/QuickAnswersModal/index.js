@@ -76,7 +76,6 @@ const QuickAnswersModal = ({
 
   const [quickAnswer, setQuickAnswer] = useState(initialState);
   let [moreQuickAnswers, setMoreQuickAnswers] = useState(["message"]);
-  let [toRender, setToRender] = useState();
 
   useEffect(() => {
     return () => {
@@ -96,8 +95,8 @@ const QuickAnswersModal = ({
 
       try {
         const { data } = await api.get(`/quickAnswers/${quickAnswerId}`);
-        const messagesKeys = data.message.split(',')[0].split('/:/');
-        const messagesValues = data.message.split(',')[1].split('/:/');
+        const messagesKeys = data.message.split('/*/')[0].split('/:/');
+        const messagesValues = data.message.split('/*/')[1].split('/:/');
 
         for (let i = 0; i <= messagesKeys.length - 1; i += 1) {
           data[messagesKeys[i]] = messagesValues[i];
@@ -121,6 +120,7 @@ const QuickAnswersModal = ({
   const handleNewQuickAnswer = () => {
     if (quickAnswerId) {
       let i = moreQuickAnswers.length - 1;
+      if (moreQuickAnswers.length === 0) return setMoreQuickAnswers(["message"]);
       return setMoreQuickAnswers([...moreQuickAnswers, `message${i += 1}`]);
     } else {
       if (moreQuickAnswers.length >= 1) {
@@ -131,18 +131,13 @@ const QuickAnswersModal = ({
     }
   }
 
-  const handleDeleteQuickAnswer = (answer) => {
-    console.log(answer);
-/*     if (quickAnswerId) {
-      const messagesList = moreQuickAnswers.filter((i) => i !== answer);
-
-      return setMoreQuickAnswers(messagesList);
+  const handleDeleteQuickAnswer = (values, answer) => {
+     if (quickAnswerId) {
+      delete values[answer]
+      setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
     } else {
-      const messagesList = moreQuickAnswers.filter((i) => i !== answer);
-      console.log(answer);
-      console.log(messagesList);
-      //setMoreQuickAnswers(messagesList);
-    } */
+      delete values[answer]
+    }
 
   }
 
@@ -151,7 +146,7 @@ const QuickAnswersModal = ({
       if (quickAnswerId) {
         const quickAnswerIdKeys = Object.keys(values).filter((i) => i.includes('message'));
         const quickAnswerIdMessages = Object.values(values).filter((i) => i !== values.id && i !== values.shortcut && i !== values.createdAt && i !== values.updatedAt);
-        const messageString = `${quickAnswerIdKeys.join('/:/')}, ${quickAnswerIdMessages.join('/:/')}`;
+        const messageString = `${quickAnswerIdKeys.join('/:/')}/*/${quickAnswerIdMessages.join('/:/')}`;
 
         values = { shortcut: values.shortcut, message: messageString }
         console.log('COM ID', values);
@@ -161,7 +156,7 @@ const QuickAnswersModal = ({
       } else {
         const quickAnswerIdKeys = Object.keys(values).filter((i) => i.includes('message'));
         const quickAnswerIdMessages = Object.values(values).filter((i) => i !== values.id && i !== values.shortcut && i !== values.createdAt && i !== values.updatedAt);
-        const messageString = `${quickAnswerIdKeys.join('/:/')}, ${quickAnswerIdMessages.join('/:/')}`;
+        const messageString = `${quickAnswerIdKeys.join('/:/')}/*/${quickAnswerIdMessages.join('/:/')}`;
         console.log(messageString);
 
         values = { shortcut: values.shortcut, message: messageString }
@@ -241,7 +236,7 @@ const QuickAnswersModal = ({
                       <IconButton
                         size="small"
                         onClick={() => {
-                          handleDeleteQuickAnswer(answer);
+                          handleDeleteQuickAnswer(values, answer);
                         }}
                       >
                         <DeleteOutline />
