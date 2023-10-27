@@ -155,7 +155,7 @@ const QuickAnswers = () => {
       }
 
       if (data.action === "add_more") {
-        dispatch({ type: "ADD_MORE_QUICK_ANSWERS", payload: data.quickAnswer });
+        dispatch({ type: "ADD_MORE_QUICK_ANSWERS", payload: data.quickAnswer.message });
       }
 
     });
@@ -171,7 +171,6 @@ const QuickAnswers = () => {
 
   const handleEditQuickAnswers = (quickAnswer) => {
     setSelectedQuickAnswers(quickAnswer);
-    console.log(quickAnswer);
     setQuickAnswersModalOpen(true);
   };
 

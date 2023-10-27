@@ -54,8 +54,15 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     action: "create",
     quickAnswer
   });
-
-  return res.status(200).json(quickAnswer);
+  const formatedQuickAnswer = {
+    id: quickAnswer.id,
+    shortcurt: quickAnswer.shortcut,
+    message: quickAnswer.message.split('/:/'),
+    createdAt: quickAnswer.createdAt,
+    updatedAt: quickAnswer.updatedAt
+  }
+  
+  return res.status(200).json(formatedQuickAnswer);
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {

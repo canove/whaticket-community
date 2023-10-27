@@ -75,7 +75,8 @@ const QuickAnswersModal = ({
   };
 
   const [quickAnswer, setQuickAnswer] = useState(initialState);
-  let [moreQuickAnswers, setMoreQuickAnswers] = useState(["0"]);
+  let [moreQuickAnswers, setMoreQuickAnswers] = useState(["message"]);
+  let [toRender, setToRender] = useState();
 
   useEffect(() => {
     return () => {
@@ -95,55 +96,78 @@ const QuickAnswersModal = ({
 
       try {
         const { data } = await api.get(`/quickAnswers/${quickAnswerId}`);
+        const messagesKeys = data.message.split(',')[0].split('/:/');
+        const messagesValues = data.message.split(',')[1].split('/:/');
+
+        for (let i = 0; i <= messagesKeys.length - 1; i += 1) {
+          data[messagesKeys[i]] = messagesValues[i];
+        }
         if (isMounted.current) {
+          setMoreQuickAnswers(Object.keys(data).filter((i) => i.includes('message')));
           setQuickAnswer(data);
         }
       } catch (err) {
-        toastError(err);
+        toastError(err.message);
       }
     };
-
     fetchQuickAnswer();
   }, [quickAnswerId, open, initialValues]);
 
   const handleClose = () => {
     onClose();
-    setMoreQuickAnswers(["0"])
+    setMoreQuickAnswers(["message"])
   };
 
-  const handleNewQuickAnswer = (values) => {
-    const messages = Object.values(values).filter( (i) => i !== values.shortcut);
-    messages.splice(0,1)
-    console.log(messages);
-    
-    for(let i = 0; i < moreQuickAnswers.length; i += 1) {
-      setMoreQuickAnswers([...moreQuickAnswers, messages[i]]);
+  const handleNewQuickAnswer = () => {
+    if (quickAnswerId) {
+      let i = moreQuickAnswers.length - 1;
+      return setMoreQuickAnswers([...moreQuickAnswers, `message${i += 1}`]);
+    } else {
+      if (moreQuickAnswers.length >= 1) {
+        let i = moreQuickAnswers.length - 1;
+        return setMoreQuickAnswers([...moreQuickAnswers, `message${i += 1}`]);
       }
-  };
+      toast.error('Escreva pelo menos uma mensagem rápida antes de criar mais mensagens')
+    }
+  }
 
-  const handleDeleteQuickAnswer = (fieldIndex) => {
-    const list = moreQuickAnswers.splice(1);
+  const handleDeleteQuickAnswer = (answer) => {
+    console.log(answer);
+/*     if (quickAnswerId) {
+      const messagesList = moreQuickAnswers.filter((i) => i !== answer);
 
-    const filtered = list.filter((i, index) => i[index] !== fieldIndex)
-    setMoreQuickAnswers(filtered)
-/*     moreQuickAnswers.splice(value, 1);
-    setMoreQuickAnswers(moreQuickAnswers); */
+      return setMoreQuickAnswers(messagesList);
+    } else {
+      const messagesList = moreQuickAnswers.filter((i) => i !== answer);
+      console.log(answer);
+      console.log(messagesList);
+      //setMoreQuickAnswers(messagesList);
+    } */
+
   }
 
   const handleSaveQuickAnswer = async (values) => {
-    const messages = Object.values(values).filter( (i) => i !== values.shortcut);
-    console.log(messages);
-    const messagesString = messages.join('/:/');
-    for(let i = 0; i <= messages.length; i += 1){
-      values = { shortcut: values.shortcut, message: `${messagesString}` }
-    }
-
     try {
       if (quickAnswerId) {
-        await api.put(`/quickAnswers/${quickAnswerId}`, { shortcut: values.shortcut, message: values.message });
+        const quickAnswerIdKeys = Object.keys(values).filter((i) => i.includes('message'));
+        const quickAnswerIdMessages = Object.values(values).filter((i) => i !== values.id && i !== values.shortcut && i !== values.createdAt && i !== values.updatedAt);
+        const messageString = `${quickAnswerIdKeys.join('/:/')}, ${quickAnswerIdMessages.join('/:/')}`;
+
+        values = { shortcut: values.shortcut, message: messageString }
+        console.log('COM ID', values);
+
+        await api.put(`/quickAnswers/${quickAnswerId}`, values);
         handleClose();
       } else {
-        const { data } = await api.post("/quickAnswers", { shortcut: values.shortcut, message: values.message });
+        const quickAnswerIdKeys = Object.keys(values).filter((i) => i.includes('message'));
+        const quickAnswerIdMessages = Object.values(values).filter((i) => i !== values.id && i !== values.shortcut && i !== values.createdAt && i !== values.updatedAt);
+        const messageString = `${quickAnswerIdKeys.join('/:/')}, ${quickAnswerIdMessages.join('/:/')}`;
+        console.log(messageString);
+
+        values = { shortcut: values.shortcut, message: messageString }
+        console.log('SEM ID', values);
+
+        const { data } = await api.post("/quickAnswers", values);
         if (onSave) {
           onSave(data);
         }
@@ -176,12 +200,12 @@ const QuickAnswersModal = ({
           onSubmit={(values, actions) => {
             setTimeout(() => {
               handleSaveQuickAnswer(values);
-              setMoreQuickAnswers(["0"]);
+              setMoreQuickAnswers(["message"]);
               actions.setSubmitting(false);
             }, 400);
           }}
         >
-        {({ values, errors, touched, isSubmitting }) => (
+          {({ values, errors, touched, isSubmitting }) => (
             <Form>
               <DialogContent dividers>
                 <div className={classes.textQuickAnswerContainer}>
@@ -199,52 +223,31 @@ const QuickAnswersModal = ({
                   />
                 </div>
                 <div className={classes.textQuickAnswerContainer}>
-                  { quickAnswerId && quickAnswer.message.split('/:/').map((i, index) => (
-                    <Field
-                      key={index}
-                      as={TextField}
-                      label={i18n.t("quickAnswersModal.form.message")}
-                      name="message"
-                      error={touched.message && Boolean(errors.message)}
-                      helperText={touched.message && errors.message}
-                      variant="outlined"
-                      margin="dense"
-                      className={classes.textField}
-                      multiline
-                      rows={5}
-                      fullWidth
-                      value={quickAnswerId && index >= quickAnswer.message.split('/:/').length ? '' : i}
-                    />
-                  ))
-                  }
-                  {moreQuickAnswers.map((i, index) => (
-                      <div className={classes.textQuickAnswerContainer}>
-                        <Field
-                          key={i}
-                          as={TextField}
-                          label={i18n.t("quickAnswersModal.form.message")}
-                          name={moreQuickAnswers.length === 1 ? "message" : `message${[index]}`}
-                          error={touched.message && Boolean(errors.message)}
-                          helperText={touched.message && errors.message}
-                          variant="outlined"
-                          margin="dense"
-                          className={classes.textField}
-                          multiline
-                          fullWidth
-                          rows={5}
-                        />
-                        { /* Botão excluir nova mensagem rápida */ }
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            handleDeleteQuickAnswer(index);
-                          }}
-                        >
-                          <DeleteOutline />
-                        </IconButton>
-                      </div>
-                      ))
-                     }
+                  {moreQuickAnswers.map((answer) => (
+                    <>
+                      <Field
+                        as={TextField}
+                        label={i18n.t("quickAnswersModal.form.message")}
+                        name={answer}
+                        error={touched.message && Boolean(errors.message)}
+                        helperText={touched.message && errors.message}
+                        variant="outlined"
+                        margin="dense"
+                        className={classes.textField}
+                        multiline
+                        rows={5}
+                        fullWidth
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          handleDeleteQuickAnswer(answer);
+                        }}
+                      >
+                        <DeleteOutline />
+                      </IconButton>
+                    </>
+                  ))}
                 </div>
               </DialogContent>
               <DialogActions>
@@ -254,7 +257,7 @@ const QuickAnswersModal = ({
                   disabled={isSubmitting}
                   variant="contained"
                   className={classes.btnWrapper}
-                  onClick={ () => handleNewQuickAnswer(values) }
+                  onClick={() => handleNewQuickAnswer()}
                 >
                   {`${i18n.t("+")}`}
                 </Button>
@@ -289,7 +292,7 @@ const QuickAnswersModal = ({
           )}
         </Formik>
       </Dialog>
-    </div>
+    </div >
   );
 };
 
