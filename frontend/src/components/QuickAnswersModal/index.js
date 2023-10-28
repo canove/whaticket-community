@@ -116,17 +116,13 @@ const QuickAnswersModal = ({
     setMoreQuickAnswers(["message"])
   };
 
-  const handleNewQuickAnswer = () => {
-    if (quickAnswerId) {
-      let i = moreQuickAnswers.length - 1;
-      if (moreQuickAnswers.length === 0) return setMoreQuickAnswers(["message"]);
-      return setMoreQuickAnswers([...moreQuickAnswers, `message${i += 1}`]);
-    } else {
-      if (moreQuickAnswers.length >= 1) {
-        let i = moreQuickAnswers.length - 1;
-        return setMoreQuickAnswers([...moreQuickAnswers, `message${i += 1}`]);
-      }
+  const handleNewQuickAnswer = (values) => {
+    const fields = Object.keys(values).filter((key) => key.includes('message'));
+    for (let i = 0; i <= fields.length - 1; i += 1) {
+      values[`message${[fields.length - 1 + 1]}`] = undefined;
+      setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
     }
+
   }
 
   const handleDeleteQuickAnswer = (values, answer) => {
@@ -246,7 +242,7 @@ const QuickAnswersModal = ({
                   disabled={isSubmitting}
                   variant="contained"
                   className={classes.btnWrapper}
-                  onClick={() => handleNewQuickAnswer()}
+                  onClick={() => handleNewQuickAnswer(values)}
                 >
                   {`${i18n.t("+")}`}
                 </Button>
