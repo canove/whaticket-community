@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import { Button, Divider, } from "@material-ui/core";
 
 const LocationPreview = ({ image, link, description }) => {
-    useEffect(() => {console.log(link);}, [image, link, description]);
+    useEffect(() => {}, [image, link, description]);
 
     const handleLocation = async() => {
         try {
@@ -24,7 +24,7 @@ const LocationPreview = ({ image, link, description }) => {
 			}}>
 				<div>
 					<div style={{ float: "left" }}>
-						<img src={image} alt="map-image-location-preview" onClick={handleLocation} style={{ width: "100px" }} />
+						<img src={image} alt="map-view-iew-location-preview" onClick={handleLocation} style={{ width: "100px" }} />
 					</div>
 					{ description && (
 					<div style={{ display: "flex", flexWrap: "wrap" }}>
