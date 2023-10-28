@@ -242,7 +242,7 @@ const MessageInput = ({ ticketStatus }) => {
   };
 
   const handleQuickAnswersClick = (value) => {
-    const quickAnswer = value.split('/*/')[1].split('/:/');
+    const quickAnswer = value.split('/:/');
 
     setInputMessage(quickAnswer);
     setTypeBar(false);
@@ -290,7 +290,6 @@ const MessageInput = ({ ticketStatus }) => {
   };
 
   const handleSendMessage = async () => {
-
     if (String(inputMessage).trim() === "") return;
     setLoading(true);
 
@@ -621,7 +620,7 @@ const MessageInput = ({ ticketStatus }) => {
               }
               multiline
               maxRows={5}
-              value={inputMessage}
+              value={typeof inputMessage !== 'string' ? Object.values(inputMessage).join('\n') : inputMessage}
               onChange={handleChangeInput}
               disabled={recording || loading || ticketStatus !== "open"}
               onPaste={(e) => {
@@ -644,7 +643,7 @@ const MessageInput = ({ ticketStatus }) => {
                     >
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a onClick={() => handleQuickAnswersClick(value.message)}>
-                        {`${value.shortcut} - ${value.message.split('/*/')[1].split('/:/').join('/')} `}
+                        {`${value.shortcut} - ${value.message.split('/:/').join('/')} `}
                       </a>
                     </li>
                   );
