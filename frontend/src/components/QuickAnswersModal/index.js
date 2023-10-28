@@ -137,6 +137,7 @@ const QuickAnswersModal = ({
       setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
     } else {
       delete values[answer]
+      setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
     }
 
   }
@@ -216,7 +217,7 @@ const QuickAnswersModal = ({
                 </div>
                 <div className={classes.textQuickAnswerContainer}>
                   {moreQuickAnswers.map((answer) => (
-                    <>
+                    <div key={answer}>
                       <Field
                         as={TextField}
                         label={i18n.t("quickAnswersModal.form.message")}
@@ -227,7 +228,7 @@ const QuickAnswersModal = ({
                         margin="dense"
                         className={classes.textField}
                         multiline
-                        rows={5}
+                        minRows={5}
                         fullWidth
                       />
                       <IconButton
@@ -238,7 +239,7 @@ const QuickAnswersModal = ({
                       >
                         <DeleteOutline />
                       </IconButton>
-                    </>
+                    </div>
                   ))}
                 </div>
               </DialogContent>
