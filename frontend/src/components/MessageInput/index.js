@@ -240,10 +240,9 @@ const MessageInput = ({ ticketStatus }) => {
   };
 
   const handleQuickAnswersClick = (value) => {
-    if (value.includes('/:/')) {
-      value = String(value);
-    }
-    setInputMessage(value);
+    const quickAnswer = value.split('/*/')[1].split('/:/');
+
+    setInputMessage((quickAnswer));
     setTypeBar(false);
   };
 
@@ -289,42 +288,23 @@ const MessageInput = ({ ticketStatus }) => {
   };
 
   const handleSendMessage = async () => {
-    if (inputMessage.trim() === "") return;
+
+    if (String(inputMessage).trim() === "") return;
     setLoading(true);
 
-    if (!inputMessage.trim().includes('/:/')) {
-      const message = {
-        read: 1,
-        fromMe: true,
-        mediaUrl: "",
-        body: signMessage
-        ? `*${user?.name}:*\n${inputMessage.trim()}`
-        : inputMessage.trim(),
-        quotedMsg: replyingMessage,
-      }
-    try {
-      await api.post(`/messages/${ticketId}`, message);
-    } catch (err) {
-      toastError(err);
-    }
-  
-    setInputMessage("");
-    setShowEmoji(false);
-    setLoading(false);
-    setReplyingMessage(null); 
-    }
+    if (typeof inputMessage !== 'string') {
+      const arrayQuickMessages = Object.values(inputMessage);
+      const limit = inputMessage.length;
 
-    if (inputMessage.trim().includes('/:/')) {
-      const arrayMessages = inputMessage.split('/:/');
-      const limit = arrayMessages.length;
-      for(let i = 0; i < limit; i += 1){
+      for (let i = 0; i < limit; i += 1) {
+        setTimeout(async () => {
           const message = {
             read: 1,
             fromMe: true,
             mediaUrl: "",
             body: signMessage
-            ? `*${user?.name}:*\n${arrayMessages[i].trim()}`
-            : inputMessage.trim(),
+              ? `*${user?.name}:*\n${arrayQuickMessages[i].trim()}`
+              : inputMessage.trim(),
             quotedMsg: replyingMessage,
           }
           try {
@@ -335,8 +315,31 @@ const MessageInput = ({ ticketStatus }) => {
           setInputMessage("");
           setShowEmoji(false);
           setLoading(false);
-          setReplyingMessage(null); 
+          setReplyingMessage(null);
+
+        }, 800 * i); //0,8seg * i
       }
+
+    } else {
+      const message = {
+        read: 1,
+        fromMe: true,
+        mediaUrl: "",
+        body: signMessage
+          ? `*${user?.name}:*\n${inputMessage.trim()}`
+          : inputMessage.trim(),
+        quotedMsg: replyingMessage,
+      }
+      try {
+        await api.post(`/messages/${ticketId}`, message);
+      } catch (err) {
+        toastError(err);
+      }
+
+      setInputMessage("");
+      setShowEmoji(false);
+      setLoading(false);
+      setReplyingMessage(null);
     }
   }
 
@@ -359,7 +362,7 @@ const MessageInput = ({ ticketStatus }) => {
         const { data } = await api.get("/quickAnswers/", {
           params: { searchParam: inputMessage.substring(1) },
         });
-        
+
         setQuickAnswer(data.quickAnswers);
         if (data.quickAnswers.length > 0) {
           setTypeBar(true);
@@ -639,7 +642,7 @@ const MessageInput = ({ ticketStatus }) => {
                     >
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a onClick={() => handleQuickAnswersClick(value.message)}>
-                        {`${value.shortcut} - ${value.message.split('/:/')}`}
+                        {`${value.shortcut} - ${value.message.split('/*/')[1].split('/:/').join('/')} `}
                       </a>
                     </li>
                   );

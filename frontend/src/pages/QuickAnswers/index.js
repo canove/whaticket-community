@@ -37,7 +37,6 @@ const reducer = (state, action) => {
 
     quickAnswers.forEach((quickAnswer) => {
       const quickAnswerIndex = state.findIndex((q) => q.id === quickAnswer.id);
-      console.log(quickAnswer);
       if (quickAnswerIndex !== -1) {
         state[quickAnswerIndex] = quickAnswer;
       } else {

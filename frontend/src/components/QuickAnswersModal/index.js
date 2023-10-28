@@ -149,7 +149,6 @@ const QuickAnswersModal = ({
         const messageString = `${quickAnswerIdKeys.join('/:/')}/*/${quickAnswerIdMessages.join('/:/')}`;
 
         values = { shortcut: values.shortcut, message: messageString }
-        console.log('COM ID', values);
 
         await api.put(`/quickAnswers/${quickAnswerId}`, values);
         handleClose();
@@ -157,10 +156,8 @@ const QuickAnswersModal = ({
         const quickAnswerIdKeys = Object.keys(values).filter((i) => i.includes('message'));
         const quickAnswerIdMessages = Object.values(values).filter((i) => i !== values.id && i !== values.shortcut && i !== values.createdAt && i !== values.updatedAt);
         const messageString = `${quickAnswerIdKeys.join('/:/')}/*/${quickAnswerIdMessages.join('/:/')}`;
-        console.log(messageString);
 
         values = { shortcut: values.shortcut, message: messageString }
-        console.log('SEM ID', values);
 
         const { data } = await api.post("/quickAnswers", values);
         if (onSave) {
