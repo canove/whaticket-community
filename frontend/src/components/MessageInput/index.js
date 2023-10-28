@@ -235,14 +235,17 @@ const MessageInput = ({ ticketStatus }) => {
   }, [ticketId, setReplyingMessage]);
 
   const handleChangeInput = (e) => {
-    setInputMessage(e.target.value);
-    handleLoadQuickAnswer(e.target.value);
+    if (typeof inputMessage === 'string') {
+      setInputMessage(e.target.value);
+      handleLoadQuickAnswer(e.target.value);
+    }
   };
 
   const handleQuickAnswersClick = (value) => {
     const quickAnswer = value.split('/*/')[1].split('/:/');
+    console.log(quickAnswer);
 
-    setInputMessage((quickAnswer));
+    setInputMessage(quickAnswer);
     setTypeBar(false);
   };
 
