@@ -243,7 +243,6 @@ const MessageInput = ({ ticketStatus }) => {
 
   const handleQuickAnswersClick = (value) => {
     const quickAnswer = value.split('/*/')[1].split('/:/');
-    console.log(quickAnswer);
 
     setInputMessage(quickAnswer);
     setTypeBar(false);
