@@ -90,9 +90,9 @@ const QuickAnswersModal = ({
           return { ...prevState, ...initialValues };
         });
       }
-
+      console.log('SEM ID');
       if (!quickAnswerId) return;
-
+      console.log('COM ID');
       try {
         const { data } = await api.get(`/quickAnswers/${quickAnswerId}`);
         const messagesValues = data.message.split('/:/');
@@ -113,11 +113,14 @@ const QuickAnswersModal = ({
 
   const handleClose = () => {
     onClose();
-    setMoreQuickAnswers(["message"])
+    setQuickAnswer(initialState);
+    setMoreQuickAnswers(["message"]);
   };
 
   const handleNewQuickAnswer = (values) => {
+    console.log(values);
     const fields = Object.keys(values).filter((key) => key.includes('message'));
+
     for (let i = 0; i <= fields.length - 1; i += 1) {
       values[`message${[fields.length - 1 + 1]}`] = undefined;
       setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
@@ -126,13 +129,23 @@ const QuickAnswersModal = ({
   }
 
   const handleDeleteQuickAnswer = (values, answer) => {
+    console.log(values);
     const fields = Object.keys(values).filter((key) => key.includes('message'));
-      if(fields.length > 1 || values[answer] === undefined) {
+    if (quickAnswerId) {
+      if (fields.length > 1 || values[answer] === undefined) {
         delete values[answer]
         setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
       } else {
         toast.error("Não foi possível completar a ação. É necessário ter pelo menos uma mensagem")
       }
+    } else {
+      if (fields.length > 1 || values[answer] === undefined) {
+        delete values[answer]
+        setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
+      } else {
+        toast.error("Não foi possível completar a ação. É necessário ter pelo menos uma mensagem")
+      }
+    }
 
   }
 
@@ -146,6 +159,7 @@ const QuickAnswersModal = ({
 
         await api.put(`/quickAnswers/${quickAnswerId}`, values);
         handleClose();
+
       } else {
         const quickAnswerIdMessages = Object.values(values).filter((i) => i !== values.id && i !== values.shortcut && i !== values.createdAt && i !== values.updatedAt);
         const messageString = `${quickAnswerIdMessages.join('/:/')}`;
