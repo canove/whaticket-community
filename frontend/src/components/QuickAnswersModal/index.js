@@ -90,9 +90,7 @@ const QuickAnswersModal = ({
           return { ...prevState, ...initialValues };
         });
       }
-      console.log('SEM ID');
       if (!quickAnswerId) return;
-      console.log('COM ID');
       try {
         const { data } = await api.get(`/quickAnswers/${quickAnswerId}`);
         const messagesValues = data.message.split('/:/');
@@ -129,7 +127,6 @@ const QuickAnswersModal = ({
   }
 
   const handleDeleteQuickAnswer = (values, answer) => {
-    console.log(values);
     const fields = Object.keys(values).filter((key) => key.includes('message'));
     if (quickAnswerId) {
       if (fields.length > 1 || values[answer] === undefined) {
