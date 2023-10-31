@@ -53,7 +53,7 @@ const QuickAnswerSchema = Yup.object().shape({
     .min(2, "Too Short!")
     .max(15, "Too Long!")
     .required("Required"),
-  message: Yup.string()
+   message: Yup.string()
     .min(8, "Too Short!")
     .max(30000, "Too Long!")
     .required("Required"),
@@ -116,11 +116,15 @@ const QuickAnswersModal = ({
   };
 
   const handleNewQuickAnswer = (values) => {
-    console.log(values);
     const fields = Object.keys(values).filter((key) => key.includes('message'));
 
     for (let i = 0; i <= fields.length - 1; i += 1) {
       values[`message${[fields.length - 1 + 1]}`] = undefined;
+      quickAnswer[`message${[i + 1]}`] = null;
+      QuickAnswerSchema.fields[`message${[i + 1]}`] = Yup.string()
+      .min(8, "Too Short!")
+      .max(30000, "Too Long!")
+      .required("Required");
       setMoreQuickAnswers(Object.keys(values).filter((key) => key.includes('message')));
     }
 
@@ -216,6 +220,7 @@ const QuickAnswersModal = ({
                     margin="dense"
                     className={classes.textField}
                     fullWidth
+
                   />
                 </div>
                 <div className={classes.textQuickAnswerContainer}>
@@ -225,8 +230,8 @@ const QuickAnswersModal = ({
                         as={TextField}
                         label={i18n.t("quickAnswersModal.form.message")}
                         name={answer}
-                        error={touched.message && Boolean(errors.message)}
-                        helperText={touched.message && errors.message}
+                        error={touched[answer] && Boolean(errors[answer])}
+                        helperText={touched[answer] && errors[answer]}
                         variant="outlined"
                         margin="dense"
                         className={classes.textField}
