@@ -54,7 +54,6 @@ let dinamicSchema = {
     .max(15, "Too Long!")
     .required("Required"),
   message: Yup.string()
-    .min(8, "Too Short!")
     .max(30000, "Too Long!")
     .required("Required"),
 }
