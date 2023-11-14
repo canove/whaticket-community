@@ -417,7 +417,10 @@ const MessageInput = ({ ticketStatus }) => {
           aria-label="showRecorder"
           component="span"
           disabled={loading || ticketStatus !== "open"}
-          onClick={() => setReplyingMessage(null)}
+          onClick={() => {
+            setReplyingMessage(null);
+            setEditingMessage(null);
+          }}
         >
           <ClearIcon className={classes.sendMessageIcons} />
         </IconButton>
