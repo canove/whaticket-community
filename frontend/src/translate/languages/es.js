@@ -423,6 +423,7 @@ const messages = {
       },
       messageOptionsMenu: {
         delete: "Borrar",
+        edit: "Editar",
         reply: "Responder",
         confirmationModal: {
           title: "¿Borrar mensaje?",
@@ -445,6 +446,7 @@ const messages = {
         ERR_SENDING_WAPP_MSG:
           "Error al enviar el mensaje de WhatsApp. Verifique la página de conexiones.",
         ERR_DELETE_WAPP_MSG: "No se pudo borrar el mensaje de WhatsApp.",
+        ERR_EDITING_WAPP_MSG: "No se pudo editar el mesaje de WhatsApp.",
         ERR_OTHER_OPEN_TICKET: "Ya hay un ticket abierto para este contacto.",
         ERR_SESSION_EXPIRED: "Sesión caducada. Inicie sesión.",
         ERR_USER_CREATION_DISABLED:

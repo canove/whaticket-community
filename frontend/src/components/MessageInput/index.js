@@ -36,6 +36,7 @@ import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessa
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
+import { EditMessageContext } from "../../context/EditingMessage/EditingMessageContext";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -216,13 +217,15 @@ const MessageInput = ({ ticketStatus }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { setReplyingMessage, replyingMessage } =
     useContext(ReplyMessageContext);
+  const { setEditingMessage, editingMessage } =
+    useContext(EditMessageContext);
   const { user } = useContext(AuthContext);
 
   const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
 
   useEffect(() => {
     inputRef.current.focus();
-  }, [replyingMessage]);
+  }, [replyingMessage, editingMessage]);
 
   useEffect(() => {
     inputRef.current.focus();
@@ -231,8 +234,9 @@ const MessageInput = ({ ticketStatus }) => {
       setShowEmoji(false);
       setMedias([]);
       setReplyingMessage(null);
+      setEditingMessage(null);
     };
-  }, [ticketId, setReplyingMessage]);
+  }, [ticketId, setReplyingMessage, setEditingMessage]);
 
   const handleChangeInput = (e) => {
     setInputMessage(e.target.value);
@@ -299,7 +303,12 @@ const MessageInput = ({ ticketStatus }) => {
       quotedMsg: replyingMessage,
     };
     try {
-      await api.post(`/messages/${ticketId}`, message);
+      if (editingMessage !== null) {
+        await api.post(`/messages/edit/${editingMessage.id}`, message);
+      }
+      else {
+        await api.post(`/messages/${ticketId}`, message);
+      }
     } catch (err) {
       toastError(err);
     }
@@ -308,6 +317,7 @@ const MessageInput = ({ ticketStatus }) => {
     setShowEmoji(false);
     setLoading(false);
     setReplyingMessage(null);
+    setEditingMessage(null);
   };
 
   const handleStartRecording = async () => {
@@ -449,7 +459,7 @@ const MessageInput = ({ ticketStatus }) => {
   else {
     return (
       <Paper square elevation={0} className={classes.mainWrapper}>
-        {replyingMessage && renderReplyingMessage(replyingMessage)}
+        {(replyingMessage && renderReplyingMessage(replyingMessage)) || (editingMessage && renderReplyingMessage(editingMessage))}
         <div className={classes.newMessageBox}>
           <Hidden only={["sm", "xs"]}>
             <IconButton

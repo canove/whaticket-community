@@ -197,6 +197,11 @@ const useStyles = makeStyles((theme) => ({
     padding: "3px 80px 6px 6px",
   },
 
+  textContentItemEdited: {
+    overflowWrap: "break-word",
+    padding: "3px 120px 6px 6px",
+  },
+
   messageMedia: {
     objectFit: "cover",
     width: 250,
@@ -649,6 +654,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
                 <div
                   className={clsx(classes.textContentItem, {
                     [classes.textContentItemDeleted]: message.isDeleted,
+                    [classes.textContentItemEdited] : message.isEdited
                   })}
                 >
                   {message.isDeleted && (
@@ -661,6 +667,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   <span className={classes.timestamp}>
+                    {message.isEdited && <span>Editada </span>}
                     {format(parseISO(message.createdAt), "HH:mm")}
                     {renderMessageAck(message)}
                   </span>

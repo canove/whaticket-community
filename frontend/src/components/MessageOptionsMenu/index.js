@@ -7,10 +7,12 @@ import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import { Menu } from "@material-ui/core";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import { EditMessageContext } from "../../context/EditingMessage/EditingMessageContext";
 import toastError from "../../errors/toastError";
 
 const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
   const { setReplyingMessage } = useContext(ReplyMessageContext);
+  const { setEditingMessage } = useContext(EditMessageContext);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   const handleDeleteMessage = async () => {
@@ -21,7 +23,7 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
     }
   };
 
-  const hanldeReplyMessage = () => {
+  const handleReplyMessage = () => {
     setReplyingMessage(message);
     handleClose();
   };
@@ -30,6 +32,11 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
     setConfirmationOpen(true);
     handleClose();
   };
+
+  const handleEditMessage = async () => {
+    setEditingMessage(message);
+    handleClose();
+  }
 
   return (
     <>
@@ -55,12 +62,15 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
         open={menuOpen}
         onClose={handleClose}
       >
-        {message.fromMe && (
-          <MenuItem onClick={handleOpenConfirmationModal}>
+        {message.fromMe && [
+          <MenuItem key="delete" onClick={handleOpenConfirmationModal}>
             {i18n.t("messageOptionsMenu.delete")}
+          </MenuItem>,
+          <MenuItem key="edit" onClick={handleEditMessage}>
+            {i18n.t("messageOptionsMenu.edit")}
           </MenuItem>
-        )}
-        <MenuItem onClick={hanldeReplyMessage}>
+        ]}
+        <MenuItem key="reply" onClick={handleReplyMessage}>
           {i18n.t("messageOptionsMenu.reply")}
         </MenuItem>
       </Menu>

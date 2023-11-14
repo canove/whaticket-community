@@ -416,6 +416,7 @@ const messages = {
       },
       messageOptionsMenu: {
         delete: "Delete",
+        edit: "Edit",
         reply: "Reply",
         confirmationModal: {
           title: "Delete message?",
@@ -438,6 +439,7 @@ const messages = {
         ERR_SENDING_WAPP_MSG:
           "Error sending WhatsApp message. Check connections page.",
         ERR_DELETE_WAPP_MSG: "Couldn't delete message from WhatsApp.",
+        ERR_EDITING_WAPP_MSG: "Couldn't edit message from WhatsApp.",
         ERR_OTHER_OPEN_TICKET:
           "There's already an open ticket for this contact.",
         ERR_SESSION_EXPIRED: "Session expired. Please login.",
@@ -457,7 +459,7 @@ const messages = {
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
-          "Greeting message is required if there is more than one queue.",
+          "Greeting message is required if there is more than one queue.",  
       },
     },
   },

@@ -241,7 +241,8 @@ const isValidMsg = (msg: WbotMessage): boolean => {
 
 const handleMessage = async (
   msg: WbotMessage,
-  wbot: Session
+  wbot: Session,
+  newBody?: String
 ): Promise<void> => {
   if (!isValidMsg(msg)) {
     return;
@@ -250,6 +251,10 @@ const handleMessage = async (
   try {
     let msgContact: WbotContact;
     let groupContact: Contact | undefined;
+
+    if (newBody !== undefined) {
+      msg.body = newBody.toString();
+    }
 
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
@@ -445,6 +450,10 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
     handleMessage(msg, wbot);
+  });
+
+  wbot.on("message_edit", async (msg, newBody) => {
+    handleMessage(msg, wbot, newBody);
   });
 
   wbot.on("media_uploaded", async msg => {
