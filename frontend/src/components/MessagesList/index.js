@@ -596,7 +596,6 @@ const MessagesList = ({ ticketId, isGroup }) => {
   };
 
   const renderMessages = () => {
-    if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
         if (!message.fromMe) {
           return (
@@ -678,9 +677,6 @@ const MessagesList = ({ ticketId, isGroup }) => {
         }
       });
       return viewMessagesList;
-    } else {
-      return <div>Say hello to your new contact!</div>;
-    }
   };
 
   return (
