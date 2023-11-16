@@ -388,6 +388,9 @@ const messages = {
         placeholderClosed: "Reopen or accept this ticket to send a message.",
         signMessage: "Sign",
       },
+      message: {
+        edited: "Edited"
+      },
       contactDrawer: {
         header: "Contact details",
         buttons: {

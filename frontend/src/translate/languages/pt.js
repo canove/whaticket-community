@@ -393,6 +393,9 @@ const messages = {
           "Reabra ou aceite esse ticket para enviar uma mensagem.",
         signMessage: "Assinar",
       },
+      message: {
+        edited: "Editada"
+      },
       contactDrawer: {
         header: "Dados do contato",
         buttons: {
@@ -404,7 +407,8 @@ const messages = {
         delete: "Deletar",
         transfer: "Transferir",
         confirmationModal: {
-          title: "Deletar o ticket do contato",
+          title: "Deletar o ticket #",
+          titleFrom: "do contato ",
           message:
             "Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
         },

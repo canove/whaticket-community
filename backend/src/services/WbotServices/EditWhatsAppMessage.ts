@@ -23,9 +23,9 @@ const EditWhatsAppMessage = async (messageId: string, newBody: string): Promise<
   const messageToEdit = await GetWbotMessage(ticket, messageId);
 
   try {
-    await messageToEdit.edit(newBody).then((res) => {
-        if (res === null) throw new Error("Can't edit");
-    });
+    const res = await messageToEdit.edit(newBody);
+    if (res === null)
+      throw new Error("Can't edit");
   } catch (err) {
     throw new AppError("ERR_EDITING_WAPP_MSG");
   }

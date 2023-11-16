@@ -394,6 +394,9 @@ const messages = {
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
         signMessage: "Firmar",
       },
+      message: {
+        edited: "Editado"
+      },
       contactDrawer: {
         header: "Detalles del contacto",
         buttons: {
