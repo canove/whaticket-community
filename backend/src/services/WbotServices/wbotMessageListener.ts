@@ -476,8 +476,6 @@ const handleMsgEdit = async (
 
     await editedMsg.reload();
 
-    logger.info(JSON.stringify(editedMsg));
-
     io.to(editedMsg.ticketId.toString()).emit("appMessage", {
       action: "update",
       message: editedMsg
