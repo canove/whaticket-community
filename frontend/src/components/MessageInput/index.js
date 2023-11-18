@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
 import MicRecorder from "mic-recorder-to-mp3";
 import clsx from "clsx";
+import PropTypes from "prop-types";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -211,7 +212,7 @@ const MessageInput = ({ ticketStatus }) => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
-  const [quickAnswers, setQuickAnswer] = useState([]);
+  const [quickAnswers, setQuickAnswers] = useState([]);
   const [typeBar, setTypeBar] = useState(false);
   const inputRef = useRef();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -339,7 +340,7 @@ const MessageInput = ({ ticketStatus }) => {
         const { data } = await api.get("/quickAnswers/", {
           params: { searchParam: inputMessage.substring(1) },
         });
-        setQuickAnswer(data.quickAnswers);
+        setQuickAnswers(data.quickAnswers);
         if (data.quickAnswers.length > 0) {
           setTypeBar(true);
         } else {
@@ -683,5 +684,9 @@ const MessageInput = ({ ticketStatus }) => {
     );
   }
 };
+
+MessageInput.propTypes = {
+  ticketStatus: PropTypes.string
+}
 
 export default MessageInput;

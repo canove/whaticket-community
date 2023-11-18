@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import PropTypes from "prop-types";
 
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -95,5 +96,12 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
     </>
   );
 };
+
+MessageOptionsMenu.propTypes = {
+  message: PropTypes.object,
+  menuOpen: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  anchorEl: PropTypes.object
+}
 
 export default MessageOptionsMenu;

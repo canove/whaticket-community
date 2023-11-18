@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer, useRef } from "react";
+import PropTypes from "prop-types";
 
 import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -708,5 +709,10 @@ const MessagesList = ({ ticketId, isGroup }) => {
     </div>
   );
 };
+
+MessagesList.propTypes = {
+  ticketId: PropTypes.string.isRequired,
+  isGroup: PropTypes.bool 
+}
 
 export default MessagesList;
