@@ -22,6 +22,7 @@ import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import {
+  Box,
   FormControlLabel,
   Hidden,
   Menu,
@@ -29,6 +30,7 @@ import {
   Switch,
 } from "@material-ui/core";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -213,7 +215,6 @@ const MessageInput = ({ ticketStatus }) => {
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
   const [quickAnswers, setQuickAnswers] = useState([]);
-  const [typeBar, setTypeBar] = useState(false);
   const inputRef = useRef();
   const [anchorEl, setAnchorEl] = useState(null);
   const { setReplyingMessage, replyingMessage } =
@@ -239,14 +240,11 @@ const MessageInput = ({ ticketStatus }) => {
     };
   }, [ticketId, setReplyingMessage, setEditingMessage]);
 
-  const handleChangeInput = (e) => {
-    setInputMessage(e.target.value);
-    handleLoadQuickAnswer(e.target.value);
-  };
-
-  const handleQuickAnswersClick = (value) => {
-    setInputMessage(value);
-    setTypeBar(false);
+  const handleChangeInput = (event, newValue, reason) => {
+    if (reason === "reset") return;
+    
+    setInputMessage(newValue);
+    handleLoadQuickAnswer(newValue);
   };
 
   const handleAddEmoji = (e) => {
@@ -335,22 +333,24 @@ const MessageInput = ({ ticketStatus }) => {
   };
 
   const handleLoadQuickAnswer = async (value) => {
-    if (value && value.indexOf("/") === 0) {
+    if (value && value.indexOf("/") === 0 && !/\s/.test(value)) {
       try {
         const { data } = await api.get("/quickAnswers/", {
           params: { searchParam: inputMessage.substring(1) },
         });
         setQuickAnswers(data.quickAnswers);
-        if (data.quickAnswers.length > 0) {
-          setTypeBar(true);
-        } else {
-          setTypeBar(false);
-        }
       } catch (err) {
-        setTypeBar(false);
+        setQuickAnswers([]);
       }
     } else {
-      setTypeBar(false);
+      setQuickAnswers([]);
+    }
+  };
+
+  const handleSelectQuickAnswer = (event, newValue) => {
+    if (newValue?.message) {
+      setInputMessage(`${newValue.message}`);
+      setQuickAnswers([]);
     }
   };
 
@@ -586,51 +586,54 @@ const MessageInput = ({ ticketStatus }) => {
             </Menu>
           </Hidden>
           <div className={classes.messageInputWrapper}>
-            <InputBase
-              inputRef={(input) => {
-                input && input.focus();
-                input && (inputRef.current = input);
-              }}
-              className={classes.messageInput}
-              placeholder={
-                ticketStatus === "open"
-                  ? i18n.t("messagesInput.placeholderOpen")
-                  : i18n.t("messagesInput.placeholderClosed")
+            <Autocomplete
+              options={quickAnswers}
+              freeSolo
+              fullWidth
+              disableClearable
+              getOptionLabel={(option) => option.shortcut || ""}
+              filterOptions={(options) =>
+                options.filter(({ shortcut }) => 
+                  shortcut.toLowerCase().includes(inputMessage.substring(1).toLowerCase()))
               }
-              multiline
-              maxRows={5}
-              value={inputMessage}
-              onChange={handleChangeInput}
+              inputValue={inputMessage}
+              onInputChange={handleChangeInput}
+              onChange={handleSelectQuickAnswer}
               disabled={recording || loading || ticketStatus !== "open"}
               onPaste={(e) => {
                 ticketStatus === "open" && handleInputPaste(e);
               }}
-              onKeyPress={(e) => {
-                if (loading || e.shiftKey) return;
+              onKeyDown={(e) => {
+                if (loading || e.shiftKey || quickAnswers.length > 0) return;
                 else if (e.key === "Enter") {
                   handleSendMessage();
                 }
               }}
+              renderOption={(option) => (
+                <Box component="li" dense>
+                  {option.shortcut} - {option.message}
+                </Box>
+              )}
+              renderInput={(params) => {
+                const { InputLabelProps, InputProps, ...rest } = params;
+                return <InputBase
+                  {...params.InputProps}
+                  {...rest}
+                  inputRef={(input) => {
+                    input && input.focus();
+                    input && (inputRef.current = input);
+                  }}
+                  className={classes.messageInput}
+                  placeholder={
+                    ticketStatus === "open"
+                    ? i18n.t("messagesInput.placeholderOpen")
+                    : i18n.t("messagesInput.placeholderClosed")
+                  }
+                  multiline
+                  maxRows={5}
+                />
+              }}
             />
-            {typeBar ? (
-              <ul className={classes.messageQuickAnswersWrapper}>
-                {quickAnswers.map((value, index) => {
-                  return (
-                    <li
-                      className={classes.messageQuickAnswersWrapperItem}
-                      key={index}
-                    >
-                      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                      <a onClick={() => handleQuickAnswersClick(value.message)}>
-                        {`${value.shortcut} - ${value.message}`}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <div></div>
-            )}
           </div>
           {inputMessage ? (
             <IconButton
