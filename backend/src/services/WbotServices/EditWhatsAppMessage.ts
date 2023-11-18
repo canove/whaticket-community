@@ -30,8 +30,6 @@ const EditWhatsAppMessage = async (messageId: string, newBody: string): Promise<
     throw new AppError("ERR_EDITING_WAPP_MSG");
   }
 
-  await message.update({ isEdited: true });
-
   return message;
 };
 

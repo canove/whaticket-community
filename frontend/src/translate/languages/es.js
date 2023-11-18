@@ -427,11 +427,16 @@ const messages = {
       messageOptionsMenu: {
         delete: "Borrar",
         edit: "Editar",
+        history: "Histórico",
         reply: "Responder",
         confirmationModal: {
           title: "¿Borrar mensaje?",
           message: "Esta acción no puede ser revertida.",
         },
+      },
+      messageHistoryModal: {
+        close: "Close",
+        title: "Message edit history"
       },
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:

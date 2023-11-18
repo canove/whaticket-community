@@ -622,10 +622,15 @@ const MessagesList = ({ ticketId, isGroup }) => {
               {(message.mediaUrl || message.mediaType === "location" || message.mediaType === "vcard"
                 //|| message.mediaType === "multi_vcard" 
               ) && checkMessageMedia(message)}
-              <div className={classes.textContentItem}>
+              <div
+                className={clsx(classes.textContentItem, {
+                  [classes.textContentItemEdited] : message.isEdited
+                })}
+              >
                 {message.quotedMsg && renderQuotedMessage(message)}
                 <MarkdownWrapper>{message.body}</MarkdownWrapper>
                 <span className={classes.timestamp}>
+                  {message.isEdited && <span>{i18n.t("message.edited")} </span>}
                   {format(parseISO(message.createdAt), "HH:mm")}
                 </span>
               </div>

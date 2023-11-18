@@ -25,6 +25,7 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
+import OldMessage from "../../models/OldMessage";
 
 interface Session extends Client {
   id?: number;
@@ -241,8 +242,7 @@ const isValidMsg = (msg: WbotMessage): boolean => {
 
 const handleMessage = async (
   msg: WbotMessage,
-  wbot: Session,
-  newBody?: String
+  wbot: Session
 ): Promise<void> => {
   if (!isValidMsg(msg)) {
     return;
@@ -251,10 +251,6 @@ const handleMessage = async (
   try {
     let msgContact: WbotContact;
     let groupContact: Contact | undefined;
-
-    if (newBody !== undefined) {
-      msg.body = newBody.toString();
-    }
 
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
@@ -429,6 +425,10 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
           model: Message,
           as: "quotedMsg",
           include: ["contact"]
+        },
+        {
+          model: OldMessage,
+          as: "oldMessages"
         }
       ]
     });
@@ -447,13 +447,54 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
   }
 };
 
+const handleMsgEdit = async (
+  msg: WbotMessage,
+  newBody: string,
+  oldBody: string
+): Promise<void> => {
+  let editedMsg = await Message.findByPk(msg.id.id, {
+    include: [
+      {
+        model: OldMessage,
+        as: "oldMessages"
+      }
+    ]
+  });
+
+  if (!editedMsg) return;
+
+  const io = getIO();
+
+  try {
+    const messageData = {
+      messageId: msg.id.id,
+      body: oldBody
+    }
+
+    await OldMessage.upsert(messageData);
+    await editedMsg.update({ body: newBody, isEdited: true});
+
+    await editedMsg.reload();
+
+    logger.info(JSON.stringify(editedMsg));
+
+    io.to(editedMsg.ticketId.toString()).emit("appMessage", {
+      action: "update",
+      message: editedMsg
+    });
+  } catch (err) {
+    Sentry.captureException(err);
+    logger.error(`Error handling message edit. Err: ${err}`);
+  }
+}
+
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
     handleMessage(msg, wbot);
   });
 
-  wbot.on("message_edit", async (msg, newBody) => {
-    handleMessage(msg, wbot, newBody);
+  wbot.on("message_edit", async (msg, newBody, oldBody) => {
+    handleMsgEdit(msg, newBody as string, oldBody as string);
   });
 
   wbot.on("media_uploaded", async msg => {

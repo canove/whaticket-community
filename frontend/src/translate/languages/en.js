@@ -420,11 +420,16 @@ const messages = {
       messageOptionsMenu: {
         delete: "Delete",
         edit: "Edit",
+        history: "History",
         reply: "Reply",
         confirmationModal: {
           title: "Delete message?",
           message: "This action cannot be reverted.",
         },
+      },
+      messageHistoryModal: {
+        close: "Cerrar",
+        title: "Historial de edición de mensajes"
       },
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:

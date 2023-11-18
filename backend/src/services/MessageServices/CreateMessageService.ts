@@ -1,5 +1,6 @@
 import { getIO } from "../../libs/socket";
 import Message from "../../models/Message";
+import OldMessage from "../../models/OldMessage";
 import Ticket from "../../models/Ticket";
 import Whatsapp from "../../models/Whatsapp";
 
@@ -41,6 +42,10 @@ const CreateMessageService = async ({
         model: Message,
         as: "quotedMsg",
         include: ["contact"]
+      },
+      {
+        model: OldMessage,
+        as: "oldMessages"
       }
     ]
   });
