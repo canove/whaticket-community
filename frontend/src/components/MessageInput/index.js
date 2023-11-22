@@ -226,8 +226,9 @@ const MessageInput = ({ ticketStatus }) => {
   const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
 
   useEffect(() => {
+    if (loading) return;
     inputRef.current.focus();
-  }, [replyingMessage, editingMessage]);
+  }, [replyingMessage, editingMessage, loading, ticketStatus]);
 
   useEffect(() => {
     inputRef.current.focus();
@@ -610,7 +611,7 @@ const MessageInput = ({ ticketStatus }) => {
                 }
               }}
               renderOption={(option) => (
-                <Box component="li" dense>
+                <Box>
                   {option.shortcut} - {option.message}
                 </Box>
               )}
@@ -620,10 +621,11 @@ const MessageInput = ({ ticketStatus }) => {
                   {...params.InputProps}
                   {...rest}
                   inputRef={(input) => {
-                    input && input.focus();
+                    // input && input.focus();
                     input && (inputRef.current = input);
                   }}
                   className={classes.messageInput}
+                  autoFocus
                   placeholder={
                     ticketStatus === "open"
                     ? i18n.t("messagesInput.placeholderOpen")
