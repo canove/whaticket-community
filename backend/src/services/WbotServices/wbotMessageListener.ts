@@ -148,7 +148,7 @@ const verifyMessage = async (
     read: msg.fromMe,
     quotedMsgId: quotedMsg?.id
   };
-
+  // @ts-ignore
   await ticket.update({ lastMessage: msg.type === "location" ? msg.location.description ? "Localization - " + msg.location.description.split('\\n')[0] : "Localization" : msg.body });
 
   await CreateMessageService({ messageData });
@@ -158,7 +158,7 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   let gmapsUrl = "https://maps.google.com/maps?q=" + msg.location.latitude + "%2C" + msg.location.longitude + "&z=17&hl=pt-BR";
 
   msg.body = "data:image/png;base64," + msg.body + "|" + gmapsUrl;
-
+  // @ts-ignore
   msg.body += "|" + (msg.location.description ? msg.location.description : (msg.location.latitude + ", " + msg.location.longitude))
 
   return msg;

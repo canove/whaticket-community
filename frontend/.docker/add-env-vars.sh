@@ -21,7 +21,7 @@ _addSslConfig() {
         echo "ssl_certificate ${SSL_CERTIFICATE};" >> ${FILE_CONF};
         echo "ssl_certificate_key ${SSL_CERTIFICATE_KEY};" >> ${FILE_CONF};
     else
-        echo 'listen 80;' >> ${FILE_CONF};
+        # echo 'listen 80;' >> ${FILE_CONF};
         echo "ssl ${1} not found >> ${SSL_CERTIFICATE} -> ${SSL_CERTIFICATE_KEY}"
     fi;
 }
