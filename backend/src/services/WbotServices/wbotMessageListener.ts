@@ -25,7 +25,10 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
-import { ResetResponseTimer, SendAwayMessageInterval } from "../../helpers/SendAwayMessageInterval";
+import {
+  ResetResponseTimer,
+  SendAwayMessageInterval
+} from "../../helpers/SendAwayMessageInterval";
 
 interface Session extends Client {
   id?: number;
@@ -154,8 +157,8 @@ export const verifyMessage = async (
   await ticket.update({
     lastMessage:
       msg.type === "location"
-        ? msg.location.description
-          ? `Localization - ${msg.location.description.split("\\n")[0]}`
+        ? msg.location.options
+          ? `Localization - ${msg.location.options.name || ""} ${msg.location.options.address || ""}`
           : "Localization"
         : msg.body
   });
@@ -169,8 +172,8 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   msg.body = `data:image/png;base64,${msg.body}|${gmapsUrl}`;
 
   msg.body += `|${
-    msg.location.description
-      ? msg.location.description
+    msg.location.options && msg.location.options.address
+      ? msg.location.options.address
       : `${msg.location.latitude}, ${msg.location.longitude}`
   }`;
 
