@@ -123,7 +123,6 @@ const QuickAnswersModal = ({
 
     for (let i = 0; i <= fields.length - 1; i += 1) {
     dinamicSchema[`message${[fields.length - 1 + 1]}`] = Yup.string()
-    .min(8, "Too Short!")
     .max(30000, "Too Long!")
     .required("Required");
 
