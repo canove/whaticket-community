@@ -57,11 +57,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const formatedQuickAnswer = {
     id: quickAnswer.id,
     shortcurt: quickAnswer.shortcut,
-    message: quickAnswer.message.split('/:/'),
+    message: quickAnswer.message.split("/:/"),
     createdAt: quickAnswer.createdAt,
     updatedAt: quickAnswer.updatedAt
-  }
-  
+  };
+
   return res.status(200).json(formatedQuickAnswer);
 };
 
