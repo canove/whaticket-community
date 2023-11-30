@@ -318,7 +318,7 @@ const MessageInput = ({ ticketStatus }) => {
           setLoading(false);
           setReplyingMessage(null);
 
-        }, 800 * i); //0,8seg * i
+        }, 1500 * i); //1,5seg * i
       }
 
     } else {
@@ -365,6 +365,7 @@ const MessageInput = ({ ticketStatus }) => {
         });
 
         setQuickAnswer(data.quickAnswers);
+        console.log(quickAnswers);
         if (data.quickAnswers.length > 0) {
           setTypeBar(true);
         } else {
@@ -643,7 +644,7 @@ const MessageInput = ({ ticketStatus }) => {
                     >
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a onClick={() => handleQuickAnswersClick(value.message)}>
-                        {`${value.shortcut} - ${value.message.split('/:/').join('/')} `}
+                        {`${value.shortcut} - ${value.message.split('/:/').join(' | ')} `}
                       </a>
                     </li>
                   );
