@@ -428,8 +428,8 @@ const messages = {
         },
       },
       messageHistoryModal: {
-        close: "Cerrar",
-        title: "Historial de edición de mensajes"
+        close: "Close",
+        title: "Message edit history"
       },
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:

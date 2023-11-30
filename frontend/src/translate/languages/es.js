@@ -435,8 +435,8 @@ const messages = {
         },
       },
       messageHistoryModal: {
-        close: "Close",
-        title: "Message edit history"
+        close: "Cerrar",
+        title: "Historial de edición de mensajes"
       },
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
