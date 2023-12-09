@@ -13,6 +13,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { AppBar, Tab, Tabs } from '@material-ui/core';
 
 import { i18n } from "../../translate/i18n";
 
@@ -72,6 +73,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		greetingMessage: "",
 	};
 
+	const [activeTab, setActiveTab] = useState("Editar Fila");
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
 	const greetingRef = useRef();
@@ -117,133 +119,162 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		}
 	};
 
+	const selectTab = (tab) => {
+		setActiveTab(tab)
+	}
+
 	return (
 		<div className={classes.root}>
 			<Dialog open={open} onClose={handleClose} scroll="paper">
-				<DialogTitle>
-					{queueId
-						? `${i18n.t("queueModal.title.edit")}`
-						: `${i18n.t("queueModal.title.add")}`}
-				</DialogTitle>
-				<Formik
-					initialValues={queue}
-					enableReinitialize={true}
-					validationSchema={QueueSchema}
-					onSubmit={(values, actions) => {
-						setTimeout(() => {
-							handleSaveQueue(values);
-							actions.setSubmitting(false);
-						}, 400);
-					}}
-				>
-					{({ touched, errors, isSubmitting, values }) => (
-						<Form>
-							<DialogContent dividers>
-								<Field
-									as={TextField}
-									label={i18n.t("queueModal.form.name")}
-									autoFocus
-									name="name"
-									error={touched.name && Boolean(errors.name)}
-									helperText={touched.name && errors.name}
-									variant="outlined"
-									margin="dense"
-									className={classes.textField}
-								/>
-								<Field
-									as={TextField}
-									label={i18n.t("queueModal.form.color")}
-									name="color"
-									id="color"
-									onFocus={() => {
-										setColorPickerModalOpen(true);
-										greetingRef.current.focus();
-									}}
-									error={touched.color && Boolean(errors.color)}
-									helperText={touched.color && errors.color}
-									InputProps={{
-										startAdornment: (
-											<InputAdornment position="start">
-												<div
-													style={{ backgroundColor: values.color }}
-													className={classes.colorAdorment}
-												></div>
-											</InputAdornment>
-										),
-										endAdornment: (
-											<IconButton
-												size="small"
-												color="default"
-												onClick={() => setColorPickerModalOpen(true)}
-											>
-												<Colorize />
-											</IconButton>
-										),
-									}}
-									variant="outlined"
-									margin="dense"
-								/>
-								<ColorPicker
-									open={colorPickerModalOpen}
-									handleClose={() => setColorPickerModalOpen(false)}
-									onChange={color => {
-										values.color = color;
-										setQueue(() => {
-											return { ...values, color };
-										});
-									}}
-								/>
-								<div>
+				<AppBar position="static" style={{ backgroundColor: "primary" }}>
+					<Tabs value={false} aria-label="simple tabs example">
+						<Tab label={queueId
+							? `${i18n.t("queueModal.title.edit")}`
+							: `${i18n.t("queueModal.title.add")}`}
+							onClick={({ target }) => selectTab(target.textContent)}
+							autoFocus />
+						<Tab
+							label={`${i18n.t("queueModal.title.holidays")}`}
+							onClick={({ target }) => selectTab(target.textContent)}
+						/>
+					</Tabs>
+				</AppBar>
+				{activeTab === "Feriados" ?
+					<table>
+						<thead>
+							<tr>
+								<th> Data</th>
+								<th> Feriado</th>
+								<th> Ação</th>
+							</tr>
+						</thead>
+						<tbody>
+							<td>Date</td>
+							<td>Feriado tal</td>
+							<td>botões de ação - excluir - editar</td>
+						</tbody>
+					</table>
+					:
+					<Formik
+						initialValues={queue}
+						enableReinitialize={true}
+						validationSchema={QueueSchema}
+						onSubmit={(values, actions) => {
+							setTimeout(() => {
+								handleSaveQueue(values);
+								actions.setSubmitting(false);
+							}, 400);
+						}}
+					>
+						{({ touched, errors, isSubmitting, values }) => (
+							<Form>
+								<DialogContent dividers>
 									<Field
 										as={TextField}
-										label={i18n.t("queueModal.form.greetingMessage")}
-										type="greetingMessage"
-										multiline
-										inputRef={greetingRef}
-										rows={5}
-										fullWidth
-										name="greetingMessage"
-										error={
-											touched.greetingMessage && Boolean(errors.greetingMessage)
-										}
-										helperText={
-											touched.greetingMessage && errors.greetingMessage
-										}
+										label={i18n.t("queueModal.form.name")}
+										autoFocus
+										name="name"
+										error={touched.name && Boolean(errors.name)}
+										helperText={touched.name && errors.name}
+										variant="outlined"
+										margin="dense"
+										className={classes.textField}
+									/>
+									<Field
+										as={TextField}
+										label={i18n.t("queueModal.form.color")}
+										name="color"
+										id="color"
+										onFocus={() => {
+											setColorPickerModalOpen(true);
+											greetingRef.current.focus();
+										}}
+										error={touched.color && Boolean(errors.color)}
+										helperText={touched.color && errors.color}
+										InputProps={{
+											startAdornment: (
+												<InputAdornment position="start">
+													<div
+														style={{ backgroundColor: values.color }}
+														className={classes.colorAdorment}
+													></div>
+												</InputAdornment>
+											),
+											endAdornment: (
+												<IconButton
+													size="small"
+													color="default"
+													onClick={() => setColorPickerModalOpen(true)}
+												>
+													<Colorize />
+												</IconButton>
+											),
+										}}
 										variant="outlined"
 										margin="dense"
 									/>
-								</div>
-							</DialogContent>
-							<DialogActions>
-								<Button
-									onClick={handleClose}
-									color="secondary"
-									disabled={isSubmitting}
-									variant="outlined"
-								>
-									{i18n.t("queueModal.buttons.cancel")}
-								</Button>
-								<Button
-									type="submit"
-									color="primary"
-									disabled={isSubmitting}
-									variant="contained"
-									className={classes.btnWrapper}
-								>
-									{queueId
-										? `${i18n.t("queueModal.buttons.okEdit")}`
-										: `${i18n.t("queueModal.buttons.okAdd")}`}
-									{isSubmitting && (
-										<CircularProgress
-											size={24}
-											className={classes.buttonProgress}
+									<ColorPicker
+										open={colorPickerModalOpen}
+										handleClose={() => setColorPickerModalOpen(false)}
+										onChange={color => {
+											values.color = color;
+											setQueue(() => {
+												return { ...values, color };
+											});
+										}}
+									/>
+									<div>
+										<Field
+											as={TextField}
+											label={i18n.t("queueModal.form.greetingMessage")}
+											type="greetingMessage"
+											multiline
+											inputRef={greetingRef}
+											minRows={5}
+											fullWidth
+											name="greetingMessage"
+											error={
+												touched.greetingMessage && Boolean(errors.greetingMessage)
+											}
+											helperText={
+												touched.greetingMessage && errors.greetingMessage
+											}
+											variant="outlined"
+											margin="dense"
 										/>
-									)}
-								</Button>
-							</DialogActions>
-						</Form>
-					)}
-				</Formik>
+									</div>
+								</DialogContent>
+								<DialogActions>
+									<Button
+										onClick={handleClose}
+										color="secondary"
+										disabled={isSubmitting}
+										variant="outlined"
+									>
+										{i18n.t("queueModal.buttons.cancel")}
+									</Button>
+									<Button
+										type="submit"
+										color="primary"
+										disabled={isSubmitting}
+										variant="contained"
+										className={classes.btnWrapper}
+									>
+										{queueId
+											? `${i18n.t("queueModal.buttons.okEdit")}`
+											: `${i18n.t("queueModal.buttons.okAdd")}`}
+										{isSubmitting && (
+											<CircularProgress
+												size={24}
+												className={classes.buttonProgress}
+											/>
+										)}
+									</Button>
+								</DialogActions>
+							</Form>
+						)}
+					</Formik>
+				}
 			</Dialog>
 		</div>
 	);
