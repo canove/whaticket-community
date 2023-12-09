@@ -197,6 +197,7 @@ const messages = {
           okAdd: "Adicionar",
           okEdit: "Salvar",
           cancel: "Cancelar",
+          addAllHolidays: "Adicionar todos os feriados"
         },
       },
       userModal: {
