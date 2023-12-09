@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, startTransition } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -45,14 +45,54 @@ const useStyles = makeStyles(theme => ({
 		marginTop: -12,
 		marginLeft: -12,
 	},
-	formControl: {
-		margin: theme.spacing(1),
-		minWidth: 120,
-	},
 	colorAdorment: {
 		width: 20,
 		height: 20,
 	},
+	rootDialog: {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "space-around",
+		flexWrap: "wrap",
+		height: "340px",
+	},
+	formControl: {
+		display: "flex",
+		justifyContent: "space-evenly",
+		margin: theme.spacing(1),
+		width: "80%",
+		height: "30%"
+	},
+	table: {
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "center",
+		alignItems: "center",
+		width: "90%",
+		height: "40%",
+	},
+	tableHead: {
+		width: "100%",
+		height: "fit-content",
+	},
+	tableTitles: {
+		display: "flex",
+		justifyContent: "space-evenly",
+		width: "100%",
+	},
+	tableBody: {
+		justifyContent: "center",
+		width: "100%",
+		height: "fit-content",
+	},
+	cells: {
+		width: "200px",
+		textAlign: "center"
+	},
+	buttonCells: {
+		width: "120px",
+		textAlign: "center"
+	}
 }));
 
 const QueueSchema = Yup.object().shape({
@@ -81,6 +121,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [selectedHolidays, setSelectedHolidays] = useState([]);
 	const [selected, setSelected] = useState("");
 	const greetingRef = useRef();
+
+	const options = holidays.map((holi) => holi.nome);
 
 	useEffect(() => {
 		(async () => {
@@ -128,9 +170,12 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	}
 
 	const handleNewHoliday = (event, selectedHoliday) => {
-		setSelected(selectedHoliday.nome);
-		const newList = selectedHolidays.push(selectedHoliday)
+		console.log(selectedHoliday);
+		const selection = holidays.find((i) => i.nome === selectedHoliday.props.children);
+		setSelected(selection.nome);
+		const newList = selectedHolidays.push(selection);
 		setSelectedHolidays(newList);
+		console.log("lista selecionados", selectedHolidays);
 	}
 
 	return (
@@ -153,16 +198,16 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					</Tabs>
 				</AppBar>
 				{activeTab === 1 ?
-					<DialogContent dividers={true}>
+					<DialogContent className={classes.rootDialog}>
 						<FormControl className={classes.formControl}>
-							<InputLabel id="select-label">Feriados</InputLabel>
+							<InputLabel id="select-label">Selecione um feriado</InputLabel>
 							<Select
 								id="select-id"
 								value={selected}
 								onChange={handleNewHoliday}
 							>
-								{holidays.map((holiday, index) =>
-									<MenuItem key={index} value={holiday.nome}>{holiday.nome}</MenuItem>)}
+								{options.map((holiday, index) =>
+									<MenuItem key={index}>{holiday}</MenuItem>)}
 							</Select>
 							<Button
 								variant="contained"
@@ -172,21 +217,22 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								{i18n.t("queueModal.buttons.addAllHolidays")}
 							</Button>
 						</FormControl>
-						<table>
-							<thead>
-								<tr>
-									<th>Data</th>
-									<th>Feriado</th>
-									<th>Ação</th>
-								</tr>
-							</thead>
-							<tbody>
+						<table className={classes.table}>
+							{selectedHolidays.length >= 1 ?
+								<thead className={classes.tableHead}>
+									<tr className={classes.tableTitles}>
+										<th className={classes.cells}>Data</th>
+										<th className={classes.cells}>Feriado</th>
+										<th className={classes.buttonCells}>Ação</th>
+									</tr>
+								</thead> : null}
+							<tbody className={classes.tableBody}>
 								{selectedHolidays.length >= 1
 									? selectedHolidays.map((holiday, index) =>
-										<tr key={index}>
-											<td>{holiday.data}</td>
-											<td>{holiday.nome}</td>
-											<td>
+										<tr className={classes.tableTitles} key={index}>
+											<td className={classes.cells}>{holiday.data}</td>
+											<td className={classes.cells}>{holiday.nome}</td>
+											<td className={classes.buttonCells}>
 												<IconButton
 													size="small"
 													onClick={() => console.log("Edit Feriado")}
@@ -206,7 +252,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											</td>
 										</tr>
 									)
-									: <tr><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
+									: <tr className={classes.tableTitles}><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
 							</tbody>
 						</table>
 					</DialogContent>
