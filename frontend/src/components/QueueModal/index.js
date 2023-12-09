@@ -11,9 +11,9 @@ import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { AppBar, Tab, Tabs } from '@material-ui/core';
+import { AppBar, Select, Tab, Tabs, MenuItem, FormControl, InputLabel } from '@material-ui/core';
+import { Edit, DeleteOutline } from "@material-ui/icons";
 
 import { i18n } from "../../translate/i18n";
 
@@ -73,9 +73,13 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		greetingMessage: "",
 	};
 
-	const [activeTab, setActiveTab] = useState("Editar Fila");
+	const [activeTab, setActiveTab] = useState(0);
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
+	//Dados iniciais para estruturação do modal
+	const [holidays, setHolidays] = useState([{ "data": "25 de Dezembro", "nome": "Feriado 1" }, { "data": "08 de Março", "nome": "Feriado 2" }, { "data": "19 de Abril", "nome": "Feriado 3" }]);
+	const [selectedHolidays, setSelectedHolidays] = useState([]);
+	const [selected, setSelected] = useState("");
 	const greetingRef = useRef();
 
 	useEffect(() => {
@@ -119,41 +123,93 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		}
 	};
 
-	const selectTab = (tab) => {
-		setActiveTab(tab)
+	const selectTab = (event, tab) => {
+		setActiveTab(tab);
+	}
+
+	const handleNewHoliday = (event, selectedHoliday) => {
+		setSelected(selectedHoliday.nome);
+		const newList = selectedHolidays.push(selectedHoliday)
+		setSelectedHolidays(newList);
 	}
 
 	return (
 		<div className={classes.root}>
-			<Dialog open={open} onClose={handleClose} scroll="paper">
-				<AppBar position="static" style={{ backgroundColor: "primary" }}>
-					<Tabs value={false} aria-label="simple tabs example">
+			<Dialog open={open} onClose={handleClose} dividers="true" scroll="paper">
+				<AppBar position="static" >
+					<Tabs
+						variant="fullWidth"
+						value={activeTab}
+						onChange={selectTab}
+						aria-label="tab-label"
+					>
 						<Tab label={queueId
 							? `${i18n.t("queueModal.title.edit")}`
 							: `${i18n.t("queueModal.title.add")}`}
-							onClick={({ target }) => selectTab(target.textContent)}
-							autoFocus />
+						/>
 						<Tab
 							label={`${i18n.t("queueModal.title.holidays")}`}
-							onClick={({ target }) => selectTab(target.textContent)}
 						/>
 					</Tabs>
 				</AppBar>
-				{activeTab === "Feriados" ?
-					<table>
-						<thead>
-							<tr>
-								<th> Data</th>
-								<th> Feriado</th>
-								<th> Ação</th>
-							</tr>
-						</thead>
-						<tbody>
-							<td>Date</td>
-							<td>Feriado tal</td>
-							<td>botões de ação - excluir - editar</td>
-						</tbody>
-					</table>
+				{activeTab === 1 ?
+					<DialogContent dividers={true}>
+						<FormControl className={classes.formControl}>
+							<InputLabel id="select-label">Feriados</InputLabel>
+							<Select
+								id="select-id"
+								value={selected}
+								onChange={handleNewHoliday}
+							>
+								{holidays.map((holiday, index) =>
+									<MenuItem key={index} value={holiday.nome}>{holiday.nome}</MenuItem>)}
+							</Select>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={() => setSelectedHolidays(holidays)}
+							>
+								{i18n.t("queueModal.buttons.addAllHolidays")}
+							</Button>
+						</FormControl>
+						<table>
+							<thead>
+								<tr>
+									<th>Data</th>
+									<th>Feriado</th>
+									<th>Ação</th>
+								</tr>
+							</thead>
+							<tbody>
+								{selectedHolidays.length >= 1
+									? selectedHolidays.map((holiday, index) =>
+										<tr key={index}>
+											<td>{holiday.data}</td>
+											<td>{holiday.nome}</td>
+											<td>
+												<IconButton
+													size="small"
+													onClick={() => console.log("Edit Feriado")}
+												>
+													<Edit />
+												</IconButton>
+												<IconButton
+													size="small"
+													onClick={() => {
+														console.log("Apagar Feriado");
+														//setConfirmModalOpen(true);
+														//setDeletingQuickAnswers(quickAnswer);
+													}}
+												>
+													<DeleteOutline />
+												</IconButton>
+											</td>
+										</tr>
+									)
+									: <tr><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
+							</tbody>
+						</table>
+					</DialogContent>
 					:
 					<Formik
 						initialValues={queue}
@@ -276,7 +332,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					</Formik>
 				}
 			</Dialog>
-		</div>
+		</div >
 	);
 };
 
