@@ -122,7 +122,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [selected, setSelected] = useState("");
 	const greetingRef = useRef();
 
-	const options = holidays.map((holi) => holi.nome);
+	const options = holidays.map((holi) => `${holi.data} - ${holi.nome}`);
 
 	useEffect(() => {
 		(async () => {
@@ -170,12 +170,11 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	}
 
 	const handleNewHoliday = (event, selectedHoliday) => {
-		console.log(selectedHoliday);
-		const selection = holidays.find((i) => i.nome === selectedHoliday.props.children);
-		setSelected(selection.nome);
-		const newList = selectedHolidays.push(selection);
-		setSelectedHolidays(newList);
-		console.log("lista selecionados", selectedHolidays);
+		const { props } = selectedHoliday;
+		const selection = holidays.find(({nome}) => props.value.includes(nome));
+		setSelected(`${selection.data} - ${selection.nome}`);
+		setSelectedHolidays([...selectedHolidays, selection]);
+		setHolidays(holidays.filter(({nome}) => nome !== selection.nome));
 	}
 
 	return (
@@ -207,7 +206,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								onChange={handleNewHoliday}
 							>
 								{options.map((holiday, index) =>
-									<MenuItem key={index}>{holiday}</MenuItem>)}
+									<MenuItem key={index} value={holiday}>{holiday}</MenuItem>)}
 							</Select>
 							<Button
 								variant="contained"
@@ -227,7 +226,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									</tr>
 								</thead> : null}
 							<tbody className={classes.tableBody}>
-								{selectedHolidays.length >= 1
+								{selectedHolidays.length > 0
 									? selectedHolidays.map((holiday, index) =>
 										<tr className={classes.tableTitles} key={index}>
 											<td className={classes.cells}>{holiday.data}</td>
