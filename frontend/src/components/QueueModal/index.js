@@ -56,12 +56,14 @@ const useStyles = makeStyles(theme => ({
 		flexWrap: "wrap",
 		height: "340px",
 	},
+	//select e botão "add feriados"
 	formControl: {
 		display: "flex",
 		justifyContent: "space-evenly",
 		margin: theme.spacing(1),
 		width: "80%",
-		height: "30%"
+		height: "30%",
+		backgroundColor: "gray"
 	},
 	table: {
 		display: "flex",
@@ -69,7 +71,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "center",
 		alignItems: "center",
 		width: "90%",
-		height: "40%",
+		height: "30%",
 	},
 	tableHead: {
 		width: "100%",
@@ -117,10 +119,19 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
 	//Dados iniciais para estruturação do modal
-	const [holidays, setHolidays] = useState([{ "data": "25 de Dezembro", "nome": "Feriado 1" }, { "data": "08 de Março", "nome": "Feriado 2" }, { "data": "19 de Abril", "nome": "Feriado 3" }]);
 	const [selectedHolidays, setSelectedHolidays] = useState([]);
 	const [selected, setSelected] = useState("");
 	const greetingRef = useRef();
+	const [holidays, setHolidays] = useState([
+		{ "data": "01 de Janeiro", "nome": "Confraternização Universal" },
+		{ "data": "21 de Abril", "nome": "Tiradentes" },
+		{ "data": "01 de Maio", "nome": "Dia do Trabalhador" },
+		{ "data": "07 de Setembro", "nome": "Dia da Independência do Brasil" },
+		{ "data": "12 de Outubro", "nome": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "data": "02 de Novembro", "nome": "Dia de Finados" },
+		{ "data": "15 de Novembro", "nome": "Proclamação da República" },
+		{ "data": "25 de Dezembro", "nome": "Natal" }
+	]);
 
 	const options = holidays.map((holi) => `${holi.data} - ${holi.nome}`);
 
@@ -171,10 +182,22 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
 	const handleNewHoliday = (event, selectedHoliday) => {
 		const { props } = selectedHoliday;
-		const selection = holidays.find(({nome}) => props.value.includes(nome));
+		const selection = holidays.find(({ nome }) => props.value.includes(nome));
 		setSelected(`${selection.data} - ${selection.nome}`);
 		setSelectedHolidays([...selectedHolidays, selection]);
-		setHolidays(holidays.filter(({nome}) => nome !== selection.nome));
+		setHolidays(holidays.filter(({ nome }) => nome !== selection.nome));
+	}
+
+	const deleteHoliday = (selectedHoliday, selectedIndex) => {
+		const returned = selectedHolidays.filter((selected) => selected !== selectedHoliday);
+		setSelectedHolidays(returned);
+		setHolidays([...holidays, selectedHoliday])
+		console.log("Volta pra lista", holidays);
+	}
+
+	const deleteAllHolidays = () => {
+		setSelectedHolidays([]);
+		setHolidays(selectedHolidays);
 	}
 
 	return (
@@ -197,64 +220,80 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					</Tabs>
 				</AppBar>
 				{activeTab === 1 ?
-					<DialogContent className={classes.rootDialog}>
-						<FormControl className={classes.formControl}>
-							<InputLabel id="select-label">Selecione um feriado</InputLabel>
-							<Select
-								id="select-id"
-								value={selected}
-								onChange={handleNewHoliday}
-							>
-								{options.map((holiday, index) =>
-									<MenuItem key={index} value={holiday}>{holiday}</MenuItem>)}
-							</Select>
+					(<>
+						<DialogContent dividers className={classes.rootDialog}>
+							<FormControl className={classes.formControl}>
+								<InputLabel id="select-label">Selecione um feriado</InputLabel>
+								<Select
+									id="select-id"
+									value={selected}
+									onChange={handleNewHoliday}
+									disabled={holidays.length === 0 ? true : false}
+								>
+									{options.map((holiday, index) =>
+										<MenuItem key={index} value={holiday}>{holiday}</MenuItem>)}
+								</Select>
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={() => setSelectedHolidays(holidays)}
+									disabled={holidays.length === 0 ? true : false}
+								>
+									{i18n.t("queueModal.buttons.addAllHolidays")}
+								</Button>
+							</FormControl>
+							<table className={classes.table}>
+								{selectedHolidays.length >= 1 ?
+									<thead className={classes.tableHead}>
+										<tr className={classes.tableTitles}>
+											<th className={classes.cells}>Data</th>
+											<th className={classes.cells}>Feriado</th>
+											<th className={classes.buttonCells}>Ação</th>
+										</tr>
+									</thead> : null}
+								<tbody className={classes.tableBody}>
+									{selectedHolidays.length > 0
+										? selectedHolidays.map((holiday, index) =>
+											<tr className={classes.tableTitles} key={index}>
+												<td className={classes.cells}>{holiday.data}</td>
+												<td className={classes.cells}>{holiday.nome}</td>
+												<td className={classes.buttonCells}>
+													<IconButton
+														size="small"
+														onClick={() => console.log("Edit Feriado")}
+													>
+														<Edit />
+													</IconButton>
+													<IconButton
+														size="small"
+														onClick={() => {
+															deleteHoliday(holiday, index)
+															//setConfirmModalOpen(true);
+															//setDeletingQuickAnswers(quickAnswer);
+														}}
+													>
+														<DeleteOutline />
+													</IconButton>
+												</td>
+											</tr>
+
+										)
+										: <tr className={classes.tableTitles}><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
+								</tbody>
+							</table>
+
+						</DialogContent>
+						<DialogActions style={{ alignSelf: "end" }}>
 							<Button
 								variant="contained"
 								color="primary"
-								onClick={() => setSelectedHolidays(holidays)}
+								onClick={() => deleteAllHolidays()}
+								disabled={selectedHolidays.length === 0 ? true : false}
 							>
-								{i18n.t("queueModal.buttons.addAllHolidays")}
+								{i18n.t("queueModal.buttons.deleteAllHolidays")}
 							</Button>
-						</FormControl>
-						<table className={classes.table}>
-							{selectedHolidays.length >= 1 ?
-								<thead className={classes.tableHead}>
-									<tr className={classes.tableTitles}>
-										<th className={classes.cells}>Data</th>
-										<th className={classes.cells}>Feriado</th>
-										<th className={classes.buttonCells}>Ação</th>
-									</tr>
-								</thead> : null}
-							<tbody className={classes.tableBody}>
-								{selectedHolidays.length > 0
-									? selectedHolidays.map((holiday, index) =>
-										<tr className={classes.tableTitles} key={index}>
-											<td className={classes.cells}>{holiday.data}</td>
-											<td className={classes.cells}>{holiday.nome}</td>
-											<td className={classes.buttonCells}>
-												<IconButton
-													size="small"
-													onClick={() => console.log("Edit Feriado")}
-												>
-													<Edit />
-												</IconButton>
-												<IconButton
-													size="small"
-													onClick={() => {
-														console.log("Apagar Feriado");
-														//setConfirmModalOpen(true);
-														//setDeletingQuickAnswers(quickAnswer);
-													}}
-												>
-													<DeleteOutline />
-												</IconButton>
-											</td>
-										</tr>
-									)
-									: <tr className={classes.tableTitles}><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
-							</tbody>
-						</table>
-					</DialogContent>
+						</DialogActions>
+					</>)
 					:
 					<Formik
 						initialValues={queue}
