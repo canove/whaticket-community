@@ -49,51 +49,84 @@ const useStyles = makeStyles(theme => ({
 		width: 20,
 		height: 20,
 	},
+	//área total do modal
 	rootDialog: {
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "space-around",
 		flexWrap: "wrap",
-		height: "340px",
+		height: "350px",
 	},
 	//select e botão "add feriados"
 	formControl: {
 		display: "flex",
 		justifyContent: "space-evenly",
 		margin: theme.spacing(1),
-		width: "80%",
-		height: "30%",
-		backgroundColor: "gray"
+		width: "90%",
+		height: "35%"
 	},
 	table: {
 		display: "flex",
 		flexDirection: "column",
-		justifyContent: "center",
+		justifyContent: "start",
 		alignItems: "center",
-		width: "90%",
-		height: "30%",
+		width: "100%",
+		height: "60%",
+		overflowY: "scroll",
 	},
+	//Títulos da tabela
 	tableHead: {
+		display: "flex",
 		width: "100%",
 		height: "fit-content",
 	},
-	tableTitles: {
+	//linhas da tabela
+	tableRows: {
 		display: "flex",
-		justifyContent: "space-evenly",
+		justifyContent: "start",
 		width: "100%",
+	},
+	titleCellsDate: {
+		width: "92px",
+		display: "flex",
+		justifyContent: "start",
+	},
+	titleCellsHoliday: {
+		width: "300px",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "start",
+	},
+	tableDataRows: {
+		display: "flex",
+		justifyContent: "space-between",
+		width: "100%",
+		borderBottom: "solid 0.2ch gray"
 	},
 	tableBody: {
+		alignItems: "center",
 		justifyContent: "center",
 		width: "100%",
 		height: "fit-content",
+		textAlign: "center",
 	},
-	cells: {
-		width: "200px",
-		textAlign: "center"
+	cellsDate: {
+		width: "50px",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "start",
+	},
+	cellsHoliday: {
+		width: "300px",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "start",
 	},
 	buttonCells: {
-		width: "120px",
-		textAlign: "center"
+		width: "100px",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "end"
 	}
 }));
 
@@ -123,17 +156,17 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [selected, setSelected] = useState("");
 	const greetingRef = useRef();
 	const [holidays, setHolidays] = useState([
-		{ "data": "01 de Janeiro", "nome": "Confraternização Universal" },
-		{ "data": "21 de Abril", "nome": "Tiradentes" },
-		{ "data": "01 de Maio", "nome": "Dia do Trabalhador" },
-		{ "data": "07 de Setembro", "nome": "Dia da Independência do Brasil" },
-		{ "data": "12 de Outubro", "nome": "Dia das Crianças/ Nossa Senhora Aparecida" },
-		{ "data": "02 de Novembro", "nome": "Dia de Finados" },
-		{ "data": "15 de Novembro", "nome": "Proclamação da República" },
-		{ "data": "25 de Dezembro", "nome": "Natal" }
+		{ "data": "01/01", "nome": "Confraternização Universal" },
+		{ "data": "21/04", "nome": "Tiradentes" },
+		{ "data": "01/05", "nome": "Dia do Trabalhador" },
+		{ "data": "07/09", "nome": "Dia da Independência do Brasil" },
+		{ "data": "12/10", "nome": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "data": "02/11", "nome": "Dia de Finados" },
+		{ "data": "15/11", "nome": "Proclamação da República" },
+		{ "data": "25/12", "nome": "Natal" }
 	]);
 
-	const options = holidays.map((holi) => `${holi.data} - ${holi.nome}`);
+	const options = holidays.map((holi) => `${holi.data} - ${holi.nome}`).sort();
 
 	useEffect(() => {
 		(async () => {
@@ -192,17 +225,29 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		const returned = selectedHolidays.filter((selected) => selected !== selectedHoliday);
 		setSelectedHolidays(returned);
 		setHolidays([...holidays, selectedHoliday])
-		console.log("Volta pra lista", holidays);
+		setSelected("");
 	}
 
 	const deleteAllHolidays = () => {
 		setSelectedHolidays([]);
 		setHolidays(selectedHolidays);
+		setSelected("");
+	}
+
+	const addAllHolidays = () => { 
+		let limit = holidays.length;
+		const newList = selectedHolidays;
+		for(let i = 0; i <= limit - 1; i += 1) {
+			newList.push(holidays[i]);
+		}
+		setSelectedHolidays(newList);
+		setHolidays([]);
+		setSelected("");
 	}
 
 	return (
 		<div className={classes.root}>
-			<Dialog open={open} onClose={handleClose} dividers="true" scroll="paper">
+			<Dialog open={open} onClose={handleClose} dividers="true">
 				<AppBar position="static" >
 					<Tabs
 						variant="fullWidth"
@@ -236,7 +281,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								<Button
 									variant="contained"
 									color="primary"
-									onClick={() => setSelectedHolidays(holidays)}
+									onClick={() => addAllHolidays()}
 									disabled={holidays.length === 0 ? true : false}
 								>
 									{i18n.t("queueModal.buttons.addAllHolidays")}
@@ -245,18 +290,17 @@ const QueueModal = ({ open, onClose, queueId }) => {
 							<table className={classes.table}>
 								{selectedHolidays.length >= 1 ?
 									<thead className={classes.tableHead}>
-										<tr className={classes.tableTitles}>
-											<th className={classes.cells}>Data</th>
-											<th className={classes.cells}>Feriado</th>
-											<th className={classes.buttonCells}>Ação</th>
+										<tr className={classes.tableRows}>
+											<th className={classes.titleCellsDate}>Data</th>
+											<th className={classes.titleCellsHoliday}>Feriado</th>
 										</tr>
 									</thead> : null}
 								<tbody className={classes.tableBody}>
 									{selectedHolidays.length > 0
 										? selectedHolidays.map((holiday, index) =>
-											<tr className={classes.tableTitles} key={index}>
-												<td className={classes.cells}>{holiday.data}</td>
-												<td className={classes.cells}>{holiday.nome}</td>
+											<tr className={classes.tableDataRows} key={index}>
+												<td className={classes.cellsDate}>{holiday.data}</td>
+												<td className={classes.cellsHoliday}>{holiday.nome}</td>
 												<td className={classes.buttonCells}>
 													<IconButton
 														size="small"
@@ -278,7 +322,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											</tr>
 
 										)
-										: <tr className={classes.tableTitles}><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
+										: <tr style={{position: "relative"}}><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
 								</tbody>
 							</table>
 
