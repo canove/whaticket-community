@@ -193,10 +193,15 @@ const messages = {
           color: "Cor",
           greetingMessage: "Mensagem de saudação",
         },
+        holiday: {
+          date: "Data",
+          name: "Nome do Feriado"
+        },
         buttons: {
           okAdd: "Adicionar",
           okEdit: "Salvar",
           cancel: "Cancelar",
+          okAddHoliday: "Novo Feriado",
           addAllHolidays: "Adicionar todos os feriados",
           deleteAllHolidays: "Apagar todos os feriados"
         },
