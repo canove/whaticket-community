@@ -13,7 +13,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { AppBar, Select, Tab, Tabs, MenuItem, FormControl, InputLabel } from '@material-ui/core';
-import { Edit, DeleteOutline } from "@material-ui/icons";
+import { Edit, DeleteOutline, Colorize } from "@material-ui/icons";
 
 import { i18n } from "../../translate/i18n";
 
@@ -21,7 +21,6 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import ColorPicker from "../ColorPicker";
 import { IconButton, InputAdornment } from "@material-ui/core";
-import { Colorize } from "@material-ui/icons";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -127,6 +126,14 @@ const useStyles = makeStyles(theme => ({
 		display: "flex",
 		alignItems: "center",
 		justifyContent: "end"
+	},
+	formNewHoliday: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	btnNewHoliday: {
+		height: "60%"
 	}
 }));
 
@@ -138,6 +145,16 @@ const QueueSchema = Yup.object().shape({
 	color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
 	greetingMessage: Yup.string(),
 });
+
+const HolidaySchema = Yup.object().shape({
+	data: Yup.string().max(5).required("Required"),
+	nome: Yup.string().required("Required"),
+});
+
+const initialHolidayValue = {
+	data: "",
+	nome: "",
+}
 
 const QueueModal = ({ open, onClose, queueId }) => {
 	const classes = useStyles();
@@ -154,6 +171,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	//Dados iniciais para estruturação do modal
 	const [selectedHolidays, setSelectedHolidays] = useState([]);
 	const [selected, setSelected] = useState("");
+	const [createNew, setCreateNew] = useState(false);
 	const greetingRef = useRef();
 	const [holidays, setHolidays] = useState([
 		{ "data": "01/01", "nome": "Confraternização Universal" },
@@ -172,6 +190,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		(async () => {
 			if (!queueId) return;
 			try {
+				console.log("Erro aqui EM CIMA");
 				const { data } = await api.get(`/queue/${queueId}`);
 				setQueue(prevState => {
 					return { ...prevState, ...data };
@@ -182,6 +201,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		})();
 
 		return () => {
+			console.log("Erro aqui");
 			setQueue({
 				name: "",
 				color: "",
@@ -229,15 +249,15 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	}
 
 	const deleteAllHolidays = () => {
-		setSelectedHolidays([]);
 		setHolidays(selectedHolidays);
+		setSelectedHolidays([]);
 		setSelected("");
 	}
 
-	const addAllHolidays = () => { 
+	const addAllHolidays = () => {
 		let limit = holidays.length;
 		const newList = selectedHolidays;
-		for(let i = 0; i <= limit - 1; i += 1) {
+		for (let i = 0; i <= limit - 1; i += 1) {
 			newList.push(holidays[i]);
 		}
 		setSelectedHolidays(newList);
@@ -245,6 +265,10 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		setSelected("");
 	}
 
+	const createNewHoliday = (newHoliday) => {
+		setHolidays([...holidays, newHoliday]);
+		setCreateNew(!createNew);
+	}
 	return (
 		<div className={classes.root}>
 			<Dialog open={open} onClose={handleClose} dividers="true">
@@ -269,23 +293,75 @@ const QueueModal = ({ open, onClose, queueId }) => {
 						<DialogContent dividers className={classes.rootDialog}>
 							<FormControl className={classes.formControl}>
 								<InputLabel id="select-label">Selecione um feriado</InputLabel>
-								<Select
+								<TextField
 									id="select-id"
 									value={selected}
 									onChange={handleNewHoliday}
+									select
 									disabled={holidays.length === 0 ? true : false}
 								>
 									{options.map((holiday, index) =>
 										<MenuItem key={index} value={holiday}>{holiday}</MenuItem>)}
-								</Select>
-								<Button
-									variant="contained"
-									color="primary"
-									onClick={() => addAllHolidays()}
-									disabled={holidays.length === 0 ? true : false}
-								>
-									{i18n.t("queueModal.buttons.addAllHolidays")}
-								</Button>
+								</TextField>
+								{createNew
+									? (
+										<Formik
+											initialValues={initialHolidayValue}
+											validationSchema={HolidaySchema}
+											onSubmit={(values, actions) => {
+												setTimeout(() => {
+													createNewHoliday(values);
+													toast.success("Novo feriado adicionado à lista");
+													values = initialHolidayValue;
+													actions.setSubmitting(false);
+												}, 400)
+											}}>
+											{({ values, touched, errors, isSubmitting }) =>
+												<Form className={classes.formNewHoliday}>
+													<Field
+														as={TextField}
+														label={i18n.t("queueModal.holiday.date")}
+														autoFocus
+														name="data"
+														placeholder="DD/MM"
+														error={touched.date && Boolean(errors.date)}
+														helperText={touched.date && errors.date}
+														variant="outlined"
+														margin="dense"
+														className={classes.textField}
+													/>
+													<Field
+														as={TextField}
+														label={i18n.t("queueModal.holiday.name")}
+														name="nome"
+														placeholder="Nome do feriado"
+														error={touched.name && Boolean(errors.name)}
+														helperText={touched.name && errors.name}
+														variant="outlined"
+														margin="dense"
+														className={classes.textField}
+													/>
+													<Button
+														variant="outlined"
+														color="primary"
+														type="submit"
+														disabled={isSubmitting}
+														className={classes.btnNewHoliday}>
+														Adicionar
+													</Button>
+												</Form>}
+										</Formik>
+									)
+									: (
+										<Button
+											variant="contained"
+											color="primary"
+											onClick={() => addAllHolidays()}
+											disabled={holidays.length === 0 ? true : false}
+										>
+											{i18n.t("queueModal.buttons.addAllHolidays")}
+										</Button>
+									)}
 							</FormControl>
 							<table className={classes.table}>
 								{selectedHolidays.length >= 1 ?
@@ -312,8 +388,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 														size="small"
 														onClick={() => {
 															deleteHoliday(holiday, index)
-															//setConfirmModalOpen(true);
-															//setDeletingQuickAnswers(quickAnswer);
 														}}
 													>
 														<DeleteOutline />
@@ -322,19 +396,26 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											</tr>
 
 										)
-										: <tr style={{position: "relative"}}><td colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
+										: <tr><td style={{ width: "100%", alignSelf: "center", justifySelf: "center" }} colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
 								</tbody>
 							</table>
-
 						</DialogContent>
 						<DialogActions style={{ alignSelf: "end" }}>
 							<Button
 								variant="contained"
-								color="primary"
+								color="secondary"
 								onClick={() => deleteAllHolidays()}
 								disabled={selectedHolidays.length === 0 ? true : false}
 							>
 								{i18n.t("queueModal.buttons.deleteAllHolidays")}
+							</Button>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={() => setCreateNew(true)}
+								disabled={holidays.length === 0 ? true : false}
+							>
+								{i18n.t("queueModal.buttons.okAddHoliday")}
 							</Button>
 						</DialogActions>
 					</>)
