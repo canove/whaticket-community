@@ -148,15 +148,16 @@ const QueueSchema = Yup.object().shape({
 
 const HolidaySchema = Yup.object().shape({
 	date: Yup.string().max(5).required("Required"),
-	name: Yup.string().required("Required"),
+	holiday: Yup.string().required("Required"),
 });
 
-const initialHolidayValue = {
-	date: "",
-	name: "",
-}
-
 const QueueModal = ({ open, onClose, queueId }) => {
+
+	const initialHolidayValue = {
+		date: "",
+		holiday: "",
+	}
+
 	const classes = useStyles();
 
 	const initialState = {
@@ -174,14 +175,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const greetingRef = useRef();
 	//Dados iniciais para estruturação do modal
 	const [holidays, setHolidays] = useState([
-		{ "date": "01/01", "name": "Confraternização Universal" },
-		{ "date": "21/04", "name": "Tiradentes" },
-		{ "date": "01/05", "name": "Dia do Trabalhador" },
-		{ "date": "07/09", "name": "Dia da Independência do Brasil" },
-		{ "date": "12/10", "name": "Dia das Crianças/ Nossa Senhora Aparecida" },
-		{ "date": "02/11", "name": "Dia de Finados" },
-		{ "date": "15/11", "name": "Proclamação da República" },
-		{ "date": "25/12", "name": "Natal" }
+		{ "date": "01/01", "holiday": "Confraternização Universal" },
+		{ "date": "21/04", "holiday": "Tiradentes" },
+		{ "date": "01/05", "holiday": "Dia do Trabalhador" },
+		{ "date": "07/09", "holiday": "Dia da Independência do Brasil" },
+		{ "date": "12/10", "holiday": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "date": "02/11", "holiday": "Dia de Finados" },
+		{ "date": "15/11", "holiday": "Proclamação da República" },
+		{ "date": "25/12", "holiday": "Natal" }
 	]);
 
 	useEffect(() => {
@@ -232,7 +233,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	}
 
 	const deleteHoliday = (selectedHoliday, selectedIndex) => {
-		const returned = holidays.filter((selected) => selected !== selectedHoliday);
+		const returned = holidays.filter((holiday) => holiday !== selectedHoliday);
 		setHolidays(returned);
 		setSelected("");
 	}
@@ -276,7 +277,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										? holidays.map((holiday, index) =>
 											<tr className={classes.tableDataRows} key={index}>
 												<td className={classes.cellsDate}>{holiday.date}</td>
-												<td className={classes.cellsHoliday}>{holiday.name}</td>
+												<td className={classes.cellsHoliday}>{holiday.holiday}</td>
 												<td className={classes.buttonCells}>
 													<IconButton
 														size="small"
@@ -312,167 +313,168 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											values = initialHolidayValue;
 											actions.resetForm();
 											actions.setSubmitting(false);
-										}, 400)}}
+										}, 400)
+									}}
 								>
-								{({ values, touched, errors, isSubmitting }) =>
-								<Form className={classes.formNewHoliday}>
+									{({ values, touched, errors, isSubmitting }) =>
+										<Form className={classes.formNewHoliday}>
+											<Field
+												as={TextField}
+												label={i18n.t("queueModal.holiday.date")}
+												name="date"
+												placeholder="DD/MM"
+												error={touched.date && Boolean(errors.date)}
+												helperText={touched.date && errors.date}
+												variant="outlined"
+												margin="dense"
+												className={classes.textField}
+											/>
+											<Field
+												as={TextField}
+												label={i18n.t("queueModal.holiday.holiday")}
+												name="holiday"
+												placeholder="Nome do feriado"
+												error={touched.holiday && Boolean(errors.holiday)}
+												helperText={touched.holiday && errors.holiday}
+												variant="outlined"
+												margin="dense"
+												className={classes.textField}
+											/>
+											<Button
+												variant="outlined"
+												color="primary"
+												type="submit"
+												disabled={isSubmitting}
+												className={classes.btnNewHoliday}>
+												Adicionar Novo
+											</Button>
+										</Form>}
+								</Formik>
+							</FormControl>
+						</DialogActions>
+					</>)
+					:
+					<Formik
+						initialValues={queue}
+						enableReinitialize={true}
+						validationSchema={QueueSchema}
+						onSubmit={(values, actions) => {
+							setTimeout(() => {
+								handleSaveQueue(values);
+								actions.setSubmitting(false);
+							}, 400);
+						}}
+					>
+						{({ touched, errors, isSubmitting, values }) => (
+							<Form>
+								<DialogContent dividers>
 									<Field
 										as={TextField}
-										label={i18n.t("queueModal.holiday.date")}
-										name="date"
-										placeholder="DD/MM"
-										error={touched.date && Boolean(errors.date)}
-										helperText={touched.date && errors.date}
-										variant="outlined"
-										margin="dense"
-										className={classes.textField}
-									/>
-									<Field
-										as={TextField}
-										label={i18n.t("queueModal.holiday.name")}
+										label={i18n.t("queueModal.form.name")}
+										autoFocus
 										name="name"
-										placeholder="Nome do feriado"
 										error={touched.name && Boolean(errors.name)}
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
 										className={classes.textField}
 									/>
-									<Button
+									<Field
+										as={TextField}
+										label={i18n.t("queueModal.form.color")}
+										name="color"
+										id="color"
+										onFocus={() => {
+											setColorPickerModalOpen(true);
+											greetingRef.current.focus();
+										}}
+										error={touched.color && Boolean(errors.color)}
+										helperText={touched.color && errors.color}
+										InputProps={{
+											startAdornment: (
+												<InputAdornment position="start">
+													<div
+														style={{ backgroundColor: values.color }}
+														className={classes.colorAdorment}
+													></div>
+												</InputAdornment>
+											),
+											endAdornment: (
+												<IconButton
+													size="small"
+													color="default"
+													onClick={() => setColorPickerModalOpen(true)}
+												>
+													<Colorize />
+												</IconButton>
+											),
+										}}
 										variant="outlined"
-										color="primary"
-										type="submit"
-										disabled={isSubmitting}
-										className={classes.btnNewHoliday}>
-										Adicionar Novo
-									</Button>
-								</Form>}
-							</Formik>
-						</FormControl>
-					</DialogActions>
-			</>)
-			:
-			<Formik
-				initialValues={queue}
-				enableReinitialize={true}
-				validationSchema={QueueSchema}
-				onSubmit={(values, actions) => {
-					setTimeout(() => {
-						handleSaveQueue(values);
-						actions.setSubmitting(false);
-					}, 400);
-				}}
-			>
-				{({ touched, errors, isSubmitting, values }) => (
-					<Form>
-						<DialogContent dividers>
-							<Field
-								as={TextField}
-								label={i18n.t("queueModal.form.name")}
-								autoFocus
-								name="name"
-								error={touched.name && Boolean(errors.name)}
-								helperText={touched.name && errors.name}
-								variant="outlined"
-								margin="dense"
-								className={classes.textField}
-							/>
-							<Field
-								as={TextField}
-								label={i18n.t("queueModal.form.color")}
-								name="color"
-								id="color"
-								onFocus={() => {
-									setColorPickerModalOpen(true);
-									greetingRef.current.focus();
-								}}
-								error={touched.color && Boolean(errors.color)}
-								helperText={touched.color && errors.color}
-								InputProps={{
-									startAdornment: (
-										<InputAdornment position="start">
-											<div
-												style={{ backgroundColor: values.color }}
-												className={classes.colorAdorment}
-											></div>
-										</InputAdornment>
-									),
-									endAdornment: (
-										<IconButton
-											size="small"
-											color="default"
-											onClick={() => setColorPickerModalOpen(true)}
-										>
-											<Colorize />
-										</IconButton>
-									),
-								}}
-								variant="outlined"
-								margin="dense"
-							/>
-							<ColorPicker
-								open={colorPickerModalOpen}
-								handleClose={() => setColorPickerModalOpen(false)}
-								onChange={color => {
-									values.color = color;
-									setQueue(() => {
-										return { ...values, color };
-									});
-								}}
-							/>
-							<div>
-								<Field
-									as={TextField}
-									label={i18n.t("queueModal.form.greetingMessage")}
-									type="greetingMessage"
-									multiline
-									inputRef={greetingRef}
-									minRows={5}
-									fullWidth
-									name="greetingMessage"
-									error={
-										touched.greetingMessage && Boolean(errors.greetingMessage)
-									}
-									helperText={
-										touched.greetingMessage && errors.greetingMessage
-									}
-									variant="outlined"
-									margin="dense"
-								/>
-							</div>
-						</DialogContent>
-						<DialogActions>
-							<Button
-								onClick={handleClose}
-								color="secondary"
-								disabled={isSubmitting}
-								variant="outlined"
-							>
-								{i18n.t("queueModal.buttons.cancel")}
-							</Button>
-							<Button
-								type="submit"
-								color="primary"
-								disabled={isSubmitting}
-								variant="contained"
-								className={classes.btnWrapper}
-							>
-								{queueId
-									? `${i18n.t("queueModal.buttons.okEdit")}`
-									: `${i18n.t("queueModal.buttons.okAdd")}`}
-								{isSubmitting && (
-									<CircularProgress
-										size={24}
-										className={classes.buttonProgress}
+										margin="dense"
 									/>
-								)}
-							</Button>
-						</DialogActions>
-					</Form>
-				)}
-			</Formik>
+									<ColorPicker
+										open={colorPickerModalOpen}
+										handleClose={() => setColorPickerModalOpen(false)}
+										onChange={color => {
+											values.color = color;
+											setQueue(() => {
+												return { ...values, color };
+											});
+										}}
+									/>
+									<div>
+										<Field
+											as={TextField}
+											label={i18n.t("queueModal.form.greetingMessage")}
+											type="greetingMessage"
+											multiline
+											inputRef={greetingRef}
+											minRows={5}
+											fullWidth
+											name="greetingMessage"
+											error={
+												touched.greetingMessage && Boolean(errors.greetingMessage)
+											}
+											helperText={
+												touched.greetingMessage && errors.greetingMessage
+											}
+											variant="outlined"
+											margin="dense"
+										/>
+									</div>
+								</DialogContent>
+								<DialogActions>
+									<Button
+										onClick={handleClose}
+										color="secondary"
+										disabled={isSubmitting}
+										variant="outlined"
+									>
+										{i18n.t("queueModal.buttons.cancel")}
+									</Button>
+									<Button
+										type="submit"
+										color="primary"
+										disabled={isSubmitting}
+										variant="contained"
+										className={classes.btnWrapper}
+									>
+										{queueId
+											? `${i18n.t("queueModal.buttons.okEdit")}`
+											: `${i18n.t("queueModal.buttons.okAdd")}`}
+										{isSubmitting && (
+											<CircularProgress
+												size={24}
+												className={classes.buttonProgress}
+											/>
+										)}
+									</Button>
+								</DialogActions>
+							</Form>
+						)}
+					</Formik>
 				}
-		</Dialog>
+			</Dialog>
 		</div >
 	);
 };
