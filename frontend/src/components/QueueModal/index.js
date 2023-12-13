@@ -51,7 +51,8 @@ const useStyles = makeStyles(theme => ({
 	//área total do modal
 	rootDialog: {
 		display: "flex",
-		justifyContent: "center",
+		flexDirection: "column",
+		justifyContent: "space-between",
 		alignItems: "center",
 		flexWrap: "wrap",
 		height: "350px",
@@ -62,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "start",
 		alignItems: "center",
 		width: "100%",
-		height: "85%",
+		height: "80%",
 		overflowY: "scroll",
 	},
 	//Títulos da tabela
@@ -274,52 +275,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				{activeTab === 1 ?
 					(<>
 						<DialogContent dividers className={classes.rootDialog}>
-								<Button
-									style={{ display: 'flex', alignSelf: "end", heigth: "17px" }}
-									variant="text"
-									color="primary"
-									onClick={() => setHolidays(defaultHolidays)}
-								>
-									Restaurar Feriados
-								</Button>
-							<table className={classes.table}>
-								{holidays.length >= 1 ?
-									<thead className={classes.tableHead}>
-										<tr className={classes.tableRows}>
-											<th className={classes.titleCellsDate}>Data</th>
-											<th className={classes.titleCellsHoliday}>Feriado</th>
-										</tr>
-									</thead> : null}
-								<tbody className={classes.tableBody}>
-									{holidays.length > 0
-										? holidays.map((holiday, index) =>
-											<tr className={classes.tableDataRows} key={index}>
-												<td className={classes.cellsDate}>{holiday.date}</td>
-												<td className={classes.cellsHoliday}>{holiday.holiday}</td>
-												<td className={classes.buttonCells}>
-													<IconButton
-														size="small"
-														onClick={() => console.log("Edit Feriado")}
-													>
-														<Edit />
-													</IconButton>
-													<IconButton
-														size="small"
-														onClick={() => {
-															deleteHoliday(holiday, index)
-														}}
-													>
-														<DeleteOutline />
-													</IconButton>
-												</td>
-											</tr>
-
-										)
-										: <tr><td style={{ width: "100%", alignSelf: "center", justifySelf: "center" }} colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
-								</tbody>
-							</table>
-						</DialogContent>
-						<DialogActions style={{ height: "fit-content", display: "flex", alignContent: "center", justifyContent: "center" }}>
 							<Formik
 								initialValues={initialHolidayValue}
 								enableReinitialize={true}
@@ -366,6 +321,53 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										</Button>
 									</Form>}
 							</Formik>
+
+							<table className={classes.table}>
+								{holidays.length >= 1 ?
+									<thead className={classes.tableHead}>
+										<tr className={classes.tableRows}>
+											<th className={classes.titleCellsDate}>Data</th>
+											<th className={classes.titleCellsHoliday}>Feriado</th>
+										</tr>
+									</thead> : null}
+								<tbody className={classes.tableBody}>
+									{holidays.length > 0
+										? holidays.map((holiday, index) =>
+											<tr className={classes.tableDataRows} key={index}>
+												<td className={classes.cellsDate}>{holiday.date}</td>
+												<td className={classes.cellsHoliday}>{holiday.holiday}</td>
+												<td className={classes.buttonCells}>
+													<IconButton
+														size="small"
+														onClick={() => console.log("Edit Feriado")}
+													>
+														<Edit />
+													</IconButton>
+													<IconButton
+														size="small"
+														onClick={() => {
+															deleteHoliday(holiday, index)
+														}}
+													>
+														<DeleteOutline />
+													</IconButton>
+												</td>
+											</tr>
+
+										)
+										: <tr><td style={{ width: "100%", alignSelf: "center", justifySelf: "center" }} colSpan={3}>Você ainda não programou nenhum feriado</td></tr>}
+								</tbody>
+							</table>
+						</DialogContent>
+						<DialogActions style={{ height: "fit-content", display: "flex", alignContent: "center", justifyContent: "center" }}>
+							<Button
+								style={{ display: 'flex', alignSelf: "end", heigth: "17px" }}
+								variant="text"
+								color="primary"
+								onClick={() => setHolidays(defaultHolidays)}
+							>
+								Restaurar Feriados
+							</Button>
 						</DialogActions>
 					</>)
 					:
