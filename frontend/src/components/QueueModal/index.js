@@ -52,11 +52,11 @@ const useStyles = makeStyles(theme => ({
 	rootDialog: {
 		display: "flex",
 		justifyContent: "center",
-		alignItems: "space-around",
+		alignItems: "center",
 		flexWrap: "wrap",
-		height: "350px",
+		height: "260px",
 	},
-	//select e botão "add feriados"
+	//botão "add feriado"
 	formControl: {
 		display: "flex",
 		justifyContent: "space-evenly",
@@ -70,7 +70,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "start",
 		alignItems: "center",
 		width: "100%",
-		height: "60%",
+		height: "90%",
 		overflowY: "scroll",
 	},
 	//Títulos da tabela
@@ -169,7 +169,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
 	//Dados iniciais para estruturação do modal
-	const [selectedHolidays, setSelectedHolidays] = useState([]);
+	const [createdHolidays, setCreatedHolidays] = useState([]);
 	const [selected, setSelected] = useState("");
 	const [createNew, setCreateNew] = useState(false);
 	const greetingRef = useRef();
@@ -233,35 +233,9 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		setActiveTab(tab);
 	}
 
-	const handleNewHoliday = (event, selectedHoliday) => {
-		const { props } = selectedHoliday;
-		const selection = holidays.find(({ nome }) => props.value.includes(nome));
-		setSelected(`${selection.data} - ${selection.nome}`);
-		setSelectedHolidays([...selectedHolidays, selection]);
-		setHolidays(holidays.filter(({ nome }) => nome !== selection.nome));
-	}
-
 	const deleteHoliday = (selectedHoliday, selectedIndex) => {
-		const returned = selectedHolidays.filter((selected) => selected !== selectedHoliday);
-		setSelectedHolidays(returned);
-		setHolidays([...holidays, selectedHoliday])
-		setSelected("");
-	}
-
-	const deleteAllHolidays = () => {
-		setHolidays(selectedHolidays);
-		setSelectedHolidays([]);
-		setSelected("");
-	}
-
-	const addAllHolidays = () => {
-		let limit = holidays.length;
-		const newList = selectedHolidays;
-		for (let i = 0; i <= limit - 1; i += 1) {
-			newList.push(holidays[i]);
-		}
-		setSelectedHolidays(newList);
-		setHolidays([]);
+		const returned = holidays.filter((selected) => selected !== selectedHoliday);
+		setHolidays(returned);
 		setSelected("");
 	}
 
@@ -291,80 +265,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				{activeTab === 1 ?
 					(<>
 						<DialogContent dividers className={classes.rootDialog}>
-							<FormControl className={classes.formControl}>
-								<InputLabel id="select-label">Selecione um feriado</InputLabel>
-								<TextField
-									id="select-id"
-									value={selected}
-									onChange={handleNewHoliday}
-									select
-									disabled={holidays.length === 0 ? true : false}
-								>
-									{options.map((holiday, index) =>
-										<MenuItem key={index} value={holiday}>{holiday}</MenuItem>)}
-								</TextField>
-								{createNew
-									? (
-										<Formik
-											initialValues={initialHolidayValue}
-											validationSchema={HolidaySchema}
-											onSubmit={(values, actions) => {
-												setTimeout(() => {
-													createNewHoliday(values);
-													toast.success("Novo feriado adicionado à lista");
-													values = initialHolidayValue;
-													actions.setSubmitting(false);
-												}, 400)
-											}}>
-											{({ values, touched, errors, isSubmitting }) =>
-												<Form className={classes.formNewHoliday}>
-													<Field
-														as={TextField}
-														label={i18n.t("queueModal.holiday.date")}
-														autoFocus
-														name="data"
-														placeholder="DD/MM"
-														error={touched.date && Boolean(errors.date)}
-														helperText={touched.date && errors.date}
-														variant="outlined"
-														margin="dense"
-														className={classes.textField}
-													/>
-													<Field
-														as={TextField}
-														label={i18n.t("queueModal.holiday.name")}
-														name="nome"
-														placeholder="Nome do feriado"
-														error={touched.name && Boolean(errors.name)}
-														helperText={touched.name && errors.name}
-														variant="outlined"
-														margin="dense"
-														className={classes.textField}
-													/>
-													<Button
-														variant="outlined"
-														color="primary"
-														type="submit"
-														disabled={isSubmitting}
-														className={classes.btnNewHoliday}>
-														Adicionar
-													</Button>
-												</Form>}
-										</Formik>
-									)
-									: (
-										<Button
-											variant="contained"
-											color="primary"
-											onClick={() => addAllHolidays()}
-											disabled={holidays.length === 0 ? true : false}
-										>
-											{i18n.t("queueModal.buttons.addAllHolidays")}
-										</Button>
-									)}
-							</FormControl>
 							<table className={classes.table}>
-								{selectedHolidays.length >= 1 ?
+								{holidays.length >= 1 ?
 									<thead className={classes.tableHead}>
 										<tr className={classes.tableRows}>
 											<th className={classes.titleCellsDate}>Data</th>
@@ -372,8 +274,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										</tr>
 									</thead> : null}
 								<tbody className={classes.tableBody}>
-									{selectedHolidays.length > 0
-										? selectedHolidays.map((holiday, index) =>
+									{holidays.length > 0
+										? holidays.map((holiday, index) =>
 											<tr className={classes.tableDataRows} key={index}>
 												<td className={classes.cellsDate}>{holiday.data}</td>
 												<td className={classes.cellsHoliday}>{holiday.nome}</td>
@@ -400,147 +302,187 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								</tbody>
 							</table>
 						</DialogContent>
-						<DialogActions style={{ alignSelf: "end" }}>
-							<Button
-								variant="contained"
-								color="secondary"
-								onClick={() => deleteAllHolidays()}
-								disabled={selectedHolidays.length === 0 ? true : false}
-							>
-								{i18n.t("queueModal.buttons.deleteAllHolidays")}
-							</Button>
-							<Button
-								variant="contained"
-								color="primary"
-								onClick={() => setCreateNew(true)}
-								disabled={holidays.length === 0 ? true : false}
-							>
-								{i18n.t("queueModal.buttons.okAddHoliday")}
-							</Button>
-						</DialogActions>
-					</>)
-					:
-					<Formik
-						initialValues={queue}
-						enableReinitialize={true}
-						validationSchema={QueueSchema}
-						onSubmit={(values, actions) => {
-							setTimeout(() => {
-								handleSaveQueue(values);
-								actions.setSubmitting(false);
-							}, 400);
-						}}
-					>
-						{({ touched, errors, isSubmitting, values }) => (
-							<Form>
-								<DialogContent dividers>
+						<DialogActions style={{ height: "fit-content", display: "flex", alignContent: "center", justifyContent: "center" }}>
+							<FormControl className={classes.formControl}>
+								<Formik
+									initialValues={initialHolidayValue}
+									enableReinitialize={true}
+									validationSchema={HolidaySchema}
+									onSubmit={(values, actions) => {
+										setTimeout(() => {
+											createNewHoliday(values);
+											values = initialHolidayValue;
+											actions.resetForm();
+											actions.setSubmitting(false);
+										}, 400)}}
+								>
+								{({ values, touched, errors, isSubmitting }) =>
+								<Form className={classes.formNewHoliday}>
 									<Field
 										as={TextField}
-										label={i18n.t("queueModal.form.name")}
-										autoFocus
-										name="name"
-										error={touched.name && Boolean(errors.name)}
-										helperText={touched.name && errors.name}
+										label={i18n.t("queueModal.holiday.date")}
+										name="data"
+										placeholder="DD/MM"
+										error={touched.date && Boolean(errors.date)}
+										helperText={touched.date && errors.date}
 										variant="outlined"
 										margin="dense"
 										className={classes.textField}
 									/>
 									<Field
 										as={TextField}
-										label={i18n.t("queueModal.form.color")}
-										name="color"
-										id="color"
-										onFocus={() => {
-											setColorPickerModalOpen(true);
-											greetingRef.current.focus();
-										}}
-										error={touched.color && Boolean(errors.color)}
-										helperText={touched.color && errors.color}
-										InputProps={{
-											startAdornment: (
-												<InputAdornment position="start">
-													<div
-														style={{ backgroundColor: values.color }}
-														className={classes.colorAdorment}
-													></div>
-												</InputAdornment>
-											),
-											endAdornment: (
-												<IconButton
-													size="small"
-													color="default"
-													onClick={() => setColorPickerModalOpen(true)}
-												>
-													<Colorize />
-												</IconButton>
-											),
-										}}
+										label={i18n.t("queueModal.holiday.name")}
+										name="nome"
+										placeholder="Nome do feriado"
+										error={touched.name && Boolean(errors.name)}
+										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
+										className={classes.textField}
 									/>
-									<ColorPicker
-										open={colorPickerModalOpen}
-										handleClose={() => setColorPickerModalOpen(false)}
-										onChange={color => {
-											values.color = color;
-											setQueue(() => {
-												return { ...values, color };
-											});
-										}}
-									/>
-									<div>
-										<Field
-											as={TextField}
-											label={i18n.t("queueModal.form.greetingMessage")}
-											type="greetingMessage"
-											multiline
-											inputRef={greetingRef}
-											minRows={5}
-											fullWidth
-											name="greetingMessage"
-											error={
-												touched.greetingMessage && Boolean(errors.greetingMessage)
-											}
-											helperText={
-												touched.greetingMessage && errors.greetingMessage
-											}
-											variant="outlined"
-											margin="dense"
-										/>
-									</div>
-								</DialogContent>
-								<DialogActions>
 									<Button
-										onClick={handleClose}
-										color="secondary"
-										disabled={isSubmitting}
 										variant="outlined"
-									>
-										{i18n.t("queueModal.buttons.cancel")}
-									</Button>
-									<Button
-										type="submit"
 										color="primary"
+										type="submit"
 										disabled={isSubmitting}
-										variant="contained"
-										className={classes.btnWrapper}
-									>
-										{queueId
-											? `${i18n.t("queueModal.buttons.okEdit")}`
-											: `${i18n.t("queueModal.buttons.okAdd")}`}
-										{isSubmitting && (
-											<CircularProgress
-												size={24}
-												className={classes.buttonProgress}
-											/>
-										)}
+										className={classes.btnNewHoliday}>
+										Adicionar Novo
 									</Button>
-								</DialogActions>
-							</Form>
-						)}
-					</Formik>
+								</Form>}
+							</Formik>
+						</FormControl>
+						{/* 							<Button
+								variant="contained"
+								color="primary"
+								onClick={() => setCreateNew(true)}
+								disabled={holidays.length === 0 ? true : false}
+							>
+								{i18n.t("queueModal.buttons.okAddHoliday")}
+							</Button> */}
+					</DialogActions>
+			</>)
+			:
+			<Formik
+				initialValues={queue}
+				enableReinitialize={true}
+				validationSchema={QueueSchema}
+				onSubmit={(values, actions) => {
+					setTimeout(() => {
+						handleSaveQueue(values);
+						actions.setSubmitting(false);
+					}, 400);
+				}}
+			>
+				{({ touched, errors, isSubmitting, values }) => (
+					<Form>
+						<DialogContent dividers>
+							<Field
+								as={TextField}
+								label={i18n.t("queueModal.form.name")}
+								autoFocus
+								name="name"
+								error={touched.name && Boolean(errors.name)}
+								helperText={touched.name && errors.name}
+								variant="outlined"
+								margin="dense"
+								className={classes.textField}
+							/>
+							<Field
+								as={TextField}
+								label={i18n.t("queueModal.form.color")}
+								name="color"
+								id="color"
+								onFocus={() => {
+									setColorPickerModalOpen(true);
+									greetingRef.current.focus();
+								}}
+								error={touched.color && Boolean(errors.color)}
+								helperText={touched.color && errors.color}
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<div
+												style={{ backgroundColor: values.color }}
+												className={classes.colorAdorment}
+											></div>
+										</InputAdornment>
+									),
+									endAdornment: (
+										<IconButton
+											size="small"
+											color="default"
+											onClick={() => setColorPickerModalOpen(true)}
+										>
+											<Colorize />
+										</IconButton>
+									),
+								}}
+								variant="outlined"
+								margin="dense"
+							/>
+							<ColorPicker
+								open={colorPickerModalOpen}
+								handleClose={() => setColorPickerModalOpen(false)}
+								onChange={color => {
+									values.color = color;
+									setQueue(() => {
+										return { ...values, color };
+									});
+								}}
+							/>
+							<div>
+								<Field
+									as={TextField}
+									label={i18n.t("queueModal.form.greetingMessage")}
+									type="greetingMessage"
+									multiline
+									inputRef={greetingRef}
+									minRows={5}
+									fullWidth
+									name="greetingMessage"
+									error={
+										touched.greetingMessage && Boolean(errors.greetingMessage)
+									}
+									helperText={
+										touched.greetingMessage && errors.greetingMessage
+									}
+									variant="outlined"
+									margin="dense"
+								/>
+							</div>
+						</DialogContent>
+						<DialogActions>
+							<Button
+								onClick={handleClose}
+								color="secondary"
+								disabled={isSubmitting}
+								variant="outlined"
+							>
+								{i18n.t("queueModal.buttons.cancel")}
+							</Button>
+							<Button
+								type="submit"
+								color="primary"
+								disabled={isSubmitting}
+								variant="contained"
+								className={classes.btnWrapper}
+							>
+								{queueId
+									? `${i18n.t("queueModal.buttons.okEdit")}`
+									: `${i18n.t("queueModal.buttons.okAdd")}`}
+								{isSubmitting && (
+									<CircularProgress
+										size={24}
+										className={classes.buttonProgress}
+									/>
+								)}
+							</Button>
+						</DialogActions>
+					</Form>
+				)}
+			</Formik>
 				}
-			</Dialog>
+		</Dialog>
 		</div >
 	);
 };
