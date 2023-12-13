@@ -54,15 +54,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "center",
 		alignItems: "center",
 		flexWrap: "wrap",
-		height: "260px",
-	},
-	//botão "add feriado"
-	formControl: {
-		display: "flex",
-		justifyContent: "space-evenly",
-		margin: theme.spacing(1),
-		width: "90%",
-		height: "35%"
+		height: "350px",
 	},
 	table: {
 		display: "flex",
@@ -70,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "start",
 		alignItems: "center",
 		width: "100%",
-		height: "90%",
+		height: "85%",
 		overflowY: "scroll",
 	},
 	//Títulos da tabela
@@ -164,6 +156,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		name: "",
 		color: "",
 		greetingMessage: "",
+		name1: ""
 	};
 
 	const [activeTab, setActiveTab] = useState(0);
@@ -174,6 +167,16 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [createNew, setCreateNew] = useState(false);
 	const greetingRef = useRef();
 	//Dados iniciais para estruturação do modal
+	const [defaultHolidays, setDefaultHolidays] = useState([
+		{ "date": "01/01", "holiday": "Confraternização Universal" },
+		{ "date": "21/04", "holiday": "Tiradentes" },
+		{ "date": "01/05", "holiday": "Dia do Trabalhador" },
+		{ "date": "07/09", "holiday": "Dia da Independência do Brasil" },
+		{ "date": "12/10", "holiday": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "date": "02/11", "holiday": "Dia de Finados" },
+		{ "date": "15/11", "holiday": "Proclamação da República" },
+		{ "date": "25/12", "holiday": "Natal" }
+	])
 	const [holidays, setHolidays] = useState([
 		{ "date": "01/01", "holiday": "Confraternização Universal" },
 		{ "date": "21/04", "holiday": "Tiradentes" },
@@ -189,10 +192,16 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		(async () => {
 			if (!queueId) return;
 			try {
-				console.log("Erro aqui EM CIMA");
 				const { data } = await api.get(`/queue/${queueId}`);
+				setHolidays(JSON.parse(data.holidays));
+				const newData = {
+					name: data.name,
+					color: data.color,
+					greetingMessage: data.greetingMessage,
+					holidays: JSON.parse(data.holidays)
+				}
 				setQueue(prevState => {
-					return { ...prevState, ...data };
+					return { ...prevState, ...newData };
 				});
 			} catch (err) {
 				toastError(err);
@@ -200,11 +209,11 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		})();
 
 		return () => {
-			console.log("Erro aqui");
 			setQueue({
 				name: "",
 				color: "",
 				greetingMessage: "",
+				holidays: holidays
 			});
 		};
 	}, [queueId, open]);
@@ -215,6 +224,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	};
 
 	const handleSaveQueue = async values => {
+		values = { name: values.name, color: values.color, greetingMessage: values.greetingMessage, holidays: JSON.stringify(holidays) }
 		try {
 			if (queueId) {
 				await api.put(`/queue/${queueId}`, values);
@@ -264,6 +274,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				{activeTab === 1 ?
 					(<>
 						<DialogContent dividers className={classes.rootDialog}>
+								<Button
+									style={{ display: 'flex', alignSelf: "end", heigth: "17px" }}
+									variant="text"
+									color="primary"
+									onClick={() => setHolidays(defaultHolidays)}
+								>
+									Restaurar Feriados
+								</Button>
 							<table className={classes.table}>
 								{holidays.length >= 1 ?
 									<thead className={classes.tableHead}>
@@ -302,55 +320,52 @@ const QueueModal = ({ open, onClose, queueId }) => {
 							</table>
 						</DialogContent>
 						<DialogActions style={{ height: "fit-content", display: "flex", alignContent: "center", justifyContent: "center" }}>
-							<FormControl className={classes.formControl}>
-								<Formik
-									initialValues={initialHolidayValue}
-									enableReinitialize={true}
-									validationSchema={HolidaySchema}
-									onSubmit={(values, actions) => {
-										setTimeout(() => {
-											createNewHoliday(values);
-											values = initialHolidayValue;
-											actions.resetForm();
-											actions.setSubmitting(false);
-										}, 400)
-									}}
-								>
-									{({ values, touched, errors, isSubmitting }) =>
-										<Form className={classes.formNewHoliday}>
-											<Field
-												as={TextField}
-												label={i18n.t("queueModal.holiday.date")}
-												name="date"
-												placeholder="DD/MM"
-												error={touched.date && Boolean(errors.date)}
-												helperText={touched.date && errors.date}
-												variant="outlined"
-												margin="dense"
-												className={classes.textField}
-											/>
-											<Field
-												as={TextField}
-												label={i18n.t("queueModal.holiday.holiday")}
-												name="holiday"
-												placeholder="Nome do feriado"
-												error={touched.holiday && Boolean(errors.holiday)}
-												helperText={touched.holiday && errors.holiday}
-												variant="outlined"
-												margin="dense"
-												className={classes.textField}
-											/>
-											<Button
-												variant="outlined"
-												color="primary"
-												type="submit"
-												disabled={isSubmitting}
-												className={classes.btnNewHoliday}>
-												Adicionar Novo
-											</Button>
-										</Form>}
-								</Formik>
-							</FormControl>
+							<Formik
+								initialValues={initialHolidayValue}
+								enableReinitialize={true}
+								validationSchema={HolidaySchema}
+								onSubmit={(values, actions) => {
+									setTimeout(() => {
+										createNewHoliday(values);
+										actions.resetForm();
+										actions.setSubmitting(false);
+									}, 400);
+								}}
+							>
+								{({ values, touched, errors, isSubmitting }) =>
+									<Form className={classes.formNewHoliday}>
+										<Field
+											as={TextField}
+											label={i18n.t("queueModal.holiday.date")}
+											name="date"
+											placeholder="DD/MM"
+											error={touched.date && Boolean(errors.date)}
+											helperText={touched.date && errors.date}
+											variant="outlined"
+											margin="dense"
+											className={classes.textField}
+										/>
+										<Field
+											as={TextField}
+											label={i18n.t("queueModal.holiday.holiday")}
+											name="holiday"
+											placeholder="Nome do feriado"
+											error={touched.holiday && Boolean(errors.holiday)}
+											helperText={touched.holiday && errors.holiday}
+											variant="outlined"
+											margin="dense"
+											className={classes.textField}
+										/>
+										<Button
+											variant="outlined"
+											color="primary"
+											type="submit"
+											disabled={isSubmitting}
+											className={classes.btnNewHoliday}>
+											Adicionar Novo
+										</Button>
+									</Form>}
+							</Formik>
 						</DialogActions>
 					</>)
 					:
@@ -377,6 +392,21 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										helperText={touched.name && errors.name}
 										variant="outlined"
 										margin="dense"
+										fullWidth
+										className={classes.textField}
+									/>
+									<Field
+										as={TextField}
+										label={i18n.t("queueModal.form.greetingMessage")}
+										name="greetingMessage"
+										inputRef={greetingRef}
+										error={touched.greetingMessage && Boolean(errors.greetingMessage)}
+										helperText={touched.greetingMessage && errors.greetingMessage}
+										variant="outlined"
+										minRows={5}
+										fullWidth
+										multiline
+										margin="dense"
 										className={classes.textField}
 									/>
 									<Field
@@ -386,6 +416,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										id="color"
 										onFocus={() => {
 											setColorPickerModalOpen(true);
+											console.log(greetingRef.current);
 											greetingRef.current.focus();
 										}}
 										error={touched.color && Boolean(errors.color)}
@@ -422,26 +453,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											});
 										}}
 									/>
-									<div>
-										<Field
-											as={TextField}
-											label={i18n.t("queueModal.form.greetingMessage")}
-											type="greetingMessage"
-											multiline
-											inputRef={greetingRef}
-											minRows={5}
-											fullWidth
-											name="greetingMessage"
-											error={
-												touched.greetingMessage && Boolean(errors.greetingMessage)
-											}
-											helperText={
-												touched.greetingMessage && errors.greetingMessage
-											}
-											variant="outlined"
-											margin="dense"
-										/>
-									</div>
 								</DialogContent>
 								<DialogActions>
 									<Button
