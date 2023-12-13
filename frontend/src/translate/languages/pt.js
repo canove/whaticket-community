@@ -195,7 +195,7 @@ const messages = {
         },
         holiday: {
           date: "Data",
-          name: "Nome do Feriado"
+          holiday: "Nome do Feriado"
         },
         buttons: {
           okAdd: "Adicionar",
