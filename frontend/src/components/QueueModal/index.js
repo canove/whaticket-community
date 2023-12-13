@@ -147,13 +147,13 @@ const QueueSchema = Yup.object().shape({
 });
 
 const HolidaySchema = Yup.object().shape({
-	data: Yup.string().max(5).required("Required"),
-	nome: Yup.string().required("Required"),
+	date: Yup.string().max(5).required("Required"),
+	name: Yup.string().required("Required"),
 });
 
 const initialHolidayValue = {
-	data: "",
-	nome: "",
+	date: "",
+	name: "",
 }
 
 const QueueModal = ({ open, onClose, queueId }) => {
@@ -174,14 +174,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const greetingRef = useRef();
 	//Dados iniciais para estruturação do modal
 	const [holidays, setHolidays] = useState([
-		{ "data": "01/01", "nome": "Confraternização Universal" },
-		{ "data": "21/04", "nome": "Tiradentes" },
-		{ "data": "01/05", "nome": "Dia do Trabalhador" },
-		{ "data": "07/09", "nome": "Dia da Independência do Brasil" },
-		{ "data": "12/10", "nome": "Dia das Crianças/ Nossa Senhora Aparecida" },
-		{ "data": "02/11", "nome": "Dia de Finados" },
-		{ "data": "15/11", "nome": "Proclamação da República" },
-		{ "data": "25/12", "nome": "Natal" }
+		{ "date": "01/01", "name": "Confraternização Universal" },
+		{ "date": "21/04", "name": "Tiradentes" },
+		{ "date": "01/05", "name": "Dia do Trabalhador" },
+		{ "date": "07/09", "name": "Dia da Independência do Brasil" },
+		{ "date": "12/10", "name": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "date": "02/11", "name": "Dia de Finados" },
+		{ "date": "15/11", "name": "Proclamação da República" },
+		{ "date": "25/12", "name": "Natal" }
 	]);
 
 	useEffect(() => {
@@ -275,8 +275,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									{holidays.length > 0
 										? holidays.map((holiday, index) =>
 											<tr className={classes.tableDataRows} key={index}>
-												<td className={classes.cellsDate}>{holiday.data}</td>
-												<td className={classes.cellsHoliday}>{holiday.nome}</td>
+												<td className={classes.cellsDate}>{holiday.date}</td>
+												<td className={classes.cellsHoliday}>{holiday.name}</td>
 												<td className={classes.buttonCells}>
 													<IconButton
 														size="small"
@@ -319,7 +319,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									<Field
 										as={TextField}
 										label={i18n.t("queueModal.holiday.date")}
-										name="data"
+										name="date"
 										placeholder="DD/MM"
 										error={touched.date && Boolean(errors.date)}
 										helperText={touched.date && errors.date}
@@ -330,7 +330,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									<Field
 										as={TextField}
 										label={i18n.t("queueModal.holiday.name")}
-										name="nome"
+										name="name"
 										placeholder="Nome do feriado"
 										error={touched.name && Boolean(errors.name)}
 										helperText={touched.name && errors.name}
