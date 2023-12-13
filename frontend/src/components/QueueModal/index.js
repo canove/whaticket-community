@@ -349,14 +349,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 								</Form>}
 							</Formik>
 						</FormControl>
-						{/* 							<Button
-								variant="contained"
-								color="primary"
-								onClick={() => setCreateNew(true)}
-								disabled={holidays.length === 0 ? true : false}
-							>
-								{i18n.t("queueModal.buttons.okAddHoliday")}
-							</Button> */}
 					</DialogActions>
 			</>)
 			:
