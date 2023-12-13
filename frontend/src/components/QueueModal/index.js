@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, startTransition } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
@@ -12,7 +12,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { AppBar, Select, Tab, Tabs, MenuItem, FormControl, InputLabel } from '@material-ui/core';
+import { AppBar, Tab, Tabs, FormControl } from '@material-ui/core';
 import { Edit, DeleteOutline, Colorize } from "@material-ui/icons";
 
 import { i18n } from "../../translate/i18n";
@@ -168,11 +168,11 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [activeTab, setActiveTab] = useState(0);
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
-	//Dados iniciais para estruturação do modal
-	const [createdHolidays, setCreatedHolidays] = useState([]);
+	//const [createdHolidays, setCreatedHolidays] = useState([]);
 	const [selected, setSelected] = useState("");
 	const [createNew, setCreateNew] = useState(false);
 	const greetingRef = useRef();
+	//Dados iniciais para estruturação do modal
 	const [holidays, setHolidays] = useState([
 		{ "data": "01/01", "nome": "Confraternização Universal" },
 		{ "data": "21/04", "nome": "Tiradentes" },
@@ -183,8 +183,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		{ "data": "15/11", "nome": "Proclamação da República" },
 		{ "data": "25/12", "nome": "Natal" }
 	]);
-
-	const options = holidays.map((holi) => `${holi.data} - ${holi.nome}`).sort();
 
 	useEffect(() => {
 		(async () => {
