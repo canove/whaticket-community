@@ -227,7 +227,6 @@ return (
                   margin="dense"
                   className={classes.textField}
                   fullWidth
-
                 />
               </div>
               <div className={classes.textQuickAnswerContainer}>
