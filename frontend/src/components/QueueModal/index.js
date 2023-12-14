@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "space-between",
 		alignItems: "center",
 		flexWrap: "wrap",
-		height: "350px",
+		height: "420px",
 	},
 	table: {
 		display: "flex",
@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: "start",
 		alignItems: "center",
 		width: "100%",
-		height: "80%",
+		height: "77%",
 		overflowY: "scroll",
 	},
 	//Títulos da tabela
@@ -122,11 +122,12 @@ const useStyles = makeStyles(theme => ({
 	},
 	formNewHoliday: {
 		display: "flex",
-		alignItems: "center",
+		alignItems: "start",
 		justifyContent: "center",
+		height: "fit-content",
 	},
 	btnNewHoliday: {
-		height: "60%"
+	marginTop: "10px",
 	}
 }));
 
@@ -139,9 +140,29 @@ const QueueSchema = Yup.object().shape({
 	greetingMessage: Yup.string(),
 });
 
+
 const HolidaySchema = Yup.object().shape({
-	date: Yup.string().max(5).required("Required"),
-	holiday: Yup.string().required("Required"),
+	date: Yup.string().test('is-day-month-format', "Please, use a valid date", (value) => {
+		if(value && value.includes("/")) {
+			const day = value.split('/')[0];
+			const month = value.split('/')[1];
+
+			if (day === '00' || month === '00') {
+				return false;
+			}
+			if (month === '02' && Number(day) > 29) {
+				return false;
+			}
+
+			if ((month === '04' || month === '06' || month === '09' || month === '11') && Number(day) > 30) {
+				return false;
+			}
+		}
+
+		const dayMonthRegex = /^((0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2]))$/;
+		return dayMonthRegex.test(value);
+	}).required("Required"),
+	holiday: Yup.string().min(3, "Too short").max(49, "Too long").required("Required"),
 });
 
 const QueueModal = ({ open, onClose, queueId }) => {
@@ -163,7 +184,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [activeTab, setActiveTab] = useState(0);
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
-	//const [createdHolidays, setCreatedHolidays] = useState([]);
 	const [edit, setEdit] = useState(false);
 	const [toEdit, setToEdit] = useState("");
 	const [createNew, setCreateNew] = useState(false);
@@ -289,6 +309,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									setTimeout(() => {
 										{ edit ? editHoliday(values.holiday) : createNewHoliday(values) }
 										actions.resetForm();
+										setEdit(false)
 										actions.setSubmitting(false);
 									}, 400);
 								}}
@@ -306,6 +327,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											margin="dense"
 											disabled={edit ? true : false}
 											className={classes.textField}
+											inputProps={{ maxLength: 5 }}
 										/>
 										<Field
 											as={TextField}
@@ -317,6 +339,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											variant="outlined"
 											margin="dense"
 											className={classes.textField}
+											inputProps={{ maxLength: 50 }}
 										/>
 										<Button
 											variant="outlined"
@@ -341,13 +364,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 									</thead> : null}
 								<tbody className={classes.tableBody}>
 									{holidays.length > 0
-										? holidays.map((holiday, index) =>
+										? holidays.sort((a, b) => a.holiday - b.holiday).map((holiday, index) =>
 											<tr className={classes.tableDataRows} key={index}>
 												<td className={classes.cellsDate}>{holiday.date}</td>
 												<td className={classes.cellsHoliday}>{holiday.holiday}</td>
 												<td className={classes.buttonCells}>
 													<IconButton
 														size="small"
+														disabled={edit}
 														onClick={() => {
 															setEdit(true);
 															setToEdit(holiday);
@@ -431,7 +455,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										id="color"
 										onFocus={() => {
 											setColorPickerModalOpen(true);
-											console.log(greetingRef.current);
 											greetingRef.current.focus();
 										}}
 										error={touched.color && Boolean(errors.color)}
