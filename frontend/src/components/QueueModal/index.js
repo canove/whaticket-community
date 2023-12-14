@@ -164,7 +164,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 	const [queue, setQueue] = useState(initialState);
 	//const [createdHolidays, setCreatedHolidays] = useState([]);
-	const [selected, setSelected] = useState("");
+	const [edit, setEdit] = useState(false);
+	const [toEdit, setToEdit] = useState("");
 	const [createNew, setCreateNew] = useState(false);
 	const greetingRef = useRef();
 	//Dados iniciais para estruturação do modal
@@ -246,12 +247,17 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const deleteHoliday = (selectedHoliday, selectedIndex) => {
 		const returned = holidays.filter((holiday) => holiday !== selectedHoliday);
 		setHolidays(returned);
-		setSelected("");
 	}
 
 	const createNewHoliday = (newHoliday) => {
 		setHolidays([...holidays, newHoliday]);
 		setCreateNew(!createNew);
+	}
+
+	const editHoliday = (holidayToEdit) => {
+		toEdit.holiday = holidayToEdit
+		setHolidays([...holidays, toEdit])
+		setEdit(false);
 	}
 	return (
 		<div className={classes.root}>
@@ -276,12 +282,12 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					(<>
 						<DialogContent dividers className={classes.rootDialog}>
 							<Formik
-								initialValues={initialHolidayValue}
+								initialValues={edit ? toEdit : initialHolidayValue}
 								enableReinitialize={true}
 								validationSchema={HolidaySchema}
 								onSubmit={(values, actions) => {
 									setTimeout(() => {
-										createNewHoliday(values);
+										{ edit ? editHoliday(values.holiday) : createNewHoliday(values) }
 										actions.resetForm();
 										actions.setSubmitting(false);
 									}, 400);
@@ -298,6 +304,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											helperText={touched.date && errors.date}
 											variant="outlined"
 											margin="dense"
+											readOnly={edit ? true : false}
 											className={classes.textField}
 										/>
 										<Field
@@ -317,7 +324,9 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											type="submit"
 											disabled={isSubmitting}
 											className={classes.btnNewHoliday}>
-											Adicionar Novo
+											{edit
+												? `${i18n.t("queueModal.buttons.okEdit")}`
+												: `${i18n.t("queueModal.buttons.okAdd")}`}
 										</Button>
 									</Form>}
 							</Formik>
@@ -339,7 +348,11 @@ const QueueModal = ({ open, onClose, queueId }) => {
 												<td className={classes.buttonCells}>
 													<IconButton
 														size="small"
-														onClick={() => console.log("Edit Feriado")}
+														onClick={() => {
+															setEdit(true);
+															setToEdit(holiday);
+															setHolidays(holidays.filter((h) => h !== holidays[index]));
+														}}
 													>
 														<Edit />
 													</IconButton>
