@@ -304,7 +304,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											helperText={touched.date && errors.date}
 											variant="outlined"
 											margin="dense"
-											readOnly={edit ? true : false}
+											disabled={edit ? true : false}
 											className={classes.textField}
 										/>
 										<Field
