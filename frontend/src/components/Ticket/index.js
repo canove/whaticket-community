@@ -82,6 +82,7 @@ const Ticket = () => {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -98,6 +99,16 @@ const Ticket = () => {
           toastError(err);
         }
       };
+      const fetchMessages = async () => {
+        try {
+          const { data } = await api.get("/messages/" + ticketId);
+          setMessages(data.messages.filter(({fromMe}) =>fromMe === false))
+        } catch (err) {
+          setLoading(false);
+          toastError(err);
+        }
+      };
+      fetchMessages();
       fetchTicket();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
@@ -169,7 +180,7 @@ const Ticket = () => {
             ticketId={ticketId}
             isGroup={ticket.isGroup}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} ticket={ticket} />
+          <MessageInput ticketStatus={ticket.status} ticket={ticket} lastMessage={messages}/>
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
