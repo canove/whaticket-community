@@ -201,10 +201,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus, ticket, lastMessage }) => {
+const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
-
   const [medias, setMedias] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -226,21 +225,10 @@ const MessageInput = ({ ticketStatus, ticket, lastMessage }) => {
 
   useEffect(() => {
     inputRef.current.focus();
-    console.log(lastMessage);
-    //Verificando se data da ultima mensagem recebida = data do feriado e dispara envio da mensagem de ausência
-    if (ticket.queue) {
-      const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
-      const date = new Date(ticket.updatedAt);
-
-      const lastMessageDate = `${date.getDate()}/${date.getMonth() + 1}`;
-      const isHoliday = currentQueueHolidays.find(({ date }) => date === lastMessageDate);
-
-      if (isHoliday) {
-        setInputMessage(ticket.queue.greetingMessage);
-        console.log(isHoliday, "MENSAGEM", ticket);
-        handleSendMessage();
-      }
-    }
+    if(holidayMessage) {
+      setInputMessage(holidayMessage)
+      handleSendMessage()
+    } 
     return () => {
       setInputMessage("");
       setShowEmoji(false);
@@ -253,8 +241,7 @@ const MessageInput = ({ ticketStatus, ticket, lastMessage }) => {
     if (typeof inputMessage === 'string') {
       setInputMessage(e.target.value);
       handleLoadQuickAnswer(e.target.value);
-    }
-  };
+    }};
 
   const handleQuickAnswersClick = (value) => {
     const quickAnswer = value.split('/:/');
