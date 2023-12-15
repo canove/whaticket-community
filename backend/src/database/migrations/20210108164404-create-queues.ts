@@ -23,7 +23,7 @@ module.exports = {
         type: DataTypes.TEXT
       },
       holidays: {
-        type: DataTypes.ARRAY
+        type: DataTypes.TEXT
       },
       createdAt: {
         type: DataTypes.DATE,
