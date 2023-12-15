@@ -201,7 +201,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus, ticket }) => {
+const MessageInput = ({ ticketStatus, ticket, lastMessage }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
 
@@ -222,10 +222,12 @@ const MessageInput = ({ ticketStatus, ticket }) => {
 
   useEffect(() => {
     inputRef.current.focus();
-  }, [replyingMessage]);
+    }, [replyingMessage]);
 
   useEffect(() => {
     inputRef.current.focus();
+    console.log(lastMessage);
+    //Verificando se data da ultima mensagem recebida = data do feriado e dispara envio da mensagem de ausência
     if (ticket.queue) {
       const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
       const date = new Date(ticket.updatedAt);
@@ -235,7 +237,7 @@ const MessageInput = ({ ticketStatus, ticket }) => {
 
       if (isHoliday) {
         setInputMessage(ticket.queue.greetingMessage);
-        console.log(isHoliday, "MENSAGEM", ticket.messages);
+        console.log(isHoliday, "MENSAGEM", ticket);
         handleSendMessage();
       }
     }
