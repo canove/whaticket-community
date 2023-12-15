@@ -9,7 +9,7 @@ interface Request {
   contactId: number;
   status: string;
   userId: number;
-  queueId ?: number;
+  queueId?: number;
 }
 
 const CreateTicketService = async ({
