@@ -7,7 +7,7 @@ const ShowUserService = async (id: string | number): Promise<User> => {
   const user = await User.findByPk(id, {
     attributes: ["name", "id", "email", "profile", "tokenVersion", "whatsappId"],
     include: [
-      { model: Queue, as: "queues", attributes: ["id", "name", "color", "holidays"] },
+      { model: Queue, as: "queues", attributes: ["id", "name", "color", "holidays", "greetingMessage"] },
       { model: Whatsapp, as: "whatsapp", attributes: ["id", "name"] },
     ],
     order: [ [ {  model: Queue, as: "queues"}, 'name', 'asc' ] ]

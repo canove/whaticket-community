@@ -50,7 +50,7 @@ const ListTicketsService = async ({
     {
       model: Queue,
       as: "queue",
-      attributes: ["id", "name", "color", "holidays"]
+      attributes: ["id", "name", "color", "holidays", "greetingMessage"]
     },
     {
       model: Whatsapp,
