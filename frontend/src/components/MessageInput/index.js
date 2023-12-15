@@ -201,7 +201,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus }) => {
+const MessageInput = ({ ticketStatus, ticket }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
 
@@ -226,6 +226,19 @@ const MessageInput = ({ ticketStatus }) => {
 
   useEffect(() => {
     inputRef.current.focus();
+    if (ticket.queue) {
+      const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
+      const date = new Date(ticket.updatedAt);
+
+      const lastMessageDate = `${date.getDate()}/${date.getMonth() + 1}`;
+      const isHoliday = currentQueueHolidays.find(({ date }) => date === lastMessageDate);
+
+      if (isHoliday) {
+        setInputMessage(ticket.queue.greetingMessage);
+        console.log(isHoliday, "MENSAGEM", ticket.messages);
+        handleSendMessage();
+      }
+    }
     return () => {
       setInputMessage("");
       setShowEmoji(false);
