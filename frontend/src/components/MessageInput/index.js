@@ -225,7 +225,8 @@ const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
 
   useEffect(() => {
     inputRef.current.focus();
-    if(holidayMessage) {
+    console.log(holidayMessage);
+    if(holidayMessage.length > 0) {
       setInputMessage(holidayMessage)
       handleSendMessage()
     } 
