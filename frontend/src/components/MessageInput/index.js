@@ -201,11 +201,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
+const MessageInput = ({ ticketStatus, ticket }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
   const [medias, setMedias] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [holidayMessage, setHolidayMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -221,28 +222,41 @@ const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
 
   useEffect(() => {
     inputRef.current.focus();
-    }, [replyingMessage]);
+  }, [replyingMessage]);
 
   useEffect(() => {
     inputRef.current.focus();
-    console.log(holidayMessage);
-    if(holidayMessage.length > 0) {
-      setInputMessage(holidayMessage)
-      handleSendMessage()
-    } 
-    return () => {
-      setInputMessage("");
-      setShowEmoji(false);
-      setMedias([]);
-      setReplyingMessage(null);
-    };
-  }, [ticketId, setReplyingMessage]);
+    //Verificando se data da ultima mensagem recebida = data do feriado e dispara envio da mensagem de ausência
+    if (ticket && ticket.queue) {
+      const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
+      const date = new Date(ticket.updatedAt);
+
+      const lastUpdate = `${date.getDate()}/${date.getMonth() + 1}`;
+      const isHoliday = currentQueueHolidays.find(({ date }) => date === lastUpdate);
+      if (!isHoliday || isHoliday === undefined) {
+        setHolidayMessage("");
+      }
+
+      setHolidayMessage(ticket.queue.greetingMessage);
+      setInputMessage(holidayMessage);
+      handleOutOfOffice(holidayMessage);
+    }
+  }, [ticket]);
+
+  const handleOutOfOffice = (holidayMessage) => {
+    handleSendMessage();
+    setInputMessage("");
+    setShowEmoji(false);
+    setLoading(false);
+    setReplyingMessage(null);
+  }
 
   const handleChangeInput = (e) => {
     if (typeof inputMessage === 'string') {
       setInputMessage(e.target.value);
       handleLoadQuickAnswer(e.target.value);
-    }};
+    }
+  };
 
   const handleQuickAnswersClick = (value) => {
     const quickAnswer = value.split('/:/');
@@ -292,8 +306,25 @@ const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
     setMedias([]);
   };
 
-  const handleSendMessage = async () => {
-    if (String(inputMessage).trim() === "") return;
+  const handleSendMessage = async () => {  
+    if (holidayMessage.length !== 0 && inputMessage.length === 0) {
+      const message = {
+        read: 1,
+        fromMe: true,
+        mediaUrl: "",
+        body: signMessage
+          ? `*${user?.name}:*\n${holidayMessage.trim()}`
+          : holidayMessage.trim(),
+        quotedMsg: replyingMessage,
+      }
+      try {
+        return await api.post(`/messages/${ticketId}`, message);
+      } catch (err) {
+        return toastError(err);
+      }
+    }
+
+    if(String(inputMessage).trim() === "") return;
     setLoading(true);
 
     if (typeof inputMessage !== 'string') {
@@ -330,8 +361,8 @@ const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
         fromMe: true,
         mediaUrl: "",
         body: signMessage
-          ? `*${user?.name}:*\n${inputMessage.trim()}`
-          : inputMessage.trim(),
+          ? inputMessage.length === 0 ? `*${user?.name}:*\n${holidayMessage.trim()}` : `*${user?.name}:*\n${inputMessage.trim()}`
+          : inputMessage.length === 0 ? holidayMessage.trim() : inputMessage.trim(),
         quotedMsg: replyingMessage,
       }
       try {
@@ -339,12 +370,12 @@ const MessageInput = ({ ticketStatus, ticket, holidayMessage }) => {
       } catch (err) {
         toastError(err);
       }
-
-      setInputMessage("");
-      setShowEmoji(false);
-      setLoading(false);
-      setReplyingMessage(null);
     }
+
+    setInputMessage("");
+    setShowEmoji(false);
+    setLoading(false);
+    setReplyingMessage(null);
   }
 
   const handleStartRecording = async () => {
