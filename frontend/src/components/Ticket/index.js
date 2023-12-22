@@ -82,20 +82,16 @@ const Ticket = () => {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
-  const [lastMessage, setLastMessage] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [holidayMessage, setHolidayMessage] = useState([]);
 
   useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
       const fetchData = async () => {
         try {
-          const messagesData = await api.get("/messages/" + ticketId);
+          //const messagesData = await api.get("/messages/" + ticketId);
           const { data } = await api.get("/tickets/" + ticketId);
           setContact(data.contact);
           setTicket(data);
-          setMessages(messagesData.data.messages.filter(({ fromMe }) => fromMe === false));
           setLoading(false);
         } catch (err) {
           setLoading(false);
@@ -104,6 +100,7 @@ const Ticket = () => {
       };
       fetchData();
     }, 500);
+
     return () => clearTimeout(delayDebounceFn);
   }, [ticketId, history]);
 
@@ -139,24 +136,6 @@ const Ticket = () => {
     };
   }, [ticketId, history]);
 
-  useEffect(() => {
-    //Verificando se data da ultima mensagem recebida = data do feriado e dispara envio da mensagem de ausência
-    if (messages.length > 0 && ticket.queue) {
-      setLastMessage(messages[messages.length - 1]);
-
-      const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
-      const date = new Date(lastMessage.updatedAt);
-
-      const lastMessageDate = `${date.getDate()}/${date.getMonth() + 1}`;
-      const isHoliday = currentQueueHolidays.find(({ date }) => date === lastMessageDate);
-      //lastMessage.contact && console.log("DE", lastMessage.contact.name, "MENSAGEM:", lastMessage.body, "DATA", lastMessageDate);
-
-      if (isHoliday && isHoliday.date === lastMessageDate) {
-        setHolidayMessage(ticket.queue.greetingMessage);
-      }
-    }
-  });
-
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
   };
@@ -191,7 +170,7 @@ const Ticket = () => {
             ticketId={ticketId}
             isGroup={ticket.isGroup}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} holidayMessage={holidayMessage} />
+          <MessageInput ticketStatus={ticket.status} ticket={ticket} />
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
