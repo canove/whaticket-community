@@ -12,7 +12,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { AppBar, Tab, Tabs, FormControl } from '@material-ui/core';
+import { AppBar, Tab, Tabs } from '@material-ui/core';
 import { Edit, DeleteOutline, Colorize } from "@material-ui/icons";
 
 import { i18n } from "../../translate/i18n";
@@ -139,7 +139,6 @@ const QueueSchema = Yup.object().shape({
 	color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
 	greetingMessage: Yup.string(),
 });
-
 
 const HolidaySchema = Yup.object().shape({
 	date: Yup.string().test('is-day-month-format', "Please, use a valid date", (value) => {
