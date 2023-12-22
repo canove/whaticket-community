@@ -88,7 +88,6 @@ const Ticket = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchData = async () => {
         try {
-          //const messagesData = await api.get("/messages/" + ticketId);
           const { data } = await api.get("/tickets/" + ticketId);
           setContact(data.contact);
           setTicket(data);
