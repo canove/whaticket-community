@@ -206,7 +206,6 @@ const MessageInput = ({ ticketStatus, ticket }) => {
   const { ticketId } = useParams();
   const [medias, setMedias] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
-  const [holidayMessage, setHolidayMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -226,30 +225,41 @@ const MessageInput = ({ ticketStatus, ticket }) => {
 
   useEffect(() => {
     inputRef.current.focus();
-    //Verificando se data da ultima mensagem recebida = data do feriado e dispara envio da mensagem de ausência
-    if (ticket && ticket.queue) {
-      const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
-      const date = new Date(ticket.updatedAt);
 
-      const lastUpdate = `${date.getDate()}/${date.getMonth() + 1}`;
-      const isHoliday = currentQueueHolidays.find(({ date }) => date === lastUpdate);
-      if (!isHoliday || isHoliday === undefined) {
-        setHolidayMessage("");
+    return () => {
+      setInputMessage("");
+      setShowEmoji(false);
+      setMedias([]);
+      setReplyingMessage(null);
+    };
+  }, [ticketId, setReplyingMessage]);
+
+  /*   useEffect(() => {
+      inputRef.current.focus();
+      //Verificando se data da ultima mensagem recebida = data do feriado e dispara envio da mensagem de ausência
+      if (ticket && ticket.queue) {
+        const currentQueueHolidays = JSON.parse(ticket.queue.holidays);
+        const date = new Date(ticket.updatedAt);
+  
+        const lastUpdate = `${date.getDate()}/${date.getMonth() + 1}`;
+        const isHoliday = currentQueueHolidays.find(({ date }) => date === lastUpdate);
+        if (!isHoliday || isHoliday === undefined) {
+          setHolidayMessage("");
+        }
+  
+        setHolidayMessage(ticket.queue.greetingMessage);
+        setInputMessage(holidayMessage);
+        handleOutOfOffice(holidayMessage);
       }
-
-      setHolidayMessage(ticket.queue.greetingMessage);
-      setInputMessage(holidayMessage);
-      handleOutOfOffice(holidayMessage);
-    }
-  }, [ticket]);
-
-  const handleOutOfOffice = (holidayMessage) => {
-    handleSendMessage();
-    setInputMessage("");
-    setShowEmoji(false);
-    setLoading(false);
-    setReplyingMessage(null);
-  }
+    }, [ticket]);
+  
+    const handleOutOfOffice = (holidayMessage) => {
+      handleSendMessage();
+      setInputMessage("");
+      setShowEmoji(false);
+      setLoading(false);
+      setReplyingMessage(null);
+    } */
 
   const handleChangeInput = (e) => {
     if (typeof inputMessage === 'string') {
@@ -306,31 +316,12 @@ const MessageInput = ({ ticketStatus, ticket }) => {
     setMedias([]);
   };
 
-  const handleSendMessage = async () => {  
-    if (holidayMessage.length !== 0 && inputMessage.length === 0) {
-      const message = {
-        read: 1,
-        fromMe: true,
-        mediaUrl: "",
-        body: signMessage
-          ? `*${user?.name}:*\n${holidayMessage.trim()}`
-          : holidayMessage.trim(),
-        quotedMsg: replyingMessage,
-      }
-      try {
-        return await api.post(`/messages/${ticketId}`, message);
-      } catch (err) {
-        return toastError(err);
-      }
-    }
-
-    if(String(inputMessage).trim() === "") return;
+  const handleSendMessage = async () => {
+    if (String(inputMessage).trim() === "") return;
     setLoading(true);
-
     if (typeof inputMessage !== 'string') {
       const arrayQuickMessages = Object.values(inputMessage);
       const limit = inputMessage.length;
-
       for (let i = 0; i < limit; i += 1) {
         setTimeout(async () => {
           const message = {
@@ -351,18 +342,16 @@ const MessageInput = ({ ticketStatus, ticket }) => {
           setShowEmoji(false);
           setLoading(false);
           setReplyingMessage(null);
-
         }, 1500 * i); //1,5seg * i
       }
-
     } else {
       const message = {
         read: 1,
         fromMe: true,
         mediaUrl: "",
         body: signMessage
-          ? inputMessage.length === 0 ? `*${user?.name}:*\n${holidayMessage.trim()}` : `*${user?.name}:*\n${inputMessage.trim()}`
-          : inputMessage.length === 0 ? holidayMessage.trim() : inputMessage.trim(),
+          ? `*${user?.name}:*\n${inputMessage.trim()}`
+          : inputMessage.trim(),
         quotedMsg: replyingMessage,
       }
       try {
@@ -370,12 +359,11 @@ const MessageInput = ({ ticketStatus, ticket }) => {
       } catch (err) {
         toastError(err);
       }
+      setInputMessage("");
+      setShowEmoji(false);
+      setLoading(false);
+      setReplyingMessage(null);
     }
-
-    setInputMessage("");
-    setShowEmoji(false);
-    setLoading(false);
-    setReplyingMessage(null);
   }
 
   const handleStartRecording = async () => {
@@ -504,7 +492,7 @@ const MessageInput = ({ ticketStatus, ticket }) => {
           <span>
             {medias[0]?.name}
             {/* <img src={media.preview} alt=""></img> */}
-          </span>
+          </span >
         )}
         <IconButton
           aria-label="send-upload"
@@ -514,7 +502,7 @@ const MessageInput = ({ ticketStatus, ticket }) => {
         >
           <SendIcon className={classes.sendMessageIcons} />
         </IconButton>
-      </Paper>
+      </Paper >
     );
   else {
     return (
