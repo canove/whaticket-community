@@ -189,6 +189,7 @@ const messages = {
           name: "Name",
           color: "Color",
           greetingMessage: "Greeting Message",
+          absenceMessage: "Absence Message",
         },
         buttons: {
           okAdd: "Add",
@@ -304,7 +305,8 @@ const messages = {
         table: {
           name: "Name",
           color: "Color",
-          greeting: "Greeting message",
+          greeting: "Greeting Message",
+          absence: "Absence Message",
           actions: "Actions",
         },
         buttons: {

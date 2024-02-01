@@ -22,6 +22,9 @@ module.exports = {
       greetingMessage: {
         type: DataTypes.TEXT
       },
+      absenceMessage: {
+        type: DataTypes.TEXT
+      },
       holidays: {
         type: DataTypes.TEXT
       },

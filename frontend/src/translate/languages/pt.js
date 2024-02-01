@@ -191,7 +191,8 @@ const messages = {
         form: {
           name: "Nome",
           color: "Cor",
-          greetingMessage: "Mensagem de saudação",
+          greetingMessage: "Mensagem de Saudação",
+          absenceMessage: "Mensagem de Ausência",
         },
         holiday: {
           date: "Data",
@@ -316,6 +317,7 @@ const messages = {
           name: "Nome",
           color: "Cor",
           greeting: "Mensagem de saudação",
+          absence: "Mensagem de Ausência",
           actions: "Ações",
         },
         buttons: {

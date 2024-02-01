@@ -191,7 +191,8 @@ const messages = {
         form: {
           name: "Nombre",
           color: "Color",
-          greetingMessage: "Mensaje de saludo",
+          greetingMessage: "Mensaje de Saludo",
+          absenceMessage: "Mensaje de Ausencia",
         },
         buttons: {
           okAdd: "Añadir",
@@ -309,6 +310,7 @@ const messages = {
           name: "Nombre",
           color: "Color",
           greeting: "Mensaje de saludo",
+          absence: "Mensaje de Ausencia",
           actions: "Comportamiento",
         },
         buttons: {

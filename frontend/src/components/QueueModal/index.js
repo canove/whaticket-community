@@ -138,6 +138,7 @@ const QueueSchema = Yup.object().shape({
 		.required("Required"),
 	color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
 	greetingMessage: Yup.string(),
+	absenceMessage: Yup.string(),
 });
 
 const HolidaySchema = Yup.object().shape({
@@ -177,6 +178,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 		name: "",
 		color: "",
 		greetingMessage: "",
+		absenceMessage: "",
 		name1: ""
 	};
 
@@ -219,6 +221,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					name: data.name,
 					color: data.color,
 					greetingMessage: data.greetingMessage,
+					absenceMessage: data.absenceMessage,
 					holidays: JSON.parse(data.holidays)
 				}
 				setQueue(prevState => {
@@ -234,6 +237,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 				name: "",
 				color: "",
 				greetingMessage: "",
+				absenceMessage: "",
 				holidays: holidays
 			});
 		};
@@ -245,7 +249,12 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	};
 
 	const handleSaveQueue = async values => {
-		values = { name: values.name, color: values.color, greetingMessage: values.greetingMessage, holidays: JSON.stringify(holidays) }
+		values = {
+			name: values.name,
+			color: values.color,
+			greetingMessage: values.greetingMessage,
+			absenceMessage: values.absenceMessage,
+			holidays: JSON.stringify(holidays) }
 		try {
 			if (queueId) {
 				await api.put(`/queue/${queueId}`, values);
@@ -440,6 +449,20 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										inputRef={greetingRef}
 										error={touched.greetingMessage && Boolean(errors.greetingMessage)}
 										helperText={touched.greetingMessage && errors.greetingMessage}
+										variant="outlined"
+										minRows={5}
+										fullWidth
+										multiline
+										margin="dense"
+										className={classes.textField}
+									/>
+																		<Field
+										as={TextField}
+										label={i18n.t("queueModal.form.absenceMessage")}
+										name="absenceMessage"
+										inputRef={greetingRef}
+										error={touched.absenceMessage && Boolean(errors.absenceMessage)}
+										helperText={touched.absenceMessage && errors.absenceMessage}
 										variant="outlined"
 										minRows={5}
 										fullWidth
