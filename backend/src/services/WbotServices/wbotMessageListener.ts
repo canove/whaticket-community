@@ -29,7 +29,6 @@ import formatBody from "../../helpers/Mustache";
 interface Session extends Client {
   id?: number;
 }
-
 const writeFileAsync = promisify(writeFile);
 
 const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
@@ -183,62 +182,65 @@ const verifyQueue = async (
   contact: Contact
 ) => {
   const { queues, greetingMessage } = await ShowWhatsAppService(wbot.id!);
-
   if (queues.length === 1) {
     await UpdateTicketService({
       ticketData: { queueId: queues[0].id },
       ticketId: ticket.id
     });
-
-    return;
   }
-
   const selectedOption = msg.body;
 
   const choosenQueue = queues[+selectedOption - 1];
+
+  let body = "";
+
+  const holidays = JSON.parse(ticket.queue.holidays);
+  const newDate = ticket.updatedAt;
+  const lastUpdate =
+    newDate.getDate() < 10
+      ? `0${newDate.getDate()}/0${newDate.getMonth() + 1}`
+      : `${newDate.getDate()}/${newDate.getMonth() + 1}`;
+
+  const isHoliday = holidays.find(({ date }) => date === lastUpdate);
+  if (isHoliday) {
+    body = choosenQueue
+      ? formatBody(`\u200e${choosenQueue.absenceMessage}`, contact)
+      : formatBody(`\u200e${ticket.queue.absenceMessage}`, contact);
+  }
 
   if (choosenQueue) {
     await UpdateTicketService({
       ticketData: { queueId: choosenQueue.id },
       ticketId: ticket.id
     });
-    const holidays = JSON.parse(choosenQueue.holidays);
-    const newDate = new Date(ticket.updatedAt);
-    const lastUpdate = `${newDate.getDate()}/${newDate.getMonth() + 1}`;
-
-    const isHoliday = holidays.find(({ date }) => date === lastUpdate);
-    let body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
-
-    if (isHoliday) {
-      body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
-    }
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
-    await verifyMessage(sentMessage, ticket, contact);
-  } else {
-    let options = "";
-
-    queues.forEach((queue, index) => {
-      options += `*${index + 1}* - ${queue.name}\n`;
-    });
-
-    const body = formatBody(`\u200e${greetingMessage}\n${options}`, contact);
-
-    const debouncedSentMessage = debounce(
-      async () => {
-        const sentMessage = await wbot.sendMessage(
-          `${contact.number}@c.us`,
-          body
-        );
-        verifyMessage(sentMessage, ticket, contact);
-      },
-      3000,
-      ticket.id
-    );
-
-    debouncedSentMessage();
+    const verify = await verifyMessage(sentMessage, ticket, contact);
+    return verify;
   }
+
+  let options = "";
+
+  queues.forEach((queue, index) => {
+    options += `*${index + 1}* - ${queue.name}\n`;
+  });
+
+  body = formatBody(`\u200e${greetingMessage}\n${options}`, contact);
+
+  const debouncedSentMessage = debounce(
+    async () => {
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        body
+      );
+      verifyMessage(sentMessage, ticket, contact);
+    },
+    3000,
+    ticket.id
+  );
+
+  debouncedSentMessage();
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {
@@ -332,15 +334,7 @@ const handleMessage = async (
       await verifyMessage(msg, ticket, contact);
     }
 
-    if (
-      !ticket.queue &&
-      !chat.isGroup &&
-      !msg.fromMe &&
-      !ticket.userId &&
-      whatsapp.queues.length >= 1
-    ) {
-      await verifyQueue(wbot, msg, ticket, contact);
-    }
+    await verifyQueue(wbot, msg, ticket, contact);
 
     if (msg.type === "vcard") {
       try {
