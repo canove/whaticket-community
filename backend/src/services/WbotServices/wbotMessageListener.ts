@@ -12,6 +12,7 @@ import {
 
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
+import Queue from "../../models/Queue";
 import Message from "../../models/Message";
 
 import { getIO } from "../../libs/socket";
@@ -175,6 +176,19 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   return msg;
 };
 
+const isHoliday = (ticket: Ticket, currentQueue: Queue) => {
+  const holidays = JSON.parse(currentQueue.holidays);
+  console.log(holidays);
+  const newDate = ticket.updatedAt;
+  const lastUpdate =
+    newDate.getDate() < 10
+      ? `0${newDate.getDate()}/0${newDate.getMonth() + 1}`
+      : `${newDate.getDate()}/${newDate.getMonth() + 1}`;
+
+  const sendAbsenceMesage = holidays.find(({ date }) => date === lastUpdate);
+  return sendAbsenceMesage;
+};
+
 const verifyQueue = async (
   wbot: Session,
   msg: WbotMessage,
@@ -194,31 +208,31 @@ const verifyQueue = async (
 
   let body = "";
 
-  const holidays = JSON.parse(ticket.queue.holidays);
-  const newDate = ticket.updatedAt;
-  const lastUpdate =
-    newDate.getDate() < 10
-      ? `0${newDate.getDate()}/0${newDate.getMonth() + 1}`
-      : `${newDate.getDate()}/${newDate.getMonth() + 1}`;
-
-  const isHoliday = holidays.find(({ date }) => date === lastUpdate);
-  if (isHoliday) {
-    body = choosenQueue
-      ? formatBody(`\u200e${choosenQueue.absenceMessage}`, contact)
-      : formatBody(`\u200e${ticket.queue.absenceMessage}`, contact);
-  }
-
+  // Escolha do setor pelo cliente não adicionado ainda
   if (choosenQueue) {
     await UpdateTicketService({
       ticketData: { queueId: choosenQueue.id },
       ticketId: ticket.id
     });
 
+    if (isHoliday(ticket, choosenQueue)) {
+      body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        body
+      );
+
+      await verifyMessage(sentMessage, ticket, contact);
+      return;
+    }
+
+    body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
-    const verify = await verifyMessage(sentMessage, ticket, contact);
-    return verify;
+    await verifyMessage(sentMessage, ticket, contact);
+    return;
   }
+  console.log("SEM id = é feriado");
 
   let options = "";
 
@@ -333,8 +347,36 @@ const handleMessage = async (
     } else {
       await verifyMessage(msg, ticket, contact);
     }
+    if (
+      !ticket.queue &&
+      !chat.isGroup &&
+      !msg.fromMe &&
+      !ticket.userId &&
+      whatsapp.queues.length >= 1
+    ) {
+      await verifyQueue(wbot, msg, ticket, contact);
+    }
 
-    await verifyQueue(wbot, msg, ticket, contact);
+    if (isHoliday(ticket, ticket.queue)) {
+      console.log("com id = é feriado");
+      const body = formatBody(`\u200e${ticket.queue.absenceMessage}`, contact);
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        body
+      );
+
+      await verifyMessage(sentMessage, ticket, contact);
+    } else {
+      console.log("com id = NÃO é feriado");
+      const body = formatBody(`\u200e${ticket.queue.greetingMessage}`, contact);
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        body
+      );
+
+      await verifyMessage(sentMessage, ticket, contact);
+      return;
+    }
 
     if (msg.type === "vcard") {
       try {
