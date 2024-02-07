@@ -187,6 +187,7 @@ const messages = {
         title: {
           add: "Agregar cola",
           edit: "Editar cola",
+          holidays: "Días Festivos"
         },
         form: {
           name: "Nombre",

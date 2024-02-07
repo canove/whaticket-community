@@ -184,6 +184,7 @@ const messages = {
         title: {
           add: "Add queue",
           edit: "Edit queue",
+          holidays: "Holidays",
         },
         form: {
           name: "Name",
