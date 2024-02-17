@@ -167,23 +167,30 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
 
   msg.body = `data:image/png;base64,${msg.body}|${gmapsUrl}`;
 
-  msg.body += `|${
-    msg.location.description
-      ? msg.location.description
-      : `${msg.location.latitude}, ${msg.location.longitude}`
-  }`;
+  msg.body += `|${msg.location.description
+    ? msg.location.description
+    : `${msg.location.latitude}, ${msg.location.longitude}`
+    }`;
 
   return msg;
 };
 
-const isHoliday = (ticket: Ticket, currentQueue: Queue) => {
+const isHoliday = async (ticket: Ticket, currentQueue: Queue) => {
   const holidays = JSON.parse(currentQueue.holidays);
-  console.log(holidays);
-  const newDate = ticket.updatedAt;
-  const lastUpdate =
-    newDate.getDate() < 10
-      ? `0${newDate.getDate()}/0${newDate.getMonth() + 1}`
-      : `${newDate.getDate()}/${newDate.getMonth() + 1}`;
+
+  const messagesList = await Message.findAll({
+    where: { ticketId: ticket.id }
+  });
+  const targetMessage = messagesList[messagesList.length - 1];
+
+  const dataNumber = targetMessage.updatedAt.getDate();
+  const dataMonth = targetMessage.updatedAt.getMonth();
+
+  const lastUpdate = `${dataNumber < 10
+    ? `0${dataNumber}`
+    : `${dataNumber}`}/${dataMonth + 1 < 10
+      ? `0${dataMonth + 1}`
+      : `${dataMonth + 1}`}`;
 
   const sendAbsenceMesage = holidays.find(({ date }) => date === lastUpdate);
   return sendAbsenceMesage;
@@ -202,6 +209,7 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
   }
+
   const selectedOption = msg.body;
 
   const choosenQueue = queues[+selectedOption - 1];
@@ -215,7 +223,7 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    if (isHoliday(ticket, choosenQueue)) {
+    if ((await isHoliday(ticket, choosenQueue)) !== undefined) {
       body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
       const sentMessage = await wbot.sendMessage(
         `${contact.number}@c.us`,
@@ -232,7 +240,6 @@ const verifyQueue = async (
     await verifyMessage(sentMessage, ticket, contact);
     return;
   }
-  console.log("SEM id = é feriado");
 
   let options = "";
 
@@ -357,8 +364,7 @@ const handleMessage = async (
       await verifyQueue(wbot, msg, ticket, contact);
     }
 
-    if (isHoliday(ticket, ticket.queue)) {
-      console.log("com id = é feriado");
+    if (await isHoliday(ticket, ticket.queue)) {
       const body = formatBody(`\u200e${ticket.queue.absenceMessage}`, contact);
       const sentMessage = await wbot.sendMessage(
         `${contact.number}@c.us`,
@@ -366,16 +372,6 @@ const handleMessage = async (
       );
 
       await verifyMessage(sentMessage, ticket, contact);
-    } else {
-      console.log("com id = NÃO é feriado");
-      const body = formatBody(`\u200e${ticket.queue.greetingMessage}`, contact);
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
-
-      await verifyMessage(sentMessage, ticket, contact);
-      return;
     }
 
     if (msg.type === "vcard") {
