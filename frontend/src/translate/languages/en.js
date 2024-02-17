@@ -192,6 +192,10 @@ const messages = {
           greetingMessage: "Greeting Message",
           absenceMessage: "Absence Message",
         },
+        holiday: {
+          date: "Date",
+          holiday: "Holiday's name"
+        },
         buttons: {
           okAdd: "Add",
           okEdit: "Save",

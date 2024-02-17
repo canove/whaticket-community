@@ -195,6 +195,10 @@ const messages = {
           greetingMessage: "Mensaje de Saludo",
           absenceMessage: "Mensaje de Ausencia",
         },
+        holiday: {
+          date: "Data",
+          holiday: "Día Festivo"
+        },
         buttons: {
           okAdd: "Añadir",
           okEdit: "Ahorrar",
