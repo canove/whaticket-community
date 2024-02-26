@@ -363,7 +363,7 @@ const handleMessage = async (
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
     }
-
+    // console.log("TICKET.QUEUE", await isHoliday(ticket, ticket.queue));
     if (await isHoliday(ticket, ticket.queue)) {
       const body = formatBody(`\u200e${ticket.queue.absenceMessage}`, contact);
       const sentMessage = await wbot.sendMessage(
