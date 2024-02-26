@@ -41,11 +41,13 @@ const TicketActionButtons = ({ ticket }) => {
 	};
 
 	const handleUpdateTicketStatus = async (e, status, userId) => {
+		console.log(status, userId)
 		setLoading(true);
 		try {
 			await api.put(`/tickets/${ticket.id}`, {
 				status: status,
 				userId: userId || null,
+				queueId: null
 			});
 
 			setLoading(false);
