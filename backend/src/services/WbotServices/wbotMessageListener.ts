@@ -150,6 +150,9 @@ const verifyMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
+  // temporaryly disable ts checks because of type definition bug for Location object
+
+  // @ts-ignore
   await ticket.update({
     lastMessage:
       msg.type === "location"
@@ -167,10 +170,14 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
 
   msg.body = `data:image/png;base64,${msg.body}|${gmapsUrl}`;
 
-  msg.body += `|${msg.location.description
-    ? msg.location.description
-    : `${msg.location.latitude}, ${msg.location.longitude}`
-    }`;
+  // temporaryly disable ts checks because of type definition bug for Location object
+
+  // @ts-ignore
+  msg.body += `|${
+    msg.location.description
+      ? msg.location.description
+      : `${msg.location.latitude}, ${msg.location.longitude}`
+  }`;
 
   return msg;
 };
@@ -186,13 +193,13 @@ const isHoliday = async (ticket: Ticket, currentQueue: Queue) => {
   const dataNumber = targetMessage.updatedAt.getDate();
   const dataMonth = targetMessage.updatedAt.getMonth();
 
-  const lastUpdate = `${dataNumber < 10
-    ? `0${dataNumber}`
-    : `${dataNumber}`}/${dataMonth + 1 < 10
-      ? `0${dataMonth + 1}`
-      : `${dataMonth + 1}`}`;
+  const lastUpdate = `${dataNumber < 10 ? `0${dataNumber}` : `${dataNumber}`}/${
+    dataMonth + 1 < 10 ? `0${dataMonth + 1}` : `${dataMonth + 1}`
+  }`;
 
-  const sendAbsenceMesage = holidays.find(({ date }) => date === lastUpdate);
+  const sendAbsenceMesage = holidays.find(
+    (h: { date: string }) => h.date === lastUpdate
+  );
   return sendAbsenceMesage;
 };
 
@@ -223,7 +230,7 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    if ((await isHoliday(ticket, choosenQueue)) !== undefined) {
+    if (await isHoliday(ticket, choosenQueue)) {
       body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
       const sentMessage = await wbot.sendMessage(
         `${contact.number}@c.us`,
@@ -362,16 +369,6 @@ const handleMessage = async (
       whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
-    }
-    // console.log("TICKET.QUEUE", await isHoliday(ticket, ticket.queue));
-    if (await isHoliday(ticket, ticket.queue)) {
-      const body = formatBody(`\u200e${ticket.queue.absenceMessage}`, contact);
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
-
-      await verifyMessage(sentMessage, ticket, contact);
     }
 
     if (msg.type === "vcard") {
