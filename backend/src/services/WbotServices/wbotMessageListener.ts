@@ -173,32 +173,26 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   // temporaryly disable ts checks because of type definition bug for Location object
 
   // @ts-ignore
-  msg.body += `|${
-    msg.location.description
-      ? msg.location.description
-      : `${msg.location.latitude}, ${msg.location.longitude}`
-  }`;
+  msg.body += `|${msg.location.description
+    ? msg.location.description
+    : `${msg.location.latitude}, ${msg.location.longitude}`
+    }`;
 
   return msg;
 };
 
-const isHoliday = async (ticket: Ticket, currentQueue: Queue) => {
+const isHoliday = async (currentQueue: Queue) => {
+  const today = new Date()
+    .toLocaleString("pt-BR", {
+      timeZone: "America/Sao_Paulo"
+    })
+    .split("/")
+    .slice(0, 2)
+    .join("/");
   const holidays = JSON.parse(currentQueue.holidays);
 
-  const messagesList = await Message.findAll({
-    where: { ticketId: ticket.id }
-  });
-  const targetMessage = messagesList[messagesList.length - 1];
-
-  const dataNumber = targetMessage.updatedAt.getDate();
-  const dataMonth = targetMessage.updatedAt.getMonth();
-
-  const lastUpdate = `${dataNumber < 10 ? `0${dataNumber}` : `${dataNumber}`}/${
-    dataMonth + 1 < 10 ? `0${dataMonth + 1}` : `${dataMonth + 1}`
-  }`;
-
   const sendAbsenceMesage = holidays.find(
-    (h: { date: string }) => h.date === lastUpdate
+    (h: { date: string }) => h.date === today
   );
   return sendAbsenceMesage;
 };
@@ -230,7 +224,7 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    if (await isHoliday(ticket, choosenQueue)) {
+    if (await isHoliday(choosenQueue)) {
       body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
       const sentMessage = await wbot.sendMessage(
         `${contact.number}@c.us`,
@@ -369,6 +363,16 @@ const handleMessage = async (
       whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
+    }
+
+    if (!msg.fromMe && !chat.isGroup && (await isHoliday(ticket.queue))) {
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        formatBody(`\u200e${ticket.queue.absenceMessage}`, contact)
+      );
+
+      await verifyMessage(sentMessage, ticket, contact);
+      return;
     }
 
     if (msg.type === "vcard") {
