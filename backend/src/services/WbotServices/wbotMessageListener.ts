@@ -181,7 +181,7 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   return msg;
 };
 
-const isHoliday = async (currentQueue: Queue) => {
+const isHoliday = (currentQueue: Queue) => {
   const today = new Date()
     .toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo"
@@ -222,7 +222,7 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    if (await isHoliday(choosenQueue)) {
+    if (isHoliday(choosenQueue)) {
       body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
       const sentMessage = await wbot.sendMessage(
         `${contact.number}@c.us`,
@@ -363,7 +363,7 @@ const handleMessage = async (
       await verifyQueue(wbot, msg, ticket, contact);
     }
 
-    if (!msg.fromMe && !chat.isGroup && (await isHoliday(ticket.queue))) {
+    if (!msg.fromMe && !chat.isGroup && isHoliday(ticket.queue)) {
       const sentMessage = await wbot.sendMessage(
         `${contact.number}@c.us`,
         formatBody(`\u200e${ticket.queue.absenceMessage}`, contact)
