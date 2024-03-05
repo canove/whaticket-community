@@ -343,7 +343,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											as={TextField}
 											label={i18n.t("queueModal.holiday.date")}
 											name="date"
-											placeholder="DD/MM/AA"
+											placeholder="DD/MM/AAAA"
 											error={touched.date && Boolean(errors.date)}
 											helperText={touched.date && errors.date}
 											variant="outlined"
