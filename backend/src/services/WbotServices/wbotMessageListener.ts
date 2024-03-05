@@ -25,7 +25,6 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
-import OldMessage from "../../models/OldMessage";
 
 interface Session extends Client {
   id?: number;
@@ -429,10 +428,6 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
           model: Message,
           as: "quotedMsg",
           include: ["contact"]
-        },
-        {
-          model: OldMessage,
-          as: "oldMessages"
         }
       ]
     });
@@ -451,52 +446,9 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
   }
 };
 
-const handleMsgEdit = async (
-  msg: WbotMessage,
-  newBody: string,
-  oldBody: string
-): Promise<void> => {
-  let editedMsg = await Message.findByPk(msg.id.id, {
-    include: [
-      {
-        model: OldMessage,
-        as: "oldMessages"
-      }
-    ]
-  });
-
-  if (!editedMsg) return;
-
-  const io = getIO();
-
-  try {
-    const messageData = {
-      messageId: msg.id.id,
-      body: oldBody
-    }
-
-    await OldMessage.upsert(messageData);
-    await editedMsg.update({ body: newBody, isEdited: true});
-
-    await editedMsg.reload();
-
-    io.to(editedMsg.ticketId.toString()).emit("appMessage", {
-      action: "update",
-      message: editedMsg
-    });
-  } catch (err) {
-    Sentry.captureException(err);
-    logger.error(`Error handling message edit. Err: ${err}`);
-  }
-}
-
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
     handleMessage(msg, wbot);
-  });
-
-  wbot.on("message_edit", async (msg, newBody, oldBody) => {
-    handleMsgEdit(msg, newBody as string, oldBody as string);
   });
 
   wbot.on("media_uploaded", async msg => {

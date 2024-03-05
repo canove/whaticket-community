@@ -1,7 +1,6 @@
 import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
-import OldMessage from "../../models/OldMessage";
 import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Request {
@@ -39,10 +38,6 @@ const ListMessagesService = async ({
         model: Message,
         as: "quotedMsg",
         include: ["contact"]
-      },
-      {
-        model: OldMessage,
-        as: "oldMessages"
       }
     ],
     offset,

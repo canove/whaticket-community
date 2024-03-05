@@ -16,7 +16,6 @@ import MessagesList from "../MessagesList";
 import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
-import { EditMessageProvider } from "../../context/EditingMessage/EditingMessageContext";
 
 const drawerWidth = 320;
 
@@ -166,13 +165,11 @@ const Ticket = () => {
           </div>
         </TicketHeader>
         <ReplyMessageProvider>
-          <EditMessageProvider>
-            <MessagesList
-              ticketId={ticketId}
-              isGroup={ticket.isGroup}
-            ></MessagesList>
-            <MessageInput ticketStatus={ticket.status} />
-          </EditMessageProvider>
+          <MessagesList
+            ticketId={ticketId}
+            isGroup={ticket.isGroup}
+          ></MessagesList>
+          <MessageInput ticketStatus={ticket.status} />
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer

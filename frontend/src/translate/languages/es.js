@@ -394,9 +394,6 @@ const messages = {
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
         signMessage: "Firmar",
       },
-      message: {
-        edited: "Editado"
-      },
       contactDrawer: {
         header: "Detalles del contacto",
         buttons: {
@@ -426,17 +423,11 @@ const messages = {
       },
       messageOptionsMenu: {
         delete: "Borrar",
-        edit: "Editar",
-        history: "Histórico",
         reply: "Responder",
         confirmationModal: {
           title: "¿Borrar mensaje?",
           message: "Esta acción no puede ser revertida.",
         },
-      },
-      messageHistoryModal: {
-        close: "Cerrar",
-        title: "Historial de edición de mensajes"
       },
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP:
@@ -454,7 +445,6 @@ const messages = {
         ERR_SENDING_WAPP_MSG:
           "Error al enviar el mensaje de WhatsApp. Verifique la página de conexiones.",
         ERR_DELETE_WAPP_MSG: "No se pudo borrar el mensaje de WhatsApp.",
-        ERR_EDITING_WAPP_MSG: "No se pudo editar el mesaje de WhatsApp.",
         ERR_OTHER_OPEN_TICKET: "Ya hay un ticket abierto para este contacto.",
         ERR_SESSION_EXPIRED: "Sesión caducada. Inicie sesión.",
         ERR_USER_CREATION_DISABLED:

@@ -9,7 +9,6 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
-import EditWhatsAppMessage from "../services/WbotServices/EditWhatsAppMessage";
 
 type IndexQuery = {
   pageNumber: string;
@@ -57,21 +56,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   return res.send();
 };
-
-export const edit = async (req: Request, res: Response): Promise<Response> => {
-  const { messageId } = req.params;
-  const { body }: MessageData = req.body;
-
-  const message = await EditWhatsAppMessage(messageId, body);
-
-  const io = getIO();
-  io.to(message.ticketId.toString()).emit("appMessage", {
-    action: "update",
-    message
-  });
-
-  return res.send();
-}
 
 export const remove = async (
   req: Request,
