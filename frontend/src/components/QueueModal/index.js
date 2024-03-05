@@ -127,9 +127,17 @@ const useStyles = makeStyles(theme => ({
 		height: "fit-content",
 	},
 	btnNewHoliday: {
-	marginTop: "10px",
+		marginTop: "10px",
 	}
 }));
+
+const currentYear = new Date()
+.toLocaleString("pt-BR", {
+	timeZone: "America/Sao_Paulo"
+})
+.split("/")[2].split(",")[0];
+
+const bissexts = ["2024", "2028", "2032", "2036", "2040"]; 
 
 const QueueSchema = Yup.object().shape({
 	name: Yup.string()
@@ -143,27 +151,33 @@ const QueueSchema = Yup.object().shape({
 
 const HolidaySchema = Yup.object().shape({
 	date: Yup.string().test('is-day-month-format', "Please, use a valid date", (value) => {
-		if(value && value.includes("/")) {
+		if (value && value.includes("/")) {
 			const day = value.split('/')[0];
 			const month = value.split('/')[1];
+			const year = value.split('/')[2];
 
 			if (day === '00' || month === '00') {
 				return false;
 			}
-			if (month === '02' && Number(day) > 29) {
+			if (month === '02' && Number(day) > 29 && !bissexts.includes(currentYear)) {
 				return false;
 			}
 
 			if ((month === '04' || month === '06' || month === '09' || month === '11') && Number(day) > 30) {
 				return false;
 			}
+
+			if (year < currentYear) {
+				return false;
+			}
 		}
 
-		const dayMonthRegex = /^((0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2]))$/;
+		const dayMonthRegex = /^((0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d\d)$/;
 		return dayMonthRegex.test(value);
 	}).required("Required"),
 	holiday: Yup.string().min(3, "Too short").max(49, "Too long").required("Required"),
 });
+
 
 const QueueModal = ({ open, onClose, queueId }) => {
 
@@ -191,24 +205,24 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const greetingRef = useRef();
 	//Dados iniciais para estruturação do modal
 	const [defaultHolidays, setDefaultHolidays] = useState([
-		{ "date": "01/01", "holiday": "Confraternização Universal" },
-		{ "date": "21/04", "holiday": "Tiradentes" },
-		{ "date": "01/05", "holiday": "Dia do Trabalhador" },
-		{ "date": "07/09", "holiday": "Dia da Independência do Brasil" },
-		{ "date": "12/10", "holiday": "Dia das Crianças/ Nossa Senhora Aparecida" },
-		{ "date": "02/11", "holiday": "Dia de Finados" },
-		{ "date": "15/11", "holiday": "Proclamação da República" },
-		{ "date": "25/12", "holiday": "Natal" }
+		{ "date": `01/01/${currentYear}`, "holiday": "Confraternização Universal" },
+		{ "date": `21/04/${currentYear}`, "holiday": "Tiradentes" },
+		{ "date": `01/05/${currentYear}`, "holiday": "Dia do Trabalhador" },
+		{ "date": `07/09/${currentYear}`, "holiday": "Dia da Independência do Brasil" },
+		{ "date": `12/10/${currentYear}`, "holiday": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "date": `02/11/${currentYear}`, "holiday": "Dia de Finados" },
+		{ "date": `15/11/${currentYear}`, "holiday": "Proclamação da República" },
+		{ "date": `25/12/${currentYear}`, "holiday": "Natal" }
 	])
 	const [holidays, setHolidays] = useState([
-		{ "date": "01/01", "holiday": "Confraternização Universal" },
-		{ "date": "21/04", "holiday": "Tiradentes" },
-		{ "date": "01/05", "holiday": "Dia do Trabalhador" },
-		{ "date": "07/09", "holiday": "Dia da Independência do Brasil" },
-		{ "date": "12/10", "holiday": "Dia das Crianças/ Nossa Senhora Aparecida" },
-		{ "date": "02/11", "holiday": "Dia de Finados" },
-		{ "date": "15/11", "holiday": "Proclamação da República" },
-		{ "date": "25/12", "holiday": "Natal" }
+		{ "date": `01/01/${currentYear}`, "holiday": "Confraternização Universal" },
+		{ "date": `21/04/${currentYear}`, "holiday": "Tiradentes" },
+		{ "date": `01/05/${currentYear}`, "holiday": "Dia do Trabalhador" },
+		{ "date": `07/09/${currentYear}`, "holiday": "Dia da Independência do Brasil" },
+		{ "date": `12/10/${currentYear}`, "holiday": "Dia das Crianças/ Nossa Senhora Aparecida" },
+		{ "date": `02/11/${currentYear}`, "holiday": "Dia de Finados" },
+		{ "date": `15/11/${currentYear}`, "holiday": "Proclamação da República" },
+		{ "date": `25/12/${currentYear}`, "holiday": "Natal" }
 	]);
 
 	useEffect(() => {
@@ -254,7 +268,8 @@ const QueueModal = ({ open, onClose, queueId }) => {
 			color: values.color,
 			greetingMessage: values.greetingMessage,
 			absenceMessage: values.absenceMessage,
-			holidays: JSON.stringify(holidays) }
+			holidays: JSON.stringify(holidays)
+		}
 		try {
 			if (queueId) {
 				await api.put(`/queue/${queueId}`, values);
@@ -328,14 +343,14 @@ const QueueModal = ({ open, onClose, queueId }) => {
 											as={TextField}
 											label={i18n.t("queueModal.holiday.date")}
 											name="date"
-											placeholder="DD/MM"
+											placeholder="DD/MM/AA"
 											error={touched.date && Boolean(errors.date)}
 											helperText={touched.date && errors.date}
 											variant="outlined"
 											margin="dense"
 											disabled={edit ? true : false}
 											className={classes.textField}
-											inputProps={{ maxLength: 5 }}
+											inputProps={{ maxLength: 10 }}
 										/>
 										<Field
 											as={TextField}
@@ -456,7 +471,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 										margin="dense"
 										className={classes.textField}
 									/>
-																		<Field
+									<Field
 										as={TextField}
 										label={i18n.t("queueModal.form.absenceMessage")}
 										name="absenceMessage"
