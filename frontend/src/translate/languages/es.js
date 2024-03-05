@@ -37,7 +37,7 @@ const messages = {
       dashboard: {
         charts: {
           perDay: {
-            title: "Tickets hoy: ",
+            title: "Chats hoy: ",
           },
         },
         messages: {
@@ -130,7 +130,7 @@ const messages = {
           deleteTitle: "Borrar",
           importTitlte: "Importar contactos",
           deleteMessage:
-            "¿Estás seguro que deseas borrar este contacto? Todos los tickets relacionados se perderán.",
+            "¿Estás seguro que deseas borrar este contacto? Todos los chats relacionados se perderán.",
           importMessage:
             "¿Quieres importar todos los contactos desde tu teléfono?",
         },
@@ -242,7 +242,7 @@ const messages = {
           search: { title: "Buscar" },
         },
         search: {
-          placeholder: "Buscar tickets y mensajes.",
+          placeholder: "Buscar chats y mensajes.",
         },
         buttons: {
           showAll: "Todos",
@@ -267,7 +267,7 @@ const messages = {
         noTicketsTitle: "¡Nada acá!",
         connectionTitle: "Conexión que se está utilizando actualmente.",
         noTicketsMessage:
-          "No se encontraron tickets con este estado o término de búsqueda",
+          "No se encontraron chats con este estado o término de búsqueda",
         buttons: {
           accept: "Acceptar",
         },
@@ -285,7 +285,7 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexiones",
-          tickets: "Tickets",
+          tickets: "Chats",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
           queues: "Departamentos",
@@ -317,7 +317,7 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Eliminar",
           deleteMessage:
-            "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en ese departamento seguirán existiendo, pero ya no tendrán ningun departamento asignada.",
+            "¿Estás seguro? ¡Esta acción no se puede revertir! Los chats en ese departamento seguirán existiendo, pero ya no tendrán ningun departamento asignada.",
         },
       },
       queueSelect: {
@@ -361,7 +361,7 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Borrar",
           deleteMessage:
-            "Toda la información del usuario se perderá. Los tickets abiertos de los usuarios se moverán al departamento.",
+            "Toda la información del usuario se perderá. Los chats abiertos de los usuarios se moverán al departamento.",
         },
       },
       settings: {
