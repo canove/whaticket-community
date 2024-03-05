@@ -186,9 +186,7 @@ const isHoliday = async (currentQueue: Queue) => {
     .toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo"
     })
-    .split("/")
-    .slice(0, 2)
-    .join("/");
+    .split(",")[0];
   const holidays = JSON.parse(currentQueue.holidays);
 
   const sendAbsenceMesage = holidays.find(
