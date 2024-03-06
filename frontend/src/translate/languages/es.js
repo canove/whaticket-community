@@ -262,7 +262,7 @@ const messages = {
         },
       },
       ticketsList: {
-        pendingHeader: "Departamento",
+        pendingHeader: "En espera",
         assignedHeader: "Trabajando en",
         noTicketsTitle: "¡Nada acá!",
         connectionTitle: "Conexión que se está utilizando actualmente.",
@@ -321,7 +321,7 @@ const messages = {
         },
       },
       queueSelect: {
-        inputLabel: "Departamentos",
+        inputLabel: "Cola",
       },
       quickAnswers: {
         title: "Respuestas rápidas",

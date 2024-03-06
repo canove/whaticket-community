@@ -1,10 +1,5 @@
 version: '3'
-
-networks:
-  whaticket:
-
 services:
-
   backend:
     build:
       context: ./backend
@@ -27,7 +22,6 @@ services:
       - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
     networks:
       - whaticket
-
   frontend:
     ports:
       - ${FRONTEND_PORT:-3000}:80
@@ -60,3 +54,16 @@ services:
     restart: always
     networks:
       - whaticket
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOSTS=mysql
+    ports:
+      - ${PMA_PORT:-9000}:80
+    networks:
+      - whaticket
+
+networks:
+  whaticket:
+    name: WhatsappTickets
+    external: true
