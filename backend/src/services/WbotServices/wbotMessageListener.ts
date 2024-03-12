@@ -173,26 +173,65 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   // temporaryly disable ts checks because of type definition bug for Location object
 
   // @ts-ignore
-  msg.body += `|${msg.location.description
-    ? msg.location.description
-    : `${msg.location.latitude}, ${msg.location.longitude}`
-    }`;
+  msg.body += `|${
+    msg.location.description
+      ? msg.location.description
+      : `${msg.location.latitude}, ${msg.location.longitude}`
+  }`;
 
   return msg;
 };
 
-const isHoliday = (currentQueue: Queue) => {
+const verifyHoliday = async (
+  currentQueue: Queue,
+  contact: Contact,
+  ticket: Ticket,
+  wbot: Session,
+  body: string,
+  holiday: boolean | string
+) => {
   const today = new Date()
     .toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo"
     })
     .split(",")[0];
+
   const holidays = JSON.parse(currentQueue.holidays);
 
-  const sendAbsenceMesage = holidays.find(
-    (h: { date: string }) => h.date === today
-  );
-  return sendAbsenceMesage;
+  const isHoliday = holidays.find((h: { date: string }) => h.date === today);
+
+  if (isHoliday) {
+    body = formatBody(`\u200e${currentQueue.absenceMessage}`, contact);
+
+    const debouncedSentMessage = debounce(
+      // função
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
+        verifyMessage(sentMessage, ticket, contact);
+      },
+      // timeout
+      3000,
+      // ticket
+      ticket.id
+    );
+    holiday = !!isHoliday;
+
+    debouncedSentMessage();
+  } else {
+    body = formatBody(`\u200e${currentQueue.greetingMessage}`, contact);
+
+    if (holiday !== "ID-noHoliday") {
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        body
+      );
+      verifyMessage(sentMessage, ticket, contact);
+    }
+  }
+  return holiday;
 };
 
 const verifyQueue = async (
@@ -214,53 +253,37 @@ const verifyQueue = async (
   const choosenQueue = queues[+selectedOption - 1];
 
   let body = "";
+  const holiday = false;
 
-  // Escolha do setor pelo cliente não adicionado ainda
   if (choosenQueue) {
     await UpdateTicketService({
       ticketData: { queueId: choosenQueue.id },
       ticketId: ticket.id
     });
+    verifyHoliday(choosenQueue, contact, ticket, wbot, body, holiday);
+  } else {
+    let options = "";
 
-    if (isHoliday(choosenQueue)) {
-      body = formatBody(`\u200e${choosenQueue.absenceMessage}`, contact);
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
+    queues.forEach((queue, index) => {
+      options += `*${index + 1}* - ${queue.name}\n`;
+    });
+    body = formatBody(`\u200e${greetingMessage}\n${options}`, contact);
 
-      await verifyMessage(sentMessage, ticket, contact);
-      return;
-    }
+    const debouncedSentMessage = debounce(
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
+        verifyMessage(sentMessage, ticket, contact);
+      },
+      3000,
+      ticket.id
+    );
 
-    body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
-
-    await verifyMessage(sentMessage, ticket, contact);
-    return;
+    debouncedSentMessage();
   }
-
-  let options = "";
-
-  queues.forEach((queue, index) => {
-    options += `*${index + 1}* - ${queue.name}\n`;
-  });
-
-  body = formatBody(`\u200e${greetingMessage}\n${options}`, contact);
-
-  const debouncedSentMessage = debounce(
-    async () => {
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
-      verifyMessage(sentMessage, ticket, contact);
-    },
-    3000,
-    ticket.id
-  );
-
-  debouncedSentMessage();
+  return holiday;
 };
 
 const isValidMsg = (msg: WbotMessage): boolean => {
@@ -361,16 +384,8 @@ const handleMessage = async (
       whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
-    }
-
-    if (!msg.fromMe && !chat.isGroup && isHoliday(ticket.queue)) {
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        formatBody(`\u200e${ticket.queue.absenceMessage}`, contact)
-      );
-
-      await verifyMessage(sentMessage, ticket, contact);
-      return;
+    } else if (!msg.fromMe && !chat.isGroup) {
+      verifyHoliday(ticket.queue, contact, ticket, wbot, "", "ID-noHoliday");
     }
 
     if (msg.type === "vcard") {
