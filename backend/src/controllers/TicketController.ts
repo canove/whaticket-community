@@ -66,10 +66,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const ticket = await CreateTicketService({ contactId, status, userId });
 
   const io = getIO();
-  io.to(ticket.status).emit("ticket", {
-    action: "update",
-    ticket
-  });
+  // send status to the specific queue channel
+  io.to(ticket.status)
+    .to(`queue-${ticket.queueId}-${ticket.status}`)
+    .emit("ticket", {
+      action: "update",
+      ticket
+    });
 
   return res.status(200).json(ticket);
 };
@@ -119,9 +122,12 @@ export const remove = async (
   const ticket = await DeleteTicketService(ticketId);
 
   const io = getIO();
+  // send delete message to queues of ticket's current status
   io.to(ticket.status)
     .to(ticketId)
     .to("notification")
+    .to(`queue-${ticket.queueId}-${ticket.status}`)
+    .to(`queue-${ticket.queueId}-notification`)
     .emit("ticket", {
       action: "delete",
       ticketId: +ticketId

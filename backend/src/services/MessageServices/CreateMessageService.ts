@@ -53,6 +53,9 @@ const CreateMessageService = async ({
   io.to(message.ticketId.toString())
     .to(message.ticket.status)
     .to("notification")
+    // send message to specific queues
+    .to(`queue-${message.ticket.queueId}-${message.ticket.status}`)
+    .to(`queue-${message.ticket.queueId}-notification`)
     .emit("appMessage", {
       action: "create",
       message,

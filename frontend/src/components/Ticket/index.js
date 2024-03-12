@@ -106,7 +106,7 @@ const Ticket = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("connect", () => socket.emit("joinChatBox", ticketId));
+    socket.on("ready", () => socket.emit("joinChatBox", ticketId));
 
     socket.on("ticket", (data) => {
       if (data.action === "update") {

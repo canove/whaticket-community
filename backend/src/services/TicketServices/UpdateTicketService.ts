@@ -62,7 +62,7 @@ const UpdateTicketService = async ({
   const io = getIO();
 
   if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
-    io.to(oldStatus).emit("ticket", {
+    io.to(oldStatus).to(`queue-${ticket.queueId}-${oldStatus}`).emit("ticket", {
       action: "delete",
       ticketId: ticket.id
     });
@@ -73,6 +73,9 @@ const UpdateTicketService = async ({
   io.to(ticket.status)
     .to("notification")
     .to(ticketId.toString())
+    // send queue specific messages
+    .to(`queue-${ticket.queueId}-${ticket.status}`)
+    .to(`queue-${ticket.queueId}-notification`)
     .emit("ticket", {
       action: "update",
       ticket
