@@ -361,7 +361,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("connect", () => socket.emit("joinChatBox", ticketId));
+    socket.on("ready", () => socket.emit("joinChatBox", ticketId));
 
     socket.on("appMessage", (data) => {
       if (data.action === "create") {
