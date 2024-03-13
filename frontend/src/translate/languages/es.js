@@ -6,7 +6,7 @@ const messages = {
         toasts: {
           success:
             "¡El usuario ha sido creado satisfactoriamente! ¡Ahora inicia sesión!",
-          fail: "Error creando el usuario. Verifica la data reportada.",
+          fail: "Error creando el usuario. Verifica los datos ingresados.",
         },
         form: {
           name: "Nombre",
@@ -62,14 +62,14 @@ const messages = {
           deleteTitle: "Borrar",
           deleteMessage: "¿Estás seguro? Este proceso no puede ser revertido.",
           disconnectTitle: "Desconectar",
-          disconnectMessage: "Estás seguro? Deberá volver a leer el código QR",
+          disconnectMessage: "¿Estás seguro? Deberá volver a leer el código QR",
         },
         buttons: {
           add: "Agrega WhatsApp",
           disconnect: "Desconectar",
           tryAgain: "Inténtalo de nuevo",
-          qrcode: "QR CODE",
-          newQr: "Nuevo QR CODE",
+          qrcode: "CÓDIGO QR",
+          newQr: "Nuevo CÓDIGO QR",
           connecting: "Conectando",
         },
         toolTips: {
@@ -227,7 +227,7 @@ const messages = {
         },
       },
       ticketsQueueSelect: {
-        placeholder: "Linhas",
+        placeholder: "Colas",
       },
       tickets: {
         toasts: {
@@ -269,7 +269,7 @@ const messages = {
         noTicketsMessage:
           "No se encontraron tickets con este estado o término de búsqueda",
         buttons: {
-          accept: "Acceptar",
+          accept: "Aceptar",
         },
       },
       newTicketModal: {
@@ -288,7 +288,7 @@ const messages = {
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
-          queues: "Linhas",
+          queues: "Colas",
           administration: "Administración",
           users: "Usuarios",
           settings: "Configuración",
@@ -304,7 +304,7 @@ const messages = {
         noTickets: "Sin notificaciones.",
       },
       queues: {
-        title: "Linhas",
+        title: "Colas",
         table: {
           name: "Nombre",
           color: "Color",
@@ -321,7 +321,7 @@ const messages = {
         },
       },
       queueSelect: {
-        inputLabel: "Linhas",
+        inputLabel: "Colas",
       },
       quickAnswers: {
         title: "Respuestas rápidas",
@@ -435,12 +435,12 @@ const messages = {
         ERR_NO_DEF_WAPP_FOUND:
           "No se encontró WhatsApp predeterminado. Verifique la página de conexiones.",
         ERR_WAPP_NOT_INITIALIZED:
-          "Esta sesión de WhatsApp no ​​está inicializada. Verifique la página de conexiones.",
+          "Esta sesión de WhatsApp no está inicializada. Verifique la página de conexiones.",
         ERR_WAPP_CHECK_CONTACT:
           "No se pudo verificar el contacto de WhatsApp. Verifique la página de conexiones.",
         ERR_WAPP_INVALID_CONTACT: "Este no es un número de whatsapp válido.",
         ERR_WAPP_DOWNLOAD_MEDIA:
-          "No se pudieron descargar los medios de WhatsApp. Verifique la página de conexiones.",
+          "No se pudieron descargar los archivos de multimedia de WhatsApp. Verifique la página de conexiones.",
         ERR_INVALID_CREDENTIALS: "Error de autenticación. Vuelva a intentarlo.",
         ERR_SENDING_WAPP_MSG:
           "Error al enviar el mensaje de WhatsApp. Verifique la página de conexiones.",
@@ -460,7 +460,7 @@ const messages = {
         ERR_CREATING_MESSAGE: "Error al crear el mensaje en la base de datos.",
         ERR_CREATING_TICKET: "Error al crear el ticket en la base de datos.",
         ERR_FETCH_WAPP_MSG:
-          "Error al obtener el mensaje en WhtasApp, tal vez sea demasiado antiguo.",
+          "Error al obtener el mensaje en WhatsApp, tal vez sea demasiado antiguo.",
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
