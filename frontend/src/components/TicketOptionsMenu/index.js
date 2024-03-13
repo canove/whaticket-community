@@ -10,10 +10,12 @@ import TransferTicketModal from "../TransferTicketModal";
 import toastError from "../../errors/toastError";
 import { Can } from "../Can";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { Switch } from "@material-ui/core";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
+	const [useQueues, setUseQueues] = useState(ticket.contact.useQueues);
 	const isMounted = useRef(true);
 	const { user } = useContext(AuthContext);
 
@@ -47,6 +49,15 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		}
 	};
 
+	const handleContactToggleUseQueues = async () => {
+		try {
+			const contact = await api.put(`/contacts/toggleUseQueues/${ticket.contact.id}`);
+			setUseQueues(contact.data.useQueues);
+		} catch (err) {
+			toastError(err);
+		}
+	};
+
 	return (
 		<>
 			<Menu
@@ -68,6 +79,14 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 				<MenuItem onClick={handleOpenTransferModal}>
 					{i18n.t("ticketOptionsMenu.transfer")}
 				</MenuItem>
+				{ticket.queue && <MenuItem>
+					<Switch
+						size="small"
+						checked={useQueues}
+						onChange={() => handleContactToggleUseQueues()}
+					/>
+					{i18n.t("ticketOptionsMenu.useQueues")}
+				</MenuItem>}
 				<Can
 					role={user.profile}
 					perform="ticket-options:deleteTicket"

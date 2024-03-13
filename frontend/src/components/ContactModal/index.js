@@ -16,6 +16,9 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
+
 
 import { i18n } from "../../translate/i18n";
 
@@ -69,6 +72,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 		name: "",
 		number: "",
 		email: "",
+		useDialogflow: true,
 	};
 
 	const [contact, setContact] = useState(initialState);
@@ -184,6 +188,17 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 										variant="outlined"
 									/>
 								</div>
+								<FormControlLabel
+										control={
+											<Field
+												as={Switch}
+												color="primary"
+												name="useDialogflow"
+												checked={values.useDialogflow}
+											/>
+										}
+										label={i18n.t("contactModal.form.dialogflow")}
+									/>
 								<Typography
 									style={{ marginBottom: 8, marginTop: 12 }}
 									variant="subtitle1"

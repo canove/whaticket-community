@@ -10,6 +10,7 @@ import Queue from "../models/Queue";
 import WhatsappQueue from "../models/WhatsappQueue";
 import UserQueue from "../models/UserQueue";
 import QuickAnswer from "../models/QuickAnswer";
+import Dialogflow from "../models/Dialogflow";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -25,6 +26,7 @@ const models = [
   Whatsapp,
   ContactCustomField,
   Setting,
+  Dialogflow,
   Queue,
   WhatsappQueue,
   UserQueue,

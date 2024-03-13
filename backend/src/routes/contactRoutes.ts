@@ -22,6 +22,10 @@ contactRoutes.post("/contact", isAuth, ContactController.getContact);
 
 contactRoutes.put("/contacts/:contactId", isAuth, ContactController.update);
 
+contactRoutes.put("/contacts/toggleUseQueues/:contactId", isAuth, ContactController.toggleUseQueue);
+
+contactRoutes.put("/contacts/toggleUseDialogflow/:contactId", isAuth, ContactController.toggleUseDialogflow);
+
 contactRoutes.delete("/contacts/:contactId", isAuth, ContactController.remove);
 
 export default contactRoutes;

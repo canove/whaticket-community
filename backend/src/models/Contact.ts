@@ -41,6 +41,14 @@ class Contact extends Model<Contact> {
   @Column
   isGroup: boolean;
 
+  @Default(true)
+  @Column
+  useQueues: boolean;
+
+  @Default(true)
+  @Column
+  useDialogflow: boolean;
+
   @CreatedAt
   createdAt: Date;
 

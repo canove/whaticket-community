@@ -7,7 +7,8 @@ import {
   Contact as WbotContact,
   Message as WbotMessage,
   MessageAck,
-  Client
+  Client,
+  Chat
 } from "whatsapp-web.js";
 
 import Contact from "../../models/Contact";
@@ -23,8 +24,9 @@ import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import { debounce } from "../../helpers/Debounce";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
-import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
+import { queryDialogFlow } from "../DialogflowServices/QueryDialogflow";
+import { createDialogflowSessionWithModel } from "../DialogflowServices/CreateSessionDialogflow";
 
 interface Session extends Client {
   id?: number;
@@ -185,6 +187,10 @@ const verifyQueue = async (
     return;
   }
 
+  if (!contact.useQueues) {
+    return;
+  }
+
   const selectedOption = msg.body;
 
   const choosenQueue = queues[+selectedOption - 1];
@@ -195,11 +201,11 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
-
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
-
-    await verifyMessage(sentMessage, ticket, contact);
+    if( choosenQueue.greetingMessage ) {
+      let body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
+      const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+      await verifyMessage(sentMessage, ticket, contact);
+    }
   } else {
     let options = "";
 
@@ -224,6 +230,51 @@ const verifyQueue = async (
     debouncedSentMessage();
   }
 };
+
+const sendDialogflowAwswer = async (
+  wbot: Session, 
+  ticket:Ticket, 
+  msg:WbotMessage, 
+  contact: Contact,
+  chat:Chat
+) => {
+  const session = await createDialogflowSessionWithModel(ticket.queue.dialogflow);
+  if(session === undefined) {
+    return;
+  }
+
+  wbot.sendPresenceAvailable();
+
+  let dialogFlowReply = await queryDialogFlow(
+    session,
+    ticket.queue.dialogflow.projectName, 
+    msg.from, 
+    msg.body, 
+    ticket.queue.dialogflow.language
+  );
+  if(dialogFlowReply === null) {
+    return;
+  }
+
+  chat.sendStateTyping();
+
+  await new Promise(f => setTimeout(f, 1000));
+
+  for(let message of dialogFlowReply) {
+    await sendDelayedMessages(wbot, ticket, contact, message.text.text[0]);
+  }
+}
+
+async function sendDelayedMessages(wbot:Session, ticket:Ticket, contact:Contact, message:string) {
+  const body = message.replace(/\\n/g, '\n');
+  const linesOfBody = body.split('\n');
+
+  for(let message of linesOfBody) {
+    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, message);
+    await verifyMessage(sentMessage, ticket, contact);
+    await new Promise(f => setTimeout(f, 1000));
+  }  
+}
 
 const isValidMsg = (msg: WbotMessage): boolean => {
   if (msg.from === "status@broadcast") return false;
@@ -319,6 +370,16 @@ const handleMessage = async (
       whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
+    }
+
+    if(
+      !msg.fromMe &&
+      !chat.isGroup &&
+      ticket.queue &&
+      ticket.queue.dialogflow &&
+      contact.useDialogflow
+    ) {
+      await sendDialogflowAwswer(wbot, ticket, msg, contact, chat);
     }
 
     if (msg.type === "vcard") {

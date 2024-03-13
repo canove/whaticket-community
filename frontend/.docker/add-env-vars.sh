@@ -1,3 +1,5 @@
+#!/bin/sh
+
 _writeFrontendEnvVars() {
     ENV_JSON="$(jq --compact-output --null-input 'env | with_entries(select(.key | startswith("REACT_APP_")))')"
     ENV_JSON_ESCAPED="$(printf "%s" "${ENV_JSON}" | sed -e 's/[\&/]/\\&/g')"

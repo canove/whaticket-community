@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "nodemon dist/server.js",
+    "start": "nodemon --ignore dialogflow/ dist/server.js",
     "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
     "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
     "test": "NODE_ENV=test jest",
@@ -15,8 +15,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/dialogflow": "^4.6.0",
     "@sentry/node": "^5.29.2",
     "@types/pino": "^6.3.4",
+    "actions-on-google": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
