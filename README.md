@@ -80,7 +80,8 @@ Fill `.env` file with environment variables:
 ```bash
 NODE_ENV=DEVELOPMENT      #it helps on debugging
 BACKEND_URL=http://localhost
-FRONTEND_URL=https://localhost:3000
+FRONTEND_URL=https://your_domain    # for server production with https ssl
+FRONTEND_URL=http://localhost:3000  # for localserver development withouth https ssl
 PROXY_PORT=8080
 PORT=8080
 
