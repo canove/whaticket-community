@@ -187,38 +187,71 @@ const verifyHoliday = async (
   contact: Contact,
   ticket: Ticket,
   wbot: Session,
-  body: WbotMessage,
+  body: WbotMessage | string,
   holiday: boolean | string
 ) => {
-  /* const today = new Date()
+  const today = new Date()
     .toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo"
     })
     .split(",")[0];
 
-  console.log(today);
-
   const holidays = JSON.parse(currentQueue.holidays);
 
-  const isHoliday = holidays.find((h: { date: string }) => h.date === today); */
-  const today = new Date()
-    .toLocaleString("pt-BR", {
-      timeZone: "America/Sao_Paulo"
-    })
-    .split(",")[1]
-    .split(":");
+  const isHoliday = holidays.find((h: { date: string }) => h.date === today);
 
-  const isHoliday = `${today[0]}:${today[1]}`;
-  const messageTime = ticket.updatedAt
-    .toLocaleString("pt-BR", {
-      timeZone: "America/Sao_Paulo"
-    })
-    .split(",")[1]
-    .split(":");
-  const time = `${messageTime[0]}:${messageTime[1]}`;
-  console.log(isHoliday, !body.fromMe, time);
+  if (isHoliday) {
+    body = formatBody(`\u200e${currentQueue.absenceMessage}`, contact);
 
-  if (isHoliday === time) {
+    const debouncedSentMessage = debounce(
+      // função
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
+        verifyMessage(sentMessage, ticket, contact);
+      },
+      // timeout
+      3000,
+      // ticket
+      ticket.id
+    );
+    holiday = !!isHoliday;
+
+    debouncedSentMessage();
+  } else {
+    body = formatBody(`\u200e${currentQueue.greetingMessage}`, contact);
+
+    if (holiday !== "ID-noHoliday") {
+      const sentMessage = await wbot.sendMessage(
+        `${contact.number}@c.us`,
+        body
+      );
+      verifyMessage(sentMessage, ticket, contact);
+    }
+  }
+  return holiday;
+
+  /* const test = () => {
+    const today = new Date()
+      .toLocaleString("pt-BR", {
+        timeZone: "America/Sao_Paulo"
+      })
+      .split(",")[1]
+      .split(":");
+
+    const isHoliday = `${today[0]}:${today[1]}`;
+    const messageTime = ticket.updatedAt
+      .toLocaleString("pt-BR", {
+        timeZone: "America/Sao_Paulo"
+      })
+      .split(",")[1]
+      .split(":");
+    const time = `${messageTime[0]}:${messageTime[1]}`;
+    console.log(isHoliday, !body.fromMe, time);
+  };
+    if (isHoliday) {
     const debouncedSentMessage = debounce(
       // função
       async () => {
@@ -237,38 +270,7 @@ const verifyHoliday = async (
       ticket.id
     );
     holiday = !!isHoliday;
-    /*   if (isHoliday) {
-    body = formatBody(`\u200e${currentQueue.absenceMessage}`, contact);
-
-    const debouncedSentMessage = debounce(
-      // função
-      async () => {
-        const sentMessage = await wbot.sendMessage(
-          `${contact.number}@c.us`,
-          body
-        );
-        verifyMessage(sentMessage, ticket, contact);
-      },
-      // timeout
-      3000,
-      // ticket
-      ticket.id
-    );
-    holiday = !!isHoliday; */
-
-    debouncedSentMessage();
-  } else {
-    body = formatBody(`\u200e${currentQueue.greetingMessage}`, contact);
-
-    if (holiday !== "ID-noHoliday") {
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
-      verifyMessage(sentMessage, ticket, contact);
-    }
-  }
-  return holiday;
+  */
 };
 
 const verifyQueue = async (
