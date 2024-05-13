@@ -44,6 +44,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       }
 
       const args:String = process.env.CHROME_ARGS || "";
+      const wwebVersion = '2.2407.3';
 
       const wbot: Session = new Client({
         session: sessionCfg,
@@ -53,7 +54,11 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
           args: args.split(' ')
-        }
+        },
+        webVersionCache: {
+          type: 'remote',
+          remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
+        },
       });
 
       wbot.initialize();
