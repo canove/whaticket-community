@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import Image from '../../assets/logo-login.png';
 
 import {
   Avatar,
@@ -77,8 +78,8 @@ const Login = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlined />
+        <Avatar >
+          <img src={Image} alt="avatar" />
         </Avatar>
         <Typography component="h1" variant="h5">
           {i18n.t("login.title")}
