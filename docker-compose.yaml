@@ -9,7 +9,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '24'
+          cpus: '48'
     build:
       context: ./backend
       dockerfile: ./Dockerfile
