@@ -46,9 +46,16 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const args:String = process.env.CHROME_ARGS || "";
 
       const wbot: Session = new Client({
+        webVersionCache: {
+          type: "remote",
+          remotePath:
+            "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2413.51-beta.html"
+        },
         session: sessionCfg,
-        authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
+        authStrategy: new LocalAuth({ clientId: `bd_${whatsapp.id}` }),
         puppeteer: {
+          headless: true,
+          ignoreHTTPSErrors: true,
           executablePath: process.env.CHROME_BIN || undefined,
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,

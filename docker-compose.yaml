@@ -6,6 +6,10 @@ networks:
 services:
 
   backend:
+    deploy:
+      resources:
+        limits:
+          cpus: '24'
     build:
       context: ./backend
       dockerfile: ./Dockerfile
@@ -19,7 +23,7 @@ services:
       - BACKEND_URL=${BACKEND_URL:-http://localhost}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - PROXY_PORT=${PROXY_PORT:-8080}
-      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
+      - CHROME_ARGS=--no-sandbox --disable-client-side-phishing-detection --disable-setuid-sandbox --disable-component-update --disable-default-apps --disable-popup-blocking --disable-offer-store-unmasked-wallet-cards --disable-speech-api --hide-scrollbars --mute-audio --disable-extensions --disable-dev-shm-usage --disable-accelerated-2d-canvas --no-first-run --no-default-browser-check --no-pings --password-store=basic --use-mock-keychain --no-zygote --single-process --disable-gpu
     ports:
       - ${BACKEND_PORT:-8080}:3000
     volumes:
