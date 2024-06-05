@@ -1,18 +1,20 @@
 import {
-  Table,
+  AllowNull,
+  AutoIncrement,
+  BelongsToMany,
   Column,
   CreatedAt,
-  UpdatedAt,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  AllowNull,
+  Table,
   Unique,
-  BelongsToMany
+  UpdatedAt
 } from "sequelize-typescript";
 import User from "./User";
 import UserQueue from "./UserQueue";
 
+import Category from "./Category";
+import QueueCategory from "./QueueCategory";
 import Whatsapp from "./Whatsapp";
 import WhatsappQueue from "./WhatsappQueue";
 
@@ -47,6 +49,9 @@ class Queue extends Model<Queue> {
 
   @BelongsToMany(() => User, () => UserQueue)
   users: Array<User & { UserQueue: UserQueue }>;
+
+  @BelongsToMany(() => Category, () => QueueCategory)
+  categories: Category[];
 }
 
 export default Queue;

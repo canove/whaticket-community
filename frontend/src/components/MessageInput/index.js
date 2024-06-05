@@ -1,25 +1,10 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import "emoji-mart/css/emoji-mart.css";
-import { useParams } from "react-router-dom";
-import { Picker } from "emoji-mart";
-import MicRecorder from "mic-recorder-to-mp3";
 import clsx from "clsx";
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
+import MicRecorder from "mic-recorder-to-mp3";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import InputBase from "@material-ui/core/InputBase";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { green } from "@material-ui/core/colors";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import IconButton from "@material-ui/core/IconButton";
-import MoreVert from "@material-ui/icons/MoreVert";
-import MoodIcon from "@material-ui/icons/Mood";
-import SendIcon from "@material-ui/icons/Send";
-import CancelIcon from "@material-ui/icons/Cancel";
-import ClearIcon from "@material-ui/icons/Clear";
-import MicIcon from "@material-ui/icons/Mic";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import {
   FormControlLabel,
   Hidden,
@@ -27,15 +12,34 @@ import {
   MenuItem,
   Switch,
 } from "@material-ui/core";
+import Badge from "@material-ui/core/Badge";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import IconButton from "@material-ui/core/IconButton";
+import InputBase from "@material-ui/core/InputBase";
+import Paper from "@material-ui/core/Paper";
+import { green } from "@material-ui/core/colors";
+import { makeStyles } from "@material-ui/core/styles";
+import AttachFileIcon from "@material-ui/icons/AttachFile";
+import CancelIcon from "@material-ui/icons/Cancel";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import ClearIcon from "@material-ui/icons/Clear";
+import CommentIcon from "@material-ui/icons/Comment";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
-import { i18n } from "../../translate/i18n";
-import api from "../../services/api";
-import RecordingTimer from "./RecordingTimer";
-import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import MicIcon from "@material-ui/icons/Mic";
+import MoodIcon from "@material-ui/icons/Mood";
+import MoreVert from "@material-ui/icons/MoreVert";
+import SendIcon from "@material-ui/icons/Send";
+
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
+import NewPrivateNoteModal from "../NewPrivateNoteModal/index.js";
+import RecordingTimer from "./RecordingTimer";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -201,12 +205,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus }) => {
+const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
 
   const [medias, setMedias] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [newPrivateNoteModalOpen, setNewPrivateNoteModalOpen] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -490,6 +495,27 @@ const MessageInput = ({ ticketStatus }) => {
                 <AttachFileIcon className={classes.sendMessageIcons} />
               </IconButton>
             </label>
+
+            <IconButton
+              component="span"
+              onClick={() => setNewPrivateNoteModalOpen(true)}
+            >
+              <Badge
+                invisible={ticketPrivateNote ? false : true}
+                badgeContent={"!"}
+                color="secondary"
+              >
+                <CommentIcon className={classes.sendMessageIcons} />
+              </Badge>
+            </IconButton>
+
+            <NewPrivateNoteModal
+              modalOpen={newPrivateNoteModalOpen}
+              onClose={(e) => setNewPrivateNoteModalOpen(false)}
+              ticketId={ticketId}
+              ticketPrivateNote={ticketPrivateNote}
+            />
+
             <FormControlLabel
               style={{ marginRight: 7, color: "gray" }}
               label={i18n.t("messagesInput.signMessage")}

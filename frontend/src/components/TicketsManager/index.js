@@ -1,27 +1,26 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import SearchIcon from "@material-ui/icons/Search";
-import InputBase from "@material-ui/core/InputBase";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
 import Badge from "@material-ui/core/Badge";
-import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
+import InputBase from "@material-ui/core/InputBase";
+import Paper from "@material-ui/core/Paper";
+import Tab from "@material-ui/core/Tab";
+import Tabs from "@material-ui/core/Tabs";
+import { makeStyles } from "@material-ui/core/styles";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
+import SearchIcon from "@material-ui/icons/Search";
 
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import NewTicketModal from "../NewTicketModal";
-import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
+import TicketsList from "../TicketsList";
 
-import { i18n } from "../../translate/i18n";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../Can";
-import TicketsQueueSelect from "../TicketsQueueSelect";
 import { Button } from "@material-ui/core";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { i18n } from "../../translate/i18n";
+import TicketsQueueSelect from "../TicketsQueueSelect";
 
 const useStyles = makeStyles((theme) => ({
   ticketsWrapper: {
@@ -108,6 +107,14 @@ const TicketsManager = () => {
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   useEffect(() => {
     if (user.profile.toUpperCase() === "ADMIN") {
       setShowAllTickets(true);
@@ -160,6 +167,8 @@ const TicketsManager = () => {
         modalOpen={newTicketModalOpen}
         onClose={(e) => setNewTicketModalOpen(false)}
       />
+
+      {/* TABS */}
       <Paper elevation={0} square className={classes.tabsHeader}>
         <Tabs
           value={tab}
@@ -169,40 +178,55 @@ const TicketsManager = () => {
           textColor="primary"
           aria-label="icon label tabs example"
         >
+          {/* open */}
           <Tab
             value={"open"}
             icon={<MoveToInboxIcon />}
             label={i18n.t("tickets.tabs.open.title")}
             classes={{ root: classes.tab }}
           />
+          {/* - open */}
+
+          {/* closed */}
           <Tab
             value={"closed"}
             icon={<CheckBoxIcon />}
             label={i18n.t("tickets.tabs.closed.title")}
             classes={{ root: classes.tab }}
           />
+          {/* - closed */}
+
+          {/* search */}
           <Tab
             value={"search"}
             icon={<SearchIcon />}
             label={i18n.t("tickets.tabs.search.title")}
             classes={{ root: classes.tab }}
           />
+          {/* - search */}
         </Tabs>
       </Paper>
+      {/* - TABS */}
+
       <Paper square elevation={0} className={classes.ticketOptionsBox}>
         {tab === "search" ? (
-          <div className={classes.serachInputWrapper}>
-            <SearchIcon className={classes.searchIcon} />
-            <InputBase
-              className={classes.searchInput}
-              inputRef={searchInputRef}
-              placeholder={i18n.t("tickets.search.placeholder")}
-              type="search"
-              onChange={handleSearch}
-            />
-          </div>
+          <>
+            {/* // SEARCH INPUT */}
+            <div className={classes.serachInputWrapper}>
+              <SearchIcon className={classes.searchIcon} />
+              <InputBase
+                className={classes.searchInput}
+                inputRef={searchInputRef}
+                placeholder={i18n.t("tickets.search.placeholder")}
+                type="search"
+                onChange={handleSearch}
+              />
+            </div>
+            {/* - SEARCH INPUT */}
+          </>
         ) : (
           <>
+            {/* ADD TICKECT BUTTON */}
             <Button
               variant="outlined"
               color="primary"
@@ -210,7 +234,10 @@ const TicketsManager = () => {
             >
               {i18n.t("ticketsManager.buttons.newTicket")}
             </Button>
-            <Can
+            {/* - ADD TICKECT BUTTON */}
+
+            {/* SHOW ALL TICKETS SWITCH */}
+            {/* <Can
               role={user.profile}
               perform="tickets-manager:showall"
               yes={() => (
@@ -230,17 +257,24 @@ const TicketsManager = () => {
                   }
                 />
               )}
-            />
+            /> */}
+            {/* - SHOW ALL TICKETS SWITCH */}
           </>
         )}
+
+        {/* QUEUE SELECT */}
         <TicketsQueueSelect
           style={{ marginLeft: 6 }}
           selectedQueueIds={selectedQueueIds}
           userQueues={user?.queues}
           onChange={(values) => setSelectedQueueIds(values)}
         />
+        {/* - QUEUE SELECT */}
       </Paper>
+
+      {/* open TAB CONTENT  */}
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
+        {/* TABS */}
         <Tabs
           value={tabOpen}
           onChange={handleChangeTabOpen}
@@ -250,13 +284,43 @@ const TicketsManager = () => {
         >
           <Tab
             label={
-              <Badge
-                className={classes.badge}
-                badgeContent={openCount}
-                color="primary"
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
-                {i18n.t("ticketsList.assignedHeader")}
-              </Badge>
+                <Badge
+                  className={classes.badge}
+                  badgeContent={openCount}
+                  color="primary"
+                >
+                  {/* {i18n.t("ticketsList.assignedHeader")} */}
+                  {showAllTickets ? "TODOS LOS CHATS" : "MIS CHATS"}
+                </Badge>
+
+                <ArrowDropDownIcon fontSize="large" onClick={handleClick} />
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem
+                    onClick={(e) => {
+                      setShowAllTickets(true);
+                      handleClose(e);
+                    }}
+                  >
+                    TODOS LOS CHATS
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      setShowAllTickets(false);
+                      handleClose(e);
+                    }}
+                  >
+                    MIS CHATS
+                  </MenuItem>
+                </Menu>
+              </div>
             }
             value={"open"}
           />
@@ -273,7 +337,11 @@ const TicketsManager = () => {
             value={"pending"}
           />
         </Tabs>
+        {/* - TABS */}
+
+        {/* TABS CONTENT */}
         <Paper className={classes.ticketsWrapper}>
+          {/*  */}
           <TicketsList
             status="open"
             showAll={showAllTickets}
@@ -288,7 +356,11 @@ const TicketsManager = () => {
             style={applyPanelStyle("pending")}
           />
         </Paper>
+        {/* - TABS CONTENT */}
       </TabPanel>
+      {/* - open TAB CONTENT  */}
+
+      {/* closed TAB CONTENT */}
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
         <TicketsList
           status="closed"
@@ -296,6 +368,9 @@ const TicketsManager = () => {
           selectedQueueIds={selectedQueueIds}
         />
       </TabPanel>
+      {/* - closed TAB CONTENT */}
+
+      {/* search TAB CONTENT */}
       <TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
         <TicketsList
           searchParam={searchParam}
@@ -303,6 +378,7 @@ const TicketsManager = () => {
           selectedQueueIds={selectedQueueIds}
         />
       </TabPanel>
+      {/* - search TAB CONTENT */}
     </Paper>
   );
 };

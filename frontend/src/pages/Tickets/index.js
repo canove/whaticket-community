@@ -1,14 +1,14 @@
-import React from "react";
-import { useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
+import { useParams } from "react-router-dom";
 
-import TicketsManager from "../../components/TicketsManager/";
 import Ticket from "../../components/Ticket/";
+import TicketsManager from "../../components/TicketsManager/";
 
-import { i18n } from "../../translate/i18n";
 import Hidden from "@material-ui/core/Hidden";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
@@ -71,6 +71,7 @@ const Chat = () => {
       <div className={classes.chatPapper}>
         <Grid container spacing={0}>
           {/* <Grid item xs={4} className={classes.contactsWrapper}> */}
+          {/* LEFT | TICKETS VIEW ADMINISTRATION */}
           <Grid
             item
             xs={12}
@@ -81,6 +82,9 @@ const Chat = () => {
           >
             <TicketsManager />
           </Grid>
+          {/* LEFT | TICKETS VIEW ADMINISTRATION */}
+
+          {/* RIGHT | SELECTED TICKET */}
           <Grid item xs={12} md={8} className={classes.messagessWrapper}>
             {/* <Grid item xs={8} className={classes.messagessWrapper}> */}
             {ticketId ? (
@@ -96,6 +100,7 @@ const Chat = () => {
               </Hidden>
             )}
           </Grid>
+          {/* - RIGHT | SELECTED TICKET */}
         </Grid>
       </div>
     </div>

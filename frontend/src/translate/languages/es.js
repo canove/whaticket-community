@@ -42,15 +42,15 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "En servicio"
+            title: "En servicio",
           },
           waiting: {
-            title: "Esperando"
+            title: "Esperando",
           },
           closed: {
-            title: "Finalizado"
-          }
-        }
+            title: "Finalizado",
+          },
+        },
       },
       connections: {
         title: "Conexiones",
@@ -185,8 +185,8 @@ const messages = {
       },
       queueModal: {
         title: {
-          add: "Agregar cola",
-          edit: "Editar cola",
+          add: "Agregar canal",
+          edit: "Editar canal",
         },
         form: {
           name: "Nombre",
@@ -195,7 +195,7 @@ const messages = {
         },
         buttons: {
           okAdd: "Añadir",
-          okEdit: "Ahorrar",
+          okEdit: "Editar",
           cancel: "Cancelar",
         },
       },
@@ -227,7 +227,7 @@ const messages = {
         },
       },
       ticketsQueueSelect: {
-        placeholder: "Linhas",
+        placeholder: "Canales",
       },
       tickets: {
         toasts: {
@@ -288,7 +288,7 @@ const messages = {
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
-          queues: "Linhas",
+          queues: "Canales",
           administration: "Administración",
           users: "Usuarios",
           settings: "Configuración",
@@ -304,7 +304,7 @@ const messages = {
         noTickets: "Sin notificaciones.",
       },
       queues: {
-        title: "Linhas",
+        title: "Canales",
         table: {
           name: "Nombre",
           color: "Color",
@@ -312,16 +312,35 @@ const messages = {
           actions: "Comportamiento",
         },
         buttons: {
-          add: "Agregar cola",
+          add: "Agregar Canal",
         },
         confirmationModal: {
           deleteTitle: "Eliminar",
           deleteMessage:
-            "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ninguna cola asignada.",
+            "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ningun canal asignada.",
         },
       },
       queueSelect: {
-        inputLabel: "Linhas",
+        inputLabel: "Canales",
+      },
+      categories: {
+        title: "Categorias",
+        table: {
+          name: "Nombre",
+          color: "Color",
+          greeting: "Mensaje de saludo",
+          actions: "Comportamiento",
+        },
+        buttons: {
+          add: "Agregar Categoria",
+        },
+        confirmationModal: {
+          deleteTitle: "Eliminar",
+          deleteMessage: "¿Estás seguro? ¡Esta acción no se puede revertir!.",
+        },
+      },
+      categorieSelect: {
+        inputLabel: "Categorias",
       },
       quickAnswers: {
         title: "Respuestas rápidas",
@@ -389,7 +408,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
+        placeholderOpen:
+          "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
         placeholderClosed:
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
         signMessage: "Firmar",

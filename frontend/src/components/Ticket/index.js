@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
+import clsx from "clsx";
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
-import clsx from "clsx";
 
 import { Paper, makeStyles } from "@material-ui/core";
 
-import ContactDrawer from "../ContactDrawer";
-import MessageInput from "../MessageInput/";
-import TicketHeader from "../TicketHeader";
-import TicketInfo from "../TicketInfo";
-import TicketActionButtons from "../TicketActionButtons";
-import MessagesList from "../MessagesList";
-import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import ContactDrawer from "../ContactDrawer";
+import MessageInput from "../MessageInput/";
+import MessagesList from "../MessagesList";
+import TicketActionButtons from "../TicketActionButtons";
+import TicketHeader from "../TicketHeader";
+import TicketInfo from "../TicketInfo";
 
 const drawerWidth = 320;
 
@@ -92,6 +92,7 @@ const Ticket = () => {
 
           setContact(data.contact);
           setTicket(data);
+          console.log("ticket:", data);
           setLoading(false);
         } catch (err) {
           setLoading(false);
@@ -111,6 +112,7 @@ const Ticket = () => {
     socket.on("ticket", (data) => {
       if (data.action === "update") {
         setTicket(data.ticket);
+        console.log("ticker actulizado", data.ticket);
       }
 
       if (data.action === "delete") {
@@ -169,7 +171,12 @@ const Ticket = () => {
             ticketId={ticketId}
             isGroup={ticket.isGroup}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} />
+          {ticket.status === "open" && (
+            <MessageInput
+              ticketStatus={ticket.status}
+              ticketPrivateNote={ticket.privateNote}
+            />
+          )}
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer

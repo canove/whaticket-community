@@ -7,7 +7,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles((theme) => ({
   chips: {
@@ -19,15 +18,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const QueueSelect = ({ selectedQueueIds, onChange }) => {
+const CategorySelect = ({ selectedCategoryIds, onChange }) => {
   const classes = useStyles();
-  const [queues, setQueues] = useState([]);
+  const [categorys, setCategorys] = useState([]);
 
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get("/queue");
-        setQueues(data);
+        const { data } = await api.get("/categories");
+        setCategorys(data);
       } catch (err) {
         toastError(err);
       }
@@ -41,11 +40,11 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
   return (
     <div style={{ marginTop: 6 }}>
       <FormControl fullWidth margin="dense" variant="outlined">
-        <InputLabel>{i18n.t("queueSelect.inputLabel")}</InputLabel>
+        <InputLabel>Categorias</InputLabel>
         <Select
           multiple
           labelWidth={60}
-          value={selectedQueueIds}
+          value={selectedCategoryIds}
           onChange={handleChange}
           MenuProps={{
             anchorOrigin: {
@@ -62,13 +61,13 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
             <div className={classes.chips}>
               {selected?.length > 0 &&
                 selected.map((id) => {
-                  const queue = queues.find((q) => q.id === id);
-                  return queue ? (
+                  const category = categorys.find((q) => q.id === id);
+                  return category ? (
                     <Chip
                       key={id}
-                      style={{ backgroundColor: queue.color }}
+                      style={{ backgroundColor: category.color }}
                       variant="outlined"
-                      label={queue.name}
+                      label={category.name}
                       className={classes.chip}
                     />
                   ) : null;
@@ -76,9 +75,9 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
             </div>
           )}
         >
-          {queues.map((queue) => (
-            <MenuItem key={queue.id} value={queue.id}>
-              {queue.name}
+          {categorys.map((category) => (
+            <MenuItem key={category.id} value={category.id}>
+              {category.name}
             </MenuItem>
           ))}
         </Select>
@@ -87,4 +86,4 @@ const QueueSelect = ({ selectedQueueIds, onChange }) => {
   );
 };
 
-export default QueueSelect;
+export default CategorySelect;

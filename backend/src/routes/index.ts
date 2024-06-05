@@ -1,16 +1,17 @@
 import { Router } from "express";
 
-import userRoutes from "./userRoutes";
+import apiRoutes from "./apiRoutes";
 import authRoutes from "./authRoutes";
-import settingRoutes from "./settingRoutes";
+import categoryRoutes from "./categoryRoutes";
 import contactRoutes from "./contactRoutes";
-import ticketRoutes from "./ticketRoutes";
-import whatsappRoutes from "./whatsappRoutes";
 import messageRoutes from "./messageRoutes";
-import whatsappSessionRoutes from "./whatsappSessionRoutes";
 import queueRoutes from "./queueRoutes";
 import quickAnswerRoutes from "./quickAnswerRoutes";
-import apiRoutes from "./apiRoutes";
+import settingRoutes from "./settingRoutes";
+import ticketRoutes from "./ticketRoutes";
+import userRoutes from "./userRoutes";
+import whatsappRoutes from "./whatsappRoutes";
+import whatsappSessionRoutes from "./whatsappSessionRoutes";
 
 const routes = Router();
 
@@ -24,6 +25,7 @@ routes.use(messageRoutes);
 routes.use(whatsappSessionRoutes);
 routes.use(queueRoutes);
 routes.use(quickAnswerRoutes);
+routes.use(categoryRoutes);
 routes.use("/api/messages", apiRoutes);
 
 export default routes;

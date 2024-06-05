@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
@@ -20,7 +20,6 @@ import { IconButton, InputAdornment } from "@material-ui/core";
 import { Colorize } from "@material-ui/icons";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import CategorySelect from "../CategorySelect";
 import ColorPicker from "../ColorPicker";
 
 const useStyles = makeStyles((theme) => ({
@@ -55,41 +54,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const QueueSchema = Yup.object().shape({
+const CategorySchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Too Short!")
     .max(50, "Too Long!")
     .required("Required"),
   color: Yup.string().min(3, "Too Short!").max(9, "Too Long!").required(),
-  greetingMessage: Yup.string(),
 });
 
-const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
+const CategoryModal = ({ open, onClose, categoryId }) => {
   const classes = useStyles();
 
   const initialState = {
     name: "",
     color: "",
-    greetingMessage: "",
   };
 
   const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
-  const [queue, setQueue] = useState(initialState);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
-  const greetingRef = useRef();
-
-  useEffect(() => {
-    if (queuesCategories) {
-      setSelectedCategoryIds(queuesCategories.map((category) => category.id));
-    }
-  }, [queuesCategories]);
+  const [category, setCategory] = useState(initialState);
 
   useEffect(() => {
     (async () => {
-      if (!queueId) return;
+      if (!categoryId) return;
       try {
-        const { data } = await api.get(`/queue/${queueId}`);
-        setQueue((prevState) => {
+        const { data } = await api.get(`/category/${categoryId}`);
+        setCategory((prevState) => {
           return { ...prevState, ...data };
         });
       } catch (err) {
@@ -98,29 +87,28 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
     })();
 
     return () => {
-      setQueue({
+      setCategory({
         name: "",
         color: "",
-        greetingMessage: "",
       });
     };
-  }, [queueId, open]);
+  }, [categoryId, open]);
 
   const handleClose = () => {
     onClose();
-    setQueue(initialState);
+    setCategory(initialState);
   };
 
-  const handleSaveQueue = async (values) => {
-    const queueData = { ...values, categoriesIds: selectedCategoryIds };
-
+  const handleSaveCategory = async (values) => {
     try {
-      if (queueId) {
-        await api.put(`/queue/${queueId}`, queueData);
+      console.log("values to submit", values);
+
+      if (categoryId) {
+        await api.put(`/category/${categoryId}`, values);
       } else {
-        await api.post("/queue", values);
+        await api.post("/category", values);
       }
-      toast.success("Queue saved successfully");
+      toast.success("Category saved successfully");
       handleClose();
     } catch (err) {
       toastError(err);
@@ -131,17 +119,17 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
     <div className={classes.root}>
       <Dialog open={open} onClose={handleClose} scroll="paper">
         <DialogTitle>
-          {queueId
-            ? `${i18n.t("queueModal.title.edit")}`
-            : `${i18n.t("queueModal.title.add")}`}
+          {categoryId
+            ? `${i18n.t("categoryModal.title.edit")}`
+            : `${i18n.t("categoryModal.title.add")}`}
         </DialogTitle>
         <Formik
-          initialValues={queue}
+          initialValues={category}
           enableReinitialize={true}
-          validationSchema={QueueSchema}
+          validationSchema={CategorySchema}
           onSubmit={(values, actions) => {
             setTimeout(() => {
-              handleSaveQueue(values);
+              handleSaveCategory(values);
               actions.setSubmitting(false);
             }, 400);
           }}
@@ -151,7 +139,7 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
               <DialogContent dividers>
                 <Field
                   as={TextField}
-                  label={i18n.t("queueModal.form.name")}
+                  label={i18n.t("categoryModal.form.name")}
                   autoFocus
                   name="name"
                   error={touched.name && Boolean(errors.name)}
@@ -162,13 +150,9 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                 />
                 <Field
                   as={TextField}
-                  label={i18n.t("queueModal.form.color")}
+                  label={i18n.t("categoryModal.form.color")}
                   name="color"
                   id="color"
-                  onFocus={() => {
-                    setColorPickerModalOpen(true);
-                    greetingRef.current.focus();
-                  }}
                   error={touched.color && Boolean(errors.color)}
                   helperText={touched.color && errors.color}
                   InputProps={{
@@ -198,34 +182,12 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                   handleClose={() => setColorPickerModalOpen(false)}
                   onChange={(color) => {
                     values.color = color;
-                    setQueue(() => {
+                    setCategory(() => {
                       return { ...values, color };
                     });
+                    console.log("se escogio un color");
+                    setColorPickerModalOpen(false);
                   }}
-                />
-                <div>
-                  <Field
-                    as={TextField}
-                    label={i18n.t("queueModal.form.greetingMessage")}
-                    type="greetingMessage"
-                    multiline
-                    inputRef={greetingRef}
-                    rows={5}
-                    fullWidth
-                    name="greetingMessage"
-                    error={
-                      touched.greetingMessage && Boolean(errors.greetingMessage)
-                    }
-                    helperText={
-                      touched.greetingMessage && errors.greetingMessage
-                    }
-                    variant="outlined"
-                    margin="dense"
-                  />
-                </div>
-                <CategorySelect
-                  selectedCategoryIds={selectedCategoryIds}
-                  onChange={(values) => setSelectedCategoryIds(values)}
                 />
               </DialogContent>
               <DialogActions>
@@ -244,7 +206,7 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                   variant="contained"
                   className={classes.btnWrapper}
                 >
-                  {queueId
+                  {categoryId
                     ? `${i18n.t("queueModal.buttons.okEdit")}`
                     : `${i18n.t("queueModal.buttons.okAdd")}`}
                   {isSubmitting && (
@@ -263,4 +225,4 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
   );
 };
 
-export default QueueModal;
+export default CategoryModal;
