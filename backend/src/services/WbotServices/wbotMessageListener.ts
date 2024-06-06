@@ -31,6 +31,9 @@ interface Session extends Client {
 
 const writeFileAsync = promisify(writeFile);
 
+/**
+ * Save or update the contact in the database (name, number, profilePicUrl)
+ */
 const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
   const profilePicUrl = await msgContact.getProfilePicUrl();
 
@@ -46,6 +49,9 @@ const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
   return contact;
 };
 
+/**
+ * Verify if the message has a quoted message and return it, otherwise return null
+ */
 const verifyQuotedMessage = async (
   msg: WbotMessage
 ): Promise<Message | null> => {
@@ -62,7 +68,9 @@ const verifyQuotedMessage = async (
   return quotedMsg;
 };
 
-// generate random id string for file names, function got from: https://stackoverflow.com/a/1349426/1851801
+/**
+ * Generate random id string for file names, function got from: https://stackoverflow.com/a/1349426/1851801
+ */
 function makeRandomId(length: number) {
   let result = "";
   const characters =
@@ -76,6 +84,10 @@ function makeRandomId(length: number) {
   return result;
 }
 
+/**
+ * Create a message in the database with the passed msg and update the ticket lastMessage
+ * - download the media, and save it in the public folder
+ */
 const verifyMediaMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
@@ -132,6 +144,10 @@ const verifyMediaMessage = async (
   return newMessage;
 };
 
+/**
+ * Create a message in the database with the passed msg and update the ticket lastMessage
+ * - If the message is a location, prepare the message to include the location description and gmaps url
+ */
 const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
@@ -140,6 +156,7 @@ const verifyMessage = async (
   if (msg.type === "location") msg = prepareLocation(msg);
 
   const quotedMsg = await verifyQuotedMessage(msg);
+
   const messageData = {
     id: msg.id.id,
     ticketId: ticket.id,
@@ -165,6 +182,9 @@ const verifyMessage = async (
   await CreateMessageService({ messageData });
 };
 
+/**
+ * Modify the passed msg object to include the location description and gmaps url and return it
+ */
 const prepareLocation = (msg: WbotMessage): WbotMessage => {
   let gmapsUrl =
     "https://maps.google.com/maps?q=" +
@@ -186,14 +206,21 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   return msg;
 };
 
+/**
+ * Validate if passed message is a option for a queue related to the conection, and assign the ticket to this queue
+ * otherwise send the conection welcome message + options
+ * - IF the conection has only one queue, assign the ticket to this queue and return
+ */
 const verifyQueue = async (
   wbot: Session,
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
 ) => {
+  // Get the queues and the welcome message from the conection
   const { queues, greetingMessage } = await ShowWhatsAppService(wbot.id!);
 
+  // IF the conection has only one queue, assign the ticket to this queue and return
   if (queues.length === 1) {
     await UpdateTicketService({
       ticketData: { queueId: queues[0].id },
@@ -203,10 +230,18 @@ const verifyQueue = async (
     return;
   }
 
+  // Consider the body msg as the selected option for a queue
   const selectedOption = msg.body;
 
+  // Identify the choosen queue
   const choosenQueue = queues[+selectedOption - 1];
 
+  // IF the choosen queue exists
+  // - assign the ticket to this queue, send the queue welcome message with his categories options
+  // - and save the send message in the database with verifyMessage()
+  // ELSE
+  // - send the conection welcome message with his queues options
+  // - and save the send message in the database with verifyMessage()
   if (choosenQueue) {
     await UpdateTicketService({
       ticketData: { queueId: choosenQueue.id },
@@ -284,6 +319,8 @@ const handleMessage = async (
     let msgContact: WbotContact;
     let groupContact: Contact | undefined;
 
+    // if i sent the message, msgContact is the contact that received the message
+    // if i received the message, msgContact is the contact that sent the message
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
       // if so, this message was already been stored in database;
@@ -291,7 +328,6 @@ const handleMessage = async (
 
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
-
       if (
         !msg.hasMedia &&
         msg.type !== "location" &&
@@ -308,6 +344,10 @@ const handleMessage = async (
 
     const chat = await msg.getChat();
 
+    // if the message is from a group,
+    // and i sent the message, groupContact is the contact that received the message
+    // and if i received the message, groupContact is the contact that sent the message
+    // in any case, save the group contact in the database
     if (chat.isGroup) {
       let msgGroupContact;
 
@@ -319,12 +359,15 @@ const handleMessage = async (
 
       groupContact = await verifyContact(msgGroupContact);
     }
+
     const whatsapp = await ShowWhatsAppService(wbot.id!);
 
+    // if i sent the message, unreadMessages = 0 otherwise unreadMessages = chat.unreadCount
     const unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
 
     const contact = await verifyContact(msgContact);
 
+    // if the message is the conection farewell message, dont do anything
     if (
       unreadMessages === 0 &&
       whatsapp.farewellMessage &&
@@ -332,6 +375,8 @@ const handleMessage = async (
     )
       return;
 
+    // find, create or update a ticket from the contact or groupContact and from whatsappId
+    // always update the ticket unreadMessages
     const ticket = await FindOrCreateTicketService(
       contact,
       wbot.id!,
@@ -345,51 +390,43 @@ const handleMessage = async (
       await verifyMessage(msg, ticket, contact);
     }
 
+    // console.log("--- ticketFromMesssage", ticket);
+
+    // If the message is not from a group or from me,
+    // the message ticket has no queue or category,
+    // has no user, and the conection has min 1 queues,
+    // we considered it as a intro message from a contact, and whe send it a messages to choose a queue and a category
     if (
-      !ticket.queue &&
+      (!ticket.queue || !(ticket.categories.length > 0)) &&
       !chat.isGroup &&
       !msg.fromMe &&
       !ticket.userId &&
       whatsapp.queues.length >= 1
     ) {
-      await verifyQueue(wbot, msg, ticket, contact);
-    }
+      if (!ticket.queue) {
+        await verifyQueue(wbot, msg, ticket, contact);
+      } else if (!(ticket.categories.length > 0)) {
+        const selectedCategoryId = msg.body;
 
-    if (
-      !chat.isGroup &&
-      !msg.fromMe &&
-      !ticket.userId &&
-      whatsapp.queues.length >= 1
-    ) {
-      const selectedCategoryId = msg.body;
+        console.log("--- selectedCategoryId", selectedCategoryId);
 
-      console.log("--- selectedCategoryId", selectedCategoryId);
+        await UpdateTicketService({
+          ticketData: { categoriesIds: [+selectedCategoryId] },
+          ticketId: ticket.id
+        });
 
-      // const selectedCategory = await ShowCategoryService(selectedCategoryId);
+        const body = formatBody(
+          `\u200e${"Se ha registrado su incidencia, pronto te antenderemos."}\n`,
+          contact
+        );
 
-      // console.log("--- selectedCategory", selectedCategory);
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
 
-      await UpdateTicketService({
-        ticketData: { categoriesIds: [+selectedCategoryId] },
-        ticketId: ticket.id
-      });
-
-      const body = formatBody(
-        `\u200e${"Se ha registrado su incidencia, pronto te antenderemos."}\n`,
-        contact
-      );
-
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
-
-      await verifyMessage(sentMessage, ticket, contact);
-
-      // ticket.$set("categories", [+selectedCategoryId]);
-
-      // const choosenQueue = queues[+selectedOption - 1];
-      // await verifyQueue(wbot, msg, ticket, contact);
+        await verifyMessage(sentMessage, ticket, contact);
+      }
     }
 
     if (msg.type === "vcard") {

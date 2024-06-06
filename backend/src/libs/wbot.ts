@@ -1,10 +1,10 @@
 import qrCode from "qrcode-terminal";
 import { Client, LocalAuth } from "whatsapp-web.js";
-import { getIO } from "./socket";
-import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
-import { logger } from "../utils/logger";
+import Whatsapp from "../models/Whatsapp";
 import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+import { logger } from "../utils/logger";
+import { getIO } from "./socket";
 
 interface Session extends Client {
   id?: number;
@@ -13,6 +13,9 @@ interface Session extends Client {
 const sessions: Session[] = [];
 
 const syncUnreadMessages = async (wbot: Session) => {
+  console.log("---  START syncUnreadMessages");
+  console.time("Loop Time");
+
   const chats = await wbot.getChats();
 
   /* eslint-disable no-restricted-syntax */
@@ -30,6 +33,9 @@ const syncUnreadMessages = async (wbot: Session) => {
       await chat.sendSeen();
     }
   }
+
+  console.log("---  END syncUnreadMessages");
+  console.timeEnd("Loop Time");
 };
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
@@ -43,7 +49,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const args:String = process.env.CHROME_ARGS || "";
+      const args: String = process.env.CHROME_ARGS || "";
 
       const wbot: Session = new Client({
         webVersionCache: {
@@ -59,7 +65,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           executablePath: process.env.CHROME_BIN || undefined,
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: args.split(' ')
+          args: args.split(" ")
         }
       });
 
