@@ -261,9 +261,20 @@ const verifyQueue = async (
       contact
     );
 
-    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
+    const debouncedSentMessage = debounce(
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
 
-    await verifyMessage(sentMessage, ticket, contact);
+        await verifyMessage(sentMessage, ticket, contact);
+      },
+      3000,
+      ticket.id
+    );
+
+    debouncedSentMessage();
   } else {
     let options = "";
 
