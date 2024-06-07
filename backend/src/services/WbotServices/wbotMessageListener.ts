@@ -173,8 +173,10 @@ const verifyMessage = async (
   await ticket.update({
     lastMessage:
       msg.type === "location"
-        ? msg.location.description
-          ? "Localization - " + msg.location.description.split("\\n")[0]
+        ? // @ts-ignore
+          msg.location.description
+          ? // @ts-ignore
+            "Localization - " + msg.location.description.split("\\n")[0]
           : "Localization"
         : msg.body
   });
@@ -199,8 +201,10 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   // @ts-ignore
   msg.body +=
     "|" +
+    // @ts-ignore
     (msg.location.description
-      ? msg.location.description
+      ? // @ts-ignore
+        msg.location.description
       : msg.location.latitude + ", " + msg.location.longitude);
 
   return msg;
