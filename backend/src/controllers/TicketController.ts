@@ -89,8 +89,6 @@ export const update = async (
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
-  console.log("ticketData", ticketData);
-
   const { ticket } = await UpdateTicketService({
     ticketData,
     ticketId

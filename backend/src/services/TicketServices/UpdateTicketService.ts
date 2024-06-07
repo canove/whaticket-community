@@ -58,8 +58,6 @@ const UpdateTicketService = async ({
     });
   }
 
-  console.log("categoriesIds", categoriesIds);
-
   if (categoriesIds) {
     await ticket.$set("categories", categoriesIds);
   }

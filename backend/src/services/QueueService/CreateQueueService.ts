@@ -62,8 +62,6 @@ const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
 
   const queue = await Queue.create(queueData);
 
-  console.log("categoriesIds", categoriesIds);
-
   if (categoriesIds) {
     await queue.$set("categories", categoriesIds);
   }

@@ -55,14 +55,10 @@ const CreateCategoryService = async (
   });
 
   try {
-    console.log("new category", { color, name });
-
     await categorySchema.validate({ color, name });
   } catch (err) {
     throw new AppError(err.message);
   }
-
-  console.log("new category pass validations", categoryData);
 
   const category = await Category.create(categoryData);
 

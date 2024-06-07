@@ -252,8 +252,6 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    console.log("--- choosenQueue", choosenQueue);
-
     let options = "";
 
     choosenQueue.categories.forEach((category, index) => {
@@ -405,8 +403,6 @@ const handleMessage = async (
       await verifyMessage(msg, ticket, contact);
     }
 
-    // console.log("--- ticketFromMesssage", ticket);
-
     // If the message is not from a group or from me,
     // the message ticket has no queue or category,
     // has no user, and the conection has min 1 queues,
@@ -422,8 +418,6 @@ const handleMessage = async (
         await verifyQueue(wbot, msg, ticket, contact);
       } else if (!(ticket.categories.length > 0)) {
         const selectedCategoryId = msg.body;
-
-        console.log("--- selectedCategoryId", selectedCategoryId);
 
         await UpdateTicketService({
           ticketData: { categoriesIds: [+selectedCategoryId] },
