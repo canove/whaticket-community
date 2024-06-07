@@ -1,18 +1,18 @@
-import * as Yup from "yup";
 import { Request, Response } from "express";
+import * as Yup from "yup";
 import { getIO } from "../libs/socket";
 
-import ListContactsService from "../services/ContactServices/ListContactsService";
 import CreateContactService from "../services/ContactServices/CreateContactService";
+import DeleteContactService from "../services/ContactServices/DeleteContactService";
+import ListContactsService from "../services/ContactServices/ListContactsService";
 import ShowContactService from "../services/ContactServices/ShowContactService";
 import UpdateContactService from "../services/ContactServices/UpdateContactService";
-import DeleteContactService from "../services/ContactServices/DeleteContactService";
 
-import CheckContactNumber from "../services/WbotServices/CheckNumber"
-import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
-import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 import AppError from "../errors/AppError";
 import GetContactService from "../services/ContactServices/GetContactService";
+import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
+import CheckContactNumber from "../services/WbotServices/CheckNumber";
+import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 
 type IndexQuery = {
   searchParam: string;
@@ -32,6 +32,7 @@ interface ContactData {
   name: string;
   number: string;
   email?: string;
+  domain?: string;
   extraInfo?: ExtraInfo[];
 }
 
@@ -46,7 +47,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   return res.json({ contacts, count, hasMore });
 };
 
-export const getContact = async (req: Request, res: Response): Promise<Response> => {
+export const getContact = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { name, number } = req.body as IndexGetContactQuery;
 
   const contact = await GetContactService({
@@ -75,14 +79,14 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   }
 
   await CheckIsValidContact(newContact.number);
-  const validNumber : any = await CheckContactNumber(newContact.number)
-  
+  const validNumber: any = await CheckContactNumber(newContact.number);
+
   const profilePicUrl = await GetProfilePicUrl(validNumber);
 
-  let name = newContact.name
-  let number = validNumber
-  let email = newContact.email
-  let extraInfo = newContact.extraInfo
+  let name = newContact.name;
+  let number = validNumber;
+  let email = newContact.email;
+  let extraInfo = newContact.extraInfo;
 
   const contact = await CreateContactService({
     name,
