@@ -18,20 +18,33 @@ const syncUnreadMessages = async (wbot: Session) => {
 
   const chats = await wbot.getChats();
 
-  /* eslint-disable no-restricted-syntax */
-  /* eslint-disable no-await-in-loop */
-  for (const chat of chats) {
-    if (chat.unreadCount > 0) {
-      const unreadMessages = await chat.fetchMessages({
-        limit: chat.unreadCount
-      });
+  const chatsChunksLimit = 5;
 
-      for (const msg of unreadMessages) {
-        await handleMessage(msg, wbot);
-      }
+  const chunks = [];
+  for (let i = 0; i < chats.length; i += chatsChunksLimit) {
+    chunks.push(chats.slice(i, i + chatsChunksLimit));
+  }
 
-      await chat.sendSeen();
-    }
+  for (const chunk of chunks) {
+    await Promise.all(
+      chunk.map(async chat => {
+        try {
+          if (chat.unreadCount > 0) {
+            const unreadMessages = await chat.fetchMessages({
+              limit: chat.unreadCount
+            });
+
+            for (const msg of unreadMessages) {
+              await handleMessage(msg, wbot);
+            }
+
+            await chat.sendSeen();
+          }
+        } catch (error) {
+          console.error(`Error processing chat with id ${chat.id}:`, error);
+        }
+      })
+    );
   }
 
   console.log("---  END syncUnreadMessages");
