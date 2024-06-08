@@ -20,7 +20,7 @@ import {
 	IconButton
   } from '@material-ui/core';
 
-import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { CloudUpload, Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -33,6 +33,19 @@ import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import useWhatsApps from "../../hooks/useWhatsApps";
+import { styled } from '@material-ui/core/styles';
+
+const VisuallyHiddenInput = styled('input')({
+	clip: 'rect(0 0 0 0)',
+	clipPath: 'inset(50%)',
+	height: 1,
+	overflow: 'hidden',
+	position: 'absolute',
+	bottom: 0,
+	left: 0,
+	whiteSpace: 'nowrap',
+	width: 1,
+  });
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -90,6 +103,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [whatsappId, setWhatsappId] = useState(false);
 	const {loading, whatsApps} = useWhatsApps();
+	const [file, setFile] = useState();
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -120,8 +134,18 @@ const UserModal = ({ open, onClose, userId }) => {
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
+				if (file) {
+					const formData = new FormData();
+					formData.append('file', file);
+					await api.post(`/users/${userId}/upload-image`, formData);
+				}
 			} else {
 				await api.post("/users", userData);
+				if (file) {
+					const formData = new FormData();
+					formData.append('file', file);
+					await api.post(`/users/${userId}/upload-image`, formData);
+				}
 			}
 			toast.success(i18n.t("userModal.success"));
 		} catch (err) {
@@ -245,6 +269,18 @@ const UserModal = ({ open, onClose, userId }) => {
 										/>
 									)}
 								/>
+								<InputLabel id="image-selection-input-label">Foto de perfil</InputLabel>
+								<Button
+											component="label"
+											role={loggedInUser.profile}
+											variant="contained"
+											tabIndex={-1}
+											startIcon={<CloudUpload />}
+										>
+											Upload file
+											<Field as={VisuallyHiddenInput} labelId="image-selection-input-label" type="file" name="file" onChange={(e) => setFile(e.target.files[0])} />
+								</Button>
+
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"

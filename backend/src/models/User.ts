@@ -55,6 +55,9 @@ class User extends Model<User> {
   @BelongsTo(() => Whatsapp)
   whatsapp: Whatsapp;
 
+  @Column
+  image: string;
+
   @CreatedAt
   createdAt: Date;
 

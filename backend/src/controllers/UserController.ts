@@ -106,3 +106,22 @@ export const remove = async (
 
   return res.status(200).json({ message: "User deleted" });
 };
+
+export const uploadImage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { userId } = req.params;
+  const image = req.file?.filename;
+  console.log(image);
+
+  const user = await UpdateUserService({ userData: { image }, userId });
+
+  const io = getIO();
+  io.emit("user", {
+    action: "update",
+    user
+  });
+
+  return res.status(200).json(user);
+};
