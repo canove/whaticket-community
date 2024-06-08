@@ -1,19 +1,19 @@
 const rules = {
-	user: {
-		static: [],
-	},
+  user: {
+    static: [],
+  },
 
-	admin: {
-		static: [
-			"drawer-admin-items:view",
-			"tickets-manager:showall",
-			"user-modal:editProfile",
-			"user-modal:editQueues",
-			"ticket-options:deleteTicket",
-			"ticket-options:transferWhatsapp",
-			"contacts-page:deleteContact",
-		],
-	},
+  admin: {
+    static: [
+      "drawer-admin-items:view",
+      "tickets-manager:showall",
+      "user-modal:editProfile",
+      "user-modal:editQueues",
+      "ticket-options:deleteTicket",
+      "ticket-options:transferWhatsapp",
+      "contacts-page:deleteContact",
+    ],
+  },
 };
 
 export default rules;

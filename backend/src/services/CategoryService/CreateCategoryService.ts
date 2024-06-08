@@ -1,31 +1,31 @@
 import * as Yup from "yup";
 import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
+import Category from "../../models/Category";
 
-interface QueueData {
+interface CategoryData {
   name: string;
   color: string;
-  greetingMessage?: string;
-  categoriesIds?: number[];
 }
 
-const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
-  const { color, name, categoriesIds } = queueData;
+const CreateCategoryService = async (
+  categoryData: CategoryData
+): Promise<Category> => {
+  const { name, color } = categoryData;
 
-  const queueSchema = Yup.object().shape({
+  const categorySchema = Yup.object().shape({
     name: Yup.string()
-      .min(2, "ERR_QUEUE_INVALID_NAME")
-      .required("ERR_QUEUE_INVALID_NAME")
+      .min(2, "ERR_Category_INVALID_NAME")
+      .required("ERR_Category_INVALID_NAME")
       .test(
         "Check-unique-name",
-        "ERR_QUEUE_NAME_ALREADY_EXISTS",
+        "ERR_Category_NAME_ALREADY_EXISTS",
         async value => {
           if (value) {
-            const queueWithSameName = await Queue.findOne({
+            const CategoryWithSameName = await Category.findOne({
               where: { name: value }
             });
 
-            return !queueWithSameName;
+            return !CategoryWithSameName;
           }
           return false;
         }
@@ -41,13 +41,13 @@ const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
       })
       .test(
         "Check-color-exists",
-        "ERR_QUEUE_COLOR_ALREADY_EXISTS",
+        "ERR_category_COLOR_ALREADY_EXISTS",
         async value => {
           if (value) {
-            const queueWithSameColor = await Queue.findOne({
+            const categoryWithSameColor = await Category.findOne({
               where: { color: value }
             });
-            return !queueWithSameColor;
+            return !categoryWithSameColor;
           }
           return false;
         }
@@ -55,18 +55,14 @@ const CreateQueueService = async (queueData: QueueData): Promise<Queue> => {
   });
 
   try {
-    await queueSchema.validate({ color, name });
+    await categorySchema.validate({ color, name });
   } catch (err) {
     throw new AppError(err.message);
   }
 
-  const queue = await Queue.create(queueData);
+  const category = await Category.create(categoryData);
 
-  if (categoriesIds) {
-    await queue.$set("categories", categoriesIds);
-  }
-
-  return queue;
+  return category;
 };
 
-export default CreateQueueService;
+export default CreateCategoryService;

@@ -8,13 +8,14 @@ interface QueueData {
   name?: string;
   color?: string;
   greetingMessage?: string;
+  categoriesIds?: number[];
 }
 
 const UpdateQueueService = async (
   queueId: number | string,
   queueData: QueueData
 ): Promise<Queue> => {
-  const { color, name } = queueData;
+  const { color, name, categoriesIds } = queueData;
 
   const queueSchema = Yup.object().shape({
     name: Yup.string()
@@ -66,6 +67,10 @@ const UpdateQueueService = async (
   const queue = await ShowQueueService(queueId);
 
   await queue.update(queueData);
+
+  if (categoriesIds) {
+    await queue.$set("categories", categoriesIds);
+  }
 
   return queue;
 };

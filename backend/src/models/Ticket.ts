@@ -1,20 +1,23 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsTo,
+  BelongsToMany,
   Column,
   CreatedAt,
-  UpdatedAt,
+  Default,
+  ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
-  ForeignKey,
-  BelongsTo,
-  HasMany,
-  AutoIncrement,
-  Default
+  Table,
+  UpdatedAt
 } from "sequelize-typescript";
 
+import Category from "./Category";
 import Contact from "./Contact";
 import Message from "./Message";
 import Queue from "./Queue";
+import TicketCategory from "./TicketCategory";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
@@ -33,6 +36,9 @@ class Ticket extends Model<Ticket> {
 
   @Column
   lastMessage: string;
+
+  @Column
+  privateNote: string;
 
   @Default(false)
   @Column
@@ -74,6 +80,9 @@ class Ticket extends Model<Ticket> {
 
   @HasMany(() => Message)
   messages: Message[];
+
+  @BelongsToMany(() => Category, () => TicketCategory)
+  categories: Category[];
 }
 
 export default Ticket;

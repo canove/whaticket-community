@@ -1,10 +1,10 @@
 import qrCode from "qrcode-terminal";
 import { Client, LocalAuth } from "whatsapp-web.js";
-import { getIO } from "./socket";
-import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
-import { logger } from "../utils/logger";
+import Whatsapp from "../models/Whatsapp";
 import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+import { logger } from "../utils/logger";
+import { getIO } from "./socket";
 
 interface Session extends Client {
   id?: number;
@@ -13,23 +13,42 @@ interface Session extends Client {
 const sessions: Session[] = [];
 
 const syncUnreadMessages = async (wbot: Session) => {
+  console.log("---  START syncUnreadMessages");
+  console.time("Loop Time");
+
   const chats = await wbot.getChats();
 
-  /* eslint-disable no-restricted-syntax */
-  /* eslint-disable no-await-in-loop */
-  for (const chat of chats) {
-    if (chat.unreadCount > 0) {
-      const unreadMessages = await chat.fetchMessages({
-        limit: chat.unreadCount
-      });
+  const chatsChunksLimit = 5;
 
-      for (const msg of unreadMessages) {
-        await handleMessage(msg, wbot);
-      }
-
-      await chat.sendSeen();
-    }
+  const chunks = [];
+  for (let i = 0; i < chats.length; i += chatsChunksLimit) {
+    chunks.push(chats.slice(i, i + chatsChunksLimit));
   }
+
+  for (const chunk of chunks) {
+    await Promise.all(
+      chunk.map(async chat => {
+        try {
+          if (chat.unreadCount > 0) {
+            const unreadMessages = await chat.fetchMessages({
+              limit: chat.unreadCount
+            });
+
+            for (const msg of unreadMessages) {
+              await handleMessage(msg, wbot);
+            }
+
+            await chat.sendSeen();
+          }
+        } catch (error) {
+          console.error(`Error processing chat with id ${chat.id}:`, error);
+        }
+      })
+    );
+  }
+
+  console.log("---  END syncUnreadMessages");
+  console.timeEnd("Loop Time");
 };
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
@@ -43,7 +62,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const args:String = process.env.CHROME_ARGS || "";
+      const args: String = process.env.CHROME_ARGS || "";
 
       const wbot: Session = new Client({
         webVersionCache: {
@@ -59,7 +78,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           executablePath: process.env.CHROME_BIN || undefined,
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: args.split(' ')
+          args: args.split(" ")
         }
       });
 
