@@ -12,6 +12,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
 type IndexQuery = {
   pageNumber: string;
+  setTicketMessagesAsRead?: string;
 };
 
 type MessageData = {
@@ -23,14 +24,18 @@ type MessageData = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { pageNumber } = req.query as IndexQuery;
+
+  const { pageNumber, setTicketMessagesAsRead } =
+    req.query as unknown as IndexQuery;
 
   const { count, messages, ticket, hasMore } = await ListMessagesService({
     pageNumber,
     ticketId
   });
 
-  SetTicketMessagesAsRead(ticket);
+  if (setTicketMessagesAsRead === "true") {
+    SetTicketMessagesAsRead(ticket);
+  }
 
   return res.json({ count, messages, ticket, hasMore });
 };

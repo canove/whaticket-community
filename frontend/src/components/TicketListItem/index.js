@@ -14,12 +14,15 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Tooltip from "@material-ui/core/Tooltip";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
+import TicketPreviewModal from "../TicketPreviewModal";
 
 import Typography from "@material-ui/core/Typography";
 import { green } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
 
+import IconButton from "@material-ui/core/IconButton";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
+import VisibilityOutlinedIcon from "@material-ui/icons/VisibilityOutlined";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
@@ -137,6 +140,7 @@ const TicketListItem = ({ ticket }) => {
   const classes = useStyles();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const [previewModalIsOpen, setPreviewModalIsOpen] = useState(false);
   const { ticketId } = useParams();
   const isMounted = useRef(true);
   const { user } = useContext(AuthContext);
@@ -289,6 +293,7 @@ const TicketListItem = ({ ticket }) => {
 
               <div
                 style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                onClick={(e) => e.stopPropagation()}
               >
                 {/* USER */}
                 {ticket.userId && (
@@ -311,6 +316,22 @@ const TicketListItem = ({ ticket }) => {
                   </Tooltip>
                 )}
                 {/* WPP */}
+
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPreviewModalIsOpen(true);
+                  }}
+                >
+                  <VisibilityOutlinedIcon fontSize="default" />
+                </IconButton>
+
+                <TicketPreviewModal
+                  ticket={ticket}
+                  open={previewModalIsOpen}
+                  onClose={() => setPreviewModalIsOpen(false)}
+                />
 
                 {/* UNREAD MESSAGES */}
                 {ticket.unreadMessages > 0 && (
