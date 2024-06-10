@@ -5,6 +5,7 @@ import { v4 } from "uuid";
 import path from "path";
 import isAuth from "../middleware/isAuth";
 import * as UserController from "../controllers/UserController";
+import { isFileValidType } from "../middleware/isFileValidType";
 
 const storagePermanent = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -26,8 +27,15 @@ const storageTemporary = multer.diskStorage({
   }
 });
 
-const uploadPermanent = multer({ storage: storagePermanent });
-const uploadTemporary = multer({ storage: storageTemporary });
+const maxSize = 2 * 1024 * 1024; // 2MB
+const uploadPermanent = multer({
+  storage: storagePermanent,
+  limits: { fileSize: maxSize }
+});
+const uploadTemporary = multer({
+  storage: storageTemporary,
+  limits: { fileSize: maxSize }
+});
 
 const userRoutes = Router();
 
@@ -45,6 +53,7 @@ userRoutes.post(
   "/users/:userId/upload-image",
   isAuth,
   uploadPermanent.single("file"),
+  isFileValidType,
   UserController.uploadImage
 );
 
@@ -52,6 +61,7 @@ userRoutes.post(
   "/users/:userId/upload-temporary-image",
   isAuth,
   uploadTemporary.single("file"),
+  isFileValidType,
   (req, res) => {
     return res.status(200).json({ image: req.file?.filename });
   }

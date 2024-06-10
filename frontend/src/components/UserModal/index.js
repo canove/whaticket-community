@@ -151,9 +151,9 @@ const UserModal = ({ open, onClose, userId }) => {
 			}
 			toast.success(i18n.t("userModal.success"));
 		} catch (err) {
-			toastError(err);
+			toast.error("Só são permitidas fotos com no máximo 2MB, e nos formatos PNG, JPG e JPEG");
 		} finally {
-			api.get(`/users/${user.id}/delete-temporary-image`)
+			api.delete(`/users/${user.id}/delete-temporary-image`)
 		}
 		handleClose();
 	};
@@ -162,8 +162,12 @@ const UserModal = ({ open, onClose, userId }) => {
 		setFile(e.target.files[0]);
 		const formData = new FormData();
 		formData.append('file', e.target.files[0]);
-		const response = await api.post(`/users/${user.id}/upload-temporary-image`, formData);
-		setTemporaryImage(response.data.image);
+		try {
+			const response = await api.post(`/users/${user.id}/upload-temporary-image`, formData);
+			setTemporaryImage(response.data.image);
+		} catch (err) {
+			toast.error("Só são permitidas fotos com no máximo 2MB, e nos formatos PNG, JPG e JPEG")
+		}
 	}
 
 	return (
