@@ -18,6 +18,7 @@ import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
 import { getIO } from "../../libs/socket";
 import { logger } from "../../utils/logger";
+import ShowChatbotOptionService from "../ChatbotOptionService/ShowChatbotOptionService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
@@ -254,8 +255,8 @@ const verifyQueue = async (
 
     let options = "";
 
-    choosenQueue.categories.forEach((category, index) => {
-      options += `*${category.id}* - ${category.name}\n`;
+    choosenQueue.chatbotOptions.forEach((chatbotOption, index) => {
+      options += `*${chatbotOption.id}* - ${chatbotOption.name}\n`;
     });
 
     const body = formatBody(
@@ -408,33 +409,67 @@ const handleMessage = async (
     // has no user, and the conection has min 1 queues,
     // we considered it as a intro message from a contact, and whe send it a messages to choose a queue and a category
     if (
-      (!ticket.queue || !(ticket.categories.length > 0)) &&
+      (!ticket.queue || !ticket.userId) &&
       !chat.isGroup &&
       !msg.fromMe &&
-      !ticket.userId &&
       whatsapp.queues.length >= 1
     ) {
       if (!ticket.queue) {
         await verifyQueue(wbot, msg, ticket, contact);
-      } else if (!(ticket.categories.length > 0)) {
-        const selectedCategoryId = msg.body;
+      } else if (!ticket.userId) {
+        const msgBody = msg.body;
 
-        await UpdateTicketService({
-          ticketData: { categoriesIds: [+selectedCategoryId] },
-          ticketId: ticket.id
-        });
+        const chatbotOption = await ShowChatbotOptionService(msgBody);
 
-        const body = formatBody(
-          `\u200e${"Se ha registrado su incidencia, pronto te antenderemos."}\n`,
-          contact
-        );
+        if (chatbotOption) {
+          if (chatbotOption.chatbotOptions.length > 0) {
+            let options = "";
 
-        const sentMessage = await wbot.sendMessage(
-          `${contact.number}@c.us`,
-          body
-        );
+            chatbotOption.chatbotOptions.forEach((chatbotOption, index) => {
+              options += `*${chatbotOption.id}* - ${chatbotOption.name}\n`;
+            });
 
-        await verifyMessage(sentMessage, ticket, contact);
+            const body = formatBody(
+              `\u200e${chatbotOption.message}\n${options}`,
+              contact
+            );
+
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+
+                await verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+
+            debouncedSentMessage();
+          } else {
+            const body = formatBody(
+              `\u200e${chatbotOption.message}\n`,
+              contact
+            );
+
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+
+                await verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+
+            debouncedSentMessage();
+          }
+        }
       }
     }
 

@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import Category from "../models/Category";
+import ChatbotOption from "../models/ChatbotOption";
 import Contact from "../models/Contact";
 import ContactCustomField from "../models/ContactCustomField";
 import Message from "../models/Message";
@@ -34,7 +35,8 @@ const models = [
   QueueCategory,
   WhatsappQueue,
   UserQueue,
-  QuickAnswer
+  QuickAnswer,
+  ChatbotOption
 ];
 
 sequelize.addModels(models);
