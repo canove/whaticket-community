@@ -513,6 +513,7 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
               modalOpen={newPrivateNoteModalOpen}
               onClose={(e) => setNewPrivateNoteModalOpen(false)}
               ticketId={ticketId}
+              actualUserName={user?.name}
               ticketPrivateNote={ticketPrivateNote}
             />
 

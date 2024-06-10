@@ -114,12 +114,10 @@ const Categories = () => {
 
     socket.on("category", (data) => {
       if (data.action === "update" || data.action === "create") {
-        console.log("se creo o actualizo un categori", data.category);
         dispatch({ type: "UPDATE_CATEGORIES", payload: data.category });
       }
 
       if (data.action === "delete") {
-        console.log("se elimino un cat", data.categoryId);
         dispatch({ type: "DELETE_CATEGORY", payload: data.categoryId });
       }
     });

@@ -21,6 +21,7 @@ import {
   GetApp,
 } from "@material-ui/icons";
 
+import TextsmsOutlinedIcon from "@material-ui/icons/TextsmsOutlined";
 import whatsBackground from "../../assets/wa-background.png";
 import LocationPreview from "../LocationPreview";
 import MarkdownWrapper from "../MarkdownWrapper";
@@ -134,6 +135,36 @@ const useStyles = makeStyles((theme) => ({
 
     whiteSpace: "pre-wrap",
     backgroundColor: "#dcf8c6",
+    color: "#303030",
+    alignSelf: "flex-end",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 0,
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingTop: 5,
+    paddingBottom: 0,
+    boxShadow: "0 1px 1px #b3b3b3",
+  },
+
+  privateMessageRight: {
+    marginLeft: 20,
+    marginTop: 2,
+    minWidth: 100,
+    maxWidth: 600,
+    height: "auto",
+    display: "block",
+    position: "relative",
+    "&:hover #messageActionsButton": {
+      display: "flex",
+      position: "absolute",
+      top: 0,
+      right: 0,
+    },
+
+    whiteSpace: "pre-wrap",
+    backgroundColor: "#FFFFD4",
     color: "#303030",
     alignSelf: "flex-end",
     borderTopLeftRadius: 8,
@@ -456,7 +487,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
       }
       return <VcardPreview contact={contact} numbers={obj[0]?.number} />;
     } else if (
-    /*else if (message.mediaType === "multi_vcard") {
+      /*else if (message.mediaType === "multi_vcard") {
       console.log("multi_vcard")
       console.log(message)
     	
@@ -644,7 +675,13 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div
+                className={
+                  message.isPrivate
+                    ? classes.privateMessageRight
+                    : classes.messageRight
+                }
+              >
                 <IconButton
                   variant="contained"
                   size="small"
@@ -676,7 +713,14 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
-                    {renderMessageAck(message)}
+                    {message.isPrivate ? (
+                      <TextsmsOutlinedIcon
+                        fontSize="small"
+                        className={classes.ackIcons}
+                      />
+                    ) : (
+                      renderMessageAck(message)
+                    )}
                   </span>
                 </div>
               </div>

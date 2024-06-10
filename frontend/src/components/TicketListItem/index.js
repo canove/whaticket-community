@@ -151,16 +151,16 @@ const TicketListItem = ({ ticket }) => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("ticket", ticket);
-  }, [ticket]);
-
   const handleAcepptTicket = async (id) => {
     setLoading(true);
     try {
       await api.put(`/tickets/${id}`, {
         status: "open",
         userId: user?.id,
+      });
+
+      await api.post(`/privateMessages/${ticketId}`, {
+        body: `${user?.name} *aceptó* la conversación`,
       });
     } catch (err) {
       setLoading(false);

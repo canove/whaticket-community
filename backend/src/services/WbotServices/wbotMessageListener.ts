@@ -149,10 +149,11 @@ const verifyMediaMessage = async (
  * Create a message in the database with the passed msg and update the ticket lastMessage
  * - If the message is a location, prepare the message to include the location description and gmaps url
  */
-const verifyMessage = async (
+export const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  isPrivate = false
 ) => {
   if (msg.type === "location") msg = prepareLocation(msg);
 
@@ -166,7 +167,8 @@ const verifyMessage = async (
     fromMe: msg.fromMe,
     mediaType: msg.type,
     read: msg.fromMe,
-    quotedMsgId: quotedMsg?.id
+    quotedMsgId: quotedMsg?.id,
+    isPrivate
   };
 
   // temporaryly disable ts checks because of type definition bug for Location object

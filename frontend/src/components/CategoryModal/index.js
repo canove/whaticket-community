@@ -185,7 +185,6 @@ const CategoryModal = ({ open, onClose, categoryId }) => {
                     setCategory(() => {
                       return { ...values, color };
                     });
-                    console.log("se escogio un color");
                     setColorPickerModalOpen(false);
                   }}
                 />

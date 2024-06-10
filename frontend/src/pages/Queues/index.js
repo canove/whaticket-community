@@ -111,10 +111,6 @@ const Queues = () => {
   }, []);
 
   useEffect(() => {
-    console.log("queues:", queues);
-  }, [queues]);
-
-  useEffect(() => {
     const socket = openSocket();
 
     socket.on("queue", (data) => {
