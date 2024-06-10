@@ -177,7 +177,6 @@ const UserModal = ({ open, onClose, userId }) => {
 		setFile(null)
 		try {
 			const { data } = await api.get(`/users/${userId}`);
-			console.log(data);
 			setUser(prevState => {
 				return { ...prevState, ...data };
 			});
