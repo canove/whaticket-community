@@ -104,7 +104,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [whatsappId, setWhatsappId] = useState(false);
 	const {loading, whatsApps} = useWhatsApps();
 	const [file, setFile] = useState();
-	const [temporaryImage, setTemporaryImage] = useState();
+	const [temporaryImage, setTemporaryImage] = useState(null);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -129,6 +129,7 @@ const UserModal = ({ open, onClose, userId }) => {
 		onClose();
 		setUser(initialState);
 		await api.delete(`/users/${user.id}/delete-temporary-image`)
+		setTemporaryImage(null)
 	};
 
 	const handleSaveUser = async values => {
@@ -170,6 +171,21 @@ const UserModal = ({ open, onClose, userId }) => {
 		}
 	}
 
+	const handleDeleteFile = async () => {
+		await api.delete(`/users/${user.id}/delete-image`);
+		setTemporaryImage(null)
+		setFile(null)
+		try {
+			const { data } = await api.get(`/users/${userId}`);
+			console.log(data);
+			setUser(prevState => {
+				return { ...prevState, ...data };
+			});
+		} catch (err) {
+			toastError(err);
+		}
+	}
+
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -197,10 +213,10 @@ const UserModal = ({ open, onClose, userId }) => {
 				>
 					{({ touched, errors, isSubmitting }) => (
 						<Form style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-							<img 
+							{ (user.image !== null || temporaryImage !== null) && <img 
 								src={temporaryImage ? `${process.env.REACT_APP_BACKEND_URL}public/uploads/temp/${temporaryImage}` : `${process.env.REACT_APP_BACKEND_URL}public/uploads/${user.image}`}
 								alt={user.name}
-								style={{ width: "300px", height: "300px", borderRadius: "50%", objectFit: "cover"}} />
+								style={{ width: "300px", height: "300px", borderRadius: "50%", objectFit: "cover"}} />}
 							<DialogContent dividers>
 								<div className={classes.multFieldLine}>
 									<Field
@@ -289,6 +305,7 @@ const UserModal = ({ open, onClose, userId }) => {
 										/>
 									)}
 								/>
+								<div className={classes.multFieldLine} style={{alignItems: "center"}}>
 								<InputLabel id="image-selection-input-label">Foto de perfil</InputLabel>
 								<Button
 											component="label"
@@ -298,9 +315,14 @@ const UserModal = ({ open, onClose, userId }) => {
 											startIcon={<CloudUpload />}
 										>
 											Upload file
-											<Field as={VisuallyHiddenInput} labelId="image-selection-input-label" type="file" name="file" onChange={handleChangeFile} />
+											<Field as={VisuallyHiddenInput}
+												labelId="image-selection-input-label"
+												type="file"
+												name="file"
+												onChange={handleChangeFile} />
 								</Button>
-
+								<Button variant="outlined" color="secondary" onClick={handleDeleteFile}>Remover Foto</Button>
+								</div>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editQueues"

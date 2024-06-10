@@ -72,4 +72,10 @@ userRoutes.delete(
   UserController.deleteTemporaryImage
 );
 
+userRoutes.delete(
+  "/users/:userId/delete-image",
+  isAuth,
+  UserController.deleteImage
+);
+
 export default userRoutes;

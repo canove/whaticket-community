@@ -116,6 +116,11 @@ export const uploadImage = async (
   const { userId } = req.params;
   const image = req.file?.filename;
 
+  const userExists = await ShowUserService(userId);
+  if (!userExists) {
+    throw new AppError("ERR_NO_USER", 404);
+  }
+
   const user = await UpdateUserService({ userData: { image }, userId });
 
   const io = getIO();
@@ -148,4 +153,33 @@ export const deleteTemporaryImage = async (
   }
 
   return res.status(204);
+};
+
+export const deleteImage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { userId } = req.params;
+
+  const userExists = await ShowUserService(userId);
+  if (!userExists) {
+    throw new AppError("ERR_NO_USER", 404);
+  }
+
+  const imagePath = path.join(
+    `${__dirname}../../../public/uploads/${userExists.image}`
+  );
+  if (fs.existsSync(imagePath)) {
+    fs.unlinkSync(imagePath);
+  }
+
+  const user = await UpdateUserService({ userData: { image: "" }, userId });
+
+  const io = getIO();
+  io.emit("user", {
+    action: "update",
+    user
+  });
+
+  return res.status(200).json(user);
 };
