@@ -319,7 +319,8 @@ const UserModal = ({ open, onClose, userId }) => {
 												labelId="image-selection-input-label"
 												type="file"
 												name="file"
-												onChange={handleChangeFile} />
+												onChange={handleChangeFile}
+												capture="camera" />
 								</Button>
 								<Button variant="outlined" color="secondary" onClick={handleDeleteFile}>Remover Foto</Button>
 								</div>
