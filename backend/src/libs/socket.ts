@@ -1,6 +1,7 @@
 import { Server } from "http";
 import { verify } from "jsonwebtoken";
 import { Server as SocketIO } from "socket.io";
+import { io, Socket } from "socket.io-client";
 import authConfig from "../config/auth";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
@@ -10,16 +11,18 @@ import {
   removeConnectedUser
 } from "./connectedUsers";
 
-let io: SocketIO;
+let ioS: SocketIO;
+let ioClient: Socket;
 
 export const initIO = (httpServer: Server): SocketIO => {
-  io = new SocketIO(httpServer, {
+  ioS = new SocketIO(httpServer, {
     cors: {
       origin: process.env.FRONTEND_URL
     }
   });
+  ioClient = io("https://chat-app-tpev4hwxwa-uk.a.run.app");
 
-  io.on("connection", socket => {
+  ioS.on("connection", socket => {
     const { token, userId } = socket.handshake.query;
 
     let tokenData = null;
@@ -29,13 +32,13 @@ export const initIO = (httpServer: Server): SocketIO => {
     } catch (error) {
       logger.error(JSON.stringify(error), "Error decoding token");
       socket.disconnect();
-      return io;
+      return ioS;
     }
 
     logger.info("Client Connected and added to the list of connected users");
     if (userId) {
       addConnectedUser(+userId);
-      io.emit("usersPresenceList", getConnectedUsers());
+      ioS.emit("usersPresenceList", getConnectedUsers());
     }
 
     socket.on("joinChatBox", (ticketId: string) => {
@@ -59,18 +62,32 @@ export const initIO = (httpServer: Server): SocketIO => {
       );
       if (userId) {
         removeConnectedUser(+userId);
-        io.emit("usersPresenceList", getConnectedUsers());
+        ioS.emit("usersPresenceList", getConnectedUsers());
       }
     });
 
     return socket;
   });
-  return io;
+  return ioS;
 };
 
-export const getIO = (): SocketIO => {
-  if (!io) {
+export const getIO2 = (): SocketIO => {
+  if (!ioS) {
     throw new AppError("Socket IO not initialized");
   }
-  return io;
+  return ioS;
+};
+
+export const getIOClient = (): Socket => {
+  if (!ioClient) {
+    throw new AppError("Socket IO Client not initialized");
+  }
+  return ioClient;
+};
+
+export const getIO = (): Socket => {
+  if (!ioClient) {
+    throw new AppError("Socket IO Client not initialized");
+  }
+  return ioClient;
 };
