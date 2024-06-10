@@ -1,10 +1,10 @@
 import React from "react";
 
-import { Card, Button } from "@material-ui/core";
+import { Button, Card } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
 import { useHistory } from "react-router-dom";
+import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 
 const useStyles = makeStyles((theme) => ({
   ticketHeader: {
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TicketHeader = ({ loading, children }) => {
+const TicketHeader = ({ loading, children, withArrow = true }) => {
   const classes = useStyles();
   const history = useHistory();
   const handleBack = () => {
@@ -31,9 +31,11 @@ const TicketHeader = ({ loading, children }) => {
         <TicketHeaderSkeleton />
       ) : (
         <Card square className={classes.ticketHeader}>
-          <Button color="primary" onClick={handleBack}>
-            <ArrowBackIos />
-          </Button>
+          {withArrow && (
+            <Button color="primary" onClick={handleBack}>
+              <ArrowBackIos />
+            </Button>
+          )}
           {children}
         </Card>
       )}

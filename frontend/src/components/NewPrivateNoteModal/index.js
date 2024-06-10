@@ -17,6 +17,7 @@ const NewPrivateNoteModal = ({
   modalOpen,
   onClose,
   ticketId,
+  actualUserName,
   ticketPrivateNote,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -34,12 +35,11 @@ const NewPrivateNoteModal = ({
     if (textFieldValueToSave === "") {
       return;
     }
-    console.log(textFieldValueToSave, ticketId);
     setLoading(true);
 
     try {
-      await api.put(`/tickets/${ticketId}`, {
-        privateNote: textFieldValueToSave,
+      await api.post(`/privateMessages/${ticketId}`, {
+        body: `*${actualUserName}:*\n${textFieldValueToSave.trim()}`,
       });
     } catch (err) {
       toastError(err);

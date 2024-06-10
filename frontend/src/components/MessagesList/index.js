@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useReducer, useRef } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 
-import { isSameDay, parseISO, format } from "date-fns";
-import openSocket from "../../services/socket-io";
 import clsx from "clsx";
+import { format, isSameDay, parseISO } from "date-fns";
+import openSocket from "../../services/socket-io";
 
-import { green } from "@material-ui/core/colors";
 import {
   Button,
   CircularProgress,
@@ -12,6 +11,7 @@ import {
   IconButton,
   makeStyles,
 } from "@material-ui/core";
+import { green } from "@material-ui/core/colors";
 import {
   AccessTime,
   Block,
@@ -21,15 +21,16 @@ import {
   GetApp,
 } from "@material-ui/icons";
 
-import MarkdownWrapper from "../MarkdownWrapper";
-import VcardPreview from "../VcardPreview";
-import LocationPreview from "../LocationPreview";
-import ModalImageCors from "../ModalImageCors";
-import MessageOptionsMenu from "../MessageOptionsMenu";
+import TextsmsOutlinedIcon from "@material-ui/icons/TextsmsOutlined";
 import whatsBackground from "../../assets/wa-background.png";
+import LocationPreview from "../LocationPreview";
+import MarkdownWrapper from "../MarkdownWrapper";
+import MessageOptionsMenu from "../MessageOptionsMenu";
+import ModalImageCors from "../ModalImageCors";
+import VcardPreview from "../VcardPreview";
 
-import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import api from "../../services/api";
 import Audio from "../Audio";
 
 const useStyles = makeStyles((theme) => ({
@@ -134,6 +135,36 @@ const useStyles = makeStyles((theme) => ({
 
     whiteSpace: "pre-wrap",
     backgroundColor: "#dcf8c6",
+    color: "#303030",
+    alignSelf: "flex-end",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 0,
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingTop: 5,
+    paddingBottom: 0,
+    boxShadow: "0 1px 1px #b3b3b3",
+  },
+
+  privateMessageRight: {
+    marginLeft: 20,
+    marginTop: 2,
+    minWidth: 100,
+    maxWidth: 600,
+    height: "auto",
+    display: "block",
+    position: "relative",
+    "&:hover #messageActionsButton": {
+      display: "flex",
+      position: "absolute",
+      top: 0,
+      right: 0,
+    },
+
+    whiteSpace: "pre-wrap",
+    backgroundColor: "#FFFFD4",
     color: "#303030",
     alignSelf: "flex-end",
     borderTopLeftRadius: 8,
@@ -307,7 +338,7 @@ const reducer = (state, action) => {
   }
 };
 
-const MessagesList = ({ ticketId, isGroup }) => {
+const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -334,7 +365,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
       const fetchMessages = async () => {
         try {
           const { data } = await api.get("/messages/" + ticketId, {
-            params: { pageNumber },
+            params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
           });
 
           if (currentTicketId.current === ticketId) {
@@ -416,19 +447,27 @@ const MessagesList = ({ ticketId, isGroup }) => {
   };
 
   const checkMessageMedia = (message) => {
-    if (message.mediaType === "location" && message.body.split('|').length >= 2) {
-      let locationParts = message.body.split('|')
-      let imageLocation = locationParts[0]
-      let linkLocation = locationParts[1]
+    if (
+      message.mediaType === "location" &&
+      message.body.split("|").length >= 2
+    ) {
+      let locationParts = message.body.split("|");
+      let imageLocation = locationParts[0];
+      let linkLocation = locationParts[1];
 
-      let descriptionLocation = null
+      let descriptionLocation = null;
 
       if (locationParts.length > 2)
-        descriptionLocation = message.body.split('|')[2]
+        descriptionLocation = message.body.split("|")[2];
 
-      return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation} />
-    }
-    else if (message.mediaType === "vcard") {
+      return (
+        <LocationPreview
+          image={imageLocation}
+          link={linkLocation}
+          description={descriptionLocation}
+        />
+      );
+    } else if (message.mediaType === "vcard") {
       //console.log("vcard")
       //console.log(message)
       let array = message.body.split("\n");
@@ -446,9 +485,9 @@ const MessagesList = ({ ticketId, isGroup }) => {
           }
         }
       }
-      return <VcardPreview contact={contact} numbers={obj[0]?.number} />
-    }
-    /*else if (message.mediaType === "multi_vcard") {
+      return <VcardPreview contact={contact} numbers={obj[0]?.number} />;
+    } else if (
+      /*else if (message.mediaType === "multi_vcard") {
       console.log("multi_vcard")
       console.log(message)
     	
@@ -465,10 +504,12 @@ const MessagesList = ({ ticketId, isGroup }) => {
         )
       } else return (<></>)
     }*/
-    else if ( /^.*\.(jpe?g|png|gif)?$/i.exec(message.mediaUrl) && message.mediaType === "image") {
+      /^.*\.(jpe?g|png|gif)?$/i.exec(message.mediaUrl) &&
+      message.mediaType === "image"
+    ) {
       return <ModalImageCors imageUrl={message.mediaUrl} />;
     } else if (message.mediaType === "audio") {
-      return <Audio url={message.mediaUrl} />
+      return <Audio url={message.mediaUrl} />;
     } else if (message.mediaType === "video") {
       return (
         <video
@@ -614,9 +655,11 @@ const MessagesList = ({ ticketId, isGroup }) => {
                     {message.contact?.name}
                   </span>
                 )}
-                {(message.mediaUrl || message.mediaType === "location" || message.mediaType === "vcard"
-                  //|| message.mediaType === "multi_vcard" 
-                ) && checkMessageMedia(message)}
+                {(message.mediaUrl ||
+                  message.mediaType === "location" ||
+                  message.mediaType === "vcard") &&
+                  //|| message.mediaType === "multi_vcard"
+                  checkMessageMedia(message)}
                 <div className={classes.textContentItem}>
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
@@ -632,7 +675,13 @@ const MessagesList = ({ ticketId, isGroup }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div
+                className={
+                  message.isPrivate
+                    ? classes.privateMessageRight
+                    : classes.messageRight
+                }
+              >
                 <IconButton
                   variant="contained"
                   size="small"
@@ -643,9 +692,11 @@ const MessagesList = ({ ticketId, isGroup }) => {
                 >
                   <ExpandMore />
                 </IconButton>
-                {(message.mediaUrl || message.mediaType === "location" || message.mediaType === "vcard"
-                  //|| message.mediaType === "multi_vcard" 
-                ) && checkMessageMedia(message)}
+                {(message.mediaUrl ||
+                  message.mediaType === "location" ||
+                  message.mediaType === "vcard") &&
+                  //|| message.mediaType === "multi_vcard"
+                  checkMessageMedia(message)}
                 <div
                   className={clsx(classes.textContentItem, {
                     [classes.textContentItemDeleted]: message.isDeleted,
@@ -662,7 +713,14 @@ const MessagesList = ({ ticketId, isGroup }) => {
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
-                    {renderMessageAck(message)}
+                    {message.isPrivate ? (
+                      <TextsmsOutlinedIcon
+                        fontSize="small"
+                        className={classes.ackIcons}
+                      />
+                    ) : (
+                      renderMessageAck(message)
+                    )}
                   </span>
                 </div>
               </div>

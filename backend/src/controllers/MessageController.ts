@@ -9,9 +9,11 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import verifyPrivateMessage from "../utils/verifyPrivateMessage";
 
 type IndexQuery = {
   pageNumber: string;
+  setTicketMessagesAsRead?: string;
 };
 
 type MessageData = {
@@ -23,14 +25,18 @@ type MessageData = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { pageNumber } = req.query as IndexQuery;
+
+  const { pageNumber, setTicketMessagesAsRead } =
+    req.query as unknown as IndexQuery;
 
   const { count, messages, ticket, hasMore } = await ListMessagesService({
     pageNumber,
     ticketId
   });
 
-  SetTicketMessagesAsRead(ticket);
+  if (setTicketMessagesAsRead === "true") {
+    SetTicketMessagesAsRead(ticket);
+  }
 
   return res.json({ count, messages, ticket, hasMore });
 };
@@ -53,6 +59,20 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   } else {
     await SendWhatsAppMessage({ body, ticket, quotedMsg });
   }
+
+  return res.send();
+};
+
+export const storePrivate = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
+  const { body }: MessageData = req.body;
+
+  const ticket = await ShowTicketService(ticketId);
+
+  verifyPrivateMessage(body, ticket, ticket.contact);
 
   return res.send();
 };

@@ -12,6 +12,7 @@ interface MessageData {
   read?: boolean;
   mediaType?: string;
   mediaUrl?: string;
+  isPrivate?: boolean;
 }
 interface Request {
   messageData: MessageData;
@@ -29,7 +30,8 @@ const CreateMessageService = async ({
         model: Ticket,
         as: "ticket",
         include: [
-          "contact", "queue",
+          "contact",
+          "queue",
           {
             model: Whatsapp,
             as: "whatsapp",

@@ -125,6 +125,11 @@ const TransferTicketModal = ({
 
       await api.put(`/tickets/${ticketid}`, data);
 
+      await api.post(`/privateMessages/${ticketid}`, {
+        // body: `${user?.name} *aceptó* la conversación`,
+        body: `${loggedInUser?.name} *transfirió* la conversación para ${selectedUser?.name}`,
+      });
+
       setLoading(false);
       history.push(`/tickets`);
     } catch (err) {

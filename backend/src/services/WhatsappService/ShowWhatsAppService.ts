@@ -1,5 +1,6 @@
 import AppError from "../../errors/AppError";
 import Category from "../../models/Category";
+import ChatbotOption from "../../models/ChatbotOption";
 import Queue from "../../models/Queue";
 import Whatsapp from "../../models/Whatsapp";
 
@@ -15,6 +16,14 @@ const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
             model: Category,
             as: "categories",
             attributes: ["id", "name", "color"]
+          },
+          {
+            model: ChatbotOption,
+            as: "chatbotOptions",
+            where: {
+              fatherChatbotOptionId: null
+            },
+            required: false
           }
         ]
       }

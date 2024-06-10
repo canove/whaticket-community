@@ -12,7 +12,7 @@ const ShowTicketService = async (id: string | number): Promise<Ticket> => {
       {
         model: Contact,
         as: "contact",
-        attributes: ["id", "name", "number", "profilePicUrl"],
+        attributes: ["id", "name", "number", "domain", "profilePicUrl"],
         include: ["extraInfo"]
       },
       {

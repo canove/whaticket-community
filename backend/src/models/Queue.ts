@@ -4,6 +4,7 @@ import {
   BelongsToMany,
   Column,
   CreatedAt,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -14,6 +15,7 @@ import User from "./User";
 import UserQueue from "./UserQueue";
 
 import Category from "./Category";
+import ChatbotOption from "./ChatbotOption";
 import QueueCategory from "./QueueCategory";
 import Whatsapp from "./Whatsapp";
 import WhatsappQueue from "./WhatsappQueue";
@@ -52,6 +54,9 @@ class Queue extends Model<Queue> {
 
   @BelongsToMany(() => Category, () => QueueCategory)
   categories: Category[];
+
+  @HasMany(() => ChatbotOption)
+  chatbotOptions: ChatbotOption[];
 }
 
 export default Queue;

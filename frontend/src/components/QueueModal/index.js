@@ -17,7 +17,14 @@ import { makeStyles } from "@material-ui/core/styles";
 import { i18n } from "../../translate/i18n";
 
 import { IconButton, InputAdornment } from "@material-ui/core";
+import Step from "@material-ui/core/Step";
+import StepContent from "@material-ui/core/StepContent";
+import StepLabel from "@material-ui/core/StepLabel";
+import Stepper from "@material-ui/core/Stepper";
 import { Colorize } from "@material-ui/icons";
+import CreateOutlinedIcon from "@material-ui/icons/CreateOutlined";
+import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
+import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import CategorySelect from "../CategorySelect";
@@ -64,6 +71,248 @@ const QueueSchema = Yup.object().shape({
   greetingMessage: Yup.string(),
 });
 
+const ChatbotOptionList = ({
+  fatherChatbotOptionId,
+  chatbotOptionsFromProps,
+  queueId,
+}) => {
+  const [chatbotOptions, setChatbotOptions] = useState([]);
+  const [subChatbotOptions, setSubChatbotOptions] = useState([]);
+  const [activeChatbotOptionIndex, setActiveChatbotOptionIndex] =
+    useState(null);
+  const [activeChatbotOption, setActiveChatbotOption] = useState(null);
+
+  useEffect(() => {
+    if (chatbotOptionsFromProps) {
+      setChatbotOptions(chatbotOptionsFromProps);
+    }
+  }, [chatbotOptionsFromProps]);
+
+  useEffect(() => {
+    if (!activeChatbotOption) {
+      return;
+    }
+
+    (async () => {
+      try {
+        const { data } = await api.get(
+          `/chatbotOption/${activeChatbotOption.id}`
+        );
+
+        setSubChatbotOptions((oldSubChatbotoptions) => [
+          ...data.chatbotOptions,
+          ...[{ name: "Agregar Opción", message: "", isAddMoreOption: true }],
+        ]);
+      } catch (err) {
+        console.log("---- err", err);
+        toastError(err);
+      }
+    })();
+  }, [activeChatbotOption]);
+
+  return (
+    <Stepper
+      activeStep={activeChatbotOptionIndex}
+      nonLinear
+      orientation="vertical"
+    >
+      {chatbotOptions.map((chatbotOption, chatbotOptionIndex) => (
+        <Step
+          key={chatbotOption.name}
+          onClick={() => {
+            if (chatbotOption.isTextField) {
+              return;
+            }
+
+            // Add text field
+            if (chatbotOption.isAddMoreOption) {
+              const newTextFieldElement = {
+                isTextField: true,
+              };
+
+              setChatbotOptions((oldChatbotOptions) => {
+                const newChatbotOptions = [...oldChatbotOptions];
+
+                if (newChatbotOptions.length === 1) {
+                  newChatbotOptions.unshift(newTextFieldElement);
+                  return newChatbotOptions;
+                }
+
+                if (newChatbotOptions.length > 1) {
+                  newChatbotOptions.splice(
+                    newChatbotOptions.length - 1,
+                    0,
+                    newTextFieldElement
+                  );
+                  return newChatbotOptions;
+                }
+              });
+
+              return;
+            }
+
+            setActiveChatbotOptionIndex(chatbotOptionIndex);
+            setActiveChatbotOption(chatbotOption);
+          }}
+        >
+          <StepLabel style={{ cursor: "pointer" }}>
+            {chatbotOption.isTextField ? (
+              <ChatbotOptionTextField
+                queueId={queueId}
+                fatherChatbotOptionId={fatherChatbotOptionId}
+                chatbotOption={chatbotOption}
+                onDelete={(id) => {
+                  setChatbotOptions((oldChatbotOptions) => {
+                    const newChatbotOptions = [...oldChatbotOptions];
+                    newChatbotOptions.splice(id, 1);
+                    return newChatbotOptions;
+                  });
+                }}
+                onSave={(newChatbotOption) => {
+                  setChatbotOptions((oldChatbotOptions) => {
+                    const newChatbotOptions = [...oldChatbotOptions];
+                    newChatbotOptions.splice(
+                      chatbotOptionIndex,
+                      1,
+                      newChatbotOption
+                    );
+                    return newChatbotOptions;
+                  });
+                }}
+              />
+            ) : (
+              <div style={{ display: "flex", gap: "6px" }}>
+                <div>{chatbotOption.name}</div>
+
+                {!chatbotOption.isAddMoreOption && (
+                  <div>
+                    <CreateOutlinedIcon
+                      onClick={() => {
+                        setChatbotOptions((oldChatbotOptions) => {
+                          const newChatbotOptions = [...oldChatbotOptions];
+
+                          newChatbotOptions.splice(chatbotOptionIndex, 1, {
+                            ...chatbotOption,
+                            isTextField: true,
+                          });
+
+                          return newChatbotOptions;
+                        });
+                      }}
+                    />
+                    <DeleteOutlineOutlinedIcon
+                      onClick={async () => {
+                        try {
+                          await api.delete(
+                            `/chatbotOption/${chatbotOption.id}`
+                          );
+                          setChatbotOptions((oldChatbotOptions) => {
+                            const newChatbotOptions = [...oldChatbotOptions];
+                            newChatbotOptions.splice(chatbotOptionIndex, 1);
+                            return newChatbotOptions;
+                          });
+                          setActiveChatbotOptionIndex(false);
+                          toast.success("Opcion eliminada correctamente");
+                        } catch (err) {
+                          toastError(err);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </StepLabel>
+          <StepContent>
+            {!chatbotOption.isTextField && !chatbotOption.isAddMoreOption && (
+              <>
+                <div>RESPUESTA: {chatbotOption.message}</div>
+
+                <ChatbotOptionList
+                  fatherChatbotOptionId={chatbotOption.id}
+                  chatbotOptionsFromProps={subChatbotOptions}
+                  queueId={queueId}
+                />
+              </>
+            )}
+          </StepContent>
+        </Step>
+      ))}
+    </Stepper>
+  );
+};
+
+const ChatbotOptionTextField = ({
+  queueId,
+  chatbotOption,
+  fatherChatbotOptionId,
+  onDelete,
+  onSave,
+}) => {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (chatbotOption) {
+      setName(chatbotOption.name);
+      setMessage(chatbotOption.message);
+    }
+  }, [chatbotOption]);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <TextField
+          label="Nombre"
+          helperText="Campo obligatorio"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <TextField
+          label="Respuesta"
+          helperText="Campo obligatorio"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+      </div>
+      <SaveOutlinedIcon
+        onClick={async () => {
+          console.log({ chatbotOption, name, message, fatherChatbotOptionId });
+
+          // return;
+
+          try {
+            if (chatbotOption.id) {
+              const updatedChatbotOption = await api.put(
+                `/chatbotOption/${chatbotOption.id}`,
+                {
+                  ...chatbotOption,
+                  name,
+                  message,
+                }
+              );
+              onSave(updatedChatbotOption.data);
+            } else {
+              const newChatbotOption = await api.post("/chatbotOption", {
+                name,
+                message,
+                queueId,
+                fatherChatbotOptionId,
+              });
+
+              onSave(newChatbotOption.data);
+            }
+            toast.success("Queue saved successfully");
+          } catch (err) {
+            toastError(err);
+          }
+        }}
+      />
+      <DeleteOutlineOutlinedIcon onClick={() => onDelete(chatbotOption.id)} />
+    </div>
+  );
+};
+
 const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
   const classes = useStyles();
 
@@ -76,6 +325,9 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
   const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
   const [queue, setQueue] = useState(initialState);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+  const [chatbotOptions, setChatbotOptions] = useState([
+    { name: "Agregar Opción", message: "", isAddMoreOption: true },
+  ]);
   const greetingRef = useRef();
 
   useEffect(() => {
@@ -89,9 +341,15 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
       if (!queueId) return;
       try {
         const { data } = await api.get(`/queue/${queueId}`);
+
         setQueue((prevState) => {
           return { ...prevState, ...data };
         });
+
+        setChatbotOptions((oldChatbotOptions) => [
+          ...data.chatbotOptions,
+          ...oldChatbotOptions,
+        ]);
       } catch (err) {
         toastError(err);
       }
@@ -226,6 +484,12 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                 <CategorySelect
                   selectedCategoryIds={selectedCategoryIds}
                   onChange={(values) => setSelectedCategoryIds(values)}
+                />
+
+                <ChatbotOptionList
+                  fatherChatbotOptionId={null}
+                  chatbotOptionsFromProps={chatbotOptions}
+                  queueId={queueId}
                 />
               </DialogContent>
               <DialogActions>

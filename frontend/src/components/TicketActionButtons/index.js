@@ -55,6 +55,24 @@ const TicketActionButtons = ({ ticket }) => {
         userId: userId || null,
       });
 
+      if (status === "open") {
+        await api.post(`/privateMessages/${ticket.id}`, {
+          body: `${user?.name} *aceptó* la conversación`,
+        });
+      }
+
+      if (status === "closed") {
+        await api.post(`/privateMessages/${ticket.id}`, {
+          body: `${user?.name} *resolvió* la conversación`,
+        });
+      }
+
+      if (status === "pending") {
+        await api.post(`/privateMessages/${ticket.id}`, {
+          body: `${user?.name} *devolvió* la conversación`,
+        });
+      }
+
       setLoading(false);
       if (status === "open") {
         history.push(`/tickets/${ticket.id}`);

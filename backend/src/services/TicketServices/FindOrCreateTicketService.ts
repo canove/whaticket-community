@@ -1,7 +1,9 @@
 import { subHours } from "date-fns";
 import { Op } from "sequelize";
 import Category from "../../models/Category";
+import ChatbotOption from "../../models/ChatbotOption";
 import Contact from "../../models/Contact";
+import Queue from "../../models/Queue";
 import Ticket from "../../models/Ticket";
 import ShowTicketService from "./ShowTicketService";
 
@@ -35,6 +37,21 @@ const FindOrCreateTicketService = async (
         model: Category,
         as: "categories",
         attributes: ["id"]
+      },
+      {
+        model: Queue,
+        as: "queue",
+        attributes: ["id", "name", "color"],
+        include: [
+          {
+            model: ChatbotOption,
+            as: "chatbotOptions",
+            where: {
+              fatherChatbotOptionId: null
+            },
+            required: false
+          }
+        ]
       }
     ]
   });
