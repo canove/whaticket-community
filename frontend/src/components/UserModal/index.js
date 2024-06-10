@@ -104,6 +104,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [whatsappId, setWhatsappId] = useState(false);
 	const {loading, whatsApps} = useWhatsApps();
 	const [file, setFile] = useState();
+	const [temporaryImage, setTemporaryImage] = useState();
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -124,9 +125,10 @@ const UserModal = ({ open, onClose, userId }) => {
 		fetchUser();
 	}, [userId, open]);
 
-	const handleClose = () => {
+	const handleClose = async () => {
 		onClose();
 		setUser(initialState);
+		await api.delete(`/users/${user.id}/delete-temporary-image`)
 	};
 
 	const handleSaveUser = async values => {
@@ -150,9 +152,19 @@ const UserModal = ({ open, onClose, userId }) => {
 			toast.success(i18n.t("userModal.success"));
 		} catch (err) {
 			toastError(err);
+		} finally {
+			api.get(`/users/${user.id}/delete-temporary-image`)
 		}
 		handleClose();
 	};
+
+	const handleChangeFile = async (e) => {
+		setFile(e.target.files[0]);
+		const formData = new FormData();
+		formData.append('file', e.target.files[0]);
+		const response = await api.post(`/users/${user.id}/upload-temporary-image`, formData);
+		setTemporaryImage(response.data.image);
+	}
 
 	return (
 		<div className={classes.root}>
@@ -180,7 +192,11 @@ const UserModal = ({ open, onClose, userId }) => {
 					}}
 				>
 					{({ touched, errors, isSubmitting }) => (
-						<Form>
+						<Form style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+							<img 
+								src={temporaryImage ? `${process.env.REACT_APP_BACKEND_URL}public/uploads/temp/${temporaryImage}` : `${process.env.REACT_APP_BACKEND_URL}public/uploads/${user.image}`}
+								alt={user.name}
+								style={{ width: "300px", height: "300px", borderRadius: "50%", objectFit: "cover"}} />
 							<DialogContent dividers>
 								<div className={classes.multFieldLine}>
 									<Field
@@ -278,7 +294,7 @@ const UserModal = ({ open, onClose, userId }) => {
 											startIcon={<CloudUpload />}
 										>
 											Upload file
-											<Field as={VisuallyHiddenInput} labelId="image-selection-input-label" type="file" name="file" onChange={(e) => setFile(e.target.files[0])} />
+											<Field as={VisuallyHiddenInput} labelId="image-selection-input-label" type="file" name="file" onChange={handleChangeFile} />
 								</Button>
 
 								<Can

@@ -229,7 +229,20 @@ const LoggedInLayout = ({ children }) => {
               onClick={handleMenu}
               color="inherit"
             >
+              {user?.image ? (
+              <img
+                src={`${process.env.REACT_APP_BACKEND_URL}public/uploads/${user?.image}`}
+                alt={user?.name}
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
               <AccountCircle />
+            )}
             </IconButton>
             <Menu
               id="menu-appbar"

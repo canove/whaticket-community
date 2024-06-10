@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import fs from "fs";
+import path from "path";
 import { getIO } from "../libs/socket";
 
 import CheckSettingsHelper from "../helpers/CheckSettings";
@@ -113,7 +115,6 @@ export const uploadImage = async (
 ): Promise<Response> => {
   const { userId } = req.params;
   const image = req.file?.filename;
-  console.log(image);
 
   const user = await UpdateUserService({ userData: { image }, userId });
 
@@ -124,4 +125,27 @@ export const uploadImage = async (
   });
 
   return res.status(200).json(user);
+};
+
+export const deleteTemporaryImage = async (
+  _req: Request,
+  res: Response
+): Promise<Response> => {
+  const tempFolder = path.join(`${__dirname}../../../public/uploads/temp`);
+  if (fs.existsSync(tempFolder)) {
+    fs.readdirSync(tempFolder).forEach(file => {
+      const curPath = `${tempFolder}/${file}`;
+      if (fs.lstatSync(curPath).isDirectory()) {
+        // recurse
+        fs.rmdirSync(curPath);
+      } else {
+        // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+  } else {
+    throw new Error("uploads/temp folder not found");
+  }
+
+  return res.status(204);
 };

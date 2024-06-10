@@ -6,7 +6,7 @@ import path from "path";
 import isAuth from "../middleware/isAuth";
 import * as UserController from "../controllers/UserController";
 
-const storage = multer.diskStorage({
+const storagePermanent = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "../../public/uploads"));
   },
@@ -16,7 +16,18 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const storageTemporary = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../../public/uploads/temp"));
+  },
+  filename: (req, file, cb) => {
+    const fileName = path.join(v4() + path.extname(file.originalname));
+    cb(null, fileName);
+  }
+});
+
+const uploadPermanent = multer({ storage: storagePermanent });
+const uploadTemporary = multer({ storage: storageTemporary });
 
 const userRoutes = Router();
 
@@ -33,8 +44,22 @@ userRoutes.delete("/users/:userId", isAuth, UserController.remove);
 userRoutes.post(
   "/users/:userId/upload-image",
   isAuth,
-  upload.single("file"),
+  uploadPermanent.single("file"),
   UserController.uploadImage
+);
+
+userRoutes.post(
+  "/users/:userId/upload-temporary-image",
+  isAuth,
+  uploadTemporary.single("file"),
+  (req, res) => {
+    return res.status(200).json({ image: req.file?.filename });
+  }
+);
+userRoutes.delete(
+  "/users/:userId/delete-temporary-image",
+  isAuth,
+  UserController.deleteTemporaryImage
 );
 
 export default userRoutes;
