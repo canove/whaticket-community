@@ -44,6 +44,9 @@ class Ticket extends Model<Ticket> {
   @Column
   isGroup: boolean;
 
+  @Column
+  userHadContact: boolean;
+
   @CreatedAt
   createdAt: Date;
 

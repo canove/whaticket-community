@@ -9,6 +9,18 @@ queueRoutes.get("/queue", isAuth, QueueController.index);
 
 queueRoutes.post("/queue", isAuth, QueueController.store);
 
+queueRoutes.post(
+  "/queueUser/:queueId",
+  isAuth,
+  QueueController.AssociateQueueWithUser
+);
+
+queueRoutes.put(
+  "/queueUser/:queueId",
+  isAuth,
+  QueueController.UpdateAssociationQueueWithUser
+);
+
 queueRoutes.get("/queue/:queueId", isAuth, QueueController.show);
 
 queueRoutes.put("/queue/:queueId", isAuth, QueueController.update);

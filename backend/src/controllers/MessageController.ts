@@ -60,6 +60,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     await SendWhatsAppMessage({ body, ticket, quotedMsg });
   }
 
+  ticket.update({ userHadContact: true });
+
   return res.send();
 };
 
