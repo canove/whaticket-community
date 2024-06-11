@@ -60,7 +60,7 @@ const UpdateUserService = async ({
     password,
     profile,
     name,
-    whatsappId: whatsappId ?? null,
+    whatsappId: whatsappId || null,
     image: image ?? null
   });
 

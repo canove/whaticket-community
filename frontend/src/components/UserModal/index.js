@@ -154,6 +154,7 @@ const UserModal = ({ open, onClose, userId }) => {
 			toast.error("Só são permitidas fotos com no máximo 2MB, e nos formatos PNG, JPG e JPEG");
 		} finally {
 			api.delete(`/users/${user.id}/delete-temporary-image`)
+			setTemporaryImage(null)
 		}
 		handleClose();
 	};
