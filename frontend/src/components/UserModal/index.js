@@ -313,7 +313,7 @@ const UserModal = ({ open, onClose, userId }) => {
 											tabIndex={-1}
 											startIcon={<CloudUpload />}
 										>
-											Upload file
+											Carregar
 											<Field as={VisuallyHiddenInput}
 												labelId="image-selection-input-label"
 												type="file"
