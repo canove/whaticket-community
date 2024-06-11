@@ -149,7 +149,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         }
 
         wbot.sendPresenceAvailable();
-        await syncUnreadMessages(wbot);
+        //await syncUnreadMessages(wbot);
 
         resolve(wbot);
       });

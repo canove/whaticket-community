@@ -42,6 +42,7 @@ services:
     environment:
       - URL_BACKEND=backend:3000
       - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
+      - REACT_APP_NODE_URL=${NODE_URL:-http://localhost}:${PROXY_PORT_NODE:-8080}/
       - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
       - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
     volumes:
@@ -62,5 +63,14 @@ services:
     ports:
       - ${MYSQL_PORT:-3306}:3306
     restart: always
+    networks:
+      - whaticket
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOSTS=mysql
+    ports:
+      - ${PMA_PORT:-9000}:80
     networks:
       - whaticket
