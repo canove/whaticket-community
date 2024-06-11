@@ -141,10 +141,8 @@ export const deleteTemporaryImage = async (
     fs.readdirSync(tempFolder).forEach(file => {
       const curPath = `${tempFolder}/${file}`;
       if (fs.lstatSync(curPath).isDirectory()) {
-        // recurse
         fs.rmdirSync(curPath);
       } else {
-        // delete file
         fs.unlinkSync(curPath);
       }
     });
