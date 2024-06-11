@@ -403,10 +403,16 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
           return { ...prevState, ...data };
         });
 
-        setChatbotOptions((oldChatbotOptions) => [
-          ...data.chatbotOptions,
-          ...oldChatbotOptions,
-        ]);
+        if (data.chatbotOptions && data.chatbotOptions.length > 0) {
+          setChatbotOptions((oldChatbotOptions) => [
+            ...data.chatbotOptions,
+            { name: "Agregar Opción", message: "", isAddMoreOption: true },
+          ]);
+        } else {
+          setChatbotOptions([
+            { name: "Agregar Opción", message: "", isAddMoreOption: true },
+          ]);
+        }
       } catch (err) {
         toastError(err);
       }
@@ -428,6 +434,8 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
 
   const handleSaveQueue = async (values) => {
     const queueData = { ...values, categoriesIds: selectedCategoryIds };
+
+    delete queueData["chatbotOptions"];
 
     try {
       if (queueId) {
