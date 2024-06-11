@@ -22,7 +22,7 @@ import {
 
 import { CloudUpload, Visibility, VisibilityOff } from '@material-ui/icons';
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, styled } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 
 import { i18n } from "../../translate/i18n";
@@ -33,7 +33,6 @@ import QueueSelect from "../QueueSelect";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import useWhatsApps from "../../hooks/useWhatsApps";
-import { styled } from '@material-ui/core/styles';
 
 const VisuallyHiddenInput = styled('input')({
 	clip: 'rect(0 0 0 0)',
