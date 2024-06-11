@@ -228,7 +228,7 @@ const LoggedInLayout = ({ children }) => {
               noWrap
               className={classes.title}
             >
-              WhaRestaurant
+              WhatRestaurant
             </Typography>
             <span>by</span>
             <img
