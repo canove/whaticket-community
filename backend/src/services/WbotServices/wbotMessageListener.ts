@@ -18,6 +18,7 @@ import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
 import { getIO } from "../../libs/socket";
 import { logger } from "../../utils/logger";
+import verifyPrivateMessage from "../../utils/verifyPrivateMessage";
 import ShowChatbotOptionService from "../ChatbotOptionService/ShowChatbotOptionService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
@@ -234,6 +235,55 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
+    let body: string;
+
+    if (queues[0].chatbotOptions?.length > 0) {
+      let options = "";
+
+      queues[0].chatbotOptions.forEach((chatbotOption, index) => {
+        options += `*${chatbotOption.id}* - ${chatbotOption.name}\n`;
+      });
+
+      body = formatBody(
+        `\u200e${queues[0].greetingMessage}\n${options}`,
+        contact
+      );
+    } else {
+      body = formatBody(`\u200e${queues[0].greetingMessage}`, contact);
+    }
+
+    const debouncedSentMessage = debounce(
+      async () => {
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
+
+        await verifyMessage(sentMessage, ticket, contact);
+      },
+      3000,
+      ticket.id
+    );
+
+    debouncedSentMessage();
+
+    if (queues[0].automaticAssignment && queues[0].users.length > 0) {
+      let userWithLessTickets = queues[0].users.sort((a, b) => {
+        return a.tickets.length - b.tickets.length;
+      })[0];
+
+      await UpdateTicketService({
+        ticketData: { userId: userWithLessTickets.id, status: "open" },
+        ticketId: ticket.id
+      });
+
+      verifyPrivateMessage(
+        `Se ha *asignó automáticamente* a ${userWithLessTickets.name}`,
+        ticket,
+        ticket.contact
+      );
+    }
+
     return;
   }
 
@@ -255,16 +305,22 @@ const verifyQueue = async (
       ticketId: ticket.id
     });
 
-    let options = "";
+    let body: string;
 
-    choosenQueue.chatbotOptions.forEach((chatbotOption, index) => {
-      options += `*${chatbotOption.id}* - ${chatbotOption.name}\n`;
-    });
+    if (choosenQueue.chatbotOptions?.length > 0) {
+      let options = "";
 
-    const body = formatBody(
-      `\u200e${choosenQueue.greetingMessage}\n${options}`,
-      contact
-    );
+      choosenQueue.chatbotOptions.forEach((chatbotOption, index) => {
+        options += `*${chatbotOption.id}* - ${chatbotOption.name}\n`;
+      });
+
+      body = formatBody(
+        `\u200e${choosenQueue.greetingMessage}\n${options}`,
+        contact
+      );
+    } else {
+      body = formatBody(`\u200e${choosenQueue.greetingMessage}`, contact);
+    }
 
     const debouncedSentMessage = debounce(
       async () => {
@@ -280,6 +336,23 @@ const verifyQueue = async (
     );
 
     debouncedSentMessage();
+
+    if (queues[0].automaticAssignment && queues[0].users.length > 0) {
+      let userWithLessTickets = queues[0].users.sort((a, b) => {
+        return a.tickets.length - b.tickets.length;
+      })[0];
+
+      await UpdateTicketService({
+        ticketData: { userId: userWithLessTickets.id, status: "open" },
+        ticketId: ticket.id
+      });
+
+      verifyPrivateMessage(
+        `Se ha *asignó automáticamente* a ${userWithLessTickets.name}`,
+        ticket,
+        ticket.contact
+      );
+    }
   } else {
     let options = "";
 
@@ -410,15 +483,16 @@ const handleMessage = async (
     // the message ticket has no queue or category,
     // has no user, and the conection has min 1 queues,
     // we considered it as a intro message from a contact, and whe send it a messages to choose a queue and a category
+
     if (
-      (!ticket.queue || !ticket.userId) &&
+      (!ticket.queue || !ticket.userHadContact) &&
       !chat.isGroup &&
       !msg.fromMe &&
       whatsapp.queues.length >= 1
     ) {
       if (!ticket.queue) {
         await verifyQueue(wbot, msg, ticket, contact);
-      } else if (!ticket.userId) {
+      } else if (!ticket.userHadContact) {
         const msgBody = msg.body;
 
         const chatbotOption = await ShowChatbotOptionService(msgBody);

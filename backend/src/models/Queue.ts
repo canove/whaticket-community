@@ -4,6 +4,7 @@ import {
   BelongsToMany,
   Column,
   CreatedAt,
+  Default,
   HasMany,
   Model,
   PrimaryKey,
@@ -45,6 +46,16 @@ class Queue extends Model<Queue> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @AllowNull(true)
+  @Default(false)
+  @Column
+  automaticAssignment: boolean;
+
+  @AllowNull(true)
+  @Default(false)
+  @Column
+  automaticAssignmentForOfflineUsers: boolean;
 
   @BelongsToMany(() => Whatsapp, () => WhatsappQueue)
   whatsapps: Array<Whatsapp & { WhatsappQueue: WhatsappQueue }>;

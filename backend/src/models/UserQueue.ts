@@ -1,10 +1,12 @@
 import {
-  Table,
+  AllowNull,
   Column,
   CreatedAt,
-  UpdatedAt,
+  Default,
+  ForeignKey,
   Model,
-  ForeignKey
+  Table,
+  UpdatedAt
 } from "sequelize-typescript";
 import Queue from "./Queue";
 import User from "./User";
@@ -18,6 +20,11 @@ class UserQueue extends Model<UserQueue> {
   @ForeignKey(() => Queue)
   @Column
   queueId: number;
+
+  @AllowNull(true)
+  @Default(false)
+  @Column
+  automaticallyAssign: boolean;
 
   @CreatedAt
   createdAt: Date;

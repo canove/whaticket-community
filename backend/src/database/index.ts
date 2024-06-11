@@ -10,6 +10,7 @@ import QuickAnswer from "../models/QuickAnswer";
 import Setting from "../models/Setting";
 import Ticket from "../models/Ticket";
 import TicketCategory from "../models/TicketCategory";
+import TicketHelpUser from "../models/TicketHelpUser";
 import User from "../models/User";
 import UserQueue from "../models/UserQueue";
 import Whatsapp from "../models/Whatsapp";
@@ -27,6 +28,7 @@ const models = [
   Ticket,
   Category,
   TicketCategory,
+  TicketHelpUser,
   Message,
   Whatsapp,
   ContactCustomField,

@@ -21,6 +21,11 @@ const ShowTicketService = async (id: string | number): Promise<Ticket> => {
         attributes: ["id", "name"]
       },
       {
+        model: User,
+        as: "helpUsers",
+        required: false
+      },
+      {
         model: Queue,
         as: "queue",
         attributes: ["id", "name", "color"]

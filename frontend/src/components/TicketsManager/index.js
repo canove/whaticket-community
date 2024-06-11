@@ -12,6 +12,8 @@ import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import SearchIcon from "@material-ui/icons/Search";
 
 import Menu from "@material-ui/core/Menu";
+import { Can } from "../Can";
+
 import MenuItem from "@material-ui/core/MenuItem";
 import NewTicketModal from "../NewTicketModal";
 import TabPanel from "../TabPanel";
@@ -296,30 +298,41 @@ const TicketsManager = () => {
                   {showAllTickets ? "TODOS LOS CHATS" : "MIS CHATS"}
                 </Badge>
 
-                <ArrowDropDownIcon fontSize="large" onClick={handleClick} />
+                <Can
+                  role={user.profile}
+                  perform="tickets-manager:showall"
+                  yes={() => (
+                    <>
+                      <ArrowDropDownIcon
+                        fontSize="large"
+                        onClick={handleClick}
+                      />
 
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}
-                >
-                  <MenuItem
-                    onClick={(e) => {
-                      setShowAllTickets(true);
-                      handleClose(e);
-                    }}
-                  >
-                    TODOS LOS CHATS
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(e) => {
-                      setShowAllTickets(false);
-                      handleClose(e);
-                    }}
-                  >
-                    MIS CHATS
-                  </MenuItem>
-                </Menu>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                      >
+                        <MenuItem
+                          onClick={(e) => {
+                            setShowAllTickets(true);
+                            handleClose(e);
+                          }}
+                        >
+                          TODOS LOS CHATS
+                        </MenuItem>
+                        <MenuItem
+                          onClick={(e) => {
+                            setShowAllTickets(false);
+                            handleClose(e);
+                          }}
+                        >
+                          MIS CHATS
+                        </MenuItem>
+                      </Menu>
+                    </>
+                  )}
+                />
               </div>
             }
             value={"open"}

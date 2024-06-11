@@ -1,5 +1,6 @@
 import Category from "../../models/Category";
 import Queue from "../../models/Queue";
+import User from "../../models/User";
 
 const ListQueuesService = async (): Promise<Queue[]> => {
   const queues = await Queue.findAll({
@@ -8,6 +9,11 @@ const ListQueuesService = async (): Promise<Queue[]> => {
         model: Category,
         as: "categories",
         attributes: ["id", "name", "color"]
+      },
+      {
+        model: User,
+        as: "users",
+        required: false
       }
     ],
     order: [["name", "ASC"]]

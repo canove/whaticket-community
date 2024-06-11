@@ -123,6 +123,9 @@ const TransferTicketModal = ({
         data.whatsappId = selectedWhatsapp;
       }
 
+      // clear the helpUsers on trasnfer
+      data.helpUsersIds = [];
+
       await api.put(`/tickets/${ticketid}`, data);
 
       await api.post(`/privateMessages/${ticketid}`, {

@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
+import UserQueue from "../models/UserQueue";
+import AssociateQueueWithUserService from "../services/QueueService/AssociateQueueWithUserService";
 import CreateQueueService from "../services/QueueService/CreateQueueService";
 import DeleteQueueService from "../services/QueueService/DeleteQueueService";
 import ListQueuesService from "../services/QueueService/ListQueuesService";
@@ -66,4 +68,37 @@ export const remove = async (
   });
 
   return res.status(200).send();
+};
+
+export const AssociateQueueWithUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { queueId } = req.params;
+  const { userIds } = req.body;
+
+  const queue = await ShowQueueService(queueId);
+
+  await AssociateQueueWithUserService(queue, userIds);
+
+  return res.status(200).json(queue);
+};
+
+export const UpdateAssociationQueueWithUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { queueId } = req.params;
+  const { userId, automaticallyAssign } = req.body;
+
+  await UserQueue.update(
+    { automaticallyAssign },
+    { where: { userId, queueId } }
+  );
+
+  const queue = await ShowQueueService(queueId);
+
+  await queue.reload();
+
+  return res.status(200).json(queue);
 };

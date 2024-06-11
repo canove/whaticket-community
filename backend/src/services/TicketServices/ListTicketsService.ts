@@ -1,5 +1,13 @@
 import { endOfDay, parseISO, startOfDay } from "date-fns";
-import { Filterable, Includeable, Op, col, fn, where } from "sequelize";
+import {
+  Filterable,
+  Includeable,
+  Op,
+  Sequelize,
+  col,
+  fn,
+  where
+} from "sequelize";
 
 import Category from "../../models/Category";
 import Contact from "../../models/Contact";
@@ -38,7 +46,19 @@ const ListTicketsService = async ({
   withUnreadMessages
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
-    [Op.or]: [{ userId }, { status: "pending" }],
+    [Op.or]: [
+      { userId },
+      {
+        id: {
+          [Op.in]: Sequelize.literal(
+            `(
+          SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
+        )`
+          )
+        }
+      },
+      { status: "pending" }
+    ],
     queueId: { [Op.or]: [queueIds, null] }
   };
   let includeCondition: Includeable[];
@@ -68,6 +88,11 @@ const ListTicketsService = async ({
       model: User,
       as: "user",
       attributes: ["id", "name"]
+    },
+    {
+      model: User,
+      as: "helpUsers",
+      required: false
     }
   ];
 

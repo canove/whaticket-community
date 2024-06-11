@@ -218,6 +218,15 @@ const TicketListItem = ({ ticket }) => {
               </Typography>
               {/* - CONTACT NAME */}
 
+              {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
+                // HELP BADGE
+                <Badge
+                  className={classes.closedBadge}
+                  badgeContent={"Apoyo"}
+                  color="primary"
+                />
+                // HELP BADGE
+              )}
               {ticket.status === "closed" && (
                 // CLOSED BADGE
                 <Badge
@@ -324,7 +333,7 @@ const TicketListItem = ({ ticket }) => {
                     setPreviewModalIsOpen(true);
                   }}
                 >
-                  <VisibilityOutlinedIcon fontSize="default" />
+                  <VisibilityOutlinedIcon fontSize="medium" />
                 </IconButton>
 
                 <TicketPreviewModal

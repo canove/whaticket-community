@@ -18,6 +18,7 @@ import Contact from "./Contact";
 import Message from "./Message";
 import Queue from "./Queue";
 import TicketCategory from "./TicketCategory";
+import TicketHelpUser from "./TicketHelpUser";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
@@ -43,6 +44,9 @@ class Ticket extends Model<Ticket> {
   @Default(false)
   @Column
   isGroup: boolean;
+
+  @Column
+  userHadContact: boolean;
 
   @CreatedAt
   createdAt: Date;
@@ -83,6 +87,9 @@ class Ticket extends Model<Ticket> {
 
   @BelongsToMany(() => Category, () => TicketCategory)
   categories: Category[];
+
+  @BelongsToMany(() => User, () => TicketHelpUser)
+  helpUsers: User[];
 }
 
 export default Ticket;

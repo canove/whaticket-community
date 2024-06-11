@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const reducer = (state, action) => {
-  console.log(action.type);
+  // console.log(action.type);
 
   if (action.type === "LOAD_TICKETS") {
     const newTickets = action.payload;
@@ -111,6 +111,22 @@ const reducer = (state, action) => {
       state[ticketIndex] = ticket;
     } else {
       state.unshift(ticket);
+    }
+
+    return [...state];
+  }
+
+  if (action.type === "VERIFY_IF_TICKET_IS_IN_TICKETlIST_TO_REMOVE_IT") {
+    const { ticket, user } = action.payload;
+
+    const ticketIndex = state.findIndex((t) => t.id === ticket.id);
+
+    if (
+      ticketIndex !== -1 &&
+      ticket.helpUsers?.find((hu) => hu.id === user?.id) === undefined &&
+      ticket.userId !== user?.id
+    ) {
+      state.splice(ticketIndex, 1);
     }
 
     return [...state];
@@ -177,6 +193,7 @@ const TicketsList = (props) => {
 
   useEffect(() => {
     if (!status && !searchParam) return;
+    // console.log("LOAD_TICKETS", tickets);
     dispatch({
       type: "LOAD_TICKETS",
       payload: tickets,
@@ -188,7 +205,10 @@ const TicketsList = (props) => {
 
     const shouldUpdateTicket = (ticket) =>
       !searchParam &&
-      (!ticket.userId || ticket.userId === user?.id || showAll) &&
+      (!ticket.userId ||
+        ticket.userId === user?.id ||
+        ticket.helpUsers?.find((hu) => hu.id === user?.id) ||
+        showAll) &&
       (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
     const notBelongsToUserQueues = (ticket) =>
@@ -223,6 +243,13 @@ const TicketsList = (props) => {
 
       if (data.action === "delete") {
         dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
+      }
+
+      if (data.action === "update") {
+        dispatch({
+          type: "VERIFY_IF_TICKET_IS_IN_TICKETlIST_TO_REMOVE_IT",
+          payload: { ticket: data.ticket, user },
+        });
       }
     });
 
