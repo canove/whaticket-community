@@ -28,20 +28,20 @@ const useStyles = makeStyles((theme) => ({
   },
 
   ticketInfo: {
-    maxWidth: "50%",
-    flexBasis: "50%",
-    [theme.breakpoints.down("sm")]: {
-      maxWidth: "80%",
-      flexBasis: "80%",
-    },
+    // maxWidth: "50%",
+    // flexBasis: "50%",
+    // [theme.breakpoints.down("sm")]: {
+    //   maxWidth: "80%",
+    //   flexBasis: "80%",
+    // },
   },
   ticketActionButtons: {
-    maxWidth: "50%",
-    flexBasis: "50%",
+    // maxWidth: "50%",
+    // flexBasis: "50%",
     display: "flex",
     [theme.breakpoints.down("sm")]: {
-      maxWidth: "100%",
-      flexBasis: "100%",
+      // maxWidth: "100%",
+      // flexBasis: "100%",
       marginBottom: "5px",
     },
   },
@@ -154,7 +154,7 @@ const Ticket = () => {
           [classes.mainWrapperShift]: drawerOpen,
         })}
       >
-        <TicketHeader loading={loading}>
+        <TicketHeader withArrow={false} loading={loading}>
           <div className={classes.ticketInfo}>
             <TicketInfo
               contact={contact}

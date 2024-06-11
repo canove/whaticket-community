@@ -11,6 +11,7 @@ interface TicketData {
   whatsappId?: number;
   privateNote?: string;
   categoriesIds?: number[];
+  helpUsersIds?: number[];
 }
 
 interface Request {
@@ -28,8 +29,15 @@ const UpdateTicketService = async ({
   ticketData,
   ticketId
 }: Request): Promise<Response> => {
-  const { status, userId, queueId, whatsappId, privateNote, categoriesIds } =
-    ticketData;
+  const {
+    status,
+    userId,
+    queueId,
+    whatsappId,
+    privateNote,
+    categoriesIds,
+    helpUsersIds
+  } = ticketData;
 
   const ticket = await ShowTicketService(ticketId);
   await SetTicketMessagesAsRead(ticket);
@@ -60,6 +68,10 @@ const UpdateTicketService = async ({
 
   if (categoriesIds) {
     await ticket.$set("categories", categoriesIds);
+  }
+
+  if (helpUsersIds) {
+    await ticket.$set("helpUsers", helpUsersIds);
   }
 
   await ticket.reload();

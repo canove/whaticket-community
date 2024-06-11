@@ -8,11 +8,14 @@ import { MoreVert, Replay } from "@material-ui/icons";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
 import Badge from "@material-ui/core/Badge";
+import CategoryOutlinedIcon from "@material-ui/icons/CategoryOutlined";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
+
 import AddCategoryToTicketModal from "../AddCategoryToTicketModal";
+import AskForHelpTicketModal from "../AskForHelpTicketModal";
 
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import TicketOptionsMenu from "../TicketOptionsMenu";
@@ -35,6 +38,8 @@ const TicketActionButtons = ({ ticket }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [addCategoryToTicketModalOpen, setAddCategoryToTicketModalOpen] =
+    useState(false);
+  const [askForHelpTicketModalOpen, setAskForHelpTicketModalOpen] =
     useState(false);
   const ticketOptionsMenuOpen = Boolean(anchorEl);
   const { user } = useContext(AuthContext);
@@ -99,40 +104,94 @@ const TicketActionButtons = ({ ticket }) => {
       )}
       {ticket.status === "open" && (
         <>
-          <ButtonWithSpinner
-            loading={loading}
-            startIcon={<Replay />}
-            size="small"
-            onClick={(e) => handleUpdateTicketStatus(e, "pending", null)}
-          >
-            {i18n.t("messagesList.header.buttons.return")}
-          </ButtonWithSpinner>
-          <ButtonWithSpinner
-            loading={loading}
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={(e) => handleUpdateTicketStatus(e, "closed", user?.id)}
-          >
-            {i18n.t("messagesList.header.buttons.resolve")}
-          </ButtonWithSpinner>
+          {ticket.userId === user?.id && (
+            <ButtonWithSpinner
+              loading={loading}
+              startIcon={<Replay />}
+              size="small"
+              onClick={(e) => handleUpdateTicketStatus(e, "pending", null)}
+            >
+              {i18n.t("messagesList.header.buttons.return")}
+            </ButtonWithSpinner>
+          )}
 
           <Badge
             badgeContent={ticket.categories.length}
             invisible={ticket.categories.length < 1}
             color="primary"
           >
-            <Button
-              variant="contained"
-              size="small"
-              color="default"
-              onClick={() => {
-                setAddCategoryToTicketModalOpen(true);
-              }}
-            >
-              Categorias
-            </Button>
+            <div>
+              <Button
+                size="small"
+                onClick={() => {
+                  setAddCategoryToTicketModalOpen(true);
+                }}
+                startIcon={<CategoryOutlinedIcon />}
+              >
+                Categorias
+              </Button>
+            </div>
           </Badge>
+
+          {ticket.userId === user?.id && (
+            <>
+              <ButtonWithSpinner
+                loading={loading}
+                size="small"
+                variant="contained"
+                color="primary"
+                onClick={(e) => handleUpdateTicketStatus(e, "closed", user?.id)}
+              >
+                {i18n.t("messagesList.header.buttons.resolve")}
+              </ButtonWithSpinner>
+
+              <Button
+                size="small"
+                variant="contained"
+                color="default"
+                onClick={() => setAskForHelpTicketModalOpen(true)}
+              >
+                Pedir apoyo
+              </Button>
+            </>
+          )}
+
+          {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
+            <>
+              <Button
+                size="small"
+                variant="contained"
+                color="default"
+                onClick={async () => {
+                  try {
+                    await api.put(`/tickets/${ticket.id}`, {
+                      helpUsersIds: ticket.helpUsers.filter(
+                        (hu) => hu.id !== user?.id
+                      ),
+                    });
+
+                    await api.post(`/privateMessages/${ticket.id}`, {
+                      body: `${user?.name} *terminó el apoyo* en la conversación`,
+                    });
+                    history.push(`/tickets`);
+                  } catch (err) {
+                    toastError(err);
+                  }
+                }}
+              >
+                Terminar apoyo
+              </Button>
+            </>
+          )}
+
+          <AskForHelpTicketModal
+            modalOpen={askForHelpTicketModalOpen}
+            onClose={() => {
+              setAskForHelpTicketModalOpen(false);
+            }}
+            ticket={ticket}
+          />
+
           <AddCategoryToTicketModal
             modalOpen={addCategoryToTicketModalOpen}
             onClose={() => {
@@ -141,9 +200,12 @@ const TicketActionButtons = ({ ticket }) => {
             ticket={ticket}
           />
 
-          <IconButton onClick={handleOpenTicketOptionsMenu}>
-            <MoreVert />
-          </IconButton>
+          {ticket.userId === user?.id && (
+            <IconButton onClick={handleOpenTicketOptionsMenu}>
+              <MoreVert />
+            </IconButton>
+          )}
+
           <TicketOptionsMenu
             ticket={ticket}
             anchorEl={anchorEl}
