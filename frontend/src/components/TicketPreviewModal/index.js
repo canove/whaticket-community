@@ -65,7 +65,7 @@ export default function TicketPreviewModal(props) {
             </div> */}
           </TicketHeader>
 
-          <div style={{ maxHeight: "50rem", overflow: "auto" }}>
+          <div style={{ maxHeight: "37.5rem", overflow: "auto" }}>
             <ReplyMessageProvider>
               <MessagesList
                 ticketId={ticket.id}
