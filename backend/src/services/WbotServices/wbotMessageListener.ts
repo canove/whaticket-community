@@ -3,7 +3,7 @@ import { writeFile } from "fs";
 import { join } from "path";
 import { promisify } from "util";
 
-import {
+import WAWebJS, {
   Client,
   MessageAck,
   Contact as WbotContact,
@@ -16,6 +16,7 @@ import Ticket from "../../models/Ticket";
 
 import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
+import { getConnectedUsers } from "../../libs/connectedUsers";
 import { getIO } from "../../libs/socket";
 import { logger } from "../../utils/logger";
 import verifyPrivateMessage from "../../utils/verifyPrivateMessage";
@@ -23,6 +24,7 @@ import ShowChatbotOptionService from "../ChatbotOptionService/ShowChatbotOptionS
 import CreateContactService from "../ContactServices/CreateContactService";
 import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import FindOrCreateTicketLiteService from "../TicketServices/FindOrCreateTicketLiteService";
 import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
@@ -47,6 +49,53 @@ const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
   };
 
   const contact = CreateOrUpdateContactService(contactData);
+
+  return contact;
+};
+
+const verifyContactForSyncUnreadMessages = async (
+  msgContact: WbotContact
+): Promise<Contact> => {
+  const contactData: {
+    name: string;
+    number: string;
+    profilePicUrl?: string;
+    isGroup: boolean;
+  } = {
+    name: msgContact.name || msgContact.pushname || msgContact.id.user,
+    number: msgContact.id.user,
+    isGroup: msgContact.isGroup
+  };
+
+  const number = contactData.isGroup
+    ? contactData.number
+    : contactData.number.replace(/[^0-9]/g, "");
+
+  let contact: Contact | null;
+
+  contact = await Contact.findOne({ where: { number } });
+
+  if (!contact) {
+    contactData.profilePicUrl = await msgContact.getProfilePicUrl();
+
+    contact = await Contact.create({
+      name: contactData.name,
+      number,
+      profilePicUrl: contactData.profilePicUrl,
+      isGroup: contactData.isGroup,
+      email: "",
+      extraInfo: []
+    });
+
+    const io = getIO();
+
+    io.emit("contact", {
+      action: "create",
+      contact
+    });
+  }
+
+  // const contact = CreateOrUpdateContactService(contactData);
 
   return contact;
 };
@@ -93,7 +142,8 @@ function makeRandomId(length: number) {
 const verifyMediaMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  updateTicketLastMessage = true
 ): Promise<Message> => {
   const quotedMsg = await verifyQuotedMessage(msg);
 
@@ -125,6 +175,7 @@ const verifyMediaMessage = async (
     );
   } catch (err) {
     Sentry.captureException(err);
+    // @ts-ignore
     logger.error(err);
   }
 
@@ -140,7 +191,9 @@ const verifyMediaMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  await ticket.update({ lastMessage: msg.body || media.filename });
+  if (updateTicketLastMessage) {
+    await ticket.update({ lastMessage: msg.body || media.filename });
+  }
   const newMessage = await CreateMessageService({ messageData });
 
   return newMessage;
@@ -154,7 +207,8 @@ export const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact,
-  isPrivate = false
+  isPrivate = false,
+  updateTicketLastMessage = true
 ) => {
   if (msg.type === "location") msg = prepareLocation(msg);
 
@@ -172,18 +226,20 @@ export const verifyMessage = async (
     isPrivate
   };
 
-  // temporaryly disable ts checks because of type definition bug for Location object
-  // @ts-ignore
-  await ticket.update({
-    lastMessage:
-      msg.type === "location"
-        ? // @ts-ignore
-          msg.location.description
+  if (updateTicketLastMessage) {
+    // temporaryly disable ts checks because of type definition bug for Location object
+    // @ts-ignore
+    await ticket.update({
+      lastMessage:
+        msg.type === "location"
           ? // @ts-ignore
-            "Localization - " + msg.location.description.split("\\n")[0]
-          : "Localization"
-        : msg.body
-  });
+            msg.location.description
+            ? // @ts-ignore
+              "Localization - " + msg.location.description.split("\\n")[0]
+            : "Localization"
+          : msg.body
+    });
+  }
 
   await CreateMessageService({ messageData });
 };
@@ -230,6 +286,8 @@ const verifyQueue = async (
 
   // IF the conection has only one queue, assign the ticket to this queue and return
   if (queues.length === 1) {
+    // console.log("solo se encontro un departamento para este wpp");
+
     await UpdateTicketService({
       ticketData: { queueId: queues[0].id },
       ticketId: ticket.id
@@ -268,17 +326,35 @@ const verifyQueue = async (
     debouncedSentMessage();
 
     if (queues[0].automaticAssignment && queues[0].users.length > 0) {
-      let userWithLessTickets = queues[0].users.sort((a, b) => {
+      // console.log("se asigna automaticamente");
+
+      let choosenQueueUsers = queues[0].users;
+
+      if (!queues[0].automaticAssignmentForOfflineUsers) {
+        // console.log("no se asigna a usuarios offline");
+        // console.log(getConnectedUsers());
+
+        const connectedUsers = getConnectedUsers();
+
+        choosenQueueUsers = choosenQueueUsers.filter(user =>
+          connectedUsers.includes(user.id)
+        );
+      }
+
+      let choosenQueueUserWithLessTickets = choosenQueueUsers.sort((a, b) => {
         return a.tickets.length - b.tickets.length;
       })[0];
 
       await UpdateTicketService({
-        ticketData: { userId: userWithLessTickets.id, status: "open" },
+        ticketData: {
+          userId: choosenQueueUserWithLessTickets.id,
+          status: "open"
+        },
         ticketId: ticket.id
       });
 
       verifyPrivateMessage(
-        `Se ha *asignó automáticamente* a ${userWithLessTickets.name}`,
+        `Se ha *asignó automáticamente* a ${choosenQueueUserWithLessTickets.name}`,
         ticket,
         ticket.contact
       );
@@ -337,18 +413,36 @@ const verifyQueue = async (
 
     debouncedSentMessage();
 
-    if (queues[0].automaticAssignment && queues[0].users.length > 0) {
-      let userWithLessTickets = queues[0].users.sort((a, b) => {
+    if (choosenQueue.automaticAssignment && choosenQueue.users.length > 0) {
+      // console.log("se asigna automaticamente");
+
+      let choosenQueueUsers = choosenQueue.users;
+
+      if (!choosenQueue.automaticAssignmentForOfflineUsers) {
+        // console.log("no se asigna a usuarios offline");
+        // console.log(getConnectedUsers());
+
+        const connectedUsers = getConnectedUsers();
+
+        choosenQueueUsers = choosenQueueUsers.filter(user =>
+          connectedUsers.includes(user.id)
+        );
+      }
+
+      let choosenQueueUserWithLessTickets = choosenQueueUsers.sort((a, b) => {
         return a.tickets.length - b.tickets.length;
       })[0];
 
       await UpdateTicketService({
-        ticketData: { userId: userWithLessTickets.id, status: "open" },
+        ticketData: {
+          userId: choosenQueueUserWithLessTickets.id,
+          status: "open"
+        },
         ticketId: ticket.id
       });
 
       verifyPrivateMessage(
-        `Se ha *asignó automáticamente* a ${userWithLessTickets.name}`,
+        `Se ha *asignó automáticamente* a ${choosenQueueUserWithLessTickets.name}`,
         ticket,
         ticket.contact
       );
@@ -485,14 +579,14 @@ const handleMessage = async (
     // we considered it as a intro message from a contact, and whe send it a messages to choose a queue and a category
 
     if (
-      (!ticket.queue || !ticket.userHadContact) &&
+      !ticket.userHadContact &&
       !chat.isGroup &&
       !msg.fromMe &&
       whatsapp.queues.length >= 1
     ) {
       if (!ticket.queue) {
         await verifyQueue(wbot, msg, ticket, contact);
-      } else if (!ticket.userHadContact) {
+      } else {
         const msgBody = msg.body;
 
         const chatbotOption = await ShowChatbotOptionService(msgBody);
@@ -640,6 +734,87 @@ const handleMessage = async (
   } catch (err) {
     Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);
+    console.log(err);
+  }
+};
+
+const handleMessageForSyncUnreadMessages = async (
+  msg: WbotMessage,
+  wbot: Session,
+  chat: WAWebJS.Chat
+): Promise<{ ticket: Ticket; contact: Contact } | undefined> => {
+  if (!isValidMsg(msg)) {
+    return;
+  }
+
+  try {
+    let msgContact: WbotContact;
+    let groupContact: Contact | undefined;
+
+    // if i sent the message, msgContact is the contact that received the message
+    // if i received the message, msgContact is the contact that sent the message
+    if (msg.fromMe) {
+      // messages sent automatically by wbot have a special character in front of it
+      // if so, this message was already been stored in database;
+      if (/\u200e/.test(msg.body[0])) return;
+
+      // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
+      // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
+      if (
+        !msg.hasMedia &&
+        msg.type !== "location" &&
+        msg.type !== "chat" &&
+        msg.type !== "vcard"
+        //&& msg.type !== "multi_vcard"
+      )
+        return;
+
+      msgContact = await wbot.getContactById(msg.to);
+    } else {
+      msgContact = await msg.getContact();
+    }
+
+    // if the message is from a group,
+    // and i sent the message, groupContact is the contact that received the message
+    // and if i received the message, groupContact is the contact that sent the message
+    // in any case, save the group contact in the database
+    if (chat.isGroup) {
+      let msgGroupContact;
+
+      if (msg.fromMe) {
+        msgGroupContact = await wbot.getContactById(msg.to);
+      } else {
+        msgGroupContact = await wbot.getContactById(msg.from);
+      }
+
+      groupContact = await verifyContactForSyncUnreadMessages(msgGroupContact);
+    }
+
+    // if i sent the message, unreadMessages = 0 otherwise unreadMessages = chat.unreadCount
+    const unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
+
+    const contact = await verifyContactForSyncUnreadMessages(msgContact);
+
+    // find, create or update a ticket from the contact or groupContact and from whatsappId
+    // always update the ticket unreadMessages
+    const ticket = await FindOrCreateTicketLiteService(
+      contact,
+      wbot.id!,
+      unreadMessages,
+      groupContact
+    );
+
+    if (msg.hasMedia) {
+      await verifyMediaMessage(msg, ticket, contact, false);
+    } else {
+      await verifyMessage(msg, ticket, contact, false, false);
+    }
+
+    return { ticket, contact };
+  } catch (err) {
+    Sentry.captureException(err);
+    logger.error(`Error handling whatsapp message: Err: ${err}`);
+    console.log(err);
   }
 };
 
@@ -678,14 +853,16 @@ const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
     handleMessage(msg, wbot);
   });
-
   wbot.on("media_uploaded", async msg => {
     handleMessage(msg, wbot);
   });
-
   wbot.on("message_ack", async (msg, ack) => {
     handleMsgAck(msg, ack);
   });
 };
 
-export { handleMessage, wbotMessageListener };
+export {
+  handleMessage,
+  handleMessageForSyncUnreadMessages,
+  wbotMessageListener
+};

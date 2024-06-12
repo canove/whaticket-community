@@ -13,15 +13,18 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import openSocket from "../services/socket-io";
 
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import MenuIcon from "@material-ui/icons/Menu";
+import SyncBackdrop from "../components/SyncBackdrop";
 
 import BackdropLoading from "../components/BackdropLoading";
 import NotificationsPopOver from "../components/NotificationsPopOver";
 import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
+import { UsersPresenceContext } from "../context/UsersPresenceContext";
 import { i18n } from "../translate/i18n";
 import MainListItems from "./MainListItems";
 
@@ -120,13 +123,43 @@ const LoggedInLayout = ({ children }) => {
   const { handleLogout, loading } = useContext(AuthContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
+  const [syncBackdropIsOpen, setSyncBackdropIsOpen] = useState(false);
   const { user } = useContext(AuthContext);
+  const { setConnectedUsers } = useContext(UsersPresenceContext);
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
       setDrawerOpen(true);
     }
+
+    const socket = openSocket();
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
+
+  useEffect(() => {
+    const socket = openSocket(user.id);
+
+    socket.on("usersPresenceList", (list) => {
+      setConnectedUsers(list);
+    });
+
+    socket.on("startSyncUnreadMessages", () => {
+      console.log("---- startSyncUnreadMessages");
+      setSyncBackdropIsOpen(true);
+    });
+
+    socket.on("endSyncUnreadMessages", () => {
+      console.log("---- endSyncUnreadMessages");
+      setSyncBackdropIsOpen(false);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     if (document.body.offsetWidth < 600) {
@@ -274,6 +307,7 @@ const LoggedInLayout = ({ children }) => {
           </div>
         </Toolbar>
       </AppBar>
+      <SyncBackdrop open={syncBackdropIsOpen} />
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
 

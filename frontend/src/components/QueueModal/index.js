@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
@@ -34,6 +34,7 @@ import { Colorize } from "@material-ui/icons";
 import CreateOutlinedIcon from "@material-ui/icons/CreateOutlined";
 import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
 import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
+import { UsersPresenceContext } from "../../context/UsersPresenceContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import CategorySelect from "../CategorySelect";
@@ -311,7 +312,7 @@ const ChatbotOptionTextField = ({
 
               onSave(newChatbotOption.data);
             }
-            toast.success("Queue saved successfully");
+            toast.success("Departamento guardado correctamente");
           } catch (err) {
             toastError(err);
           }
@@ -362,6 +363,7 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
   ] = useState(false);
   const [users, setUsers] = useState([]);
   const greetingRef = useRef();
+  const { connectedUsers } = useContext(UsersPresenceContext);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -647,8 +649,7 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                   />
                 </div>
               </div>
-              {/* todavia no disponible */}
-              {/* <div
+              <div
                 style={{
                   marginBottom: "1.5rem",
                   opacity: queueAutomaticAssignment ? "1" : "0.5",
@@ -689,11 +690,12 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                     inputProps={{ "aria-label": "primary checkbox" }}
                   />
                 </div>
-              </div> */}
+              </div>
 
               <Table size="medium">
                 <TableHead>
                   <TableRow>
+                    <TableCell align="center">Estado</TableCell>
                     <TableCell align="center">
                       {i18n.t("contacts.table.name")}
                     </TableCell>
@@ -710,6 +712,11 @@ const QueueModal = ({ open, onClose, queueId, queuesCategories }) => {
                   <>
                     {users.map((user) => (
                       <TableRow key={user.id}>
+                        <TableCell align="center">
+                          {connectedUsers.find((id) => id === user.id)
+                            ? "🟢"
+                            : "🟡"}
+                        </TableCell>
                         <TableCell align="center">{user.name}</TableCell>
                         <TableCell align="center">{user.email}</TableCell>
                         <TableCell align="center">
