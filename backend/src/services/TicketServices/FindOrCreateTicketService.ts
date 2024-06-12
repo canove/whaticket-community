@@ -21,7 +21,8 @@ const FindOrCreateTicketService = async (
   contact: Contact,
   whatsappId: number,
   unreadMessages: number,
-  groupContact?: Contact
+  groupContact?: Contact,
+  lastMessageTimestamp?: number
 ): Promise<Ticket> => {
   // find a ticket with status open or pending, from the contact or groupContact and  from the whatsappId
   let ticket = await Ticket.findOne({
@@ -58,7 +59,7 @@ const FindOrCreateTicketService = async (
 
   // if ticket exists, update his unreadMessages
   if (ticket) {
-    await ticket.update({ unreadMessages });
+    await ticket.update({ unreadMessages, lastMessageTimestamp });
   }
 
   // if ticket not exists and groupContact is trully, find a ticket from the groupContact and from the whatsappId
@@ -83,7 +84,8 @@ const FindOrCreateTicketService = async (
       await ticket.update({
         status: "pending",
         userId: null,
-        unreadMessages
+        unreadMessages,
+        lastMessageTimestamp
       });
     }
   }
@@ -113,7 +115,8 @@ const FindOrCreateTicketService = async (
       await ticket.update({
         status: "pending",
         userId: null,
-        unreadMessages
+        unreadMessages,
+        lastMessageTimestamp
       });
     }
   }
@@ -126,7 +129,8 @@ const FindOrCreateTicketService = async (
       status: "pending",
       isGroup: !!groupContact,
       unreadMessages,
-      whatsappId
+      whatsappId,
+      lastMessageTimestamp
     });
   }
 

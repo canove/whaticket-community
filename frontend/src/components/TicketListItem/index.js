@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import clsx from "clsx";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format, fromUnixTime, isSameDay } from "date-fns";
 import { useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@material-ui/core/Avatar";
@@ -236,7 +236,7 @@ const TicketListItem = ({ ticket }) => {
                 />
                 // CLOSED BADGE
               )}
-              {ticket.lastMessage && (
+              {ticket.lastMessageTimestamp && (
                 // LAST MESSAGE TIME
                 <Typography
                   className={classes.lastMessageTime}
@@ -244,10 +244,23 @@ const TicketListItem = ({ ticket }) => {
                   variant="body2"
                   color="textSecondary"
                 >
-                  {isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
-                    <>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
+                  {isSameDay(
+                    fromUnixTime(ticket.lastMessageTimestamp),
+                    new Date()
+                  ) ? (
+                    <>
+                      {format(
+                        fromUnixTime(ticket.lastMessageTimestamp),
+                        "HH:mm"
+                      )}
+                    </>
                   ) : (
-                    <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
+                    <>
+                      {format(
+                        fromUnixTime(ticket.lastMessageTimestamp),
+                        "dd/MM/yyyy"
+                      )}
+                    </>
                   )}
                 </Typography>
                 // - LAST MESSAGE TIME
