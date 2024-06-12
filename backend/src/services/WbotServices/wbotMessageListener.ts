@@ -564,7 +564,8 @@ const handleMessage = async (
       contact,
       wbot.id!,
       unreadMessages,
-      groupContact
+      groupContact,
+      msg.timestamp
     );
 
     if (msg.hasMedia) {
@@ -801,7 +802,8 @@ const handleMessageForSyncUnreadMessages = async (
       contact,
       wbot.id!,
       unreadMessages,
-      groupContact
+      groupContact,
+      msg.timestamp
     );
 
     if (msg.hasMedia) {
