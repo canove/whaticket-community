@@ -104,7 +104,7 @@ const TicketActionButtons = ({ ticket }) => {
       )}
       {ticket.status === "open" && (
         <>
-          {ticket.userId === user?.id && (
+          {(ticket.userId === user?.id || user?.profile === "admin") && (
             <ButtonWithSpinner
               loading={loading}
               startIcon={<Replay />}
@@ -133,7 +133,7 @@ const TicketActionButtons = ({ ticket }) => {
             </div>
           </Badge>
 
-          {ticket.userId === user?.id && (
+          {(ticket.userId === user?.id || user?.profile === "admin") && (
             <>
               <ButtonWithSpinner
                 loading={loading}
