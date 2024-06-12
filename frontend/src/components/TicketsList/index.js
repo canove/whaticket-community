@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const reducer = (state, action) => {
-  // console.log(action.type);
+  // console.log("accion que llega al reducer", action.type, action.payload);
 
   if (action.type === "LOAD_TICKETS") {
     const newTickets = action.payload;
@@ -104,20 +104,21 @@ const reducer = (state, action) => {
   }
 
   if (action.type === "UPDATE_TICKET") {
-    const ticket = action.payload;
+    const { ticket, setUpdatedCount } = action.payload;
 
     const ticketIndex = state.findIndex((t) => t.id === ticket.id);
     if (ticketIndex !== -1) {
       state[ticketIndex] = ticket;
     } else {
       state.unshift(ticket);
+      setUpdatedCount((oldCount) => oldCount + 1);
     }
 
     return [...state];
   }
 
   if (action.type === "VERIFY_IF_TICKET_IS_IN_TICKETlIST_TO_REMOVE_IT") {
-    const { ticket, user } = action.payload;
+    const { ticket, user, setUpdatedCount } = action.payload;
 
     const ticketIndex = state.findIndex((t) => t.id === ticket.id);
 
@@ -127,13 +128,14 @@ const reducer = (state, action) => {
       ticket.userId !== user?.id
     ) {
       state.splice(ticketIndex, 1);
+      setUpdatedCount((oldCount) => oldCount - 1);
     }
 
     return [...state];
   }
 
   if (action.type === "UPDATE_TICKET_UNREAD_MESSAGES") {
-    const ticket = action.payload;
+    const { ticket, setUpdatedCount } = action.payload;
 
     const ticketIndex = state.findIndex((t) => t.id === ticket.id);
     if (ticketIndex !== -1) {
@@ -141,6 +143,7 @@ const reducer = (state, action) => {
       state.unshift(state.splice(ticketIndex, 1)[0]);
     } else {
       state.unshift(ticket);
+      setUpdatedCount((oldCount) => oldCount + 1);
     }
 
     return [...state];
@@ -156,10 +159,11 @@ const reducer = (state, action) => {
   }
 
   if (action.type === "DELETE_TICKET") {
-    const ticketId = action.payload;
+    const { ticketId, setUpdatedCount } = action.payload;
     const ticketIndex = state.findIndex((t) => t.id === ticketId);
     if (ticketIndex !== -1) {
       state.splice(ticketIndex, 1);
+      setUpdatedCount((oldCount) => oldCount - 1);
     }
 
     return [...state];
@@ -176,6 +180,7 @@ const TicketsList = (props) => {
   const classes = useStyles();
   const [pageNumber, setPageNumber] = useState(1);
   const [ticketsList, dispatch] = useReducer(reducer, []);
+  const [updatedCount, setUpdatedCount] = useState(0);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -183,7 +188,7 @@ const TicketsList = (props) => {
     setPageNumber(1);
   }, [status, searchParam, dispatch, showAll, selectedQueueIds]);
 
-  const { tickets, hasMore, loading } = useTickets({
+  const { tickets, hasMore, loading, count } = useTickets({
     pageNumber,
     searchParam,
     status,
@@ -199,6 +204,16 @@ const TicketsList = (props) => {
       payload: tickets,
     });
   }, [tickets]);
+
+  useEffect(() => {
+    setUpdatedCount(count);
+  }, [count]);
+
+  useEffect(() => {
+    if (typeof updateCount === "function") {
+      updateCount(updatedCount);
+    }
+  }, [updatedCount]);
 
   useEffect(() => {
     const socket = openSocket();
@@ -233,22 +248,28 @@ const TicketsList = (props) => {
       if (data.action === "update" && shouldUpdateTicket(data.ticket)) {
         dispatch({
           type: "UPDATE_TICKET",
-          payload: data.ticket,
+          payload: { ticket: data.ticket, setUpdatedCount },
         });
       }
 
       if (data.action === "update" && notBelongsToUserQueues(data.ticket)) {
-        dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
+        dispatch({
+          type: "DELETE_TICKET",
+          payload: { ticketId: data.ticket.id, setUpdatedCount },
+        });
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
+        dispatch({
+          type: "DELETE_TICKET",
+          payload: { ticketId: data.ticketId, setUpdatedCount },
+        });
       }
 
       if (data.action === "update") {
         dispatch({
           type: "VERIFY_IF_TICKET_IS_IN_TICKETlIST_TO_REMOVE_IT",
-          payload: { ticket: data.ticket, user },
+          payload: { ticket: data.ticket, user, setUpdatedCount },
         });
       }
     });
@@ -257,7 +278,7 @@ const TicketsList = (props) => {
       if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
         dispatch({
           type: "UPDATE_TICKET_UNREAD_MESSAGES",
-          payload: data.ticket,
+          payload: { ticket: data.ticket, setUpdatedCount },
         });
       }
     });
@@ -276,12 +297,12 @@ const TicketsList = (props) => {
     };
   }, [status, searchParam, showAll, user, selectedQueueIds]);
 
-  useEffect(() => {
-    if (typeof updateCount === "function") {
-      updateCount(ticketsList.length);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketsList]);
+  // useEffect(() => {
+  //   if (typeof updateCount === "function") {
+  //     updateCount(ticketsList.length);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [ticketsList]);
 
   const loadMore = () => {
     setPageNumber((prevState) => prevState + 1);
