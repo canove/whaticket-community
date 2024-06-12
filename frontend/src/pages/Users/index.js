@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import IconButton from "@material-ui/core/IconButton";
-import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import { makeStyles } from "@material-ui/core/styles";
+import SearchIcon from "@material-ui/icons/Search";
 
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
@@ -23,12 +23,13 @@ import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 
-import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import { UsersPresenceContext } from "../../context/UsersPresenceContext";
 import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -95,6 +96,7 @@ const Users = () => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [users, dispatch] = useReducer(reducer, []);
+  const { connectedUsers } = useContext(UsersPresenceContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -236,6 +238,7 @@ const Users = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
+              <TableCell align="center">Estado</TableCell>
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
               <TableCell align="center">
                 {i18n.t("users.table.email")}
@@ -245,7 +248,7 @@ const Users = () => {
               </TableCell>
               <TableCell align="center">
                 {i18n.t("users.table.whatsapp")}
-              </TableCell>              
+              </TableCell>
               <TableCell align="center">
                 {i18n.t("users.table.actions")}
               </TableCell>
@@ -255,6 +258,9 @@ const Users = () => {
             <>
               {users.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell align="center">
+                    {connectedUsers.find((id) => id === user.id) ? "🟢" : "🟡"}
+                  </TableCell>
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>

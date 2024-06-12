@@ -12,6 +12,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Autocomplete, {
   createFilterOptions,
 } from "@material-ui/lab/Autocomplete";
+import { UsersPresenceContext } from "../../context/UsersPresenceContext";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
@@ -34,6 +35,7 @@ const AskForHelpTicketModal = ({ modalOpen, onClose, ticket }) => {
   const [loading, setLoading] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
+  const { connectedUsers } = useContext(UsersPresenceContext);
 
   const { user: loggedInUser } = useContext(AuthContext);
 
@@ -97,6 +99,14 @@ const AskForHelpTicketModal = ({ modalOpen, onClose, ticket }) => {
           <Autocomplete
             style={{ width: 300, marginBottom: 20 }}
             getOptionLabel={(option) => `${option.name}`}
+            renderOption={(option) => {
+              return (
+                <div>
+                  {connectedUsers.find((id) => id === option.id) ? "🟢" : "🟡"}{" "}
+                  {option.name}
+                </div>
+              );
+            }}
             onChange={(e, newValue) => {
               setSelectedUser(newValue);
             }}
@@ -104,6 +114,7 @@ const AskForHelpTicketModal = ({ modalOpen, onClose, ticket }) => {
             filterOptions={filterOptions}
             freeSolo
             autoHighlight
+            openOnFocus={true}
             noOptionsText={i18n.t("transferTicketModal.noOptions")}
             loading={loading}
             renderInput={(params) => (

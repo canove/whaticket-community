@@ -185,8 +185,8 @@ const messages = {
       },
       queueModal: {
         title: {
-          add: "Agregar canal",
-          edit: "Editar canal",
+          add: "Agregar departamento",
+          edit: "Editar departamento",
         },
         form: {
           name: "Nombre",
@@ -227,7 +227,7 @@ const messages = {
         },
       },
       ticketsQueueSelect: {
-        placeholder: "Canales",
+        placeholder: "Departamentos",
       },
       tickets: {
         toasts: {
@@ -288,9 +288,9 @@ const messages = {
           tickets: "Tickets",
           contacts: "Contactos",
           quickAnswers: "Respuestas rápidas",
-          queues: "Canales",
+          queues: "Departamentos",
           administration: "Administración",
-          users: "Usuarios",
+          users: "Equipo",
           settings: "Configuración",
         },
         appBar: {
@@ -304,7 +304,7 @@ const messages = {
         noTickets: "Sin notificaciones.",
       },
       queues: {
-        title: "Canales",
+        title: "Departamentos",
         table: {
           name: "Nombre",
           color: "Color",
@@ -312,16 +312,16 @@ const messages = {
           actions: "Comportamiento",
         },
         buttons: {
-          add: "Agregar Canal",
+          add: "Agregar Departamento",
         },
         confirmationModal: {
           deleteTitle: "Eliminar",
           deleteMessage:
-            "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ningun canal asignada.",
+            "¿Estás seguro? ¡Esta acción no se puede revertir! Los tickets en esa cola seguirán existiendo, pero ya no tendrán ningun departamento asignada.",
         },
       },
       queueSelect: {
-        inputLabel: "Canales",
+        inputLabel: "Departamentos",
       },
       categories: {
         title: "Categorias",

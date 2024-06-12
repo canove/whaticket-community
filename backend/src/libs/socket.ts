@@ -1,9 +1,14 @@
-import { Server as SocketIO } from "socket.io";
 import { Server } from "http";
 import { verify } from "jsonwebtoken";
+import { Server as SocketIO } from "socket.io";
+import authConfig from "../config/auth";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
-import authConfig from "../config/auth";
+import {
+  addConnectedUser,
+  getConnectedUsers,
+  removeConnectedUser
+} from "./connectedUsers";
 
 let io: SocketIO;
 
@@ -15,7 +20,8 @@ export const initIO = (httpServer: Server): SocketIO => {
   });
 
   io.on("connection", socket => {
-    const { token } = socket.handshake.query;
+    const { token, userId } = socket.handshake.query;
+
     let tokenData = null;
     try {
       tokenData = verify(token, authConfig.secret);
@@ -26,7 +32,12 @@ export const initIO = (httpServer: Server): SocketIO => {
       return io;
     }
 
-    logger.info("Client Connected");
+    logger.info("Client Connected and added to the list of connected users");
+    if (userId) {
+      addConnectedUser(+userId);
+      io.emit("usersPresenceList", getConnectedUsers());
+    }
+
     socket.on("joinChatBox", (ticketId: string) => {
       logger.info("A client joined a ticket channel");
       socket.join(ticketId);
@@ -43,7 +54,13 @@ export const initIO = (httpServer: Server): SocketIO => {
     });
 
     socket.on("disconnect", () => {
-      logger.info("Client disconnected");
+      logger.info(
+        "Client disconnected and removed from the list of connected users"
+      );
+      if (userId) {
+        removeConnectedUser(+userId);
+        io.emit("usersPresenceList", getConnectedUsers());
+      }
     });
 
     return socket;

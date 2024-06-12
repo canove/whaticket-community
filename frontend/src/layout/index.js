@@ -13,6 +13,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import openSocket from "../services/socket-io";
 
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -22,6 +23,7 @@ import BackdropLoading from "../components/BackdropLoading";
 import NotificationsPopOver from "../components/NotificationsPopOver";
 import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
+import { UsersPresenceContext } from "../context/UsersPresenceContext";
 import { i18n } from "../translate/i18n";
 import MainListItems from "./MainListItems";
 
@@ -121,12 +123,25 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const { setConnectedUsers } = useContext(UsersPresenceContext);
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
       setDrawerOpen(true);
     }
   }, []);
+
+  useEffect(() => {
+    const socket = openSocket(user.id);
+
+    socket.on("usersPresenceList", (list) => {
+      setConnectedUsers(list);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     if (document.body.offsetWidth < 600) {

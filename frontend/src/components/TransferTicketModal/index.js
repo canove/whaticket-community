@@ -19,6 +19,7 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { UsersPresenceContext } from "../../context/UsersPresenceContext";
 import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
 import useWhatsApps from "../../hooks/useWhatsApps";
@@ -55,6 +56,7 @@ const TransferTicketModal = ({
   const classes = useStyles();
   const { findAll: findAllQueues } = useQueues();
   const { loadingWhatsapps, whatsApps } = useWhatsApps();
+  const { connectedUsers } = useContext(UsersPresenceContext);
 
   const { user: loggedInUser } = useContext(AuthContext);
 
@@ -151,6 +153,14 @@ const TransferTicketModal = ({
           <Autocomplete
             style={{ width: 300, marginBottom: 20 }}
             getOptionLabel={(option) => `${option.name}`}
+            renderOption={(option) => {
+              return (
+                <div>
+                  {connectedUsers.find((id) => id === option.id) ? "🟢" : "🟡"}{" "}
+                  {option.name}
+                </div>
+              );
+            }}
             onChange={(e, newValue) => {
               setSelectedUser(newValue);
               if (newValue != null && Array.isArray(newValue.queues)) {
@@ -164,6 +174,7 @@ const TransferTicketModal = ({
             filterOptions={filterOptions}
             freeSolo
             autoHighlight
+            openOnFocus={true}
             noOptionsText={i18n.t("transferTicketModal.noOptions")}
             loading={loading}
             renderInput={(params) => (

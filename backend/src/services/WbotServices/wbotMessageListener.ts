@@ -16,6 +16,7 @@ import Ticket from "../../models/Ticket";
 
 import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
+import { getConnectedUsers } from "../../libs/connectedUsers";
 import { getIO } from "../../libs/socket";
 import { logger } from "../../utils/logger";
 import verifyPrivateMessage from "../../utils/verifyPrivateMessage";
@@ -125,6 +126,7 @@ const verifyMediaMessage = async (
     );
   } catch (err) {
     Sentry.captureException(err);
+    // @ts-ignore
     logger.error(err);
   }
 
@@ -230,6 +232,8 @@ const verifyQueue = async (
 
   // IF the conection has only one queue, assign the ticket to this queue and return
   if (queues.length === 1) {
+    // console.log("solo se encontro un departamento para este wpp");
+
     await UpdateTicketService({
       ticketData: { queueId: queues[0].id },
       ticketId: ticket.id
@@ -268,17 +272,35 @@ const verifyQueue = async (
     debouncedSentMessage();
 
     if (queues[0].automaticAssignment && queues[0].users.length > 0) {
-      let userWithLessTickets = queues[0].users.sort((a, b) => {
+      // console.log("se asigna automaticamente");
+
+      let choosenQueueUsers = queues[0].users;
+
+      if (!queues[0].automaticAssignmentForOfflineUsers) {
+        // console.log("no se asigna a usuarios offline");
+        // console.log(getConnectedUsers());
+
+        const connectedUsers = getConnectedUsers();
+
+        choosenQueueUsers = choosenQueueUsers.filter(user =>
+          connectedUsers.includes(user.id)
+        );
+      }
+
+      let choosenQueueUserWithLessTickets = choosenQueueUsers.sort((a, b) => {
         return a.tickets.length - b.tickets.length;
       })[0];
 
       await UpdateTicketService({
-        ticketData: { userId: userWithLessTickets.id, status: "open" },
+        ticketData: {
+          userId: choosenQueueUserWithLessTickets.id,
+          status: "open"
+        },
         ticketId: ticket.id
       });
 
       verifyPrivateMessage(
-        `Se ha *asignó automáticamente* a ${userWithLessTickets.name}`,
+        `Se ha *asignó automáticamente* a ${choosenQueueUserWithLessTickets.name}`,
         ticket,
         ticket.contact
       );
@@ -337,18 +359,36 @@ const verifyQueue = async (
 
     debouncedSentMessage();
 
-    if (queues[0].automaticAssignment && queues[0].users.length > 0) {
-      let userWithLessTickets = queues[0].users.sort((a, b) => {
+    if (choosenQueue.automaticAssignment && choosenQueue.users.length > 0) {
+      // console.log("se asigna automaticamente");
+
+      let choosenQueueUsers = choosenQueue.users;
+
+      if (!choosenQueue.automaticAssignmentForOfflineUsers) {
+        // console.log("no se asigna a usuarios offline");
+        // console.log(getConnectedUsers());
+
+        const connectedUsers = getConnectedUsers();
+
+        choosenQueueUsers = choosenQueueUsers.filter(user =>
+          connectedUsers.includes(user.id)
+        );
+      }
+
+      let choosenQueueUserWithLessTickets = choosenQueueUsers.sort((a, b) => {
         return a.tickets.length - b.tickets.length;
       })[0];
 
       await UpdateTicketService({
-        ticketData: { userId: userWithLessTickets.id, status: "open" },
+        ticketData: {
+          userId: choosenQueueUserWithLessTickets.id,
+          status: "open"
+        },
         ticketId: ticket.id
       });
 
       verifyPrivateMessage(
-        `Se ha *asignó automáticamente* a ${userWithLessTickets.name}`,
+        `Se ha *asignó automáticamente* a ${choosenQueueUserWithLessTickets.name}`,
         ticket,
         ticket.contact
       );
