@@ -293,6 +293,7 @@ const TicketsManager = () => {
                   className={classes.badge}
                   badgeContent={openCount}
                   color="primary"
+                  max={99999}
                 >
                   {/* {i18n.t("ticketsList.assignedHeader")} */}
                   {showAllTickets ? "TODOS LOS CHATS" : "MIS CHATS"}
@@ -343,6 +344,7 @@ const TicketsManager = () => {
                 className={classes.badge}
                 badgeContent={pendingCount}
                 color="secondary"
+                max={99999}
               >
                 {i18n.t("ticketsList.pendingHeader")}
               </Badge>
