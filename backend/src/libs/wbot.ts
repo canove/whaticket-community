@@ -1,8 +1,15 @@
 import qrCode from "qrcode-terminal";
 import { Client, LocalAuth } from "whatsapp-web.js";
 import AppError from "../errors/AppError";
+import { debounce } from "../helpers/Debounce";
+import formatBody from "../helpers/Mustache";
+import Contact from "../models/Contact";
+import Ticket from "../models/Ticket";
 import Whatsapp from "../models/Whatsapp";
-import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+import {
+  handleMessageForSyncUnreadMessages,
+  verifyMessage
+} from "../services/WbotServices/wbotMessageListener";
 import { logger } from "../utils/logger";
 import { getIO } from "./socket";
 
@@ -13,10 +20,12 @@ interface Session extends Client {
 const sessions: Session[] = [];
 
 const syncUnreadMessages = async (wbot: Session) => {
-  console.log("---  START syncUnreadMessages");
-  console.time("Loop Time");
+  console.log("--- syncUnreadMessages ---");
 
-  const chats = await wbot.getChats();
+  let chats = await wbot.getChats();
+  chats = chats.filter(chat => chat.unreadCount > 0);
+
+  console.log("---  chats to syncUnreadMessages:", chats.length, "chats");
 
   const chatsChunksLimit = 5;
 
@@ -25,19 +34,56 @@ const syncUnreadMessages = async (wbot: Session) => {
     chunks.push(chats.slice(i, i + chatsChunksLimit));
   }
 
+  console.log("---  START syncUnreadMessages");
+  console.time("Loop Time");
+
   for (const chunk of chunks) {
     await Promise.all(
       chunk.map(async chat => {
         try {
-          if (chat.unreadCount > 0) {
-            const unreadMessages = await chat.fetchMessages({
-              limit: chat.unreadCount
-            });
+          // if (chat.unreadCount > 0) {
+          const unreadMessages = await chat.fetchMessages({
+            limit: chat.unreadCount
+          });
 
-            for (const msg of unreadMessages) {
-              await handleMessage(msg, wbot);
+          let lastTicket: Ticket | undefined;
+          let lastContact: Contact | undefined;
+
+          for (const msg of unreadMessages) {
+            // await handleMessage(msg, wbot);
+            let handleMessageForSyncUnreadMessagesResult =
+              await handleMessageForSyncUnreadMessages(msg, wbot, chat);
+
+            if (handleMessageForSyncUnreadMessagesResult) {
+              lastTicket = handleMessageForSyncUnreadMessagesResult.ticket;
+              lastContact = handleMessageForSyncUnreadMessagesResult.contact;
             }
+          }
 
+          if (lastTicket && lastContact && !chat.isGroup) {
+            const body = formatBody(
+              `\u200e${"En estos momentos tenemos un alto flujo de mensajes. Te atenderemos en breve, muchas gracias por tu espera."}\n`,
+              lastContact
+            );
+
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${lastContact?.number}@c.us`,
+                  body
+                );
+
+                // @ts-ignore
+                await verifyMessage(sentMessage, lastTicket, lastContact);
+                await chat.sendSeen();
+                await lastTicket?.update({ userHadContact: true });
+              },
+              3000,
+              lastTicket.id
+            );
+
+            debouncedSentMessage();
+          } else {
             await chat.sendSeen();
           }
         } catch (error) {
@@ -148,8 +194,12 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           sessions.push(wbot);
         }
 
+        io.emit("startSyncUnreadMessages");
+
         wbot.sendPresenceAvailable();
-        //await syncUnreadMessages(wbot);
+        await syncUnreadMessages(wbot);
+
+        io.emit("endSyncUnreadMessages");
 
         resolve(wbot);
       });
