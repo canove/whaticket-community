@@ -1,15 +1,10 @@
 import qrCode from "qrcode-terminal";
 import { Client, LocalAuth } from "whatsapp-web.js";
 import AppError from "../errors/AppError";
-import { debounce } from "../helpers/Debounce";
-import formatBody from "../helpers/Mustache";
 import Contact from "../models/Contact";
 import Ticket from "../models/Ticket";
 import Whatsapp from "../models/Whatsapp";
-import {
-  handleMessageForSyncUnreadMessages,
-  verifyMessage
-} from "../services/WbotServices/wbotMessageListener";
+import { handleMessageForSyncUnreadMessages } from "../services/WbotServices/wbotMessageListener";
 import { logger } from "../utils/logger";
 import { getIO } from "./socket";
 
@@ -60,30 +55,35 @@ const syncUnreadMessages = async (wbot: Session) => {
             }
           }
 
-          if (lastTicket && lastContact && !chat.isGroup) {
-            const body = formatBody(
-              `\u200e${"En estos momentos tenemos un alto flujo de mensajes. Te atenderemos en breve, muchas gracias por tu espera."}\n`,
-              lastContact
-            );
+          // if (lastTicket && lastContact && !chat.isGroup) {
+          //   const body = formatBody(
+          //     `\u200e${"En estos momentos tenemos un alto flujo de mensajes. Te atenderemos en breve, muchas gracias por tu espera."}\n`,
+          //     lastContact
+          //   );
 
-            const debouncedSentMessage = debounce(
-              async () => {
-                const sentMessage = await wbot.sendMessage(
-                  `${lastContact?.number}@c.us`,
-                  body
-                );
+          //   const debouncedSentMessage = debounce(
+          //     async () => {
+          //       const sentMessage = await wbot.sendMessage(
+          //         `${lastContact?.number}@c.us`,
+          //         body
+          //       );
 
-                // @ts-ignore
-                await verifyMessage(sentMessage, lastTicket, lastContact);
-                await chat.sendSeen();
-                await lastTicket?.update({ userHadContact: true });
-              },
-              3000,
-              lastTicket.id
-            );
+          //       // @ts-ignore
+          //       await verifyMessage(sentMessage, lastTicket, lastContact);
+          //       await chat.sendSeen();
+          //       await lastTicket?.update({ userHadContact: true });
+          //     },
+          //     3000,
+          //     lastTicket.id
+          //   );
 
-            debouncedSentMessage();
-          } else {
+          //   debouncedSentMessage();
+          // } else {
+          //   await chat.sendSeen();
+          //   }
+
+          if (lastTicket) {
+            await lastTicket?.update({ userHadContact: true });
             await chat.sendSeen();
           }
         } catch (error) {
