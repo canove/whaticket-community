@@ -29,6 +29,20 @@ const ListMessagesService = async ({
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
+  const ticketMessages = await Message.findAll({
+    where: { ticketId },
+    attributes: ["id", "timestamp"]
+  });
+
+  let findMessagesOrderProp = "timestamp";
+
+  // search if the ticket has messages with no timestamp
+  // this means thah the chat was created before we start to save the timestamp
+  // and we need to order the messages by createdAt
+  if (ticketMessages.find(msg => !msg.timestamp)) {
+    findMessagesOrderProp = "createdAt";
+  }
+
   const { count, rows: messages } = await Message.findAndCountAll({
     where: { ticketId },
     limit,
@@ -41,7 +55,7 @@ const ListMessagesService = async ({
       }
     ],
     offset,
-    order: [["createdAt", "DESC"]]
+    order: [[findMessagesOrderProp, "DESC"]]
   });
 
   const hasMore = count > offset + messages.length;

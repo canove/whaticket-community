@@ -188,7 +188,8 @@ const verifyMediaMessage = async (
     read: msg.fromMe,
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0],
-    quotedMsgId: quotedMsg?.id
+    quotedMsgId: quotedMsg?.id,
+    timestamp: msg.timestamp
   };
 
   if (updateTicketLastMessage) {
@@ -223,7 +224,8 @@ export const verifyMessage = async (
     mediaType: msg.type,
     read: msg.fromMe,
     quotedMsgId: quotedMsg?.id,
-    isPrivate
+    isPrivate,
+    timestamp: msg.timestamp
   };
 
   if (updateTicketLastMessage) {
@@ -742,7 +744,8 @@ const handleMessage = async (
 const handleMessageForSyncUnreadMessages = async (
   msg: WbotMessage,
   wbot: Session,
-  chat: WAWebJS.Chat
+  chat: WAWebJS.Chat,
+  ignoreMyMessages = true
 ): Promise<{ ticket: Ticket; contact: Contact } | undefined> => {
   if (!isValidMsg(msg)) {
     return;
@@ -757,7 +760,9 @@ const handleMessageForSyncUnreadMessages = async (
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
       // if so, this message was already been stored in database;
-      if (/\u200e/.test(msg.body[0])) return;
+      if (ignoreMyMessages) {
+        if (/\u200e/.test(msg.body[0])) return;
+      }
 
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"

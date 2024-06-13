@@ -47,6 +47,9 @@ class Message extends Model<Message> {
   @Column
   mediaType: string;
 
+  @Column
+  timestamp: number;
+
   @Default(false)
   @Column
   isDeleted: boolean;
