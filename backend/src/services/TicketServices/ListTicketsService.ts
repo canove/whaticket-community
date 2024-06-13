@@ -26,7 +26,7 @@ interface Request {
   showAll?: string;
   userId: string;
   withUnreadMessages?: string;
-  queueIds: number[];
+  queueIds: Array<number>;
 }
 
 interface Response {
@@ -59,7 +59,12 @@ const ListTicketsService = async ({
       },
       { status: "pending" }
     ],
-    queueId: { [Op.or]: [queueIds, null] }
+    queueId: {
+      // @ts-ignore
+      [Op.or]: queueIds?.includes(null)
+        ? [queueIds.filter(id => id !== null), null]
+        : [queueIds]
+    }
   };
   let includeCondition: Includeable[];
 
@@ -97,7 +102,14 @@ const ListTicketsService = async ({
   ];
 
   if (showAll === "true") {
-    whereCondition = { queueId: { [Op.or]: [queueIds, null] } };
+    whereCondition = {
+      queueId: {
+        // @ts-ignore
+        [Op.or]: queueIds?.includes(null)
+          ? [queueIds.filter(id => id !== null), null]
+          : [queueIds]
+      }
+    };
   }
 
   if (status) {
@@ -164,7 +176,12 @@ const ListTicketsService = async ({
 
     whereCondition = {
       [Op.or]: [{ userId }, { status: "pending" }],
-      queueId: { [Op.or]: [userQueueIds, null] },
+      queueId: {
+        // @ts-ignore
+        [Op.or]: queueIds?.includes(null)
+          ? [queueIds.filter(id => id !== null), null]
+          : [queueIds]
+      },
       unreadMessages: { [Op.gt]: 0 }
     };
   }
