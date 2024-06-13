@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
 import { getIO } from "../libs/socket";
 
+import { parseISO } from "date-fns";
 import formatBody from "../helpers/Mustache";
+import { getWbot } from "../libs/wbot";
+import Message from "../models/Message";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import { handleMessageForSyncUnreadMessages } from "../services/WbotServices/wbotMessageListener";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 
 type IndexQuery = {
@@ -125,4 +129,71 @@ export const remove = async (
   });
 
   return res.status(200).json({ message: "ticket deleted" });
+};
+
+export const recoverAllMessages = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
+
+  const ticket = await ShowTicketService(ticketId);
+
+  const whatsapp = await ShowWhatsAppService(ticket.whatsappId);
+
+  const wbot = getWbot(whatsapp.id);
+
+  const ticketChat = await wbot.getChatById(
+    `${ticket.contact.number}${ticket.contact.isGroup ? "@g.us" : "@c.us"}`
+  );
+
+  const ticketMessages = await ticketChat.fetchMessages({ limit: 250 });
+
+  console.log("se van a recuperar: ", ticketMessages.length, "mensajes");
+
+  if (ticketMessages && ticketMessages.length > 0) {
+    await Message.destroy({ where: { ticketId, isPrivate: false } });
+
+    const privateMessages = await Message.findAll({
+      where: {
+        ticketId,
+        isPrivate: true
+      }
+    });
+
+    await Promise.all(
+      privateMessages.map(async message => {
+        try {
+          const timestamp = parseISO(message.createdAt.toISOString()).getTime();
+          await message.update({ timestamp: Math.floor(timestamp / 1000) });
+        } catch (error) {
+          console.log(error);
+        }
+      })
+    );
+
+    const BATCH_SIZE = 30;
+
+    for (let i = 0; i < ticketMessages.length; i += BATCH_SIZE) {
+      const batch = ticketMessages.slice(i, i + BATCH_SIZE);
+
+      const updatePromises = batch.map(async message => {
+        try {
+          await handleMessageForSyncUnreadMessages(
+            message,
+            wbot,
+            ticketChat,
+            false
+          );
+        } catch (error) {
+          console.error(`Error actualizando el mensaje ${message}:`, error);
+        }
+      });
+      await Promise.all(updatePromises);
+    }
+  }
+
+  console.log("se recuperaron los mensajes");
+
+  return res.status(200).json({ message: "success" });
 };

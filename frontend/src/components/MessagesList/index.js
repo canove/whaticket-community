@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
 
 import clsx from "clsx";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format, fromUnixTime, isSameDay, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
 
 import {
@@ -561,14 +561,24 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
           key={`timestamp-${message.id}`}
         >
           <div className={classes.dailyTimestampText}>
-            {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
+            {format(
+              messagesList[index].timestamp
+                ? fromUnixTime(messagesList[index].timestamp)
+                : parseISO(messagesList[index].createdAt),
+              "dd/MM/yyyy"
+            )}
           </div>
         </span>
       );
     }
     if (index < messagesList.length - 1) {
-      let messageDay = parseISO(messagesList[index].createdAt);
-      let previousMessageDay = parseISO(messagesList[index - 1].createdAt);
+      let messageDay = messagesList[index].timestamp
+        ? fromUnixTime(messagesList[index].timestamp)
+        : parseISO(messagesList[index].createdAt);
+
+      let previousMessageDay = messagesList[index - 1].timestamp
+        ? fromUnixTime(messagesList[index - 1].timestamp)
+        : parseISO(messagesList[index - 1].createdAt);
 
       if (!isSameDay(messageDay, previousMessageDay)) {
         return (
@@ -577,7 +587,12 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
             key={`timestamp-${message.id}`}
           >
             <div className={classes.dailyTimestampText}>
-              {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
+              {format(
+                messagesList[index].timestamp
+                  ? fromUnixTime(messagesList[index].timestamp)
+                  : parseISO(messagesList[index].createdAt),
+                "dd/MM/yyyy"
+              )}
             </div>
           </span>
         );
@@ -586,7 +601,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     if (index === messagesList.length - 1) {
       return (
         <div
-          key={`ref-${message.createdAt}`}
+          key={`ref-${message.timestamp || message.createdAt}`}
           ref={lastMessageRef}
           style={{ float: "left", clear: "both" }}
         />
@@ -664,7 +679,12 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   <span className={classes.timestamp}>
-                    {format(parseISO(message.createdAt), "HH:mm")}
+                    {format(
+                      messagesList[index].timestamp
+                        ? fromUnixTime(messagesList[index].timestamp)
+                        : parseISO(messagesList[index].createdAt),
+                      "HH:mm"
+                    )}
                   </span>
                 </div>
               </div>
@@ -712,7 +732,12 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
                   <span className={classes.timestamp}>
-                    {format(parseISO(message.createdAt), "HH:mm")}
+                    {format(
+                      messagesList[index].timestamp
+                        ? fromUnixTime(messagesList[index].timestamp)
+                        : parseISO(messagesList[index].createdAt),
+                      "HH:mm"
+                    )}
                     {message.isPrivate ? (
                       <TextsmsOutlinedIcon
                         fontSize="small"

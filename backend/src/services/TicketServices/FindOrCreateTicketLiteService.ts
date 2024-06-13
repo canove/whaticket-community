@@ -32,8 +32,13 @@ const FindOrCreateTicketLiteService = async (
   });
 
   // if ticket exists, update his unreadMessages
-  if (ticket && ticket.unreadMessages !== unreadMessages) {
-    await ticket.update({ unreadMessages, lastMessageTimestamp });
+  if (ticket && (unreadMessages || lastMessageTimestamp)) {
+    await ticket.update({
+      ...(ticket.unreadMessages !== unreadMessages && { unreadMessages }),
+      ...(ticket.lastMessageTimestamp < (lastMessageTimestamp || 0) && {
+        lastMessageTimestamp
+      })
+    });
   }
 
   // if ticket not exists and groupContact is trully, find a ticket from the groupContact and from the whatsappId
@@ -52,7 +57,10 @@ const FindOrCreateTicketLiteService = async (
         status: "pending",
         userId: null,
         unreadMessages,
-        lastMessageTimestamp
+        ...(lastMessageTimestamp &&
+          ticket.lastMessageTimestamp < lastMessageTimestamp && {
+            lastMessageTimestamp
+          })
       });
     }
   }
@@ -76,7 +84,10 @@ const FindOrCreateTicketLiteService = async (
         status: "pending",
         userId: null,
         unreadMessages,
-        lastMessageTimestamp
+        ...(lastMessageTimestamp &&
+          ticket.lastMessageTimestamp < lastMessageTimestamp && {
+            lastMessageTimestamp
+          })
       });
     }
   }
