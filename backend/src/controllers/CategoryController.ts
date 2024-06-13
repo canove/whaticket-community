@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getIO, getIOClient } from "../libs/socket";
+import { getIO } from "../libs/socket";
 import CreateCategoryService from "../services/CategoryService/CreateCategoryService";
 import DeleteCategoryService from "../services/CategoryService/DeleteCategoryService";
 import ListCategorysService from "../services/CategoryService/ListCategorysService";
@@ -26,11 +26,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     category
   });
 
-  /*const ioClient = getIOClient();
+  /* const ioClient = getIOClient();
   ioClient.emit("category", {
     action: "update",
     category
-  });*/
+  }); */
 
   return res.status(200).json(category);
 };

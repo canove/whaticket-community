@@ -8,6 +8,6 @@ const server = app.listen(process.env.PORT, () => {
   logger.info(`Server started on port: ${process.env.PORT}`);
 });
 
-initIO(server);
+initIO();
 StartAllWhatsAppsSessions();
 gracefulShutdown(server);

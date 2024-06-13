@@ -28,11 +28,41 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
     );
   }
 
-  const io = getIO();
+  /* const io = getIO();
   io.to(ticket.status).to("notification").emit("ticket", {
     action: "updateUnread",
     ticketId: ticket.id
-  });
+  }); */
+  // Define la URL a la que se va a enviar la solicitud
+  const url = "http://localhost:8081/toEmit";
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      to: [ticket.status],
+      event: {
+        name: "ticket",
+        data: {
+          action: "updateUnread",
+          ticketId: ticket.id
+        }
+      }
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Success:", data);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
 };
 
 export default SetTicketMessagesAsRead;

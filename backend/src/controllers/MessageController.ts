@@ -87,11 +87,41 @@ export const remove = async (
 
   const message = await DeleteWhatsAppMessage(messageId);
 
-  const io = getIO();
+  /* const io = getIO();
   io.to(message.ticketId.toString()).emit("appMessage", {
     action: "update",
     message
-  });
+  }); */
+  // Define la URL a la que se va a enviar la solicitud
+  const url = "http://localhost:8081/toEmit";
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      to: [message.ticketId.toString()],
+      event: {
+        name: "appMessage",
+        data: {
+          action: "update",
+          message
+        }
+      }
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Success:", data);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
 
   return res.send();
 };
