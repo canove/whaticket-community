@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
-import { getIO } from "../libs/socket";
 import Message from "../models/Message";
 
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
@@ -93,7 +92,7 @@ export const remove = async (
     message
   }); */
   // Define la URL a la que se va a enviar la solicitud
-  const url = "http://localhost:8081/toEmit";
+  const url = process.env.NODE_URL + "/toEmit";
   fetch(url, {
     method: "POST",
     headers: {

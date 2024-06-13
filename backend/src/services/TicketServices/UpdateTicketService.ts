@@ -1,6 +1,5 @@
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
-import { getIO } from "../../libs/socket";
 import Ticket from "../../models/Ticket";
 import ShowTicketService from "./ShowTicketService";
 
@@ -84,7 +83,7 @@ const UpdateTicketService = async ({
       ticketId: ticket.id
     }); */
     // Define la URL a la que se va a enviar la solicitud
-    const url = "http://localhost:8081/toEmit";
+    const url = process.env.NODE_URL + "/toEmit";
     fetch(url, {
       method: "POST",
       headers: {
@@ -123,7 +122,7 @@ const UpdateTicketService = async ({
       ticket
     }); */
   // Define la URL a la que se va a enviar la solicitud
-  const url = "http://localhost:8081/toEmit";
+  const url = process.env.NODE_URL + "/toEmit";
   fetch(url, {
     method: "POST",
     headers: {

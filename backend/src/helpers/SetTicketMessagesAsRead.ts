@@ -1,4 +1,3 @@
-import { getIO } from "../libs/socket";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
 import { logger } from "../utils/logger";
@@ -34,7 +33,7 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
     ticketId: ticket.id
   }); */
   // Define la URL a la que se va a enviar la solicitud
-  const url = "http://localhost:8081/toEmit";
+  const url = process.env.NODE_URL + "/toEmit";
   fetch(url, {
     method: "POST",
     headers: {
