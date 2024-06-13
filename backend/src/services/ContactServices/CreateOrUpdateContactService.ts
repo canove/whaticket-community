@@ -31,17 +31,19 @@ const CreateOrUpdateContactService = async ({
   contact = await Contact.findOne({ where: { number } });
 
   if (contact) {
-    contact.update({ profilePicUrl });
+    if (profilePicUrl) {
+      contact.update({ profilePicUrl });
 
-    io.emit("contact", {
-      action: "update",
-      contact
-    });
+      io.emit("contact", {
+        action: "update",
+        contact
+      });
+    }
   } else {
     contact = await Contact.create({
       name,
       number,
-      profilePicUrl,
+      ...(profilePicUrl && { profilePicUrl }),
       email,
       isGroup,
       extraInfo

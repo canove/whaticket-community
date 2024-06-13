@@ -19,6 +19,7 @@ import formatBody from "../../helpers/Mustache";
 import { getConnectedUsers } from "../../libs/connectedUsers";
 import { getIO } from "../../libs/socket";
 import { logger } from "../../utils/logger";
+import timeoutPromise from "../../utils/timeoutPromise";
 import verifyPrivateMessage from "../../utils/verifyPrivateMessage";
 import ShowChatbotOptionService from "../ChatbotOptionService/ShowChatbotOptionService";
 import CreateContactService from "../ContactServices/CreateContactService";
@@ -39,14 +40,25 @@ const writeFileAsync = promisify(writeFile);
  * Save or update the contact in the database (name, number, profilePicUrl)
  */
 const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
-  const profilePicUrl = await msgContact.getProfilePicUrl();
+  const profilePicUrl = await timeoutPromise(
+    msgContact.getProfilePicUrl(),
+    200
+  );
 
-  const contactData = {
+  const contactData: {
+    name: string;
+    number: string;
+    profilePicUrl?: string;
+    isGroup: boolean;
+  } = {
     name: msgContact.name || msgContact.pushname || msgContact.id.user,
     number: msgContact.id.user,
-    profilePicUrl,
     isGroup: msgContact.isGroup
   };
+
+  if (profilePicUrl) {
+    contactData.profilePicUrl = profilePicUrl;
+  }
 
   const contact = CreateOrUpdateContactService(contactData);
 
@@ -826,7 +838,7 @@ const handleMessageForSyncUnreadMessages = async (
 };
 
 const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
-  await new Promise(r => setTimeout(r, 500));
+  await new Promise(r => setTimeout(r, 600));
 
   const io = getIO();
 
