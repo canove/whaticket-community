@@ -147,7 +147,7 @@ export const recoverAllMessages = async (
     `${ticket.contact.number}${ticket.contact.isGroup ? "@g.us" : "@c.us"}`
   );
 
-  const ticketMessages = await ticketChat.fetchMessages({ limit: 250 });
+  const ticketMessages = await ticketChat.fetchMessages({ limit: 500 });
 
   console.log("se van a recuperar: ", ticketMessages.length, "mensajes");
 
