@@ -1,39 +1,39 @@
-import React, { useState, useEffect, useReducer, useContext } from "react";
-import openSocket from "../../services/socket-io";
-import { toast } from "react-toastify";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import openSocket from "../../services/socket-io";
 
-import { makeStyles } from "@material-ui/core/styles";
+import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import Avatar from "@material-ui/core/Avatar";
-import WhatsAppIcon from "@material-ui/icons/WhatsApp";
-import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import { makeStyles } from "@material-ui/core/styles";
+import SearchIcon from "@material-ui/icons/Search";
+import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
 
-import api from "../../services/api";
-import TableRowSkeleton from "../../components/TableRowSkeleton";
-import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
+import ContactModal from "../../components/ContactModal";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
+import api from "../../services/api";
 
-import { i18n } from "../../translate/i18n";
-import MainHeader from "../../components/MainHeader";
-import Title from "../../components/Title";
-import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
-import MainContainer from "../../components/MainContainer";
-import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../../components/Can";
+import MainContainer from "../../components/MainContainer";
+import MainHeader from "../../components/MainHeader";
+import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
+import Title from "../../components/Title";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import toastError from "../../errors/toastError";
+import { i18n } from "../../translate/i18n";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_CONTACTS") {
@@ -309,7 +309,21 @@ const Contacts = () => {
                   <TableCell align="center">
                     <IconButton
                       size="small"
-                      onClick={() => handleSaveTicket(contact.id)}
+                      onClick={() => {
+                        console.log(contact);
+
+                        // get the last ticket of the contact
+                        // ordena los tickets por id de mayor a meno
+                        const tickets = contact.tickets.sort(
+                          (a, b) => b.id - a.id
+                        );
+
+                        if (tickets.length === 0) {
+                          return;
+                        }
+
+                        history.push(`/tickets/${tickets[0].id}`);
+                      }}
                     >
                       <WhatsAppIcon />
                     </IconButton>
