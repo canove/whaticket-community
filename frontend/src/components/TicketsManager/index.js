@@ -106,7 +106,7 @@ const TicketsManager = () => {
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
 
-  const userQueueIds = [...user.queues.map((q) => q.id), null];
+  const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);

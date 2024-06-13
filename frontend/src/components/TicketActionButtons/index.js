@@ -200,7 +200,7 @@ const TicketActionButtons = ({ ticket }) => {
             ticket={ticket}
           />
 
-          {(ticket.userId === user?.id || user?.profile === "admin") && (
+          {ticket.userId === user?.id && (
             <IconButton onClick={handleOpenTicketOptionsMenu}>
               <MoreVert />
             </IconButton>
