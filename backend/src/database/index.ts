@@ -3,6 +3,7 @@ import Category from "../models/Category";
 import ChatbotOption from "../models/ChatbotOption";
 import Contact from "../models/Contact";
 import ContactCustomField from "../models/ContactCustomField";
+import GroupContact from "../models/GroupContact";
 import Message from "../models/Message";
 import Queue from "../models/Queue";
 import QueueCategory from "../models/QueueCategory";
@@ -31,6 +32,7 @@ const models = [
   TicketHelpUser,
   Message,
   Whatsapp,
+  GroupContact,
   ContactCustomField,
   Setting,
   Queue,

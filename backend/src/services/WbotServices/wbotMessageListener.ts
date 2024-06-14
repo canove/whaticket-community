@@ -39,7 +39,9 @@ const writeFileAsync = promisify(writeFile);
 /**
  * Save or update the contact in the database (name, number, profilePicUrl)
  */
-const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
+export const verifyContact = async (
+  msgContact: WbotContact
+): Promise<Contact> => {
   const profilePicUrl = await timeoutPromise(
     msgContact.getProfilePicUrl(),
     200
