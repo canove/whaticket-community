@@ -20,7 +20,7 @@ import {
 	IconButton
   } from '@material-ui/core';
 
-import { CloudUpload, Visibility, VisibilityOff } from '@material-ui/icons';
+import { AccountCircle, CloudUpload, Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { makeStyles, styled } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -212,10 +212,11 @@ const UserModal = ({ open, onClose, userId }) => {
 				>
 					{({ touched, errors, isSubmitting }) => (
 						<Form style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-							{ (user.image !== null || temporaryImage !== null) && <img 
+							{ (user.image || temporaryImage) ? <img 
 								src={temporaryImage ? `${process.env.REACT_APP_BACKEND_URL}public/uploads/temp/${temporaryImage}` : `${process.env.REACT_APP_BACKEND_URL}public/uploads/${user.image}`}
 								alt={user.name}
-								style={{ width: "300px", height: "300px", borderRadius: "50%", objectFit: "cover"}} />}
+								style={{ width: "300px", height: "300px", borderRadius: "50%", objectFit: "cover"}} />
+							: <AccountCircle style={{ width: "300px", height: "300px"}} />}
 							<DialogContent dividers>
 								<div className={classes.multFieldLine}>
 									<Field
