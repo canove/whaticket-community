@@ -312,16 +312,21 @@ const Contacts = () => {
                       onClick={() => {
                         console.log(contact);
 
-                        // get the last ticket of the contact
-                        // ordena los tickets por id de mayor a meno
-                        const tickets = contact.tickets.sort(
-                          (a, b) => b.id - a.id
-                        );
+                        const contactTickets = contact.tickets;
 
-                        if (tickets.length === 0) {
+                        // si no tiene ticket crearle
+                        if (contactTickets.length === 0) {
+                          console.log("se creo otro ticket");
+                          handleSaveTicket(contact.id);
                           return;
                         }
 
+                        // ordena los tickets por id de mayor a meno
+                        const tickets = contactTickets.sort(
+                          (a, b) => b.id - a.id
+                        );
+
+                        // mandarlo al ultimo ticket del contact
                         history.push(`/tickets/${tickets[0].id}`);
                       }}
                     >
