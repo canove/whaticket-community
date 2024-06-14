@@ -12,13 +12,15 @@ import Whatsapp from "./Whatsapp";
 
 @Table
 class GroupContact extends Model<GroupContact> {
-  @ForeignKey(() => Contact)
   @PrimaryKey
+  @Column
+  id: string;
+
+  @ForeignKey(() => Contact)
   @Column
   groupContactId: number;
 
   @ForeignKey(() => Contact)
-  @PrimaryKey
   @Column
   participantContactId: number;
 
