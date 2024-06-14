@@ -139,6 +139,7 @@ const Connections = () => {
 
   const handleCloseConectionsMenu = (e) => {
     setAnchorEl(null);
+    setSelectedWhatsApp(null);
   };
 
   const handleOpenWhatsAppModal = () => {
@@ -431,13 +432,16 @@ const Connections = () => {
                           size="small"
                           id="messageActionsButton"
                           className={classes.messageActionsButton}
-                          onClick={(e) => handleOpenConectionsMenu(e)}
+                          onClick={(e) => {
+                            handleOpenConectionsMenu(e);
+                            setSelectedWhatsApp(whatsApp);
+                          }}
                         >
                           <MoreVert />
                         </IconButton>
 
                         <ConectionsMenu
-                          whatsApp={whatsApp}
+                          whatsApp={selectedWhatsApp}
                           anchorEl={anchorEl}
                           menuOpen={conectionsMenuOpen}
                           handleClose={handleCloseConectionsMenu}
