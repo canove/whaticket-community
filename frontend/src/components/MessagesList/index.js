@@ -392,9 +392,13 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("connect", () => socket.emit("joinChatBox", ticketId));
+    socket.on("connect", () => {
+      console.log("socket conectado");
+      socket.emit("joinChatBox", ticketId);
+    });
 
     socket.on("appMessage", (data) => {
+      console.log("appMessage", data);
       if (data.action === "create") {
         dispatch({ type: "ADD_MESSAGE", payload: data.message });
         scrollToBottom();
@@ -406,6 +410,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     });
 
     return () => {
+      console.log("socket desconectado");
       socket.disconnect();
     };
   }, [ticketId]);

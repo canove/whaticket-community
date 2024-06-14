@@ -60,6 +60,8 @@ const ConectionsMenu = ({ whatsApp, menuOpen, handleClose, anchorEl }) => {
           disabled={syncGroupContactsTable}
           onClick={async () => {
             setSyncGroupContactsTableActived(true);
+
+            console.log("whatsApp.id", whatsApp.id);
             try {
               await api.post(
                 `/whatsappsession/syncGroupContactsTable/${whatsApp.id}`

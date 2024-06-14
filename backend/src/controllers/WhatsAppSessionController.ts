@@ -188,7 +188,8 @@ const syncGroupContactsTable = async (
             await GroupContact.findOrCreate({
               where: {
                 groupContactId: groupContactInDB.id,
-                participantContactId: participantContactId
+                participantContactId: participantContactId,
+                whatsappId: whatsappId
               },
               defaults: {
                 groupContactId: groupContactInDB.id,
