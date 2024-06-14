@@ -22,18 +22,19 @@ import {
   CropFree,
   DeleteOutline,
   Edit,
+  MoreVert,
   SignalCellular4Bar,
   SignalCellularConnectedNoInternet0Bar,
   SignalCellularConnectedNoInternet2Bar,
 } from "@material-ui/icons";
 
-import ButtonWithSpinner from "../../components/ButtonWithSpinner";
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import Title from "../../components/Title";
 
+import ConectionsMenu from "../../components/ConectionsMenu";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
 import WhatsAppModal from "../../components/WhatsAppModal";
@@ -112,6 +113,9 @@ const Connections = () => {
   const [confirmModalInfo, setConfirmModalInfo] = useState(
     confirmationModalInitialState
   );
+  // const [conectionsMenuOpen, setConectionsMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const conectionsMenuOpen = Boolean(anchorEl);
 
   const handleStartWhatsAppSession = async (whatsAppId) => {
     try {
@@ -127,6 +131,14 @@ const Connections = () => {
     } catch (err) {
       toastError(err);
     }
+  };
+
+  const handleOpenConectionsMenu = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleCloseConectionsMenu = (e) => {
+    setAnchorEl(null);
   };
 
   const handleOpenWhatsAppModal = () => {
@@ -389,7 +401,7 @@ const Connections = () => {
                           <DeleteOutline />
                         </IconButton>
 
-                        <ButtonWithSpinner
+                        {/* <ButtonWithSpinner
                           variant="contained"
                           color="default"
                           loading={syncContactsIsActived}
@@ -412,7 +424,24 @@ const Connections = () => {
                           }}
                         >
                           Sincronizar contactos
-                        </ButtonWithSpinner>
+                        </ButtonWithSpinner> */}
+
+                        <IconButton
+                          variant="contained"
+                          size="small"
+                          id="messageActionsButton"
+                          className={classes.messageActionsButton}
+                          onClick={(e) => handleOpenConectionsMenu(e)}
+                        >
+                          <MoreVert />
+                        </IconButton>
+
+                        <ConectionsMenu
+                          whatsApp={whatsApp}
+                          anchorEl={anchorEl}
+                          menuOpen={conectionsMenuOpen}
+                          handleClose={handleCloseConectionsMenu}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
