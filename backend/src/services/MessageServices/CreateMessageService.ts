@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import Whatsapp from "../../models/Whatsapp";
@@ -12,6 +13,7 @@ interface MessageData {
   mediaType?: string;
   mediaUrl?: string;
   isPrivate?: boolean;
+  isDuplicated?: boolean;
 }
 interface Request {
   messageData: MessageData;
@@ -20,7 +22,14 @@ interface Request {
 const CreateMessageService = async ({
   messageData
 }: Request): Promise<Message> => {
-  await Message.upsert(messageData);
+  const meesageAlreadyCreated = await Message.findByPk(messageData.id);
+
+  if (meesageAlreadyCreated) {
+    messageData.id = uuidv4();
+    messageData.isDuplicated = true;
+  }
+
+  await Message.create(messageData);
 
   const message = await Message.findByPk(messageData.id, {
     include: [
