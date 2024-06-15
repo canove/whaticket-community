@@ -57,6 +57,9 @@ class Message extends Model<Message> {
   @Column
   isPrivate: boolean;
 
+  @Column
+  isDuplicated: boolean;
+
   @CreatedAt
   @Column(DataType.DATE(6))
   createdAt: Date;
