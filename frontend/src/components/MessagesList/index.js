@@ -328,6 +328,8 @@ const reducer = (state, action) => {
 
     if (messageIndex !== -1) {
       state[messageIndex] = messageToUpdate;
+    } else {
+      state.push(messageToUpdate);
     }
 
     return [...state];
