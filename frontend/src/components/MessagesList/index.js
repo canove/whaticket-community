@@ -416,17 +416,17 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
       socket.emit("joinChatBox", ticketId);
     });
 
-    // socket.on("appMessage", (data) => {
-    //   console.log("appMessage", data);
-    //   if (data.action === "create") {
-    //     dispatch({ type: "ADD_MESSAGE", payload: data.message });
-    //     scrollToBottom();
-    //   }
+    socket.on("appMessage", (data) => {
+      console.log("appMessage", data);
+      if (data.action === "create") {
+        dispatch({ type: "ADD_MESSAGE", payload: data.message });
+        scrollToBottom();
+      }
 
-    //   if (data.action === "update") {
-    //     dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
-    //   }
-    // });
+      if (data.action === "update") {
+        dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
+      }
+    });
 
     return () => {
       console.log("socket desconectado");
