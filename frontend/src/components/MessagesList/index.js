@@ -363,31 +363,41 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
 
   useEffect(() => {
     setLoading(true);
-    const delayDebounceFn = setTimeout(() => {
-      const fetchMessages = async () => {
-        try {
-          const { data } = await api.get("/messages/" + ticketId, {
-            params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
-          });
 
-          if (currentTicketId.current === ticketId) {
-            dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
-            setHasMore(data.hasMore);
-            setLoading(false);
-          }
+    const fetchMessages = async () => {
+      try {
+        const { data } = await api.get("/messages/" + ticketId, {
+          params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
+        });
 
-          if (pageNumber === 1 && data.messages.length > 1) {
-            scrollToBottom();
-          }
-        } catch (err) {
+        if (currentTicketId.current === ticketId) {
+          dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
+          setHasMore(data.hasMore);
           setLoading(false);
-          toastError(err);
         }
-      };
+
+        if (pageNumber === 1 && data.messages.length > 1) {
+          scrollToBottom();
+        }
+      } catch (err) {
+        setLoading(false);
+        toastError(err);
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      console.log("fetching messages in setTimeout");
       fetchMessages();
     }, 500);
+
+    const intervalFn = setInterval(() => {
+      console.log("fetching messages in setInterval");
+      fetchMessages();
+    }, 5000);
+
     return () => {
       clearTimeout(delayDebounceFn);
+      clearInterval(intervalFn);
     };
   }, [pageNumber, ticketId]);
 
