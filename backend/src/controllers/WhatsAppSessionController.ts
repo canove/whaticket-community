@@ -261,7 +261,8 @@ const syncGroupContactsTable = async (
               }
             });
 
-            if (GroupContactEncontrado) {
+            // si no se encuentra la relación buscada añadirla
+            if (!GroupContactEncontrado) {
               GroupContact.create({
                 groupContactId: groupContactInDB.id,
                 participantContactId: participantContactId,
