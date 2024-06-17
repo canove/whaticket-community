@@ -293,7 +293,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const reducer = (state, action) => {
-  if (action.type === "LOAD_MESSAGES") {
+  if (action.type === "LOAD_MESSAGES" || action.type === "LOAD_NEW_MESSAGES") {
     const messages = action.payload;
     const newMessages = [];
 
@@ -306,7 +306,11 @@ const reducer = (state, action) => {
       }
     });
 
-    return [...newMessages, ...state];
+    if (action.type === "LOAD_MESSAGES") {
+      return [...newMessages, ...state];
+    } else if (action.type === "LOAD_NEW_MESSAGES") {
+      return [...state, ...newMessages];
+    }
   }
 
   if (action.type === "ADD_MESSAGE") {
@@ -364,14 +368,17 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   useEffect(() => {
     setLoading(true);
 
-    const fetchMessages = async () => {
+    const fetchMessages = async (evenToDispatch) => {
       try {
         const { data } = await api.get("/messages/" + ticketId, {
           params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
         });
 
         if (currentTicketId.current === ticketId) {
-          dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
+          dispatch({
+            type: evenToDispatch || "LOAD_MESSAGES",
+            payload: data.messages,
+          });
           setHasMore(data.hasMore);
           setLoading(false);
         }
@@ -392,7 +399,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
 
     const intervalFn = setInterval(() => {
       console.log("fetching messages in setInterval");
-      fetchMessages();
+      fetchMessages("LOAD_NEW_MESSAGES");
     }, 5000);
 
     return () => {
