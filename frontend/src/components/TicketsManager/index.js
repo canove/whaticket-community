@@ -10,9 +10,12 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import SearchIcon from "@material-ui/icons/Search";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 import Menu from "@material-ui/core/Menu";
 import { Can } from "../Can";
+
+import TicketsWhatsappSelect from "../TicketsWhatsappSelect";
 
 import MenuItem from "@material-ui/core/MenuItem";
 import NewTicketModal from "../NewTicketModal";
@@ -107,6 +110,8 @@ const TicketsManager = () => {
   const [pendingCount, setPendingCount] = useState(0);
 
   const userQueueIds = [...user.queues.map((q) => q.id), null];
+  const { whatsApps, loading } = useContext(WhatsAppsContext);
+  const [selectedWhatsappIds, setSelectedWhatsappIds] = useState(null);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -116,6 +121,11 @@ const TicketsManager = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    console.log(whatsApps);
+    setSelectedWhatsappIds([...whatsApps.map((w) => w.id)]);
+  }, [whatsApps]);
 
   useEffect(() => {
     if (user.profile.toUpperCase() === "ADMIN") {
@@ -265,6 +275,15 @@ const TicketsManager = () => {
         )}
 
         {/* QUEUE SELECT */}
+        <TicketsWhatsappSelect
+          style={{ marginLeft: 6 }}
+          selectedWhatsappIds={selectedWhatsappIds || []}
+          userWhatsapps={whatsApps || []}
+          onChange={(values) => setSelectedWhatsappIds(values)}
+        />
+        {/* - QUEUE SELECT */}
+
+        {/* QUEUE SELECT */}
         <TicketsQueueSelect
           style={{ marginLeft: 6 }}
           selectedQueueIds={selectedQueueIds}
@@ -360,12 +379,14 @@ const TicketsManager = () => {
           <TicketsList
             status="open"
             showAll={showAllTickets}
+            selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setOpenCount(val)}
             style={applyPanelStyle("open")}
           />
           <TicketsList
             status="pending"
+            selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
@@ -380,6 +401,7 @@ const TicketsManager = () => {
         <TicketsList
           status="closed"
           showAll={true}
+          selectedWhatsappIds={selectedWhatsappIds}
           selectedQueueIds={selectedQueueIds}
         />
       </TabPanel>
@@ -390,6 +412,7 @@ const TicketsManager = () => {
         <TicketsList
           searchParam={searchParam}
           showAll={true}
+          selectedWhatsappIds={selectedWhatsappIds}
           selectedQueueIds={selectedQueueIds}
         />
       </TabPanel>

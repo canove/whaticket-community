@@ -21,6 +21,7 @@ type IndexQuery = {
   showAll: string;
   withUnreadMessages: string;
   queueIds: string;
+  whatsappIds: string;
 };
 
 interface TicketData {
@@ -37,6 +38,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     date,
     searchParam,
     showAll,
+    whatsappIds: whatsappIdsStringified,
     queueIds: queueIdsStringified,
     withUnreadMessages
   } = req.query as IndexQuery;
@@ -44,7 +46,11 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const userId = req.user.id;
 
   let queueIds: number[] = [];
+  let whatsappIds: number[] = [];
 
+  if (whatsappIdsStringified) {
+    whatsappIds = JSON.parse(whatsappIdsStringified);
+  }
   if (queueIdsStringified) {
     queueIds = JSON.parse(queueIdsStringified);
   }
@@ -56,6 +62,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     date,
     showAll,
     userId,
+    whatsappIds,
     queueIds,
     withUnreadMessages
   });

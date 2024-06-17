@@ -26,6 +26,7 @@ interface Request {
   showAll?: string;
   userId: string;
   withUnreadMessages?: string;
+  whatsappIds: Array<number>;
   queueIds: Array<number>;
 }
 
@@ -38,6 +39,7 @@ interface Response {
 const ListTicketsService = async ({
   searchParam = "",
   pageNumber = "1",
+  whatsappIds,
   queueIds,
   status,
   date,
@@ -45,6 +47,8 @@ const ListTicketsService = async ({
   userId,
   withUnreadMessages
 }: Request): Promise<Response> => {
+  console.log("whatsappIds", whatsappIds);
+
   let whereCondition: Filterable["where"] = {
     [Op.or]: [
       { userId },
@@ -64,7 +68,12 @@ const ListTicketsService = async ({
       [Op.or]: queueIds?.includes(null)
         ? [queueIds.filter(id => id !== null), null]
         : [queueIds]
-    }
+    },
+    ...(whatsappIds?.length && {
+      whatsappId: {
+        [Op.or]: [whatsappIds]
+      }
+    })
   };
   let includeCondition: Includeable[];
 
@@ -109,7 +118,12 @@ const ListTicketsService = async ({
         [Op.or]: queueIds?.includes(null)
           ? [queueIds.filter(id => id !== null), null]
           : [queueIds]
-      }
+      },
+      ...(whatsappIds?.length && {
+        whatsappId: {
+          [Op.or]: [whatsappIds]
+        }
+      })
     };
   }
 
@@ -183,6 +197,11 @@ const ListTicketsService = async ({
           ? [queueIds.filter(id => id !== null), null]
           : [queueIds]
       },
+      ...(whatsappIds?.length && {
+        whatsappId: {
+          [Op.or]: [whatsappIds]
+        }
+      }),
       unreadMessages: { [Op.gt]: 0 }
     };
   }

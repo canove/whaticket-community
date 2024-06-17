@@ -175,8 +175,15 @@ const reducer = (state, action) => {
 };
 
 const TicketsList = (props) => {
-  const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
-    props;
+  const {
+    status,
+    searchParam,
+    showAll,
+    selectedWhatsappIds,
+    selectedQueueIds,
+    updateCount,
+    style,
+  } = props;
   const classes = useStyles();
   const [pageNumber, setPageNumber] = useState(1);
   const [ticketsList, dispatch] = useReducer(reducer, []);
@@ -186,13 +193,21 @@ const TicketsList = (props) => {
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
-  }, [status, searchParam, dispatch, showAll, selectedQueueIds]);
+  }, [
+    status,
+    searchParam,
+    dispatch,
+    showAll,
+    selectedWhatsappIds,
+    selectedQueueIds,
+  ]);
 
   const { tickets, hasMore, loading, count } = useTickets({
     pageNumber,
     searchParam,
     status,
     showAll,
+    whatsappIds: JSON.stringify(selectedWhatsappIds),
     queueIds: JSON.stringify(selectedQueueIds),
   });
 
