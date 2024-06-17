@@ -11,6 +11,7 @@ const TicketsWhatsappSelect = ({
   onChange,
 }) => {
   const handleChange = (e) => {
+    localStorage.setItem("selectedWhatsappIds", JSON.stringify(e.target.value));
     onChange(e.target.value);
   };
 
