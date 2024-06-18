@@ -108,6 +108,19 @@ const ListTicketsService = async ({
       model: User,
       as: "helpUsers",
       required: false
+    },
+    {
+      model: Message,
+      as: "messages",
+      separate: true, // <--- Run separate query
+      limit: 1,
+      order: [["timestamp", "DESC"]],
+      required: false,
+      where: {
+        isPrivate: {
+          [Op.or]: [false, null]
+        }
+      }
     }
   ];
 

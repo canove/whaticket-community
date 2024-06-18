@@ -239,6 +239,18 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
     };
   }, [ticketId, setReplyingMessage]);
 
+  useEffect(() => {
+    if (medias.length > 0) {
+      console.log("se agrega el addEventListener para el enter");
+      document.addEventListener("keydown", handleEnterOnMedia);
+    }
+
+    return () => {
+      console.log("se remueve el addEventListener para el enter");
+      document.removeEventListener("keydown", handleEnterOnMedia);
+    };
+  }, [medias]);
+
   const handleChangeInput = (e) => {
     setInputMessage(e.target.value);
     handleLoadQuickAnswer(e.target.value);
@@ -263,6 +275,17 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
     setMedias(selectedMedias);
   };
 
+  const handleEnterOnMedia = (e) => {
+    if (e.key === "Enter") {
+      console.log("se presiono enter");
+      handleUploadMedia(e);
+    } else {
+      console.log("no se presiono enter");
+      console.log("se remueve el addEventListener para el enter");
+      document.removeEventListener("keydown", handleEnterOnMedia);
+    }
+  };
+
   const handleInputPaste = (e) => {
     if (e.clipboardData.files[0]) {
       setMedias([e.clipboardData.files[0]]);
@@ -270,6 +293,7 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
   };
 
   const handleUploadMedia = async (e) => {
+    console.log("handleUploadMedia medias:", medias);
     setLoading(true);
     e.preventDefault();
 
