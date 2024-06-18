@@ -5,7 +5,6 @@ import { format, fromUnixTime, isSameDay } from "date-fns";
 import { useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@material-ui/core/Avatar";
-import Badge from "@material-ui/core/Badge";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
@@ -28,6 +27,7 @@ import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
+import TicketListItemLastMessageTime from "../TicketListItemLastMessageTime";
 
 const useStyles = makeStyles((theme) => ({
   ticket: {
@@ -218,53 +218,76 @@ const TicketListItem = ({ ticket }) => {
               </Typography>
               {/* - CONTACT NAME */}
 
-              {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
-                // HELP BADGE
-                <Badge
-                  className={classes.closedBadge}
-                  badgeContent={"Apoyo"}
-                  color="primary"
-                />
-                // HELP BADGE
-              )}
-              {ticket.status === "closed" && (
-                // CLOSED BADGE
-                <Badge
-                  className={classes.closedBadge}
-                  badgeContent={"Resuelto"}
-                  color="primary"
-                />
-                // CLOSED BADGE
-              )}
-              {ticket.lastMessageTimestamp && (
-                // LAST MESSAGE TIME
-                <Typography
-                  className={classes.lastMessageTime}
-                  component="span"
-                  variant="body2"
-                  color="textSecondary"
-                >
-                  {isSameDay(
-                    fromUnixTime(ticket.lastMessageTimestamp),
-                    new Date()
-                  ) ? (
-                    <>
-                      {format(
-                        fromUnixTime(ticket.lastMessageTimestamp),
-                        "HH:mm"
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {format(
-                        fromUnixTime(ticket.lastMessageTimestamp),
-                        "dd/MM/yyyy"
-                      )}
-                    </>
-                  )}
-                </Typography>
-                // - LAST MESSAGE TIME
-              )}
+              <div style={{ display: "flex" }}>
+                {ticket.status !== "closed" &&
+                ticket.messages?.length &&
+                ticket.messages[0]?.timestamp &&
+                (ticket.contact?.id === ticket.messages[0]?.contactId ||
+                  (ticket.isGroup && !ticket.messages[0]?.fromMe)) ? (
+                  <TicketListItemLastMessageTime ticket={ticket} />
+                ) : null}
+
+                {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
+                  // HELP BADGE
+                  // <Badge
+                  //   className={classes.closedBadge}
+                  //   badgeContent={"Apoyo"}
+                  //   color="primary"
+                  // />
+                  <Chip
+                    style={{ scale: "0.85" }}
+                    color="primary"
+                    size="small"
+                    label="Apoyo"
+                  />
+                  // HELP BADGE
+                )}
+                {ticket.status === "closed" && (
+                  // CLOSED BADGE
+                  // <Badge
+                  //   className={classes.closedBadge}
+                  //   badgeContent={"Resuelto"}
+                  //   color="primary"
+                  // />
+                  <Chip
+                    style={{ scale: "0.85" }}
+                    color="primary"
+                    size="small"
+                    label="Resuelto"
+                  />
+                  // CLOSED BADGE
+                )}
+
+                {ticket.lastMessageTimestamp && (
+                  // LAST MESSAGE TIME
+                  <Typography
+                    className={classes.lastMessageTime}
+                    component="span"
+                    variant="body2"
+                    color="textSecondary"
+                  >
+                    {isSameDay(
+                      fromUnixTime(ticket.lastMessageTimestamp),
+                      new Date()
+                    ) ? (
+                      <>
+                        {format(
+                          fromUnixTime(ticket.lastMessageTimestamp),
+                          "HH:mm"
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {format(
+                          fromUnixTime(ticket.lastMessageTimestamp),
+                          "dd/MM/yyyy"
+                        )}
+                      </>
+                    )}
+                  </Typography>
+                  // - LAST MESSAGE TIME
+                )}
+              </div>
 
               {/* WPP */}
               {/* {ticket.whatsappId && (

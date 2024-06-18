@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
@@ -44,6 +45,19 @@ const CreateMessageService = async ({
             model: Whatsapp,
             as: "whatsapp",
             attributes: ["name"]
+          },
+          {
+            model: Message,
+            as: "messages",
+            separate: true, // <--- Run separate query
+            limit: 1,
+            order: [["timestamp", "DESC"]],
+            required: false,
+            where: {
+              isPrivate: {
+                [Op.or]: [false, null]
+              }
+            }
           }
         ]
       },
@@ -91,12 +105,13 @@ const CreateMessageService = async ({
   })
     .then(response => {
       if (!response.ok) {
+        console.log("---------- response NOT OK");
         throw new Error("Network response was not ok " + response.statusText);
       }
       return response.json();
     })
     .then(data => {
-      console.log("Success:", data);
+      console.log("------------ Success:", data);
     })
     .catch(error => {
       console.error("Error:", error);
