@@ -47,8 +47,6 @@ const ListTicketsService = async ({
   userId,
   withUnreadMessages
 }: Request): Promise<Response> => {
-  console.log("whatsappIds", whatsappIds);
-
   let whereCondition: Filterable["where"] = {
     [Op.or]: [
       { userId },
@@ -63,12 +61,14 @@ const ListTicketsService = async ({
       },
       { status: "pending" }
     ],
-    queueId: {
-      // @ts-ignore
-      [Op.or]: queueIds?.includes(null)
-        ? [queueIds.filter(id => id !== null), null]
-        : [queueIds]
-    },
+    ...(queueIds?.length && {
+      queueId: {
+        // @ts-ignore
+        [Op.or]: queueIds?.includes(null)
+          ? [queueIds.filter(id => id !== null), null]
+          : [queueIds]
+      }
+    }),
     ...(whatsappIds?.length && {
       whatsappId: {
         [Op.or]: [whatsappIds]
@@ -113,12 +113,14 @@ const ListTicketsService = async ({
 
   if (showAll === "true") {
     whereCondition = {
-      queueId: {
-        // @ts-ignore
-        [Op.or]: queueIds?.includes(null)
-          ? [queueIds.filter(id => id !== null), null]
-          : [queueIds]
-      },
+      ...(queueIds?.length && {
+        queueId: {
+          // @ts-ignore
+          [Op.or]: queueIds?.includes(null)
+            ? [queueIds.filter(id => id !== null), null]
+            : [queueIds]
+        }
+      }),
       ...(whatsappIds?.length && {
         whatsappId: {
           [Op.or]: [whatsappIds]
@@ -191,12 +193,14 @@ const ListTicketsService = async ({
 
     whereCondition = {
       [Op.or]: [{ userId }, { status: "pending" }],
-      queueId: {
-        // @ts-ignore
-        [Op.or]: queueIds?.includes(null)
-          ? [queueIds.filter(id => id !== null), null]
-          : [queueIds]
-      },
+      ...(queueIds?.length && {
+        queueId: {
+          // @ts-ignore
+          [Op.or]: queueIds?.includes(null)
+            ? [queueIds.filter(id => id !== null), null]
+            : [queueIds]
+        }
+      }),
       ...(whatsappIds?.length && {
         whatsappId: {
           [Op.or]: [whatsappIds]
@@ -208,6 +212,14 @@ const ListTicketsService = async ({
 
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
+
+  // @ts-ignore
+  console.log("Ticket.findAndCountAll where queId", whereCondition?.queueId);
+  console.log(
+    "Ticket.findAndCountAll where whatsappId",
+    // @ts-ignore
+    whereCondition?.whatsappId
+  );
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,

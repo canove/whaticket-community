@@ -12,6 +12,7 @@ const TicketsQueueSelect = ({
   onChange,
 }) => {
   const handleChange = (e) => {
+    localStorage.setItem("selectedQueueIds", JSON.stringify(e.target.value));
     onChange(e.target.value);
   };
 

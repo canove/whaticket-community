@@ -123,9 +123,14 @@ const TicketsManager = () => {
   };
 
   useEffect(() => {
-    console.log(whatsApps);
-    setSelectedWhatsappIds([...whatsApps.map((w) => w.id)]);
-  }, [whatsApps]);
+    localStorage.getItem("selectedWhatsappIds") &&
+      setSelectedWhatsappIds(
+        JSON.parse(localStorage.getItem("selectedWhatsappIds"))
+      );
+
+    localStorage.getItem("selectedQueueIds") &&
+      setSelectedQueueIds(JSON.parse(localStorage.getItem("selectedQueueIds")));
+  }, []);
 
   useEffect(() => {
     if (user.profile.toUpperCase() === "ADMIN") {
