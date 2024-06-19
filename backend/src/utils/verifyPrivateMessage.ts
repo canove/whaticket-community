@@ -25,12 +25,17 @@ export default function verifyPrivateMessage(
     _serialized: ""
   };
 
+  const privateMessageTimestamp = Math.floor(Date.now() / 1000);
+
   // @ts-ignore
   const testMessage: WbotMessage = {
     id: testMessageId,
     fromMe: true,
-    body: bodyMessage
+    body: bodyMessage,
+    timestamp: privateMessageTimestamp
   };
 
   verifyMessage(testMessage, ticket, contact, true);
+
+  ticket.update({ lastMessageTimestamp: privateMessageTimestamp });
 }
