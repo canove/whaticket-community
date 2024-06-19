@@ -430,7 +430,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
       console.log("appMessage", data);
       if (data.action === "create") {
         dispatch({ type: "ADD_MESSAGE", payload: data.message });
-        // scrollToBottom();
+        scrollToBottom();
       }
 
       if (data.action === "update") {
