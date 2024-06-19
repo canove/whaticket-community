@@ -135,7 +135,7 @@ export const update = async (
     ticketId
   });
 
-  if (ticket.status === "closed") {
+  if (ticket.status === "closed" && !ticket.isGroup) {
     const whatsapp = await ShowWhatsAppService(ticket.whatsappId);
 
     const { farewellMessage } = whatsapp;

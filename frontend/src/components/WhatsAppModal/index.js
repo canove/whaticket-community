@@ -180,7 +180,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                 <div>
                   <Field
                     as={TextField}
-                    label={i18n.t("whatsappModal.form.farewellMessage")}
+                    label={"Mensaje de despedida"}
                     type="farewellMessage"
                     multiline
                     rows={5}
