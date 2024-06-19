@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { parseISO } from "date-fns";
+import { Op } from "sequelize";
 import formatBody from "../helpers/Mustache";
 import { getWbot } from "../libs/wbot";
 import Message from "../models/Message";
@@ -213,12 +214,21 @@ export const recoverAllMessages = async (
     `${ticket.contact.number}${ticket.contact.isGroup ? "@g.us" : "@c.us"}`
   );
 
-  const ticketMessages = await ticketChat.fetchMessages({ limit: 500 });
+  const ticketMessages = await ticketChat.fetchMessages({ limit: 100000 });
 
   console.log("se van a recuperar: ", ticketMessages.length, "mensajes");
 
   if (ticketMessages && ticketMessages.length > 0) {
-    await Message.destroy({ where: { ticketId, isPrivate: false } });
+    console.log("se eliminan los mensajes del ticket:", ticketId);
+
+    await Message.destroy({
+      where: {
+        ticketId,
+        isPrivate: {
+          [Op.or]: [false, null]
+        }
+      }
+    });
 
     const privateMessages = await Message.findAll({
       where: {
