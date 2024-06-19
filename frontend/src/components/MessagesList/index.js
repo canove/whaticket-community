@@ -294,6 +294,7 @@ const useStyles = makeStyles((theme) => ({
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_MESSAGES" || action.type === "LOAD_NEW_MESSAGES") {
+    // console.log(action.type);
     const messages = action.payload;
     const newMessages = [];
 
@@ -368,7 +369,10 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   useEffect(() => {
     setLoading(true);
 
-    const fetchMessages = async (evenToDispatch) => {
+    const fetchMessages = async ({
+      evenToDispatch,
+      wantScrollToBottom = true,
+    }) => {
       try {
         const { data } = await api.get("/messages/" + ticketId, {
           params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
@@ -384,7 +388,9 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
         }
 
         if (pageNumber === 1 && data.messages.length > 1) {
-          scrollToBottom();
+          if (wantScrollToBottom) {
+            scrollToBottom();
+          }
         }
       } catch (err) {
         setLoading(false);
@@ -394,12 +400,15 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
 
     const delayDebounceFn = setTimeout(() => {
       console.log("fetching messages in setTimeout");
-      fetchMessages();
+      fetchMessages({});
     }, 500);
 
     const intervalFn = setInterval(() => {
       console.log("fetching messages in setInterval");
-      fetchMessages("LOAD_NEW_MESSAGES");
+      fetchMessages({
+        evenToDispatch: "LOAD_NEW_MESSAGES",
+        wantScrollToBottom: false,
+      });
     }, 5000);
 
     return () => {
@@ -420,7 +429,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
       console.log("appMessage", data);
       if (data.action === "create") {
         dispatch({ type: "ADD_MESSAGE", payload: data.message });
-        scrollToBottom();
+        // scrollToBottom();
       }
 
       if (data.action === "update") {
@@ -440,6 +449,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
 
   const scrollToBottom = () => {
     if (lastMessageRef.current) {
+      console.log("---- scrollIntoView");
       lastMessageRef.current.scrollIntoView({});
     }
   };
