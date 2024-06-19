@@ -212,6 +212,7 @@ const useStyles = makeStyles((theme) => ({
 
   messageContactName: {
     display: "flex",
+    alignItems: "center",
     color: "#6bcbef",
     fontWeight: 500,
   },
@@ -672,6 +673,10 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
           {!message.quotedMsg?.fromMe && (
             <span className={classes.messageContactName}>
               {message.quotedMsg?.contact?.name}
+              <div style={{ fontSize: 11, color: "#999", marginRight: 30 }}>
+                {" "}
+                +{message.quotedMsg?.contact?.number}
+              </div>
             </span>
           )}
           {message.quotedMsg?.body}
@@ -700,9 +705,15 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
                   <ExpandMore />
                 </IconButton>
                 {isGroup && (
-                  <span className={classes.messageContactName}>
-                    {message.contact?.name}
-                  </span>
+                  <div className={classes.messageContactName}>
+                    {message.contact?.name}{" "}
+                    <div
+                      style={{ fontSize: 11, color: "#999", marginRight: 30 }}
+                    >
+                      {" "}
+                      +{message.contact?.number}
+                    </div>
+                  </div>
                 )}
                 {(message.mediaUrl ||
                   message.mediaType === "location" ||
