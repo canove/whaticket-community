@@ -571,8 +571,21 @@ const handleMessage = async (
       unreadMessages === 0 &&
       whatsapp.farewellMessage &&
       formatBody(whatsapp.farewellMessage, contact) === msg.body
-    )
+    ) {
+      let ticket = await Ticket.findOne({
+        where: {
+          status: "closed",
+          contactId: groupContact ? groupContact.id : contact.id,
+          whatsappId: whatsapp.id
+        }
+      });
+
+      if (ticket) {
+        await verifyMessage(msg, ticket, contact);
+      }
+
       return;
+    }
 
     // find, create or update a ticket from the contact or groupContact and from whatsappId
     // always update the ticket unreadMessages

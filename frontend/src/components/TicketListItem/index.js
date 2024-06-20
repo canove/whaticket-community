@@ -159,7 +159,7 @@ const TicketListItem = ({ ticket }) => {
         userId: user?.id,
       });
 
-      await api.post(`/privateMessages/${ticketId}`, {
+      await api.post(`/privateMessages/${id}`, {
         body: `${user?.name} *aceptó* la conversación`,
       });
     } catch (err) {

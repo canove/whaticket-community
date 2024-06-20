@@ -212,6 +212,7 @@ const useStyles = makeStyles((theme) => ({
 
   messageContactName: {
     display: "flex",
+    alignItems: "center",
     color: "#6bcbef",
     fontWeight: 500,
   },
@@ -294,6 +295,7 @@ const useStyles = makeStyles((theme) => ({
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_MESSAGES" || action.type === "LOAD_NEW_MESSAGES") {
+    // console.log(action.type);
     const messages = action.payload;
     const newMessages = [];
 
@@ -368,7 +370,10 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   useEffect(() => {
     setLoading(true);
 
-    const fetchMessages = async (evenToDispatch) => {
+    const fetchMessages = async ({
+      evenToDispatch,
+      wantScrollToBottom = true,
+    }) => {
       try {
         const { data } = await api.get("/messages/" + ticketId, {
           params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
@@ -384,7 +389,9 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
         }
 
         if (pageNumber === 1 && data.messages.length > 1) {
-          scrollToBottom();
+          if (wantScrollToBottom) {
+            scrollToBottom();
+          }
         }
       } catch (err) {
         setLoading(false);
@@ -394,12 +401,15 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
 
     const delayDebounceFn = setTimeout(() => {
       console.log("fetching messages in setTimeout");
-      fetchMessages();
+      fetchMessages({});
     }, 500);
 
     const intervalFn = setInterval(() => {
       console.log("fetching messages in setInterval");
-      fetchMessages("LOAD_NEW_MESSAGES");
+      fetchMessages({
+        evenToDispatch: "LOAD_NEW_MESSAGES",
+        wantScrollToBottom: false,
+      });
     }, 5000);
 
     return () => {
@@ -440,6 +450,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
 
   const scrollToBottom = () => {
     if (lastMessageRef.current) {
+      console.log("---- scrollIntoView");
       lastMessageRef.current.scrollIntoView({});
     }
   };
@@ -662,6 +673,10 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
           {!message.quotedMsg?.fromMe && (
             <span className={classes.messageContactName}>
               {message.quotedMsg?.contact?.name}
+              <div style={{ fontSize: 11, color: "#999", marginRight: 30 }}>
+                {" "}
+                +{message.quotedMsg?.contact?.number}
+              </div>
             </span>
           )}
           {message.quotedMsg?.body}
@@ -690,9 +705,15 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
                   <ExpandMore />
                 </IconButton>
                 {isGroup && (
-                  <span className={classes.messageContactName}>
-                    {message.contact?.name}
-                  </span>
+                  <div className={classes.messageContactName}>
+                    {message.contact?.name}{" "}
+                    <div
+                      style={{ fontSize: 11, color: "#999", marginRight: 30 }}
+                    >
+                      {" "}
+                      +{message.contact?.number}
+                    </div>
+                  </div>
                 )}
                 {(message.mediaUrl ||
                   message.mediaType === "location" ||
