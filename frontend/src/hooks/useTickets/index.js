@@ -13,11 +13,16 @@ const useTickets = ({
   whatsappIds,
   queueIds,
   withUnreadMessages,
+  typeIds,
 }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
   const [tickets, setTickets] = useState([]);
   const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log("....... typeIds", typeIds);
+  }, [typeIds]);
 
   useEffect(() => {
     setLoading(true);
@@ -33,6 +38,7 @@ const useTickets = ({
               showAll,
               whatsappIds,
               queueIds,
+              typeIds,
               withUnreadMessages,
             },
           });
@@ -88,6 +94,7 @@ const useTickets = ({
     showAll,
     whatsappIds,
     queueIds,
+    typeIds,
     withUnreadMessages,
   ]);
 

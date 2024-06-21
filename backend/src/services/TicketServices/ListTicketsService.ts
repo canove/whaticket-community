@@ -28,6 +28,7 @@ interface Request {
   withUnreadMessages?: string;
   whatsappIds: Array<number>;
   queueIds: Array<number>;
+  typeIds: Array<string>;
 }
 
 interface Response {
@@ -41,6 +42,7 @@ const ListTicketsService = async ({
   pageNumber = "1",
   whatsappIds,
   queueIds,
+  typeIds,
   status,
   date,
   showAll,
@@ -61,6 +63,11 @@ const ListTicketsService = async ({
       },
       { status: "pending" }
     ],
+    ...(typeIds?.length && {
+      isGroup: {
+        [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
+      }
+    }),
     ...(queueIds?.length && {
       queueId: {
         // @ts-ignore
@@ -126,6 +133,11 @@ const ListTicketsService = async ({
 
   if (showAll === "true") {
     whereCondition = {
+      ...(typeIds?.length && {
+        isGroup: {
+          [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
+        }
+      }),
       ...(queueIds?.length && {
         queueId: {
           // @ts-ignore
@@ -206,6 +218,11 @@ const ListTicketsService = async ({
 
     whereCondition = {
       [Op.or]: [{ userId }, { status: "pending" }],
+      ...(typeIds?.length && {
+        isGroup: {
+          [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
+        }
+      }),
       ...(queueIds?.length && {
         queueId: {
           // @ts-ignore
@@ -226,13 +243,19 @@ const ListTicketsService = async ({
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
 
-  // @ts-ignore
-  console.log("Ticket.findAndCountAll where queId", whereCondition?.queueId);
   console.log(
-    "Ticket.findAndCountAll where whatsappId",
+    typeIds,
+    "Ticket.findAndCountAll where shoGroups",
     // @ts-ignore
-    whereCondition?.whatsappId
+    whereCondition?.isGroup
   );
+  // // @ts-ignore
+  // console.log("Ticket.findAndCountAll where queId", whereCondition?.queueId);
+  // console.log(
+  //   "Ticket.findAndCountAll where whatsappId",
+  //   // @ts-ignore
+  //   whereCondition?.whatsappId
+  // );
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,
