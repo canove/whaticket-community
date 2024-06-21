@@ -23,6 +23,7 @@ import {
 
 import TextsmsOutlinedIcon from "@material-ui/icons/TextsmsOutlined";
 import whatsBackground from "../../assets/wa-background.png";
+import useWhatsApps from "../../hooks/useWhatsApps";
 import LocationPreview from "../LocationPreview";
 import MarkdownWrapper from "../MarkdownWrapper";
 import MessageOptionsMenu from "../MessageOptionsMenu";
@@ -103,6 +104,15 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
   },
 
+  quotedContainerLeftFromOtherConnection: {
+    margin: "-3px -80px 6px -6px",
+    overflow: "hidden",
+    backgroundColor: "#daeced",
+    borderRadius: "7.5px",
+    display: "flex",
+    position: "relative",
+  },
+
   quotedMsg: {
     padding: 10,
     maxWidth: 300,
@@ -141,6 +151,36 @@ const useStyles = makeStyles((theme) => ({
     borderTopRightRadius: 8,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 0,
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingTop: 5,
+    paddingBottom: 0,
+    boxShadow: "0 1px 1px #b3b3b3",
+  },
+
+  messageLeftFromOtherConnection: {
+    marginRight: 20,
+    marginTop: 2,
+    minWidth: 100,
+    maxWidth: 600,
+    height: "auto",
+    display: "block",
+    position: "relative",
+    "&:hover #messageActionsButton": {
+      display: "flex",
+      position: "absolute",
+      top: 0,
+      right: 0,
+    },
+
+    whiteSpace: "pre-wrap",
+    backgroundColor: "#ebfeff",
+    color: "#303030",
+    alignSelf: "flex-start",
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
     paddingLeft: 5,
     paddingRight: 5,
     paddingTop: 5,
@@ -341,6 +381,22 @@ const reducer = (state, action) => {
     return [...state];
   }
 
+  if (action.type === "UPDATE_CONTACT") {
+    const updatedContact = action.payload;
+
+    const newState = state.map((message) => {
+      if (message.contact?.id === updatedContact.id) {
+        return {
+          ...message,
+          contact: updatedContact,
+        };
+      }
+      return message;
+    });
+
+    return [...newState];
+  }
+
   if (action.type === "RESET") {
     return [];
   }
@@ -359,6 +415,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
+  const { loadingWhatsapps, whatsApps } = useWhatsApps();
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -378,6 +435,8 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
         const { data } = await api.get("/messages/" + ticketId, {
           params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
         });
+
+        console.log("messages", data);
 
         if (currentTicketId.current === ticketId) {
           dispatch({
@@ -438,11 +497,22 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
       }
     });
 
+    socket.on("contact", (data) => {
+      if (data.action === "update") {
+        console.log("UPDATE_CONTACT", data);
+        dispatch({ type: "UPDATE_CONTACT", payload: data.contact });
+      }
+    });
+
     return () => {
       console.log("socket desconectado");
       socket.disconnect();
     };
   }, [ticketId]);
+
+  useEffect(() => {
+    console.log("whatsApps", whatsApps);
+  }, [whatsApps]);
 
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
@@ -661,6 +731,11 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     return (
       <div
         className={clsx(classes.quotedContainerLeft, {
+          [classes.quotedContainerLeftFromOtherConnection]:
+            !message.fromMe &&
+            isGroup &&
+            (whatsApps.find((w) => w.number === message.contact?.number) ||
+              message.contact?.isCompanyMember),
           [classes.quotedContainerRight]: message.fromMe,
         })}
       >
@@ -670,15 +745,19 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
           })}
         ></span>
         <div className={classes.quotedMsg}>
-          {!message.quotedMsg?.fromMe && (
-            <span className={classes.messageContactName}>
-              {message.quotedMsg?.contact?.name}
-              <div style={{ fontSize: 11, color: "#999", marginRight: 30 }}>
-                {" "}
-                +{message.quotedMsg?.contact?.number}
-              </div>
-            </span>
-          )}
+          <span className={classes.messageContactName}>
+            {message.quotedMsg?.fromMe ? (
+              <>Tú</>
+            ) : (
+              <>
+                {message.quotedMsg?.contact?.name}
+                <div style={{ fontSize: 11, color: "#999", marginRight: 30 }}>
+                  {" "}
+                  +{message.quotedMsg?.contact?.number}
+                </div>
+              </>
+            )}
+          </span>
           {message.quotedMsg?.body}
         </div>
       </div>
@@ -693,7 +772,17 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageLeft}>
+              <div
+                className={
+                  isGroup &&
+                  (whatsApps.find(
+                    (w) => w.number === message.contact?.number
+                  ) ||
+                    message.contact?.isCompanyMember)
+                    ? classes.messageLeftFromOtherConnection
+                    : classes.messageLeft
+                }
+              >
                 <IconButton
                   variant="contained"
                   size="small"
@@ -811,13 +900,20 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
         anchorEl={anchorEl}
         menuOpen={messageOptionsMenuOpen}
         handleClose={handleCloseMessageOptionsMenu}
+        canChangeTheIsCompanyMemberFromTheContact={
+          isGroup &&
+          !selectedMessage.fromMe &&
+          !whatsApps.find((w) => w.number === selectedMessage.contact?.number)
+        }
       />
       <div
         id="messagesList"
         className={classes.messagesList}
         onScroll={handleScroll}
       >
-        {messagesList.length > 0 ? renderMessages() : []}
+        {messagesList.length > 0 && (!isGroup || !loadingWhatsapps)
+          ? renderMessages()
+          : []}
       </div>
       {loading && (
         <div>

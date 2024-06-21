@@ -1,15 +1,21 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import MenuItem from "@material-ui/core/MenuItem";
 
-import { i18n } from "../../translate/i18n";
-import api from "../../services/api";
-import ConfirmationModal from "../ConfirmationModal";
 import { Menu } from "@material-ui/core";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
+import ConfirmationModal from "../ConfirmationModal";
 
-const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
+const MessageOptionsMenu = ({
+  message,
+  menuOpen,
+  handleClose,
+  anchorEl,
+  canChangeTheIsCompanyMemberFromTheContact,
+}) => {
   const { setReplyingMessage } = useContext(ReplyMessageContext);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
@@ -18,6 +24,19 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
       await api.delete(`/messages/${message.id}`);
     } catch (err) {
       toastError(err);
+    }
+  };
+
+  const handleChangeIsCompanyMember = async (nextValue) => {
+    try {
+      await api.put(`/contacts/${message.contact?.id}`, {
+        ...message.contact,
+        isCompanyMember: nextValue,
+      });
+      handleClose();
+    } catch (err) {
+      toastError(err);
+      handleClose();
     }
   };
 
@@ -58,6 +77,17 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
         {message.fromMe && (
           <MenuItem onClick={handleOpenConfirmationModal}>
             {i18n.t("messageOptionsMenu.delete")}
+          </MenuItem>
+        )}
+        {canChangeTheIsCompanyMemberFromTheContact && (
+          <MenuItem
+            onClick={() =>
+              handleChangeIsCompanyMember(!message.contact?.isCompanyMember)
+            }
+          >
+            {message.contact?.isCompanyMember
+              ? "Desmarcar contacto como mienbro"
+              : "Marcar contacto como mienbro"}
           </MenuItem>
         )}
         <MenuItem onClick={hanldeReplyMessage}>
