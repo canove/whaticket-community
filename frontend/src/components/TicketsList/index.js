@@ -181,6 +181,7 @@ const TicketsList = (props) => {
     showAll,
     selectedWhatsappIds,
     selectedQueueIds,
+    selectedTypeIds,
     updateCount,
     style,
   } = props;
@@ -200,6 +201,7 @@ const TicketsList = (props) => {
     showAll,
     selectedWhatsappIds,
     selectedQueueIds,
+    selectedTypeIds,
   ]);
 
   const { tickets, hasMore, loading, count } = useTickets({
@@ -209,6 +211,7 @@ const TicketsList = (props) => {
     showAll,
     whatsappIds: JSON.stringify(selectedWhatsappIds),
     queueIds: JSON.stringify(selectedQueueIds),
+    typeIds: JSON.stringify(selectedTypeIds),
   });
 
   useEffect(() => {
@@ -310,7 +313,7 @@ const TicketsList = (props) => {
     return () => {
       socket.disconnect();
     };
-  }, [status, searchParam, showAll, user, selectedQueueIds]);
+  }, [status, searchParam, showAll, user, selectedQueueIds, selectedTypeIds]);
 
   // useEffect(() => {
   //   if (typeof updateCount === "function") {

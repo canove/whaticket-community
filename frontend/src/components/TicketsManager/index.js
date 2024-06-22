@@ -15,6 +15,7 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import Menu from "@material-ui/core/Menu";
 import { Can } from "../Can";
 
+import TicketsTypeSelect from "../TicketsTypeSelect";
 import TicketsWhatsappSelect from "../TicketsWhatsappSelect";
 
 import MenuItem from "@material-ui/core/MenuItem";
@@ -112,6 +113,7 @@ const TicketsManager = () => {
   const userQueueIds = [...user.queues.map((q) => q.id), null];
   const { whatsApps, loading } = useContext(WhatsAppsContext);
   const [selectedWhatsappIds, setSelectedWhatsappIds] = useState(null);
+  const [selectedTypeIds, setSelectedTypeIds] = useState(null);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -123,6 +125,9 @@ const TicketsManager = () => {
   };
 
   useEffect(() => {
+    localStorage.getItem("selectedTypes") &&
+      setSelectedTypeIds(JSON.parse(localStorage.getItem("selectedTypes")));
+
     localStorage.getItem("selectedWhatsappIds") &&
       setSelectedWhatsappIds(
         JSON.parse(localStorage.getItem("selectedWhatsappIds"))
@@ -280,6 +285,14 @@ const TicketsManager = () => {
         )}
 
         {/* QUEUE SELECT */}
+        <TicketsTypeSelect
+          style={{ marginLeft: 6 }}
+          selectedTypeIds={selectedTypeIds || []}
+          onChange={(values) => setSelectedTypeIds(values)}
+        />
+        {/* - QUEUE SELECT */}
+
+        {/* QUEUE SELECT */}
         <TicketsWhatsappSelect
           style={{ marginLeft: 6 }}
           selectedWhatsappIds={selectedWhatsappIds || []}
@@ -384,6 +397,7 @@ const TicketsManager = () => {
           <TicketsList
             status="open"
             showAll={showAllTickets}
+            selectedTypeIds={selectedTypeIds}
             selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setOpenCount(val)}
@@ -391,6 +405,7 @@ const TicketsManager = () => {
           />
           <TicketsList
             status="pending"
+            selectedTypeIds={selectedTypeIds}
             selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setPendingCount(val)}
@@ -406,6 +421,7 @@ const TicketsManager = () => {
         <TicketsList
           status="closed"
           showAll={true}
+          selectedTypeIds={selectedTypeIds}
           selectedWhatsappIds={selectedWhatsappIds}
           selectedQueueIds={selectedQueueIds}
         />
@@ -417,6 +433,7 @@ const TicketsManager = () => {
         <TicketsList
           searchParam={searchParam}
           showAll={true}
+          selectedTypeIds={selectedTypeIds}
           selectedWhatsappIds={selectedWhatsappIds}
           selectedQueueIds={selectedQueueIds}
         />
