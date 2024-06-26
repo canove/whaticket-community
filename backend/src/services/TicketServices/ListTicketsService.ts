@@ -243,12 +243,14 @@ const ListTicketsService = async ({
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
 
-  console.log(
-    typeIds,
-    "Ticket.findAndCountAll where shoGroups",
-    // @ts-ignore
-    whereCondition?.isGroup
-  );
+  console.log("________-whereCondition", whereCondition);
+
+  // console.log(
+  //   typeIds,
+  //   "Ticket.findAndCountAll where shoGroups",
+  //   // @ts-ignore
+  //   whereCondition?.isGroup
+  // );
   // // @ts-ignore
   // console.log("Ticket.findAndCountAll where queId", whereCondition?.queueId);
   // console.log(
@@ -266,10 +268,33 @@ const ListTicketsService = async ({
     order: [["lastMessageTimestamp", "DESC"]]
   });
 
+  let filteredTickets: Ticket[] | null = null;
+
+  // @ts-ignore
+  if (whereCondition.status === "closed") {
+    console.log("______SE PIDIERON SOLO LOS TICKETS CERRADOS");
+
+    filteredTickets = (
+      await Promise.all(
+        tickets.map(async ticket => {
+          const similiarTicketsButOpensOrPendings = await Ticket.findAll({
+            where: {
+              whatsappId: ticket.whatsappId,
+              contactId: ticket.contactId,
+              status: ["pending", "open"]
+            }
+          });
+
+          return similiarTicketsButOpensOrPendings.length === 0 ? ticket : null;
+        })
+      )
+    ).filter(ticket => ticket !== null) as Ticket[];
+  }
+
   const hasMore = count > offset + tickets.length;
 
   return {
-    tickets,
+    tickets: filteredTickets || tickets,
     count,
     hasMore
   };

@@ -85,7 +85,17 @@ const reducer = (state, action) => {
           state.unshift(state.splice(ticketIndex, 1)[0]);
         }
       } else {
-        state.push(ticket);
+        // if no ticket with same id, search for ticket with same contactId and whatsappId
+        // this for dont have more than 1 ticket for contact-wpp
+        const ticketWithSameContactIdAndWhatsappId = state.find(
+          (t) =>
+            t.contactId === ticket.contactId &&
+            t.whatsappId === ticket.whatsappId
+        );
+
+        if (!ticketWithSameContactIdAndWhatsappId) {
+          state.push(ticket);
+        }
       }
     });
 
@@ -216,7 +226,8 @@ const TicketsList = (props) => {
 
   useEffect(() => {
     if (!status && !searchParam) return;
-    // console.log("LOAD_TICKETS", tickets);
+    console.log("LOAD_TICKETS", tickets);
+
     dispatch({
       type: "LOAD_TICKETS",
       payload: tickets,

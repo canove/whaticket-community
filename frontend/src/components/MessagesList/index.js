@@ -1,4 +1,10 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 import clsx from "clsx";
 import { format, fromUnixTime, isSameDay, parseISO } from "date-fns";
@@ -23,6 +29,7 @@ import {
 
 import TextsmsOutlinedIcon from "@material-ui/icons/TextsmsOutlined";
 import whatsBackground from "../../assets/wa-background.png";
+import { SearchMessageContext } from "../../context/SearchMessage/SearchMessageContext";
 import useWhatsApps from "../../hooks/useWhatsApps";
 import LocationPreview from "../LocationPreview";
 import MarkdownWrapper from "../MarkdownWrapper";
@@ -298,6 +305,21 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "0 1px 1px #b3b3b3",
   },
 
+  ticketDivider: {
+    alignItems: "center",
+    textAlign: "center",
+    alignSelf: "center",
+    width: "100%",
+    backgroundColor: "#4a4a4a",
+    fontSize: 18,
+    color: "white",
+    margin: "30px 0px 30px",
+    paddingTop: "5px",
+    paddingBottom: "5px",
+    borderRadius: "10px",
+    boxShadow: "0 1px 1px #b3b3b3",
+  },
+
   dailyTimestampText: {
     color: "#808888",
     padding: 8,
@@ -406,7 +428,6 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
-  const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const lastMessageRef = useRef();
@@ -416,66 +437,105 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
   const { loadingWhatsapps, whatsApps } = useWhatsApps();
+  const [ticketsQueue, setTicketsQueue] = useState([]);
+  const [nextTicketsQueue, setNextTicketsQueue] = useState([]);
+  const [foundMessageId, setFoundMessageId] = useState(null);
+  const foundMessageRef = useRef();
+  const { searchingMessageId, setSearchingMessageId } =
+    useContext(SearchMessageContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
-    setPageNumber(1);
+    setTicketsQueue([
+      {
+        ticketId,
+        pageNumber: 1,
+      },
+    ]);
 
     currentTicketId.current = ticketId;
   }, [ticketId]);
 
-  useEffect(() => {
-    setLoading(true);
+  const fetchMessages = async ({
+    evenToDispatch = "LOAD_MESSAGES",
+    wantScrollToBottom = true,
+    ticketId,
+    ticketsQueue,
+  }) => {
+    try {
+      if (ticketsQueue) {
+        console.log("________fetchMessages START ticketsQueue:", ticketsQueue);
 
-    const fetchMessages = async ({
-      evenToDispatch,
-      wantScrollToBottom = true,
-    }) => {
-      try {
-        const { data } = await api.get("/messages/" + ticketId, {
-          params: { pageNumber, setTicketMessagesAsRead: !isAPreview },
+        const { data } = await api.get("/messagesV2", {
+          params: {
+            setTicketMessagesAsRead: !isAPreview,
+            ticketsToFetchMessagesQueue: JSON.stringify(ticketsQueue),
+            ...(searchingMessageId && { searchMessageId: searchingMessageId }),
+          },
         });
 
-        console.log("messages", data);
+        console.log("________fetchMessages data", data);
+
+        setNextTicketsQueue(data.nextTicketsToFetchMessagesQueue);
 
         if (currentTicketId.current === ticketId) {
           dispatch({
-            type: evenToDispatch || "LOAD_MESSAGES",
+            type: evenToDispatch,
             payload: data.messages,
           });
           setHasMore(data.hasMore);
           setLoading(false);
         }
 
-        if (pageNumber === 1 && data.messages.length > 1) {
+        if (ticketsQueue[0].pageNumber === 1 && data.messages.length > 1) {
           if (wantScrollToBottom) {
+            console.log("________fetchMessages wantScrollToBottom");
             scrollToBottom();
           }
         }
-      } catch (err) {
-        setLoading(false);
-        toastError(err);
+
+        if (searchingMessageId) {
+          console.log(
+            "________fetchMessages setFoundMessageId with searchingMessageId:",
+            searchingMessageId
+          );
+          setFoundMessageId(searchingMessageId);
+          setSearchingMessageId(null);
+        }
       }
-    };
+    } catch (err) {
+      console.log("_____________err: ", err);
+      setLoading(false);
+      toastError(err);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
 
     const delayDebounceFn = setTimeout(() => {
       console.log("fetching messages in setTimeout");
-      fetchMessages({});
+      fetchMessages({
+        ticketId,
+        ticketsQueue,
+      });
     }, 500);
 
-    const intervalFn = setInterval(() => {
-      console.log("fetching messages in setInterval");
-      fetchMessages({
-        evenToDispatch: "LOAD_NEW_MESSAGES",
-        wantScrollToBottom: false,
-      });
-    }, 5000);
+    // const intervalFn = setInterval(() => {
+    //   console.log("fetching messages in setInterval");
+    //   fetchMessages({
+    //     ticketId,
+    //     ticketsQueue,
+    //     evenToDispatch: "LOAD_NEW_MESSAGES",
+    //     wantScrollToBottom: false,
+    //   });
+    // }, 5000);
 
     return () => {
       clearTimeout(delayDebounceFn);
-      clearInterval(intervalFn);
+      // clearInterval(intervalFn);
     };
-  }, [pageNumber, ticketId]);
+  }, [ticketId, ticketsQueue]);
 
   useEffect(() => {
     const socket = openSocket();
@@ -511,17 +571,50 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   }, [ticketId]);
 
   useEffect(() => {
+    if (searchingMessageId) {
+      if (messagesList.find((m) => m.id === searchingMessageId)) {
+        console.log(
+          "---- searchingMessageId alredy in messagesList!: ",
+          searchingMessageId
+        );
+        setFoundMessageId(searchingMessageId);
+        setSearchingMessageId(null);
+      } else {
+        loadMore();
+      }
+    }
+  }, [searchingMessageId]);
+
+  useEffect(() => {
+    if (foundMessageId) {
+      scrollToFoundMessage();
+    }
+  }, [foundMessageId]);
+
+  useEffect(() => {
     console.log("whatsApps", whatsApps);
   }, [whatsApps]);
 
   const loadMore = () => {
-    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+    setTicketsQueue(() => {
+      const next = JSON.parse(JSON.stringify(nextTicketsQueue));
+      next[next.length - 1].pageNumber = +next[next.length - 1].pageNumber + 1;
+      console.log("---- loadMore setTicketsQueue", next);
+      return next;
+    });
   };
 
   const scrollToBottom = () => {
     if (lastMessageRef.current) {
       console.log("---- scrollIntoView");
       lastMessageRef.current.scrollIntoView({});
+    }
+  };
+
+  const scrollToFoundMessage = () => {
+    if (foundMessageRef.current) {
+      console.log("---- scrollToFoundMessage foundMessageId", foundMessageId);
+      foundMessageRef.current.scrollIntoView({});
     }
   };
 
@@ -658,6 +751,33 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     }
   };
 
+  const renderTicketDividers = (message, index) => {
+    if (index === 0 && !hasMore) {
+      return (
+        <div
+          className={classes.ticketDivider}
+          key={`timestamp-${message.ticketId}`}
+        >
+          Ticket: {message.ticketId}
+        </div>
+      );
+    }
+
+    if (index > 0 && index <= messagesList.length - 1) {
+      let previousMessage = messagesList[index - 1];
+      if (message?.ticketId !== previousMessage?.ticketId) {
+        return (
+          <div
+            className={classes.ticketDivider}
+            key={`timestamp-${message.ticketId}`}
+          >
+            Ticket: {message.ticketId}
+          </div>
+        );
+      }
+    }
+  };
+
   const renderDailyTimestamps = (message, index) => {
     if (index === 0) {
       return (
@@ -676,7 +796,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
         </span>
       );
     }
-    if (index < messagesList.length - 1) {
+    if (index <= messagesList.length - 1) {
       let messageDay = messagesList[index].timestamp
         ? fromUnixTime(messagesList[index].timestamp)
         : parseISO(messagesList[index].createdAt);
@@ -702,15 +822,6 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
           </span>
         );
       }
-    }
-    if (index === messagesList.length - 1) {
-      return (
-        <div
-          key={`ref-${message.timestamp || message.createdAt}`}
-          ref={lastMessageRef}
-          style={{ float: "left", clear: "both" }}
-        />
-      );
     }
   };
 
@@ -764,14 +875,45 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     );
   };
 
+  const renderLastMessageMark = (message, index) => {
+    return (
+      <>
+        {index === messagesList.length - 1 && (
+          <div
+            key={`ref-${message.timestamp || message.createdAt}`}
+            ref={lastMessageRef}
+            style={{ float: "left", clear: "both" }}
+          />
+        )}
+      </>
+    );
+  };
+
+  const renderFoundMessageMark = (message) => {
+    return (
+      <>
+        {message.id === foundMessageId && (
+          <div
+            key={`ref-${message.timestamp || message.createdAt}-${message.id}`}
+            ref={foundMessageRef}
+            style={{ float: "left", clear: "both", scrollMargin: "4rem" }}
+          />
+        )}
+      </>
+    );
+  };
+
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
         if (!message.fromMe) {
           return (
             <React.Fragment key={message.id}>
-              {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
+              {renderTicketDividers(message, index)}
+              {renderDailyTimestamps(message, index)}
+              {renderLastMessageMark(message, index)}
+              {renderFoundMessageMark(message)}
               <div
                 className={
                   isGroup &&
@@ -827,8 +969,11 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
         } else {
           return (
             <React.Fragment key={message.id}>
-              {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
+              {renderTicketDividers(message, index)}
+              {renderDailyTimestamps(message, index)}
+              {renderLastMessageMark(message, index)}
+              {renderFoundMessageMark(message)}
               <div
                 className={
                   message.isPrivate
