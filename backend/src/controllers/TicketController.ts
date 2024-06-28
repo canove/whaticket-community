@@ -26,6 +26,7 @@ type IndexQuery = {
   queueIds: string;
   whatsappIds: string;
   typeIds: string;
+  showOnlyMyGroups: string;
 };
 
 interface TicketData {
@@ -45,7 +46,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     whatsappIds: whatsappIdsStringified,
     queueIds: queueIdsStringified,
     typeIds: typeIdsStringified,
-    withUnreadMessages
+    withUnreadMessages,
+    showOnlyMyGroups: showOnlyMyGroupsStringified
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -53,6 +55,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   let queueIds: number[] = [];
   let whatsappIds: number[] = [];
   let typeIds: string[] = [];
+  let showOnlyMyGroups: boolean = false;
 
   if (typeIdsStringified) {
     typeIds = JSON.parse(typeIdsStringified);
@@ -66,6 +69,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     queueIds = JSON.parse(queueIdsStringified);
   }
 
+  if (showOnlyMyGroupsStringified) {
+    showOnlyMyGroups = JSON.parse(showOnlyMyGroupsStringified);
+  }
+
   const { tickets, count, hasMore } = await ListTicketsService({
     searchParam,
     pageNumber,
@@ -76,7 +83,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     whatsappIds,
     queueIds,
     typeIds,
-    withUnreadMessages
+    withUnreadMessages,
+    showOnlyMyGroups
   });
 
   return res.status(200).json({ tickets, count, hasMore });

@@ -11,6 +11,7 @@ interface TicketData {
   privateNote?: string;
   categoriesIds?: number[];
   helpUsersIds?: number[];
+  participantUsersIds?: number[];
 }
 
 interface Request {
@@ -35,7 +36,8 @@ const UpdateTicketService = async ({
     whatsappId,
     privateNote,
     categoriesIds,
-    helpUsersIds
+    helpUsersIds,
+    participantUsersIds
   } = ticketData;
 
   const ticket = await ShowTicketService(ticketId);
@@ -71,6 +73,15 @@ const UpdateTicketService = async ({
 
   if (helpUsersIds) {
     await ticket.$set("helpUsers", helpUsersIds);
+  }
+
+  if (participantUsersIds) {
+    console.log(
+      "se quiere actualizar los participantUsersIds con : ",
+      participantUsersIds
+    );
+
+    await ticket.$set("participantUsers", participantUsersIds);
   }
 
   await ticket.reload();

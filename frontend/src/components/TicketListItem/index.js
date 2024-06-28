@@ -12,7 +12,7 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Tooltip from "@material-ui/core/Tooltip";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
-import SyncAltIcon from "@material-ui/icons/SyncAlt";
+import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import TicketPreviewModal from "../TicketPreviewModal";
 
 import Typography from "@material-ui/core/Typography";
@@ -219,13 +219,21 @@ const TicketListItem = ({ ticket }) => {
               {/* - CONTACT NAME */}
 
               <div style={{ display: "flex" }}>
-                {ticket.status !== "closed" &&
-                ticket.messages?.length &&
-                ticket.messages[0]?.timestamp &&
-                (ticket.contact?.id === ticket.messages[0]?.contactId ||
-                  (ticket.isGroup && !ticket.messages[0]?.fromMe)) ? (
-                  <TicketListItemLastMessageTime ticket={ticket} />
-                ) : null}
+                {ticket.participantUsers?.find((hu) => hu.id === user?.id) && (
+                  // HELP BADGE
+                  // <Badge
+                  //   className={classes.closedBadge}
+                  //   badgeContent={"Apoyo"}
+                  //   color="primary"
+                  // />
+                  <Chip
+                    style={{ scale: "0.85" }}
+                    color="primary"
+                    size="small"
+                    label="Participando"
+                  />
+                  // HELP BADGE
+                )}
 
                 {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
                   // HELP BADGE
@@ -257,6 +265,14 @@ const TicketListItem = ({ ticket }) => {
                   />
                   // CLOSED BADGE
                 )}
+
+                {ticket.status !== "closed" &&
+                ((ticket.firstClientMessageAfterLastUserMessage.length > 0 &&
+                  ticket.firstClientMessageAfterLastUserMessage[0].timestamp) ||
+                  (ticket.firstClientMessageAfterLastUserMessage.length === 0 &&
+                    !ticket.userHadContact)) ? (
+                  <TicketListItemLastMessageTime ticket={ticket} />
+                ) : null}
 
                 {ticket.lastMessageTimestamp && (
                   // LAST MESSAGE TIME
@@ -341,7 +357,21 @@ const TicketListItem = ({ ticket }) => {
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* USER */}
-                {ticket.userId && (
+                {ticket.isGroup && ticket.participantUsers.length > 0 && (
+                  <Tooltip
+                    title={`Participando: 
+                            ${[...ticket.participantUsers]
+                              .map((u) => u.name)
+                              .join(", ")}`}
+                    aria-label="add"
+                  >
+                    <PeopleAltIcon fontSize="small" />
+                  </Tooltip>
+                )}
+                {/* - USER */}
+
+                {/* USER */}
+                {!ticket.isGroup && ticket.userId && (
                   <Tooltip
                     title={`Asignado: ${ticket.user?.name}`}
                     aria-label="add"
@@ -357,7 +387,7 @@ const TicketListItem = ({ ticket }) => {
                     title={`Conexión: ${ticket.whatsapp?.name}`}
                     aria-label="add"
                   >
-                    <SyncAltIcon fontSize="small" />
+                    <WhatsAppIcon style={{ color: "green" }} fontSize="small" />
                   </Tooltip>
                 )}
                 {/* WPP */}

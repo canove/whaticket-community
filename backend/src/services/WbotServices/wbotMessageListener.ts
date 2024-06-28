@@ -253,7 +253,8 @@ export const verifyMessage = async (
             ? // @ts-ignore
               "Localization - " + msg.location.description.split("\\n")[0]
             : "Localization"
-          : msg.body
+          : msg.body,
+      ...(msg.fromMe && !isPrivate && { userHadContact: true })
     });
   }
 

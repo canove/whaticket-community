@@ -77,6 +77,8 @@ const reducer = (state, action) => {
   if (action.type === "LOAD_TICKETS") {
     const newTickets = action.payload;
 
+    // console.log("_________newTickets", newTickets);
+
     newTickets.forEach((ticket) => {
       const ticketIndex = state.findIndex((t) => t.id === ticket.id);
       if (ticketIndex !== -1) {
@@ -98,7 +100,6 @@ const reducer = (state, action) => {
         }
       }
     });
-
     return [...state];
   }
 
@@ -145,6 +146,10 @@ const reducer = (state, action) => {
   }
 
   if (action.type === "UPDATE_TICKET_UNREAD_MESSAGES") {
+    // console.log(
+    //   "UPDATE_TICKET_UNREAD_MESSAGES before:",
+    //   JSON.parse(JSON.stringify(state))
+    // );
     const { ticket, setUpdatedCount } = action.payload;
 
     const ticketIndex = state.findIndex((t) => t.id === ticket.id);
@@ -155,6 +160,11 @@ const reducer = (state, action) => {
       state.unshift(ticket);
       setUpdatedCount((oldCount) => oldCount + 1);
     }
+
+    // console.log(
+    //   "UPDATE_TICKET_UNREAD_MESSAGES after:",
+    //   JSON.parse(JSON.stringify(state))
+    // );
 
     return [...state];
   }
@@ -194,6 +204,7 @@ const TicketsList = (props) => {
     selectedTypeIds,
     updateCount,
     style,
+    showOnlyMyGroups = false,
   } = props;
   const classes = useStyles();
   const [pageNumber, setPageNumber] = useState(1);
@@ -202,6 +213,8 @@ const TicketsList = (props) => {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    // console.log("RESET: ");
+
     dispatch({ type: "RESET" });
     setPageNumber(1);
   }, [
@@ -212,6 +225,7 @@ const TicketsList = (props) => {
     selectedWhatsappIds,
     selectedQueueIds,
     selectedTypeIds,
+    showOnlyMyGroups,
   ]);
 
   const { tickets, hasMore, loading, count } = useTickets({
@@ -222,9 +236,11 @@ const TicketsList = (props) => {
     whatsappIds: JSON.stringify(selectedWhatsappIds),
     queueIds: JSON.stringify(selectedQueueIds),
     typeIds: JSON.stringify(selectedTypeIds),
+    showOnlyMyGroups,
   });
 
   useEffect(() => {
+    // console.log("PREV_TICKETS - STATUS:", status, "SEARCH_PARAM:", searchParam);
     if (!status && !searchParam) return;
     console.log("LOAD_TICKETS", tickets);
 
@@ -253,7 +269,9 @@ const TicketsList = (props) => {
         ticket.userId === user?.id ||
         ticket.helpUsers?.find((hu) => hu.id === user?.id) ||
         showAll) &&
-      (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+      (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1) &&
+      ((ticket.isGroup && selectedTypeIds[0] === "group") ||
+        (!ticket.isGroup && selectedTypeIds[0] === "individual"));
 
     const notBelongsToUserQueues = (ticket) =>
       ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
@@ -267,6 +285,8 @@ const TicketsList = (props) => {
     });
 
     socket.on("ticket", (data) => {
+      // console.log("ticket socket::::::::::::::::::::", data);
+
       if (data.action === "updateUnread") {
         dispatch({
           type: "RESET_UNREAD",
@@ -304,6 +324,7 @@ const TicketsList = (props) => {
     });
 
     socket.on("appMessage", (data) => {
+      // console.log("appMessage socket::::::::::::::::::::", data);
       if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
         dispatch({
           type: "UPDATE_TICKET_UNREAD_MESSAGES",
@@ -313,6 +334,7 @@ const TicketsList = (props) => {
     });
 
     socket.on("contact", (data) => {
+      // console.log("contact socket::::::::::::::::::::", data);
       if (data.action === "update") {
         dispatch({
           type: "UPDATE_TICKET_CONTACT",

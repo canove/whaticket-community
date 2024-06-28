@@ -19,6 +19,7 @@ import Message from "./Message";
 import Queue from "./Queue";
 import TicketCategory from "./TicketCategory";
 import TicketHelpUser from "./TicketHelpUser";
+import TicketParticipantUsers from "./TicketParticipantUsers";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
@@ -88,11 +89,17 @@ class Ticket extends Model<Ticket> {
   @HasMany(() => Message)
   messages: Message[];
 
+  @HasMany(() => Message)
+  firstClientMessageAfterLastUserMessage: Message[];
+
   @BelongsToMany(() => Category, () => TicketCategory)
   categories: Category[];
 
   @BelongsToMany(() => User, () => TicketHelpUser)
   helpUsers: User[];
+
+  @BelongsToMany(() => User, () => TicketParticipantUsers)
+  participantUsers: User[];
 }
 
 export default Ticket;

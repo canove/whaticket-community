@@ -26,7 +26,11 @@ export default function TicketListItemLastMessageTime({ ticket }) {
       color={
         differenceInHours(
           nowTime,
-          fromUnixTime(ticket?.messages[0]?.timestamp)
+          ticket.userHadContact
+            ? fromUnixTime(
+                ticket.firstClientMessageAfterLastUserMessage[0].timestamp
+              )
+            : new Date(ticket.createdAt)
         ) >= 24
           ? "secondary"
           : "default"
@@ -35,7 +39,11 @@ export default function TicketListItemLastMessageTime({ ticket }) {
       label={`Hace ${
         formatDistanceStrict(
           nowTime,
-          fromUnixTime(ticket?.messages[0]?.timestamp),
+          ticket.userHadContact
+            ? fromUnixTime(
+                ticket.firstClientMessageAfterLastUserMessage[0].timestamp
+              )
+            : new Date(ticket.createdAt),
           {
             locale: es,
           }

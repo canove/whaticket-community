@@ -6,6 +6,7 @@ import {
   Sequelize,
   col,
   fn,
+  literal,
   where
 } from "sequelize";
 
@@ -29,6 +30,7 @@ interface Request {
   whatsappIds: Array<number>;
   queueIds: Array<number>;
   typeIds: Array<string>;
+  showOnlyMyGroups: boolean;
 }
 
 interface Response {
@@ -47,7 +49,8 @@ const ListTicketsService = async ({
   date,
   showAll,
   userId,
-  withUnreadMessages
+  withUnreadMessages,
+  showOnlyMyGroups
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [
@@ -117,6 +120,18 @@ const ListTicketsService = async ({
       required: false
     },
     {
+      model: User,
+      as: "participantUsers",
+      ...(showOnlyMyGroups && typeIds.length === 1 && typeIds.includes("group")
+        ? {
+            where: {
+              id: +userId
+            },
+            required: true
+          }
+        : { required: false })
+    },
+    {
       model: Message,
       as: "messages",
       separate: true, // <--- Run separate query
@@ -126,6 +141,25 @@ const ListTicketsService = async ({
       where: {
         isPrivate: {
           [Op.or]: [false, null]
+        }
+      }
+    },
+    {
+      model: Message,
+      as: "firstClientMessageAfterLastUserMessage",
+      attributes: ["id", "body", "timestamp"],
+      order: [["timestamp", "ASC"]],
+      required: false,
+      limit: 1,
+      where: {
+        isPrivate: {
+          [Op.or]: [false, null]
+        },
+        fromMe: false,
+        timestamp: {
+          [Op.gt]: literal(
+            `(SELECT MAX(mes.timestamp) FROM Messages mes WHERE mes.ticketId = Message.ticketId AND mes.fromMe = 1 AND (mes.isPrivate = 0 OR mes.isPrivate IS NULL))`
+          )
         }
       }
     }

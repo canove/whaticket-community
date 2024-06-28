@@ -15,7 +15,6 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import Menu from "@material-ui/core/Menu";
 import { Can } from "../Can";
 
-import TicketsTypeSelect from "../TicketsTypeSelect";
 import TicketsWhatsappSelect from "../TicketsWhatsappSelect";
 
 import MenuItem from "@material-ui/core/MenuItem";
@@ -104,19 +103,26 @@ const TicketsManager = () => {
   const [tabOpen, setTabOpen] = useState("open");
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
   const [showAllTickets, setShowAllTickets] = useState(false);
+  const [showOnlyMyGroups, setShowOnlyMyGroups] = useState(false);
   const searchInputRef = useRef();
   const { user } = useContext(AuthContext);
 
+  const [groupCount, setGroupCount] = useState(0);
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
 
   const userQueueIds = [...user.queues.map((q) => q.id), null];
   const { whatsApps, loading } = useContext(WhatsAppsContext);
   const [selectedWhatsappIds, setSelectedWhatsappIds] = useState(null);
-  const [selectedTypeIds, setSelectedTypeIds] = useState(null);
+  // const [selectedTypeIds] = useState(["individual"]);
+  const [typeIdsForAll] = useState(["individual", "group"]);
+  const [typeIdsForIndividuals] = useState(["individual"]);
+  const [typeIdsForGroups] = useState(["group"]);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl2, setAnchorEl2] = useState(null);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -124,9 +130,16 @@ const TicketsManager = () => {
     setAnchorEl(null);
   };
 
+  const handleClick2 = (event) => {
+    setAnchorEl2(event.currentTarget);
+  };
+  const handleClose2 = () => {
+    setAnchorEl2(null);
+  };
+
   useEffect(() => {
-    localStorage.getItem("selectedTypes") &&
-      setSelectedTypeIds(JSON.parse(localStorage.getItem("selectedTypes")));
+    // localStorage.getItem("selectedTypes") &&
+    //   setSelectedTypeIds(JSON.parse(localStorage.getItem("selectedTypes")));
 
     localStorage.getItem("selectedWhatsappIds") &&
       setSelectedWhatsappIds(
@@ -136,6 +149,10 @@ const TicketsManager = () => {
     localStorage.getItem("selectedQueueIds") &&
       setSelectedQueueIds(JSON.parse(localStorage.getItem("selectedQueueIds")));
   }, []);
+
+  // useEffect(() => {
+  //   console.log("selectedTypeIds", selectedTypeIds);
+  // }, [selectedTypeIds]);
 
   useEffect(() => {
     if (user.profile.toUpperCase() === "ADMIN") {
@@ -285,11 +302,11 @@ const TicketsManager = () => {
         )}
 
         {/* QUEUE SELECT */}
-        <TicketsTypeSelect
+        {/* <TicketsTypeSelect
           style={{ marginLeft: 6 }}
           selectedTypeIds={selectedTypeIds || []}
           onChange={(values) => setSelectedTypeIds(values)}
-        />
+        /> */}
         {/* - QUEUE SELECT */}
 
         {/* QUEUE SELECT */}
@@ -321,6 +338,50 @@ const TicketsManager = () => {
           textColor="primary"
           variant="fullWidth"
         >
+          <Tab
+            label={
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <Badge
+                  className={classes.badge}
+                  badgeContent={groupCount}
+                  color="primary"
+                  max={99999}
+                >
+                  {!showOnlyMyGroups ? "TODOS LOS GRUPOS" : "MIS GRUPOS"}
+                </Badge>
+
+                <>
+                  <ArrowDropDownIcon fontSize="large" onClick={handleClick2} />
+
+                  <Menu
+                    anchorEl={anchorEl2}
+                    open={Boolean(anchorEl2)}
+                    onClose={handleClose2}
+                  >
+                    <MenuItem
+                      onClick={(e) => {
+                        setShowOnlyMyGroups(false);
+                        handleClose2(e);
+                      }}
+                    >
+                      TODOS LOS GRUPOS
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(e) => {
+                        setShowOnlyMyGroups(true);
+                        handleClose2(e);
+                      }}
+                    >
+                      MIS GRUPOS
+                    </MenuItem>
+                  </Menu>
+                </>
+              </div>
+            }
+            value={"groups"}
+          />
           <Tab
             label={
               <div
@@ -396,8 +457,20 @@ const TicketsManager = () => {
           {/*  */}
           <TicketsList
             status="open"
+            showAll={true}
+            selectedTypeIds={typeIdsForGroups}
+            showOnlyMyGroups={showOnlyMyGroups}
+            selectedWhatsappIds={selectedWhatsappIds}
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => {
+              setGroupCount(val);
+            }}
+            style={applyPanelStyle("groups")}
+          />
+          <TicketsList
+            status="open"
             showAll={showAllTickets}
-            selectedTypeIds={selectedTypeIds}
+            selectedTypeIds={typeIdsForIndividuals}
             selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setOpenCount(val)}
@@ -405,7 +478,7 @@ const TicketsManager = () => {
           />
           <TicketsList
             status="pending"
-            selectedTypeIds={selectedTypeIds}
+            selectedTypeIds={typeIdsForAll}
             selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setPendingCount(val)}
@@ -421,7 +494,7 @@ const TicketsManager = () => {
         <TicketsList
           status="closed"
           showAll={true}
-          selectedTypeIds={selectedTypeIds}
+          selectedTypeIds={typeIdsForAll}
           selectedWhatsappIds={selectedWhatsappIds}
           selectedQueueIds={selectedQueueIds}
         />
@@ -433,7 +506,7 @@ const TicketsManager = () => {
         <TicketsList
           searchParam={searchParam}
           showAll={true}
-          selectedTypeIds={selectedTypeIds}
+          selectedTypeIds={typeIdsForAll}
           selectedWhatsappIds={selectedWhatsappIds}
           selectedQueueIds={selectedQueueIds}
         />
