@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
 import clsx from "clsx";
@@ -8,6 +8,7 @@ import openSocket from "../../services/socket-io";
 import { Paper, makeStyles } from "@material-ui/core";
 
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import { SearchMessageContext } from "../../context/SearchMessage/SearchMessageContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
@@ -16,6 +17,11 @@ import MessagesList from "../MessagesList";
 import TicketActionButtons from "../TicketActionButtons";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
+
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 
 const drawerWidth = 320;
 
@@ -82,6 +88,9 @@ const Ticket = () => {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+  const [relatedTickets, setRelatedTickets] = useState([]);
+  const [selectRelatedTicketId, setSelectRelatedTicketId] = useState(null);
+  const { setSearchingMessageId } = useContext(SearchMessageContext);
 
   useEffect(() => {
     setLoading(true);
@@ -92,7 +101,18 @@ const Ticket = () => {
 
           setContact(data.contact);
           setTicket(data);
-          console.log("ticket:", data);
+
+          // console.log("________ticket:", data);
+
+          const { data: relatedTickets } = await api.get(
+            "/showAllRelatedTickets/" + ticketId
+          );
+
+          console.log("________relatedTickets:", relatedTickets);
+
+          setRelatedTickets(relatedTickets);
+          setSelectRelatedTicketId(ticketId);
+
           setLoading(false);
         } catch (err) {
           setLoading(false);
@@ -162,6 +182,45 @@ const Ticket = () => {
               onClick={handleDrawerOpen}
             />
           </div>
+
+          <div>
+            <FormControl fullWidth margin="dense" variant="outlined">
+              <InputLabel>Ticket</InputLabel>
+              <Select
+                labelWidth={60}
+                onChange={(e) => {
+                  console.log(
+                    e.target.value,
+                    relatedTickets.find((rt) => rt.id === e.target.value)
+                  );
+                  setSelectRelatedTicketId(e.target.value);
+                  setSearchingMessageId(
+                    relatedTickets.find((rt) => rt.id === e.target.value)
+                      ?.messages[0]?.id
+                  );
+                }}
+                value={selectRelatedTicketId}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "left",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "left",
+                  },
+                  getContentAnchorEl: null,
+                }}
+              >
+                {relatedTickets.map((rt) => (
+                  <MenuItem key={rt.id} value={rt.id}>
+                    Ticket: {rt.id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+
           <div className={classes.ticketActionButtons}>
             <TicketActionButtons ticket={ticket} />
           </div>

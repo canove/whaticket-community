@@ -3,7 +3,9 @@ import { Request, Response } from "express";
 import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
 import Message from "../models/Message";
 
+// import ListMessages2Service from "../services/MessageServices/ListMessages2Service";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
+import ListMessagesV2Service from "../services/MessageServices/ListMessagesV2Service";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
@@ -13,6 +15,12 @@ import verifyPrivateMessage from "../utils/verifyPrivateMessage";
 type IndexQuery = {
   pageNumber: string;
   setTicketMessagesAsRead?: string;
+};
+
+type IndexQueryV2 = {
+  setTicketMessagesAsRead?: string;
+  searchMessageId?: string;
+  ticketsToFetchMessagesQueue: string;
 };
 
 type MessageData = {
@@ -38,6 +46,39 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   }
 
   return res.json({ count, messages, ticket, hasMore });
+};
+
+export const indexV2 = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const {
+    setTicketMessagesAsRead,
+    ticketsToFetchMessagesQueue,
+    searchMessageId
+  } = req.query as unknown as IndexQueryV2;
+
+  // console.log("_________index2:", {
+  //   setTicketMessagesAsRead,
+  //   ticketsToFetchMessagesQueue
+  // });
+
+  const {
+    messages,
+    ticketsToFetchMessagesQueue: nextTicketsToFetchMessagesQueue,
+    hasMore
+  } = await ListMessagesV2Service({
+    ticketsToFetchMessagesQueue,
+    searchMessageId
+  });
+
+  if (setTicketMessagesAsRead === "true") {
+    if (nextTicketsToFetchMessagesQueue[0].ticket) {
+      SetTicketMessagesAsRead(nextTicketsToFetchMessagesQueue[0].ticket);
+    }
+  }
+
+  return res.json({ messages, nextTicketsToFetchMessagesQueue, hasMore });
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {

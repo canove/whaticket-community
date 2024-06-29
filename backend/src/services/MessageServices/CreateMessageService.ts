@@ -1,7 +1,8 @@
-import { Op } from "sequelize";
+import { Op, literal } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
+import User from "../../models/User";
 import Whatsapp from "../../models/Whatsapp";
 
 interface MessageData {
@@ -56,6 +57,41 @@ const CreateMessageService = async ({
             where: {
               isPrivate: {
                 [Op.or]: [false, null]
+              }
+            }
+          },
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "name"],
+            required: false
+          },
+          {
+            model: User,
+            as: "helpUsers",
+            required: false
+          },
+          {
+            model: User,
+            as: "participantUsers",
+            required: false
+          },
+          {
+            model: Message,
+            as: "firstClientMessageAfterLastUserMessage",
+            attributes: ["id", "body", "timestamp"],
+            order: [["timestamp", "ASC"]],
+            required: false,
+            limit: 1,
+            where: {
+              isPrivate: {
+                [Op.or]: [false, null]
+              },
+              fromMe: false,
+              timestamp: {
+                [Op.gt]: literal(
+                  `(SELECT MAX(mes.timestamp) FROM Messages mes WHERE mes.ticketId = Message.ticketId AND mes.fromMe = 1 AND (mes.isPrivate = 0 OR mes.isPrivate IS NULL))`
+                )
               }
             }
           }

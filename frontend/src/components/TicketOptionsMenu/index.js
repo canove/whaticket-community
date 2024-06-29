@@ -3,8 +3,6 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { toast } from "react-toastify";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
@@ -69,7 +67,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
         open={menuOpen}
         onClose={handleClose}
       >
-        <MenuItem
+        {/* <MenuItem
           disabled={recoveringTheEntireConversation}
           onClick={async () => {
             setRecoveringTheEntireConversation(true);
@@ -87,7 +85,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
         >
           {recoveringTheEntireConversation && <CircularProgress />}
           Recuperar toda la conversación
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleOpenTransferModal}>
           {i18n.t("ticketOptionsMenu.transfer")}
         </MenuItem>

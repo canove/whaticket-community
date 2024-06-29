@@ -9,6 +9,12 @@ ticketRoutes.get("/tickets", isAuth, TicketController.index);
 
 ticketRoutes.get("/tickets/:ticketId", isAuth, TicketController.show);
 
+ticketRoutes.get(
+  "/showAllRelatedTickets/:ticketId",
+  isAuth,
+  TicketController.showAllRelatedTickets
+);
+
 ticketRoutes.post("/tickets", isAuth, TicketController.store);
 
 ticketRoutes.post(

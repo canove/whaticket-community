@@ -16,6 +16,7 @@ import { i18n } from "../../translate/i18n";
 
 import AddCategoryToTicketModal from "../AddCategoryToTicketModal";
 import AskForHelpTicketModal from "../AskForHelpTicketModal";
+import AskForParticipationTicketModal from "../AskForParticipationTicketModal";
 
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import TicketOptionsMenu from "../TicketOptionsMenu";
@@ -41,6 +42,10 @@ const TicketActionButtons = ({ ticket }) => {
     useState(false);
   const [askForHelpTicketModalOpen, setAskForHelpTicketModalOpen] =
     useState(false);
+  const [
+    askForParticipationTicketModalOpen,
+    setAskForParticipationTicketModalOpen,
+  ] = useState(false);
   const ticketOptionsMenuOpen = Boolean(anchorEl);
   const { user } = useContext(AuthContext);
 
@@ -51,6 +56,10 @@ const TicketActionButtons = ({ ticket }) => {
   const handleCloseTicketOptionsMenu = (e) => {
     setAnchorEl(null);
   };
+
+  // useEffect(() => {
+  //   console.log(">>>>>>><ticket", ticket);
+  // }, [ticket]);
 
   const handleUpdateTicketStatus = async (e, status, userId) => {
     setLoading(true);
@@ -93,27 +102,56 @@ const TicketActionButtons = ({ ticket }) => {
   return (
     <div className={classes.actionButtons}>
       {ticket.status === "closed" && (
-        <ButtonWithSpinner
-          loading={loading}
-          startIcon={<Replay />}
-          size="small"
-          onClick={(e) => handleUpdateTicketStatus(e, "open", user?.id)}
-        >
-          {i18n.t("messagesList.header.buttons.reopen")}
-        </ButtonWithSpinner>
-      )}
-      {ticket.status === "open" && (
         <>
-          {(ticket.userId === user?.id || user?.profile === "admin") && (
+          {!ticket.isGroup ? (
             <ButtonWithSpinner
               loading={loading}
               startIcon={<Replay />}
               size="small"
-              onClick={(e) => handleUpdateTicketStatus(e, "pending", null)}
+              onClick={(e) => handleUpdateTicketStatus(e, "open", user?.id)}
             >
-              {i18n.t("messagesList.header.buttons.return")}
+              {i18n.t("messagesList.header.buttons.reopen")}
             </ButtonWithSpinner>
+          ) : (
+            <></>
+            // <ButtonWithSpinner
+            //   loading={loading}
+            //   startIcon={<Replay />}
+            //   size="small"
+            //   onClick={async () => {
+            //     try {
+            //       await api.put(`/tickets/${ticket.id}`, {
+            //         status: "open",
+            //       });
+
+            //       await api.post(`/privateMessages/${ticket.id}`, {
+            //         body: `${user?.name} *Devolvió a bandeja* la conversación`,
+            //       });
+            //       history.push(`/tickets/${ticket.id}`);
+            //     } catch (err) {
+            //       toastError(err);
+            //     }
+            //   }}
+            // >
+            //   Devolver a bandeja
+            // </ButtonWithSpinner>
           )}
+        </>
+      )}
+
+      {ticket.status === "open" && (
+        <>
+          {(ticket.userId === user?.id || user?.profile === "admin") &&
+            !ticket.isGroup && (
+              <ButtonWithSpinner
+                loading={loading}
+                startIcon={<Replay />}
+                size="small"
+                onClick={(e) => handleUpdateTicketStatus(e, "pending", null)}
+              >
+                {i18n.t("messagesList.header.buttons.return")}
+              </ButtonWithSpinner>
+            )}
 
           <Badge
             badgeContent={ticket.categories.length}
@@ -133,28 +171,55 @@ const TicketActionButtons = ({ ticket }) => {
             </div>
           </Badge>
 
-          {(ticket.userId === user?.id || user?.profile === "admin") && (
-            <>
-              <ButtonWithSpinner
-                loading={loading}
-                size="small"
-                variant="contained"
-                color="primary"
-                onClick={(e) => handleUpdateTicketStatus(e, "closed", user?.id)}
-              >
-                {i18n.t("messagesList.header.buttons.resolve")}
-              </ButtonWithSpinner>
+          {/* {ticket.isGroup && (
+            <ButtonWithSpinner
+              loading={loading}
+              startIcon={<Replay />}
+              size="small"
+              onClick={async () => {
+                try {
+                  await api.put(`/tickets/${ticket.id}`, {
+                    status: "closed",
+                  });
 
-              <Button
-                size="small"
-                variant="contained"
-                color="default"
-                onClick={() => setAskForHelpTicketModalOpen(true)}
-              >
-                Pedir apoyo
-              </Button>
-            </>
-          )}
+                  await api.post(`/privateMessages/${ticket.id}`, {
+                    body: `${user?.name} *Envio a resueltos* la conversación`,
+                  });
+                  history.push(`/tickets`);
+                } catch (err) {
+                  toastError(err);
+                }
+              }}
+            >
+              Enviar a resueltos
+            </ButtonWithSpinner>
+          )} */}
+
+          {(ticket.userId === user?.id || user?.profile === "admin") &&
+            !ticket.isGroup && (
+              <>
+                <ButtonWithSpinner
+                  loading={loading}
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={(e) =>
+                    handleUpdateTicketStatus(e, "closed", user?.id)
+                  }
+                >
+                  {i18n.t("messagesList.header.buttons.resolve")}
+                </ButtonWithSpinner>
+
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="default"
+                  onClick={() => setAskForHelpTicketModalOpen(true)}
+                >
+                  Pedir apoyo
+                </Button>
+              </>
+            )}
 
           {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
             <>
@@ -200,11 +265,12 @@ const TicketActionButtons = ({ ticket }) => {
             ticket={ticket}
           />
 
-          {(ticket.userId === user?.id || user?.profile === "admin") && (
-            <IconButton onClick={handleOpenTicketOptionsMenu}>
-              <MoreVert />
-            </IconButton>
-          )}
+          {(ticket.userId === user?.id || user?.profile === "admin") &&
+            !ticket.isGroup && (
+              <IconButton onClick={handleOpenTicketOptionsMenu}>
+                <MoreVert />
+              </IconButton>
+            )}
 
           <TicketOptionsMenu
             ticket={ticket}
@@ -226,6 +292,82 @@ const TicketActionButtons = ({ ticket }) => {
 
           {i18n.t("messagesList.header.buttons.accept")}
         </ButtonWithSpinner>
+      )}
+
+      {ticket.isGroup && (
+        <>
+          {ticket.participantUsers?.find((pu) => pu.id === user?.id) ? (
+            <ButtonWithSpinner
+              loading={loading}
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={async () => {
+                try {
+                  await api.put(`/tickets/${ticket.id}`, {
+                    participantUsersIds: ticket.participantUsers
+                      .filter((pu) => pu.id !== user?.id)
+                      .map((pu) => pu.id),
+                  });
+
+                  await api.post(`/privateMessages/${ticket.id}`, {
+                    body: `${user?.name} *Terminó su participación* en la conversación`,
+                  });
+                  history.push(`/tickets`);
+                } catch (err) {
+                  toastError(err);
+                }
+              }}
+            >
+              Terminar participación
+            </ButtonWithSpinner>
+          ) : (
+            <ButtonWithSpinner
+              loading={loading}
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={async () => {
+                try {
+                  await api.put(`/tickets/${ticket.id}`, {
+                    participantUsersIds: [
+                      ...ticket.participantUsers.map((pu) => pu.id),
+                      user?.id,
+                    ],
+                  });
+
+                  await api.post(`/privateMessages/${ticket.id}`, {
+                    body: `${user?.name} *Empezó a participar* en la conversación`,
+                  });
+                } catch (err) {
+                  toastError(err);
+                }
+              }}
+            >
+              <GroupAddIcon style={{ marginRight: 6 }} />
+              Empezar participación
+            </ButtonWithSpinner>
+          )}
+
+          <Button
+            size="small"
+            variant="contained"
+            color="default"
+            onClick={() => {
+              setAskForParticipationTicketModalOpen(true);
+            }}
+          >
+            Pedir participación
+          </Button>
+
+          <AskForParticipationTicketModal
+            modalOpen={askForParticipationTicketModalOpen}
+            onClose={() => {
+              setAskForParticipationTicketModalOpen(false);
+            }}
+            ticket={ticket}
+          />
+        </>
       )}
     </div>
   );

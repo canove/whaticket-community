@@ -6,6 +6,7 @@ import {
   Sequelize,
   col,
   fn,
+  literal,
   where
 } from "sequelize";
 
@@ -29,6 +30,7 @@ interface Request {
   whatsappIds: Array<number>;
   queueIds: Array<number>;
   typeIds: Array<string>;
+  showOnlyMyGroups: boolean;
 }
 
 interface Response {
@@ -47,7 +49,8 @@ const ListTicketsService = async ({
   date,
   showAll,
   userId,
-  withUnreadMessages
+  withUnreadMessages,
+  showOnlyMyGroups
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [
@@ -117,6 +120,18 @@ const ListTicketsService = async ({
       required: false
     },
     {
+      model: User,
+      as: "participantUsers",
+      ...(showOnlyMyGroups && typeIds.length === 1 && typeIds.includes("group")
+        ? {
+            where: {
+              id: +userId
+            },
+            required: true
+          }
+        : { required: false })
+    },
+    {
       model: Message,
       as: "messages",
       separate: true, // <--- Run separate query
@@ -126,6 +141,25 @@ const ListTicketsService = async ({
       where: {
         isPrivate: {
           [Op.or]: [false, null]
+        }
+      }
+    },
+    {
+      model: Message,
+      as: "firstClientMessageAfterLastUserMessage",
+      attributes: ["id", "body", "timestamp"],
+      order: [["timestamp", "ASC"]],
+      required: false,
+      limit: 1,
+      where: {
+        isPrivate: {
+          [Op.or]: [false, null]
+        },
+        fromMe: false,
+        timestamp: {
+          [Op.gt]: literal(
+            `(SELECT MAX(mes.timestamp) FROM Messages mes WHERE mes.ticketId = Message.ticketId AND mes.fromMe = 1 AND (mes.isPrivate = 0 OR mes.isPrivate IS NULL))`
+          )
         }
       }
     }
@@ -243,12 +277,14 @@ const ListTicketsService = async ({
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
 
-  console.log(
-    typeIds,
-    "Ticket.findAndCountAll where shoGroups",
-    // @ts-ignore
-    whereCondition?.isGroup
-  );
+  console.log("________-whereCondition", whereCondition);
+
+  // console.log(
+  //   typeIds,
+  //   "Ticket.findAndCountAll where shoGroups",
+  //   // @ts-ignore
+  //   whereCondition?.isGroup
+  // );
   // // @ts-ignore
   // console.log("Ticket.findAndCountAll where queId", whereCondition?.queueId);
   // console.log(
@@ -266,10 +302,33 @@ const ListTicketsService = async ({
     order: [["lastMessageTimestamp", "DESC"]]
   });
 
+  let filteredTickets: Ticket[] | null = null;
+
+  // @ts-ignore
+  if (whereCondition.status === "closed") {
+    console.log("______SE PIDIERON SOLO LOS TICKETS CERRADOS");
+
+    filteredTickets = (
+      await Promise.all(
+        tickets.map(async ticket => {
+          const similiarTicketsButOpensOrPendings = await Ticket.findAll({
+            where: {
+              whatsappId: ticket.whatsappId,
+              contactId: ticket.contactId,
+              status: ["pending", "open"]
+            }
+          });
+
+          return similiarTicketsButOpensOrPendings.length === 0 ? ticket : null;
+        })
+      )
+    ).filter(ticket => ticket !== null) as Ticket[];
+  }
+
   const hasMore = count > offset + tickets.length;
 
   return {
-    tickets,
+    tickets: filteredTickets || tickets,
     count,
     hasMore
   };

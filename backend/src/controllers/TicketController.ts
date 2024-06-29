@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 
 import { parseISO } from "date-fns";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import AppError from "../errors/AppError";
 import formatBody from "../helpers/Mustache";
 import { getWbot } from "../libs/wbot";
 import Message from "../models/Message";
+import Ticket from "../models/Ticket";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
@@ -24,6 +26,7 @@ type IndexQuery = {
   queueIds: string;
   whatsappIds: string;
   typeIds: string;
+  showOnlyMyGroups: string;
 };
 
 interface TicketData {
@@ -43,7 +46,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     whatsappIds: whatsappIdsStringified,
     queueIds: queueIdsStringified,
     typeIds: typeIdsStringified,
-    withUnreadMessages
+    withUnreadMessages,
+    showOnlyMyGroups: showOnlyMyGroupsStringified
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -51,6 +55,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   let queueIds: number[] = [];
   let whatsappIds: number[] = [];
   let typeIds: string[] = [];
+  let showOnlyMyGroups: boolean = false;
 
   if (typeIdsStringified) {
     typeIds = JSON.parse(typeIdsStringified);
@@ -64,6 +69,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     queueIds = JSON.parse(queueIdsStringified);
   }
 
+  if (showOnlyMyGroupsStringified) {
+    showOnlyMyGroups = JSON.parse(showOnlyMyGroupsStringified);
+  }
+
   const { tickets, count, hasMore } = await ListTicketsService({
     searchParam,
     pageNumber,
@@ -74,7 +83,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     whatsappIds,
     queueIds,
     typeIds,
-    withUnreadMessages
+    withUnreadMessages,
+    showOnlyMyGroups
   });
 
   return res.status(200).json({ tickets, count, hasMore });
@@ -281,4 +291,43 @@ export const recoverAllMessages = async (
   console.log("se recuperaron los mensajes");
 
   return res.status(200).json({ message: "success" });
+};
+
+export const showAllRelatedTickets = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
+
+  const ticket = await ShowTicketService(ticketId);
+
+  const relatedTickets = await Ticket.findAll({
+    where: {
+      whatsappId: ticket.whatsappId,
+      contactId: ticket.contactId
+    },
+    order: [["lastMessageTimestamp", "ASC"]],
+    include: [
+      {
+        model: Message,
+        as: "messages",
+        order: [["timestamp", "ASC"]],
+        where: {
+          timestamp: {
+            [Op.gte]: Sequelize.literal(
+              `(SELECT UNIX_TIMESTAMP(Tickets.createdAt) FROM Tickets WHERE Tickets.id = ticketId)`
+            )
+          }
+        },
+        limit: 1,
+        required: false
+      }
+    ]
+  });
+
+  if (!relatedTickets || relatedTickets.length === 0) {
+    throw new AppError("ERR_NO_TICKET_relateds_FOUND", 404);
+  }
+
+  return res.status(200).json(relatedTickets);
 };

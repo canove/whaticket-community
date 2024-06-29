@@ -54,8 +54,8 @@ const FindOrCreateTicketLiteService = async (
 
     if (ticket) {
       await ticket.update({
-        status: "pending",
-        userId: null,
+        status: "open",
+        // userId: null,
         unreadMessages,
         ...(lastMessageTimestamp &&
           ticket.lastMessageTimestamp < lastMessageTimestamp && {
@@ -97,7 +97,7 @@ const FindOrCreateTicketLiteService = async (
   if (!ticket) {
     ticket = await Ticket.create({
       contactId: groupContact ? groupContact.id : contact.id,
-      status: "pending",
+      status: !!groupContact ? "open" : "pending",
       isGroup: !!groupContact,
       unreadMessages,
       whatsappId,

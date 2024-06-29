@@ -9,6 +9,7 @@ import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 const useStyles = makeStyles((theme) => ({
   ticketHeader: {
     display: "flex",
+    alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#eee",
     flex: "none",
