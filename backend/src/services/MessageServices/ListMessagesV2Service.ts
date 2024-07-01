@@ -136,16 +136,32 @@ const getMessagesForTicket = async (
     ? "createdAt"
     : "timestamp";
 
+  let relatedTickets: number | null = null;
+
+  if (ticketToFetchMessages.ticket) {
+    relatedTickets = await Ticket.count({
+      where: {
+        whatsappId: ticketToFetchMessages.ticket.whatsappId,
+        contactId: ticketToFetchMessages.ticket.contactId
+      }
+    });
+
+    console.log("relatedTickets at getMessagesForTicket", relatedTickets);
+  }
+
   // Buscar y contar mensajes con la propiedad de ordenación adecuada
   const { count, rows: messages } = await Message.findAndCountAll({
     where: {
       ticketId: ticketToFetchMessages.ticketId,
-      timestamp: {
-        [Op.gte]:
-          Math.floor(
-            new Date(ticketToFetchMessages.ticket?.createdAt!).getTime() / 1000
-          ) - 5
-      }
+      ...(relatedTickets > 1 && {
+        timestamp: {
+          [Op.gte]:
+            Math.floor(
+              new Date(ticketToFetchMessages.ticket?.createdAt!).getTime() /
+                1000
+            ) - 28800 // 8 horas en segundos por si acaso el server se cayo por tiempo prolognado
+        }
+      })
     },
     limit,
     offset,
