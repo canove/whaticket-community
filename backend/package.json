@@ -40,7 +40,7 @@
     "socket.io": "^3.0.5",
     "socket.io-client": "^3.0.5",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "https://github.com/rubensedanoc/whatsapp-web.js#main-fork-update",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus",
     "yup": "^0.32.8"
   },
   "devDependencies": {
