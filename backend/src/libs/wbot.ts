@@ -6,7 +6,6 @@ import Ticket from "../models/Ticket";
 import Whatsapp from "../models/Whatsapp";
 import { handleMessageForSyncUnreadMessages } from "../services/WbotServices/wbotMessageListener";
 import { logger } from "../utils/logger";
-import { getIO } from "./socket";
 
 interface Session extends Client {
   id?: number;
@@ -100,7 +99,7 @@ const syncUnreadMessages = async (wbot: Session) => {
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
   return new Promise((resolve, reject) => {
     try {
-      const io = getIO();
+      // const io = getIO();
       const sessionName = whatsapp.name;
       let sessionCfg;
 
@@ -136,10 +135,41 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           sessions.push(wbot);
         }
 
-        io.emit("whatsappSession", {
-          action: "update",
-          session: whatsapp
-        });
+        // io.emit("whatsappSession", {
+        //   action: "update",
+        //   session: whatsapp
+        // });
+
+        const url = process.env.NODE_URL + "/toEmit";
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            event: {
+              name: "whatsappSession",
+              data: {
+                action: "update",
+                session: whatsapp
+              }
+            }
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log("Success:", data);
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
       });
 
       wbot.on("authenticated", async session => {
@@ -161,10 +191,41 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           retries: retry + 1
         });
 
-        io.emit("whatsappSession", {
-          action: "update",
-          session: whatsapp
-        });
+        // io.emit("whatsappSession", {
+        //   action: "update",
+        //   session: whatsapp
+        // });
+
+        const url = process.env.NODE_URL + "/toEmit";
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            event: {
+              name: "whatsappSession",
+              data: {
+                action: "update",
+                session: whatsapp
+              }
+            }
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log("Success:", data);
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
 
         reject(new Error("Error starting whatsapp session."));
       });
@@ -181,10 +242,41 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           ...(wbot.info?.wid?.user && { number: wbot.info?.wid?.user })
         });
 
-        io.emit("whatsappSession", {
-          action: "update",
-          session: whatsapp
-        });
+        // io.emit("whatsappSession", {
+        //   action: "update",
+        //   session: whatsapp
+        // });
+
+        const url = process.env.NODE_URL + "/toEmit";
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            event: {
+              name: "whatsappSession",
+              data: {
+                action: "update",
+                session: whatsapp
+              }
+            }
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log("Success:", data);
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
 
         const sessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
         if (sessionIndex === -1) {
@@ -192,12 +284,66 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           sessions.push(wbot);
         }
 
-        io.emit("startSyncUnreadMessages");
+        // io.emit("startSyncUnreadMessages");
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            event: {
+              name: "startSyncUnreadMessages",
+              data: {}
+            }
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log("Success:", data);
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
 
         wbot.sendPresenceAvailable();
         await syncUnreadMessages(wbot);
 
-        io.emit("endSyncUnreadMessages");
+        // io.emit("endSyncUnreadMessages");
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            event: {
+              name: "endSyncUnreadMessages",
+              data: {}
+            }
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log("Success:", data);
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
 
         resolve(wbot);
       });
