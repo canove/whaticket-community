@@ -114,7 +114,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         webVersionCache: {
           type: "remote",
           remotePath:
-            "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2413.51-beta.html"
+            "https://raw.githubusercontent.com/rubensedanoc/whaticket-community/master/frontend/templates/2.2413.51-beta.html"
         },
         session: sessionCfg,
         authStrategy: new LocalAuth({ clientId: `bd_${whatsapp.id}` }),
