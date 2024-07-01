@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 
 import { parseISO } from "date-fns";
 import { Op, Sequelize } from "sequelize";
+import { GroupChat } from "whatsapp-web.js";
 import AppError from "../errors/AppError";
 import formatBody from "../helpers/Mustache";
 import { getWbot } from "../libs/wbot";
+import Contact from "../models/Contact";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
@@ -140,6 +142,63 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const contact = await ShowTicketService(ticketId);
 
   return res.status(200).json(contact);
+};
+
+export const ShowParticipants = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
+
+  // console.log("--- ShowParticipants");
+
+  const ticketInDb = await Ticket.findOne({
+    where: {
+      id: ticketId
+    },
+    include: ["contact"]
+  });
+
+  if (!ticketInDb) {
+    throw new AppError("ERR_TICKET_NOT_FOUND");
+  }
+
+  // console.log("--- ShowParticipants 2");
+
+  // Obtiene la información del servicio de WhatsApp
+  const wbot = getWbot(ticketInDb.whatsappId);
+
+  if (!wbot) {
+    throw new Error("WhatsApp service not found");
+  }
+
+  // console.log("--- ShowParticipants 3");
+
+  const chat = await wbot.getChatById(ticketInDb.contact.number + "@g.us");
+
+  if (!chat) {
+    throw new Error("Chat not found");
+  }
+
+  // console.log("--- ShowParticipants 4");
+
+  const chatDetails = chat as GroupChat;
+
+  // console.log("--- ShowParticipants chatDetails: ", chatDetails);
+
+  const chatParticipants = chatDetails.participants;
+
+  const chatParticipantsContacts = await Contact.findAll({
+    where: {
+      number: {
+        [Op.in]: chatParticipants.map(participant => participant.id.user)
+      }
+    }
+  });
+
+  // chatParticipants.map(participant => participant.id.user)
+
+  return res.status(200).json(chatParticipantsContacts);
 };
 
 export const update = async (
