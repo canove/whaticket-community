@@ -111,11 +111,6 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       const args: String = process.env.CHROME_ARGS || "";
 
       const wbot: Session = new Client({
-        webVersionCache: {
-          type: "remote",
-          remotePath:
-            "https://raw.githubusercontent.com/rubensedanoc/whaticket-community/master/frontend/templates/2.2413.51-beta.html"
-        },
         session: sessionCfg,
         authStrategy: new LocalAuth({ clientId: `bd_${whatsapp.id}` }),
         puppeteer: {
