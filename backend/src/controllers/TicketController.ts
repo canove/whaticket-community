@@ -205,15 +205,29 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  // console.log("--- ticket update");
+
   const { ticketId } = req.params;
+
+  let withFarewellMessage = true;
+
+  if ("withFarewellMessage" in req.body) {
+    withFarewellMessage = req.body.withFarewellMessage;
+
+    delete req.body.withFarewellMessage;
+  }
+
   const ticketData: TicketData = req.body;
+
+  // console.log("ticketData", ticketData);
+  // console.log({ withFarewellMessage });
 
   const { ticket } = await UpdateTicketService({
     ticketData,
     ticketId
   });
 
-  if (ticket.status === "closed" && !ticket.isGroup) {
+  if (ticket.status === "closed" && !ticket.isGroup && withFarewellMessage) {
     const whatsapp = await ShowWhatsAppService(ticket.whatsappId);
 
     const { farewellMessage } = whatsapp;
