@@ -5,7 +5,7 @@ import InputBase from "@material-ui/core/InputBase";
 import Paper from "@material-ui/core/Paper";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
@@ -84,9 +84,9 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 30,
   },
 
-  badge: {
-    right: "-10px",
-  },
+  // badge: {
+  //   right: "-10px",
+  // },
   show: {
     display: "block",
   },
@@ -94,6 +94,12 @@ const useStyles = makeStyles((theme) => ({
     display: "none !important",
   },
 }));
+
+const StyledTab = withStyles({
+  root: {
+    minWidth: 72,
+  },
+})((props) => <Tab {...props} />);
 
 const TicketsManager = () => {
   const classes = useStyles();
@@ -338,10 +344,16 @@ const TicketsManager = () => {
           textColor="primary"
           variant="fullWidth"
         >
-          <Tab
+          <StyledTab
             label={
               <div
-                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0px",
+                  fontSize: "13px",
+                  textTransform: "initial",
+                }}
               >
                 <Badge
                   className={classes.badge}
@@ -349,11 +361,11 @@ const TicketsManager = () => {
                   color="primary"
                   max={99999}
                 >
-                  {!showOnlyMyGroups ? "TODOS LOS GRUPOS" : "MIS GRUPOS"}
+                  {!showOnlyMyGroups ? "Todos los grupos" : "Mis grupos"}
                 </Badge>
 
                 <>
-                  <ArrowDropDownIcon fontSize="large" onClick={handleClick2} />
+                  <ArrowDropDownIcon fontSize="medium" onClick={handleClick2} />
 
                   <Menu
                     anchorEl={anchorEl2}
@@ -366,7 +378,7 @@ const TicketsManager = () => {
                         handleClose2(e);
                       }}
                     >
-                      TODOS LOS GRUPOS
+                      Todos los grupos
                     </MenuItem>
                     <MenuItem
                       onClick={(e) => {
@@ -374,7 +386,7 @@ const TicketsManager = () => {
                         handleClose2(e);
                       }}
                     >
-                      MIS GRUPOS
+                      Mis grupos
                     </MenuItem>
                   </Menu>
                 </>
@@ -382,10 +394,16 @@ const TicketsManager = () => {
             }
             value={"groups"}
           />
-          <Tab
+          <StyledTab
             label={
               <div
-                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0px",
+                  fontSize: "13px",
+                  textTransform: "initial",
+                }}
               >
                 <Badge
                   className={classes.badge}
@@ -394,7 +412,7 @@ const TicketsManager = () => {
                   max={99999}
                 >
                   {/* {i18n.t("ticketsList.assignedHeader")} */}
-                  {showAllTickets ? "TODOS LOS CHATS" : "MIS CHATS"}
+                  {showAllTickets ? "Todos los chats" : "Mis chats"}
                 </Badge>
 
                 <Can
@@ -403,7 +421,7 @@ const TicketsManager = () => {
                   yes={() => (
                     <>
                       <ArrowDropDownIcon
-                        fontSize="large"
+                        fontSize="medium"
                         onClick={handleClick}
                       />
 
@@ -418,7 +436,7 @@ const TicketsManager = () => {
                             handleClose(e);
                           }}
                         >
-                          TODOS LOS CHATS
+                          Todos los chats
                         </MenuItem>
                         <MenuItem
                           onClick={(e) => {
@@ -426,7 +444,7 @@ const TicketsManager = () => {
                             handleClose(e);
                           }}
                         >
-                          MIS CHATS
+                          Mis chats
                         </MenuItem>
                       </Menu>
                     </>
@@ -436,16 +454,23 @@ const TicketsManager = () => {
             }
             value={"open"}
           />
-          <Tab
+          <StyledTab
             label={
-              <Badge
-                className={classes.badge}
-                badgeContent={pendingCount}
-                color="secondary"
-                max={99999}
+              <div
+                style={{
+                  fontSize: "13px",
+                  textTransform: "initial",
+                }}
               >
-                {i18n.t("ticketsList.pendingHeader")}
-              </Badge>
+                <Badge
+                  className={classes.badge}
+                  badgeContent={pendingCount}
+                  color="secondary"
+                  max={99999}
+                >
+                  {i18n.t("ticketsList.pendingHeader")}
+                </Badge>
+              </div>
             }
             value={"pending"}
           />

@@ -271,7 +271,9 @@ const TicketsList = (props) => {
         showAll) &&
       (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1) &&
       ((ticket.isGroup && selectedTypeIds[0] === "group") ||
-        (!ticket.isGroup && selectedTypeIds[0] === "individual"));
+        (!ticket.isGroup && selectedTypeIds[0] === "individual")) &&
+      (selectedWhatsappIds.indexOf(ticket.whatsappId) > -1 ||
+        selectedWhatsappIds.length === 0);
 
     const notBelongsToUserQueues = (ticket) =>
       ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
@@ -286,6 +288,7 @@ const TicketsList = (props) => {
 
     socket.on("ticket", (data) => {
       // console.log("ticket socket::::::::::::::::::::", data);
+      // console.log("selectedWhatsappIds: ", selectedWhatsappIds);
 
       if (data.action === "updateUnread") {
         dispatch({
@@ -325,6 +328,7 @@ const TicketsList = (props) => {
 
     socket.on("appMessage", (data) => {
       // console.log("appMessage socket::::::::::::::::::::", data);
+      // console.log("selectedWhatsappIds: ", selectedWhatsappIds);
       if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
         dispatch({
           type: "UPDATE_TICKET_UNREAD_MESSAGES",
@@ -346,7 +350,15 @@ const TicketsList = (props) => {
     return () => {
       socket.disconnect();
     };
-  }, [status, searchParam, showAll, user, selectedQueueIds, selectedTypeIds]);
+  }, [
+    status,
+    searchParam,
+    showAll,
+    user,
+    selectedQueueIds,
+    selectedTypeIds,
+    selectedWhatsappIds,
+  ]);
 
   // useEffect(() => {
   //   if (typeof updateCount === "function") {

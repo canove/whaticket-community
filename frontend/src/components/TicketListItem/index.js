@@ -218,7 +218,7 @@ const TicketListItem = ({ ticket }) => {
               </Typography>
               {/* - CONTACT NAME */}
 
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", gap: "4px" }}>
                 {ticket.participantUsers?.find((hu) => hu.id === user?.id) && (
                   // HELP BADGE
                   // <Badge
@@ -227,7 +227,7 @@ const TicketListItem = ({ ticket }) => {
                   //   color="primary"
                   // />
                   <Chip
-                    style={{ scale: "0.85" }}
+                    style={{ height: "20px", fontSize: "11px" }}
                     color="primary"
                     size="small"
                     label="Participando"
@@ -235,21 +235,25 @@ const TicketListItem = ({ ticket }) => {
                   // HELP BADGE
                 )}
 
-                {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
-                  // HELP BADGE
-                  // <Badge
-                  //   className={classes.closedBadge}
-                  //   badgeContent={"Apoyo"}
-                  //   color="primary"
-                  // />
-                  <Chip
-                    style={{ scale: "0.85" }}
-                    color="primary"
-                    size="small"
-                    label="Apoyo"
-                  />
-                  // HELP BADGE
-                )}
+                {/* // HELP BADGE */}
+                {ticket.helpUsers?.length > 0 ? (
+                  ticket.helpUsers?.find((hu) => hu.id === user?.id) ? (
+                    <Chip
+                      style={{ height: "20px", fontSize: "11px" }}
+                      color="primary"
+                      size="small"
+                      label="Apoyando"
+                    />
+                  ) : (
+                    <Chip
+                      style={{ height: "20px", fontSize: "11px" }}
+                      color="primary"
+                      size="small"
+                      label="Con apoyo"
+                    />
+                  )
+                ) : null}
+
                 {ticket.status === "closed" && (
                   // CLOSED BADGE
                   // <Badge
@@ -258,7 +262,7 @@ const TicketListItem = ({ ticket }) => {
                   //   color="primary"
                   // />
                   <Chip
-                    style={{ scale: "0.85" }}
+                    style={{ height: "20px", fontSize: "11px" }}
                     color="primary"
                     size="small"
                     label="Resuelto"
@@ -359,10 +363,10 @@ const TicketListItem = ({ ticket }) => {
                 {/* USER */}
                 {ticket.isGroup && ticket.participantUsers.length > 0 && (
                   <Tooltip
-                    title={`Participando: 
+                    title={`PARTICIPANDO: 
                             ${[...ticket.participantUsers]
                               .map((u) => u.name)
-                              .join(", ")}`}
+                              .join(" - ")}`}
                     aria-label="add"
                   >
                     <PeopleAltIcon fontSize="small" />
@@ -373,7 +377,13 @@ const TicketListItem = ({ ticket }) => {
                 {/* USER */}
                 {!ticket.isGroup && ticket.userId && (
                   <Tooltip
-                    title={`Asignado: ${ticket.user?.name}`}
+                    title={`ASIGNADO: ${ticket.user?.name}${
+                      ticket.helpUsers?.length > 0
+                        ? ` | APOYO: ${ticket.helpUsers
+                            .map((hu) => hu.name)
+                            .join(" - ")}`
+                        : ""
+                    }`}
                     aria-label="add"
                   >
                     <PeopleAltIcon fontSize="small" />

@@ -32,6 +32,7 @@ import MoodIcon from "@material-ui/icons/Mood";
 import MoreVert from "@material-ui/icons/MoreVert";
 import SendIcon from "@material-ui/icons/Send";
 
+import { Avatar } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
@@ -180,6 +181,8 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 500,
   },
   messageQuickAnswersWrapper: {
+    maxHeight: "500px",
+    overflowY: "auto",
     margin: 0,
     position: "absolute",
     bottom: "50px",
@@ -205,7 +208,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
+const MessageInput = ({ ticketStatus, ticketPrivateNote, ticketIsGroup }) => {
   const classes = useStyles();
   const { ticketId } = useParams();
 
@@ -216,7 +219,10 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
   const [quickAnswers, setQuickAnswer] = useState([]);
+  const [groupParticipants, setGroupParticipants] = useState([]);
   const [typeBar, setTypeBar] = useState(false);
+  const [typeBar2, setTypeBar2] = useState(false);
+  const [mentionIndexOnString, setMentionIndexOnString] = useState(false);
   const inputRef = useRef();
   const [anchorEl, setAnchorEl] = useState(null);
   const { setReplyingMessage, replyingMessage } =
@@ -259,6 +265,17 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
   const handleQuickAnswersClick = (value) => {
     setInputMessage(value);
     setTypeBar(false);
+  };
+
+  const handleMentionAUserClick = (user) => {
+    setInputMessage(
+      (oldMessage) =>
+        oldMessage.slice(0, mentionIndexOnString + 1) +
+        `${user.number}` +
+        oldMessage.slice(mentionIndexOnString + 1)
+    );
+    setMentionIndexOnString(false);
+    setTypeBar2(false);
   };
 
   const handleAddEmoji = (e) => {
@@ -369,6 +386,26 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
       }
     } else {
       setTypeBar(false);
+    }
+  };
+
+  const handleLoadMention = async (value) => {
+    try {
+      console.log("haciendo la request");
+
+      const { data } = await api.get("/showParticipants/" + ticketId);
+
+      setGroupParticipants(data || []);
+
+      console.log("handleLoadMention ", data);
+
+      if (data.length > 0) {
+        setTypeBar2(true);
+      } else {
+        setTypeBar2(false);
+      }
+    } catch (err) {
+      setTypeBar2(false);
     }
   };
 
@@ -646,6 +683,15 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
                 if (loading || e.shiftKey) return;
                 else if (e.key === "Enter") {
                   handleSendMessage();
+                } else if (e.key === "@") {
+                  if (ticketIsGroup) {
+                    setMentionIndexOnString(e.target.selectionStart);
+                    handleLoadMention();
+                  } else {
+                    setTypeBar2(false);
+                  }
+                } else {
+                  setTypeBar2(false);
                 }
               }}
             />
@@ -660,6 +706,36 @@ const MessageInput = ({ ticketStatus, ticketPrivateNote }) => {
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a onClick={() => handleQuickAnswersClick(value.message)}>
                         {`${value.shortcut} - ${value.message}`}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div></div>
+            )}
+            {typeBar2 ? (
+              <ul className={classes.messageQuickAnswersWrapper}>
+                {groupParticipants.map((value, index) => {
+                  return (
+                    <li
+                      className={classes.messageQuickAnswersWrapperItem}
+                      key={index}
+                    >
+                      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                      <a
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          maxHeight: "unset",
+                        }}
+                        onClick={() => {
+                          handleMentionAUserClick(value);
+                        }}
+                      >
+                        <Avatar src={value.profilePicUrl} alt={value.name} />
+                        {`${value.name} - ${value.number}`}
                       </a>
                     </li>
                   );

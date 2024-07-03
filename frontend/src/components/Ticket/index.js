@@ -232,6 +232,7 @@ const Ticket = () => {
           ></MessagesList>
           {ticket.status === "open" && (
             <MessageInput
+              ticketIsGroup={ticket.isGroup}
               ticketStatus={ticket.status}
               ticketPrivateNote={ticket.privateNote}
             />

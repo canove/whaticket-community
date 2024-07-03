@@ -55,12 +55,29 @@ const SendWhatsAppMessage = async ({
 
     const wbot = await GetTicketWbot(ticket);
 
+    const bodyFormated = formatBody(body, ticket.contact);
+
+    // console.log("--- sendWhatsAppMessage: ", bodyFormated);
+
+    let mentionedNumbers: string[] | null = null;
+
+    if (ticket.isGroup) {
+      mentionedNumbers = bodyFormated
+        .match(/@(\d+)/g)
+        ?.map(match => match.slice(1));
+      // console.log(bodyFormated.match(/@(\d+)/g)?.map(match => match.slice(1)));
+    }
+
     const sentMessage = await wbot.sendMessage(
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
-      formatBody(body, ticket.contact),
+      bodyFormated,
       {
         quotedMessageId: quotedMsgSerializedId,
-        linkPreview: false
+        linkPreview: false,
+        ...(mentionedNumbers &&
+          mentionedNumbers.length > 0 && {
+            mentions: mentionedNumbers.map(number => number + "@c.us")
+          })
       }
     );
 

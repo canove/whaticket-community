@@ -17,6 +17,7 @@ import { i18n } from "../../translate/i18n";
 import AddCategoryToTicketModal from "../AddCategoryToTicketModal";
 import AskForHelpTicketModal from "../AskForHelpTicketModal";
 import AskForParticipationTicketModal from "../AskForParticipationTicketModal";
+import CloseTicketModal from "../CloseTicketModal";
 
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import TicketOptionsMenu from "../TicketOptionsMenu";
@@ -40,6 +41,7 @@ const TicketActionButtons = ({ ticket }) => {
   const [loading, setLoading] = useState(false);
   const [addCategoryToTicketModalOpen, setAddCategoryToTicketModalOpen] =
     useState(false);
+  const [closeTicketModalOpen, setCloseTicketModalOpen] = useState(false);
   const [askForHelpTicketModalOpen, setAskForHelpTicketModalOpen] =
     useState(false);
   const [
@@ -61,12 +63,27 @@ const TicketActionButtons = ({ ticket }) => {
   //   console.log(">>>>>>><ticket", ticket);
   // }, [ticket]);
 
-  const handleUpdateTicketStatus = async (e, status, userId) => {
-    setLoading(true);
+  const handleUpdateTicketStatus = async ({
+    status,
+    userId,
+    withFarewellMessage = true,
+    comment = "",
+  }) => {
+    // setLoading(true);
+
+    console.log(
+      "handleUpdateTicketStatus",
+      status,
+      userId,
+      withFarewellMessage,
+      comment
+    );
+
     try {
       await api.put(`/tickets/${ticket.id}`, {
         status: status,
         userId: userId || null,
+        ...(status === "closed" && { withFarewellMessage }),
       });
 
       if (status === "open") {
@@ -77,7 +94,9 @@ const TicketActionButtons = ({ ticket }) => {
 
       if (status === "closed") {
         await api.post(`/privateMessages/${ticket.id}`, {
-          body: `${user?.name} *resolvió* la conversación`,
+          body: `${user?.name} *resolvió* la conversación${
+            comment ? ` con el *comentario*: ${comment}` : ""
+          }`,
         });
       }
 
@@ -89,8 +108,10 @@ const TicketActionButtons = ({ ticket }) => {
 
       setLoading(false);
       if (status === "open") {
+        console.log(`/tickets/${ticket.id}`);
         history.push(`/tickets/${ticket.id}`);
       } else {
+        console.log("/tickets");
         history.push("/tickets");
       }
     } catch (err) {
@@ -108,7 +129,9 @@ const TicketActionButtons = ({ ticket }) => {
               loading={loading}
               startIcon={<Replay />}
               size="small"
-              onClick={(e) => handleUpdateTicketStatus(e, "open", user?.id)}
+              onClick={(e) =>
+                handleUpdateTicketStatus({ status: "open", userId: user?.id })
+              }
             >
               {i18n.t("messagesList.header.buttons.reopen")}
             </ButtonWithSpinner>
@@ -147,7 +170,9 @@ const TicketActionButtons = ({ ticket }) => {
                 loading={loading}
                 startIcon={<Replay />}
                 size="small"
-                onClick={(e) => handleUpdateTicketStatus(e, "pending", null)}
+                onClick={(e) =>
+                  handleUpdateTicketStatus({ status: "pending", userId: null })
+                }
               >
                 {i18n.t("messagesList.header.buttons.return")}
               </ButtonWithSpinner>
@@ -203,12 +228,27 @@ const TicketActionButtons = ({ ticket }) => {
                   size="small"
                   variant="contained"
                   color="primary"
-                  onClick={(e) =>
-                    handleUpdateTicketStatus(e, "closed", user?.id)
-                  }
+                  onClick={(e) => {
+                    setCloseTicketModalOpen(true);
+                  }}
                 >
                   {i18n.t("messagesList.header.buttons.resolve")}
                 </ButtonWithSpinner>
+
+                <CloseTicketModal
+                  modalOpen={closeTicketModalOpen}
+                  onClose={() => {
+                    setCloseTicketModalOpen(false);
+                  }}
+                  onSubmit={async ({ withFarewellMessage, comment }) => {
+                    await handleUpdateTicketStatus({
+                      status: "closed",
+                      userId: user?.id,
+                      withFarewellMessage,
+                      comment,
+                    });
+                  }}
+                />
 
                 <Button
                   size="small"
@@ -286,7 +326,9 @@ const TicketActionButtons = ({ ticket }) => {
           size="small"
           variant="contained"
           color="primary"
-          onClick={(e) => handleUpdateTicketStatus(e, "open", user?.id)}
+          onClick={(e) =>
+            handleUpdateTicketStatus({ status: "open", userId: user?.id })
+          }
         >
           <GroupAddIcon style={{ marginRight: 6 }} />
 

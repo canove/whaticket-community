@@ -22,7 +22,7 @@ export default function TicketListItemLastMessageTime({ ticket }) {
 
   return (
     <Chip
-      style={{ scale: "0.85" }}
+      style={{ height: "20px", fontSize: "11px" }}
       color={
         differenceInHours(
           nowTime,
