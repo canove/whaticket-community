@@ -56,9 +56,9 @@ const CreateMessageService = async ({
     console.log("---- Reintentando otra vez vez con el id original");
 
     // Verificar nuevamente con el ID original
-    let messageAlreadyCreated = await Message.findByPk(originalId);
+    let messageAlreadyCreated2 = await Message.findByPk(originalId);
 
-    if (messageAlreadyCreated) {
+    if (messageAlreadyCreated2) {
       // Generar un nuevo ID y marcar como duplicado si ya existe
       console.log(
         "---- El mensaje ya existe, generando un nuevo ID y marcando como duplicado"
