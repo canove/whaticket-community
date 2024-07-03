@@ -24,14 +24,57 @@ interface Request {
 const CreateMessageService = async ({
   messageData
 }: Request): Promise<Message> => {
-  const meesageAlreadyCreated = await Message.findByPk(messageData.id);
+  console.log("--- CreateMessageService messageData.id: ", messageData.id);
 
-  if (meesageAlreadyCreated) {
-    messageData.id = uuidv4();
-    messageData.isDuplicated = true;
+  // Guardar una copia del ID original
+  const originalId = messageData.id;
+
+  try {
+    let messageAlreadyCreated = await Message.findByPk(originalId);
+
+    if (messageAlreadyCreated) {
+      console.log(
+        "---- El mensaje ya existe, generando un nuevo ID y marcando como duplicado"
+      );
+      // Generar un nuevo ID y marcar como duplicado si ya existe
+      messageData.id = uuidv4();
+      messageData.isDuplicated = true;
+    } else {
+      console.log("---- El mensaje no existe");
+    }
+
+    console.log("--- Creando el mensaje");
+
+    // Crear el mensaje
+    await Message.create(messageData);
+  } catch (error) {
+    console.log("---- Error al crear el mensaje", error);
+
+    // Esperar 200 ms antes de reintentar
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    console.log("---- Reintentando otra vez vez con el id original");
+
+    // Verificar nuevamente con el ID original
+    let messageAlreadyCreated = await Message.findByPk(originalId);
+
+    if (messageAlreadyCreated) {
+      // Generar un nuevo ID y marcar como duplicado si ya existe
+      console.log(
+        "---- El mensaje ya existe, generando un nuevo ID y marcando como duplicado"
+      );
+      messageData.id = uuidv4();
+      messageData.isDuplicated = true;
+    } else {
+      console.log("---- El mensaje no existe");
+    }
+
+    // Reintentar la creación del mensaje
+    console.log("--- Reintentar Creando el mensaje");
+    await Message.create(messageData);
   }
 
-  await Message.create(messageData);
+  // Recuperar el mensaje creado
 
   const message = await Message.findByPk(messageData.id, {
     include: [
