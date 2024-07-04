@@ -11,6 +11,7 @@ import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
 import CategoryOutlinedIcon from "@material-ui/icons/CategoryOutlined";
 import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
+import MessageOutlinedIcon from "@material-ui/icons/MessageOutlined";
 import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
 import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutlined";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
@@ -91,6 +92,12 @@ const MainListItems = (props) => {
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
         icon={<WhatsAppIcon />}
+      />
+
+      <ListItemLink
+        to="/messages"
+        primary={"Mensajes"}
+        icon={<MessageOutlinedIcon />}
       />
 
       <ListItemLink

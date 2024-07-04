@@ -6,11 +6,17 @@ import Message from "../models/Message";
 // import ListMessages2Service from "../services/MessageServices/ListMessages2Service";
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
 import ListMessagesV2Service from "../services/MessageServices/ListMessagesV2Service";
+import SearchMessagesService from "../services/MessageServices/SearchMessagesService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import verifyPrivateMessage from "../utils/verifyPrivateMessage";
+
+type searchQuery = {
+  searchParam: string;
+  pageNumber: string;
+};
 
 type IndexQuery = {
   pageNumber: string;
@@ -28,6 +34,20 @@ type MessageData = {
   fromMe: boolean;
   read: boolean;
   quotedMsg?: Message;
+};
+
+export const search = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { searchParam, pageNumber } = req.query as unknown as searchQuery;
+
+  const { count, messages, hasMore } = await SearchMessagesService({
+    searchParam,
+    pageNumber
+  });
+
+  return res.json({ count, messages, hasMore });
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {

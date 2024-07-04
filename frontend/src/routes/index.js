@@ -11,6 +11,7 @@ import Connections from "../pages/Connections/";
 import Contacts from "../pages/Contacts/";
 import Dashboard from "../pages/Dashboard/";
 import Login from "../pages/Login/";
+import Messages from "../pages/Messages/";
 import Queues from "../pages/Queues/";
 import QuickAnswers from "../pages/QuickAnswers/";
 import Settings from "../pages/Settings/";
@@ -43,6 +44,7 @@ const Routes = () => {
                   isPrivate
                 />
                 <Route exact path="/contacts" component={Contacts} isPrivate />
+                <Route exact path="/messages" component={Messages} isPrivate />
                 <Route exact path="/users" component={Users} isPrivate />
                 <Route
                   exact
