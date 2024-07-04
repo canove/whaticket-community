@@ -1,10 +1,16 @@
 import qrCode from "qrcode-terminal";
-import { Client, LocalAuth } from "whatsapp-web.js";
+import {
+  Chat,
+  Client,
+  LocalAuth,
+  Message as WbotMessage
+} from "whatsapp-web.js";
 import AppError from "../errors/AppError";
 import Contact from "../models/Contact";
+import Message from "../models/Message";
 import Ticket from "../models/Ticket";
 import Whatsapp from "../models/Whatsapp";
-import { handleMessageForSyncUnreadMessages } from "../services/WbotServices/wbotMessageListener";
+import { handleMessage } from "../services/WbotServices/wbotMessageListener";
 import { logger } from "../utils/logger";
 
 interface Session extends Client {
@@ -13,87 +19,169 @@ interface Session extends Client {
 
 const sessions: Session[] = [];
 
-const syncUnreadMessages = async (wbot: Session) => {
-  console.log("--- syncUnreadMessages ---");
+const fetchWbotMessagesGraduallyUpToATimestamp = async ({
+  wbotChat,
+  limit,
+  timestamp
+}: {
+  wbotChat: Chat;
+  limit?: number;
+  timestamp: number;
+}): Promise<WbotMessage[]> => {
+  const chatMessages = await wbotChat.fetchMessages({ limit });
 
-  let chats = await wbot.getChats();
-  chats = chats.filter(chat => chat.unreadCount > 0);
+  const msgBeforeTimestampFound = chatMessages.find(
+    msg => msg.timestamp <= timestamp
+  );
 
-  console.log("---  chats to syncUnreadMessages:", chats.length, "chats");
-
-  const chatsChunksLimit = 5;
-
-  const chunks = [];
-  for (let i = 0; i < chats.length; i += chatsChunksLimit) {
-    chunks.push(chats.slice(i, i + chatsChunksLimit));
+  if (!msgBeforeTimestampFound && limit < 200) {
+    return fetchWbotMessagesGraduallyUpToATimestamp({
+      wbotChat,
+      limit: limit + 20,
+      timestamp
+    });
   }
 
-  console.log("---  START syncUnreadMessages");
+  return chatMessages.filter(msg => msg.timestamp > timestamp);
+};
+
+const syncUnreadMessages = async ({
+  wbot,
+  allWhatsappTickets,
+  whatsapp
+}: {
+  wbot: Session;
+  allWhatsappTickets: Ticket[];
+  whatsapp: Whatsapp;
+}) => {
+  console.log("--- START syncUnreadMessages --- ", whatsapp.name);
+
+  const url = process.env.NODE_URL + "/toEmit";
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      event: {
+        name: "startSyncUnreadMessages",
+        data: {}
+      }
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Success:", data);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+
   console.time("Loop Time");
 
-  for (const chunk of chunks) {
-    await Promise.all(
-      chunk.map(async chat => {
-        try {
-          // if (chat.unreadCount > 0) {
-          const unreadMessages = await chat.fetchMessages({
-            limit: chat.unreadCount
-          });
+  let chats = await wbot.getChats();
 
-          let lastTicket: Ticket | undefined;
-          let lastContact: Contact | undefined;
+  // filter chats with last message in the last 8 hours
+  let last8HoursChats = chats.filter(chat =>
+    chat.lastMessage
+      ? chat.lastMessage.timestamp > Date.now() / 1000 - 28800 // 8 hours in seconds
+      : false
+  );
 
-          for (const msg of unreadMessages) {
-            // await handleMessage(msg, wbot);
-            let handleMessageForSyncUnreadMessagesResult =
-              await handleMessageForSyncUnreadMessages(msg, wbot, chat);
+  console.log(
+    "---  chats to syncUnreadMessages:",
+    last8HoursChats.length,
+    "chats",
+    last8HoursChats.map(chat => chat.name)
+  );
 
-            if (handleMessageForSyncUnreadMessagesResult) {
-              lastTicket = handleMessageForSyncUnreadMessagesResult.ticket;
-              lastContact = handleMessageForSyncUnreadMessagesResult.contact;
-            }
-          }
-
-          // if (lastTicket && lastContact && !chat.isGroup) {
-          //   const body = formatBody(
-          //     `\u200e${"En estos momentos tenemos un alto flujo de mensajes. Te atenderemos en breve, muchas gracias por tu espera."}\n`,
-          //     lastContact
-          //   );
-
-          //   const debouncedSentMessage = debounce(
-          //     async () => {
-          //       const sentMessage = await wbot.sendMessage(
-          //         `${lastContact?.number}@c.us`,
-          //         body
-          //       );
-
-          //       // @ts-ignore
-          //       await verifyMessage(sentMessage, lastTicket, lastContact);
-          //       await chat.sendSeen();
-          //       await lastTicket?.update({ userHadContact: true });
-          //     },
-          //     3000,
-          //     lastTicket.id
-          //   );
-
-          //   debouncedSentMessage();
-          // } else {
-          //   await chat.sendSeen();
-          //   }
-
-          if (lastTicket) {
-            await lastTicket?.update({ userHadContact: true });
-            await chat.sendSeen();
-          }
-        } catch (error) {
-          console.error(`Error processing chat with id ${chat.id}:`, error);
+  await Promise.all(
+    last8HoursChats.map(async chat => {
+      const chatContact = await Contact.findOne({
+        where: {
+          number: chat.id.user
         }
-      })
-    );
-  }
+      });
+
+      const lastTicketForThisChat = allWhatsappTickets.find(t => {
+        return t.contactId === chatContact?.id;
+      });
+
+      let timestampUpToFetchMessages = Date.now() / 1000 - 28800; // 8 hours in seconds
+
+      if (
+        lastTicketForThisChat &&
+        lastTicketForThisChat.messages.length > 0 &&
+        lastTicketForThisChat.messages[0].timestamp
+      ) {
+        timestampUpToFetchMessages =
+          lastTicketForThisChat.messages[0].timestamp;
+      } else {
+        console.log("no hay lastOpenTicket o no hay messages");
+      }
+
+      const wppMessagesAfterLastMessageTimestamp =
+        await fetchWbotMessagesGraduallyUpToATimestamp({
+          limit: 20,
+          timestamp: timestampUpToFetchMessages,
+          wbotChat: chat
+        });
+
+      console.log(
+        "lo que se mandaria a fetchWbotMessagesGraduallyUpToATimestamp y resultado",
+        {
+          limit: 20,
+          lastMessageTimestamp:
+            lastTicketForThisChat?.messages[0].timestamp || null,
+          lastMessageBody: lastTicketForThisChat?.messages[0].body || null,
+          wbotChat: chat.name,
+          wppMessagesAfterLastMessageTimestamp:
+            wppMessagesAfterLastMessageTimestamp.length
+        }
+      );
+
+      if (wppMessagesAfterLastMessageTimestamp.length > 0) {
+        console.log("hay mensajes nuevos");
+        for (const msg of wppMessagesAfterLastMessageTimestamp) {
+          await handleMessage(msg, wbot, true);
+        }
+      }
+    })
+  );
 
   console.log("---  END syncUnreadMessages");
   console.timeEnd("Loop Time");
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      event: {
+        name: "endSyncUnreadMessages",
+        data: {}
+      }
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Success:", data);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
 };
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
@@ -286,64 +374,31 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 
         // io.emit("startSyncUnreadMessages");
 
-        fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            event: {
-              name: "startSyncUnreadMessages",
-              data: {}
-            }
-          })
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(
-                "Network response was not ok " + response.statusText
-              );
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log("Success:", data);
-          })
-          .catch(error => {
-            console.error("Error:", error);
-          });
-
         wbot.sendPresenceAvailable();
-        await syncUnreadMessages(wbot);
+
+        const allWhatsappTickets = await Ticket.findAll({
+          where: {
+            whatsappId: whatsapp.id
+          },
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: Message,
+              as: "messages",
+              order: [["timestamp", "DESC"]],
+              required: false,
+              limit: 1
+            }
+          ]
+        });
+
+        syncUnreadMessages({
+          wbot,
+          allWhatsappTickets,
+          whatsapp
+        });
 
         // io.emit("endSyncUnreadMessages");
-
-        fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            event: {
-              name: "endSyncUnreadMessages",
-              data: {}
-            }
-          })
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(
-                "Network response was not ok " + response.statusText
-              );
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log("Success:", data);
-          })
-          .catch(error => {
-            console.error("Error:", error);
-          });
 
         resolve(wbot);
       });

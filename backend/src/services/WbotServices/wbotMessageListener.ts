@@ -509,7 +509,8 @@ const isValidMsg = (msg: WbotMessage): boolean => {
 
 const handleMessage = async (
   msg: WbotMessage,
-  wbot: Session
+  wbot: Session,
+  syncUnreadMessagesProccess = false
 ): Promise<void> => {
   if (!isValidMsg(msg)) {
     return;
@@ -613,7 +614,8 @@ const handleMessage = async (
       !ticket.userHadContact &&
       !chat.isGroup &&
       !msg.fromMe &&
-      whatsapp.queues.length >= 1
+      whatsapp.queues.length >= 1 &&
+      !syncUnreadMessagesProccess
     ) {
       if (!ticket.queue) {
         await verifyQueue(wbot, msg, ticket, contact);
