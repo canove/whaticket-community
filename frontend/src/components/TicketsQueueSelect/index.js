@@ -17,7 +17,7 @@ const TicketsQueueSelect = ({
   };
 
   return (
-    <div style={{ width: 120, marginTop: -4 }}>
+    <div style={{ width: 160 }}>
       <FormControl fullWidth margin="dense">
         <Select
           multiple

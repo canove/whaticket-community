@@ -15,15 +15,19 @@ import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import Menu from "@material-ui/core/Menu";
 import { Can } from "../Can";
 
+import { IconButton } from "@material-ui/core";
+import NumberGroupsModal from "../NumberGroupsModal";
 import TicketsWhatsappSelect from "../TicketsWhatsappSelect";
 
 import MenuItem from "@material-ui/core/MenuItem";
+import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 import NewTicketModal from "../NewTicketModal";
 import TabPanel from "../TabPanel";
 import TicketsList from "../TicketsList";
 
 import { Button } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import TicketsQueueSelect from "../TicketsQueueSelect";
 
@@ -56,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
 
   ticketOptionsBox: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
     background: "#fafafa",
@@ -63,6 +68,8 @@ const useStyles = makeStyles((theme) => ({
   },
 
   serachInputWrapper: {
+    // minWidth: 200,
+    minWidth: "100%",
     flex: 1,
     background: "#fff",
     display: "flex",
@@ -84,9 +91,9 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 30,
   },
 
-  // badge: {
-  //   right: "-10px",
-  // },
+  badge: {
+    right: "12px",
+  },
   show: {
     display: "block",
   },
@@ -125,6 +132,9 @@ const TicketsManager = () => {
   const [typeIdsForIndividuals] = useState(["individual"]);
   const [typeIdsForGroups] = useState(["group"]);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
+
+  const [numberGroups, setNumberGroups] = useState([]);
+  const [numberGroupsModalIsOpen, setNumberGroupsModalIsOpen] = useState(false);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorEl2, setAnchorEl2] = useState(null);
@@ -171,8 +181,28 @@ const TicketsManager = () => {
     if (tab === "search") {
       searchInputRef.current.focus();
       setSearchParam("");
+      setNumberGroups([]);
     }
   }, [tab]);
+
+  useEffect(() => {
+    async function getNumberGroups() {
+      try {
+        const { data } = await api.get(`/getNumberGroups/${searchParam}`);
+        console.log("getNumberContacts -> data", data);
+        setNumberGroups(data.registerGroups);
+      } catch (err) {
+        console.log("err", err);
+        // toastError(err);
+      }
+    }
+
+    if (searchParam && /^\d+$/.test(searchParam) && tab === "search") {
+      console.log("se dispara la busqueda: ", /^\d+$/.test(searchParam));
+
+      getNumberGroups();
+    }
+  }, [searchParam]);
 
   let searchTimeout;
 
@@ -332,6 +362,37 @@ const TicketsManager = () => {
           onChange={(values) => setSelectedQueueIds(values)}
         />
         {/* - QUEUE SELECT */}
+
+        {tab === "search" && (
+          <>
+            <Badge
+              badgeContent={numberGroups.length}
+              className={classes.badge}
+              color="primary"
+              max={99999}
+              invisible={numberGroups.length === 0}
+            >
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setNumberGroupsModalIsOpen(true);
+                }}
+                // style={{ position: "relative", left: "-5px" }}
+                style={{ marginRight: "5px" }}
+              >
+                <PeopleOutlineIcon fontSize="large" />
+              </IconButton>
+            </Badge>
+
+            <NumberGroupsModal
+              modalOpen={numberGroupsModalIsOpen}
+              onClose={() => setNumberGroupsModalIsOpen(false)}
+              number={searchParam}
+              groups={numberGroups}
+            />
+          </>
+        )}
       </Paper>
 
       {/* open TAB CONTENT  */}
@@ -355,12 +416,7 @@ const TicketsManager = () => {
                   textTransform: "initial",
                 }}
               >
-                <Badge
-                  className={classes.badge}
-                  badgeContent={groupCount}
-                  color="primary"
-                  max={99999}
-                >
+                <Badge badgeContent={groupCount} color="primary" max={99999}>
                   {!showOnlyMyGroups ? "Todos los grupos" : "Mis grupos"}
                 </Badge>
 
@@ -405,12 +461,7 @@ const TicketsManager = () => {
                   textTransform: "initial",
                 }}
               >
-                <Badge
-                  className={classes.badge}
-                  badgeContent={openCount}
-                  color="primary"
-                  max={99999}
-                >
+                <Badge badgeContent={openCount} color="primary" max={99999}>
                   {/* {i18n.t("ticketsList.assignedHeader")} */}
                   {showAllTickets ? "Todos los chats" : "Mis chats"}
                 </Badge>
@@ -463,7 +514,6 @@ const TicketsManager = () => {
                 }}
               >
                 <Badge
-                  className={classes.badge}
                   badgeContent={pendingCount}
                   color="secondary"
                   max={99999}
