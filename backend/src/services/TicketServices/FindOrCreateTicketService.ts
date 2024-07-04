@@ -59,7 +59,12 @@ const FindOrCreateTicketService = async (
 
   // if ticket exists, update his unreadMessages
   if (ticket) {
-    await ticket.update({ unreadMessages, lastMessageTimestamp });
+    await ticket.update({
+      unreadMessages,
+      ...(lastMessageTimestamp > ticket.lastMessageTimestamp && {
+        lastMessageTimestamp
+      })
+    });
   }
 
   // if ticket not exists and groupContact is trully, find a ticket from the groupContact and from the whatsappId
@@ -85,7 +90,9 @@ const FindOrCreateTicketService = async (
         status: "open",
         // userId: null,
         unreadMessages,
-        lastMessageTimestamp
+        ...(lastMessageTimestamp > ticket.lastMessageTimestamp && {
+          lastMessageTimestamp
+        })
       });
     }
   }

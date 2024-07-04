@@ -24,7 +24,11 @@ interface Request {
 const CreateMessageService = async ({
   messageData
 }: Request): Promise<Message> => {
-  console.log("--- CreateMessageService messageData.id: ", messageData.id);
+  console.log(
+    "--- CreateMessageService messageData.id: ",
+    messageData.id,
+    messageData.body
+  );
 
   // Guardar una copia del ID original
   const originalId = messageData.id;
