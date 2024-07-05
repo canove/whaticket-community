@@ -73,30 +73,34 @@ const ListTicketsService = async ({
     }),
     ...(typeIds.length === 1 && typeIds[0] === "individual"
       ? {
-          [Op.or]: [
+          [Op.and]: [
             {
-              id: {
-                [Op.in]: Sequelize.literal(
-                  `(
+              [Op.or]: [
+                {
+                  id: {
+                    [Op.in]: Sequelize.literal(
+                      `(
       SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
     )`
-                )
-              }
-            },
-            {
-              ...(queueIds?.length && {
-                queueId: {
-                  // @ts-ignore
-                  [Op.or]: queueIds?.includes(null)
-                    ? [queueIds.filter(id => id !== null), null]
-                    : [queueIds]
+                    )
+                  }
+                },
+                {
+                  ...(queueIds?.length && {
+                    queueId: {
+                      // @ts-ignore
+                      [Op.or]: queueIds?.includes(null)
+                        ? [queueIds.filter(id => id !== null), null]
+                        : [queueIds]
+                    }
+                  }),
+                  ...(whatsappIds?.length && {
+                    whatsappId: {
+                      [Op.or]: [whatsappIds]
+                    }
+                  })
                 }
-              }),
-              ...(whatsappIds?.length && {
-                whatsappId: {
-                  [Op.or]: [whatsappIds]
-                }
-              })
+              ]
             }
           ]
         }
@@ -205,30 +209,34 @@ const ListTicketsService = async ({
       }),
       ...(typeIds.length === 1 && typeIds[0] === "individual"
         ? {
-            [Op.or]: [
+            [Op.and]: [
               {
-                id: {
-                  [Op.in]: Sequelize.literal(
-                    `(
+                [Op.or]: [
+                  {
+                    id: {
+                      [Op.in]: Sequelize.literal(
+                        `(
             SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
           )`
-                  )
-                }
-              },
-              {
-                ...(queueIds?.length && {
-                  queueId: {
-                    // @ts-ignore
-                    [Op.or]: queueIds?.includes(null)
-                      ? [queueIds.filter(id => id !== null), null]
-                      : [queueIds]
+                      )
+                    }
+                  },
+                  {
+                    ...(queueIds?.length && {
+                      queueId: {
+                        // @ts-ignore
+                        [Op.or]: queueIds?.includes(null)
+                          ? [queueIds.filter(id => id !== null), null]
+                          : [queueIds]
+                      }
+                    }),
+                    ...(whatsappIds?.length && {
+                      whatsappId: {
+                        [Op.or]: [whatsappIds]
+                      }
+                    })
                   }
-                }),
-                ...(whatsappIds?.length && {
-                  whatsappId: {
-                    [Op.or]: [whatsappIds]
-                  }
-                })
+                ]
               }
             ]
           }
