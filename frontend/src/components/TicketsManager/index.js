@@ -533,8 +533,8 @@ const TicketsManager = () => {
           <TicketsList
             status="open"
             showAll={true}
-            selectedTypeIds={typeIdsForGroups}
             showOnlyMyGroups={showOnlyMyGroups}
+            selectedTypeIds={typeIdsForGroups}
             selectedWhatsappIds={selectedWhatsappIds}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => {
