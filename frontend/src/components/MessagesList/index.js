@@ -842,12 +842,12 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     return (
       <div
         className={clsx(classes.quotedContainerLeft, {
-          [classes.quotedContainerLeftFromOtherConnection]:
-            !message.fromMe &&
-            isGroup &&
-            (whatsApps.find((w) => w.number === message.contact?.number) ||
-              message.contact?.isCompanyMember),
-          [classes.quotedContainerRight]: message.fromMe,
+          [classes.quotedContainerRight]:
+            message.fromMe ||
+            (isGroup &&
+              !message.fromMe &&
+              (whatsApps.find((w) => w.number === message.contact?.number) ||
+                message.contact?.isCompanyMember)),
         })}
       >
         <span
@@ -921,7 +921,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
                     (w) => w.number === message.contact?.number
                   ) ||
                     message.contact?.isCompanyMember)
-                    ? classes.messageLeftFromOtherConnection
+                    ? classes.messageRight
                     : classes.messageLeft
                 }
               >

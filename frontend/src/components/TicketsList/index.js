@@ -263,17 +263,35 @@ const TicketsList = (props) => {
   useEffect(() => {
     const socket = openSocket();
 
-    const shouldUpdateTicket = (ticket) =>
-      !searchParam &&
-      (!ticket.userId ||
+    const shouldUpdateTicket = (ticket) => {
+      const noSearchParam = !searchParam;
+      const userCondition =
+        !ticket.userId ||
         ticket.userId === user?.id ||
         ticket.helpUsers?.find((hu) => hu.id === user?.id) ||
-        showAll) &&
-      (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1) &&
-      ((ticket.isGroup && selectedTypeIds[0] === "group") ||
-        (!ticket.isGroup && selectedTypeIds[0] === "individual")) &&
-      (selectedWhatsappIds.indexOf(ticket.whatsappId) > -1 ||
-        selectedWhatsappIds.length === 0);
+        showAll;
+      const queueCondition =
+        !ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1;
+      const typeCondition =
+        (ticket.isGroup && selectedTypeIds[0] === "group") ||
+        (!ticket.isGroup && selectedTypeIds[0] === "individual");
+      const whatsappCondition =
+        selectedWhatsappIds.indexOf(ticket.whatsappId) > -1 ||
+        selectedWhatsappIds.length === 0;
+
+      const ignoreConditions =
+        selectedTypeIds.length === 1 &&
+        selectedTypeIds[0] === "individual" &&
+        ticket.helpUsers?.find((hu) => hu.id === user?.id);
+
+      const isConditionMet =
+        noSearchParam &&
+        userCondition &&
+        typeCondition &&
+        (ignoreConditions || (queueCondition && whatsappCondition));
+
+      return isConditionMet;
+    };
 
     const notBelongsToUserQueues = (ticket) =>
       ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;

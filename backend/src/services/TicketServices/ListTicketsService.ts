@@ -71,19 +71,50 @@ const ListTicketsService = async ({
         [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
       }
     }),
-    ...(queueIds?.length && {
-      queueId: {
-        // @ts-ignore
-        [Op.or]: queueIds?.includes(null)
-          ? [queueIds.filter(id => id !== null), null]
-          : [queueIds]
-      }
-    }),
-    ...(whatsappIds?.length && {
-      whatsappId: {
-        [Op.or]: [whatsappIds]
-      }
-    })
+    ...(typeIds.length === 1 && typeIds[0] === "individual"
+      ? {
+          [Op.or]: [
+            {
+              id: {
+                [Op.in]: Sequelize.literal(
+                  `(
+      SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
+    )`
+                )
+              }
+            },
+            {
+              ...(queueIds?.length && {
+                queueId: {
+                  // @ts-ignore
+                  [Op.or]: queueIds?.includes(null)
+                    ? [queueIds.filter(id => id !== null), null]
+                    : [queueIds]
+                }
+              }),
+              ...(whatsappIds?.length && {
+                whatsappId: {
+                  [Op.or]: [whatsappIds]
+                }
+              })
+            }
+          ]
+        }
+      : {
+          ...(queueIds?.length && {
+            queueId: {
+              // @ts-ignore
+              [Op.or]: queueIds?.includes(null)
+                ? [queueIds.filter(id => id !== null), null]
+                : [queueIds]
+            }
+          }),
+          ...(whatsappIds?.length && {
+            whatsappId: {
+              [Op.or]: [whatsappIds]
+            }
+          })
+        })
   };
   let includeCondition: Includeable[];
 
@@ -172,19 +203,50 @@ const ListTicketsService = async ({
           [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
         }
       }),
-      ...(queueIds?.length && {
-        queueId: {
-          // @ts-ignore
-          [Op.or]: queueIds?.includes(null)
-            ? [queueIds.filter(id => id !== null), null]
-            : [queueIds]
-        }
-      }),
-      ...(whatsappIds?.length && {
-        whatsappId: {
-          [Op.or]: [whatsappIds]
-        }
-      })
+      ...(typeIds.length === 1 && typeIds[0] === "individual"
+        ? {
+            [Op.or]: [
+              {
+                id: {
+                  [Op.in]: Sequelize.literal(
+                    `(
+            SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
+          )`
+                  )
+                }
+              },
+              {
+                ...(queueIds?.length && {
+                  queueId: {
+                    // @ts-ignore
+                    [Op.or]: queueIds?.includes(null)
+                      ? [queueIds.filter(id => id !== null), null]
+                      : [queueIds]
+                  }
+                }),
+                ...(whatsappIds?.length && {
+                  whatsappId: {
+                    [Op.or]: [whatsappIds]
+                  }
+                })
+              }
+            ]
+          }
+        : {
+            ...(queueIds?.length && {
+              queueId: {
+                // @ts-ignore
+                [Op.or]: queueIds?.includes(null)
+                  ? [queueIds.filter(id => id !== null), null]
+                  : [queueIds]
+              }
+            }),
+            ...(whatsappIds?.length && {
+              whatsappId: {
+                [Op.or]: [whatsappIds]
+              }
+            })
+          })
     };
   }
 

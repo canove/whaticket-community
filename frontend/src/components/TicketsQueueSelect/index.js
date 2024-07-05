@@ -17,7 +17,7 @@ const TicketsQueueSelect = ({
   };
 
   return (
-    <div style={{ width: 120, marginTop: -4 }}>
+    <div style={{ width: 160 }}>
       <FormControl fullWidth margin="dense">
         <Select
           multiple
@@ -61,7 +61,7 @@ const TicketsQueueSelect = ({
               color="primary"
               checked={selectedQueueIds.indexOf(null) > -1}
             />
-            <ListItemText primary="Sin categoria" />
+            <ListItemText primary="Sin departamento" />
           </MenuItem>
         </Select>
       </FormControl>

@@ -16,6 +16,12 @@ contactRoutes.get("/contacts", isAuth, ContactController.index);
 
 contactRoutes.get("/contacts/:contactId", isAuth, ContactController.show);
 
+contactRoutes.get(
+  "/getNumberGroups/:number",
+  isAuth,
+  ContactController.getNumberGroups
+);
+
 contactRoutes.post("/contacts", isAuth, ContactController.store);
 
 contactRoutes.post("/contact", isAuth, ContactController.getContact);

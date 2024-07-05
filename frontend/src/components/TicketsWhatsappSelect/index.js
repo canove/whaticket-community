@@ -16,7 +16,7 @@ const TicketsWhatsappSelect = ({
   };
 
   return (
-    <div style={{ width: 120, marginTop: -4 }}>
+    <div style={{ width: 140 }}>
       <FormControl fullWidth margin="dense">
         <Select
           multiple
