@@ -7,14 +7,11 @@ import { MoreVert, Replay } from "@material-ui/icons";
 
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
-import Badge from "@material-ui/core/Badge";
-import CategoryOutlinedIcon from "@material-ui/icons/CategoryOutlined";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 
-import AddCategoryToTicketModal from "../AddCategoryToTicketModal";
 import AskForHelpTicketModal from "../AskForHelpTicketModal";
 import AskForParticipationTicketModal from "../AskForParticipationTicketModal";
 import CloseTicketModal from "../CloseTicketModal";
@@ -178,7 +175,7 @@ const TicketActionButtons = ({ ticket }) => {
               </ButtonWithSpinner>
             )}
 
-          <Badge
+          {/* <Badge
             badgeContent={ticket.categories.length}
             invisible={ticket.categories.length < 1}
             color="primary"
@@ -194,7 +191,7 @@ const TicketActionButtons = ({ ticket }) => {
                 Categorias
               </Button>
             </div>
-          </Badge>
+          </Badge> */}
 
           {/* {ticket.isGroup && (
             <ButtonWithSpinner
@@ -297,13 +294,13 @@ const TicketActionButtons = ({ ticket }) => {
             ticket={ticket}
           />
 
-          <AddCategoryToTicketModal
+          {/* <AddCategoryToTicketModal
             modalOpen={addCategoryToTicketModalOpen}
             onClose={() => {
               setAddCategoryToTicketModalOpen(false);
             }}
             ticket={ticket}
-          />
+          /> */}
 
           {(ticket.userId === user?.id || user?.profile === "admin") &&
             !ticket.isGroup && (

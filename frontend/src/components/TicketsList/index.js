@@ -129,15 +129,11 @@ const reducer = (state, action) => {
   }
 
   if (action.type === "VERIFY_IF_TICKET_IS_IN_TICKETlIST_TO_REMOVE_IT") {
-    const { ticket, user, setUpdatedCount } = action.payload;
+    const { ticket, setUpdatedCount } = action.payload;
 
     const ticketIndex = state.findIndex((t) => t.id === ticket.id);
 
-    if (
-      ticketIndex !== -1 &&
-      ticket.helpUsers?.find((hu) => hu.id === user?.id) === undefined &&
-      ticket.userId !== user?.id
-    ) {
+    if (ticketIndex !== -1) {
       state.splice(ticketIndex, 1);
       setUpdatedCount((oldCount) => oldCount - 1);
     }
@@ -336,7 +332,7 @@ const TicketsList = (props) => {
         });
       }
 
-      if (data.action === "update") {
+      if (data.action === "update" && !shouldUpdateTicket(data.ticket)) {
         dispatch({
           type: "VERIFY_IF_TICKET_IS_IN_TICKETlIST_TO_REMOVE_IT",
           payload: { ticket: data.ticket, user, setUpdatedCount },

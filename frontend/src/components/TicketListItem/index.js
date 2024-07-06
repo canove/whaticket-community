@@ -324,22 +324,9 @@ const TicketListItem = ({ ticket }) => {
             </span>
           }
           secondary={
-            <span className={classes.contactNameWrapper}>
-              {/* CATEGORY OR LAST MESSAGE */}
-              {ticket.categories?.length ? (
-                <div>
-                  {ticket.categories.map((category) => (
-                    <Chip
-                      key={category.id}
-                      style={{ backgroundColor: category.color }}
-                      size="small"
-                      variant="outlined"
-                      label={category.name}
-                      className={classes.chip}
-                    />
-                  ))}
-                </div>
-              ) : (
+            <>
+              <span className={classes.contactNameWrapper}>
+                {/* CATEGORY OR LAST MESSAGE */}
                 <Typography
                   className={classes.contactLastMessage}
                   noWrap
@@ -353,82 +340,103 @@ const TicketListItem = ({ ticket }) => {
                     <br />
                   )}
                 </Typography>
-              )}
-              {/* - CATEGORY OR LAST MESSAGE */}
+                {/* - CATEGORY OR LAST MESSAGE */}
 
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "4px" }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* USER */}
-                {ticket.isGroup && ticket.participantUsers.length > 0 && (
-                  <Tooltip
-                    title={`PARTICIPANDO: 
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* USER */}
+                  {ticket.isGroup && ticket.participantUsers.length > 0 && (
+                    <Tooltip
+                      title={`PARTICIPANDO: 
                             ${[...ticket.participantUsers]
                               .map((u) => u.name)
                               .join(" - ")}`}
-                    aria-label="add"
-                  >
-                    <PeopleAltIcon fontSize="small" />
-                  </Tooltip>
-                )}
-                {/* - USER */}
+                      aria-label="add"
+                    >
+                      <PeopleAltIcon fontSize="small" />
+                    </Tooltip>
+                  )}
+                  {/* - USER */}
 
-                {/* USER */}
-                {!ticket.isGroup && ticket.userId && (
-                  <Tooltip
-                    title={`ASIGNADO: ${ticket.user?.name}${
-                      ticket.helpUsers?.length > 0
-                        ? ` | APOYO: ${ticket.helpUsers
-                            .map((hu) => hu.name)
-                            .join(" - ")}`
-                        : ""
-                    }`}
-                    aria-label="add"
-                  >
-                    <PeopleAltIcon fontSize="small" />
-                  </Tooltip>
-                )}
-                {/* - USER */}
+                  {/* USER */}
+                  {!ticket.isGroup && ticket.userId && (
+                    <Tooltip
+                      title={`ASIGNADO: ${ticket.user?.name}${
+                        ticket.helpUsers?.length > 0
+                          ? ` | APOYO: ${ticket.helpUsers
+                              .map((hu) => hu.name)
+                              .join(" - ")}`
+                          : ""
+                      }`}
+                      aria-label="add"
+                    >
+                      <PeopleAltIcon fontSize="small" />
+                    </Tooltip>
+                  )}
+                  {/* - USER */}
 
-                {/* WPP */}
-                {ticket.whatsappId && (
-                  <Tooltip
-                    title={`Conexión: ${ticket.whatsapp?.name}`}
-                    aria-label="add"
-                  >
-                    <WhatsAppIcon style={{ color: "green" }} fontSize="small" />
-                  </Tooltip>
-                )}
-                {/* WPP */}
+                  {/* WPP */}
+                  {ticket.whatsappId && (
+                    <Tooltip
+                      title={`Conexión: ${ticket.whatsapp?.name}`}
+                      aria-label="add"
+                    >
+                      <WhatsAppIcon
+                        style={{ color: "green" }}
+                        fontSize="small"
+                      />
+                    </Tooltip>
+                  )}
+                  {/* WPP */}
 
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setPreviewModalIsOpen(true);
-                  }}
-                >
-                  <VisibilityOutlinedIcon fontSize="medium" />
-                </IconButton>
-
-                <TicketPreviewModal
-                  ticket={ticket}
-                  open={previewModalIsOpen}
-                  onClose={() => setPreviewModalIsOpen(false)}
-                />
-
-                {/* UNREAD MESSAGES */}
-                {ticket.unreadMessages > 0 && (
-                  <Chip
-                    label={ticket.unreadMessages}
+                  <IconButton
                     size="small"
-                    style={{ backgroundColor: green[500], color: "white" }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPreviewModalIsOpen(true);
+                    }}
+                  >
+                    <VisibilityOutlinedIcon fontSize="medium" />
+                  </IconButton>
+
+                  <TicketPreviewModal
+                    ticket={ticket}
+                    open={previewModalIsOpen}
+                    onClose={() => setPreviewModalIsOpen(false)}
                   />
-                )}
-                {/* - UNREAD MESSAGES */}
-              </div>
-            </span>
+
+                  {/* UNREAD MESSAGES */}
+                  {ticket.unreadMessages > 0 && (
+                    <Chip
+                      label={ticket.unreadMessages}
+                      size="small"
+                      style={{ backgroundColor: green[500], color: "white" }}
+                    />
+                  )}
+                  {/* - UNREAD MESSAGES */}
+                </div>
+              </span>
+
+              {ticket.categories.length > 0 && (
+                <div style={{ display: "flex", justifyContent: "end" }}>
+                  {ticket.categories.map((category) => (
+                    <Chip
+                      key={category.id}
+                      style={{
+                        backgroundColor: category.color,
+                        height: "20px",
+                        fontSize: "11px",
+                      }}
+                      variant="outlined"
+                      label={category.name}
+                      className={classes.chip}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           }
         />
         {ticket.status === "pending" && (

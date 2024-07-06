@@ -6,17 +6,18 @@ import ShowCategoryService from "./ShowCategoryService";
 
 interface CategoryData {
   name?: string;
+  color?: string;
 }
 
 const UpdateCategoryService = async (
   categoryId: number | string,
   categoryData: CategoryData
 ): Promise<Category> => {
-  const { name } = categoryData;
+  const { name, color } = categoryData;
 
   const categorySchema = Yup.object().shape({
     name: Yup.string()
-      .min(2, "ERR_QUEUE_INVALID_NAME")
+      .min(2, "ERR_CATEGORY_NAME_MIN_LENGTH")
       .test(
         "Check-unique-name",
         "ERR_QUEUE_NAME_ALREADY_EXISTS",
@@ -32,7 +33,7 @@ const UpdateCategoryService = async (
         }
       ),
     color: Yup.string()
-      .required("ERR_QUEUE_INVALID_COLOR")
+      .required("ERR_CATEGORY_COLOR_REQUIRED")
       .test("Check-color", "ERR_QUEUE_INVALID_COLOR", async value => {
         if (value) {
           const colorTestRegex = /^#[0-9a-f]{3,6}$/i;
@@ -56,7 +57,7 @@ const UpdateCategoryService = async (
   });
 
   try {
-    await categorySchema.validate({ name });
+    await categorySchema.validate({ name, color });
   } catch (err) {
     throw new AppError(err.message);
   }
