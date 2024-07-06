@@ -120,8 +120,8 @@ const FindOrCreateTicketService = async (
 
     if (ticket) {
       await ticket.update({
-        status: "pending",
-        userId: null,
+        status: "open",
+        // userId: null,
         unreadMessages,
         lastMessageTimestamp
       });

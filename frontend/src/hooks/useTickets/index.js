@@ -21,9 +21,9 @@ const useTickets = ({
   const [tickets, setTickets] = useState([]);
   const [count, setCount] = useState(0);
 
-  useEffect(() => {
-    console.log("....... typeIds", typeIds);
-  }, [typeIds]);
+  // useEffect(() => {
+  //   console.log("....... typeIds", typeIds);
+  // }, [typeIds]);
 
   useEffect(() => {
     setLoading(true);
