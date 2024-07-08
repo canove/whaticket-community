@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import React, { useContext, useState } from "react";
 
+import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
@@ -12,6 +13,7 @@ import ReportsWhatsappSelect from "../../components/ReportsWhatsappSelect";
 import Title from "../../components/Title";
 
 import Typography from "@material-ui/core/Typography";
+import * as XLSX from "xlsx";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 
@@ -41,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
-    height: 120,
+    // height: 120,
   },
   customFixedHeightPaperLg: {
     padding: theme.spacing(2),
@@ -70,15 +72,25 @@ const Reports = () => {
   const classes = useStyles();
 
   const [loading, setLoading] = useState(false);
-  const [createdTicketsCount, setCreatedTicketsCount] = useState(null);
   const [selectedWhatsappIds, setSelectedWhatsappIds] = useState([]);
+
+  const [createdTicketsData, setCreatedTicketsData] = useState(null);
+  const [createdTicketsCount, setCreatedTicketsCount] = useState(null);
   const [createdTicketsChartData, setCreatedTicketsChartData] = useState(null);
+
   const [
     createdTicketsClosedInTheRangeTimeChartData,
     setCreatedTicketsClosedInTheRangeTimeChartData,
   ] = useState(null);
+  const [
+    createdTicketsClosedInTheRangeTimeData,
+    setCreatedTicketsClosedInTheRangeTimeData,
+  ] = useState(null);
 
+  const [tprData, setTprData] = useState(null);
   const [tprPromedio, setTprPromedio] = useState(null);
+
+  const [tdrData, setTdrData] = useState(null);
   const [tdrPromedio, setTdrPromedio] = useState(null);
   const [
     createdTicketsClosedInTheRangeTimeCount,
@@ -125,15 +137,25 @@ const Reports = () => {
 
           setLoading(false);
 
+          setCreatedTicketsData(data.createdTicketsData);
           setCreatedTicketsCount(data.createdTicketsCount);
           setCreatedTicketsChartData(data.createdTicketsChartData);
+
           setCreatedTicketsClosedInTheRangeTimeChartData(
             data.createdTicketsClosedInTheRangeTimeChartData
           );
+          setCreatedTicketsClosedInTheRangeTimeData(
+            data.createdTicketsClosedInTheRangeTimeData
+          );
+
+          setTprData(data.tprData);
           setTprPromedio(data.tprPromedio);
+
           setCreatedTicketsClosedInTheRangeTimeCount(
             data.createdTicketsClosedInTheRangeTimeCount
           );
+
+          setTdrData(data.tdrData);
           setTdrPromedio(data.tdrPromedio);
 
           console.log(data);
@@ -145,56 +167,158 @@ const Reports = () => {
     }
   }, [fromDate, toDate, selectedWhatsappIds]);
 
+  const exportToExcel = () => {
+    try {
+      const dataToExport = createdTicketsData.map((ticket) => ({
+        NÚMERO: ticket.id,
+        CREACIÓN_FECHA: format(new Date(ticket.createdAt), "dd-MM-yyyy"),
+        CREACIÓN_HORA: format(new Date(ticket.createdAt), "HH:mm"),
+        CONEXIÓN: ticket.whatsapp?.name,
+        USUARIO: ticket.user?.name,
+        ESTADO: ticket.status,
+      }));
+
+      tprData.map((tpr) => {
+        const ticketToAddTprData = dataToExport.find((d) => {
+          return d.NÚMERO === tpr.ticket.id;
+        });
+
+        // console.log("ticketToAddTprData:", ticketToAddTprData, tpr);
+
+        if (ticketToAddTprData) {
+          ticketToAddTprData["TPR_MENSAJE_CLIENTE_CUERPO"] =
+            tpr.tprFirstMessage.body;
+          ticketToAddTprData["TPR_MENSAJE_USUARIO_FECHA"] = tpr
+            .tprFirstUserMessage?.timestamp
+            ? format(
+                new Date(tpr.tprFirstUserMessage.timestamp * 1000),
+                "dd-MM-yyyy"
+              )
+            : "-";
+          ticketToAddTprData["TPR_MENSAJE_USUARIO_HORA"] = tpr
+            .tprFirstUserMessage?.timestamp
+            ? format(
+                new Date(tpr.tprFirstUserMessage?.timestamp * 1000),
+                "HH:mm"
+              )
+            : "-";
+          ticketToAddTprData["TPR_MENSAJE_USUARIO_CUERPO"] = tpr
+            .tprFirstUserMessage?.body
+            ? tpr.tprFirstUserMessage?.body
+            : "-";
+          ticketToAddTprData["TPR_EN_SEGUNDOS"] = tpr.tprItem;
+        }
+      });
+
+      createdTicketsClosedInTheRangeTimeData.map((i) => {
+        const ticketToAddTdrData = dataToExport.find((d) => {
+          return d.NÚMERO === i.id;
+        });
+
+        // console.log("ticketToAddTdrData:", ticketToAddTdrData, i);
+
+        if (ticketToAddTdrData) {
+          ticketToAddTdrData["CERRADO_FECHA"] = i.messages[
+            i.messages.length - 1
+          ]?.timestamp
+            ? format(
+                new Date(i.messages[i.messages.length - 1].timestamp * 1000),
+                "dd-MM-yyyy"
+              )
+            : "-";
+          ticketToAddTdrData["CERRADO_HORA"] = i.messages[i.messages.length - 1]
+            ?.timestamp
+            ? format(
+                new Date(i.messages[i.messages.length - 1].timestamp * 1000),
+                "HH:mm"
+              )
+            : "-";
+        }
+      });
+
+      tdrData.map((tdr) => {
+        const ticketToAddTdrData = dataToExport.find((d) => {
+          return d.NÚMERO === tdr.ticket.id;
+        });
+
+        if (ticketToAddTdrData) {
+          ticketToAddTdrData["TDR_EN_SEGUNDOS"] = tdr.tdrItem;
+        }
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+      XLSX.writeFile(workbook, `${"WHATREST"}.xlsx`);
+    } catch (error) {
+      console.log("-----------error", error);
+    }
+  };
+
   return (
     <div>
       <Container maxWidth="lg" className={classes.container}>
         <MainHeader>
-          <Title>Reportes</Title>
           <div
             style={{
-              marginLeft: "2.5rem",
               display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
               alignItems: "center",
-              gap: "1rem",
             }}
           >
-            <TextField
-              id="date"
-              label="Desde"
-              type="datetime-local"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className={classes.textField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <TextField
-              id="date"
-              label="Hasta"
-              type="datetime-local"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className={classes.textField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <div>
-              {/* <UsersSelect
+            <div style={{ display: "flex" }}>
+              <Title>Reportes</Title>
+              <div
+                style={{
+                  marginLeft: "2.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1rem",
+                }}
+              >
+                <TextField
+                  id="date"
+                  label="Desde"
+                  type="datetime-local"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  id="date"
+                  label="Hasta"
+                  type="datetime-local"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <div>
+                  {/* <UsersSelect
                 selectedUserIds={selectedUserIds}
                 onChange={(value) => {
                   setSelectedUserIds(value);
                 }}
               /> */}
-              <ReportsWhatsappSelect
-                style={{ marginLeft: 6 }}
-                selectedWhatsappIds={selectedWhatsappIds || []}
-                userWhatsapps={whatsApps || []}
-                onChange={(values) => setSelectedWhatsappIds(values)}
-              />
+                  <ReportsWhatsappSelect
+                    style={{ marginLeft: 6 }}
+                    selectedWhatsappIds={selectedWhatsappIds || []}
+                    userWhatsapps={whatsApps || []}
+                    onChange={(values) => setSelectedWhatsappIds(values)}
+                  />
+                </div>
+                {loading && <CircularProgress color="primary" size={25} />}
+              </div>
             </div>
-            {loading && <CircularProgress color="primary" size={25} />}
+            <Button variant="contained" color="primary" onClick={exportToExcel}>
+              Exportar
+            </Button>
           </div>
         </MainHeader>
         <Grid container spacing={3}>

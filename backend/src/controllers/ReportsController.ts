@@ -7,6 +7,8 @@ import { Op } from "sequelize";
 import Contact from "../models/Contact";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
+import User from "../models/User";
+import Whatsapp from "../models/Whatsapp";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -195,6 +197,16 @@ export const generalReport = async (
       {
         model: Contact,
         as: "contact",
+        required: false
+      },
+      {
+        model: User,
+        as: "user",
+        required: false
+      },
+      {
+        model: Whatsapp,
+        as: "whatsapp",
         required: false
       }
     ]
