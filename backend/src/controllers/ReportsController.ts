@@ -1,8 +1,15 @@
+import { addHours } from "date-fns";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import Contact from "../models/Contact";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type IndexQuery = {
   fromDate: string;
@@ -51,6 +58,8 @@ function transformTicketsData(
   endDate,
   dateProperty = "createdAt"
 ) {
+  console.log("transformTicketsData", { startDate, endDate });
+
   // Verificar si el rango de fechas es solo un día
   const isSingleDay = isSameDay(startDate, endDate);
 
@@ -62,10 +71,9 @@ function transformTicketsData(
     // Si el rango es solo un día, agrupar por hora
     while (currentDate <= endDate) {
       const isoDate = currentDate.toISOString().split("T")[0];
-      for (let hour = 0; hour < 24; hour++) {
-        dateMap[`${isoDate} ${hour.toString().padStart(2, "0")}:00`] = 0;
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
+      const hour = currentDate.getUTCHours();
+      dateMap[`${isoDate} ${hour.toString().padStart(2, "0")}:00`] = 0;
+      currentDate = addHours(currentDate, 1);
     }
   } else {
     // Si el rango abarca más de un día, agrupar por día
@@ -78,33 +86,36 @@ function transformTicketsData(
 
   // Contar los tickets por fecha
   const groupedTickets = tickets.reduce((acc, ticket) => {
-    let date = ticket[dateProperty];
-    if (date instanceof Date) {
-      date = date.toISOString().split("T")[0];
-    } else if (typeof date === "string") {
-      date = date.split("T")[0];
-    } else {
-      date = new Date(date).toISOString().split("T")[0];
-    }
+    let dateAsDate = ticket[dateProperty] as Date;
+    let dateAsString = dateAsDate.toISOString();
+
+    console.log("Verificar el ticket esta dentro del rango: ", {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      dateAsString
+    });
 
     // Verificar que la fecha esté dentro del rango especificado
     if (
-      date >= startDate.toISOString().split("T")[0] &&
-      date <= endDate.toISOString().split("T")[0]
+      dateAsString >= startDate.toISOString() &&
+      dateAsString <= endDate.toISOString()
     ) {
       if (isSingleDay) {
         // Agrupar por hora si el rango es un día
-        const hour = new Date(ticket[dateProperty]).getUTCHours();
-        const isoDate = date.split("T")[0];
+        const isoDate = dateAsString.split("T")[0];
+        const hour = dateAsDate.getUTCHours();
         acc[`${isoDate} ${hour.toString().padStart(2, "0")}:00`]++;
       } else {
         // Agrupar por día si el rango abarca más de un día
-        acc[date]++;
+        const isoDate = dateAsString.split("T")[0];
+        acc[isoDate]++;
       }
     }
 
     return acc;
   }, dateMap);
+
+  console.log("chartData", groupedTickets);
 
   // Convertir el objeto en un array de objetos
   const chartData = Object.keys(groupedTickets).map(date => ({
@@ -122,6 +133,8 @@ function transformTicketsData(
 
 // Función para verificar si dos fechas son del mismo día
 function isSameDay(date1, date2) {
+  console.log("isSameDay", date1.toISOString(), date2.toISOString());
+
   return (
     date1.toISOString().split("T")[0] === date2.toISOString().split("T")[0]
   );
@@ -137,6 +150,14 @@ export const generalReport = async (
     selectedWhatsappIds: selectedUserIdsAsString
   } = req.query as IndexQuery;
 
+  console.log({ fromDateAsString, toDateAsString });
+
+  // Parse the date strings without converting to UTC
+  const fromDate = new Date(fromDateAsString.replace(/-05:00$/, "Z"));
+  const toDate = new Date(toDateAsString.replace(/-05:00$/, "Z"));
+
+  console.log({ fromDate, toDate });
+
   let createdTicketsChartData: null | any[] = null;
   let createdTicketsData: null | Ticket[] = null;
   let createdTicketsCount: null | number = null;
@@ -150,16 +171,11 @@ export const generalReport = async (
 
   const selectedWhatsappIds = JSON.parse(selectedUserIdsAsString) as number[];
 
-  console.log("ReportsController.generalReport", {
-    inicio: new Date(fromDateAsString),
-    fin: new Date(getEndOfDayInSeconds(toDateAsString) * 1000)
-  });
-
   const createdTickets = await Ticket.findAll({
     where: {
       createdAt: {
-        [Op.gte]: new Date(fromDateAsString),
-        [Op.lte]: new Date(getEndOfDayInSeconds(toDateAsString) * 1000)
+        [Op.gte]: dayjs(fromDateAsString).utc().toDate(),
+        [Op.lte]: dayjs(toDateAsString).utc().toDate()
       },
       isGroup: false,
       ...(selectedWhatsappIds.length > 0 && {
@@ -184,13 +200,26 @@ export const generalReport = async (
     ]
   });
 
-  createdTicketsData = createdTickets;
+  let createdTicketsWithClientHours = createdTickets.map(ticket => {
+    const modifiedTicket = JSON.parse(JSON.stringify(ticket)) as Ticket;
+
+    modifiedTicket.createdAt = dayjs(modifiedTicket.createdAt)
+      .subtract(5, "hours")
+      .toDate();
+    modifiedTicket.updatedAt = dayjs(modifiedTicket.updatedAt)
+      .subtract(5, "hours")
+      .toDate();
+
+    return modifiedTicket;
+  });
+
+  createdTicketsData = createdTicketsWithClientHours;
   createdTicketsChartData = transformTicketsData(
-    createdTickets,
-    new Date(fromDateAsString),
-    new Date(getEndOfDayInSeconds(toDateAsString) * 1000)
+    createdTicketsWithClientHours,
+    fromDate,
+    toDate
   );
-  createdTicketsCount = createdTickets.length;
+  createdTicketsCount = createdTicketsWithClientHours.length;
 
   // console.log({
   //   createdTicketsCount: createdTickets.length,
@@ -199,29 +228,32 @@ export const generalReport = async (
   //   })
   // });
 
-  const createdTicketsWithFirstClientMessage = createdTickets.filter(
-    ticket => ticket.messages.length > 0 && ticket.messages[0].fromMe === false
-  );
-
-  const createdTicketsClosedInTheRangeTime = createdTickets.filter(ticket => {
-    const lastCloseMessage = findLast(ticket.messages, (message: Message) => {
-      return message.body.includes("*resolvió* la conversación");
-    });
-
-    // console.log("createdTicketsClosedInTheRangeTime", {
-    //   lastCloseMessage,
-    //   dateConlaQueSeVaAComparar: getEndOfDayInSeconds(toDateAsString),
-    //   lastCloseMessageTimestampIsValid:
-    //     lastCloseMessage?.timestamp < getEndOfDayInSeconds(toDateAsString),
-    //   ticketStatus: ticket.status === "closed"
-    // });
-
-    return (
-      lastCloseMessage &&
-      lastCloseMessage.timestamp < getEndOfDayInSeconds(toDateAsString) &&
-      ticket.status === "closed"
+  const createdTicketsWithFirstClientMessage =
+    createdTicketsWithClientHours.filter(
+      ticket =>
+        ticket.messages?.length > 0 && ticket.messages[0].fromMe === false
     );
-  });
+
+  const createdTicketsClosedInTheRangeTime =
+    createdTicketsWithClientHours.filter(ticket => {
+      const lastCloseMessage = findLast(ticket.messages, (message: Message) => {
+        return message.body.includes("*resolvió* la conversación");
+      });
+
+      // console.log("createdTicketsClosedInTheRangeTime", {
+      //   lastCloseMessage,
+      //   dateConlaQueSeVaAComparar: getEndOfDayInSeconds(toDateAsString),
+      //   lastCloseMessageTimestampIsValid:
+      //     lastCloseMessage?.timestamp < getEndOfDayInSeconds(toDateAsString),
+      //   ticketStatus: ticket.status === "closed"
+      // });
+
+      return (
+        lastCloseMessage &&
+        lastCloseMessage.timestamp < getEndOfDayInSeconds(toDateAsString) &&
+        ticket.status === "closed"
+      );
+    });
 
   if (createdTicketsClosedInTheRangeTime.length > 0) {
     createdTicketsClosedInTheRangeTimeData = createdTicketsClosedInTheRangeTime;
@@ -229,8 +261,8 @@ export const generalReport = async (
       createdTicketsClosedInTheRangeTime.length;
     createdTicketsClosedInTheRangeTimeChartData = transformTicketsData(
       createdTicketsClosedInTheRangeTime,
-      new Date(fromDateAsString),
-      new Date(toDateAsString),
+      fromDate,
+      toDate,
       "updatedAt"
     );
 

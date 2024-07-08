@@ -1,5 +1,7 @@
+import { format } from "date-fns";
 import React, { useContext, useState } from "react";
 
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -67,6 +69,7 @@ function segundosAHorasMinutos(segundos) {
 const Reports = () => {
   const classes = useStyles();
 
+  const [loading, setLoading] = useState(false);
   const [createdTicketsCount, setCreatedTicketsCount] = useState(null);
   const [selectedWhatsappIds, setSelectedWhatsappIds] = useState([]);
   const [createdTicketsChartData, setCreatedTicketsChartData] = useState(null);
@@ -82,12 +85,13 @@ const Reports = () => {
     setCreatedTicketsClosedInTheRangeTimeCount,
   ] = useState(null);
 
-  // const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [fromDate, setFromDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0] + " 00:00:00"
   );
-  const { whatsApps, loading } = useContext(WhatsAppsContext);
-  const [toDate, setToDate] = useState(new Date().toISOString().split("T")[0]);
+  const { whatsApps } = useContext(WhatsAppsContext);
+  const [toDate, setToDate] = useState(
+    new Date().toISOString().split("T")[0] + " 23:59:59"
+  );
 
   useEffect(() => {
     localStorage.getItem("ReportsWhatsappSelect") &&
@@ -100,17 +104,26 @@ const Reports = () => {
 
   useEffect(() => {
     if (esFechaValida(fromDate) && esFechaValida(toDate)) {
-      console.log({ fromDate, toDate, selectedWhatsappIds });
+      // console.log({ fromDate, toDate, selectedWhatsappIds });
+      console.log({
+        fromDate: format(new Date(fromDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
+        toDate: format(new Date(toDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
+        selectedWhatsappIds,
+      });
 
       (async () => {
         try {
+          setLoading(true);
+
           const { data } = await api.get("/generalReport", {
             params: {
-              fromDate,
-              toDate,
+              fromDate: format(new Date(fromDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
+              toDate: format(new Date(toDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
               selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
             },
           });
+
+          setLoading(false);
 
           setCreatedTicketsCount(data.createdTicketsCount);
           setCreatedTicketsChartData(data.createdTicketsChartData);
@@ -148,8 +161,7 @@ const Reports = () => {
             <TextField
               id="date"
               label="Desde"
-              type="date"
-              defaultValue={new Date().toISOString().split("T")[0]}
+              type="datetime-local"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
               className={classes.textField}
@@ -160,8 +172,7 @@ const Reports = () => {
             <TextField
               id="date"
               label="Hasta"
-              type="date"
-              defaultValue={new Date().toISOString().split("T")[0]}
+              type="datetime-local"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
               className={classes.textField}
@@ -169,7 +180,7 @@ const Reports = () => {
                 shrink: true,
               }}
             />
-            <div style={{ minWidth: 250 }}>
+            <div>
               {/* <UsersSelect
                 selectedUserIds={selectedUserIds}
                 onChange={(value) => {
@@ -183,6 +194,7 @@ const Reports = () => {
                 onChange={(values) => setSelectedWhatsappIds(values)}
               />
             </div>
+            {loading && <CircularProgress color="primary" size={25} />}
           </div>
         </MainHeader>
         <Grid container spacing={3}>
