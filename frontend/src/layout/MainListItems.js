@@ -8,6 +8,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
+import BarChartIcon from "@material-ui/icons/BarChart";
 import CategoryOutlinedIcon from "@material-ui/icons/CategoryOutlined";
 import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
@@ -119,6 +120,11 @@ const MainListItems = (props) => {
             <ListSubheader inset>
               {i18n.t("mainDrawer.listItems.administration")}
             </ListSubheader>
+            <ListItemLink
+              to="/reports"
+              primary={"Reportes"}
+              icon={<BarChartIcon />}
+            />
             <ListItemLink
               to="/users"
               primary={i18n.t("mainDrawer.listItems.users")}

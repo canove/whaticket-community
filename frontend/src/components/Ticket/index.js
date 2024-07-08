@@ -15,6 +15,7 @@ import ContactDrawer from "../ContactDrawer";
 import MessageInput from "../MessageInput/";
 import MessagesList from "../MessagesList";
 import TicketActionButtons from "../TicketActionButtons";
+import TicketCategories from "../TicketCategories";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
 
@@ -225,6 +226,9 @@ const Ticket = () => {
             <TicketActionButtons ticket={ticket} />
           </div>
         </TicketHeader>
+
+        <TicketCategories ticket={ticket} />
+
         <ReplyMessageProvider>
           <MessagesList
             ticketId={ticketId}

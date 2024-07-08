@@ -8,6 +8,7 @@ import contactRoutes from "./contactRoutes";
 import messageRoutes from "./messageRoutes";
 import queueRoutes from "./queueRoutes";
 import quickAnswerRoutes from "./quickAnswerRoutes";
+import reportsRoutes from "./reports";
 import settingRoutes from "./settingRoutes";
 import ticketRoutes from "./ticketRoutes";
 import userRoutes from "./userRoutes";
@@ -28,6 +29,7 @@ routes.use(queueRoutes);
 routes.use(quickAnswerRoutes);
 routes.use(categoryRoutes);
 routes.use(chatbotOptionRoutes);
+routes.use(reportsRoutes);
 routes.use("/api/messages", apiRoutes);
 
 export default routes;
