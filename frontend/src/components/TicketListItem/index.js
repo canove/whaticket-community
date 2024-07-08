@@ -419,7 +419,7 @@ const TicketListItem = ({ ticket }) => {
                 </div>
               </span>
 
-              {ticket.categories.length > 0 && (
+              {ticket.categories?.length > 0 && (
                 <div style={{ display: "flex", justifyContent: "end" }}>
                   {ticket.categories.map((category) => (
                     <Chip
