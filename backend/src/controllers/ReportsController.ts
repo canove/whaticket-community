@@ -150,11 +150,16 @@ export const generalReport = async (
 
   const selectedWhatsappIds = JSON.parse(selectedUserIdsAsString) as number[];
 
+  console.log("ReportsController.generalReport", {
+    inicio: new Date(fromDateAsString),
+    fin: new Date(getEndOfDayInSeconds(toDateAsString) * 1000)
+  });
+
   const createdTickets = await Ticket.findAll({
     where: {
       createdAt: {
         [Op.gte]: new Date(fromDateAsString),
-        [Op.lte]: new Date(toDateAsString)
+        [Op.lte]: new Date(getEndOfDayInSeconds(toDateAsString) * 1000)
       },
       isGroup: false,
       ...(selectedWhatsappIds.length > 0 && {
@@ -183,7 +188,7 @@ export const generalReport = async (
   createdTicketsChartData = transformTicketsData(
     createdTickets,
     new Date(fromDateAsString),
-    new Date(toDateAsString)
+    new Date(getEndOfDayInSeconds(toDateAsString) * 1000)
   );
   createdTicketsCount = createdTickets.length;
 
