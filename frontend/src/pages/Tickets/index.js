@@ -8,7 +8,7 @@ import Ticket from "../../components/Ticket/";
 import TicketsManager from "../../components/TicketsManager/";
 
 import Hidden from "@material-ui/core/Hidden";
-import { SearchMessageProvider } from "../../context/SearchMessage/SearchMessageContext";
+
 import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles((theme) => ({
@@ -70,43 +70,39 @@ const Chat = () => {
   return (
     <div className={classes.chatContainer}>
       <div className={classes.chatPapper}>
-        <SearchMessageProvider>
-          <Grid container spacing={0}>
-            {/* <Grid item xs={4} className={classes.contactsWrapper}> */}
-            {/* LEFT | TICKETS VIEW ADMINISTRATION */}
-            <Grid
-              item
-              xs={12}
-              md={4}
-              className={
-                ticketId
-                  ? classes.contactsWrapperSmall
-                  : classes.contactsWrapper
-              }
-            >
-              <TicketsManager />
-            </Grid>
-            {/* LEFT | TICKETS VIEW ADMINISTRATION */}
-
-            {/* RIGHT | SELECTED TICKET */}
-            <Grid item xs={12} md={8} className={classes.messagessWrapper}>
-              {/* <Grid item xs={8} className={classes.messagessWrapper}> */}
-              {ticketId ? (
-                <>
-                  <Ticket />
-                </>
-              ) : (
-                <Hidden only={["sm", "xs"]}>
-                  <Paper className={classes.welcomeMsg}>
-                    {/* <Paper square variant="outlined" className={classes.welcomeMsg}> */}
-                    <span>{i18n.t("chat.noTicketMessage")}</span>
-                  </Paper>
-                </Hidden>
-              )}
-            </Grid>
-            {/* - RIGHT | SELECTED TICKET */}
+        <Grid container spacing={0}>
+          {/* <Grid item xs={4} className={classes.contactsWrapper}> */}
+          {/* LEFT | TICKETS VIEW ADMINISTRATION */}
+          <Grid
+            item
+            xs={12}
+            md={4}
+            className={
+              ticketId ? classes.contactsWrapperSmall : classes.contactsWrapper
+            }
+          >
+            <TicketsManager />
           </Grid>
-        </SearchMessageProvider>
+          {/* LEFT | TICKETS VIEW ADMINISTRATION */}
+
+          {/* RIGHT | SELECTED TICKET */}
+          <Grid item xs={12} md={8} className={classes.messagessWrapper}>
+            {/* <Grid item xs={8} className={classes.messagessWrapper}> */}
+            {ticketId ? (
+              <>
+                <Ticket />
+              </>
+            ) : (
+              <Hidden only={["sm", "xs"]}>
+                <Paper className={classes.welcomeMsg}>
+                  {/* <Paper square variant="outlined" className={classes.welcomeMsg}> */}
+                  <span>{i18n.t("chat.noTicketMessage")}</span>
+                </Paper>
+              </Hidden>
+            )}
+          </Grid>
+          {/* - RIGHT | SELECTED TICKET */}
+        </Grid>
       </div>
     </div>
   );
