@@ -134,6 +134,10 @@ const Reports = () => {
   );
 
   useEffect(() => {
+    console.log("whatsApps", whatsApps);
+  }, [whatsApps]);
+
+  useEffect(() => {
     localStorage.getItem("ReportsWhatsappSelect") &&
       setSelectedWhatsappIds(
         JSON.parse(localStorage.getItem("ReportsWhatsappSelect"))
@@ -143,165 +147,182 @@ const Reports = () => {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    if (esFechaValida(fromDate) && esFechaValida(toDate)) {
-      // console.log({ fromDate, toDate, selectedWhatsappIds });
-      console.log({
-        fromDate: format(new Date(fromDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
-        toDate: format(new Date(toDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
-        selectedWhatsappIds,
-      });
+    const delayDebounceFn = setTimeout(() => {
+      if (esFechaValida(fromDate) && esFechaValida(toDate)) {
+        // console.log({ fromDate, toDate, selectedWhatsappIds });
+        console.log({
+          fromDate: format(new Date(fromDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
+          toDate: format(new Date(toDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
+          selectedWhatsappIds,
+        });
 
-      (async () => {
-        try {
-          setLoading(true);
+        (async () => {
+          try {
+            setLoading(true);
 
-          const { data } = await api.get("/generalReport", {
-            params: {
-              fromDate: format(new Date(fromDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
-              toDate: format(new Date(toDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
-              selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
-            },
-          });
-
-          setCreatedTicketsData(data.createdTicketsData);
-          setCreatedTicketsCount(data.createdTicketsCount);
-          setCreatedTicketsChartData(data.createdTicketsChartData);
-
-          setCreatedTicketsClosedInTheRangeTimeChartData(
-            data.createdTicketsClosedInTheRangeTimeChartData
-          );
-          setCreatedTicketsClosedInTheRangeTimeData(
-            data.createdTicketsClosedInTheRangeTimeData
-          );
-
-          setTprData(data.tprData);
-          setTprPromedio(data.tprPromedio);
-
-          setCreatedTicketsClosedInTheRangeTimeCount(
-            data.createdTicketsClosedInTheRangeTimeCount
-          );
-
-          setTdrData(data.tdrData);
-          setTdrPromedio(data.tdrPromedio);
-
-          console.log(data);
-
-          const { data: data2 } = await api.get("/responseTimes", {
-            params: {
-              selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
-            },
-          });
-
-          const ticketsWithAllMessages = data2.ticketsWithAllMessages;
-          const ticketsWithAllMessagesFiltered =
-            data2.ticketsWithAllMessages.filter((t) => {
-              let ticketMessages = t.messages?.filter((m) => {
-                return !m.isPrivate;
-              });
-
-              if (ticketMessages.length === 0) {
-                return false;
-              }
-
-              const lastTicketMessage =
-                ticketMessages[ticketMessages.length - 1];
-
-              if (
-                lastTicketMessage?.contact?.isCompanyMember ||
-                lastTicketMessage?.fromMe
-              ) {
-                return false;
-              }
-
-              return true;
+            const { data } = await api.get("/generalReport", {
+              params: {
+                fromDate: format(
+                  new Date(fromDate),
+                  "yyyy-MM-dd'T'HH:mm:ssXXX"
+                ),
+                toDate: format(new Date(toDate), "yyyy-MM-dd'T'HH:mm:ssXXX"),
+                selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
+              },
             });
-          const ticketsWithAllMessagesFilteredWithFirstLastUserMessage =
-            ticketsWithAllMessagesFiltered.map((t) => {
-              let ticketMessages = t.messages.filter((m) => {
-                return !m.isPrivate;
-              });
-              let firstLastMessageThatIsFromTheClient;
 
-              for (let i = ticketMessages.length - 1; i >= 0; i--) {
+            setCreatedTicketsData(data.createdTicketsData);
+            setCreatedTicketsCount(data.createdTicketsCount);
+            setCreatedTicketsChartData(data.createdTicketsChartData);
+
+            setCreatedTicketsClosedInTheRangeTimeChartData(
+              data.createdTicketsClosedInTheRangeTimeChartData
+            );
+            setCreatedTicketsClosedInTheRangeTimeData(
+              data.createdTicketsClosedInTheRangeTimeData
+            );
+
+            setTprData(data.tprData);
+            setTprPromedio(data.tprPromedio);
+
+            setCreatedTicketsClosedInTheRangeTimeCount(
+              data.createdTicketsClosedInTheRangeTimeCount
+            );
+
+            setTdrData(data.tdrData);
+            setTdrPromedio(data.tdrPromedio);
+
+            console.log(data);
+
+            const { data: data2 } = await api.get("/responseTimes", {
+              params: {
+                selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
+              },
+            });
+
+            const ticketsWithAllMessages = data2.ticketsWithAllMessages;
+            const ticketsWithAllMessagesFiltered =
+              data2.ticketsWithAllMessages.filter((t) => {
+                let ticketMessages = t.messages?.filter((m) => {
+                  return !m.isPrivate;
+                });
+
+                if (ticketMessages.length === 0) {
+                  return false;
+                }
+
+                const lastTicketMessage =
+                  ticketMessages[ticketMessages.length - 1];
+
                 if (
-                  !ticketMessages[i]?.contact?.isCompanyMember &&
-                  !ticketMessages[i]?.fromMe
+                  whatsApps.find(
+                    (w) => w.number === lastTicketMessage.contact?.number
+                  ) ||
+                  lastTicketMessage?.contact?.isCompanyMember ||
+                  lastTicketMessage?.fromMe
                 ) {
-                  firstLastMessageThatIsFromTheClient = ticketMessages[i];
-                } else {
-                  break;
+                  return false;
                 }
-              }
 
-              return {
-                ticket: t,
-                firstLastUserMessage: firstLastMessageThatIsFromTheClient,
-                firstLastUserMessageTime: new Date(
-                  firstLastMessageThatIsFromTheClient.timestamp * 1000
-                ),
-                days: differenceInDays(
-                  new Date(),
-                  new Date(firstLastMessageThatIsFromTheClient.timestamp * 1000)
-                ),
-                hours: differenceInHours(
-                  new Date(),
-                  new Date(firstLastMessageThatIsFromTheClient.timestamp * 1000)
-                ),
-              };
-            });
-
-          console.log("ticketsWithAllMessages", ticketsWithAllMessages);
-          console.log(
-            "ticketsWithAllMessagesFiltered",
-            ticketsWithAllMessagesFiltered
-          );
-          console.log(
-            "ticketsWithAllMessagesFilteredWithFirstLastUserMessage",
-            ticketsWithAllMessagesFilteredWithFirstLastUserMessage
-          );
-
-          const responseTimesData = responseTimesRanges.map((range) => ({
-            label: range.label,
-            count: 0,
-            tickets: [],
-          }));
-
-          ticketsWithAllMessagesFilteredWithFirstLastUserMessage.forEach(
-            (item) => {
-              responseTimesRanges.forEach((range, index) => {
-                if (range.type === "hours") {
-                  if (
-                    item.days === 0 &&
-                    item.hours >= range.min &&
-                    item.hours < range.max
-                  ) {
-                    responseTimesData[index].count += 1;
-                    responseTimesData[index].tickets.push(item.ticket);
-                  }
-                } else if (range.type === "days") {
-                  if (item.days >= range.min && item.days < range.max) {
-                    responseTimesData[index].count += 1;
-                    responseTimesData[index].tickets.push(item.ticket);
-                  }
-                }
+                return true;
               });
-            }
-          );
+            const ticketsWithAllMessagesFilteredWithFirstLastUserMessage =
+              ticketsWithAllMessagesFiltered.map((t) => {
+                let ticketMessages = t.messages.filter((m) => {
+                  return !m.isPrivate;
+                });
+                let firstLastMessageThatIsFromTheClient;
 
-          console.log("responseTimesData", responseTimesData);
-          setResponseTimesData(
-            ticketsWithAllMessagesFilteredWithFirstLastUserMessage
-          );
-          setResponseTimes(responseTimesData);
+                for (let i = ticketMessages.length - 1; i >= 0; i--) {
+                  if (
+                    !whatsApps.find(
+                      (w) => w.number === ticketMessages.contact?.number
+                    ) &&
+                    !ticketMessages[i]?.contact?.isCompanyMember &&
+                    !ticketMessages[i]?.fromMe
+                  ) {
+                    firstLastMessageThatIsFromTheClient = ticketMessages[i];
+                  } else {
+                    break;
+                  }
+                }
 
-          setLoading(false);
-        } catch (error) {
-          console.log(error);
-          toastError(error);
-        }
-      })();
-    }
-  }, [fromDate, toDate, selectedWhatsappIds]);
+                return {
+                  ticket: t,
+                  firstLastUserMessage: firstLastMessageThatIsFromTheClient,
+                  firstLastUserMessageTime: new Date(
+                    firstLastMessageThatIsFromTheClient.timestamp * 1000
+                  ),
+                  days: differenceInDays(
+                    new Date(),
+                    new Date(
+                      firstLastMessageThatIsFromTheClient.timestamp * 1000
+                    )
+                  ),
+                  hours: differenceInHours(
+                    new Date(),
+                    new Date(
+                      firstLastMessageThatIsFromTheClient.timestamp * 1000
+                    )
+                  ),
+                };
+              });
+
+            console.log("ticketsWithAllMessages", ticketsWithAllMessages);
+            console.log(
+              "ticketsWithAllMessagesFiltered",
+              ticketsWithAllMessagesFiltered
+            );
+            console.log(
+              "ticketsWithAllMessagesFilteredWithFirstLastUserMessage",
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessage
+            );
+
+            const responseTimesData = responseTimesRanges.map((range) => ({
+              label: range.label,
+              count: 0,
+              tickets: [],
+            }));
+
+            ticketsWithAllMessagesFilteredWithFirstLastUserMessage.forEach(
+              (item) => {
+                responseTimesRanges.forEach((range, index) => {
+                  if (range.type === "hours") {
+                    if (
+                      item.days === 0 &&
+                      item.hours >= range.min &&
+                      item.hours < range.max
+                    ) {
+                      responseTimesData[index].count += 1;
+                      responseTimesData[index].tickets.push(item.ticket);
+                    }
+                  } else if (range.type === "days") {
+                    if (item.days >= range.min && item.days < range.max) {
+                      responseTimesData[index].count += 1;
+                      responseTimesData[index].tickets.push(item.ticket);
+                    }
+                  }
+                });
+              }
+            );
+
+            console.log("responseTimesData", responseTimesData);
+            setResponseTimesData(
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessage
+            );
+            setResponseTimes(responseTimesData);
+
+            setLoading(false);
+          } catch (error) {
+            console.log(error);
+            toastError(error);
+          }
+        })();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [fromDate, toDate, selectedWhatsappIds, whatsApps]);
 
   const exportToExcel = () => {
     try {
