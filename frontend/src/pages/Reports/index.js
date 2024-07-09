@@ -1,15 +1,19 @@
 import { format } from "date-fns";
 import React, { useContext, useState } from "react";
 
+import { differenceInDays, differenceInHours } from "date-fns";
+
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MainHeader from "../../components/MainHeader";
 import ReportsWhatsappSelect from "../../components/ReportsWhatsappSelect";
+import TicketListModal from "../../components/TicketListModal";
 import Title from "../../components/Title";
 
 import Typography from "@material-ui/core/Typography";
@@ -36,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
-    height: 240,
+    height: 250,
   },
   customFixedHeightPaper: {
     padding: theme.spacing(2),
@@ -68,6 +72,24 @@ function segundosAHorasMinutos(segundos) {
   return `${horas}h ${minutos}m ${segundosRestantes}s`;
 }
 
+const responseTimesRanges = [
+  { label: "0 - 1 Horas", min: 0, max: 1, type: "hours" },
+  { label: "1 - 2 Horas", min: 1, max: 2, type: "hours" },
+  { label: "2 - 3 Horas", min: 2, max: 3, type: "hours" },
+  { label: "3 - 4 Horas", min: 3, max: 4, type: "hours" },
+  { label: "4 - 5 Horas", min: 4, max: 5, type: "hours" },
+  { label: "0 - 5 Horas", min: 0, max: 5, type: "hours" },
+  { label: "5 - 10 Horas", min: 5, max: 10, type: "hours" },
+  { label: "10 - 15 Horas", min: 10, max: 15, type: "hours" },
+  { label: "15 - 20 Horas", min: 15, max: 20, type: "hours" },
+  { label: "20 - 24 Horas", min: 20, max: 24, type: "hours" },
+  { label: "0 - 24 Horas", min: 0, max: 24, type: "hours" },
+  { label: "1 - 2 Días", min: 1, max: 2, type: "days" },
+  { label: "2 - 3 Días", min: 2, max: 3, type: "days" },
+  { label: "3 - 4 Días", min: 3, max: 4, type: "days" },
+  { label: "4 - x Días", min: 4, max: Infinity, type: "days" },
+];
+
 const Reports = () => {
   const classes = useStyles();
 
@@ -96,6 +118,12 @@ const Reports = () => {
     createdTicketsClosedInTheRangeTimeCount,
     setCreatedTicketsClosedInTheRangeTimeCount,
   ] = useState(null);
+
+  const [responseTimesData, setResponseTimesData] = useState(null);
+  const [responseTimes, setResponseTimes] = useState(null);
+  const [ticketListModalOpen, setTicketListModalOpen] = useState(false);
+  const [ticketListModalTitle, setTicketListModalTitle] = useState("");
+  const [ticketListModalTickets, setTicketListModalTickets] = useState([]);
 
   const [fromDate, setFromDate] = useState(
     format(new Date(), "yyyy-MM-dd") + " 00:00:00"
@@ -135,8 +163,6 @@ const Reports = () => {
             },
           });
 
-          setLoading(false);
-
           setCreatedTicketsData(data.createdTicketsData);
           setCreatedTicketsCount(data.createdTicketsCount);
           setCreatedTicketsChartData(data.createdTicketsChartData);
@@ -159,6 +185,116 @@ const Reports = () => {
           setTdrPromedio(data.tdrPromedio);
 
           console.log(data);
+
+          const { data: data2 } = await api.get("/responseTimes", {
+            params: {
+              selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
+            },
+          });
+
+          const ticketsWithAllMessages = data2.ticketsWithAllMessages;
+          const ticketsWithAllMessagesFiltered =
+            data2.ticketsWithAllMessages.filter((t) => {
+              let ticketMessages = t.messages?.filter((m) => {
+                return !m.isPrivate;
+              });
+
+              if (ticketMessages.length === 0) {
+                return false;
+              }
+
+              const lastTicketMessage =
+                ticketMessages[ticketMessages.length - 1];
+
+              if (
+                lastTicketMessage?.contact?.isCompanyMember ||
+                lastTicketMessage?.fromMe
+              ) {
+                return false;
+              }
+
+              return true;
+            });
+          const ticketsWithAllMessagesFilteredWithFirstLastUserMessage =
+            ticketsWithAllMessagesFiltered.map((t) => {
+              let ticketMessages = t.messages.filter((m) => {
+                return !m.isPrivate;
+              });
+              let firstLastMessageThatIsFromTheClient;
+
+              for (let i = ticketMessages.length - 1; i >= 0; i--) {
+                if (
+                  !ticketMessages[i]?.contact?.isCompanyMember &&
+                  !ticketMessages[i]?.fromMe
+                ) {
+                  firstLastMessageThatIsFromTheClient = ticketMessages[i];
+                } else {
+                  break;
+                }
+              }
+
+              return {
+                ticket: t,
+                firstLastUserMessage: firstLastMessageThatIsFromTheClient,
+                firstLastUserMessageTime: new Date(
+                  firstLastMessageThatIsFromTheClient.timestamp * 1000
+                ),
+                days: differenceInDays(
+                  new Date(),
+                  new Date(firstLastMessageThatIsFromTheClient.timestamp * 1000)
+                ),
+                hours: differenceInHours(
+                  new Date(),
+                  new Date(firstLastMessageThatIsFromTheClient.timestamp * 1000)
+                ),
+              };
+            });
+
+          console.log("ticketsWithAllMessages", ticketsWithAllMessages);
+          console.log(
+            "ticketsWithAllMessagesFiltered",
+            ticketsWithAllMessagesFiltered
+          );
+          console.log(
+            "ticketsWithAllMessagesFilteredWithFirstLastUserMessage",
+            ticketsWithAllMessagesFilteredWithFirstLastUserMessage
+          );
+
+          const responseTimesData = responseTimesRanges.map((range) => ({
+            label: range.label,
+            count: 0,
+            tickets: [],
+          }));
+
+          ticketsWithAllMessagesFilteredWithFirstLastUserMessage.forEach(
+            (item) => {
+              responseTimesRanges.forEach((range, index) => {
+                if (range.type === "hours") {
+                  if (
+                    item.days === 0 &&
+                    item.hours >= range.min &&
+                    item.hours < range.max
+                  ) {
+                    responseTimesData[index].count += 1;
+                    responseTimesData[index].tickets.push(item.ticket);
+                  }
+                } else if (range.type === "days") {
+                  if (item.days >= range.min && item.days < range.max) {
+                    responseTimesData[index].count += 1;
+                    responseTimesData[index].tickets.push(item.ticket);
+                  }
+                }
+              });
+            }
+          );
+
+          console.log("responseTimesData", responseTimesData);
+          setResponseTimesData(
+            ticketsWithAllMessagesFilteredWithFirstLastUserMessage
+          );
+          setResponseTimes(responseTimesData);
+
+          setLoading(false);
         } catch (error) {
           console.log(error);
           toastError(error);
@@ -329,6 +465,199 @@ const Reports = () => {
           </div>
         </MainHeader>
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Paper className={classes.fixedHeightPaper}>
+              <Typography
+                component="h3"
+                variant="h6"
+                color="primary"
+                paragraph
+                style={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <span>Tiempo de espera de respuesta actual</span>
+                <span style={{ color: "black" }}>
+                  Tickets Totales:{" "}
+                  {responseTimesData ? responseTimesData.length : 0}
+                </span>
+              </Typography>
+              <div style={{ flexGrow: 1 }}>
+                <Grid container spacing={3} style={{ fontSize: 18 }}>
+                  {responseTimes ? (
+                    <>
+                      <Grid item xs={4}>
+                        {responseTimes.slice(0, 5).map((range) => (
+                          <div>
+                            <span>{range.label}</span>
+                            {": "}
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              style={{ fontWeight: "bold" }}
+                              onClick={() => {
+                                setTicketListModalOpen(true);
+                                setTicketListModalTickets(range.tickets);
+                                setTicketListModalTitle(range.label);
+                              }}
+                            >
+                              {range.count}{" "}
+                              {range.count > 0 && (
+                                <span
+                                  style={{
+                                    color: "black",
+                                    fontSize: "12px",
+                                    display: "inline-block",
+                                    marginLeft: 5,
+                                  }}
+                                >
+                                  (
+                                  {Math.round(
+                                    (range.count * 100) /
+                                      responseTimes
+                                        .slice(0, 5)
+                                        .reduce(
+                                          (acc, range) => acc + range.count,
+                                          0
+                                        )
+                                  )}
+                                  %)
+                                </span>
+                              )}
+                            </IconButton>
+                          </div>
+                        ))}
+
+                        <div style={{ fontWeight: "bold", marginTop: 5 }}>
+                          Porcentaje:{" "}
+                          {Math.round(
+                            (responseTimes
+                              .slice(0, 5)
+                              .reduce((acc, range) => acc + range.count, 0) *
+                              100) /
+                              responseTimesData.length
+                          )}
+                          %
+                        </div>
+                      </Grid>
+                      <Grid item xs={4}>
+                        {responseTimes.slice(5, 10).map((range, index) => (
+                          <div>
+                            <span>{range.label}</span>
+                            {": "}
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              style={{ fontWeight: "bold" }}
+                              onClick={() => {
+                                setTicketListModalOpen(true);
+                                setTicketListModalTickets(range.tickets);
+                                setTicketListModalTitle(range.label);
+                              }}
+                            >
+                              {range.count}{" "}
+                              {index !== 0 && range.count > 0 && (
+                                <span
+                                  style={{
+                                    color: "black",
+                                    fontSize: "12px",
+                                    display: "inline-block",
+                                    marginLeft: 5,
+                                  }}
+                                >
+                                  (
+                                  {Math.round(
+                                    (range.count * 100) /
+                                      responseTimes
+                                        .slice(6, 10)
+                                        .reduce(
+                                          (acc, range) => acc + range.count,
+                                          0
+                                        )
+                                  )}
+                                  %)
+                                </span>
+                              )}
+                            </IconButton>
+                          </div>
+                        ))}
+                        <div style={{ fontWeight: "bold", marginTop: 5 }}>
+                          Porcentaje:{" "}
+                          {Math.round(
+                            (responseTimes
+                              .slice(6, 10)
+                              .reduce((acc, range) => acc + range.count, 0) *
+                              100) /
+                              responseTimesData.length
+                          )}
+                          %
+                        </div>
+                      </Grid>
+                      <Grid item xs={4}>
+                        {responseTimes.slice(10, 15).map((range, index) => (
+                          <div>
+                            <span>{range.label}</span>
+                            {": "}
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              style={{ fontWeight: "bold" }}
+                              onClick={() => {
+                                setTicketListModalOpen(true);
+                                setTicketListModalTickets(range.tickets);
+                                setTicketListModalTitle(range.label);
+                              }}
+                            >
+                              {range.count}
+                              {index !== 0 && range.count > 0 && (
+                                <span
+                                  style={{
+                                    color: "black",
+                                    fontSize: "12px",
+                                    display: "inline-block",
+                                    marginLeft: 5,
+                                  }}
+                                >
+                                  (
+                                  {Math.round(
+                                    (range.count * 100) /
+                                      responseTimes
+                                        .slice(11, 15)
+                                        .reduce(
+                                          (acc, range) => acc + range.count,
+                                          0
+                                        )
+                                  )}
+                                  %)
+                                </span>
+                              )}
+                            </IconButton>
+                          </div>
+                        ))}
+                        <div style={{ fontWeight: "bold", marginTop: 5 }}>
+                          Porcentaje:{" "}
+                          {Math.round(
+                            (responseTimes
+                              .slice(11, 15)
+                              .reduce((acc, range) => acc + range.count, 0) *
+                              100) /
+                              responseTimesData.length
+                          )}
+                          %
+                        </div>
+                      </Grid>
+
+                      <TicketListModal
+                        modalOpen={ticketListModalOpen}
+                        onClose={() => setTicketListModalOpen(false)}
+                        title={ticketListModalTitle}
+                        tickets={ticketListModalTickets}
+                      />
+                    </>
+                  ) : null}
+                </Grid>
+              </div>
+            </Paper>
+          </Grid>
+
           <Grid item xs={3}>
             <Paper
               className={classes.customFixedHeightPaper}
@@ -415,6 +744,7 @@ const Reports = () => {
               />
             </Paper>
           </Grid>
+
           {/* <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart

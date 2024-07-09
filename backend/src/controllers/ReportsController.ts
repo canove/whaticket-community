@@ -3,9 +3,11 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { literal, Op } from "sequelize";
+import Category from "../models/Category";
 import Contact from "../models/Contact";
 import Message from "../models/Message";
+import Queue from "../models/Queue";
 import Ticket from "../models/Ticket";
 import User from "../models/User";
 import Whatsapp from "../models/Whatsapp";
@@ -357,4 +359,102 @@ export const generalReport = async (
     tdrData,
     tdrPromedio
   });
+};
+
+export const responseTimes = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  console.log("---------------responseTimes");
+
+  const { selectedWhatsappIds: selectedUserIdsAsString } =
+    req.query as IndexQuery;
+
+  const selectedWhatsappIds = JSON.parse(selectedUserIdsAsString) as number[];
+
+  const ticketsWithAllMessages = await Ticket.findAll({
+    where: {
+      status: { [Op.or]: ["open", "pending"] },
+      ...(selectedWhatsappIds.length > 0 && {
+        whatsappId: {
+          [Op.in]: selectedWhatsappIds
+        }
+      })
+    },
+    include: [
+      {
+        model: Contact,
+        as: "contact",
+        required: false
+      },
+      {
+        model: User,
+        as: "user",
+        required: false
+      },
+      {
+        model: Queue,
+        as: "queue",
+        attributes: ["id", "name", "color"],
+        required: false
+      },
+      {
+        model: Whatsapp,
+        as: "whatsapp",
+        attributes: ["name"],
+        required: false
+      },
+      {
+        model: Category,
+        as: "categories",
+        attributes: ["id", "name", "color"]
+      },
+      {
+        model: User,
+        as: "helpUsers",
+        required: false
+      },
+      {
+        model: User,
+        as: "participantUsers",
+        required: false
+      },
+      {
+        model: Message,
+        as: "firstClientMessageAfterLastUserMessage",
+        attributes: ["id", "body", "timestamp"],
+        order: [["timestamp", "ASC"]],
+        required: false,
+        separate: true,
+        limit: 1,
+        where: {
+          isPrivate: {
+            [Op.or]: [false, null]
+          },
+          fromMe: false,
+          timestamp: {
+            [Op.gt]: literal(
+              `(SELECT MAX(mes.timestamp) FROM Messages mes WHERE mes.ticketId = Message.ticketId AND mes.fromMe = 1 AND (mes.isPrivate = 0 OR mes.isPrivate IS NULL))`
+            )
+          }
+        }
+      },
+      {
+        model: Message,
+        as: "messages",
+        order: [["timestamp", "ASC"]],
+        required: false,
+        separate: true,
+        include: [
+          {
+            model: Contact,
+            as: "contact",
+            required: false
+          }
+        ]
+      }
+    ]
+  });
+
+  return res.status(200).json({ ticketsWithAllMessages });
 };

@@ -7,4 +7,6 @@ const reportsRoutes = Router();
 
 reportsRoutes.get("/generalReport", isAuth, ReportsController.generalReport);
 
+reportsRoutes.get("/responseTimes", isAuth, ReportsController.responseTimes);
+
 export default reportsRoutes;
