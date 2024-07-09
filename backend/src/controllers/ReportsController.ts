@@ -442,8 +442,9 @@ export const responseTimes = async (
       {
         model: Message,
         as: "messages",
-        order: [["timestamp", "ASC"]],
+        order: [["timestamp", "DESC"]],
         required: false,
+        limit: 25,
         separate: true,
         include: [
           {
@@ -454,6 +455,10 @@ export const responseTimes = async (
         ]
       }
     ]
+  });
+
+  ticketsWithAllMessages.forEach(ticket => {
+    ticket.messages.sort((a, b) => a.timestamp - b.timestamp);
   });
 
   return res.status(200).json({ ticketsWithAllMessages });
