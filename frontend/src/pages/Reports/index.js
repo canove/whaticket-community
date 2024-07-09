@@ -98,11 +98,11 @@ const Reports = () => {
   ] = useState(null);
 
   const [fromDate, setFromDate] = useState(
-    new Date().toISOString().split("T")[0] + " 00:00:00"
+    format(new Date(), "yyyy-MM-dd") + " 00:00:00"
   );
   const { whatsApps } = useContext(WhatsAppsContext);
   const [toDate, setToDate] = useState(
-    new Date().toISOString().split("T")[0] + " 23:59:59"
+    format(new Date(), "yyyy-MM-dd") + " 23:59:59"
   );
 
   useEffect(() => {
@@ -171,8 +171,15 @@ const Reports = () => {
     try {
       const dataToExport = createdTicketsData.map((ticket) => ({
         NÚMERO: ticket.id,
-        CREACIÓN_FECHA: format(new Date(ticket.createdAt), "dd-MM-yyyy"),
-        CREACIÓN_HORA: format(new Date(ticket.createdAt), "HH:mm"),
+        CREACIÓN_FECHA: format(
+          new Date(ticket.createdAt.replace("Z", "")),
+          "dd-MM-yyyy"
+        ),
+        CREACIÓN_HORA: format(
+          new Date(ticket.createdAt.replace("Z", "")),
+          "HH:mm"
+        ),
+        CONTACTO: ticket.contact?.name,
         CONEXIÓN: ticket.whatsapp?.name,
         USUARIO: ticket.user?.name,
         ESTADO: ticket.status,
