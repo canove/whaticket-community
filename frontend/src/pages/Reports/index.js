@@ -837,12 +837,107 @@ const Reports = () => {
                       Individuales
                     </TableCell>
                     <TableCell align="center" style={{ fontSize: "18px" }}>
-                      {ticketsWithAllMessagesInverseFilteredThatAreIndividuals}
+                      <div>
+                        <div>
+                          {
+                            ticketsWithAllMessagesInverseFilteredThatAreIndividuals
+                          }
+                          {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                            ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesInverseFilteredThatAreIndividuals *
+                                  100) /
+                                  (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                                    ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+                        {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                          ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesInverseFilteredThatAreIndividuals *
+                                100) /
+                                (ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                                  ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell align="center" style={{ fontSize: "18px" }}>
-                      {
-                        ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals
-                      }
+                      <div>
+                        <div>
+                          {
+                            ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals
+                          }
+                          {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                            ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals *
+                                  100) /
+                                  (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                                    ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+
+                        {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                          ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals *
+                                100) /
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                                  ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell
                       align="center"
@@ -860,12 +955,105 @@ const Reports = () => {
                       Grupos
                     </TableCell>
                     <TableCell align="center" style={{ fontSize: "18px" }}>
-                      {ticketsWithAllMessagesInverseFilteredThatAreGroups}
+                      <div>
+                        <div>
+                          {ticketsWithAllMessagesInverseFilteredThatAreGroups}
+                          {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                            ticketsWithAllMessagesInverseFilteredThatAreGroups >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesInverseFilteredThatAreGroups *
+                                  100) /
+                                  (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                                    ticketsWithAllMessagesInverseFilteredThatAreGroups)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+                        {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                          ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesInverseFilteredThatAreGroups *
+                                100) /
+                                (ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                                  ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell align="center" style={{ fontSize: "18px" }}>
-                      {
-                        ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups
-                      }
+                      <div>
+                        <div>
+                          {
+                            ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups
+                          }
+                          {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                            ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups *
+                                  100) /
+                                  (ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                                    ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+
+                        {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                          ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups *
+                                100) /
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                                  ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell
                       align="center"
