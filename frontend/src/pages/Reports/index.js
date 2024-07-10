@@ -3,6 +3,13 @@ import React, { useContext, useState } from "react";
 
 import { differenceInDays, differenceInHours } from "date-fns";
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
@@ -124,6 +131,22 @@ const Reports = () => {
   const [ticketListModalOpen, setTicketListModalOpen] = useState(false);
   const [ticketListModalTitle, setTicketListModalTitle] = useState("");
   const [ticketListModalTickets, setTicketListModalTickets] = useState([]);
+  const [
+    ticketsWithAllMessagesInverseFilteredThatAreGroups,
+    setTicketsWithAllMessagesInverseFilteredThatAreGroups,
+  ] = useState(0);
+  const [
+    ticketsWithAllMessagesInverseFilteredThatAreIndividuals,
+    setTicketsWithAllMessagesInverseFilteredThatAreIndividuals,
+  ] = useState(0);
+  const [
+    ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups,
+    setTicketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups,
+  ] = useState(0);
+  const [
+    ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals,
+    setTicketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals,
+  ] = useState(0);
 
   const [fromDate, setFromDate] = useState(
     format(new Date(), "yyyy-MM-dd") + " 00:00:00"
@@ -201,6 +224,9 @@ const Reports = () => {
             });
 
             const ticketsWithAllMessages = data2.ticketsWithAllMessages;
+
+            console.log("ticketsWithAllMessages", ticketsWithAllMessages);
+
             const ticketsWithAllMessagesFiltered =
               data2.ticketsWithAllMessages.filter((t) => {
                 let ticketMessages = t.messages?.filter((m) => {
@@ -226,6 +252,66 @@ const Reports = () => {
 
                 return true;
               });
+
+            const ticketsWithAllMessagesInverseFiltered =
+              data2.ticketsWithAllMessages.filter((t) => {
+                let ticketMessages = t.messages?.filter((m) => {
+                  return !m.isPrivate;
+                });
+
+                if (ticketMessages.length === 0) {
+                  return true;
+                }
+
+                const lastTicketMessage =
+                  ticketMessages[ticketMessages.length - 1];
+
+                if (
+                  whatsApps.find(
+                    (w) => w.number === lastTicketMessage.contact?.number
+                  ) ||
+                  lastTicketMessage?.contact?.isCompanyMember ||
+                  lastTicketMessage?.fromMe
+                ) {
+                  return true;
+                }
+
+                return false;
+              });
+
+            console.log(
+              "--- ticketsWithAllMessagesInverseFiltered: ",
+              ticketsWithAllMessagesInverseFiltered
+            );
+
+            const ticketsWithAllMessagesInverseFilteredThatAreGroups =
+              ticketsWithAllMessagesInverseFiltered.filter(
+                (t) => t.contact?.isGroup
+              );
+
+            const ticketsWithAllMessagesInverseFilteredThatAreIndividuals =
+              ticketsWithAllMessagesInverseFiltered.filter(
+                (t) => !t.contact?.isGroup
+              );
+
+            console.log(
+              "--- ticketsWithAllMessagesInverseFilteredThatAreGroups: ",
+              ticketsWithAllMessagesInverseFilteredThatAreGroups.length
+            );
+
+            setTicketsWithAllMessagesInverseFilteredThatAreGroups(
+              ticketsWithAllMessagesInverseFilteredThatAreGroups.length
+            );
+
+            console.log(
+              "--- ticketsWithAllMessagesInverseFilteredThatAreIndividuals: ",
+              ticketsWithAllMessagesInverseFilteredThatAreIndividuals.length
+            );
+
+            setTicketsWithAllMessagesInverseFilteredThatAreIndividuals(
+              ticketsWithAllMessagesInverseFilteredThatAreIndividuals.length
+            );
+
             const ticketsWithAllMessagesFilteredWithFirstLastUserMessage =
               ticketsWithAllMessagesFiltered.map((t) => {
                 let ticketMessages = t.messages.filter((m) => {
@@ -268,7 +354,6 @@ const Reports = () => {
                 };
               });
 
-            console.log("ticketsWithAllMessages", ticketsWithAllMessages);
             console.log(
               "ticketsWithAllMessagesFiltered",
               ticketsWithAllMessagesFiltered
@@ -276,6 +361,34 @@ const Reports = () => {
             console.log(
               "ticketsWithAllMessagesFilteredWithFirstLastUserMessage",
               ticketsWithAllMessagesFilteredWithFirstLastUserMessage
+            );
+
+            const ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups =
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessage.filter(
+                (t) => t.ticket.contact?.isGroup
+              );
+
+            const ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals =
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessage.filter(
+                (t) => !t.ticket.contact?.isGroup
+              );
+
+            console.log(
+              "--- ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups: ",
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups.length
+            );
+
+            setTicketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups(
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups.length
+            );
+
+            console.log(
+              "--- ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals: ",
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals.length
+            );
+
+            setTicketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals(
+              ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals.length
             );
 
             const responseTimesData = responseTimesRanges.map((range) => ({
@@ -495,7 +608,7 @@ const Reports = () => {
                 paragraph
                 style={{ display: "flex", justifyContent: "space-between" }}
               >
-                <span>Tiempo de espera de respuesta actual</span>
+                <span>Tiempo de respuesta total</span>
                 <span style={{ color: "black" }}>
                   Tickets Totales:{" "}
                   {responseTimesData ? responseTimesData.length : 0}
@@ -507,7 +620,7 @@ const Reports = () => {
                     <>
                       <Grid item xs={4}>
                         {responseTimes.slice(0, 5).map((range) => (
-                          <div>
+                          <div key={range.label}>
                             <span>{range.label}</span>
                             {": "}
                             <IconButton
@@ -561,7 +674,7 @@ const Reports = () => {
                       </Grid>
                       <Grid item xs={4}>
                         {responseTimes.slice(5, 10).map((range, index) => (
-                          <div>
+                          <div key={range.label}>
                             <span>{range.label}</span>
                             {": "}
                             <IconButton
@@ -614,7 +727,7 @@ const Reports = () => {
                       </Grid>
                       <Grid item xs={4}>
                         {responseTimes.slice(10, 15).map((range, index) => (
-                          <div>
+                          <div key={range.label}>
                             <span>{range.label}</span>
                             {": "}
                             <IconButton
@@ -676,6 +789,314 @@ const Reports = () => {
                   ) : null}
                 </Grid>
               </div>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Paper className={classes.customFixedHeightPaper}>
+              <Typography
+                component="h3"
+                variant="h6"
+                color="primary"
+                paragraph
+                style={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <span>Distribución de respuesta total</span>
+              </Typography>
+
+              <Table size="medium">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center"></TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontWeight: "bold", fontSize: "18px" }}
+                    >
+                      Con respuesta
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontWeight: "bold", fontSize: "18px" }}
+                    >
+                      Sin respuesta
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontWeight: "bold", fontSize: "18px" }}
+                    >
+                      Total
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell
+                      align="center"
+                      style={{ fontWeight: "bold", fontSize: "18px" }}
+                    >
+                      Individuales
+                    </TableCell>
+                    <TableCell align="center" style={{ fontSize: "18px" }}>
+                      <div>
+                        <div>
+                          {
+                            ticketsWithAllMessagesInverseFilteredThatAreIndividuals
+                          }
+                          {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                            ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesInverseFilteredThatAreIndividuals *
+                                  100) /
+                                  (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                                    ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+                        {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                          ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesInverseFilteredThatAreIndividuals *
+                                100) /
+                                (ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                                  ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell align="center" style={{ fontSize: "18px" }}>
+                      <div>
+                        <div>
+                          {
+                            ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals
+                          }
+                          {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                            ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals *
+                                  100) /
+                                  (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                                    ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+
+                        {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                          ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals *
+                                100) /
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                                  ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontSize: "18px", color: "#2576d2" }}
+                    >
+                      {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                        ticketsWithAllMessagesInverseFilteredThatAreIndividuals}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell
+                      align="center"
+                      style={{ fontWeight: "bold", fontSize: "18px" }}
+                    >
+                      Grupos
+                    </TableCell>
+                    <TableCell align="center" style={{ fontSize: "18px" }}>
+                      <div>
+                        <div>
+                          {ticketsWithAllMessagesInverseFilteredThatAreGroups}
+                          {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                            ticketsWithAllMessagesInverseFilteredThatAreGroups >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesInverseFilteredThatAreGroups *
+                                  100) /
+                                  (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                                    ticketsWithAllMessagesInverseFilteredThatAreGroups)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+                        {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                          ticketsWithAllMessagesInverseFilteredThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesInverseFilteredThatAreGroups *
+                                100) /
+                                (ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                                  ticketsWithAllMessagesInverseFilteredThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell align="center" style={{ fontSize: "18px" }}>
+                      <div>
+                        <div>
+                          {
+                            ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups
+                          }
+                          {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                            ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups >
+                            0 && (
+                            <span
+                              style={{
+                                color: "black",
+                                fontSize: "12px",
+                                display: "inline-block",
+                                marginLeft: 5,
+                              }}
+                            >
+                              (
+                              {Math.round(
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups *
+                                  100) /
+                                  (ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                                    ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups)
+                              )}
+                              %)
+                            </span>
+                          )}
+                        </div>
+
+                        {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                          ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals >
+                          0 && (
+                          <span
+                            style={{
+                              color: "black",
+                              fontSize: "12px",
+                              display: "inline-block",
+                              marginLeft: 5,
+                            }}
+                          >
+                            (
+                            {Math.round(
+                              (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups *
+                                100) /
+                                (ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                                  ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals)
+                            )}
+                            %)
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontSize: "18px", color: "#2576d2" }}
+                    >
+                      {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                        ticketsWithAllMessagesInverseFilteredThatAreGroups}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell
+                      align="center"
+                      style={{ fontWeight: "bold", fontSize: "18px" }}
+                    >
+                      Total
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontSize: "18px", color: "#2576d2" }}
+                    >
+                      {ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                        ticketsWithAllMessagesInverseFilteredThatAreIndividuals}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontSize: "18px", color: "#2576d2" }}
+                    >
+                      {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                        ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ fontSize: "18px", color: "#2576d2" }}
+                    >
+                      {ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups +
+                        ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals +
+                        ticketsWithAllMessagesInverseFilteredThatAreGroups +
+                        ticketsWithAllMessagesInverseFilteredThatAreIndividuals}
+                    </TableCell>
+                  </TableRow>
+                  {/* {loading && <TableRowSkeleton columns={4} />} */}
+                </TableBody>
+              </Table>
             </Paper>
           </Grid>
 
