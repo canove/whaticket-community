@@ -1,5 +1,6 @@
 import { Op, literal } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
+import Contact from "../../models/Contact";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import User from "../../models/User";
@@ -97,10 +98,17 @@ const CreateMessageService = async ({
           {
             model: Message,
             as: "messages",
-            separate: true, // <--- Run separate query
-            limit: 1,
             order: [["timestamp", "DESC"]],
             required: false,
+            limit: 25,
+            separate: true,
+            include: [
+              {
+                model: Contact,
+                as: "contact",
+                required: false
+              }
+            ],
             where: {
               isPrivate: {
                 [Op.or]: [false, null]
@@ -155,6 +163,8 @@ const CreateMessageService = async ({
   if (!message) {
     throw new Error("ERR_CREATING_MESSAGE");
   }
+
+  message.ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
 
   // const io = getIO();
   /* io.to(message.ticketId.toString())

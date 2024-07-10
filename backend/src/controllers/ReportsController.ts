@@ -467,6 +467,26 @@ export const getATicketsList = async (
       },
       {
         model: Message,
+        as: "messages",
+        order: [["timestamp", "DESC"]],
+        required: false,
+        limit: 25,
+        separate: true,
+        include: [
+          {
+            model: Contact,
+            as: "contact",
+            required: false
+          }
+        ],
+        where: {
+          isPrivate: {
+            [Op.or]: [false, null]
+          }
+        }
+      },
+      {
+        model: Message,
         as: "firstClientMessageAfterLastUserMessage",
         attributes: ["id", "body", "timestamp"],
         order: [["timestamp", "ASC"]],
@@ -486,6 +506,10 @@ export const getATicketsList = async (
         }
       }
     ]
+  });
+
+  tickets.forEach(ticket => {
+    ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
   });
 
   return res.status(200).json({ tickets });

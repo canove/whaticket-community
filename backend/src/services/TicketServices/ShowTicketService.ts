@@ -41,6 +41,26 @@ const ShowTicketService = async (id: string | number): Promise<Ticket> => {
       },
       {
         model: Message,
+        as: "messages",
+        order: [["timestamp", "DESC"]],
+        required: false,
+        limit: 25,
+        separate: true,
+        include: [
+          {
+            model: Contact,
+            as: "contact",
+            required: false
+          }
+        ],
+        where: {
+          isPrivate: {
+            [Op.or]: [false, null]
+          }
+        }
+      },
+      {
+        model: Message,
         as: "firstClientMessageAfterLastUserMessage",
         attributes: ["id", "body", "timestamp"],
         order: [["timestamp", "ASC"]],
@@ -79,6 +99,8 @@ const ShowTicketService = async (id: string | number): Promise<Ticket> => {
   if (!ticket) {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
+
+  ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
 
   return ticket;
 };
