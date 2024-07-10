@@ -23,6 +23,7 @@ import IconButton from "@material-ui/core/IconButton";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import VisibilityOutlinedIcon from "@material-ui/icons/VisibilityOutlined";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
@@ -144,6 +145,7 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
   const { ticketId } = useParams();
   const isMounted = useRef(true);
   const { user } = useContext(AuthContext);
+  const { whatsApps } = useContext(WhatsAppsContext);
 
   useEffect(() => {
     return () => {
@@ -197,7 +199,7 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
         <Tooltip
           arrow
           placement="right"
-          title={ticket.queue?.name || "Sem fila"}
+          title={ticket.queue?.name || "Sin departamento"}
         >
           <span
             style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
@@ -274,13 +276,55 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
                   // CLOSED BADGE
                 )}
 
-                {ticket.status !== "closed" &&
-                ((ticket.firstClientMessageAfterLastUserMessage.length > 0 &&
+                {(() => {
+                  let ticketMessages = ticket.messages;
+
+                  if (ticketMessages?.length === 0) {
+                    return null;
+                  }
+
+                  const lastTicketMessage =
+                    ticketMessages[ticketMessages.length - 1];
+
+                  if (
+                    whatsApps.find(
+                      (w) => w.number === lastTicketMessage.contact?.number
+                    ) ||
+                    lastTicketMessage?.contact?.isCompanyMember ||
+                    lastTicketMessage?.fromMe
+                  ) {
+                    return null;
+                  }
+
+                  let firstLastMessageThatIsFromTheClient;
+
+                  for (let i = ticketMessages.length - 1; i >= 0; i--) {
+                    if (
+                      !whatsApps.find(
+                        (w) => w.number === ticketMessages.contact?.number
+                      ) &&
+                      !ticketMessages[i]?.contact?.isCompanyMember &&
+                      !ticketMessages[i]?.fromMe
+                    ) {
+                      firstLastMessageThatIsFromTheClient = ticketMessages[i];
+                    } else {
+                      break;
+                    }
+                  }
+
+                  return (
+                    <TicketListItemLastMessageTime
+                      message={firstLastMessageThatIsFromTheClient}
+                    />
+                  );
+                })()}
+
+                {/* {(ticket.messages.length > 0 &&
                   ticket.firstClientMessageAfterLastUserMessage[0].timestamp) ||
-                  (ticket.firstClientMessageAfterLastUserMessage.length === 0 &&
-                    !ticket.userHadContact)) ? (
+                (ticket.firstClientMessageAfterLastUserMessage.length === 0 &&
+                  !ticket.userHadContact) ? (
                   <TicketListItemLastMessageTime ticket={ticket} />
-                ) : null}
+                ) : null} */}
 
                 {ticket.lastMessageTimestamp && (
                   // LAST MESSAGE TIME
@@ -384,7 +428,7 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
                   {/* WPP */}
                   {ticket.whatsappId && (
                     <Tooltip
-                      title={`Conexión: ${ticket.whatsapp?.name}`}
+                      title={`CONEXIÓN: ${ticket.whatsapp?.name}`}
                       aria-label="add"
                     >
                       <WhatsAppIcon

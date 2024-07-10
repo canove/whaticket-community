@@ -7,7 +7,7 @@ import {
 import { es } from "date-fns/locale";
 import React, { useEffect, useState } from "react";
 
-export default function TicketListItemLastMessageTime({ ticket }) {
+export default function TicketListItemLastMessageTime({ message }) {
   const [nowTime, setNowTime] = useState(new Date().getTime());
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function TicketListItemLastMessageTime({ ticket }) {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [ticket]);
+  }, [message]);
 
   return (
     <Chip
@@ -26,11 +26,9 @@ export default function TicketListItemLastMessageTime({ ticket }) {
       color={
         differenceInHours(
           nowTime,
-          ticket.userHadContact
-            ? fromUnixTime(
-                ticket.firstClientMessageAfterLastUserMessage[0].timestamp
-              )
-            : new Date(ticket.createdAt)
+          message.timestamp
+            ? fromUnixTime(message.timestamp)
+            : new Date(message.createdAt)
         ) >= 24
           ? "secondary"
           : "default"
@@ -39,11 +37,9 @@ export default function TicketListItemLastMessageTime({ ticket }) {
       label={`Hace ${
         formatDistanceStrict(
           nowTime,
-          ticket.userHadContact
-            ? fromUnixTime(
-                ticket.firstClientMessageAfterLastUserMessage[0].timestamp
-              )
-            : new Date(ticket.createdAt),
+          message.timestamp
+            ? fromUnixTime(message.timestamp)
+            : new Date(message.createdAt),
           {
             locale: es,
           }
