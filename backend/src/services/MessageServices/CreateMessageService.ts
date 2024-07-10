@@ -164,6 +164,8 @@ const CreateMessageService = async ({
     throw new Error("ERR_CREATING_MESSAGE");
   }
 
+  message.ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
+
   // const io = getIO();
   /* io.to(message.ticketId.toString())
     .to(message.ticket.status)

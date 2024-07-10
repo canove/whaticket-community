@@ -508,5 +508,9 @@ export const getATicketsList = async (
     ]
   });
 
+  tickets.forEach(ticket => {
+    ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
+  });
+
   return res.status(200).json({ tickets });
 };

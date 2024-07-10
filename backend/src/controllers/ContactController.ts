@@ -335,6 +335,10 @@ export const getNumberGroups = async (
         });
 
         if (wbotChatInOurDb) {
+          wbotChatInOurDb.tickets?.forEach(ticket => {
+            ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
+          });
+
           registerGroups.push(wbotChatInOurDb);
         } else {
           notRegisterGroups.push(chat);
@@ -462,6 +466,10 @@ export const getNumberGroups = async (
                 });
 
                 if (wbotChatInOurDb) {
+                  wbotChatInOurDb.tickets?.forEach(ticket => {
+                    ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
+                  });
+
                   registerGroups.push(wbotChatInOurDb);
                 } else {
                   notRegisterGroups.push(chat);

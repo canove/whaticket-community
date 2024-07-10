@@ -407,7 +407,7 @@ const ListTicketsService = async ({
   const ticketsToReturn = filteredTickets || tickets;
 
   ticketsToReturn.forEach(ticket => {
-    ticket.messages.sort((a, b) => a.timestamp - b.timestamp);
+    ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
   });
 
   return {

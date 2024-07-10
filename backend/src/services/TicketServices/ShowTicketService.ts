@@ -100,6 +100,8 @@ const ShowTicketService = async (id: string | number): Promise<Ticket> => {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
+  ticket.messages?.sort((a, b) => a.timestamp - b.timestamp);
+
   return ticket;
 };
 
