@@ -361,11 +361,11 @@ export const generalReport = async (
   });
 };
 
-export const responseTimes = async (
+export const getOpenOrPendingTicketsWithLastMessages = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  console.log("---------------responseTimes");
+  console.log("---------------getOpenOrPendingTicketsWithLastMessages");
 
   const { selectedWhatsappIds: selectedUserIdsAsString } =
     req.query as IndexQuery;
@@ -380,6 +380,52 @@ export const responseTimes = async (
           [Op.in]: selectedWhatsappIds
         }
       })
+    },
+    include: [
+      {
+        model: Message,
+        as: "messages",
+        order: [["timestamp", "DESC"]],
+        required: false,
+        limit: 25,
+        separate: true,
+        include: [
+          {
+            model: Contact,
+            as: "contact",
+            required: false
+          }
+        ]
+      }
+    ]
+  });
+
+  ticketsWithAllMessages.forEach(ticket => {
+    ticket.messages.sort((a, b) => a.timestamp - b.timestamp);
+  });
+
+  return res.status(200).json({ ticketsWithAllMessages });
+};
+
+export const getATicketsList = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  console.log("---------------getATicketsList");
+
+  const { ticketIds: ticketIdsAsString } = req.query as {
+    ticketIds: string;
+  };
+
+  // console.log({ ticketIdsAsString });
+
+  const ticketIds = JSON.parse(ticketIdsAsString) as number[];
+
+  const tickets = await Ticket.findAll({
+    where: {
+      id: {
+        [Op.in]: ticketIds
+      }
     },
     include: [
       {
@@ -438,28 +484,9 @@ export const responseTimes = async (
             )
           }
         }
-      },
-      {
-        model: Message,
-        as: "messages",
-        order: [["timestamp", "DESC"]],
-        required: false,
-        limit: 25,
-        separate: true,
-        include: [
-          {
-            model: Contact,
-            as: "contact",
-            required: false
-          }
-        ]
       }
     ]
   });
 
-  ticketsWithAllMessages.forEach(ticket => {
-    ticket.messages.sort((a, b) => a.timestamp - b.timestamp);
-  });
-
-  return res.status(200).json({ ticketsWithAllMessages });
+  return res.status(200).json({ tickets });
 };

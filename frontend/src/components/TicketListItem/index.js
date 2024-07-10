@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TicketListItem = ({ ticket }) => {
+const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
   const classes = useStyles();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
@@ -173,7 +173,11 @@ const TicketListItem = ({ ticket }) => {
   };
 
   const handleSelectTicket = (id) => {
-    history.push(`/tickets/${id}`);
+    if (openInANewWindowOnSelect) {
+      window.open(`/tickets/${id}`, "_blank");
+    } else {
+      history.push(`/tickets/${id}`);
+    }
   };
 
   return (

@@ -217,11 +217,14 @@ const Reports = () => {
 
             console.log(data);
 
-            const { data: data2 } = await api.get("/responseTimes", {
-              params: {
-                selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
-              },
-            });
+            const { data: data2 } = await api.get(
+              "/getOpenOrPendingTicketsWithLastMessages",
+              {
+                params: {
+                  selectedWhatsappIds: JSON.stringify(selectedWhatsappIds),
+                },
+              }
+            );
 
             const ticketsWithAllMessages = data2.ticketsWithAllMessages;
 
