@@ -7,6 +7,16 @@ const reportsRoutes = Router();
 
 reportsRoutes.get("/generalReport", isAuth, ReportsController.generalReport);
 
-reportsRoutes.get("/responseTimes", isAuth, ReportsController.responseTimes);
+reportsRoutes.get(
+  "/getOpenOrPendingTicketsWithLastMessages",
+  isAuth,
+  ReportsController.getOpenOrPendingTicketsWithLastMessages
+);
+
+reportsRoutes.get(
+  "/getATicketsList",
+  isAuth,
+  ReportsController.getATicketsList
+);
 
 export default reportsRoutes;

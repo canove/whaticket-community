@@ -169,10 +169,17 @@ const ListTicketsService = async ({
     {
       model: Message,
       as: "messages",
-      separate: true, // <--- Run separate query
-      limit: 1,
       order: [["timestamp", "DESC"]],
       required: false,
+      limit: 25,
+      separate: true,
+      include: [
+        {
+          model: Contact,
+          as: "contact",
+          required: false
+        }
+      ],
       where: {
         isPrivate: {
           [Op.or]: [false, null]
@@ -269,21 +276,21 @@ const ListTicketsService = async ({
     const sanitizedSearchParam = searchParam.toLocaleLowerCase().trim();
 
     includeCondition = [
-      ...includeCondition,
-      {
-        model: Message,
-        as: "messages",
-        attributes: ["id", "body"],
-        where: {
-          body: where(
-            fn("LOWER", col("body")),
-            "LIKE",
-            `%${sanitizedSearchParam}%`
-          )
-        },
-        required: false,
-        duplicating: false
-      }
+      ...includeCondition
+      // {
+      //   model: Message,
+      //   as: "messages",
+      //   attributes: ["id", "body"],
+      //   where: {
+      //     body: where(
+      //       fn("LOWER", col("body")),
+      //       "LIKE",
+      //       `%${sanitizedSearchParam}%`
+      //     )
+      //   },
+      //   required: false,
+      //   duplicating: false
+      // }
     ];
 
     whereCondition = {
@@ -397,8 +404,14 @@ const ListTicketsService = async ({
 
   const hasMore = count > offset + tickets.length;
 
+  const ticketsToReturn = filteredTickets || tickets;
+
+  ticketsToReturn.forEach(ticket => {
+    ticket.messages.sort((a, b) => a.timestamp - b.timestamp);
+  });
+
   return {
-    tickets: filteredTickets || tickets,
+    tickets: ticketsToReturn,
     count,
     hasMore
   };
