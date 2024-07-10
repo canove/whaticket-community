@@ -292,6 +292,26 @@ export const getNumberGroups = async (
                 },
                 {
                   model: Message,
+                  as: "messages",
+                  order: [["timestamp", "DESC"]],
+                  required: false,
+                  limit: 25,
+                  separate: true,
+                  include: [
+                    {
+                      model: Contact,
+                      as: "contact",
+                      required: false
+                    }
+                  ],
+                  where: {
+                    isPrivate: {
+                      [Op.or]: [false, null]
+                    }
+                  }
+                },
+                {
+                  model: Message,
                   as: "firstClientMessageAfterLastUserMessage",
                   attributes: ["id", "body", "timestamp"],
                   order: [["timestamp", "ASC"]],
@@ -396,6 +416,26 @@ export const getNumberGroups = async (
                           model: User,
                           as: "participantUsers",
                           required: false
+                        },
+                        {
+                          model: Message,
+                          as: "messages",
+                          order: [["timestamp", "DESC"]],
+                          required: false,
+                          limit: 25,
+                          separate: true,
+                          include: [
+                            {
+                              model: Contact,
+                              as: "contact",
+                              required: false
+                            }
+                          ],
+                          where: {
+                            isPrivate: {
+                              [Op.or]: [false, null]
+                            }
+                          }
                         },
                         {
                           model: Message,
