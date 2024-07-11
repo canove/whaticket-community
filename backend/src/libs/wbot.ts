@@ -149,7 +149,7 @@ const syncUnreadMessages = async ({
       if (wppMessagesAfterLastMessageTimestamp.length > 0) {
         console.log("hay mensajes nuevos");
         for (const msg of wppMessagesAfterLastMessageTimestamp) {
-          await handleMessage(msg, wbot, true);
+          await handleMessage(msg, wbot);
         }
       }
     })

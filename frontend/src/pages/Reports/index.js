@@ -288,14 +288,10 @@ const Reports = () => {
             );
 
             const ticketsWithAllMessagesInverseFilteredThatAreGroups =
-              ticketsWithAllMessagesInverseFiltered.filter(
-                (t) => t.contact?.isGroup
-              );
+              ticketsWithAllMessagesInverseFiltered.filter((t) => t.isGroup);
 
             const ticketsWithAllMessagesInverseFilteredThatAreIndividuals =
-              ticketsWithAllMessagesInverseFiltered.filter(
-                (t) => !t.contact?.isGroup
-              );
+              ticketsWithAllMessagesInverseFiltered.filter((t) => !t.isGroup);
 
             console.log(
               "--- ticketsWithAllMessagesInverseFilteredThatAreGroups: ",
@@ -368,12 +364,12 @@ const Reports = () => {
 
             const ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreGroups =
               ticketsWithAllMessagesFilteredWithFirstLastUserMessage.filter(
-                (t) => t.ticket.contact?.isGroup
+                (t) => t.ticket?.isGroup
               );
 
             const ticketsWithAllMessagesFilteredWithFirstLastUserMessageThatAreIndividuals =
               ticketsWithAllMessagesFilteredWithFirstLastUserMessage.filter(
-                (t) => !t.ticket.contact?.isGroup
+                (t) => !t.ticket?.isGroup
               );
 
             console.log(
