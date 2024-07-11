@@ -272,8 +272,8 @@ const TicketsList = (props) => {
         (ticket.isGroup && selectedTypeIds[0] === "group") ||
         (!ticket.isGroup && selectedTypeIds[0] === "individual");
       const whatsappCondition =
-        selectedWhatsappIds.indexOf(ticket.whatsappId) > -1 ||
-        selectedWhatsappIds.length === 0;
+        selectedWhatsappIds?.indexOf(ticket.whatsappId) > -1 ||
+        selectedWhatsappIds?.length === 0;
 
       const ignoreConditions =
         selectedTypeIds.length === 1 &&

@@ -40,7 +40,7 @@ const UpdateTicketService = async ({
     participantUsersIds
   } = ticketData;
 
-  const ticket = await ShowTicketService(ticketId);
+  const ticket = await ShowTicketService(ticketId, true);
   await SetTicketMessagesAsRead(ticket);
 
   if (whatsappId && ticket.whatsappId !== whatsappId) {

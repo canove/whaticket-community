@@ -277,11 +277,11 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
                 )}
 
                 {(() => {
-                  let ticketMessages = ticket.messages;
-
-                  if (ticketMessages?.length === 0) {
+                  if (!ticket.messages?.length > 0) {
                     return null;
                   }
+
+                  let ticketMessages = ticket.messages;
 
                   const lastTicketMessage =
                     ticketMessages[ticketMessages.length - 1];
