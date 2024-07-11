@@ -126,7 +126,7 @@ const TicketsManager = () => {
 
   const userQueueIds = [...user.queues.map((q) => q.id), null];
   const { whatsApps, loading } = useContext(WhatsAppsContext);
-  const [selectedWhatsappIds, setSelectedWhatsappIds] = useState(null);
+  const [selectedWhatsappIds, setSelectedWhatsappIds] = useState([]);
   // const [selectedTypeIds] = useState(["individual"]);
   const [typeIdsForAll] = useState(["individual", "group"]);
   const [typeIdsForIndividuals] = useState(["individual"]);
