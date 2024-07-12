@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { Message as WbotMessage } from "whatsapp-web.js";
 import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
@@ -85,6 +86,7 @@ const SendWhatsAppMessage = async ({
     return sentMessage;
   } catch (err) {
     console.log("Error en SendWhatsAppMessage", err);
+    Sentry.captureException(err);
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };
