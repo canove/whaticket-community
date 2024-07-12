@@ -18,6 +18,7 @@ import Autocomplete, {
   createFilterOptions,
 } from "@material-ui/lab/Autocomplete";
 
+import { TICKETLOGTYPES } from "../../constants";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { UsersPresenceContext } from "../../context/UsersPresenceContext";
 import toastError from "../../errors/toastError";
@@ -106,7 +107,9 @@ const TransferTicketModal = ({
     if (!ticketid) return;
     setLoading(true);
     try {
-      let data = {};
+      let data = {
+        transferred: true,
+      };
 
       if (selectedUser) {
         data.userId = selectedUser.id;
@@ -133,6 +136,14 @@ const TransferTicketModal = ({
       await api.post(`/privateMessages/${ticketid}`, {
         // body: `${user?.name} *aceptó* la conversación`,
         body: `${loggedInUser?.name} *transfirió* la conversación para ${selectedUser?.name}`,
+      });
+
+      await api.post(`/ticketLog`, {
+        ticketId: ticketid,
+        userId: loggedInUser?.id,
+        newUserId: selectedUser?.id,
+        logType: TICKETLOGTYPES.TRANSFER,
+        ticketStatus: "open",
       });
 
       setLoading(false);

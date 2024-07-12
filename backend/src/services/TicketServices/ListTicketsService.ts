@@ -71,54 +71,22 @@ const ListTicketsService = async ({
         [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
       }
     }),
-    ...(typeIds.length === 1 && typeIds[0] === "individual"
-      ? {
-          [Op.and]: [
-            {
-              [Op.or]: [
-                {
-                  id: {
-                    [Op.in]: Sequelize.literal(
-                      `(
-      SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
-    )`
-                    )
-                  }
-                },
-                {
-                  ...(queueIds?.length && {
-                    queueId: {
-                      // @ts-ignore
-                      [Op.or]: queueIds?.includes(null)
-                        ? [queueIds.filter(id => id !== null), null]
-                        : [queueIds]
-                    }
-                  }),
-                  ...(whatsappIds?.length && {
-                    whatsappId: {
-                      [Op.or]: [whatsappIds]
-                    }
-                  })
-                }
-              ]
-            }
-          ]
+    // si no estoy viendo la tab de mis chats, entonces aplico filtros de queues y whatsapp
+    ...(!(typeIds.length === 1 && typeIds[0] === "individual") && {
+      ...(queueIds?.length && {
+        queueId: {
+          // @ts-ignore
+          [Op.or]: queueIds?.includes(null)
+            ? [queueIds.filter(id => id !== null), null]
+            : [queueIds]
         }
-      : {
-          ...(queueIds?.length && {
-            queueId: {
-              // @ts-ignore
-              [Op.or]: queueIds?.includes(null)
-                ? [queueIds.filter(id => id !== null), null]
-                : [queueIds]
-            }
-          }),
-          ...(whatsappIds?.length && {
-            whatsappId: {
-              [Op.or]: [whatsappIds]
-            }
-          })
-        })
+      }),
+      ...(whatsappIds?.length && {
+        whatsappId: {
+          [Op.or]: [whatsappIds]
+        }
+      })
+    })
   };
   let includeCondition: Includeable[];
 
@@ -214,54 +182,27 @@ const ListTicketsService = async ({
           [Op.or]: typeIds?.map(typeId => (typeId === "group" ? true : false))
         }
       }),
-      ...(typeIds.length === 1 && typeIds[0] === "individual"
-        ? {
-            [Op.and]: [
-              {
-                [Op.or]: [
-                  {
-                    id: {
-                      [Op.in]: Sequelize.literal(
-                        `(
-            SELECT \`ticketId\` FROM \`TicketHelpUsers\` WHERE \`userId\` = ${userId}
-          )`
-                      )
-                    }
-                  },
-                  {
-                    ...(queueIds?.length && {
-                      queueId: {
-                        // @ts-ignore
-                        [Op.or]: queueIds?.includes(null)
-                          ? [queueIds.filter(id => id !== null), null]
-                          : [queueIds]
-                      }
-                    }),
-                    ...(whatsappIds?.length && {
-                      whatsappId: {
-                        [Op.or]: [whatsappIds]
-                      }
-                    })
-                  }
-                ]
-              }
-            ]
+
+      // si no estoy viendo la tab de mis grupos, entonces aplico filtros de queues y whatsapp
+      ...(!(
+        typeIds.length === 1 &&
+        typeIds[0] === "group" &&
+        showOnlyMyGroups
+      ) && {
+        ...(queueIds?.length && {
+          queueId: {
+            // @ts-ignore
+            [Op.or]: queueIds?.includes(null)
+              ? [queueIds.filter(id => id !== null), null]
+              : [queueIds]
           }
-        : {
-            ...(queueIds?.length && {
-              queueId: {
-                // @ts-ignore
-                [Op.or]: queueIds?.includes(null)
-                  ? [queueIds.filter(id => id !== null), null]
-                  : [queueIds]
-              }
-            }),
-            ...(whatsappIds?.length && {
-              whatsappId: {
-                [Op.or]: [whatsappIds]
-              }
-            })
-          })
+        }),
+        ...(whatsappIds?.length && {
+          whatsappId: {
+            [Op.or]: [whatsappIds]
+          }
+        })
+      })
     };
   }
 

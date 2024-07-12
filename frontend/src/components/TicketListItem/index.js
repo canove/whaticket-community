@@ -260,6 +260,17 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
                   )
                 ) : null}
 
+                {/* // TRANFER BADGE */}
+                {ticket.transferred && (
+                  <Chip
+                    style={{ height: "20px", fontSize: "11px" }}
+                    color="primary"
+                    size="small"
+                    label="Transferido"
+                  />
+                )}
+                {/* // TRANFER BADGE */}
+
                 {ticket.status === "closed" && (
                   // CLOSED BADGE
                   // <Badge

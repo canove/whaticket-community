@@ -12,6 +12,7 @@ import Setting from "../models/Setting";
 import Ticket from "../models/Ticket";
 import TicketCategory from "../models/TicketCategory";
 import TicketHelpUser from "../models/TicketHelpUser";
+import TicketLog from "../models/TicketLog";
 import TicketParticipantUsers from "../models/TicketParticipantUsers";
 import User from "../models/User";
 import UserQueue from "../models/UserQueue";
@@ -42,7 +43,8 @@ const models = [
   UserQueue,
   QuickAnswer,
   ChatbotOption,
-  TicketParticipantUsers
+  TicketParticipantUsers,
+  TicketLog
 ];
 
 sequelize.addModels(models);

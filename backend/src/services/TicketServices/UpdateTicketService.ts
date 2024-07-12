@@ -12,6 +12,7 @@ interface TicketData {
   categoriesIds?: number[];
   helpUsersIds?: number[];
   participantUsersIds?: number[];
+  transferred?: boolean;
 }
 
 interface Request {
@@ -37,7 +38,8 @@ const UpdateTicketService = async ({
     privateNote,
     categoriesIds,
     helpUsersIds,
-    participantUsersIds
+    participantUsersIds,
+    transferred
   } = ticketData;
 
   const ticket = await ShowTicketService(ticketId, true);
@@ -58,7 +60,8 @@ const UpdateTicketService = async ({
     status,
     queueId,
     userId,
-    privateNote
+    privateNote,
+    ...(transferred === true && { transferred })
   });
 
   if (whatsappId) {
