@@ -77,7 +77,10 @@ const AskForHelpTicketModal = ({ modalOpen, onClose, ticket }) => {
 
     try {
       await api.put(`/tickets/${ticket.id}`, {
-        helpUsersIds: [...ticket.helpUsers, selectedUser.id],
+        helpUsersIds: [
+          ...ticket.helpUsers?.map((hu) => hu.id),
+          selectedUser.id,
+        ],
       });
 
       await api.post(`/privateMessages/${ticket.id}`, {
