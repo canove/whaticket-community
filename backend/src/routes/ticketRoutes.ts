@@ -23,6 +23,8 @@ ticketRoutes.get(
 
 ticketRoutes.post("/tickets", isAuth, TicketController.store);
 
+ticketRoutes.post("/ticketLog", isAuth, TicketController.createTicketLog);
+
 ticketRoutes.post(
   "/tickets/recoverAllMessages/:ticketId",
   isAuth,

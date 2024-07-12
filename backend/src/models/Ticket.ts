@@ -52,6 +52,9 @@ class Ticket extends Model<Ticket> {
   @Column
   userHadContact: boolean;
 
+  @Column
+  transferred: boolean;
+
   @CreatedAt
   createdAt: Date;
 

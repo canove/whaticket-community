@@ -9,6 +9,7 @@ import { getWbot } from "../libs/wbot";
 import Contact from "../models/Contact";
 import Message from "../models/Message";
 import Ticket from "../models/Ticket";
+import TicketLog from "../models/TicketLog";
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
@@ -36,6 +37,14 @@ interface TicketData {
   status: string;
   queueId: number;
   userId: number;
+}
+
+interface TicketLogData {
+  ticketId: number;
+  userId?: number;
+  newUserId?: number;
+  logType: string;
+  ticketStatus: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -403,4 +412,27 @@ export const showAllRelatedTickets = async (
   }
 
   return res.status(200).json(relatedTickets);
+};
+
+export const createTicketLog = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const ticketLog: TicketLogData = req.body;
+
+  try {
+    const newTicketLog = await TicketLog.create(ticketLog);
+
+    if (!newTicketLog) {
+      console.log("error");
+
+      throw new AppError("ERR_TICKET_NOT_FOUND");
+    }
+  } catch (error) {
+    console.log("error", error);
+
+    throw new AppError("ERR_TICKET_NOT_FOUND");
+  }
+
+  return res.status(200).json({});
 };
