@@ -260,12 +260,25 @@ const TicketsList = (props) => {
     const socket = openSocket();
 
     const shouldUpdateTicket = (ticket) => {
+      // console.log("shouldUpdateTicket: ", ticket);
+      // console.log("USER: ", user);
+
       const noSearchParam = !searchParam;
       const userCondition =
-        !ticket.userId ||
-        ticket.userId === user?.id ||
-        ticket.helpUsers?.find((hu) => hu.id === user?.id) ||
-        showAll;
+        (!ticket.userId && !ticket.isGroup) ||
+        (ticket.userId === user?.id && !ticket.isGroup) ||
+        (ticket.helpUsers?.find((hu) => hu.id === user?.id) &&
+          !ticket.isGroup) ||
+        (ticket.participantUsers?.find((pu) => pu.id === user?.id) &&
+          ticket.isGroup) ||
+        (!ticket.isGroup &&
+          showAll &&
+          selectedTypeIds.length === 1 &&
+          selectedTypeIds[0] === "individual") ||
+        (ticket.isGroup &&
+          !showOnlyMyGroups &&
+          selectedTypeIds.length === 1 &&
+          selectedTypeIds[0] === "group");
       const queueCondition =
         !ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1;
       const typeCondition =
@@ -276,15 +289,28 @@ const TicketsList = (props) => {
         selectedWhatsappIds?.length === 0;
 
       const ignoreConditions =
-        selectedTypeIds.length === 1 &&
-        selectedTypeIds[0] === "individual" &&
-        ticket.helpUsers?.find((hu) => hu.id === user?.id);
+        (!ticket.isGroup &&
+          selectedTypeIds.length === 1 &&
+          selectedTypeIds[0] === "individual" &&
+          !showAll) ||
+        (ticket.isGroup &&
+          selectedTypeIds.length === 1 &&
+          selectedTypeIds[0] === "group" &&
+          showOnlyMyGroups);
 
       const isConditionMet =
         noSearchParam &&
         userCondition &&
         typeCondition &&
         (ignoreConditions || (queueCondition && whatsappCondition));
+
+      // console.log("noSearchParam", noSearchParam);
+      // console.log("userCondition", userCondition);
+      // console.log("typeCondition", typeCondition);
+      // console.log("ignoreConditions", ignoreConditions);
+      // console.log("queueCondition", queueCondition);
+      // console.log("whatsappCondition", whatsappCondition);
+      // console.log(isConditionMet ? "PASÓ" : "NO PASÓ");
 
       return isConditionMet;
     };
@@ -372,6 +398,7 @@ const TicketsList = (props) => {
     selectedQueueIds,
     selectedTypeIds,
     selectedWhatsappIds,
+    showOnlyMyGroups,
   ]);
 
   // useEffect(() => {
