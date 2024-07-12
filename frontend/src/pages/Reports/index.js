@@ -553,28 +553,6 @@ const Reports = () => {
                   gap: "1rem",
                 }}
               >
-                <TextField
-                  id="date"
-                  label="Desde"
-                  type="datetime-local"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className={classes.textField}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-                <TextField
-                  id="date"
-                  label="Hasta"
-                  type="datetime-local"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  className={classes.textField}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
                 <div>
                   {/* <UsersSelect
                 selectedUserIds={selectedUserIds}
@@ -592,9 +570,6 @@ const Reports = () => {
                 {loading && <CircularProgress color="primary" size={25} />}
               </div>
             </div>
-            <Button variant="contained" color="primary" onClick={exportToExcel}>
-              Exportar
-            </Button>
           </div>
         </MainHeader>
         <Grid container spacing={3}>
@@ -1099,6 +1074,91 @@ const Reports = () => {
             </Paper>
           </Grid>
 
+          <Grid item xs={12}>
+            <MainHeader>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: "1rem",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ display: "flex" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "1rem",
+                    }}
+                  >
+                    <TextField
+                      id="date"
+                      label="Desde"
+                      type="datetime-local"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      className={classes.textField}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                    <TextField
+                      id="date"
+                      label="Hasta"
+                      type="datetime-local"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                      className={classes.textField}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                    <div>
+                      {/* <UsersSelect
+                selectedUserIds={selectedUserIds}
+                onChange={(value) => {
+                  setSelectedUserIds(value);
+                }}
+              /> */}
+                    </div>
+                  </div>
+                </div>
+                {/* <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={exportToExcel}
+                >
+                  Exportar
+                </Button> */}
+              </div>
+            </MainHeader>
+          </Grid>
+
+          <Grid item xs={12}>
+            <MainHeader>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: "1rem",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ display: "flex" }}></div>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={exportToExcel}
+                >
+                  Exportar
+                </Button>
+              </div>
+            </MainHeader>
+          </Grid>
+
           <Grid item xs={3}>
             <Paper
               className={classes.customFixedHeightPaper}
@@ -1120,7 +1180,7 @@ const Reports = () => {
               style={{ overflow: "hidden" }}
             >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                Tiempo primera respuesta
+                T. primera respuesta prom
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
@@ -1150,7 +1210,7 @@ const Reports = () => {
               style={{ overflow: "hidden" }}
             >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                Tiempo de resolución
+                T. de resolución prom
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
@@ -1162,7 +1222,7 @@ const Reports = () => {
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart
-                title={"Ticket creados"}
+                title="Ticket creados en el tiempo"
                 total={createdTicketsCount}
                 chartData={createdTicketsChartData}
               />
@@ -1179,7 +1239,7 @@ const Reports = () => {
           <Grid item xs={12}>
             <Paper className={classes.fixedHeightPaper}>
               <Chart
-                title={"Tickets resueltos"}
+                title="Tickets resueltos en el tiempo"
                 total={createdTicketsClosedInTheRangeTimeCount}
                 chartData={createdTicketsClosedInTheRangeTimeChartData}
               />
