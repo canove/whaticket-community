@@ -94,6 +94,7 @@ export const indexV2 = async (
 
   if (setTicketMessagesAsRead === "true") {
     if (nextTicketsToFetchMessagesQueue[0].ticket) {
+      console.log("_________index2 SetTicketMessagesAsRead: ");
       SetTicketMessagesAsRead(nextTicketsToFetchMessagesQueue[0].ticket);
     }
   }
