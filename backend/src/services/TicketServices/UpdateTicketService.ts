@@ -1,5 +1,4 @@
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
-import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import Ticket from "../../models/Ticket";
 import ShowTicketService from "./ShowTicketService";
 
@@ -43,7 +42,7 @@ const UpdateTicketService = async ({
   } = ticketData;
 
   const ticket = await ShowTicketService(ticketId, true);
-  await SetTicketMessagesAsRead(ticket);
+  // await SetTicketMessagesAsRead(ticket);
 
   if (whatsappId && ticket.whatsappId !== whatsappId) {
     await CheckContactOpenTickets(ticket.contactId, whatsappId);
