@@ -119,63 +119,29 @@ const TicketActionButtons = ({ ticket }) => {
 
   return (
     <div className={classes.actionButtons}>
-      {ticket.status === "closed" && (
+      {!ticket.isGroup && (
         <>
-          {!ticket.isGroup ? (
-            <ButtonWithSpinner
-              loading={loading}
-              startIcon={<Replay />}
-              size="small"
-              onClick={(e) =>
-                handleUpdateTicketStatus({ status: "open", userId: user?.id })
-              }
-            >
-              {i18n.t("messagesList.header.buttons.reopen")}
-            </ButtonWithSpinner>
-          ) : (
-            <></>
-            // <ButtonWithSpinner
-            //   loading={loading}
-            //   startIcon={<Replay />}
-            //   size="small"
-            //   onClick={async () => {
-            //     try {
-            //       await api.put(`/tickets/${ticket.id}`, {
-            //         status: "open",
-            //       });
-
-            //       await api.post(`/privateMessages/${ticket.id}`, {
-            //         body: `${user?.name} *Devolvió a bandeja* la conversación`,
-            //       });
-            //       history.push(`/tickets/${ticket.id}`);
-            //     } catch (err) {
-            //       toastError(err);
-            //     }
-            //   }}
-            // >
-            //   Devolver a bandeja
-            // </ButtonWithSpinner>
-          )}
-        </>
-      )}
-
-      {ticket.status === "open" && (
-        <>
-          {(ticket.userId === user?.id || user?.profile === "admin") &&
-            !ticket.isGroup && (
+          {ticket.status === "closed" && (
+            <>
               <ButtonWithSpinner
                 loading={loading}
                 startIcon={<Replay />}
                 size="small"
                 onClick={(e) =>
-                  handleUpdateTicketStatus({ status: "pending", userId: null })
+                  handleUpdateTicketStatus({
+                    status: "open",
+                    userId: user?.id,
+                  })
                 }
               >
-                {i18n.t("messagesList.header.buttons.return")}
+                {i18n.t("messagesList.header.buttons.reopen")}
               </ButtonWithSpinner>
-            )}
+            </>
+          )}
 
-          {/* <Badge
+          {ticket.status === "open" && (
+            <>
+              {/* <Badge
             badgeContent={ticket.categories.length}
             invisible={ticket.categories.length < 1}
             color="primary"
@@ -193,7 +159,7 @@ const TicketActionButtons = ({ ticket }) => {
             </div>
           </Badge> */}
 
-          {/* {ticket.isGroup && (
+              {/* {ticket.isGroup && (
             <ButtonWithSpinner
               loading={loading}
               startIcon={<Replay />}
@@ -217,123 +183,122 @@ const TicketActionButtons = ({ ticket }) => {
             </ButtonWithSpinner>
           )} */}
 
-          {(ticket.userId === user?.id || user?.profile === "admin") &&
-            !ticket.isGroup && (
-              <>
-                <ButtonWithSpinner
-                  loading={loading}
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={(e) => {
-                    setCloseTicketModalOpen(true);
-                  }}
-                >
-                  {i18n.t("messagesList.header.buttons.resolve")}
-                </ButtonWithSpinner>
+              {(ticket.userId === user?.id || user?.profile === "admin") && (
+                <>
+                  <ButtonWithSpinner
+                    loading={loading}
+                    startIcon={<Replay />}
+                    size="small"
+                    onClick={(e) =>
+                      handleUpdateTicketStatus({
+                        status: "pending",
+                        userId: null,
+                      })
+                    }
+                  >
+                    {i18n.t("messagesList.header.buttons.return")}
+                  </ButtonWithSpinner>
 
-                <CloseTicketModal
-                  modalOpen={closeTicketModalOpen}
-                  onClose={() => {
-                    setCloseTicketModalOpen(false);
-                  }}
-                  onSubmit={async ({ withFarewellMessage, comment }) => {
-                    await handleUpdateTicketStatus({
-                      status: "closed",
-                      userId: user?.id,
-                      withFarewellMessage,
-                      comment,
-                    });
-                  }}
-                />
+                  <ButtonWithSpinner
+                    loading={loading}
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    onClick={(e) => {
+                      setCloseTicketModalOpen(true);
+                    }}
+                  >
+                    {i18n.t("messagesList.header.buttons.resolve")}
+                  </ButtonWithSpinner>
 
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="default"
-                  onClick={() => setAskForHelpTicketModalOpen(true)}
-                >
-                  Pedir apoyo
-                </Button>
-              </>
-            )}
+                  <CloseTicketModal
+                    modalOpen={closeTicketModalOpen}
+                    onClose={() => {
+                      setCloseTicketModalOpen(false);
+                    }}
+                    onSubmit={async ({ withFarewellMessage, comment }) => {
+                      await handleUpdateTicketStatus({
+                        status: "closed",
+                        userId: user?.id,
+                        withFarewellMessage,
+                        comment,
+                      });
+                    }}
+                  />
 
-          {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
-            <>
-              <Button
-                size="small"
-                variant="contained"
-                color="default"
-                onClick={async () => {
-                  try {
-                    await api.put(`/tickets/${ticket.id}`, {
-                      helpUsersIds: ticket.helpUsers
-                        .filter((hu) => hu.id !== user?.id)
-                        .map((pu) => pu.id),
-                    });
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="default"
+                    onClick={() => setAskForHelpTicketModalOpen(true)}
+                  >
+                    Pedir apoyo
+                  </Button>
+                </>
+              )}
 
-                    await api.post(`/privateMessages/${ticket.id}`, {
-                      body: `${user?.name} *terminó el apoyo* en la conversación`,
-                    });
-                    history.push(`/tickets`);
-                  } catch (err) {
-                    toastError(err);
-                  }
+              {ticket.helpUsers?.find((hu) => hu.id === user?.id) && (
+                <>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="default"
+                    onClick={async () => {
+                      try {
+                        await api.put(`/tickets/${ticket.id}`, {
+                          helpUsersIds: ticket.helpUsers
+                            .filter((hu) => hu.id !== user?.id)
+                            .map((pu) => pu.id),
+                        });
+
+                        await api.post(`/privateMessages/${ticket.id}`, {
+                          body: `${user?.name} *terminó el apoyo* en la conversación`,
+                        });
+                        history.push(`/tickets`);
+                      } catch (err) {
+                        toastError(err);
+                      }
+                    }}
+                  >
+                    Terminar apoyo
+                  </Button>
+                </>
+              )}
+
+              <AskForHelpTicketModal
+                modalOpen={askForHelpTicketModalOpen}
+                onClose={() => {
+                  setAskForHelpTicketModalOpen(false);
                 }}
-              >
-                Terminar apoyo
-              </Button>
+                ticket={ticket}
+              />
+
+              {(ticket.userId === user?.id || user?.profile === "admin") && (
+                <IconButton onClick={handleOpenTicketOptionsMenu}>
+                  <MoreVert />
+                </IconButton>
+              )}
             </>
           )}
+          {ticket.status === "pending" && (
+            <ButtonWithSpinner
+              loading={loading}
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={(e) =>
+                handleUpdateTicketStatus({ status: "open", userId: user?.id })
+              }
+            >
+              <GroupAddIcon style={{ marginRight: 6 }} />
 
-          <AskForHelpTicketModal
-            modalOpen={askForHelpTicketModalOpen}
-            onClose={() => {
-              setAskForHelpTicketModalOpen(false);
-            }}
-            ticket={ticket}
-          />
-
-          {/* <AddCategoryToTicketModal
-            modalOpen={addCategoryToTicketModalOpen}
-            onClose={() => {
-              setAddCategoryToTicketModalOpen(false);
-            }}
-            ticket={ticket}
-          /> */}
-
-          {(ticket.userId === user?.id || user?.profile === "admin") &&
-            !ticket.isGroup && (
-              <IconButton onClick={handleOpenTicketOptionsMenu}>
-                <MoreVert />
-              </IconButton>
-            )}
-
-          <TicketOptionsMenu
-            ticket={ticket}
-            anchorEl={anchorEl}
-            menuOpen={ticketOptionsMenuOpen}
-            handleClose={handleCloseTicketOptionsMenu}
-          />
+              {i18n.t("messagesList.header.buttons.accept")}
+            </ButtonWithSpinner>
+          )}
         </>
       )}
-      {ticket.status === "pending" && (
-        <ButtonWithSpinner
-          loading={loading}
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={(e) =>
-            handleUpdateTicketStatus({ status: "open", userId: user?.id })
-          }
-        >
-          <GroupAddIcon style={{ marginRight: 6 }} />
 
-          {i18n.t("messagesList.header.buttons.accept")}
-        </ButtonWithSpinner>
-      )}
-
-      {ticket.isGroup && (
+      {ticket.isGroup && ticket.status === "open" && (
         <>
           {ticket.participantUsers?.find((pu) => pu.id === user?.id) ? (
             <ButtonWithSpinner
@@ -399,6 +364,10 @@ const TicketActionButtons = ({ ticket }) => {
             Pedir participación
           </Button>
 
+          <IconButton onClick={handleOpenTicketOptionsMenu}>
+            <MoreVert />
+          </IconButton>
+
           <AskForParticipationTicketModal
             modalOpen={askForParticipationTicketModalOpen}
             onClose={() => {
@@ -408,6 +377,13 @@ const TicketActionButtons = ({ ticket }) => {
           />
         </>
       )}
+
+      <TicketOptionsMenu
+        ticket={ticket}
+        anchorEl={anchorEl}
+        menuOpen={ticketOptionsMenuOpen}
+        handleClose={handleCloseTicketOptionsMenu}
+      />
     </div>
   );
 };

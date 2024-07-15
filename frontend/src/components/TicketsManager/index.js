@@ -518,7 +518,7 @@ const TicketsManager = () => {
                   color="secondary"
                   max={99999}
                 >
-                  {i18n.t("ticketsList.pendingHeader")}
+                  Pendientes
                 </Badge>
               </div>
             }

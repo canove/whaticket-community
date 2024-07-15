@@ -4,6 +4,7 @@ import { parseISO } from "date-fns";
 import { Op, Sequelize } from "sequelize";
 import { GroupChat } from "whatsapp-web.js";
 import AppError from "../errors/AppError";
+import GetTicketWbot from "../helpers/GetTicketWbot";
 import formatBody from "../helpers/Mustache";
 import { getWbot } from "../libs/wbot";
 import Contact from "../models/Contact";
@@ -219,11 +220,18 @@ export const update = async (
   const { ticketId } = req.params;
 
   let withFarewellMessage = true;
+  let leftGroup = false;
 
   if ("withFarewellMessage" in req.body) {
     withFarewellMessage = req.body.withFarewellMessage;
 
     delete req.body.withFarewellMessage;
+  }
+
+  if ("leftGroup" in req.body) {
+    leftGroup = req.body.leftGroup;
+
+    delete req.body.leftGroup;
   }
 
   const ticketData: TicketData = req.body;
@@ -247,6 +255,18 @@ export const update = async (
         ticket
       });
     }
+  }
+
+  if (ticket.status === "closed" && ticket.isGroup && leftGroup) {
+    const wbot = await GetTicketWbot(ticket);
+
+    const wbotChat = await wbot.getChatById(
+      `${ticket.contact?.number}@${ticket.isGroup ? "g" : "c"}.us`
+    );
+
+    const wbotGroupChat = wbotChat as GroupChat;
+
+    await wbotGroupChat.leave();
   }
 
   return res.status(200).json(ticket);
