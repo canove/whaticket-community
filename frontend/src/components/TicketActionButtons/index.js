@@ -267,9 +267,9 @@ const TicketActionButtons = ({ ticket }) => {
                 onClick={async () => {
                   try {
                     await api.put(`/tickets/${ticket.id}`, {
-                      helpUsersIds: ticket.helpUsers.filter(
-                        (hu) => hu.id !== user?.id
-                      ),
+                      helpUsersIds: ticket.helpUsers
+                        .filter((hu) => hu.id !== user?.id)
+                        .map((pu) => pu.id),
                     });
 
                     await api.post(`/privateMessages/${ticket.id}`, {

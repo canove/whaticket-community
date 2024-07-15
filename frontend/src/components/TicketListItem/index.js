@@ -4,6 +4,9 @@ import clsx from "clsx";
 import { format, fromUnixTime, isSameDay } from "date-fns";
 import { useHistory, useParams } from "react-router-dom";
 
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
+
 import Avatar from "@material-ui/core/Avatar";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
@@ -24,8 +27,6 @@ import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import VisibilityOutlinedIcon from "@material-ui/icons/VisibilityOutlined";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
-import toastError from "../../errors/toastError";
-import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
 import TicketListItemLastMessageTime from "../TicketListItemLastMessageTime";
@@ -171,7 +172,7 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
     if (isMounted.current) {
       setLoading(false);
     }
-    history.push(`/tickets/${id}`);
+    // history.push(`/tickets/${id}`);
   };
 
   const handleSelectTicket = (id) => {
@@ -506,7 +507,10 @@ const TicketListItem = ({ ticket, openInANewWindowOnSelect = false }) => {
               className={classes.acceptButton}
               size="small"
               loading={loading}
-              onClick={(e) => handleAcepptTicket(ticket.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAcepptTicket(ticket.id);
+              }}
             >
               <GroupAddIcon />
             </ButtonWithSpinner>

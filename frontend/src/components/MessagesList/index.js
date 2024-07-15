@@ -577,7 +577,11 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
           "---- searchingMessageId alredy in messagesList!: ",
           searchingMessageId
         );
-        setFoundMessageId(searchingMessageId);
+        if (searchingMessageId && searchingMessageId === foundMessageId) {
+          scrollToFoundMessage();
+        } else {
+          setFoundMessageId(searchingMessageId);
+        }
         setSearchingMessageId(null);
       } else {
         loadMore();
@@ -586,6 +590,7 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   }, [searchingMessageId]);
 
   useEffect(() => {
+    // console.log("____ foundMessageId cambió: " + foundMessageId);
     if (foundMessageId) {
       scrollToFoundMessage();
     }
@@ -841,6 +846,12 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
   const renderQuotedMessage = (message) => {
     return (
       <div
+        style={{ cursor: "pointer" }}
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log("Quoted message clicked:", message);
+          setSearchingMessageId(message.quotedMsg?.id);
+        }}
         className={clsx(classes.quotedContainerLeft, {
           [classes.quotedContainerRight]:
             message.fromMe ||
@@ -893,11 +904,37 @@ const MessagesList = ({ ticketId, isGroup, isAPreview }) => {
     return (
       <>
         {message.id === foundMessageId && (
-          <div
-            key={`ref-${message.timestamp || message.createdAt}-${message.id}`}
-            ref={foundMessageRef}
-            style={{ float: "left", clear: "both", scrollMargin: "4rem" }}
-          />
+          <>
+            <div
+              key={`ref-${message.timestamp || message.createdAt}-${
+                message.id
+              }`}
+              ref={foundMessageRef}
+              style={{ float: "left", clear: "both", scrollMargin: "4rem" }}
+            />
+            <span
+              style={{
+                background: "black",
+                alignSelf:
+                  message.fromMe ||
+                  (isGroup &&
+                    (whatsApps?.find(
+                      (w) => w.number === message?.contact?.number
+                    ) ||
+                      message?.contact?.isCompanyMember))
+                    ? "flex-end"
+                    : "flex-start",
+                padding: "1px 8px",
+                borderRadius: "100px",
+                fontSize: "11px",
+                marginBottom: "3px",
+                marginTop: "10px",
+                color: "white",
+              }}
+            >
+              Mensaje buscado
+            </span>
+          </>
         )}
       </>
     );

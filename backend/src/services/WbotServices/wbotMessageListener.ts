@@ -767,9 +767,9 @@ const handleMessage = async (
       }
     } */
   } catch (err) {
-    Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);
     console.log(err);
+    Sentry.captureException(err);
   }
 };
 
@@ -851,9 +851,9 @@ const handleMessageForSyncUnreadMessages = async (
 
     return { ticket, contact };
   } catch (err) {
-    Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);
     console.log(err);
+    Sentry.captureException(err);
   }
 };
 
@@ -876,6 +876,14 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
     if (!messageToUpdate) {
       return;
     }
+
+    console.log(
+      "-- handleMsgAck -messageToUpdate:",
+      messageToUpdate,
+      " -ack: ",
+      ack
+    );
+
     await messageToUpdate.update({ ack });
 
     /* io.to(messageToUpdate.ticketId.toString()).emit("appMessage", {
