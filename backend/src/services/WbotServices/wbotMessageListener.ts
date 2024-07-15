@@ -934,6 +934,12 @@ const wbotMessageListener = (wbot: Session): void => {
     handleMessage(msg, wbot);
   });
   wbot.on("message_ack", async (msg, ack) => {
+    // la libreria a veces envia null como ack y causaba error
+    if (ack === null) {
+      console.log("____ message_ack EVENT SEND ME NULL, DONT UPDATE MESSAGE");
+      return;
+    }
+
     handleMsgAck(msg, ack);
   });
 };
