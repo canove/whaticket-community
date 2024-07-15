@@ -40,19 +40,59 @@ const CreateOrUpdateContactService = async ({
       });
     }
   } else {
-    contact = await Contact.create({
-      name,
-      number,
-      ...(profilePicUrl && { profilePicUrl }),
-      email,
-      isGroup,
-      extraInfo
-    });
+    try {
+      contact = await Contact.create({
+        name,
+        number,
+        ...(profilePicUrl && { profilePicUrl }),
+        email,
+        isGroup,
+        extraInfo
+      });
 
-    io.emit("contact", {
-      action: "create",
-      contact
-    });
+      io.emit("contact", {
+        action: "create",
+        contact
+      });
+    } catch (error) {
+      console.log("---- Error al crear contacto", error);
+
+      // Esperar 200 ms antes de reintentar
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      console.log(
+        "---- Volvemos a verificar que el contacto no exista: ",
+        number
+      );
+
+      // Verificar nuevamente que no exista ya
+      contact = await Contact.findOne({ where: { number } });
+
+      if (!contact) {
+        console.log(
+          "---- En la segunda verificación el contacto no existe, Reintentando otra vez crear el contacto: ",
+          number
+        );
+        contact = await Contact.create({
+          name,
+          number,
+          ...(profilePicUrl && { profilePicUrl }),
+          email,
+          isGroup,
+          extraInfo
+        });
+
+        io.emit("contact", {
+          action: "create",
+          contact
+        });
+      } else {
+        console.log(
+          "---- En la segunda verificación, El contacto ya existe: ",
+          number
+        );
+      }
+    }
   }
 
   return contact;
