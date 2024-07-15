@@ -1,4 +1,3 @@
-import AppError from "../../errors/AppError";
 import ChatbotOption from "../../models/ChatbotOption";
 
 const ShowChatbotOptionService = async (id: string): Promise<ChatbotOption> => {
@@ -7,7 +6,8 @@ const ShowChatbotOptionService = async (id: string): Promise<ChatbotOption> => {
   });
 
   if (!chatbotOption) {
-    throw new AppError("ERR_NO_CHATBOT_OPTION_FOUND", 404);
+    return null;
+    // throw new AppError("ERR_NO_CHATBOT_OPTION_FOUND", 404);
   }
 
   return chatbotOption;
