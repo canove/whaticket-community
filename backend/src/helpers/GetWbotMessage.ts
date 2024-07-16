@@ -1,7 +1,7 @@
 import { Message as WbotMessage } from "whatsapp-web.js";
+import AppError from "../errors/AppError";
 import Ticket from "../models/Ticket";
 import GetTicketWbot from "./GetTicketWbot";
-import AppError from "../errors/AppError";
 
 export const GetWbotMessage = async (
   ticket: Ticket,
@@ -20,7 +20,7 @@ export const GetWbotMessage = async (
 
     const msgFound = chatMessages.find(msg => msg.id.id === messageId);
 
-    if (!msgFound && limit < 100) {
+    if (!msgFound && limit < 300) {
       limit += 20;
       return fetchWbotMessagesGradually();
     }
@@ -37,6 +37,7 @@ export const GetWbotMessage = async (
 
     return msgFound;
   } catch (err) {
+    console.log("Error fetching wbot message", err);
     throw new AppError("ERR_FETCH_WAPP_MSG");
   }
 };

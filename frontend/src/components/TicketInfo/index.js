@@ -15,9 +15,21 @@ const TicketInfo = ({ contact, ticket, onClick }) => {
       title={`${contact.name} #${ticket.id}`}
       subheader={
         <>
+          <div>{`Conexión: ${ticket?.whatsapp?.name}`}</div>
           <div>
-            {ticket.user &&
+            {!ticket.isGroup &&
+              ticket.user &&
               `${i18n.t("messagesList.header.assignedTo")} ${ticket.user.name}`}
+          </div>
+          <div>
+            {ticket.isGroup && ticket.participantUsers?.length > 0 && (
+              <div>
+                Participando:{" "}
+                {ticket.participantUsers?.map((pu) => (
+                  <span key={pu.id}>{pu.name} - </span>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             {contact.domain && (

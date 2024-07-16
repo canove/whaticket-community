@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
+import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
@@ -12,6 +13,7 @@ import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
+  const history = useHistory();
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
   const [recoveringTheEntireConversation, setRecoveringTheEntireConversation] =
@@ -67,37 +69,62 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
         open={menuOpen}
         onClose={handleClose}
       >
-        {/* <MenuItem
-          disabled={recoveringTheEntireConversation}
-          onClick={async () => {
-            setRecoveringTheEntireConversation(true);
-            try {
-              await api.post(`/tickets/recoverAllMessages/${ticket.id}`);
-              setRecoveringTheEntireConversation(false);
-              window.location.reload();
+        {ticket.isGroup ? (
+          <>
+            <MenuItem
+              onClick={async () => {
+                try {
+                  await api.put(`/tickets/${ticket.id}`, {
+                    status: "closed",
+                    leftGroup: true,
+                  });
 
-              toast.success("Chat recuperado con exito!");
-            } catch (error) {
-              setRecoveringTheEntireConversation(false);
-              toast.error(error);
-            }
-          }}
-        >
-          {recoveringTheEntireConversation && <CircularProgress />}
-          Recuperar toda la conversación
-        </MenuItem> */}
-        <MenuItem onClick={handleOpenTransferModal}>
-          {i18n.t("ticketOptionsMenu.transfer")}
-        </MenuItem>
-        <Can
-          role={user.profile}
-          perform="ticket-options:deleteTicket"
-          yes={() => (
-            <MenuItem onClick={handleOpenConfirmationModal}>
-              {i18n.t("ticketOptionsMenu.delete")}
+                  await api.post(`/privateMessages/${ticket.id}`, {
+                    body: `${user?.name} *Envio a resueltos* la conversación y *Salió del grupo*`,
+                  });
+                  history.push(`/tickets`);
+                } catch (err) {
+                  toastError(err);
+                }
+              }}
+            >
+              Salir del grupo y Resolver ticket
             </MenuItem>
-          )}
-        />
+            <MenuItem
+              onClick={async () => {
+                try {
+                  await api.put(`/tickets/${ticket.id}`, {
+                    status: "closed",
+                  });
+
+                  await api.post(`/privateMessages/${ticket.id}`, {
+                    body: `${user?.name} *Envio a resueltos* la conversación`,
+                  });
+                  history.push(`/tickets`);
+                } catch (err) {
+                  toastError(err);
+                }
+              }}
+            >
+              Resolver ticket
+            </MenuItem>
+          </>
+        ) : (
+          <>
+            <MenuItem onClick={handleOpenTransferModal}>
+              {i18n.t("ticketOptionsMenu.transfer")}
+            </MenuItem>
+            <Can
+              role={user.profile}
+              perform="ticket-options:deleteTicket"
+              yes={() => (
+                <MenuItem onClick={handleOpenConfirmationModal}>
+                  {i18n.t("ticketOptionsMenu.delete")}
+                </MenuItem>
+              )}
+            />
+          </>
+        )}
       </Menu>
       <ConfirmationModal
         title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${

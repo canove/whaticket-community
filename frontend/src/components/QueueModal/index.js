@@ -109,6 +109,10 @@ const ChatbotOptionList = ({
           `/chatbotOption/${activeChatbotOption.id}`
         );
 
+        if (!data) {
+          toastError("No se encontró la opción de chatbot");
+        }
+
         setSubChatbotOptions((oldSubChatbotoptions) => [
           ...data.chatbotOptions,
           ...[{ name: "Agregar Opción", message: "", isAddMoreOption: true }],
