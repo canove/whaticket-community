@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import Dialog from "@material-ui/core/Dialog";
 
@@ -10,6 +10,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { makeStyles } from "@material-ui/core/styles";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import api from "../../services/api";
 
 const useRowStyles = makeStyles({
@@ -26,6 +27,7 @@ const useRowStyles = makeStyles({
 const TicketListModal = ({ modalOpen, onClose, title, tickets }) => {
   const [loading, setLoading] = useState(false);
   const [ticketsData, setTicketsData] = useState([]);
+  const { whatsApps } = useContext(WhatsAppsContext);
 
   useEffect(() => {
     console.log("tickets", tickets);
@@ -41,8 +43,60 @@ const TicketListModal = ({ modalOpen, onClose, title, tickets }) => {
             ticketIds: JSON.stringify(tickets.map((ticket) => ticket.id)),
           },
         });
+        console.log("tickets data", data.tickets);
 
-        setTicketsData(data.tickets);
+        const relevantTickets = data.tickets
+          .map((ticket) => {
+            if (!ticket.messages?.length > 0) {
+              return null;
+            }
+
+            let ticketMessages = ticket.messages;
+
+            const lastTicketMessage = ticketMessages[ticketMessages.length - 1];
+
+            if (
+              whatsApps.find(
+                (w) => w.number === lastTicketMessage.contact?.number
+              ) ||
+              lastTicketMessage?.contact?.isCompanyMember ||
+              lastTicketMessage?.fromMe
+            ) {
+              return null;
+            }
+
+            let firstLastMessageThatIsFromTheClient;
+
+            for (let i = ticketMessages.length - 1; i >= 0; i--) {
+              if (
+                !whatsApps.find(
+                  (w) => w.number === ticketMessages[i]?.contact?.number
+                ) &&
+                !ticketMessages[i]?.contact?.isCompanyMember &&
+                !ticketMessages[i]?.fromMe
+              ) {
+                firstLastMessageThatIsFromTheClient = ticketMessages[i];
+              } else {
+                break;
+              }
+            }
+
+            return { ticket, firstLastMessageThatIsFromTheClient };
+          })
+          .filter((item) => item !== null);
+
+        relevantTickets.sort((a, b) => {
+          return (
+            a.firstLastMessageThatIsFromTheClient.timestamp -
+            b.firstLastMessageThatIsFromTheClient.timestamp
+          );
+        });
+
+        const sortedTickets = relevantTickets.map((item) => item.ticket);
+
+        console.log({ sortedTickets });
+
+        setTicketsData(sortedTickets);
 
         setLoading(false);
       }
