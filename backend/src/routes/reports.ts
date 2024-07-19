@@ -19,4 +19,9 @@ reportsRoutes.get(
   ReportsController.getATicketsList
 );
 
+reportsRoutes.get("/reportHistory", ReportsController.reportHistory);
+reportsRoutes.get(
+  "/reportHistoryWithDateRange",
+  ReportsController.reportHistoryWithDateRange
+);
 export default reportsRoutes;
