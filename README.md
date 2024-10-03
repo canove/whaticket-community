@@ -5,7 +5,7 @@
 [![Discord Chat](https://img.shields.io/discord/784109818247774249.svg?logo=discord)](https://discord.gg/Dp2tTZRYHg)
 [![Forum](https://img.shields.io/badge/forum-online-blue.svg?logo=discourse)](https://whaticket.online/)
 
-# WhaTicket
+# WhaTicket!
 
 **NOTE**: The new version of whatsapp-web.js required Node 14. Upgrade your installations to keep using it.
 
