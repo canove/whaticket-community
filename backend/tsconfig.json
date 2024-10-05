@@ -3,6 +3,7 @@
     "target": "es6",
     "module": "commonjs",
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
@@ -10,5 +11,7 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

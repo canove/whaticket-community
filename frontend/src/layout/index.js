@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
-
 import {
   makeStyles,
   Drawer,
@@ -12,11 +11,15 @@ import {
   MenuItem,
   IconButton,
   Menu,
+  CssBaseline,
+  Switch,
+  FormControlLabel,
 } from "@material-ui/core";
-
+import { WbSunny, NightsStay, NightsStaySharp } from '@material-ui/icons';
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -35,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
       height: "calc(100vh - 56px)",
     },
   },
-
+  // Outras classes permanecem inalteradas...
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
   },
@@ -55,7 +58,6 @@ const useStyles = makeStyles((theme) => ({
   },
   appBarShift: {
     marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -109,6 +111,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// Defini os temas claro e escuro
+const lightTheme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#f44336',
+    },
+  },
+});
+
+const darkTheme = createTheme({
+  palette: {
+    type: 'dark',
+    primary: {
+      main: '#90caf9',
+    },
+    secondary: {
+      main: '#f48fb1',
+    },
+  },
+});
+
 const LoggedInLayout = ({ children }) => {
   const classes = useStyles();
   const [userModalOpen, setUserModalOpen] = useState(false);
@@ -118,6 +145,7 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const [darkMode, setDarkMode] = useState(false); //usei useState pra setar o estado do mode
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -159,110 +187,133 @@ const LoggedInLayout = ({ children }) => {
     }
   };
 
+  // Alterna o tema claro/escuro
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   if (loading) {
     return <BackdropLoading />;
   }
 
   return (
-    <div className={classes.root}>
-      <Drawer
-        variant={drawerVariant}
-        className={drawerOpen ? classes.drawerPaper : classes.drawerPaperClose}
-        classes={{
-          paper: clsx(
-            classes.drawerPaper,
-            !drawerOpen && classes.drawerPaperClose
-          ),
-        }}
-        open={drawerOpen}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <List>
-          <MainListItems drawerClose={drawerClose} />
-        </List>
-        <Divider />
-      </Drawer>
-      <UserModal
-        open={userModalOpen}
-        onClose={() => setUserModalOpen(false)}
-        userId={user?.id}
-      />
-      <AppBar
-        position="absolute"
-        className={clsx(classes.appBar, drawerOpen && classes.appBarShift)}
-        color={process.env.NODE_ENV === "development" ? "inherit" : "primary"}
-      >
-        <Toolbar variant="dense" className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            className={clsx(
-              classes.menuButton,
-              drawerOpen && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            WhaTicket
-          </Typography>
-          {user.id && <NotificationsPopOver />}
-
-          <div>
-            <IconButton
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <AccountCircle />
+    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+      <CssBaseline />
+      <div className={classes.root}>
+        <Drawer
+          variant={drawerVariant}
+          className={drawerOpen ? classes.drawerPaper : classes.drawerPaperClose}
+          classes={{
+            paper: clsx(
+              classes.drawerPaper,
+              !drawerOpen && classes.drawerPaperClose
+            ),
+          }}
+          open={drawerOpen}
+        >
+          <div className={classes.toolbarIcon}>
+            <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
+              <ChevronLeftIcon />
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              getContentAnchorEl={null}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={menuOpen}
-              onClose={handleCloseMenu}
-            >
-              <MenuItem onClick={handleOpenUserModal}>
-                {i18n.t("mainDrawer.appBar.user.profile")}
-              </MenuItem>
-              <MenuItem onClick={handleClickLogout}>
-                {i18n.t("mainDrawer.appBar.user.logout")}
-              </MenuItem>
-            </Menu>
           </div>
-        </Toolbar>
-      </AppBar>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
+          <Divider />
+          <List>
+            <MainListItems drawerClose={drawerClose} />
+          </List>
+          <Divider />
+        </Drawer>
+        <UserModal
+          open={userModalOpen}
+          onClose={() => setUserModalOpen(false)}
+          userId={user?.id}
+        />
+        <AppBar
+          position="absolute"
+          className={clsx(classes.appBar, drawerOpen && classes.appBarShift)}
+          color={process.env.NODE_ENV === "development" ? "inherit" : "primary"}
+        >
+          <Toolbar variant="dense" className={classes.toolbar}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => setDrawerOpen(!drawerOpen)}
+              className={clsx(
+                classes.menuButton,
+                drawerOpen && classes.menuButtonHidden
+              )}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
+              WhaTicket
+            </Typography>
 
-        {children ? children : null}
-      </main>
-    </div>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={darkMode}
+                  onChange={toggleDarkMode}
+                  name="darkModeToggle"
+                  color="default"
+                />
+              }
+              label={
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '50%' }}> 
+                { darkMode ? <NightsStay style={{ color: darkMode ? 'white' : 'gray' }} /> : <WbSunny style={{ color: darkMode ? 'gray' : 'black' }} /> }
+                </span>
+              }
+              labelPlacement="end"
+            />
+            {user.id && <NotificationsPopOver />}
+            <div>
+              <IconButton
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={menuOpen}
+                onClose={handleCloseMenu}
+              >
+                <MenuItem onClick={handleOpenUserModal}>
+                  {i18n.t("mainDrawer.appBar.user.profile")}
+                </MenuItem>
+                <MenuItem onClick={handleClickLogout}>
+                  {i18n.t("mainDrawer.appBar.user.logout")}
+                </MenuItem>
+              </Menu>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          {children ? children : null}
+        </main>
+      </div>
+    </ThemeProvider>
   );
 };
 
-export default LoggedInLayout;
+export default LoggedInLayout; 
