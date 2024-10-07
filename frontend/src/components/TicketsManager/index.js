@@ -32,11 +32,12 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
+    backgroundColor: theme.palette.background.paper,
   },
 
   tabsHeader: {
     flex: "none",
-    backgroundColor: "#eee",
+    backgroundColor: theme.palette.background.paper,
   },
 
   settingsIcon: {
@@ -54,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    background: "#fafafa",
+    background: theme.palette.background.default,
     padding: theme.spacing(1),
   },
 
