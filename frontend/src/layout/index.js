@@ -145,7 +145,18 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
-  const [darkMode, setDarkMode] = useState(false); //usei useState pra setar o estado do mode
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode ? JSON.parse(savedMode) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -185,11 +196,6 @@ const LoggedInLayout = ({ children }) => {
     if (document.body.offsetWidth < 600) {
       setDrawerOpen(false);
     }
-  };
-
-  // Alterna o tema claro/escuro
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
   };
 
   if (loading) {
