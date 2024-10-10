@@ -26,6 +26,8 @@ import toastError from "../../errors/toastError";
 const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
+		backgroundColor: theme.palette.background.paper,
+		color: theme.palette.text.primary,
 	},
 
 	pendingTicket: {
@@ -43,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 	noTicketsText: {
 		textAlign: "center",
-		color: "rgb(104, 121, 146)",
+		color: theme.palette.text.secondary,
 		fontSize: "14px",
 		lineHeight: "1.4",
 	},

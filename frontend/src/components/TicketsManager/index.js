@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
   serachInputWrapper: {
     flex: 1,
-    background: "#fff",
+    background: theme.palette.background.default,
     display: "flex",
     borderRadius: 40,
     padding: 4,
@@ -79,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     border: "none",
     borderRadius: 30,
+    color: theme.palette.text.primary,
   },
 
   badge: {

@@ -49,6 +49,11 @@ const messages = {
           closed: {
             title: "Closed"
           }
+        },
+        chartPerUser: {
+          perUser: {
+            title: "Tickets per user"
+          }
         }
       },
       connections: {

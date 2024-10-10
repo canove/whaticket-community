@@ -50,6 +50,11 @@ const messages = {
           closed: {
             title: "Finalizado"
           }
+        },
+        chartPerUser: {
+          perUser: {
+            title: "Entradas por usuario"
+          }
         }
       },
       connections: {
