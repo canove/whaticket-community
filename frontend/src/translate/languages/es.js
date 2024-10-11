@@ -55,7 +55,23 @@ const messages = {
           perUser: {
             title: "Entradas por usuario"
           }
-        }
+        },
+        chartPerConnection: {
+          perConnection: {
+            title: "Billetes por conexión"
+          }
+        },
+        chartPerQueue: {
+          perQueue: {
+            title: "Entradas por cola"
+          }
+        },
+        newContacts: {
+          title: "Nuevos contactos por día"
+        },
+        contactsWithTickets: {
+          title: "Contactos que crearon tickets ese día"
+        },
       },
       connections: {
         title: "Conexiones",

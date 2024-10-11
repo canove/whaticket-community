@@ -1,3 +1,4 @@
+
 const messages = {
   pt: {
     translations: {
@@ -54,7 +55,23 @@ const messages = {
           perUser: {
             title: "Tickets por usuário"
           }
-        }
+        },
+        chartPerConnection: {
+          perConnection: {
+            title: "Tickets por conexão"
+          }
+        },
+        chartPerQueue: {
+          perQueue: {
+            title: "Tickets por Fila"
+          }
+        },
+        newContacts: {
+            title: "Contatos Novos por Dia"
+          },
+        contactsWithTickets: {
+            title: "Contatos que criaram tickets no dia"
+          },
       },
       connections: {
         title: "Conexões",
