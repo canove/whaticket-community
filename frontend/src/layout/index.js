@@ -16,6 +16,7 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import Brightness4Icon from "@material-ui/icons/Brightness4";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -114,6 +115,13 @@ const useStyles = makeStyles((theme) => ({
     transform: "scale(0.8)",
   },
   iconButton: {
+    color: theme.palette.text.primary,
+  },
+  themeSwitchContainer: {
+    display: "flex",
+    alignItems: "center",
+  },
+  themeIcon: {
     color: theme.palette.text.primary,
   },
 }));
@@ -227,12 +235,15 @@ const LoggedInLayout = ({ children }) => {
             WhaTicket
           </Typography>
 
-          <Switch
-            checked={darkMode}
-            onChange={toggleTheme}
-            color="default"
-            className={classes.switch}
-          />
+          <div className={classes.themeSwitchContainer}>
+            <Brightness4Icon className={classes.themeIcon} />
+            <Switch
+              checked={darkMode}
+              onChange={toggleTheme}
+              color="default"
+              className={classes.switch}
+            />
+          </div>
 
           {user.id && (
             <NotificationsPopOver className={classes.iconButton} />
