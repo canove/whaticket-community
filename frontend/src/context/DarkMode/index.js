@@ -1,4 +1,3 @@
-// src/context/DarkMode.js
 import React, { createContext, useState, useContext } from "react";
 import { createMuiTheme, ThemeProvider as MUIThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
