@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useMemo } from "react";
+import PropTypes from "prop-types";
 import { createMuiTheme, ThemeProvider as MUIThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
 
@@ -11,20 +12,29 @@ export const ThemeProvider = ({ children }) => {
     setDarkMode((prevMode) => !prevMode);
   };
 
-  const theme = createMuiTheme({
-    palette: {
-      type: darkMode ? "dark" : "light", 
-    },
-  });
+  const theme = useMemo(
+    () =>
+      createMuiTheme({
+        palette: {
+          type: darkMode ? "dark" : "light",
+        },
+      }),
+    [darkMode]
+  );
+
+  const contextValue = useMemo(() => ({ darkMode, toggleTheme }), [darkMode]);
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       <MUIThemeProvider theme={theme}>
         <CssBaseline />
         {children}
       </MUIThemeProvider>
     </ThemeContext.Provider>
   );
+};
+ThemeProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useThemeContext = () => useContext(ThemeContext);
