@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
+    paddingRight: 24,
   },
   toolbarIcon: {
     display: "flex",
@@ -118,6 +118,7 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -132,6 +133,13 @@ const LoggedInLayout = ({ children }) => {
       setDrawerVariant("permanent");
     }
   }, [drawerOpen]);
+
+  useEffect(() => {
+    const savedProfileImage = localStorage.getItem("profileImage");
+    if (savedProfileImage) {
+      setProfileImage(savedProfileImage);
+    }
+  }, []);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -229,7 +237,15 @@ const LoggedInLayout = ({ children }) => {
               onClick={handleMenu}
               color="inherit"
             >
-              <AccountCircle />
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  style={{ width: 40, height: 40, borderRadius: "50%" }}
+                />
+              ) : (
+                <AccountCircle />
+              )}
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -258,7 +274,6 @@ const LoggedInLayout = ({ children }) => {
       </AppBar>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-
         {children ? children : null}
       </main>
     </div>
