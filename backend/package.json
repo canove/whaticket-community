@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@sentry/node": "^5.29.2",
+    "@types/lodash": "^4.17.5",
     "@types/pino": "^6.3.4",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
