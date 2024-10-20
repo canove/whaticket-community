@@ -40,13 +40,7 @@ const NewContactsChart = ({ startDate, endDate }) => {
           margin={{ top: 16, right: 16, bottom: 0, left: 24 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" stroke={theme.palette.text.secondary}>
-            <Label
-              value={i18n.t("Data")}
-              position="insideBottom"
-              style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-            />
-          </XAxis>
+          <XAxis dataKey="date" stroke={theme.palette.text.secondary}/>
           <YAxis stroke={theme.palette.text.secondary}>
             <Label
               angle={270}

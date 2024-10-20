@@ -11,6 +11,7 @@ const useTickets = ({
     showAll,
     queueIds,
     withUnreadMessages,
+   
 }) => {
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(false);
@@ -36,9 +37,13 @@ const useTickets = ({
                             showAll,
                             queueIds,
                             withUnreadMessages,
+                    
+                           
                         },
                     });
+                    
                     setTickets(data.tickets);
+                    console.log("data do usetickets:", data.tickets);
                      // Contagem de contatos que criaram tickets por dia
                      const contactsByDay = data.tickets.reduce((acc, ticket) => {
                         const contactName = ticket.contact?.name || "Contato desconhecido";
@@ -68,7 +73,7 @@ const useTickets = ({
                         return acc;
                     }, {});
                     setNewContactsByDay(contactsPerDay);
-
+                   
                     // Contagem de tickets por fila
                     const ticketsCountByQueue = data.tickets.reduce((acc, ticket) => {
                         const queueName = ticket.queue?.name || "Fila desconhecida";
@@ -80,20 +85,28 @@ const useTickets = ({
 
                     // Contagem de tickets por conexão
                     const ticketsCountByConnection = data.tickets.reduce((acc, ticket) => {
-                        const connectionName = ticket.connection?.name || "Conexão desconhecida";
+                        const connectionName = ticket.whatsapp?.name || "Conexão desconhecida";
                         acc[connectionName] = acc[connectionName] ? acc[connectionName] + 1 : 1;
                         return acc;
                     }, {});
                     setTicketsByConnection(ticketsCountByConnection);
 
-                    // Contagem de tickets por usuário usando o nome
+                    // Contagem de tickets por usuário usando o id
                     const ticketsCountByUser = data.tickets.reduce((acc, ticket) => {
-                        const userName = ticket.user?.name || "Usuário desconhecido";
-                        acc[userName] = acc[userName] ? acc[userName] + 1 : 1;
+                        const userID = ticket.userId;
+                        const createdDate = new Date(ticket.createdAt).toISOString().split("T")[0];
+                        
+                        if (!acc[userID]) {
+                          acc[userID] = {};
+                        }
+                      
+                        acc[userID][createdDate] = acc[userID][createdDate] ? acc[userID][createdDate] + 1 : 1;
+                        
                         return acc;
-                    }, {});
-                    setTicketsByUser(ticketsCountByUser);
-
+                      }, {});
+                      
+                      setTicketsByUser(ticketsCountByUser);
+                    
                     // Fechamento automático de tickets
                     let horasFecharAutomaticamente = getHoursCloseTicketsAuto();
                     if (

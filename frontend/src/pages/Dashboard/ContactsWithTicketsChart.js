@@ -42,13 +42,8 @@ const ContactsWithTicketsChart = ({ startDate, endDate }) => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" stroke={theme.palette.text.secondary}>
-            <Label
-              value={i18n.t("Data")}
-              position="insideBottom"
-              style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-            />
-          </XAxis>
+          <XAxis dataKey="date" stroke={theme.palette.text.secondary}/>
+            
           <YAxis stroke={theme.palette.text.secondary}>
             <Label
               angle={270}

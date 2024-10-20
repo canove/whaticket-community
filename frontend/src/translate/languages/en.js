@@ -51,6 +51,9 @@ const messages = {
           }
         },
         chartPerUser: {
+          date: {
+            title: "Filter"
+          },
           perUser: {
             title: "Tickets per user"
           }

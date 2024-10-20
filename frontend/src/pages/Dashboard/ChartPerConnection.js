@@ -21,7 +21,6 @@ const ChartPerConnection = ({ startDate, endDate }) => {
   const [connectionChartData, setConnectionChartData] = useState([]);
 
   useEffect(() => {
-    // Verifica se há dados de tickets e formata para o gráfico
     if (ticketsByConnection && Object.keys(ticketsByConnection).length > 0) {
       const connectionData = Object.entries(ticketsByConnection).map(([connectionName, count]) => ({
         connectionName,
@@ -30,7 +29,7 @@ const ChartPerConnection = ({ startDate, endDate }) => {
 
       setConnectionChartData(connectionData);
     } else {
-      setConnectionChartData([]); // Define como vazio caso não haja dados
+      setConnectionChartData([]);
     }
   }, [ticketsByConnection]);
 
@@ -51,13 +50,7 @@ const ChartPerConnection = ({ startDate, endDate }) => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="connectionName" stroke={theme.palette.text.secondary}>
-            <Label
-              value={i18n.t("Conexões")}
-              position="insideBottom"
-              style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-            />
-          </XAxis>
+          <XAxis dataKey="connectionName" stroke={theme.palette.text.secondary}/>
           <YAxis stroke={theme.palette.text.secondary}>
             <Label
               angle={270}

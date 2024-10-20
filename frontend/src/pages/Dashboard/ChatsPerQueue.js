@@ -49,13 +49,8 @@ const ChartPerQueue = ({ startDate, endDate }) => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="queueName" stroke={theme.palette.text.secondary}>
-            <Label
-              value={i18n.t("Filas")}
-              position="insideBottom"
-              style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-            />
-          </XAxis>
+          <XAxis dataKey="queueName" stroke={theme.palette.text.secondary}/>
+            
           <YAxis stroke={theme.palette.text.secondary}>
             <Label
               angle={270}

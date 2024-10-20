@@ -41,44 +41,14 @@ const useStyles = makeStyles(theme => ({
 const Dashboard = () => {
     const classes = useStyles();
     const { user } = useContext(AuthContext);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [selectedStartDate, setSelectedStartDate] = useState('');
-    const [selectedEndDate, setSelectedEndDate] = useState('');
     const [error, setError] = useState(false);
     const userQueueIds = user.queues?.map(q => q.id) || [];
-
-    const handleStartDateChange = (event) => {
-        setSelectedStartDate(event.target.value);
-    };
-
-    const handleEndDateChange = (event) => {
-        setSelectedEndDate(event.target.value);
-    };
-
-    const validateDates = (start, end) => {
-        if (start && end && isBefore(parseISO(end), parseISO(start))) {
-            setError(true);
-        } else {
-            setError(false);
-        }
-    };
-
-    const handleFilterClick = () => {
-        validateDates(selectedStartDate, selectedEndDate);
-        if (!error) {
-            setStartDate(selectedStartDate);
-            setEndDate(selectedEndDate);
-        }
-    };
 
     const ticketsInAttendance = useTickets({
         status: "open",
         showAll: "true",
         withUnreadMessages: "false",
         queueIds: JSON.stringify(userQueueIds),
-        startDate,
-        endDate,
     });
 
     const ticketsWaiting = useTickets({
@@ -86,8 +56,6 @@ const Dashboard = () => {
         showAll: "true",
         withUnreadMessages: "false",
         queueIds: JSON.stringify(userQueueIds),
-        startDate,
-        endDate,
     });
 
     const ticketsClosed = useTickets({
@@ -95,55 +63,10 @@ const Dashboard = () => {
         showAll: "true",
         withUnreadMessages: "false",
         queueIds: JSON.stringify(userQueueIds),
-        startDate,
-        endDate,
     });
 
     return (
         <Container maxWidth="lg" className={classes.container}>
-            <Grid container spacing={3}>
-    <Grid container spacing={3} item xs={12}>
-        <Grid item xs={6} sm={4}>
-            <TextField
-                label="Data Inicial"
-                type="date"
-                value={selectedStartDate}
-                onChange={handleStartDateChange}
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-            />
-        </Grid>
-        <Grid item xs={6} sm={4}>
-            <TextField
-                label="Data Final"
-                type="date"
-                value={selectedEndDate}
-                onChange={handleEndDateChange}
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                error={error}
-                helperText={error && "A data final deve ser posterior à data inicial"}
-            />
-        </Grid>
-        <Grid item xs={6} sm={4}>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleFilterClick}
-                disabled={error}
-            >
-                Filtrar
-            </Button>
-        </Grid>
-    </Grid>
-    <Grid item xs={12} style={{ marginBottom: '16px' }}> {/* Adiciona espaço entre as linhas */}
-        {error && (
-            <Typography color="error">
-                A data inicial não pode ser posterior à data final.
-            </Typography>
-        )}
-    </Grid>
-</Grid>
 
             <Grid container spacing={3}>
                 <Grid item xs={4}>
@@ -181,25 +104,12 @@ const Dashboard = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                     <Paper className={classes.fixedHeightPaper}>
-                        <Chart tickets={ticketsInAttendance.tickets} startDate={startDate} endDate={endDate} />
+                        <Chart tickets={ticketsInAttendance.tickets} />
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <Paper className={classes.fixedHeightPaper}>
-                        <ChartPerUser ticketsByUser={ticketsInAttendance.tickets} startDate={startDate} endDate={endDate} />
-                    </Paper>
-                </Grid>
-            </Grid>
-
-            <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                    <Paper className={classes.fixedHeightPaper}>
-                        <ChartPerConnection ticketsByConnection={ticketsInAttendance.tickets} startDate={startDate} endDate={endDate} />
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <Paper className={classes.fixedHeightPaper}>
-                        <ChartPerQueue ticketsByQueue={ticketsInAttendance.tickets} startDate={startDate} endDate={endDate} />
+                        <ChartPerUser ticketsByUser={ticketsInAttendance.tickets}  />
                     </Paper>
                 </Grid>
             </Grid>
@@ -207,12 +117,25 @@ const Dashboard = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                     <Paper className={classes.fixedHeightPaper}>
-                        <NewContactsChart startDate={startDate} endDate={endDate} />
+                        <ChartPerConnection ticketsByConnection={ticketsInAttendance.tickets}  />
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <Paper className={classes.fixedHeightPaper}>
-                        <ContactsWithTicketsChart startDate={startDate} endDate={endDate} />
+                        <ChartPerQueue ticketsByQueue={ticketsInAttendance.tickets}  />
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                    <Paper className={classes.fixedHeightPaper}>
+                        <NewContactsChart  />
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <Paper className={classes.fixedHeightPaper}>
+                        <ContactsWithTicketsChart  />
                     </Paper>
                 </Grid>
             </Grid>
