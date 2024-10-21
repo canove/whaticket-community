@@ -15,14 +15,21 @@ import { i18n } from "../../translate/i18n";
 import useTickets from "../../hooks/useTickets";
 import Title from "./Title";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { TextField } from "@material-ui/core";
 
 const ChartPerQueue = () => {
   const theme = useTheme();
   const { user } = useContext(AuthContext);
   const userQueueIds = user.queues.map(q => q.id) || [];
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
 
   const { tickets } = useTickets({
     queueIds: JSON.stringify(userQueueIds),
+    date: selectedDate,
   });
 
   const [queueChartData, setQueueChartData] = useState([]);
@@ -39,8 +46,11 @@ const ChartPerQueue = () => {
     });
   
     setQueueChartData(queueData);
-  }, [tickets]);
+  }, [tickets, selectedDate]);
   
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
 
   return (
     <React.Fragment>
@@ -73,6 +83,16 @@ const ChartPerQueue = () => {
           <Bar dataKey="count" fill={theme.palette.primary.main} />
         </BarChart>
       </ResponsiveContainer>
+      <TextField
+        label={i18n.t("dashboard.chartPerQueue.date.title")}
+        type="date"
+        value={selectedDate}
+        onChange={handleDateChange}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        style={{ marginBottom: "16px" }}
+      />
     </React.Fragment>
   );
 };

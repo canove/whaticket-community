@@ -67,11 +67,21 @@ const messages = {
           }
         },
         chartPerQueue: {
+          date: {
+            title: "Filter"
+          },
           perQueue: {
             title: "Tickets per queue"
           }
         },
         newContacts: {
+          contacts: "Contacts",
+          endDate: { 
+            title: "End Date"
+           },
+           initialDate: { 
+            title: "Initial Date"
+           },
           title: "New Contacts per Days"
         },
         contactsWithTickets: {

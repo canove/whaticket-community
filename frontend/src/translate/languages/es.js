@@ -68,11 +68,21 @@ const messages = {
           }
         },
         chartPerQueue: {
+          date: {
+            title: "Filtrar"
+          },
           perQueue: {
             title: "Entradas por cola"
           }
         },
         newContacts: {
+          contacts: "Contactos",
+          endDate: { 
+            title: "Fecha de Finalización"
+           },
+           initialDate: { 
+            title: "Fecha de Inicio"
+           },
           title: "Nuevos contactos por día"
         },
         contactsWithTickets: {

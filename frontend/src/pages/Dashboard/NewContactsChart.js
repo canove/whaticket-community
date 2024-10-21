@@ -109,7 +109,7 @@ const NewContactsChart = ({
               position="left"
               style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
             >
-              {i18n.t("Contatos")}
+              {i18n.t("dashboard.newContacts.contacts")}
             </Label>
           </YAxis>
           <Tooltip />
@@ -125,7 +125,7 @@ const NewContactsChart = ({
         style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}
       >
         <TextField
-          label="Data de Início"
+          label={i18n.t("dashboard.newContacts.initialDate.title")}
           type="date"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
@@ -134,7 +134,7 @@ const NewContactsChart = ({
           }}
         />
         <TextField
-          label="Data de Fim"
+          label={i18n.t("dashboard.newContacts.endDate.title")}
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
