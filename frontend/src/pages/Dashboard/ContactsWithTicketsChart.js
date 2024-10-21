@@ -1,62 +1,83 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@material-ui/core/styles";
-import {
-  BarChart,
-  CartesianGrid,
-  Bar,
-  XAxis,
-  YAxis,
-  Label,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@material-ui/core";
 import { i18n } from "../../translate/i18n";
 import useTickets from "../../hooks/useTickets";
 import Title from "./Title";
+import { TextField } from "@material-ui/core";
 
-const ContactsWithTicketsChart = ({ startDate, endDate }) => {
+const ContactsWithTicketsChart = () => {
   const theme = useTheme();
-  const { contactsWithTicketsByDay } = useTickets({ startDate, endDate });
-  const [chartData, setChartData] = useState([]);
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  const { contactsWithTicketsByDay } = useTickets({ date: selectedDate });
+
+  const [contactsForSelectedDate, setContactsForSelectedDate] = useState([]);
 
   useEffect(() => {
-    if (contactsWithTicketsByDay) {
-      setChartData(contactsWithTicketsByDay);
+    if (contactsWithTicketsByDay && contactsWithTicketsByDay.length > 0) {
+        const formattedSelectedDate = selectedDate.split("-").reverse().join("/");
+        
+        // Encontrar os contatos correspondentes à data formatada
+        const contactsData = contactsWithTicketsByDay.find(item => item.date === formattedSelectedDate);
+
+        if (contactsData) {
+            setContactsForSelectedDate(contactsData.contacts);
+        } else {
+            setContactsForSelectedDate([]);
+        }
+    } else {
+        setContactsForSelectedDate([]);
     }
-  }, [contactsWithTicketsByDay]);
+  }, [contactsWithTicketsByDay, selectedDate]);
+  console.log(contactsForSelectedDate, 'contatos aaaa');
+
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
 
   return (
     <React.Fragment>
-      <Title>{i18n.t("dashboard.contactsWithTickets.title")}</Title>
-      <ResponsiveContainer>
-        <BarChart
-          data={chartData}
-          barSize={40}
-          width={730}
-          height={250}
-          margin={{
-            top: 16,
-            right: 16,
-            bottom: 0,
-            left: 24,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" stroke={theme.palette.text.secondary}/>
-            
-          <YAxis stroke={theme.palette.text.secondary}>
-            <Label
-              angle={270}
-              position="left"
-              style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
-            >
-              {i18n.t("Contatos Únicos")}
-            </Label>
-          </YAxis>
-          <Tooltip />
-          <Bar dataKey="count" fill={theme.palette.primary.main} />
-        </BarChart>
-      </ResponsiveContainer>
+      <Title>{`${i18n.t("dashboard.contactsWithTickets.title")} ${
+				 contactsForSelectedDate.length
+			}`}</Title>
+      <TableContainer style={{ marginTop: "16px", border: `1px solid ${theme.palette.divider}` }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><Typography variant="h6">{i18n.t("dashboard.contactsWithTickets.contactList.title")}</Typography></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {contactsForSelectedDate.length > 0 ? (
+              contactsForSelectedDate.map((contact, index) => (
+                <TableRow key={index}>
+                  <TableCell>{contact}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell>{i18n.t("dashboard.contactsWithTickets.message")}</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TextField
+        label={i18n.t("dashboard.contactsWithTickets.date.title")}
+        type="date"
+        value={selectedDate}
+        onChange={handleDateChange}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        style={{ marginBottom: "16px" }}
+      />
     </React.Fragment>
   );
 };

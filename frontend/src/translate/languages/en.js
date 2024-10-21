@@ -85,7 +85,14 @@ const messages = {
           title: "New Contacts per Days"
         },
         contactsWithTickets: {
-          title: "Contacts who created tickets on the day"
+          message: "No contacts found for this date.",
+          contactList: {
+            title: "Contact List"
+          },
+          date: {
+            title: "Filter"
+          },
+          title: "Contacts who created tickets on the day:"
         },
       },
       connections: {

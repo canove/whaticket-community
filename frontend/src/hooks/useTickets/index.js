@@ -19,7 +19,7 @@ const useTickets = ({
     const [ticketsByUser, setTicketsByUser] = useState({});
     const [ticketsByConnection, setTicketsByConnection] = useState({});
     const [newContactsByDay, setNewContactsByDay] = useState({});
-    const [contactsWithTicketsByDay, setContactsWithTicketsByDay] = useState({});
+    const [contactsWithTicketsByDay, setContactsWithTicketsByDay] = useState([]);
 
     // Função para formatar a data no formato dd-mm-yyyy
     const formatDateToDDMMYYYY = (date) => {
@@ -55,22 +55,22 @@ const useTickets = ({
                     const contactsByDay = data.tickets.reduce((acc, ticket) => {
                         const contactName = ticket.contact?.name || "Contato desconhecido";
                         const createdAtDate = new Date(ticket.createdAt).toLocaleDateString();
-
-                        if (!acc[createdAtDate]) {
-                            acc[createdAtDate] = new Set();
-                        }
-                        acc[createdAtDate].add(contactName);
-
+                        if (!acc[createdAtDate]) acc[createdAtDate] = [];
+                        acc[createdAtDate].push(contactName);
                         return acc;
                     }, {});
-
+    
                     const contactsWithTicketsByDay = Object.entries(contactsByDay).map(
-                        ([date, contacts]) => ({
-                            date,
-                            count: contacts.size,
-                        })
+                        ([date, contacts]) => {
+                            const uniqueContacts = Array.from(new Set(contacts));
+                            return {
+                                date,
+                                contacts: uniqueContacts,
+                                count: uniqueContacts.length,
+                            };
+                        }
                     );
-
+    
                     setContactsWithTicketsByDay(contactsWithTicketsByDay);
 
                     // Lógica para calcular os contatos novos por dia

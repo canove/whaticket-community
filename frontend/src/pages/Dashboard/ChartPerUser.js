@@ -95,7 +95,7 @@ const ChartPerUser = ({ searchParam, pageNumber, status, date, showAll, queueIds
               position="left"
               style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
             >
-              {i18n.t("Tickets")}
+             Tickets
             </Label>
           </YAxis>
           <Tooltip />

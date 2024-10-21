@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import TextField from '@material-ui/core/TextField'; // Importação do TextField
+import TextField from '@material-ui/core/TextField';
 
 import { i18n } from "../../translate/i18n";
 import useTickets from "../../hooks/useTickets";
@@ -24,7 +24,7 @@ const ChartPerConnection = ({ searchParam, pageNumber, status, date, showAll, qu
     return today.toISOString().split("T")[0];
   };
 
-  const [selectedDate, setSelectedDate] = useState(getCurrentDate()); // Chamada da função para obter a data atual
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const { ticketsByConnection, formatDateToDDMMYYYY } = useTickets({ searchParam, pageNumber, status, date, showAll, queueIds, withUnreadMessages });
   const [connectionChartData, setConnectionChartData] = useState([]);
 
