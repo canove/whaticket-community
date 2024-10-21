@@ -56,10 +56,13 @@ const messages = {
             title: "Filtrar"
           },
           perUser: {
-            title: "Tickets per user"
+            title: "Entradas por usuario"
           }
         },
         chartPerConnection: {
+          date: {
+            title: "Filtrar"
+          },
           perConnection: {
             title: "Billetes por conexión"
           }

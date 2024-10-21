@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import {
   BarChart,
@@ -14,23 +14,33 @@ import {
 import { i18n } from "../../translate/i18n";
 import useTickets from "../../hooks/useTickets";
 import Title from "./Title";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
-const ChartPerQueue = ({ startDate, endDate }) => {
+const ChartPerQueue = () => {
   const theme = useTheme();
-  const { ticketsByQueue } = useTickets({ startDate, endDate });
+  const { user } = useContext(AuthContext);
+  const userQueueIds = user.queues.map(q => q.id) || [];
+
+  const { tickets } = useTickets({
+    queueIds: JSON.stringify(userQueueIds),
+  });
+
   const [queueChartData, setQueueChartData] = useState([]);
 
   useEffect(() => {
-    if (ticketsByQueue && Object.keys(ticketsByQueue).length > 0) {
-      const queueData = Object.entries(ticketsByQueue).map(([queueName, count]) => ({
-        queueName,
-        count,
-      }));
-      setQueueChartData(queueData);
-    } else {
-      setQueueChartData([]);
-    }
-  }, [ticketsByQueue]);
+    const queueData = userQueueIds.map((queueId) => {
+      const queue = user.queues.find((q) => q.id === queueId);
+      const queueTickets = tickets.filter(ticket => Number(ticket.queueId) === Number(queueId));
+  
+      return {
+        queueName: queue.name || `Queue ${queueId}`,
+        count: queueTickets.length,
+      };
+    });
+  
+    setQueueChartData(queueData);
+  }, [tickets]);
+  
 
   return (
     <React.Fragment>
@@ -49,15 +59,14 @@ const ChartPerQueue = ({ startDate, endDate }) => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="queueName" stroke={theme.palette.text.secondary}/>
-            
+          <XAxis dataKey="queueName" stroke={theme.palette.text.secondary} />
           <YAxis stroke={theme.palette.text.secondary}>
             <Label
               angle={270}
               position="left"
               style={{ textAnchor: "middle", fill: theme.palette.text.primary }}
             >
-              {i18n.t("Quantidade de Tickets")}
+              Tickets
             </Label>
           </YAxis>
           <Tooltip />

@@ -59,6 +59,9 @@ const messages = {
           }
         },
         chartPerConnection: {
+          date: {
+            title: "Filter"
+          },
           perConnection: {
             title: "Tickets per connection"
           }

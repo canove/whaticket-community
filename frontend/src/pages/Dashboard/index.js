@@ -9,8 +9,6 @@ import useTickets from "../../hooks/useTickets";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { i18n } from "../../translate/i18n";
 import Chart from "./Chart";
-import { isBefore, parseISO } from "date-fns";
-import { TextField } from "@material-ui/core";
 import ChartPerUser from "./ChartPerUser";
 import ChartPerConnection from "./ChartPerConnection";
 import ChartPerQueue from "./ChatsPerQueue";
@@ -41,8 +39,7 @@ const useStyles = makeStyles(theme => ({
 const Dashboard = () => {
     const classes = useStyles();
     const { user } = useContext(AuthContext);
-    const [error, setError] = useState(false);
-    const userQueueIds = user.queues?.map(q => q.id) || [];
+    const userQueueIds = user.queues.map(q => q.id) || [];
 
     const ticketsInAttendance = useTickets({
         status: "open",
@@ -50,6 +47,7 @@ const Dashboard = () => {
         withUnreadMessages: "false",
         queueIds: JSON.stringify(userQueueIds),
     });
+
 
     const ticketsWaiting = useTickets({
         status: "pending",
@@ -121,10 +119,11 @@ const Dashboard = () => {
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <Paper className={classes.fixedHeightPaper}>
-                        <ChartPerQueue ticketsByQueue={ticketsInAttendance.tickets}  />
-                    </Paper>
-                </Grid>
+                   <Paper className={classes.fixedHeightPaper}>
+                     <ChartPerQueue ticketsByQueue={ticketsInAttendance.tickets}  />
+                   </Paper>
+               </Grid> 
+               
             </Grid>
 
             <Grid container spacing={3}>
