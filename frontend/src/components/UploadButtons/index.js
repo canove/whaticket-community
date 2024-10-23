@@ -17,11 +17,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function UploadButtons({ imageFile, onDelete, ...props }) {
+export default function UploadButtons({ imageFile, onImageChange, onDelete }) {
   const classes = useStyles();
+  
+  const handleImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      onImageChange(URL.createObjectURL(file), file); 
+    }
+  };
+
   return (
     <div className={classes.root}>
-      <input accept="image/*" className={classes.input} id="icon-button-file" type="file" />
+      <input
+        accept="image/*"
+        className={classes.input}
+        id="icon-button-file"
+        type="file"
+        name='image'
+        onChange={handleImageChange} // Associando a função de mudança
+      />
       {!imageFile ? (
         <Tooltip title="Clique para adicionar sua foto de perfil" arrow>
           <label htmlFor="icon-button-file">
@@ -32,16 +47,16 @@ export default function UploadButtons({ imageFile, onDelete, ...props }) {
         </Tooltip>
       ) : (
         <>
-          <Tooltip title="Click para Trocar" arrow>
-          <IconButton onClick={""} style={{ margin: "2vh" }} aria-label="Trocar foto de perfil">
-
-            <Avatar
-              alt="foto de perfil atual"
-              src={imageFile}
-              style={{ margin: "2vh", width: '100px', height: '100px' }}
-            />
-          </IconButton>
-          
+          <Tooltip title="Clique para trocar a foto" arrow>
+            <label htmlFor="icon-button-file">
+              <IconButton color="primary" aria-label="upload picture" component="span" size="large">
+                <Avatar
+                  alt="foto de perfil atual"
+                  src={imageFile}
+                  style={{ margin: "2vh", width: '100px', height: '100px' }}
+                />
+              </IconButton>
+            </label>
           </Tooltip>
           <Tooltip title="Deletar foto de perfil atual" arrow>
             <IconButton onClick={onDelete} style={{ margin: "2vh" }} aria-label="deletar foto de perfil">

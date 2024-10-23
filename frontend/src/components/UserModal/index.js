@@ -3,8 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
-
-import PhotoCamera from "@material-ui/icons/PhotoCamera";
+import UploadButtons from "../UploadButtons";
 
 import {
   Button,
@@ -64,6 +63,11 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  multFieldLineTwo: {
+    display: "flex",
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 }));
 
 const UserSchema = Yup.object().shape({
@@ -94,7 +98,7 @@ const UserModal = ({ open, onClose, userId }) => {
     email: "",
     password: "",
     profile: "user",
-    image: null,
+    image: "http://localhost:3000/profile.jpeg",
   };
 
   const { user: loggedInUser } = useContext(AuthContext);
@@ -159,7 +163,7 @@ const UserModal = ({ open, onClose, userId }) => {
             : `${i18n.t("userModal.title.add")}`}
         </DialogTitle>
         <Formik
-          initialValues={user}
+          initialValues={initialState}
           enableReinitialize={true}
           validationSchema={UserSchema}
           onSubmit={(values, actions) => {
@@ -219,6 +223,7 @@ const UserModal = ({ open, onClose, userId }) => {
                     margin="dense"
                     fullWidth
                   />
+
                   <FormControl
                     variant="outlined"
                     className={classes.formControl}
@@ -248,60 +253,6 @@ const UserModal = ({ open, onClose, userId }) => {
                       )}
                     />
                   </FormControl>
-                </div>
-                <div className={classes.multFieldLine}>
-                  <Field name="image">
-                    {({ field, form }) => (
-                      <div>
-                        <h4>Foto Perfil</h4>
-                        <input
-                          style={{ display: "none" }}
-                          accept="image/*"
-                          className={classes.input}
-                          id="contained-button-file"
-                          multiple
-                          type="file"
-                          onChange={(event) => {
-                            form.setFieldValue(
-                              "image",
-                              event.currentTarget.files[0]
-                            );
-                          }}
-                          value={undefined}
-                        />
-                        <label htmlFor="contained-button-file">
-                          <Button
-                            variant="contained"
-                            color="secondary"
-                            component="span"
-                            sizeSmall
-                          >
-                            Deletar
-                          </Button>
-                        </label>
-                        <input
-                          style={{ display: "none" }}
-                          accept="image/*"
-                          className={classes.input}
-                          id="icon-button-file"
-                          type="file"
-                        />
-                        <label htmlFor="icon-button-file">
-                          <IconButton
-                            color="primary"
-                            aria-label="upload picture"
-                            component="span"
-                          >
-                            <PhotoCamera />
-                            <span>upload</span>
-                          </IconButton>
-                        </label>
-                        {form.touched.image && form.errors.image && (
-                          <div className="error">{form.errors.image}</div>
-                        )}
-                      </div>
-                    )}
-                  </Field>
                 </div>
                 <Can
                   role={loggedInUser.profile}
@@ -345,6 +296,19 @@ const UserModal = ({ open, onClose, userId }) => {
                   }
                 />
               </DialogContent>
+              <div className={classes.multFieldLineTwo}>
+                  <Field
+                    as={UploadButtons}
+                    label="imagem de Perfil"
+                    name="image"
+                    imageFile={initialState.image}
+                    helperText={touched.image && errors.image}
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                  ></Field>
+              {console.log(initialState)}
+              </div>
               <DialogActions>
                 <Button
                   onClick={handleClose}
