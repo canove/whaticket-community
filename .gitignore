@@ -2,3 +2,6 @@
 ssl/
 .env
 .wwebjs_auth
+./backend/uploads/*
+./backend/.wwebjs_cache/*
+
