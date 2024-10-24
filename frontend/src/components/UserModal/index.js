@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
 import UploadButtons from "../UploadButtons";
-
 import {
   Button,
   Dialog,
@@ -22,12 +20,9 @@ import {
 } from "@material-ui/core";
 
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
-
 import { i18n } from "../../translate/i18n";
-
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
@@ -46,11 +41,9 @@ const useStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(1),
     },
   },
-
   btnWrapper: {
     position: "relative",
   },
-
   buttonProgress: {
     color: green[500],
     position: "absolute",
@@ -65,8 +58,8 @@ const useStyles = makeStyles((theme) => ({
   },
   multFieldLineTwo: {
     display: "flex",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 }));
 
@@ -92,52 +85,78 @@ const UserSchema = Yup.object().shape({
 
 const UserModal = ({ open, onClose, userId }) => {
   const classes = useStyles();
-
   const initialState = {
     name: "",
     email: "",
     password: "",
     profile: "user",
-    image: "http://localhost:3000/profile.jpeg",
+    image: null,
   };
-
   const { user: loggedInUser } = useContext(AuthContext);
-
   const [user, setUser] = useState(initialState);
   const [selectedQueueIds, setSelectedQueueIds] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [whatsappId, setWhatsappId] = useState(false);
   const { loading, whatsApps } = useWhatsApps();
+  const [imagePreview, setImagePreview] = useState(initialState.image);
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       if (!userId) return;
       try {
         const { data } = await api.get(`/users/${userId}`);
-        setUser((prevState) => {
-          return { ...prevState, ...data };
-        });
-        const userQueueIds = data.queues?.map((queue) => queue.id);
-        setSelectedQueueIds(userQueueIds);
-        setWhatsappId(data.whatsappId ? data.whatsappId : "");
+        setUser((prevState) => ({ ...prevState, ...data }));
+        setSelectedQueueIds(data.queues?.map((queue) => queue.id));
+        setWhatsappId(data.whatsappId || "");
+        setImagePreview(data.image || "");
       } catch (err) {
         toastError(err);
       }
     };
-
     fetchUser();
   }, [userId, open]);
 
-  const handleClose = () => {
-    onClose();
-    setUser(initialState);
+  const handleImageChange = (imageUrl, file) => {
+    
+    setImagePreview(imageUrl);
+    setImageFile(file);
+  };
+
+  const handleImageDelete = () => {
+    setImagePreview("");
+    setImageFile(null);
   };
 
   const handleSaveUser = async (values) => {
     const userData = { ...values, whatsappId, queueIds: selectedQueueIds };
+    const formData = new FormData();
+    Object.keys(userData).forEach((key) => {
+    if (key === "queueIds" || key === "queues") {
+      // Converter array para string JSON antes de adicionar
+      formData.append(key, JSON.stringify(userData[key]));
+    } else {
+      formData.append(key, userData[key]);
+    }
+  });
+
+    if (formData.has('image')) {
+      formData.delete('image');
+    }
+
+    if (imageFile instanceof File) {
+      formData.append('image', imageFile);
+      console.log("dentro do if imagefile  ", imageFile)
+    } 
+
+     
+    
+    console.log(" fora if formdata depois do append", [...formData.entries()])
+
+
     try {
       if (userId) {
-        await api.put(`/users/${userId}`, userData);
+        await api.put(`/users/${userId}`, formData);
       } else {
         await api.post("/users", userData);
       }
@@ -146,6 +165,13 @@ const UserModal = ({ open, onClose, userId }) => {
       toastError(err);
     }
     handleClose();
+  };
+
+  const handleClose = () => {
+    onClose();
+    setUser(initialState);
+    setImagePreview("");
+    setImageFile(null);
   };
 
   return (
@@ -157,13 +183,13 @@ const UserModal = ({ open, onClose, userId }) => {
         fullWidth
         scroll="paper"
       >
-        <DialogTitle id="form-dialog-title">
+        <DialogTitle>
           {userId
-            ? `${i18n.t("userModal.title.edit")}`
-            : `${i18n.t("userModal.title.add")}`}
+            ? i18n.t("userModal.title.edit")
+            : i18n.t("userModal.title.add")}
         </DialogTitle>
         <Formik
-          initialValues={initialState}
+          initialValues={user}
           enableReinitialize={true}
           validationSchema={UserSchema}
           onSubmit={(values, actions) => {
@@ -223,7 +249,6 @@ const UserModal = ({ open, onClose, userId }) => {
                     margin="dense"
                     fullWidth
                   />
-
                   <FormControl
                     variant="outlined"
                     className={classes.formControl}
@@ -295,20 +320,24 @@ const UserModal = ({ open, onClose, userId }) => {
                     )
                   }
                 />
-              </DialogContent>
-              <div className={classes.multFieldLineTwo}>
+                <div className={classes.multFieldLineTwo}>
                   <Field
                     as={UploadButtons}
-                    label="imagem de Perfil"
-                    name="image"
-                    imageFile={initialState.image}
+                    autoFocus
+                    error={touched.image && Boolean(errors.image)}
                     helperText={touched.image && errors.image}
                     variant="outlined"
                     margin="dense"
                     fullWidth
-                  ></Field>
-              {console.log(initialState)}
-              </div>
+                    name="image"
+                    label={i18n.t("userModal.form.image")}
+                    imageFile={imagePreview}
+                    onImageChange={handleImageChange}
+                    onDelete={handleImageDelete}
+                  />
+                </div>
+              </DialogContent>
+
               <DialogActions>
                 <Button
                   onClick={handleClose}
