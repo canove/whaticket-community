@@ -3,6 +3,9 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import ShowUserService from "./ShowUserService";
+import path from "path";
+import fs from "fs";
+
 
 interface UserData {
   email?: string;
@@ -38,12 +41,24 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, name, queueIds = [], whatsappId } = userData;
-
+  const { email, password, profile, name, queueIds = [], whatsappId, imagePath } = userData;
+ 
   try {
     await schema.validate({ email, password, profile, name });
   } catch (err) {
     throw new AppError(err.message);
+  }
+
+
+  let imageBanco = user.imagePath;
+  if (imagePath){
+    if (imageBanco){
+      const oldImagePath = path.join("", imageBanco); //  endereço
+      if (fs.existsSync(oldImagePath)) { // esta lá ?
+        fs.unlinkSync(oldImagePath); // Rm antigo
+      }
+    }
+  
   }
 
   await user.update({
@@ -51,6 +66,7 @@ const UpdateUserService = async ({
     password,
     profile,
     name,
+    imagePath,
     whatsappId: whatsappId ? whatsappId : null
   });
 
