@@ -46,7 +46,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     queueIds,
     whatsappId
   });
-
+  
   const io = getIO();
   io.emit("user", {
     action: "create",
@@ -71,6 +71,8 @@ export const update = async (
   if (req.user.profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
+  console.log("teste no controler update -->  ", req.body)
+  console.log("teste no controler update variavel params -->  ", req.body)
 
   const { userId } = req.params;
   const userData = req.body;
