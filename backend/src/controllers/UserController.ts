@@ -71,12 +71,25 @@ export const update = async (
   if (req.user.profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
-  console.log("teste no controler update -->  ", req.body)
-  console.log("teste no controler update variavel params -->  ", req.body)
 
+  const imageFile = req.file;
+  
   const { userId } = req.params;
-  const userData = req.body;
+  const { name, email, password, profile, whatsappId, queueIds } = req.body;
 
+  const parsedQueueIds = JSON.parse(queueIds);
+  
+
+  const userData = {
+    name,
+    email,
+    password,
+    profile,
+    whatsappId: parseInt(whatsappId, 10),  // Exemplo de conversão de string para número
+    queueIds: parsedQueueIds,
+    imagePath: imageFile ? imageFile.path : null,  // Caminho da imagem salva
+  };
+  
   const user = await UpdateUserService({ userData, userId });
 
   const io = getIO();
