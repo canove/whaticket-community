@@ -26,6 +26,7 @@
     "express-async-errors": "^3.1.1",
     "http-graceful-shutdown": "^2.3.2",
     "jsonwebtoken": "^8.5.1",
+    "mariadb": "^3.3.2",
     "multer": "^1.4.2",
     "mustache": "^4.2.0",
     "mysql2": "^2.2.5",
