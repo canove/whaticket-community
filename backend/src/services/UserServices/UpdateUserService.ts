@@ -15,12 +15,14 @@ interface UserData {
   queueIds?: number[];
   whatsappId?: number;
   imagePath?: string;
+  imageForDelete?: string;
 }
 
 interface Request {
   userData: UserData;
   userId: string | number;
   imagePath?: string;
+  imageForDelete?:string
 }
 
 interface Response {
@@ -29,6 +31,7 @@ interface Response {
   email: string;
   profile: string;
   imagePath?: string;
+  imageForDelete?:string;
 }
 
 const UpdateUserService = async ({
@@ -44,7 +47,7 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, name, queueIds = [], whatsappId, imagePath } = userData;
+  const { email, password, profile, name, queueIds = [], whatsappId, imagePath, imageForDelete } = userData;
  
   try {
     await schema.validate({ email, password, profile, name });
@@ -61,7 +64,15 @@ const UpdateUserService = async ({
         fs.unlinkSync(oldImagePath); // Rm antigo
       }
     }
+  }
   
+
+  if (imageForDelete){
+    const oldImagePath = path.join("", imageForDelete);
+     //  endereço
+    if (fs.existsSync(oldImagePath)) { // esta lá ?
+      fs.unlinkSync(oldImagePath); // Rm antigo
+    }
   }
 
   await user.update({

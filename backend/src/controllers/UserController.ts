@@ -79,7 +79,7 @@ export const update = async (
   const imageFile = req.file;
   
   const { userId } = req.params;
-  const { name, email, password, profile, whatsappId, queueIds } = req.body;
+  const { name, email, password, profile, whatsappId, queueIds, imageForDelete } = req.body;
 
   const parsedQueueIds = JSON.parse(queueIds);
   
@@ -91,7 +91,8 @@ export const update = async (
     profile,
     whatsappId: parseInt(whatsappId, 10),  // conversão para número
     queueIds: parsedQueueIds,
-    imagePath: imageFile ? imageFile.path : null,  
+    imagePath: imageFile ? imageFile.path : null,
+    imageForDelete 
   };
   
   const user = await UpdateUserService({ userData, userId });

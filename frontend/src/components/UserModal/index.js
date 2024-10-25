@@ -100,6 +100,7 @@ const UserModal = ({ open, onClose, userId }) => {
   const { loading, whatsApps } = useWhatsApps();
   const [imagePreview, setImagePreview] = useState(initialState.image);
   const [imageFile, setImageFile] = useState(null);
+  const [imageForDelete, setImageForDelete] = useState(null);
   
   useEffect(() => {
     const fetchUser = async () => {
@@ -138,14 +139,15 @@ const UserModal = ({ open, onClose, userId }) => {
   
 
   const handleImageChange = (imageUrl, file) => {
-    
     setImagePreview(imageUrl);
     setImageFile(file);
   };
 
   const handleImageDelete = () => {
+    setImageForDelete(loggedInUser.imagePath)
     setImagePreview("");
     setImageFile(null);
+
   };
 
   const handleSaveUser = async (values) => {
@@ -166,6 +168,11 @@ const UserModal = ({ open, onClose, userId }) => {
     if (imageFile instanceof File) {
       formData.append('image', imageFile);
     } 
+
+    if (imageForDelete) {
+      formData.append("imageForDelete", imageForDelete)
+    }
+    
     try {
       if (userId) {
         await api.put(`/users/${userId}`, formData);
