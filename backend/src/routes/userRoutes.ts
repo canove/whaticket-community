@@ -10,7 +10,7 @@ const userRoutes = Router();
 
 userRoutes.get("/users", isAuth, UserController.index);
 
-userRoutes.post("/users", isAuth, UserController.store);
+userRoutes.post("/users", isAuth,adminUpload.single("image"), UserController.store);
 
 userRoutes.put("/users/:userId", isAuth, adminUpload.single("image"), UserController.update);
 

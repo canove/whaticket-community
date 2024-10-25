@@ -14,11 +14,13 @@ interface UserData {
   profile?: string;
   queueIds?: number[];
   whatsappId?: number;
+  imagePath?: string;
 }
 
 interface Request {
   userData: UserData;
   userId: string | number;
+  imagePath?: string;
 }
 
 interface Response {
@@ -26,6 +28,7 @@ interface Response {
   name: string;
   email: string;
   profile: string;
+  imagePath?: string;
 }
 
 const UpdateUserService = async ({

@@ -170,7 +170,7 @@ const UserModal = ({ open, onClose, userId }) => {
       if (userId) {
         await api.put(`/users/${userId}`, formData);
       } else {
-        await api.post("/users", userData);
+        await api.post("/users", formData);
       }
       toast.success(i18n.t("userModal.success"));
     } catch (err) {

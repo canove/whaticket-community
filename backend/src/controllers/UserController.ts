@@ -37,14 +37,18 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   } else if (req.url !== "/signup" && req.user.profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
+  const imageFile = req.file;
+  
+  const parsedQueueIds = JSON.parse(queueIds);
 
   const user = await CreateUserService({
+    name,
     email,
     password,
-    name,
     profile,
-    queueIds,
-    whatsappId
+    whatsappId: parseInt(whatsappId, 10),  // conversão para número
+    queueIds: parsedQueueIds,
+    imagePath: imageFile ? imageFile.path : null,  
   });
   
   const io = getIO();
