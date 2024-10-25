@@ -5,6 +5,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
+import path from 'path';
+
 
 import "./database";
 import uploadConfig from "./config/upload";
@@ -26,6 +28,8 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
 app.use("/public", express.static(uploadConfig.directory));
+app.use("/uploads", express.static(path.resolve(__dirname, "..","uploads"))); //restringir, se preciso.
+
 app.use(routes);
 
 app.use(Sentry.Handlers.errorHandler());

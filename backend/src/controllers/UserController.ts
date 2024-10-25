@@ -85,9 +85,9 @@ export const update = async (
     email,
     password,
     profile,
-    whatsappId: parseInt(whatsappId, 10),  // Exemplo de conversão de string para número
+    whatsappId: parseInt(whatsappId, 10),  // conversão para número
     queueIds: parsedQueueIds,
-    imagePath: imageFile ? imageFile.path : null,  // Caminho da imagem salva
+    imagePath: imageFile ? imageFile.path : null,  
   };
   
   const user = await UpdateUserService({ userData, userId });
