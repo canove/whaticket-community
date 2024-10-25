@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 
 // Filtro
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-  if (req.user) { // && req.user.profile !== "admin" -> não tenho certeza
+  if (req.user && req.user.profile !== "admin") {
     return cb(new AppError("ERR_NO_PERMISSION", 403), false);
   }
     // Verifica se o arquivo é uma imagem
