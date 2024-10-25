@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Tooltip } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import Avatar from '@material-ui/core/Avatar';
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import * as Yup from "yup";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,13 +19,33 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const UserSchema = Yup.object().shape({
+  image: Yup.mixed()
+    .nullable()
+    .test("fileType", "Unsupported file format", (value) => {
+      if (value === null) return true;
+      return ["image/jpeg", "image/png", "image/gif"].includes(value.type);
+    })
+    .test(
+      "fileSize",
+      "Limitado a 2MB",
+      (value) => !value || (value && value.size < 2 * 1024 * 1024)
+    ),
+});
+
 export default function UploadButtons({ imageFile, onImageChange, onDelete }) {
   const classes = useStyles();
-  
-  const handleImageChange = (event) => {
+  const [errorMessage, setErrorMessage] = useState("");
+  const handleImageChange = async (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      onImageChange(URL.createObjectURL(file), file); 
+      try {
+        await UserSchema.validate({ image: file });
+        setErrorMessage(""); 
+        onImageChange(URL.createObjectURL(file), file);
+      } catch (error) {
+        setErrorMessage(error.message); 
+      }
     }
   };
 
@@ -35,7 +57,7 @@ export default function UploadButtons({ imageFile, onImageChange, onDelete }) {
         id="icon-button-file"
         type="file"
         name='image'
-        onChange={handleImageChange} // Associando a função de mudança
+        onChange={handleImageChange} 
       />
       {!imageFile ? (
         <Tooltip title="Clique para adicionar sua foto de perfil" arrow>
@@ -65,6 +87,7 @@ export default function UploadButtons({ imageFile, onImageChange, onDelete }) {
           </Tooltip>
         </>
       )}
+       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
     </div>
   );
 }
