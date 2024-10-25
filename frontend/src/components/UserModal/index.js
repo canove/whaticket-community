@@ -100,22 +100,42 @@ const UserModal = ({ open, onClose, userId }) => {
   const { loading, whatsApps } = useWhatsApps();
   const [imagePreview, setImagePreview] = useState(initialState.image);
   const [imageFile, setImageFile] = useState(null);
-
+  
   useEffect(() => {
     const fetchUser = async () => {
       if (!userId) return;
       try {
         const { data } = await api.get(`/users/${userId}`);
-        setUser((prevState) => ({ ...prevState, ...data }));
+        
+       
+        const imageUrl = data.imagePath ? `http://localhost:8080/${data.imagePath}` : ""; //trocar por env
+  
+        setUser((prevState) => ({ 
+          ...prevState, 
+          ...data,
+        }));
+  
         setSelectedQueueIds(data.queues?.map((queue) => queue.id));
+        
         setWhatsappId(data.whatsappId || "");
-        setImagePreview(data.image || "");
+
+        setImagePreview(imageUrl || "");
+  
+        if (imageUrl) {
+          const file = await fetchImageAsFile(imageUrl);
+          if (file) {
+            setImageFile(file);
+          }
+        }
+        
       } catch (err) {
         toastError(err);
       }
     };
+  
     fetchUser();
   }, [userId, open]);
+  
 
   const handleImageChange = (imageUrl, file) => {
     
@@ -132,28 +152,20 @@ const UserModal = ({ open, onClose, userId }) => {
     const userData = { ...values, whatsappId, queueIds: selectedQueueIds };
     const formData = new FormData();
     Object.keys(userData).forEach((key) => {
-    if (key === "queueIds" || key === "queues") {
-      // Converter array para string JSON antes de adicionar
-      formData.append(key, JSON.stringify(userData[key]));
-    } else {
-      formData.append(key, userData[key]);
-    }
-  });
+      if (key === "queueIds" || key === "queues") {
+        // Converter array para string JSON antes de adicionar
+        formData.append(key, JSON.stringify(userData[key]));
+      } else {
+        formData.append(key, userData[key]);
+      }
+    });
 
     if (formData.has('image')) {
       formData.delete('image');
     }
-
     if (imageFile instanceof File) {
       formData.append('image', imageFile);
-      console.log("dentro do if imagefile  ", imageFile)
     } 
-
-     
-    
-    console.log(" fora if formdata depois do append", [...formData.entries()])
-
-
     try {
       if (userId) {
         await api.put(`/users/${userId}`, formData);
@@ -166,6 +178,20 @@ const UserModal = ({ open, onClose, userId }) => {
     }
     handleClose();
   };
+
+  const fetchImageAsFile = async (url) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const fileName = url.split('/').pop();
+      const file = new File([blob], fileName, { type: blob.type });
+      return file;
+    } catch (error) {
+      console.error('Erro ao buscar a imagem:', error);
+      return null;
+    }
+  };
+
 
   const handleClose = () => {
     onClose();
@@ -323,13 +349,14 @@ const UserModal = ({ open, onClose, userId }) => {
                 <div className={classes.multFieldLineTwo}>
                   <Field
                     as={UploadButtons}
+                    validationSchema={UserSchema}
                     autoFocus
                     error={touched.image && Boolean(errors.image)}
                     helperText={touched.image && errors.image}
                     variant="outlined"
                     margin="dense"
                     fullWidth
-                    name="image"
+                    name="imagePath"
                     label={i18n.t("userModal.form.image")}
                     imageFile={imagePreview}
                     onImageChange={handleImageChange}
