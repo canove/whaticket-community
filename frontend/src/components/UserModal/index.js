@@ -168,7 +168,8 @@ const UserModal = ({ open, onClose, userId }) => {
     } 
     try {
       if (userId) {
-        await api.put(`/users/${userId}`, formData);
+        const { data : { imagePath: imagePathTwo }} = await api.put(`/users/${userId}`, formData);
+        console.log("userputRes dentro de usermodal --> ", imagePathTwo)
       } else {
         await api.post("/users", userData);
       }
@@ -193,10 +194,10 @@ const UserModal = ({ open, onClose, userId }) => {
   };
 
 
-  const handleClose = () => {
+  const handleClose = (imagePathTwo) => {
     onClose();
     setUser(initialState);
-    setImagePreview("");
+    setImagePreview(imagePathTwo);
     setImageFile(null);
   };
 
@@ -349,7 +350,6 @@ const UserModal = ({ open, onClose, userId }) => {
                 <div className={classes.multFieldLineTwo}>
                   <Field
                     as={UploadButtons}
-                    validationSchema={UserSchema}
                     autoFocus
                     error={touched.image && Boolean(errors.image)}
                     helperText={touched.image && errors.image}
