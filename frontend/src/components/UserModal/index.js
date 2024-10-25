@@ -169,7 +169,6 @@ const UserModal = ({ open, onClose, userId }) => {
     try {
       if (userId) {
         const { data : { imagePath: imagePathTwo }} = await api.put(`/users/${userId}`, formData);
-        console.log("userputRes dentro de usermodal --> ", imagePathTwo)
       } else {
         await api.post("/users", userData);
       }

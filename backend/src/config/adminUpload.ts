@@ -2,6 +2,9 @@ import multer, { Multer, FileFilterCallback } from "multer";
 import AppError from "../errors/AppError";
 import { Request } from "express";
 
+
+
+// @ implementar quando deletar image excluir image na pasta uploads
 // Configuração
 const storage = multer.diskStorage({
   destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {

@@ -12,6 +12,7 @@ import {
   MenuItem,
   IconButton,
   Menu,
+  Avatar
 } from "@material-ui/core";
 
 import MenuIcon from "@material-ui/icons/Menu";
@@ -118,6 +119,7 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const [profileImage, setProfileImage] = useState(user.imagePath);
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -132,6 +134,10 @@ const LoggedInLayout = ({ children }) => {
       setDrawerVariant("permanent");
     }
   }, [drawerOpen]);
+
+  useEffect(() => {
+    setProfileImage(user.imagePath);
+  }, [user.imagePath]);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -222,6 +228,7 @@ const LoggedInLayout = ({ children }) => {
           {user.id && <NotificationsPopOver />}
 
           <div>
+            
             <IconButton
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -229,7 +236,19 @@ const LoggedInLayout = ({ children }) => {
               onClick={handleMenu}
               color="inherit"
             >
-              <AccountCircle />
+              {
+                profileImage ? 
+                    <>
+                      <Avatar
+                        alt="foto de perfil atual"
+                        src={"http://localhost:8080/" + profileImage}
+                      />
+                    </>
+                  : 
+                    <AccountCircle 
+                      alt="esta sem foto de perfil"
+                    />
+              }
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -264,5 +283,4 @@ const LoggedInLayout = ({ children }) => {
     </div>
   );
 };
-
 export default LoggedInLayout;
