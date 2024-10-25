@@ -168,7 +168,7 @@ const UserModal = ({ open, onClose, userId }) => {
     } 
     try {
       if (userId) {
-        const { data : { imagePath: imagePathTwo }} = await api.put(`/users/${userId}`, formData);
+        await api.put(`/users/${userId}`, formData);
       } else {
         await api.post("/users", userData);
       }
@@ -193,10 +193,10 @@ const UserModal = ({ open, onClose, userId }) => {
   };
 
 
-  const handleClose = (imagePathTwo) => {
+  const handleClose = (loggedInUser) => {
     onClose();
     setUser(initialState);
-    setImagePreview(imagePathTwo);
+    setImagePreview(loggedInUser);
     setImageFile(null);
   };
 
