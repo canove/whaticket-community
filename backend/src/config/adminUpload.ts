@@ -19,10 +19,19 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
   if (req.user && req.user.profile !== "admin") {
     return cb(new AppError("ERR_NO_PERMISSION", 403), false);
   }
+    // Verifica se o arquivo é uma imagem
+  if (!file.mimetype.startsWith("image/")) {
+    return cb(new AppError("ERR_INVALID_FILE_TYPE", 400), false); // Arquivo inválido
+  }
+
   cb(null, true);
 };
 
 // Cria middleware de upload
-const adminUpload: Multer = multer({ storage, fileFilter });
+const adminUpload: Multer = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }, // Limite de 2MB
+});
 
 export default adminUpload;
