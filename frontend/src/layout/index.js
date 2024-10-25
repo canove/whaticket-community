@@ -108,6 +108,10 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
   },
+  small: {
+    width: theme.spacing(3),
+    height: theme.spacing(3),
+  },
 }));
 
 const LoggedInLayout = ({ children }) => {
@@ -242,6 +246,8 @@ const LoggedInLayout = ({ children }) => {
                       <Avatar
                         alt="foto de perfil atual"
                         src={"http://localhost:8080/" + profileImage}
+                        className={classes.small}
+
                       />
                     </>
                   : 
