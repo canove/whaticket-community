@@ -56,7 +56,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
       - TZ=${TZ:-America/Fortaleza}
     ports:
-      - ${MYSQL_PORT:-3306}:3306
+      - ${MYSQL_PORT:-3307}:3307
     restart: always
     networks:
       - whaticket

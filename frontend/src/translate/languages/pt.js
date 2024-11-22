@@ -403,6 +403,7 @@ const messages = {
       ticketOptionsMenu: {
         delete: "Deletar",
         transfer: "Transferir",
+        search: "Pesquisar Mensagens",
         confirmationModal: {
           title: "Deletar o ticket do contato",
           message:
@@ -426,6 +427,12 @@ const messages = {
           title: "Apagar mensagem?",
           message: "Esta ação não pode ser revertida.",
         },
+      },
+      searchDrawer: {
+        header: "Pesquisar Mensagens",
+        placeholder: "Digite para buscar",
+        noResults: "Nenhum resultado.",
+        noMoreResults: "Não há mais resultados"
       },
       backendErrors: {
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
