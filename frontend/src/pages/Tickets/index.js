@@ -1,14 +1,14 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
 
-import TicketsManager from "../../components/TicketsManager/";
-import Ticket from "../../components/Ticket/";
+import TicketsManager from '../../components/TicketsManager/';
+import Ticket from '../../components/Ticket/';
 
-import { i18n } from "../../translate/i18n";
-import Hidden from "@material-ui/core/Hidden";
+import { i18n } from '../../translate/i18n';
+import Hidden from '@material-ui/core/Hidden';
 
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
@@ -16,50 +16,50 @@ const useStyles = makeStyles((theme) => ({
     // // backgroundColor: "#eee",
     // padding: theme.spacing(4),
     height: `calc(100% - 48px)`,
-    overflowY: "hidden",
+    overflowY: 'hidden',
     backgroundColor: theme.palette.background.default,
   },
 
   chatPapper: {
     // backgroundColor: "red",
-    display: "flex",
-    height: "100%",
+    display: 'flex',
+    height: '100%',
     backgroundColor: theme.palette.background.paper,
   },
 
   contactsWrapper: {
-    display: "flex",
-    height: "100%",
-    flexDirection: "column",
-    overflowY: "hidden",
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+    overflowY: 'hidden',
   },
   contactsWrapperSmall: {
-    display: "flex",
-    height: "100%",
-    flexDirection: "column",
-    overflowY: "hidden",
-    [theme.breakpoints.down("sm")]: {
-      display: "none",
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+    overflowY: 'hidden',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
     },
   },
   messagessWrapper: {
-    display: "flex",
-    height: "100%",
-    flexDirection: "column",
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
   },
   welcomeMsg: {
     backgroundColor: theme.palette.background.paper,
-    display: "flex",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    height: "100%",
-    textAlign: "center",
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: '100%',
+    textAlign: 'center',
     borderRadius: 0,
   },
   ticketsManager: {},
   ticketsManagerClosed: {
-    [theme.breakpoints.down("sm")]: {
-      display: "none",
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
     },
   },
 }));
@@ -90,10 +90,10 @@ const Chat = () => {
                 <Ticket />
               </>
             ) : (
-              <Hidden only={["sm", "xs"]}>
+              <Hidden only={['sm', 'xs']}>
                 <Paper className={classes.welcomeMsg}>
                   {/* <Paper square variant="outlined" className={classes.welcomeMsg}> */}
-                  <span>{i18n.t("chat.noTicketMessage")}</span>
+                  <span>{i18n.t('chat.noTicketMessage')}</span>
                 </Paper>
               </Hidden>
             )}

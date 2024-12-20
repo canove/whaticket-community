@@ -1,62 +1,62 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 
-import { toast } from "react-toastify";
-import openSocket from "../../services/socket-io";
-import clsx from "clsx";
+import { toast } from 'react-toastify';
+import openSocket from '../../services/socket-io';
+import clsx from 'clsx';
 
-import { Paper, makeStyles } from "@material-ui/core";
+import { Paper, makeStyles } from '@material-ui/core';
 
-import ContactDrawer from "../ContactDrawer";
-import MessageInput from "../MessageInput/";
-import TicketHeader from "../TicketHeader";
-import TicketInfo from "../TicketInfo";
-import TicketActionButtons from "../TicketActionButtons";
-import MessagesList from "../MessagesList";
-import api from "../../services/api";
-import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
-import toastError from "../../errors/toastError";
+import ContactDrawer from '../ContactDrawer';
+import MessageInput from '../MessageInput/';
+import TicketHeader from '../TicketHeader';
+import TicketInfo from '../TicketInfo';
+import TicketActionButtons from '../TicketActionButtons';
+import MessagesList from '../MessagesList';
+import api from '../../services/api';
+import { ReplyMessageProvider } from '../../context/ReplyingMessage/ReplyingMessageContext';
+import toastError from '../../errors/toastError';
 
 const drawerWidth = 320;
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
-    height: "100%",
-    position: "relative",
-    overflow: "hidden",
+    display: 'flex',
+    height: '100%',
+    position: 'relative',
+    overflow: 'hidden',
   },
 
   ticketInfo: {
-    maxWidth: "50%",
-    flexBasis: "50%",
-    [theme.breakpoints.down("sm")]: {
-      maxWidth: "80%",
-      flexBasis: "80%",
+    maxWidth: '50%',
+    flexBasis: '50%',
+    [theme.breakpoints.down('sm')]: {
+      maxWidth: '80%',
+      flexBasis: '80%',
     },
   },
   ticketActionButtons: {
-    maxWidth: "50%",
-    flexBasis: "50%",
-    display: "flex",
-    [theme.breakpoints.down("sm")]: {
-      maxWidth: "100%",
-      flexBasis: "100%",
-      marginBottom: "5px",
+    maxWidth: '50%',
+    flexBasis: '50%',
+    display: 'flex',
+    [theme.breakpoints.down('sm')]: {
+      maxWidth: '100%',
+      flexBasis: '100%',
+      marginBottom: '5px',
     },
   },
 
   mainWrapper: {
     flex: 1,
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
-    borderLeft: "0",
+    borderLeft: '0',
     marginRight: -drawerWidth,
-    transition: theme.transitions.create("margin", {
+    transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   mainWrapperShift: {
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
-    transition: theme.transitions.create("margin", {
+    transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -88,7 +88,7 @@ const Ticket = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchTicket = async () => {
         try {
-          const { data } = await api.get("/tickets/" + ticketId);
+          const { data } = await api.get('/tickets/' + ticketId);
 
           setContact(data.contact);
           setTicket(data);
@@ -106,21 +106,21 @@ const Ticket = () => {
   useEffect(() => {
     const socket = openSocket();
 
-    socket.on("connect", () => socket.emit("joinChatBox", ticketId));
+    socket.on('connect', () => socket.emit('joinChatBox', ticketId));
 
-    socket.on("ticket", (data) => {
-      if (data.action === "update") {
+    socket.on('ticket', (data) => {
+      if (data.action === 'update') {
         setTicket(data.ticket);
       }
 
-      if (data.action === "delete") {
-        toast.success("Ticket deleted sucessfully.");
-        history.push("/tickets");
+      if (data.action === 'delete') {
+        toast.success('Ticket deleted sucessfully.');
+        history.push('/tickets');
       }
     });
 
-    socket.on("contact", (data) => {
-      if (data.action === "update") {
+    socket.on('contact', (data) => {
+      if (data.action === 'update') {
         setContact((prevState) => {
           if (prevState.id === data.contact?.id) {
             return { ...prevState, ...data.contact };
