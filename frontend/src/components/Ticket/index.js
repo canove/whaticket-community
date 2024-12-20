@@ -16,6 +16,7 @@ import MessagesList from '../MessagesList';
 import api from '../../services/api';
 import { ReplyMessageProvider } from '../../context/ReplyingMessage/ReplyingMessageContext';
 import toastError from '../../errors/toastError';
+import SearchDrawer from '../SearchDrawer';
 
 const drawerWidth = 320;
 
@@ -172,6 +173,7 @@ const Ticket = () => {
           <MessageInput ticketStatus={ticket.status} />
         </ReplyMessageProvider>
       </Paper>
+      <SearchDrawer open={drawerOpen} contact={contact} loading={loading} />
       <ContactDrawer
         open={drawerOpen}
         handleDrawerClose={handleDrawerClose}

@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from 'react';
+import React, { createContext, useReducer, useState } from 'react';
 
 const MessageListContext = createContext();
 
@@ -49,10 +49,13 @@ const reducer = (state, action) => {
 };
 
 const MessageListProvider = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [messagesList, dispatch] = useReducer(reducer, []);
 
   return (
-    <MessageListContext.Provider value={{ messagesList, dispatch }}>
+    <MessageListContext.Provider
+      value={{ messagesList, dispatch, isOpen, setIsOpen }}
+    >
       {children}
     </MessageListContext.Provider>
   );
