@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { Paper, makeStyles } from "@material-ui/core";
 
 import ContactDrawer from "../ContactDrawer";
+import SearchDrawer from "../SearchDrawer";
 import MessageInput from "../MessageInput/";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
@@ -16,6 +17,7 @@ import MessagesList from "../MessagesList";
 import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
+import ButtonWithSeach from "../ButtonWithSearch";
 
 const drawerWidth = 320;
 
@@ -79,9 +81,13 @@ const Ticket = () => {
   const classes = useStyles();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [seachDrawerisOpen, setSearchDrawerisOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+  const [scrollToMessageId, setScrollToMessageId] = useState(null);
+  const [scrollToMessage, setScrollToMessage] = useState(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -137,10 +143,38 @@ const Ticket = () => {
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
+    setSearchDrawerisOpen(false);
   };
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
+    setSearchDrawerisOpen(false);
+  };
+
+  const handleSearchDrawer = () => {
+    setSearchDrawerisOpen(!seachDrawerisOpen);
+    setDrawerOpen(false);
+  };
+
+  const scrollToDocumentMessageId = (messageId) => {
+    if (!messageId) return;
+
+    const message = document.getElementById(messageId);
+    if (message) {
+      message.scrollIntoView({ behavior: "smooth", block: "center" });
+      setHighlightedMessageId(messageId);
+      setTimeout(() => {
+        setHighlightedMessageId(null);
+      }, 2000);
+    }
+  };
+
+  const handleScrollToMessage = (messageId, message) => {
+    setScrollToMessage(message.body);
+    setScrollToMessageId(messageId, message.body);
+    setSearchDrawerisOpen(false);
+
+    scrollToDocumentMessageId(messageId);
   };
 
   return (
@@ -162,22 +196,37 @@ const Ticket = () => {
           </div>
           <div className={classes.ticketActionButtons}>
             <TicketActionButtons ticket={ticket} />
+            <ButtonWithSeach
+						loading={loading}
+            onClick={handleSearchDrawer}
+					/>
           </div>
         </TicketHeader>
         <ReplyMessageProvider>
           <MessagesList
             ticketId={ticketId}
             isGroup={ticket.isGroup}
+            scrollToMessageId={scrollToMessageId}
+            scrollToMessage={scrollToMessage}
+            highlightedMessageId={highlightedMessageId}
           ></MessagesList>
           <MessageInput ticketStatus={ticket.status} />
         </ReplyMessageProvider>
       </Paper>
-      <ContactDrawer
-        open={drawerOpen}
-        handleDrawerClose={handleDrawerClose}
-        contact={contact}
-        loading={loading}
-      />
+      {seachDrawerisOpen && (
+          <SearchDrawer
+          open={handleSearchDrawer}
+          handleDrawerClose={handleDrawerClose}
+          ticketId={ticketId}
+          onMessageClick={handleScrollToMessage}
+        />
+      )}
+        <ContactDrawer
+          open={drawerOpen}
+          handleDrawerClose={handleDrawerClose}
+          contact={contact}
+          loading={loading}
+        />
     </div>
   );
 };

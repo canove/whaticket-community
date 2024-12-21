@@ -259,6 +259,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "inherit",
     padding: 10,
   },
+  highlightedMessage: {
+    backgroundColor: "#ffff99",
+    transition: "background-color 0.5s ease",
+  },
 }));
 
 const reducer = (state, action) => {
@@ -307,10 +311,11 @@ const reducer = (state, action) => {
   }
 };
 
-const MessagesList = ({ ticketId, isGroup }) => {
+const MessagesList = ({ ticketId, isGroup, scrollToMessageId, highlightedMessageId }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
+  const [highlightedMessageInListId, setHighlightedMessageInListId] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -336,6 +341,9 @@ const MessagesList = ({ ticketId, isGroup }) => {
           const { data } = await api.get("/messages/" + ticketId, {
             params: { pageNumber },
           });
+
+          console.log(data);
+          
 
           if (currentTicketId.current === ticketId) {
             dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
@@ -378,6 +386,46 @@ const MessagesList = ({ ticketId, isGroup }) => {
       socket.disconnect();
     };
   }, [ticketId]);
+
+  const scrollToDocumentMessageId = (messageId) => {
+    if (!messageId) return;
+
+    const message = document.getElementById(messageId);
+    if (message) {
+      message.scrollIntoView({ behavior: "smooth", block: "center" });
+      setHighlightedMessageInListId(messageId);
+      setTimeout(() => {
+        setHighlightedMessageInListId(null);
+      }, 2000);
+    }
+  };
+
+  useEffect(() => {
+    if (scrollToMessageId) {
+      console.log("scrollToMessageId", scrollToMessageId);
+      //console.log("scrollToMessage", scrollToMessage);
+      
+      const fetchAndScrollToMessage = async () => {
+        try {
+          const { data } = await api.get(`/messages/${ticketId}/surrounding/${scrollToMessageId}`);
+          const messages = data.messages;
+
+          if (messages.length > 0) {
+            dispatch({ type: "RESET" });
+            dispatch({ type: "LOAD_MESSAGES", payload: messages });
+
+            setTimeout(() => {
+              scrollToDocumentMessageId(scrollToMessageId);
+            }, 500);
+          }
+        } catch (err) {
+          toastError(err);
+        }
+      };
+
+      fetchAndScrollToMessage();
+    }
+  }, [scrollToMessageId, ticketId]);
 
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
@@ -593,12 +641,18 @@ const MessagesList = ({ ticketId, isGroup }) => {
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
+        const isHighlighted = message.id === highlightedMessageId || message.id === highlightedMessageInListId;
         if (!message.fromMe) {
           return (
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageLeft}>
+              <div
+                className={clsx(classes.messageLeft, {
+                  [classes.highlightedMessage]: isHighlighted,
+                })}
+                id={message.id}
+              >
                 <IconButton
                   variant="contained"
                   size="small"
@@ -632,7 +686,12 @@ const MessagesList = ({ ticketId, isGroup }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div
+                className={clsx(classes.messageRight, {
+                  [classes.highlightedMessage]: isHighlighted,
+                })}
+                id={message.id}
+              >
                 <IconButton
                   variant="contained"
                   size="small"

@@ -9,9 +9,12 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import searchMessage from "../services/MessageServices/SearchMessage";
+import GetSurroundingMessagesService from "../services/MessageServices/GetSurroundingMessagesService";
 
 type IndexQuery = {
-  pageNumber: string;
+  pageNumber?: string;
+  searchParam?: string;
 };
 
 type MessageData = {
@@ -20,6 +23,28 @@ type MessageData = {
   read: boolean;
   quotedMsg?: Message;
 };
+
+
+export const search = async (req: Request, res: Response): Promise<Response> => {
+  const { ticketId, searchParam } = req.params;
+
+
+  console.log(ticketId,searchParam);
+  
+
+  const { messages } = await searchMessage({ticketId, searchParam});
+
+  return res.json({ messages });
+}
+
+export const getSurroundingMessages = async (req: Request, res: Response): Promise<Response> => {
+  const { ticketId, messageId } = req.params;
+
+  const { messages } = await GetSurroundingMessagesService({ ticketId, messageId });
+
+  return res.json({ messages });
+};
+
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
