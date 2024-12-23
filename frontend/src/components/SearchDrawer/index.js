@@ -125,21 +125,31 @@ const SearchDrawer = ({ contact }) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [loading, setIsLoading] = useState(false);
 
-  const handleChange = (event) => {
-    setSearchInputValue(event.target.value.toLowerCase());
+  const normalizeSearchValue = (searchValue) => {
+    return searchValue
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   };
 
-  console.log(foundMessages);
+  const normalizeSearchInput = normalizeSearchValue(
+    searchInputValue.toLocaleLowerCase()
+  );
+
+  const handleChange = (event) => {
+    setSearchInputValue(event.target.value);
+  };
 
   const highLightMessage = (message) => {
     const trimMessage =
       message.length > 30 ? message.slice(0, 30).trim() + '...' : message;
     const selectedMessage = trimMessage.split(
-      new RegExp(`(${searchInputValue})`, 'gi')
+      new RegExp(`(${normalizeSearchInput})`, 'gi')
     );
 
     const highLight = selectedMessage.map((selection, i) =>
-      selection.toLowerCase() === searchInputValue ? (
+      normalizeSearchValue(selection) === normalizeSearchInput ? (
         <span className={classes.highlightMessage} key={i}>
           {selection}
         </span>
@@ -152,17 +162,21 @@ const SearchDrawer = ({ contact }) => {
   };
 
   useEffect(() => {
-    if (searchInputValue.length > 1) {
+    if (normalizeSearchInput.length > 1) {
       setTimeout(() => {
-        const messages = messagesList.filter((message) =>
-          message.body.toLowerCase().includes(searchInputValue)
-        );
+        const messages = messagesList.filter((message) => {
+          const normalizeMessage = normalizeSearchValue(
+            message.body.toLowerCase()
+          );
+
+          return normalizeMessage.includes(normalizeSearchInput);
+        });
         setFoundMessages(messages);
       }, 1000);
     } else {
       setFoundMessages([]);
     }
-  }, [searchInputValue, messagesList]);
+  }, [normalizeSearchInput, messagesList]);
 
   return (
     <Drawer
