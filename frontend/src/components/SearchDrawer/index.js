@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import CloseIcon from '@material-ui/icons/Close';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Button, CircularProgress } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
 
@@ -129,6 +130,11 @@ const useStyles = makeStyles((theme) => ({
     background:
       'linear-gradient(to top, rgba(237, 237, 237, 0), rgb(237, 237, 237))',
   },
+
+  arrowDown: {
+    marginTop: '1rem',
+    marginBottom: '5rem',
+  },
 }));
 
 const SearchDrawer = ({ contact }) => {
@@ -138,7 +144,13 @@ const SearchDrawer = ({ contact }) => {
     useContext(MessageListContext);
   const [foundMessages, setFoundMessages] = useState([]);
   const [searchInputValue, setSearchInputValue] = useState('');
+  const [loadingSearch, setLoadingSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [limitMult, setLimitMult] = useState(1);
+
+  const limit = 40;
+  const showSearch = foundMessages.slice(0, limit * limitMult);
+  const hasMore = showSearch.length !== foundMessages.length;
 
   const normalizeSearchValue = (searchValue) => {
     return searchValue
@@ -179,21 +191,70 @@ const SearchDrawer = ({ contact }) => {
   useEffect(() => {
     if (normalizeSearchInput.length > 1) {
       setIsLoading(true);
-      setTimeout(() => {
-        const messages = messagesList.filter((message) => {
-          const normalizeMessage = normalizeSearchValue(
-            message.body.toLowerCase()
-          );
 
-          return normalizeMessage.includes(normalizeSearchInput);
-        });
-        setFoundMessages(messages);
-        setIsLoading(false);
-      }, 1000);
+      const messages = messagesList.filter((message) => {
+        const normalizeMessage = normalizeSearchValue(
+          message.body.toLowerCase()
+        );
+
+        return normalizeMessage.includes(normalizeSearchInput);
+      });
+      setFoundMessages(messages);
+
+      setIsLoading(false);
     } else {
       setFoundMessages([]);
     }
   }, [normalizeSearchInput, messagesList]);
+
+  const loadMore = () => {
+    setLoadingSearch(true);
+    setTimeout(() => {
+      setLimitMult((prevNum) => prevNum + 1);
+      setLoadingSearch(false);
+    }, 800);
+  };
+
+  const handleScroll = (e) => {
+    if (!hasMore) return;
+    const scrollBottom =
+      e.currentTarget.scrollHeight -
+      e.currentTarget.scrollTop -
+      e.currentTarget.clientHeight;
+
+    if (scrollBottom === 0) {
+      document.getElementById('content').scrollBottom = 1;
+    }
+
+    if (isLoading) {
+      return;
+    }
+
+    if (scrollBottom < 30) {
+      loadMore();
+    }
+  };
+
+  const renderIcons = () => {
+    if (loadingSearch) {
+      return <CircularProgress className={classes.arrowDown} size={18} />;
+    }
+
+    if (hasMore && !loadingSearch) {
+      return <ArrowDropDownIcon className={classes.arrowDown} />;
+    }
+
+    return null;
+  };
+
+  const handleClose = (closeModal) => {
+    if (closeModal) {
+      setIsOpen(false);
+    }
+    setFoundMessages([]);
+    setSearchInputValue('');
+    setLimitMult(1);
+  };
 
   return (
     <Drawer
@@ -212,7 +273,7 @@ const SearchDrawer = ({ contact }) => {
       }}
     >
       <div className={classes.header}>
-        <IconButton onClick={() => setIsOpen(false)}>
+        <IconButton onClick={() => handleClose(true)}>
           <CloseIcon />
         </IconButton>
         <Typography style={{ justifySelf: 'center' }}>
@@ -220,7 +281,7 @@ const SearchDrawer = ({ contact }) => {
         </Typography>
       </div>
 
-      <div className={classes.content}>
+      <div className={classes.content} id="content" onScroll={handleScroll}>
         <div className={classes.searchContainer}>
           <TextField
             id="standard-basic"
@@ -232,7 +293,7 @@ const SearchDrawer = ({ contact }) => {
           />
           <IconButton
             className={classes.resetSearch}
-            onClick={() => setSearchInputValue('')}
+            onClick={() => handleClose(false)}
           >
             <CloseIcon />
           </IconButton>
@@ -243,7 +304,7 @@ const SearchDrawer = ({ contact }) => {
           {isLoading ? (
             <CircularProgress size={24} />
           ) : (
-            foundMessages.map((message, i) => (
+            showSearch.map((message, i) => (
               <Button
                 key={i}
                 className={classes.messageButton}
@@ -263,6 +324,7 @@ const SearchDrawer = ({ contact }) => {
               </Button>
             ))
           )}
+          {renderIcons()}
         </div>
       </div>
     </Drawer>
