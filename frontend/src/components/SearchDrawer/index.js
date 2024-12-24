@@ -7,13 +7,10 @@ import TextField from '@material-ui/core/TextField';
 import CloseIcon from '@material-ui/icons/Close';
 import { Button, CircularProgress } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
-import Paper from '@material-ui/core/Paper';
-import { Search } from '@material-ui/icons';
 
 import { i18n } from '../../translate/i18n';
 import { MessageListContext } from '../../context/MessageList/MessageListContext';
 import formatDate from '../../utils/formatDate';
-import zIndex from '@material-ui/core/styles/zIndex';
 
 const drawerWidth = 320;
 
@@ -48,11 +45,13 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     overflowY: 'scroll',
     ...theme.scrollbarStyles,
+    position: 'relative',
   },
 
   searchContainer: {
     display: 'flex',
-    width: '100%',
+    width: '310px',
+    height: '48px',
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: '0 0.5rem',
@@ -122,9 +121,9 @@ const useStyles = makeStyles((theme) => ({
   },
 
   overlay: {
-    position: 'fixed',
+    position: 'absolute',
     width: '100%',
-    top: 170,
+    top: 48,
     zIndex: 10,
     height: '2rem',
     background:
