@@ -120,10 +120,11 @@ const useStyles = makeStyles((theme) => ({
 const SearchDrawer = ({ contact }) => {
   const classes = useStyles();
 
-  const { isOpen, setIsOpen, messagesList } = useContext(MessageListContext);
+  const { isOpen, setIsOpen, messagesList, scrollToMessage } =
+    useContext(MessageListContext);
   const [foundMessages, setFoundMessages] = useState([]);
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [loading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const normalizeSearchValue = (searchValue) => {
     return searchValue
@@ -163,6 +164,7 @@ const SearchDrawer = ({ contact }) => {
 
   useEffect(() => {
     if (normalizeSearchInput.length > 1) {
+      setIsLoading(true);
       setTimeout(() => {
         const messages = messagesList.filter((message) => {
           const normalizeMessage = normalizeSearchValue(
@@ -172,6 +174,7 @@ const SearchDrawer = ({ contact }) => {
           return normalizeMessage.includes(normalizeSearchInput);
         });
         setFoundMessages(messages);
+        setIsLoading(false);
       }, 1000);
     } else {
       setFoundMessages([]);
@@ -222,11 +225,15 @@ const SearchDrawer = ({ contact }) => {
         </div>
 
         <div className={classes.messagesContainer}>
-          {loading ? (
+          {isLoading ? (
             <CircularProgress size={24} />
           ) : (
             foundMessages.map((message, i) => (
-              <Button key={i} className={classes.messageButton}>
+              <Button
+                key={i}
+                className={classes.messageButton}
+                onClick={() => scrollToMessage(message.id)}
+              >
                 <div className={classes.messageSection}>
                   <p className={classes.date}>
                     {formatDate(message.createdAt)}

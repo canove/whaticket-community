@@ -10,6 +10,7 @@
     "@testing-library/react": "^11.0.4",
     "@testing-library/user-event": "^12.1.7",
     "axios": "^0.21.1",
+    "clsx": "^2.1.1",
     "date-fns": "^2.16.1",
     "emoji-mart": "^3.0.1",
     "formik": "^2.2.0",

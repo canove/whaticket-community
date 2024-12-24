@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useState } from 'react';
+import React, { createContext, useReducer, useState, useRef } from 'react';
 
 const MessageListContext = createContext();
 
@@ -51,10 +51,35 @@ const reducer = (state, action) => {
 const MessageListProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messagesList, dispatch] = useReducer(reducer, []);
+  const [referedMessage, setReferedMessage] = useState(null);
+  const [isPulsing, setIsPulsing] = useState(false);
+
+  const messageRef = useRef({});
+
+  const scrollToMessage = (messageId) => {
+    const selectedMessage = messageRef.current[messageId];
+    if (selectedMessage) {
+      selectedMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setReferedMessage(messageId);
+      setIsPulsing(true);
+      setTimeout(() => {
+        setIsPulsing(false);
+      }, 1500);
+    }
+  };
 
   return (
     <MessageListContext.Provider
-      value={{ messagesList, dispatch, isOpen, setIsOpen }}
+      value={{
+        messagesList,
+        dispatch,
+        isOpen,
+        setIsOpen,
+        scrollToMessage,
+        messageRef,
+        referedMessage,
+        isPulsing,
+      }}
     >
       {children}
     </MessageListContext.Provider>

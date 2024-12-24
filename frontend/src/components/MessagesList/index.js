@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useReducer,
-  useRef,
-  useContext,
-} from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 
 import { isSameDay, parseISO, format } from 'date-fns';
 import openSocket from '../../services/socket-io';
@@ -266,14 +260,33 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: 'inherit',
     padding: 10,
   },
+
+  pulsing: {
+    animation: '$pulse 1s ease-in-out 1',
+  },
+  '@keyframes pulse': {
+    '0%': {
+      opacity: 1,
+    },
+    '50%': {
+      opacity: 0.5,
+      backgroundColor: '#000',
+    },
+    '100%': {
+      opacity: 1,
+    },
+  },
 }));
 
 const MessagesList = ({ ticketId, isGroup }) => {
   const classes = useStyles();
-  const { messagesList, dispatch } = useContext(MessageListContext);
+  const { messagesList, dispatch, messageRef, referedMessage, isPulsing } =
+    useContext(MessageListContext);
+
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const lastMessageRef = useRef();
 
   const [selectedMessage, setSelectedMessage] = useState({});
@@ -563,12 +576,19 @@ const MessagesList = ({ ticketId, isGroup }) => {
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
+        const isSelected = referedMessage === message.id;
+
         if (!message.fromMe) {
           return (
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageLeft}>
+              <div
+                className={clsx(classes.messageLeft, {
+                  [classes.pulsing]: isPulsing && isSelected,
+                })}
+                ref={(el) => (messageRef.current[message.id] = el)}
+              >
                 <IconButton
                   variant="contained"
                   size="small"
@@ -604,7 +624,12 @@ const MessagesList = ({ ticketId, isGroup }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div
+                className={clsx(classes.messageRight, {
+                  [classes.pulsing]: isPulsing && isSelected,
+                })}
+                ref={(el) => (messageRef.current[message.id] = el)}
+              >
                 <IconButton
                   variant="contained"
                   size="small"
