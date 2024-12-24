@@ -13,6 +13,7 @@ import { Search } from '@material-ui/icons';
 import { i18n } from '../../translate/i18n';
 import { MessageListContext } from '../../context/MessageList/MessageListContext';
 import formatDate from '../../utils/formatDate';
+import zIndex from '@material-ui/core/styles/zIndex';
 
 const drawerWidth = 320;
 
@@ -55,6 +56,10 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: '0 0.5rem',
+    position: 'fixed',
+    top: 122,
+    backgroundColor: '#ededed',
+    zIndex: 50,
   },
 
   searchInput: {
@@ -72,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginTop: '2rem',
+    marginTop: '3rem',
   },
 
   messageButton: {
@@ -114,6 +119,16 @@ const useStyles = makeStyles((theme) => ({
 
   highlightMessage: {
     backgroundColor: 'yellow',
+  },
+
+  overlay: {
+    position: 'fixed',
+    width: '100%',
+    top: 170,
+    zIndex: 10,
+    height: '2rem',
+    background:
+      'linear-gradient(to top, rgba(237, 237, 237, 0), rgb(237, 237, 237))',
   },
 }));
 
@@ -222,6 +237,7 @@ const SearchDrawer = ({ contact }) => {
           >
             <CloseIcon />
           </IconButton>
+          <div className={classes.overlay} />
         </div>
 
         <div className={classes.messagesContainer}>
