@@ -137,7 +137,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchDrawer = ({ contact }) => {
+const SearchDrawer = () => {
   const classes = useStyles();
 
   const { isOpen, setIsOpen, messagesList, scrollToMessage } =

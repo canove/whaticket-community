@@ -15,9 +15,19 @@ const useStyles = makeStyles((theme) => ({
 
 const SearchMessageButton = () => {
   const classes = useStyles();
-  const { setIsOpen } = useContext(MessageListContext);
+  const { setIsOpen, drawerOpen, setDrawerOpen } =
+    useContext(MessageListContext);
+  const handleClose = () => {
+    if (!drawerOpen) {
+      setIsOpen(true);
+    }
+    setDrawerOpen(false);
+    setTimeout(() => {
+      setIsOpen(true);
+    }, 500);
+  };
   return (
-    <Button onClick={() => setIsOpen(true)} className={classes.searchButton}>
+    <Button onClick={handleClose} className={classes.searchButton}>
       <Search />
     </Button>
   );

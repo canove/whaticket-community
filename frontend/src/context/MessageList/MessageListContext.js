@@ -50,6 +50,7 @@ const reducer = (state, action) => {
 
 const MessageListProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [messagesList, dispatch] = useReducer(reducer, []);
   const [referedMessage, setReferedMessage] = useState(null);
   const [isPulsing, setIsPulsing] = useState(false);
@@ -79,6 +80,8 @@ const MessageListProvider = ({ children }) => {
         messageRef,
         referedMessage,
         isPulsing,
+        drawerOpen,
+        setDrawerOpen,
       }}
     >
       {children}
