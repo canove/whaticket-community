@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
   searchContainer: {
     display: 'flex',
-    width: '310px',
+    width: '302px',
     height: '48px',
     justifyContent: 'center',
     alignItems: 'flex-end',
@@ -148,8 +148,8 @@ const SearchDrawer = ({ contact }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [limitMult, setLimitMult] = useState(1);
 
-  const limit = 40;
-  const showSearch = foundMessages.slice(0, limit * limitMult);
+  const limit = 40 * limitMult;
+  const showSearch = foundMessages.slice(0, limit);
   const hasMore = showSearch.length !== foundMessages.length;
 
   const normalizeSearchValue = (searchValue) => {
@@ -188,49 +188,81 @@ const SearchDrawer = ({ contact }) => {
     return highLight;
   };
 
+  const createIndex = (messages) => {
+    const index = {};
+    messages.forEach((message, i) => {
+      const words = normalizeSearchValue(message.body.toLowerCase()).split(' ');
+      words.forEach((word) => {
+        if (!index[word]) {
+          index[word] = [];
+        }
+        index[word].push(i);
+      });
+    });
+    return { index, messages };
+  };
+
+  const [indexedMessage, setIndexedMessage] = useState(null);
+
+  useEffect(() => {
+    setIndexedMessage(createIndex(messagesList));
+  }, [messagesList]);
+
+  const searchMessages = (searchTerm) => {
+    if (!indexedMessage || searchTerm.length <= 1) return [];
+
+    const words = searchTerm.split(' ');
+
+    const results = Object.keys(indexedMessage.index).reduce((acc, word) => {
+      if (word.includes(words[0])) {
+        acc.push(...indexedMessage.index[word]);
+      }
+      return acc;
+    }, []);
+
+    const uniqueResults = Array.from(new Set(results));
+
+    const search = uniqueResults.filter((idx) => {
+      const messageBody = normalizeSearchValue(
+        indexedMessage.messages[idx].body.toLowerCase()
+      );
+      return (
+        words.every((word) => messageBody.includes(word)) &&
+        messageBody.includes(searchTerm)
+      );
+    });
+
+    return search.map((idx) => indexedMessage.messages[idx]);
+  };
+
   useEffect(() => {
     if (normalizeSearchInput.length > 1) {
       setIsLoading(true);
 
-      const messages = messagesList.filter((message) => {
-        const normalizeMessage = normalizeSearchValue(
-          message.body.toLowerCase()
-        );
-
-        return normalizeMessage.includes(normalizeSearchInput);
-      });
+      const messages = searchMessages(normalizeSearchInput);
       setFoundMessages(messages);
 
       setIsLoading(false);
     } else {
       setFoundMessages([]);
     }
-  }, [normalizeSearchInput, messagesList]);
+  }, [normalizeSearchInput]);
 
   const loadMore = () => {
+    if (loadingSearch || !hasMore) return;
     setLoadingSearch(true);
     setTimeout(() => {
       setLimitMult((prevNum) => prevNum + 1);
       setLoadingSearch(false);
-    }, 800);
+    }, 300);
   };
 
   const handleScroll = (e) => {
-    if (!hasMore) return;
     const scrollBottom =
       e.currentTarget.scrollHeight -
       e.currentTarget.scrollTop -
       e.currentTarget.clientHeight;
-
-    if (scrollBottom === 0) {
-      document.getElementById('content').scrollBottom = 1;
-    }
-
-    if (isLoading) {
-      return;
-    }
-
-    if (scrollBottom < 30) {
+    if (scrollBottom < 50 && !loadingSearch && hasMore) {
       loadMore();
     }
   };
@@ -242,6 +274,14 @@ const SearchDrawer = ({ contact }) => {
 
     if (hasMore && !loadingSearch) {
       return <ArrowDropDownIcon className={classes.arrowDown} />;
+    }
+
+    if (foundMessages.length > 1 && !hasMore) {
+      return <h4>Fim</h4>;
+    }
+
+    if (foundMessages.length === 0 && searchInputValue.length > 1) {
+      return <p>Sem resultado</p>;
     }
 
     return null;
