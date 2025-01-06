@@ -2,9 +2,8 @@ import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../../libs/socket";
 import Ticket from "../../models/Ticket";
-import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
-import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import ShowTicketService from "./ShowTicketService";
+import Distribution from "../../models/Distribution";
 
 interface TicketData {
   status?: string;
@@ -29,11 +28,12 @@ const UpdateTicketService = async ({
   ticketId
 }: Request): Promise<Response> => {
   const { status, userId, queueId, whatsappId } = ticketData;
+  console.log("UpdateTicketService", queueId);
 
   const ticket = await ShowTicketService(ticketId);
   await SetTicketMessagesAsRead(ticket);
 
-  if(whatsappId && ticket.whatsappId !== whatsappId) {
+  if (whatsappId && ticket.whatsappId !== whatsappId) {
     await CheckContactOpenTickets(ticket.contactId, whatsappId);
   }
 
@@ -44,14 +44,32 @@ const UpdateTicketService = async ({
     await CheckContactOpenTickets(ticket.contact.id, ticket.whatsappId);
   }
 
+  let updatedUserId = userId;
+
+  if (queueId) {
+    const distribution = await Distribution.findOne({
+      where: { queue_id: queueId, is_active: 1 }
+    });
+
+    if (distribution) {
+      const userIds = JSON.parse(distribution.user_ids as any);
+      const currentUserIndex = userIds.indexOf(Number(distribution.current_user));
+
+      const nextUserIndex = (currentUserIndex + 1) % userIds.length;
+      updatedUserId = userIds[nextUserIndex];
+
+      distribution.current_user = userIds[nextUserIndex];
+      await distribution.save();
+    }
+  }
+
   await ticket.update({
     status,
     queueId,
-    userId
+    userId: updatedUserId || ticket.userId
   });
 
-
-  if(whatsappId) {
+  if (whatsappId) {
     await ticket.update({
       whatsappId
     });
@@ -67,8 +85,6 @@ const UpdateTicketService = async ({
       ticketId: ticket.id
     });
   }
-
-
 
   io.to(ticket.status)
     .to("notification")

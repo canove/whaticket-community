@@ -13,6 +13,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Switch,
 } from "@material-ui/core";
 
 import MainContainer from "../../components/MainContainer";
@@ -88,19 +89,28 @@ const reducer = (state, action) => {
 const Queues = () => {
   const classes = useStyles();
 
-  const [queues, dispatch] = useReducer(reducer, []);
+  const [queues, queuesDispatch] = useReducer(reducer, []);
   const [loading, setLoading] = useState(false);
 
   const [queueModalOpen, setQueueModalOpen] = useState(false);
   const [selectedQueue, setSelectedQueue] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
+  const [activeQueues, setActiveQueues] = useState({});
+
   useEffect(() => {
     (async () => {
       setLoading(true);
       try {
         const { data } = await api.get("/queue");
-        dispatch({ type: "LOAD_QUEUES", payload: data });
+        queuesDispatch({ type: "LOAD_QUEUES", payload: data });
+
+        const activeState = {};
+        for (const queue of data) {
+          const response = await api.get(`/distribution/${queue.id}`);
+          activeState[queue.id] = response.data.length > 0 && response.data[0].is_active;
+        }
+        setActiveQueues(activeState);
 
         setLoading(false);
       } catch (err) {
@@ -115,11 +125,11 @@ const Queues = () => {
 
     socket.on("queue", (data) => {
       if (data.action === "update" || data.action === "create") {
-        dispatch({ type: "UPDATE_QUEUES", payload: data.queue });
+        queuesDispatch({ type: "UPDATE_QUEUES", payload: data.queue });
       }
 
       if (data.action === "delete") {
-        dispatch({ type: "DELETE_QUEUE", payload: data.queueId });
+        queuesDispatch({ type: "DELETE_QUEUE", payload: data.queueId });
       }
     });
 
@@ -156,6 +166,36 @@ const Queues = () => {
       toastError(err);
     }
     setSelectedQueue(null);
+  };
+
+  const handleToggleQueueDistribution = async (checked, queue) => {
+    try {
+      const response = await api.get("/users");
+
+      const userIdsInQueue = response.data.users
+        .filter((user) => user.queues.some((q) => q.id === queue.id))
+        .map((user) => user.id);      
+    
+      const distributionPayload = {
+        queueId: queue.id,
+        userIds: userIdsInQueue,
+       current_user: userIdsInQueue[0], 
+        is_active: checked 
+      };
+
+      await api.post("/distribution", distributionPayload);
+
+      if (checked) {
+        await api.post("/distribution/start", { queueId: queue.id });
+      }
+
+      setActiveQueues((prevState) => ({
+        ...prevState,
+        [queue.id]: checked,
+      }));
+    } catch (error) {
+      console.error("Erro ao processar a distribuição:", error);
+    }
   };
 
   return (
@@ -204,6 +244,9 @@ const Queues = () => {
                 {i18n.t("queues.table.greeting")}
               </TableCell>
               <TableCell align="center">
+                Ativar distribuição de filas
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("queues.table.actions")}
               </TableCell>
             </TableRow>
@@ -235,6 +278,14 @@ const Queues = () => {
                         {queue.greetingMessage}
                       </Typography>
                     </div>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Switch
+                      onChange={(e) =>
+                        handleToggleQueueDistribution(e.target.checked, queue)
+                      }
+                      checked={!!activeQueues[queue.id]}
+                    />
                   </TableCell>
                   <TableCell align="center">
                     <IconButton

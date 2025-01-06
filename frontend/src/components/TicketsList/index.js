@@ -153,17 +153,21 @@ const reducer = (state, action) => {
 };
 
 	const TicketsList = (props) => {
-		const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
+		const { status, searchParam, showAll, isPending, selectedQueueIds, updateCount, style } =
 			props;
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
+
+	console.log(ticketsList);
+	
 	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
 	}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
+
 
 	const { tickets, hasMore, loading } = useTickets({
 		pageNumber,
@@ -247,11 +251,21 @@ const reducer = (state, action) => {
 	}, [status, searchParam, showAll, user, selectedQueueIds]);
 
 	useEffect(() => {
-    if (typeof updateCount === "function") {
-      updateCount(ticketsList.length);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketsList]);
+		if (typeof updateCount === "function") {
+			if (showAll) {
+				updateCount(ticketsList.length);
+				return;
+			}
+
+			if (isPending) {
+				const userFilteredTickets = ticketsList.filter(ticket => ticket.userId === user.id);
+				updateCount(userFilteredTickets.length);
+			} else {
+				updateCount(ticketsList.length);
+			}
+		}
+	}, [showAll, ticketsList, isPending, user.id]);
+	
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
@@ -267,6 +281,31 @@ const reducer = (state, action) => {
 			loadMore();
 		}
 	};
+
+
+	if (isPending && !showAll) {
+		console.log(user.id);
+		const filteredTickets = ticketsList.filter(ticket => ticket.userId === user.id);
+
+		return (
+			<Paper className={classes.ticketsListWrapper} style={style}>
+				<Paper
+					square
+					name="closed"
+					elevation={0}
+					className={classes.ticketsList}
+					onScroll={handleScroll}
+				>
+					<List style={{ paddingTop: 0 }}>
+						{filteredTickets.map(ticket => (
+							<TicketListItem ticket={ticket} key={ticket.id} />
+						))}
+						{loading && <TicketsListSkeleton />}
+					</List>
+				</Paper>
+			</Paper>
+		);
+	}
 
 	return (
     <Paper className={classes.ticketsListWrapper} style={style}>
