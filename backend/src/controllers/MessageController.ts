@@ -9,6 +9,7 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import { Op } from "sequelize";
 
 type IndexQuery = {
   pageNumber: string;
@@ -72,4 +73,26 @@ export const remove = async (
   });
 
   return res.send();
+};
+
+export const search = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
+  const { searchText } = req.query;
+
+  if (!searchText) {
+    return res.status(400).json({ error: "Search text is required" });
+  }
+
+  const messages = await Message.findAll({
+    where: {
+      ticketId,
+      body: { [Op.like]: `%${searchText}%` }
+    },
+    order: [["createdAt", "DESC"]]
+  });
+
+  return res.json(messages);
 };
