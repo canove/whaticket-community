@@ -79,19 +79,15 @@ export const search = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { ticketId } = req.params;
-  const { searchText } = req.query;
-
-  if (!searchText) {
-    return res.status(400).json({ error: "Search text is required" });
-  }
+  const { ticketId, search } = req.params;
 
   const messages = await Message.findAll({
     where: {
       ticketId,
-      body: { [Op.like]: `%${searchText}%` }
-    },
-    order: [["createdAt", "DESC"]]
+      body: {
+        [Op.like]: `%${search}%`
+      }
+    }
   });
 
   return res.json(messages);
