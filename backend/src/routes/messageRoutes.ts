@@ -19,7 +19,7 @@ messageRoutes.post(
 );
 
 messageRoutes.get(
-  "/messages/:ticketId/search",
+  "/messages/:ticketId/:search",
   isAuth,
   MessageController.search
 );
