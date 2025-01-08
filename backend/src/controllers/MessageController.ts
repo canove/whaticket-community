@@ -9,7 +9,7 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 
 import { performance } from "perf_hooks";
 
@@ -88,9 +88,10 @@ export const search = async (
   const messages = await Message.findAll({
     where: {
       ticketId,
-      body: {
-        [Op.like]: `%${search}%`
-      }
+      // Tornando a busca case-insensitive usando a função LOWER
+      body: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("body")), {
+        [Op.like]: `%${search.toLowerCase()}%`
+      })
     }
   });
 
