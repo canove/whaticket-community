@@ -88,7 +88,6 @@ export const search = async (
   const messages = await Message.findAll({
     where: {
       ticketId,
-      // Tornando a busca case-insensitive usando a função LOWER
       body: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("body")), {
         [Op.like]: `%${search.toLowerCase()}%`
       })
