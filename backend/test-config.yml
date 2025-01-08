@@ -1,0 +1,13 @@
+config:
+  target: "http://localhost:8080" # Definindo o URL de destino
+  phases:
+    - duration: 60 # Duração do teste
+      arrivalRate: 10 # Taxa de chegada de requisições por segundo
+
+scenarios:
+  - flow:
+      - get:
+          url: "/messages/2/teste" # Endpoint para a requisição
+          headers:
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2FybmFtZSI6IkJpZyBKb3NlcGgiLCJwcm9maWxlIjoiYWRtaW4iLCJpZCI6MywiaWF0IjoxNzM2MzQ4Njg1LCJleHAiOjE3MzYzNDk1ODV9.KrpTrzKXsQmGXekSdx1JJqnNRAVoZvgLh3ipUAHgClc
+"
