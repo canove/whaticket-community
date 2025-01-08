@@ -11,6 +11,8 @@ import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import { Op } from "sequelize";
 
+import { performance } from "perf_hooks";
+
 type IndexQuery = {
   pageNumber: string;
 };
@@ -79,6 +81,8 @@ export const search = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  const start = performance.now();
+
   const { ticketId, search } = req.params;
 
   const messages = await Message.findAll({
@@ -89,6 +93,9 @@ export const search = async (
       }
     }
   });
+
+  const end = performance.now();
+  console.log(`Execution time: ${(end - start).toFixed(2)}ms`);
 
   return res.json(messages);
 };
