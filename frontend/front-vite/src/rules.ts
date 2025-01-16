@@ -1,3 +1,4 @@
+import type { IRules } from './types/Rules'
 const rules = {
   user: {
     static: [],
@@ -14,6 +15,6 @@ const rules = {
       "contacts-page:deleteContact",
     ],
   },
-};
+} as IRules;
 
 export default rules;
