@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 import { CircularProgress, Button } from "@material-ui/core";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
   button: {
     position: "relative",
   },
@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
 type buttonWithSpinnerProps = {
   loading: boolean;
   children: React.ReactNode;
+  [any: string]: any;
 };
 
 const ButtonWithSpinner = ({

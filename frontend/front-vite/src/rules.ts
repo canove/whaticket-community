@@ -1,7 +1,8 @@
-import type { IRules } from './types/Rules'
+import type { IRules } from "./types/Rules";
 const rules = {
   user: {
     static: [],
+    dynamic: [],
   },
 
   admin: {
@@ -12,8 +13,8 @@ const rules = {
       "user-modal:editQueues",
       "ticket-options:deleteTicket",
       "ticket-options:transferWhatsapp",
-      "contacts-page:deleteContact",
     ],
+    dynamic: {},
   },
 } as IRules;
 

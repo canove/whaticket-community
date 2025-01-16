@@ -22,6 +22,7 @@ import type { ReactNode } from "react";
 
 interface MainContainerProps {
   children: ReactNode;
+  className?: string;
 }
 
 const MainContainer = ({ children }: MainContainerProps) => {
