@@ -29,11 +29,11 @@ const AppRoutes = () => {
             <Route
               path="/"
               element={
-                <Dashboard />
+                <LoggedInLayout>
+                  <Dashboard />
+                </LoggedInLayout>
                 // <PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -41,11 +41,11 @@ const AppRoutes = () => {
             <Route
               path="/tickets/:ticketId?"
               element={
-                <Tickets />
+                <LoggedInLayout>
+                  <Tickets />
+                </LoggedInLayout>
                 // <PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -53,11 +53,11 @@ const AppRoutes = () => {
             <Route
               path="/connections"
               element={
-                <Connections />
-                // <PrivateRoute>
+                <LoggedInLayout>
+                  <Connections />
+                </LoggedInLayout>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
+                // <PrivateRoute>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -65,11 +65,11 @@ const AppRoutes = () => {
             <Route
               path="/contacts"
               element={
-                <Contacts />
+                <LoggedInLayout>
+                  <Contacts />
+                </LoggedInLayout>
                 // <PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -77,11 +77,11 @@ const AppRoutes = () => {
             <Route
               path="/users"
               element={
-                <Users />
+                <LoggedInLayout>
+                  <Users />
+                </LoggedInLayout>
                 // <PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -89,11 +89,11 @@ const AppRoutes = () => {
             <Route
               path="/quickAnswers"
               element={
-                <QuickAnswers />
-                // <PrivateRoute>
+                <LoggedInLayout>
+                  <QuickAnswers />
+                </LoggedInLayout>
+                //<PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -101,11 +101,11 @@ const AppRoutes = () => {
             <Route
               path="/Settings"
               element={
-                <Settings />
+                <LoggedInLayout>
+                  <Settings />
+                </LoggedInLayout>
                 // <PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }
@@ -113,11 +113,11 @@ const AppRoutes = () => {
             <Route
               path="/Queues"
               element={
-                <Queues />
+                <LoggedInLayout>
+                  <Queues />
+                </LoggedInLayout>
                 // <PrivateRoute>
                 //   <WhatsAppsProvider>
-                //     <LoggedInLayout>
-                //     </LoggedInLayout>
                 //   </WhatsAppsProvider>
                 // </PrivateRoute>
               }

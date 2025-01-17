@@ -17,10 +17,10 @@
     "recorder-js": "^1.0.7"
   },
   "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@eslint/js": "^9.17.0",
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.56",
+    "@mui/material": "^6.4.0",
     "@types/react": "^18.3.18",
     "@types/react-color": "^3.0.13",
     "@types/react-dom": "^18.3.5",
@@ -51,5 +51,9 @@
     "use-sound": "^4.0.3",
     "vite": "^6.0.5",
     "yup": "^1.6.1"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   }
 }
