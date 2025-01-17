@@ -11,8 +11,10 @@
     "clean": "bun x del-cli node_modules bun.lockb dist"
   },
   "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "recorder-js": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -23,6 +25,7 @@
     "@types/react-color": "^3.0.13",
     "@types/react-dom": "^18.3.5",
     "@types/react-modal-image": "^2.6.4",
+    "@types/recorder-js": "^1.0.4",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "axios": "^1.7.9",
     "date-fns": "^4.1.0",
@@ -35,7 +38,6 @@
     "i18next": "^24.2.1",
     "i18next-browser-languagedetector": "^8.0.2",
     "markdown-to-jsx": "^7.7.3",
-    "mic-recorder-to-mp3": "^2.2.2",
     "qrcode.react": "^4.2.0",
     "react-color": "^2.19.3",
     "react-modal-image": "^2.6.0",

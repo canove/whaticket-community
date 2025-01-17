@@ -4,45 +4,28 @@ import { Route as RouterRoute, Navigate } from "react-router-dom";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 
-import { ComponentType } from "react";
-
 interface RouteProps {
-  component: ComponentType<any>;
+  element: JSX.Element;
   isPrivate?: boolean;
   [key: string]: any;
 }
 
-const Route = ({
-  component: Component,
-  isPrivate = false,
-  ...rest
-}: RouteProps) => {
+const Route = ({ element, isPrivate = false, ...rest }: RouteProps) => {
   const { isAuth, loading } = useContext(AuthContext);
 
-  if (!isAuth && isPrivate) {
-    return (
-      <>
-        {loading && <BackdropLoading />}
-        <Navigate to="/login" state={{ from: rest.location }} />
-      </>
-    );
+  if (loading) {
+    return <BackdropLoading />;
   }
 
-  if (isAuth && !isPrivate) {
-    return (
-      <>
-        {loading && <BackdropLoading />}
-        <Navigate to="/" state={{ from: rest.location }} />;
-      </>
-    );
+  if (isPrivate && !isAuth) {
+    return <Navigate to="/login" state={{ from: rest.location }} replace />;
   }
 
-  return (
-    <>
-      {loading && <BackdropLoading />}
-      <RouterRoute {...rest} element={<Component />} />
-    </>
-  );
+  if (!isPrivate && isAuth) {
+    return <Navigate to="/" state={{ from: rest.location }} replace />;
+  }
+
+  return <RouterRoute {...rest} element={element} />;
 };
 
 export default Route;

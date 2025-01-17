@@ -14,9 +14,9 @@ function getConfig(name: string, defaultValue = null) {
 }
 
 export function getBackendUrl() {
-  return getConfig("REACT_APP_BACKEND_URL");
+  return getConfig("VITE_BACKEND_URL");
 }
 
 export function getHoursCloseTicketsAuto() {
-  return getConfig("REACT_APP_HOURS_CLOSE_TICKETS_AUTO");
+  return getConfig("VITE_HOURS_CLOSE_TICKETS_AUTO");
 }

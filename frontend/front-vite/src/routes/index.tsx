@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import LoggedInLayout from "../layout";
@@ -15,7 +15,8 @@ import Queues from "../pages/Queues";
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import { ThemeProvider } from "../context/DarkMode";
-import Route from "./Route";
+// import Route from "./Route";
+import PrivateRoute from "./PrivateRouter";
 
 const AppRoutes = () => {
   return (
@@ -23,35 +24,104 @@ const AppRoutes = () => {
       <AuthProvider>
         <ThemeProvider>
           <Routes>
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/signup" component={Signup} />
-            <WhatsAppsProvider>
-              <LoggedInLayout>
-                <Route exact path="/" component={Dashboard} isPrivate />
-                <Route
-                  exact
-                  path="/tickets/:ticketId?"
-                  component={Tickets}
-                  isPrivate
-                />
-                <Route
-                  exact
-                  path="/connections"
-                  component={Connections}
-                  isPrivate
-                />
-                <Route exact path="/contacts" component={Contacts} isPrivate />
-                <Route exact path="/users" component={Users} isPrivate />
-                <Route
-                  exact
-                  path="/quickAnswers"
-                  component={QuickAnswers}
-                  isPrivate
-                />
-                <Route exact path="/Settings" component={Settings} isPrivate />
-                <Route exact path="/Queues" component={Queues} isPrivate />
-              </LoggedInLayout>
-            </WhatsAppsProvider>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/"
+              element={
+                <Dashboard />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tickets/:ticketId?"
+              element={
+                <Tickets />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/connections"
+              element={
+                <Connections />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/contacts"
+              element={
+                <Contacts />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <Users />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/quickAnswers"
+              element={
+                <QuickAnswers />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/Settings"
+              element={
+                <Settings />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
+            <Route
+              path="/Queues"
+              element={
+                <Queues />
+                // <PrivateRoute>
+                //   <WhatsAppsProvider>
+                //     <LoggedInLayout>
+                //     </LoggedInLayout>
+                //   </WhatsAppsProvider>
+                // </PrivateRoute>
+              }
+            />
           </Routes>
           <ToastContainer autoClose={3000} />
         </ThemeProvider>

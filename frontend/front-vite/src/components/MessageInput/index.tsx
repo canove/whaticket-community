@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useRef } from "react";
 // import "emoji-mart/css/emoji-mart.css";
 import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
-import MicRecorder from "mic-recorder-to-mp3";
+//import MicRecorder from "mic-recorder-to-mp3";
 import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -37,8 +37,9 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
+import { useMp3Recorder } from "../../hooks/useMp3Recorder";
 
-const Mp3Recorder = new MicRecorder({ bitRate: 128 });
+// const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 const useStyles = makeStyles((theme) => ({
   mainWrapper: {
@@ -203,6 +204,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MessageInput = ({ ticketStatus }: { ticketStatus: string }) => {
+  const { blob, startRecording, stopRecording } = useMp3Recorder();
+
   const classes = useStyles();
   const { ticketId } = useParams();
 
@@ -339,8 +342,7 @@ const MessageInput = ({ ticketStatus }: { ticketStatus: string }) => {
   const handleStartRecording = async () => {
     setLoading(true);
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      await Mp3Recorder.start();
+      await startRecording();
       setRecording(true);
       setLoading(false);
     } catch (err) {
@@ -373,7 +375,10 @@ const MessageInput = ({ ticketStatus }: { ticketStatus: string }) => {
     setLoading(true);
     try {
       //@ts-ignore
-      const [, blob] = await Mp3Recorder.stop().getMp3();
+      stopRecording();
+      if (blob === null) {
+        throw new Error("No audio recorded");
+      }
       if (blob.size < 10000) {
         setLoading(false);
         setRecording(false);
@@ -398,7 +403,7 @@ const MessageInput = ({ ticketStatus }: { ticketStatus: string }) => {
   const handleCancelAudio = async () => {
     try {
       //@ts-ignore
-      await Mp3Recorder.stop().getMp3();
+      stopRecording();
       setRecording(false);
     } catch (err) {
       toastError(err as Error);
