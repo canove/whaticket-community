@@ -68,7 +68,6 @@ const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
   onClose,
   whatsAppId,
 }) => {
-  const classes = useStyles();
   const initialState = {
     name: "",
     greetingMessage: "",
@@ -163,7 +162,6 @@ const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
                     helperText={touched.name && errors.name}
                     variant="outlined"
                     margin="dense"
-                    // className={classes.textField}
                   />
                   <FormControlLabel
                     control={
