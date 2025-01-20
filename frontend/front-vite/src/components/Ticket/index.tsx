@@ -19,8 +19,62 @@ import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMess
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
 import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
 const drawerWidth = 320;
+
+const RootStyled = styled("div")({
+  display: "flex",
+  height: "100%",
+  position: "relative",
+  overflow: "hidden",
+});
+
+const TicketInfoStyled = styled("div")(({ theme }) => ({
+  maxWidth: "50%",
+  flexBasis: "50%",
+  [theme.breakpoints.down("sm")]: {
+    maxWidth: "80%",
+    flexBasis: "80%",
+  },
+}));
+
+const TicketActionButtonsStyled = styled("div")(({ theme }) => ({
+  maxWidth: "50%",
+  flexBasis: "50%",
+  display: "flex",
+  [theme.breakpoints.down("sm")]: {
+    maxWidth: "100%",
+    flexBasis: "100%",
+    marginBottom: "5px",
+  },
+}));
+
+const MainWrapperStyled = styled("div")(({ theme }) => ({
+  flex: 1,
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+  borderLeft: "0",
+  marginRight: `-${theme.spacing(drawerWidth)}`,
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+}));
+
+const MainWrapperShiftStyled = styled("div")(({ theme }) => ({
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.easeOut,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  marginRight: 0,
+}));
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -155,7 +209,7 @@ const Ticket = () => {
   };
 
   return (
-    <div className={classes.root} id="drawer-container">
+    <RootStyled id="drawer-container">
       <Paper
         variant="outlined"
         elevation={0}
@@ -164,16 +218,16 @@ const Ticket = () => {
         })}
       >
         <TicketHeader loading={loading}>
-          <div className={classes.ticketInfo}>
+          <TicketInfoStyled>
             <TicketInfo
               contact={contact}
               ticket={ticket}
               onClick={handleDrawerOpen}
             />
-          </div>
-          <div className={classes.ticketActionButtons}>
+          </TicketInfoStyled>
+          <TicketActionButtonsStyled>
             <TicketActionButtons ticket={ticket} />
-          </div>
+          </TicketActionButtonsStyled>
         </TicketHeader>
         <ReplyMessageProvider>
           <MessagesList
@@ -189,7 +243,7 @@ const Ticket = () => {
         contact={contact}
         loading={loading}
       />
-    </div>
+    </RootStyled>
   );
 };
 

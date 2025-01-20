@@ -1,7 +1,6 @@
 import { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
 
-import { makeStyles } from "@mui/styles";
 import List from "@mui/material/List";
 import Paper from "@mui/material/Paper";
 
@@ -11,67 +10,51 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((_theme: Theme) => ({
-  ticketsListWrapper: {
-    position: "relative",
-    display: "flex",
-    height: "100%",
-    flexDirection: "column",
-    overflow: "hidden",
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-  },
+const TicketsListWrapperStyled = styled(Paper)({
+  position: "relative",
+  display: "flex",
+  height: "100%",
+  flexDirection: "column",
+  overflow: "hidden",
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+});
 
-  ticketsList: {
-    flex: 1,
-    overflowY: "scroll",
-    //@ts-ignore
-    // ...theme.scrollbarStyles,
-    borderTop: "2px solid rgba(0, 0, 0, 0.12)",
-  },
+const TicketsListStyled = styled(Paper)({
+  flex: 1,
+  overflowY: "scroll",
+  //@ts-ignore
+  // ...theme.scrollbarStyles,
+  borderTop: "2px solid rgba(0, 0, 0, 0.12)",
+});
+const ticketsListHeaderStyled = styled(Paper)({
+  color: "rgb(67, 83, 105)",
+  zIndex: 2,
+  backgroundColor: "white",
+  borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+});
+const ticketsCountStyled = styled(Paper)({
+  fontWeight: "normal",
+  color: "rgb(104, 121, 146)",
+  marginLeft: "8px",
+  fontSize: "14px",
+});
+const NoTicketsTextStyled = styled("p")({ textAlign: "center", color: "rgb(104, 121, 146)", fontSize: "14px", lineHeight: "1.4" });
+const NoTicketsTitleStyled = styled("span")({ textAlign: "center", fontSize: "16px", fontWeight: 600, margin: "0px" });
+const NoTicketsDivStyled = styled("div")({
+  display: "flex",
+  height: "100px",
+  margin: 40,
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+});
 
-  ticketsListHeader: {
-    color: "rgb(67, 83, 105)",
-    zIndex: 2,
-    backgroundColor: "white",
-    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
-  ticketsCount: {
-    fontWeight: "normal",
-    color: "rgb(104, 121, 146)",
-    marginLeft: "8px",
-    fontSize: "14px",
-  },
-
-  noTicketsText: {
-    textAlign: "center",
-    color: "rgb(104, 121, 146)",
-    fontSize: "14px",
-    lineHeight: "1.4",
-  },
-
-  noTicketsTitle: {
-    textAlign: "center",
-    fontSize: "16px",
-    fontWeight: 600,
-    margin: "0px",
-  },
-
-  noTicketsDiv: {
-    display: "flex",
-    height: "100px",
-    margin: 40,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-}));
 
 interface Ticket {
   id: number;
@@ -188,9 +171,7 @@ interface TicketsListProps {
 }
 
 const TicketsList = (props: TicketsListProps) => {
-  const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
-    props;
-  const classes = useStyles();
+  const { status, searchParam, showAll, selectedQueueIds, updateCount, style } = props;
   const [pageNumber, setPageNumber] = useState(1);
   const [ticketsList, dispatch] = useReducer(reducer, []);
   const authContext = useContext(AuthContext);
@@ -227,8 +208,7 @@ const TicketsList = (props: TicketsListProps) => {
       (!ticket.userId || ticket.userId === user?.id || showAll) &&
       (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
-    const notBelongsToUserQueues = (ticket: Ticket) =>
-      ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+    const notBelongsToUserQueues = (ticket: Ticket) => ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
 
     socket.on("connect", () => {
       if (status) {
@@ -308,23 +288,14 @@ const TicketsList = (props: TicketsListProps) => {
   };
 
   return (
-    <Paper className={classes.ticketsListWrapper} style={style}>
-      <Paper
-        square
-        elevation={0}
-        className={classes.ticketsList}
-        onScroll={handleScroll}
-      >
+    <TicketsListWrapperStyled style={style}>
+      <TicketsListStyled square elevation={0} onScroll={handleScroll}>
         <List style={{ paddingTop: 0 }}>
           {ticketsList.length === 0 && !loading ? (
-            <div className={classes.noTicketsDiv}>
-              <span className={classes.noTicketsTitle}>
-                {i18n.t("ticketsList.noTicketsTitle")}
-              </span>
-              <p className={classes.noTicketsText}>
-                {i18n.t("ticketsList.noTicketsMessage")}
-              </p>
-            </div>
+            <NoTicketsDivStyled>
+              <NoTicketsTitleStyled>{i18n.t("ticketsList.noTicketsTitle")}</NoTicketsTitleStyled>
+              <NoTicketsTextStyled>{i18n.t("ticketsList.noTicketsMessage")}</NoTicketsTextStyled>
+            </NoTicketsDivStyled>
           ) : (
             <>
               {ticketsList.map((ticket) => (
@@ -334,8 +305,8 @@ const TicketsList = (props: TicketsListProps) => {
           )}
           {loading && <TicketsListSkeleton />}
         </List>
-      </Paper>
-    </Paper>
+      </TicketsListStyled>
+    </TicketsListWrapperStyled>
   );
 };
 

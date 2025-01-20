@@ -8,7 +8,6 @@ import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import { makeStyles } from "@mui/material";
 
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -26,13 +25,11 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 
 import type { Error } from "../../types/Error";
-import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((_theme: Theme) => ({
-  maxWidth: {
-    width: "100%",
-  },
-}));
+const FormControlMaxWidth = styled(FormControl)({
+  width: "100%",
+})
 
 const filterOptions = createFilterOptions({
   trim: true,
@@ -72,7 +69,6 @@ const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
   const [selectedQueue, setSelectedQueue] = useState("");
   const [selectedWhatsapp, setSelectedWhatsapp] = useState(ticketWhatsappId);
   //@ts-ignore
-  const classes = useStyles();
   const { findAll: findAllQueues } = useQueues();
   const { loading: loadingWhatsapps, whatsApps } = useWhatsApps();
 
@@ -210,7 +206,7 @@ const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
               />
             )}
           />
-          <FormControl variant="outlined" className={classes.maxWidth}>
+          <FormControlMaxWidth variant="outlined">
             <InputLabel>
               {i18n.t("transferTicketModal.fieldQueueLabel")}
             </InputLabel>
@@ -226,16 +222,15 @@ const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControlMaxWidth>
           <Can
             role={loggedInUser.profile}
             perform="ticket-options:transferWhatsapp"
             data={{}}
             yes={() =>
               !loadingWhatsapps ? (
-                <FormControl
+                <FormControlMaxWidth
                   variant="outlined"
-                  className={classes.maxWidth}
                   style={{ marginTop: 20 }}
                 >
                   <InputLabel>
@@ -256,7 +251,7 @@ const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
                       </MenuItem>
                     ))}
                   </Select>
-                </FormControl>
+                </FormControlMaxWidth>
               ) : (
                 <></>
               )

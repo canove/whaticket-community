@@ -1,21 +1,18 @@
-import { makeStyles } from "@mui/styles";
 import { Avatar, Card, CardHeader } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((_theme) => ({
-  ticketHeader: {
-    display: "flex",
-    backgroundColor: "#eee",
-    flex: "none",
-    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-  },
-}));
+const TicketHeaderStyled = styled(Card)({
+  display: "flex",
+  backgroundColor: "#eee",
+  flex: "none",
+  borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+})
+
 
 const TicketHeaderSkeleton = () => {
-  const classes = useStyles();
-
   return (
-    <Card square className={classes.ticketHeader}>
+    <TicketHeaderStyled>
       <CardHeader
         titleTypographyProps={{ noWrap: true }}
         subheaderTypographyProps={{ noWrap: true }}
@@ -27,7 +24,7 @@ const TicketHeaderSkeleton = () => {
         title={<Skeleton animation="wave" width={80} />}
         subheader={<Skeleton animation="wave" width={140} />}
       />
-    </Card>
+    </TicketHeaderStyled>
   );
 };
 

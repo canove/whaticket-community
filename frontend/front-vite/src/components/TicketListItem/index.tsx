@@ -23,6 +23,98 @@ import { Tooltip } from "@mui/material";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
+import { styled } from "@mui/material/styles";
+
+const TicketStyled = styled("div")({
+  position: "relative",
+});
+
+const PendingTicketStyled = styled("div")({
+  cursor: "unset",
+});
+
+const NoTicketsDivStyled = styled("div")({
+  display: "flex",
+  height: "100px",
+  margin: 40,
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+const NoTicketsTextStyled = styled("p")({
+  textAlign: "center",
+  color: "rgb(104, 121, 146)",
+  fontSize: "14px",
+  lineHeight: "1.4",
+});
+
+const NoTicketsTitleStyled = styled("h2")({
+  textAlign: "center",
+  fontSize: "16px",
+  fontWeight: 600,
+  margin: "0px",
+});
+
+const ContactNameWrapperStyled = styled("span")({
+  display: "flex",
+  justifyContent: "space-between",
+});
+
+const LastMessageTimeStyled = styled(Typography)({
+  justifySelf: "flex-end",
+});
+
+const ClosedBadgeStyled = styled(Badge)({
+  alignSelf: "center",
+  justifySelf: "flex-end",
+  marginRight: 32,
+  marginLeft: "auto",
+});
+
+const ContactLastMessageStyled = styled(Typography)({
+  paddingRight: 20,
+});
+
+const NewMessagesCountStyled = styled(Badge)({
+  alignSelf: "center",
+  marginRight: 8,
+  marginLeft: "auto",
+});
+
+const BadgeStyleStyled = styled("div")({
+  color: "white",
+  backgroundColor: green[500],
+});
+
+const AcceptButtonStyled = styled(ButtonWithSpinner)({
+  position: "absolute",
+  left: "50%",
+});
+
+const TicketQueueColorStyled = styled("span")({
+  flex: "none",
+  width: "8px",
+  height: "100%",
+  position: "absolute",
+  top: "0%",
+  left: "0%",
+});
+
+const UserTagStyled = styled("div")({
+  position: "absolute",
+  marginRight: 5,
+  right: 5,
+  bottom: 5,
+  background: "#2576D2",
+  color: "#ffffff",
+  border: "1px solid #CCC",
+  padding: 1,
+  paddingLeft: 5,
+  paddingRight: 5,
+  borderRadius: 10,
+  fontSize: "0.9em",
+});
 
 const useStyles = makeStyles((_theme) => ({
   ticket: {
@@ -192,10 +284,9 @@ const TicketListItem = ({ ticket }: { ticket: Ticket }) => {
           placement="right"
           title={ticket.queue?.name || "Sem fila"}
         >
-          <span
+          <TicketQueueColorStyled
             style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
-            className={classes.ticketQueueColor}
-          ></span>
+          ></TicketQueueColorStyled>
         </Tooltip>
         <ListItemAvatar>
           <Avatar src={ticket?.contact?.profilePicUrl} />
@@ -203,7 +294,7 @@ const TicketListItem = ({ ticket }: { ticket: Ticket }) => {
         <ListItemText
           disableTypography
           primary={
-            <span className={classes.contactNameWrapper}>
+            <ContactNameWrapperStyled>
               <Typography
                 noWrap
                 component="span"
@@ -213,15 +304,13 @@ const TicketListItem = ({ ticket }: { ticket: Ticket }) => {
                 {ticket.contact.name}
               </Typography>
               {ticket.status === "closed" && (
-                <Badge
-                  className={classes.closedBadge}
+                <ClosedBadgeStyled
                   badgeContent={"closed"}
                   color="primary"
                 />
               )}
               {ticket.lastMessage && (
-                <Typography
-                  className={classes.lastMessageTime}
+                <LastMessageTimeStyled
                   component="span"
                   variant="body2"
                   color="textSecondary"
@@ -231,22 +320,20 @@ const TicketListItem = ({ ticket }: { ticket: Ticket }) => {
                   ) : (
                     <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
                   )}
-                </Typography>
+                </LastMessageTimeStyled>
               )}
               {ticket.whatsappId && (
-                <div
-                  className={classes.userTag}
+                <UserTagStyled
                   title={i18n.t("ticketsList.connectionTitle")}
                 >
                   {ticket.whatsapp?.name}
-                </div>
+                </UserTagStyled>
               )}
-            </span>
+            </ContactNameWrapperStyled>
           }
           secondary={
-            <span className={classes.contactNameWrapper}>
-              <Typography
-                className={classes.contactLastMessage}
+            <ContactNameWrapperStyled>
+              <ContactLastMessageStyled
                 noWrap
                 component="span"
                 variant="body2"
@@ -257,29 +344,27 @@ const TicketListItem = ({ ticket }: { ticket: Ticket }) => {
                 ) : (
                   <br />
                 )}
-              </Typography>
+              </ContactLastMessageStyled>
 
-              <Badge
-                className={classes.newMessagesCount}
+              <NewMessagesCountStyled
                 badgeContent={ticket.unreadMessages}
                 classes={{
                   badge: classes.badgeStyle,
                 }}
               />
-            </span>
+            </ContactNameWrapperStyled>
           }
         />
         {ticket.status === "pending" && (
-          <ButtonWithSpinner
+          <AcceptButtonStyled
             color="primary"
             variant="contained"
-            className={classes.acceptButton}
             size="small"
             loading={loading}
             onClick={(e) => handleAcepptTicket(ticket.id)}
           >
             {i18n.t("ticketsList.buttons.accept")}
-          </ButtonWithSpinner>
+          </AcceptButtonStyled>
         )}
       </ListItem>
       <Divider variant="inset" component="li" />

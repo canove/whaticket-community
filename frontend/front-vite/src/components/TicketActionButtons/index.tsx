@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { makeStyles } from "@mui/styles";
 import { IconButton } from "@mui/material";
 import { MoreVert, Replay } from "@mui/icons-material";
 
@@ -12,22 +11,19 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import type { Error } from "../../types/Error";
-import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  actionButtons: {
-    marginRight: 6,
-    flex: "none",
-    alignSelf: "center",
-    marginLeft: "auto",
-    "& > *": {
-      margin: theme.spacing(1),
-    },
+const ActionButtonsStyle = styled("div")(({ theme }) => ({
+  marginRight: 6,
+  flex: "none",
+  alignSelf: "center",
+  marginLeft: "auto",
+  "& > *": {
+    margin: theme.spacing(1),
   },
 }));
 
 const TicketActionButtons = ({ ticket }: { ticket: any }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,9 +31,7 @@ const TicketActionButtons = ({ ticket }: { ticket: any }) => {
   const authContext = useContext(AuthContext);
   const user = authContext ? authContext.user : null;
 
-  const handleOpenTicketOptionsMenu = (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const handleOpenTicketOptionsMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
   };
 
@@ -45,11 +39,7 @@ const TicketActionButtons = ({ ticket }: { ticket: any }) => {
     setAnchorEl(null);
   };
 
-  const handleUpdateTicketStatus = async (
-    _e: React.MouseEvent<HTMLButtonElement>,
-    status: string,
-    userId: number | null
-  ) => {
+  const handleUpdateTicketStatus = async (_e: React.MouseEvent<HTMLButtonElement>, status: string, userId: number | null) => {
     setLoading(true);
     try {
       await api.put(`/tickets/${ticket.id}`, {
@@ -70,7 +60,7 @@ const TicketActionButtons = ({ ticket }: { ticket: any }) => {
   };
 
   return (
-    <div className={classes.actionButtons}>
+    <ActionButtonsStyle>
       {ticket.status === "closed" && (
         <ButtonWithSpinner
           loading={loading}
@@ -96,9 +86,7 @@ const TicketActionButtons = ({ ticket }: { ticket: any }) => {
             size="small"
             variant="contained"
             color="primary"
-            onClick={(e: any) =>
-              handleUpdateTicketStatus(e, "closed", user?.id)
-            }
+            onClick={(e: any) => handleUpdateTicketStatus(e, "closed", user?.id)}
           >
             {i18n.t("messagesList.header.buttons.resolve")}
           </ButtonWithSpinner>
@@ -124,7 +112,7 @@ const TicketActionButtons = ({ ticket }: { ticket: any }) => {
           {i18n.t("messagesList.header.buttons.accept")}
         </ButtonWithSpinner>
       )}
-    </div>
+    </ActionButtonsStyle>
   );
 };
 

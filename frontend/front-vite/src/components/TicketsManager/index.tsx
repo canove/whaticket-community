@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { makeStyles } from "@mui/styles";
 import Paper from "@mui/material/Paper";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
@@ -18,74 +17,94 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import TicketsQueueSelect from "../TicketsQueueSelect";
 import { Button } from "@mui/material";
-import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  ticketsWrapper: {
-    position: "relative",
-    display: "flex",
-    height: "100%",
-    flexDirection: "column",
-    overflow: "hidden",
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    backgroundColor: theme.palette.background.default,
-    color: theme.palette.text.primary,
-  },
-  tabsHeader: {
-    flex: "none",
-    backgroundColor: theme.palette.background.paper,
-  },
-  settingsIcon: {
-    alignSelf: "center",
-    marginLeft: "auto",
-    padding: 8,
-  },
-  tab: {
-    minWidth: 120,
-    width: 120,
-  },
-  ticketOptionsBox: {
+const TicketsWrapperStyled = styled(Paper)(({ theme }) => ({
+  position: "relative",
+  display: "flex",
+  height: "100%",
+  flexDirection: "column",
+  overflow: "hidden",
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
+
+const TabPanelStyled = styled(TabPanel)(({ theme }) => ({
+  position: "relative",
+  display: "flex",
+  height: "100%",
+  flexDirection: "column",
+  overflow: "hidden",
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
+
+const TabsHeaderStyled = styled(Paper)(({ theme }) => ({
+  flex: "none",
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const SettingsIconStyled = styled("div")({
+  alignSelf: "center",
+  marginLeft: "auto",
+  padding: 8,
+})
+
+const TabStyled = styled(Tab)({
+  minWidth: 120,
+  width: 120,
+});
+
+const TicketOptionsBoxStyled = styled(Paper)(({ theme }) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     background: theme.palette.background.paper,
     padding: theme.spacing(1),
-  },
-  serachInputWrapper: {
-    flex: 1,
-    background: theme.palette.background.default,
-    display: "flex",
-    borderRadius: 40,
-    padding: 4,
-    marginRight: theme.spacing(1),
-  },
-  searchIcon: {
-    color: "grey",
-    marginLeft: 6,
-    marginRight: 6,
-    alignSelf: "center",
-  },
-  searchInput: {
-    flex: 1,
-    border: "none",
-    borderRadius: 30,
-    color: theme.palette.text.primary,
-    backgroundColor: theme.palette.background.default,
-  },
-  badge: {
-    right: "-10px",
-  },
-  show: {
-    display: "block",
-  },
-  hide: {
-    display: "none !important",
-  },
 }));
 
+const SerachInputWrapperStyled = styled("div")(({ theme }) => ({
+  flex: 1,
+  background: theme.palette.background.default,
+  display: "flex",
+  borderRadius: 40,
+  padding: 4,
+  marginRight: theme.spacing(1),
+}));
+
+const SearchIconStyled = styled(SearchIcon)({
+  color: "grey",
+  marginLeft: 6,
+  marginRight: 6,
+  alignSelf: "center",
+})
+
+const SearchInputStyled = styled(InputBase)(({ theme }) => ({
+  flex: 1,
+  border: "none",
+  borderRadius: 30,
+  color: theme.palette.text.primary,
+  backgroundColor: theme.palette.background.default,
+}));
+
+const BadgeStyled = styled(Badge)({
+  right: "-10px",
+})
+
+const ShowStyled = styled(SearchIcon)({
+  display: "block",
+
+})
+
+const HydeStyled = styled(SearchIcon)({
+  display: "none !important",
+})
+
 const TicketsManager = () => {
-  const classes = useStyles();
   const [searchParam, setSearchParam] = useState("");
   const [tab, setTab] = useState("open");
   const [tabOpen, setTabOpen] = useState("open");
@@ -146,12 +165,9 @@ const TicketsManager = () => {
   };
 
   return (
-    <Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
-      <NewTicketModal
-        modalOpen={newTicketModalOpen}
-        onClose={() => setNewTicketModalOpen(false)}
-      />
-      <Paper elevation={0} square className={classes.tabsHeader}>
+    <TicketsWrapperStyled variant="outlined">
+      <NewTicketModal modalOpen={newTicketModalOpen} onClose={() => setNewTicketModalOpen(false)} />
+      <TabsHeaderStyled elevation={0} square>
         <Tabs
           value={tab}
           onChange={handleChangeTab}
@@ -160,45 +176,25 @@ const TicketsManager = () => {
           textColor="primary"
           aria-label="icon label tabs example"
         >
-          <Tab
-            value={"open"}
-            icon={<MoveToInboxIcon />}
-            label={i18n.t("tickets.tabs.open.title")}
-            classes={{ root: classes.tab }}
-          />
-          <Tab
-            value={"closed"}
-            icon={<CheckBoxIcon />}
-            label={i18n.t("tickets.tabs.closed.title")}
-            classes={{ root: classes.tab }}
-          />
-          <Tab
-            value={"search"}
-            icon={<SearchIcon />}
-            label={i18n.t("tickets.tabs.search.title")}
-            classes={{ root: classes.tab }}
-          />
+          <Tab value={"open"} icon={<MoveToInboxIcon />} label={i18n.t("tickets.tabs.open.title")} classes={{ root: classes.tab }} />
+          <Tab value={"closed"} icon={<CheckBoxIcon />} label={i18n.t("tickets.tabs.closed.title")} classes={{ root: classes.tab }} />
+          <Tab value={"search"} icon={<SearchIcon />} label={i18n.t("tickets.tabs.search.title")} classes={{ root: classes.tab }} />
         </Tabs>
-      </Paper>
-      <Paper square elevation={0} className={classes.ticketOptionsBox}>
+      </TabsHeaderStyled>
+      <TicketOptionsBoxStyled>
         {tab === "search" ? (
-          <div className={classes.serachInputWrapper}>
-            <SearchIcon className={classes.searchIcon} />
-            <InputBase
-              className={classes.searchInput}
+          <SerachInputWrapperStyled>
+            <SearchIconStyled />
+            <SearchInputStyled
               inputRef={searchInputRef}
               placeholder={i18n.t("tickets.search.placeholder")}
               type="search"
               onChange={handleSearch}
             />
-          </div>
+          </SerachInputWrapperStyled>
         ) : (
           <>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => setNewTicketModalOpen(true)}
-            >
+            <Button variant="outlined" color="primary" onClick={() => setNewTicketModalOpen(true)}>
               {i18n.t("ticketsManager.buttons.newTicket")}
             </Button>
             <Can
@@ -212,9 +208,7 @@ const TicketsManager = () => {
                     <Switch
                       size="small"
                       checked={showAllTickets}
-                      onChange={() =>
-                        setShowAllTickets((prevState) => !prevState)
-                      }
+                      onChange={() => setShowAllTickets((prevState) => !prevState)}
                       name="showAllTickets"
                       color="primary"
                     />
@@ -230,41 +224,27 @@ const TicketsManager = () => {
           userQueues={user?.queues}
           onChange={(values) => setSelectedQueueIds(values)}
         />
-      </Paper>
-      <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
-        <Tabs
-          value={tabOpen}
-          onChange={handleChangeTabOpen}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="fullWidth"
-        >
+      </TicketOptionsBoxStyled>
+      <TabPanelStyled  value={tab} name="open" >
+        <Tabs value={tabOpen} onChange={handleChangeTabOpen} indicatorColor="primary" textColor="primary" variant="fullWidth">
           <Tab
             label={
-              <Badge
-                className={classes.badge}
-                badgeContent={openCount}
-                color="primary"
-              >
+              <BadgeStyled badgeContent={openCount} color="primary">
                 {i18n.t("ticketsList.assignedHeader")}
-              </Badge>
+              </BadgeStyled>
             }
             value={"open"}
           />
           <Tab
             label={
-              <Badge
-                className={classes.badge}
-                badgeContent={pendingCount}
-                color="secondary"
-              >
+              <BadgeStyled badgeContent={pendingCount} color="secondary">
                 {i18n.t("ticketsList.pendingHeader")}
-              </Badge>
+              </BadgeStyled>
             }
             value={"pending"}
           />
         </Tabs>
-        <Paper className={classes.ticketsWrapper}>
+        <TicketsWrapperStyled>
           <TicketsList
             status="open"
             showAll={showAllTickets}
@@ -278,23 +258,15 @@ const TicketsManager = () => {
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
           />
-        </Paper>
-      </TabPanel>
-      <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
-        <TicketsList
-          status="closed"
-          showAll={true}
-          selectedQueueIds={selectedQueueIds}
-        />
-      </TabPanel>
-      <TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
-        <TicketsList
-          searchParam={searchParam}
-          showAll={true}
-          selectedQueueIds={selectedQueueIds}
-        />
-      </TabPanel>
-    </Paper>
+        </TicketsWrapperStyled>
+      </TabPanelStyled>
+      <TabPanelStyled value={tab} name="closed">
+        <TicketsList status="closed" showAll={true} selectedQueueIds={selectedQueueIds} />
+      </TabPanelStyled>
+      <TabPanelStyled value={tab} name="search">
+        <TicketsList searchParam={searchParam} showAll={true} selectedQueueIds={selectedQueueIds} />
+      </TabPanelStyled>
+    </TicketsWrapperStyled>
   );
 };
 

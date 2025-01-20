@@ -22,7 +22,6 @@ import {
 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-import { makeStyles } from "@mui/styles";
 import { green } from "@mui/material/colors";
 
 import { i18n } from "../../translate/i18n";
@@ -34,37 +33,39 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 import useWhatsApps from "../../hooks/useWhatsApps";
 import type { Error } from "../../types/Error";
-import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  multFieldLine: {
-    display: "flex",
+const RootStyled = styled("div")({
+  display: "flex",
+  flexWrap: "wrap",
+})
+
+const MultFieldLineStyled = styled("div")(({ theme }) => ({
+  display: "flex",
     "& > *:not(:last-child)": {
       marginRight: theme.spacing(1),
     },
-  },
+}))
 
-  btnWrapper: {
-    position: "relative",
-  },
+const BtnWrapperStyled = styled(Button)({
+  position: "relative",
 
-  buttonProgress: {
-    color: green[500],
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -12,
-    marginLeft: -12,
-  },
-  formControl: {
-    margin: theme.spacing(1),
+})
+
+const ButtonProgressStyled = styled(CircularProgress)({
+  color: green[500],
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  marginTop: -12,
+  marginLeft: -12,
+})
+
+const FormControlStyled = styled(FormControl)(({ theme }) => ({
+  margin: theme.spacing(1),
     minWidth: 120,
-  },
-}));
+}))
+
 
 const UserSchema = Yup.object().shape({
   name: Yup.string()
@@ -82,7 +83,6 @@ interface UserModalProps {
 }
 
 const UserModal = ({ open, onClose, userId }: UserModalProps) => {
-  const classes = useStyles();
 
   const initialState = {
     name: "",
@@ -147,7 +147,7 @@ const UserModal = ({ open, onClose, userId }: UserModalProps) => {
   };
 
   return (
-    <div className={classes.root}>
+    <RootStyled>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -174,7 +174,7 @@ const UserModal = ({ open, onClose, userId }: UserModalProps) => {
           {({ touched, errors, isSubmitting }) => (
             <Form>
               <DialogContent dividers>
-                <div className={classes.multFieldLine}>
+                <MultFieldLineStyled>
                   <Field
                     as={TextField}
                     label={i18n.t("userModal.form.name")}
@@ -209,8 +209,8 @@ const UserModal = ({ open, onClose, userId }: UserModalProps) => {
                     }}
                     fullWidth
                   />
-                </div>
-                <div className={classes.multFieldLine}>
+                </MultFieldLineStyled>
+                <MultFieldLineStyled>
                   <Field
                     as={TextField}
                     label={i18n.t("userModal.form.email")}
@@ -221,9 +221,8 @@ const UserModal = ({ open, onClose, userId }: UserModalProps) => {
                     margin="dense"
                     fullWidth
                   />
-                  <FormControl
+                  <FormControlStyled
                     variant="outlined"
-                    className={classes.formControl}
                     margin="dense"
                   >
                     <Can
@@ -249,8 +248,8 @@ const UserModal = ({ open, onClose, userId }: UserModalProps) => {
                         </>
                       )}
                     />
-                  </FormControl>
-                </div>
+                  </FormControlStyled>
+                </MultFieldLineStyled>
                 <Can
                   role={loggedInUser.profile}
                   perform="user-modal:editQueues"
@@ -304,29 +303,27 @@ const UserModal = ({ open, onClose, userId }: UserModalProps) => {
                 >
                   {i18n.t("userModal.buttons.cancel")}
                 </Button>
-                <Button
+                <BtnWrapperStyled
                   type="submit"
                   color="primary"
                   disabled={isSubmitting}
                   variant="contained"
-                  className={classes.btnWrapper}
                 >
                   {userId
                     ? `${i18n.t("userModal.buttons.okEdit")}`
                     : `${i18n.t("userModal.buttons.okAdd")}`}
                   {isSubmitting && (
-                    <CircularProgress
+                    <ButtonProgressStyled
                       size={24}
-                      className={classes.buttonProgress}
                     />
                   )}
-                </Button>
+                </BtnWrapperStyled>
               </DialogActions>
             </Form>
           )}
         </Formik>
       </Dialog>
-    </div>
+    </RootStyled>
   );
 };
 
