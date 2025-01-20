@@ -23,34 +23,33 @@ import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
 import type { Error } from "../../types/Error";
-import type { Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
+const RootStyled = styled("div")({
+  display: "flex",
+  flexWrap: "wrap",
+})
 
-  multFieldLine: {
-    display: "flex",
+const MultFieldLineStyled = styled("div")(({ theme }) => ({
+  display: "flex",
     "& > *:not(:last-child)": {
       marginRight: theme.spacing(1),
     },
-  },
+}))
 
-  btnWrapper: {
-    position: "relative",
-  },
+const BtnWrapperStyled = styled(Button)({
+  position: "relative",
 
-  buttonProgress: {
-    color: green[500],
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -12,
-    marginLeft: -12,
-  },
-}));
+})
+
+const ButtonProgressStyled = styled(CircularProgress)({
+  color: green[500],
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  marginTop: -12,
+  marginLeft: -12,
+})
 
 const SessionSchema = Yup.object().shape({
   name: Yup.string()
@@ -128,7 +127,7 @@ const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
   };
 
   return (
-    <div className={classes.root}>
+    <RootStyled>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -155,7 +154,7 @@ const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
           {({ values, touched, errors, isSubmitting }) => (
             <Form>
               <DialogContent dividers>
-                <div className={classes.multFieldLine}>
+                <MultFieldLineStyled>
                   <Field
                     as={TextField}
                     label={i18n.t("whatsappModal.form.name")}
@@ -178,7 +177,7 @@ const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
                     }
                     label={i18n.t("whatsappModal.form.default")}
                   />
-                </div>
+                </MultFieldLineStyled>
                 <div>
                   <Field
                     as={TextField}
@@ -231,29 +230,27 @@ const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
                 >
                   {i18n.t("whatsappModal.buttons.cancel")}
                 </Button>
-                <Button
+                <BtnWrapperStyled
                   type="submit"
                   color="primary"
                   disabled={isSubmitting}
                   variant="contained"
-                  className={classes.btnWrapper}
                 >
                   {whatsAppId
                     ? i18n.t("whatsappModal.buttons.okEdit")
                     : i18n.t("whatsappModal.buttons.okAdd")}
                   {isSubmitting && (
-                    <CircularProgress
+                    <ButtonProgressStyled
                       size={24}
-                      className={classes.buttonProgress}
                     />
                   )}
-                </Button>
+                </BtnWrapperStyled>
               </DialogActions>
             </Form>
           )}
         </Formik>
       </Dialog>
-    </div>
+    </RootStyled>
   );
 };
 
