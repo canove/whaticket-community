@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 
-import Avatar from "@material-ui/core/Avatar";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
+import Avatar from "@mui/material/Avatar";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid2";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 
-import { Button, Divider } from "@material-ui/core";
+import { Button, Divider } from "@mui/material";
 import type { Error } from "../../types/Error";
 
 interface VcardPreviewProps {
@@ -72,10 +72,14 @@ const VcardPreview = ({ contact, numbers }: VcardPreviewProps) => {
         }}
       >
         <Grid container spacing={1}>
-          <Grid item xs={2}>
+          <Grid
+            size={{
+              xs: 3,
+            }}
+          >
             <Avatar src={selectedContact.profilePicUrl} />
           </Grid>
-          <Grid item xs={9}>
+          <Grid size={{ xs: 9 }}>}>
             <Typography
               style={{ marginTop: "12px", marginLeft: "10px" }}
               variant="subtitle1"
@@ -85,7 +89,7 @@ const VcardPreview = ({ contact, numbers }: VcardPreviewProps) => {
               {selectedContact.name}
             </Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Divider />
             <Button
               fullWidth

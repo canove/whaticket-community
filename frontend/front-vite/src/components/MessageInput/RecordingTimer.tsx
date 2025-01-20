@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles((_theme) => ({
+const useStyles = makeStyles(() => ({
   timerBox: {
     display: "flex",
     marginLeft: 10,

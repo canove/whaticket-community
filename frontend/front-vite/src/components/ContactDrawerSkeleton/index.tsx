@@ -1,9 +1,8 @@
-import Skeleton from "@material-ui/lab/Skeleton";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
+import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 import { i18n } from "../../translate/i18n";
-
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles({
   content: {},
@@ -25,7 +24,7 @@ const ContactDrawerSkeleton: React.FC<ContactDrawerSkeletonProps> = ({
       <Paper square variant="outlined" className={classes.contactHeader}>
         <Skeleton
           animation="wave"
-          variant="circle"
+          variant="circular"
           width={160}
           height={160}
           className={classes.contactAvatar}
