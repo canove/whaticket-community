@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
-import { MoreVert, Replay } from "@material-ui/icons";
+import { makeStyles } from "@mui/styles";
+import { IconButton } from "@mui/material";
+import { MoreVert, Replay } from "@mui/icons-material";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -12,8 +12,9 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import type { Error } from "../../types/Error";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   actionButtons: {
     marginRight: 6,
     flex: "none",

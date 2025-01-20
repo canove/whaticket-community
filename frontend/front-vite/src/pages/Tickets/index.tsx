@@ -1,15 +1,16 @@
 import { useParams } from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
+import Grid from "@mui/material/Grid2";
+import Paper from "@mui/material/Paper";
+import { makeStyles } from "@mui/styles";
 
 import TicketsManager from "../../components/TicketsManager/";
 import Ticket from "../../components/Ticket/";
 
 import { i18n } from "../../translate/i18n";
-import Hidden from "@material-ui/core/Hidden";
+import Hidden from "@mui/material/Hidden";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   chatContainer: {
     flex: 1,
     // // backgroundColor: "#eee",

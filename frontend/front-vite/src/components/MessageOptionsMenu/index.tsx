@@ -1,11 +1,12 @@
 import { useState, useContext } from "react";
 
-import MenuItem from "@material-ui/core/MenuItem";
+import MenuItem from "@mui/material/MenuItem";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
-import { Menu } from "@material-ui/core";
+import Menu from "@mui/material/Menu";
+
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
@@ -66,7 +67,6 @@ const MessageOptionsMenu: React.FC<MessageOptionsMenuProps> = ({
       </ConfirmationModal>
       <Menu
         anchorEl={anchorEl}
-        getContentAnchorEl={null}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",

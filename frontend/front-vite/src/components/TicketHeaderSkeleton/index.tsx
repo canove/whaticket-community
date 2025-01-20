@@ -1,6 +1,6 @@
-import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Card, CardHeader } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
+import { makeStyles } from "@mui/styles";
+import { Avatar, Card, CardHeader } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 
 const useStyles = makeStyles((_theme) => ({
   ticketHeader: {
@@ -20,7 +20,7 @@ const TicketHeaderSkeleton = () => {
         titleTypographyProps={{ noWrap: true }}
         subheaderTypographyProps={{ noWrap: true }}
         avatar={
-          <Skeleton animation="wave" variant="circle">
+          <Skeleton animation="wave" variant="circular">
             <Avatar alt="contact_image" />
           </Skeleton>
         }

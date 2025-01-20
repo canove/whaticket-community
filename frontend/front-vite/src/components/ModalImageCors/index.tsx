@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
 import ModalImage from "react-modal-image";
 import api from "../../services/api";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((_theme) => ({
+const useStyles = makeStyles((_theme: Theme) => ({
   messageMedia: {
     objectFit: "cover",
     width: 250,

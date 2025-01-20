@@ -3,23 +3,23 @@ import openSocket from "../../services/socket-io";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import Avatar from "@material-ui/core/Avatar";
-import WhatsAppIcon from "@material-ui/icons/WhatsApp";
-import SearchIcon from "@material-ui/icons/Search";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import { makeStyles } from "@mui/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import Avatar from "@mui/material/Avatar";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import SearchIcon from "@mui/icons-material/Search";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
 
-import IconButton from "@material-ui/core/IconButton";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import EditIcon from "@material-ui/icons/Edit";
+import IconButton from "@mui/material/IconButton";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
 
 import api from "../../services/api";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
@@ -35,6 +35,7 @@ import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../../components/Can";
 import type { Error } from "../../types/Error";
+import type { Theme } from "@mui/material/styles";
 
 interface Contact {
   id: number;
@@ -95,13 +96,13 @@ const reducer = (state: Contact[], action: Action): Contact[] => {
   return state;
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   mainPaper: {
     flex: 1,
     padding: theme.spacing(1),
     overflowY: "scroll",
     //@ts-ignore
-    ...theme.scrollbarStyles,
+    // ...theme.scrollbarStyles,
   },
 }));
 

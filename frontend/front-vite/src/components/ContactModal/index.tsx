@@ -4,18 +4,18 @@ import * as Yup from "yup";
 import { Formik, FieldArray, Form, Field } from "formik";
 import { toast } from "react-toastify";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { green } from "@mui/material/colors";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CircularProgress from "@mui/material/CircularProgress";
+import { styled } from "@mui/material/styles";
 
 import { i18n } from "../../translate/i18n";
 
@@ -23,35 +23,33 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  textField: {
-    marginRight: theme.spacing(1),
-    flex: 1,
-  },
+const Root = styled("div")({
+  display: "flex",
+  flexWrap: "wrap",
+});
 
-  extraAttr: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  btnWrapper: {
-    position: "relative",
-  },
-
-  buttonProgress: {
-    color: green[500],
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -12,
-    marginLeft: -12,
-  },
+const TextFieldStyled = styled(TextField)(({ theme }) => ({
+  marginRight: theme.spacing(1),
+  flex: 1,
 }));
+
+const ArrayFieldsExtra = styled("div")({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+});
+
+const ButtonWrapperStyled = styled(Button)({
+  position: "relative",
+});
+const ButtonProgress = styled(CircularProgress)({
+  color: green[500],
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  marginTop: -12,
+  marginLeft: -12,
+});
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string()
@@ -82,7 +80,6 @@ const ContactModal: React.FC<ContactModalProps> = ({
   initialValues,
   onSave,
 }) => {
-  const classes = useStyles();
   const isMounted = useRef(true);
 
   const initialState = {
@@ -156,7 +153,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
   };
 
   return (
-    <div className={classes.root}>
+    <Root>
       <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
         <DialogTitle id="form-dialog-title">
           {contactId
@@ -181,7 +178,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                   {i18n.t("contactModal.form.mainInfo")}
                 </Typography>
                 <Field
-                  as={TextField}
+                  as={TextFieldStyled}
                   label={i18n.t("contactModal.form.name")}
                   name="name"
                   autoFocus
@@ -189,10 +186,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
                   helperText={touched.name && errors.name}
                   variant="outlined"
                   margin="dense"
-                  className={classes.textField}
                 />
                 <Field
-                  as={TextField}
+                  as={TextFieldStyled}
                   label={i18n.t("contactModal.form.number")}
                   name="number"
                   error={touched.number && Boolean(errors.number)}
@@ -203,7 +199,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 />
                 <div>
                   <Field
-                    as={TextField}
+                    as={TextFieldStyled}
                     label={i18n.t("contactModal.form.email")}
                     name="email"
                     error={touched.email && Boolean(errors.email)}
@@ -227,25 +223,20 @@ const ContactModal: React.FC<ContactModalProps> = ({
                       {values.extraInfo &&
                         values.extraInfo.length > 0 &&
                         values.extraInfo.map((_info, index) => (
-                          <div
-                            className={classes.extraAttr}
-                            key={`${index}-info`}
-                          >
+                          <ArrayFieldsExtra key={`${index}-info`}>
                             <Field
-                              as={TextField}
+                              as={TextFieldStyled}
                               label={i18n.t("contactModal.form.extraName")}
                               name={`extraInfo[${index}].name`}
                               variant="outlined"
                               margin="dense"
-                              className={classes.textField}
                             />
                             <Field
-                              as={TextField}
+                              as={TextFieldStyled}
                               label={i18n.t("contactModal.form.extraValue")}
                               name={`extraInfo[${index}].value`}
                               variant="outlined"
                               margin="dense"
-                              className={classes.textField}
                             />
                             <IconButton
                               size="small"
@@ -253,9 +244,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
                             >
                               <DeleteOutlineIcon />
                             </IconButton>
-                          </div>
+                          </ArrayFieldsExtra>
                         ))}
-                      <div className={classes.extraAttr}>
+                      <ArrayFieldsExtra>
                         <Button
                           style={{ flex: 1, marginTop: 8 }}
                           variant="outlined"
@@ -264,7 +255,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                         >
                           {`+ ${i18n.t("contactModal.buttons.addExtraInfo")}`}
                         </Button>
-                      </div>
+                      </ArrayFieldsExtra>
                     </>
                   )}
                 </FieldArray>
@@ -278,29 +269,23 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 >
                   {i18n.t("contactModal.buttons.cancel")}
                 </Button>
-                <Button
+                <ButtonWrapperStyled
                   type="submit"
                   color="primary"
                   disabled={isSubmitting}
                   variant="contained"
-                  className={classes.btnWrapper}
                 >
                   {contactId
                     ? `${i18n.t("contactModal.buttons.okEdit")}`
                     : `${i18n.t("contactModal.buttons.okAdd")}`}
-                  {isSubmitting && (
-                    <CircularProgress
-                      size={24}
-                      className={classes.buttonProgress}
-                    />
-                  )}
-                </Button>
+                  {isSubmitting && <ButtonProgress size={24} />}
+                </ButtonWrapperStyled>
               </DialogActions>
             </Form>
           )}
         </Formik>
       </Dialog>
-    </div>
+    </Root>
   );
 };
 

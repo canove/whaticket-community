@@ -12,11 +12,11 @@ import {
   IconButton,
   Menu,
   Switch,
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -26,10 +26,11 @@ import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
 import { useThemeContext } from "../context/DarkMode";
 import type { ReactNode } from "react";
+import type { Theme } from "@mui/material/styles";
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: "flex",
     height: "100vh",
@@ -128,6 +129,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LoggedInLayout = ({ children }: { children: ReactNode }) => {
+  //@ts-ignore
   const classes = useStyles();
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -265,7 +267,7 @@ const LoggedInLayout = ({ children }: { children: ReactNode }) => {
             <Menu
               id="menu-appbar"
               anchorEl={anchorEl}
-              getContentAnchorEl={null}
+              // getContentAnchorEl={null}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "right",

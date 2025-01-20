@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
-import { Paper, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@mui/styles";
+import Paper from "@mui/material/Paper";
 
 import ContactDrawer from "../ContactDrawer";
 import MessageInput from "../MessageInput/";
@@ -17,10 +18,11 @@ import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
+import type { Theme } from "@mui/material/styles";
 
 const drawerWidth = 320;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: "flex",
     height: "100%",

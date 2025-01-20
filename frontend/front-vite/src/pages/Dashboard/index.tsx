@@ -1,10 +1,10 @@
 import { useContext } from "react";
 
-import Paper from "@material-ui/core/Paper";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
+import Paper from "@mui/material/Paper";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import { makeStyles } from "@mui/styles";
+import Typography from "@mui/material/Typography";
 
 import useTickets from "../../hooks/useTickets";
 
@@ -13,8 +13,9 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { i18n } from "../../translate/i18n";
 
 import Chart from "./Chart";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),

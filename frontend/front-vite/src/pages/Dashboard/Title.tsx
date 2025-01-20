@@ -1,4 +1,4 @@
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 
 import type { ReactNode } from "react";
 

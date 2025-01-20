@@ -6,22 +6,23 @@ import {
   Button,
   CssBaseline,
   TextField,
-  Grid,
+  Grid2 as Grid,
   Box,
   Typography,
   Container,
   InputAdornment,
   IconButton,
   Link,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { LockOutlined, Visibility, VisibilityOff } from "@material-ui/icons";
+import { LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
+import type { Theme } from "@mui/material/styles";
 
 // const Copyright = () => {
 // 	return (
@@ -36,7 +37,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 // 	);
 // };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     marginTop: theme.spacing(8),
     display: "flex",
@@ -134,13 +135,8 @@ const Login = () => {
             {i18n.t("login.buttons.submit")}
           </Button>
           <Grid container>
-            <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                component={RouterLink}
-                to="/signup"
-              >
+            <Grid>
+              <Link variant="body2" component={RouterLink} to="/signup">
                 {i18n.t("login.buttons.register")}
               </Link>
             </Grid>

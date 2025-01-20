@@ -5,29 +5,30 @@ import { Picker } from "emoji-mart";
 //import MicRecorder from "mic-recorder-to-mp3";
 import clsx from "clsx";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import InputBase from "@material-ui/core/InputBase";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { green } from "@material-ui/core/colors";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import IconButton from "@material-ui/core/IconButton";
-import MoreVert from "@material-ui/icons/MoreVert";
-import MoodIcon from "@material-ui/icons/Mood";
-import SendIcon from "@material-ui/icons/Send";
-import CancelIcon from "@material-ui/icons/Cancel";
-import ClearIcon from "@material-ui/icons/Clear";
-import MicIcon from "@material-ui/icons/Mic";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import { makeStyles } from "@mui/styles";
+import { styled } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import CircularProgress from "@mui/material/CircularProgress";
+import { green } from "@mui/material/colors";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import IconButton from "@mui/material/IconButton";
+import MoreVert from "@mui/icons-material/MoreVert";
+import MoodIcon from "@mui/icons-material/Mood";
+import SendIcon from "@mui/icons-material/Send";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ClearIcon from "@mui/icons-material/Clear";
+import MicIcon from "@mui/icons-material/Mic";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import {
   FormControlLabel,
   Hidden,
   Menu,
   MenuItem,
   Switch,
-} from "@material-ui/core";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+} from "@mui/material";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -38,10 +39,23 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
 import type { Error } from "../../types/Error";
 import { useMp3Recorder } from "../../hooks/useMp3Recorder";
+import type { Theme } from "@mui/material/styles";
 
 // const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
-const useStyles = makeStyles((theme) => ({
+const mainWrapperStyled = styled(Paper)(({ theme }) => ({
+  background: "#eee",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+  [theme.breakpoints.down("sm")]: {
+    position: "fixed",
+    bottom: 0,
+    width: "100%",
+  },
+}));
+const useStyles = makeStyles((theme: Theme) => ({
   mainWrapper: {
     background: "#eee",
     display: "flex",

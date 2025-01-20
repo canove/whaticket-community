@@ -1,20 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import Divider from "@material-ui/core/Divider";
-import { Badge } from "@material-ui/core";
-import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
-import WhatsAppIcon from "@material-ui/icons/WhatsApp";
-import SyncAltIcon from "@material-ui/icons/SyncAlt";
-import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
-import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
-import ContactPhoneOutlinedIcon from "@material-ui/icons/ContactPhoneOutlined";
-import AccountTreeOutlinedIcon from "@material-ui/icons/AccountTreeOutlined";
-import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutlined";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import Divider from "@mui/material/Divider";
+import { Badge } from "@mui/material";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
+import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
+import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";

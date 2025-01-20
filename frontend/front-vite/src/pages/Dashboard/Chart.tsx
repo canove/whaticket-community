@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/styles";
 import {
   BarChart,
   CartesianGrid,
@@ -15,9 +15,10 @@ import { i18n } from "../../translate/i18n";
 
 import Title from "./Title";
 import useTickets from "../../hooks/useTickets";
+import type { Theme } from "@mui/material/styles";
 
 const Chart = () => {
-  const theme = useTheme();
+  const theme = useTheme<Theme>();
 
   const date = useRef(new Date().toISOString());
   const { tickets } = useTickets({ date: date.current });

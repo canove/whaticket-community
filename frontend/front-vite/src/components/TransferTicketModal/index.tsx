@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Dialog from "@material-ui/core/Dialog";
-import Select from "@material-ui/core/Select";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import { makeStyles } from "@material-ui/core";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import Select from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import { makeStyles } from "@mui/material";
 
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Autocomplete, {
-  createFilterOptions,
-} from "@material-ui/lab/Autocomplete";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -28,8 +26,9 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 
 import type { Error } from "../../types/Error";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((_theme) => ({
+const useStyles = makeStyles((_theme: Theme) => ({
   maxWidth: {
     width: "100%",
   },
@@ -72,6 +71,7 @@ const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedQueue, setSelectedQueue] = useState("");
   const [selectedWhatsapp, setSelectedWhatsapp] = useState(ticketWhatsappId);
+  //@ts-ignore
   const classes = useStyles();
   const { findAll: findAllQueues } = useQueues();
   const { loading: loadingWhatsapps, whatsApps } = useWhatsApps();

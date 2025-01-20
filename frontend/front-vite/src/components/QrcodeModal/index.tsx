@@ -3,7 +3,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import openSocket from "../../services/socket-io";
 import toastError from "../../errors/toastError";
 
-import { Dialog, DialogContent, Paper, Typography } from "@material-ui/core";
+import { Dialog, DialogContent, Paper, Typography } from "@mui/material";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import type { Error } from "../../types/Error";

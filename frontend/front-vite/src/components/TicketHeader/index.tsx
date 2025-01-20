@@ -1,10 +1,11 @@
-import { Card, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Card, Button } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
-import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
+import ArrowBackIos from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   ticketHeader: {
     display: "flex",
     backgroundColor: "#eee",

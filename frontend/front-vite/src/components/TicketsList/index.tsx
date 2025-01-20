@@ -1,9 +1,9 @@
 import { useState, useEffect, useReducer, useContext } from "react";
 import openSocket from "../../services/socket-io";
 
-import { makeStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@mui/styles";
+import List from "@mui/material/List";
+import Paper from "@mui/material/Paper";
 
 import TicketListItem from "../TicketListItem";
 import TicketsListSkeleton from "../TicketsListSkeleton";
@@ -11,8 +11,9 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import type { Theme } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme: Theme) => ({
   ticketsListWrapper: {
     position: "relative",
     display: "flex",
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     overflowY: "scroll",
     //@ts-ignore
-    ...theme.scrollbarStyles,
+    // ...theme.scrollbarStyles,
     borderTop: "2px solid rgba(0, 0, 0, 0.12)",
   },
 

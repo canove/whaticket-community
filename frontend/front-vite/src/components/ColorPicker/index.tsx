@@ -1,7 +1,7 @@
-import { Dialog } from "@material-ui/core";
+import Dialog from "@mui/material/Dialog";
 import { useState } from "react";
-
 import { GithubPicker } from "react-color";
+import type {} from "react-color";
 
 interface ColorPickerProps {
   onChange: (color: string) => void;
@@ -10,7 +10,12 @@ interface ColorPickerProps {
   open: boolean;
 }
 
-const ColorPicker: React.FC<ColorPickerProps> = ({ onChange, currentColor, handleClose, open }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({
+  onChange,
+  currentColor,
+  handleClose,
+  open,
+}) => {
   const [selectedColor, setSelectedColor] = useState(currentColor);
   const colors = [
     "#B80000",
@@ -66,7 +71,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onChange, currentColor, handl
     "#AB149E",
   ];
 
-  const handleChange = (color) => {
+  const handleChange = (color: { hex: string }) => {
     setSelectedColor(color.hex);
     handleClose();
   };
@@ -78,7 +83,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onChange, currentColor, handl
       open={open}
       maxWidth="xs"
       fullWidth={true}
-     /*  paperFullWidth */
+      /*  paperFullWidth */
     >
       <GithubPicker
         width={"100%"}
