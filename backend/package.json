@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@sentry/node": "^5.29.2",
+    "@types/lodash": "^4.17.5",
     "@types/pino": "^6.3.4",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
@@ -39,7 +40,7 @@
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^3.0.5",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus",
+    "whatsapp-web.js": "^1.25.0",
     "yup": "^0.32.8"
   },
   "devDependencies": {
@@ -60,6 +61,7 @@
     "@types/uuid": "^8.3.3",
     "@types/validator": "^13.1.0",
     "@types/yup": "^0.29.8",
+    "@types/lodash": "4.14",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
     "eslint": "^7.10.0",

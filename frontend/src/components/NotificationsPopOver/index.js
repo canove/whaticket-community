@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
-
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import openSocket from "../../services/socket-io";
@@ -37,6 +36,9 @@ const useStyles = makeStyles(theme => ({
 	},
 	noShadow: {
 		boxShadow: "none !important",
+	},
+	iconButton: {
+		color: theme.palette.text.primary,
 	},
 }));
 
@@ -192,7 +194,7 @@ const NotificationsPopOver = () => {
 				onClick={handleClick}
 				ref={anchorEl}
 				aria-label="Open Notifications"
-				color="inherit"
+				className={classes.iconButton}
 			>
 				<Badge badgeContent={notifications.length} color="secondary">
 					<ChatIcon />

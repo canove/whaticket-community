@@ -17,12 +17,14 @@ const useStyles = makeStyles((theme) => ({
     // padding: theme.spacing(4),
     height: `calc(100% - 48px)`,
     overflowY: "hidden",
+    backgroundColor: theme.palette.background.default,
   },
 
   chatPapper: {
     // backgroundColor: "red",
     display: "flex",
     height: "100%",
+    backgroundColor: theme.palette.background.paper,
   },
 
   contactsWrapper: {
@@ -46,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   welcomeMsg: {
-    backgroundColor: "#eee",
+    backgroundColor: theme.palette.background.paper,
     display: "flex",
     justifyContent: "space-evenly",
     alignItems: "center",
