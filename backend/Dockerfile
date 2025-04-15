@@ -5,21 +5,19 @@ FROM node:20-bullseye as build
 WORKDIR /app
 
 # Copia apenas os arquivos essenciais para instalar dependências
-COPY backend/package.json backend/package-lock.json* ./backend/
-COPY backend/tsconfig.json ./backend/
+COPY backend/package.json backend/package-lock.json* backend/tsconfig.json ./backend/
 
+# Entra na pasta backend
 WORKDIR /app/backend
 
-# Instala o TypeScript atualizado e as dependências
+# Instala TypeScript atualizado e dependências
 RUN npm install typescript@^5.2.0 --save-dev && npm install
 
 # Copia o restante do código
 COPY backend/ .
 
-# Compila o projeto (gera o /dist)
+# Compila o projeto (gera /dist)
 RUN npm run build
-
----
 
 # Etapa 2 - Produção (imagem leve e otimizada)
 FROM node:20-alpine as production
@@ -27,15 +25,15 @@ FROM node:20-alpine as production
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Copia apenas os arquivos necessários da etapa anterior
+# Copia os arquivos necessários da etapa anterior
 COPY --from=build /app/backend/dist ./dist
 COPY --from=build /app/backend/package.json ./
 
-# Instala apenas dependências de produção
+# Instala apenas as dependências de produção
 RUN npm install --omit=dev
 
 # Define variáveis de ambiente padrão
 ENV NODE_ENV=production
 
-# Comando de inicialização
+# Comando para iniciar o backend
 CMD ["node", "dist/server.js"]
