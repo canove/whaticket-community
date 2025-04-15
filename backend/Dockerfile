@@ -1,29 +1,27 @@
-# Etapa 1 - Build
-FROM node:18 AS builder
+# Etapa de build
+FROM node:18 as build
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copia só os arquivos necessários inicialmente
-COPY backend/package.json backend/package-lock.json* backend/tsconfig.json ./backend/
+# Copia os arquivos da pasta backend
+COPY backend ./backend
 
-WORKDIR /usr/src/app/backend
+WORKDIR /app/backend
 
-# Instala dependências com TypeScript atualizado
+# Instala TypeScript atualizado e dependências
 RUN npm install typescript@^5.2.0 --save-dev && npm install
 
-# Copia o restante do código
-COPY backend .
-
-# Compila o projeto
+# Compila o backend
 RUN npm run build
 
-# Etapa 2 - Produção
-FROM node:18-alpine
+# Etapa de produção
+FROM node:18-alpine as production
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY --from=builder /usr/src/app/backend/dist ./dist
-COPY --from=builder /usr/src/app/backend/package.json ./
+# Copia apenas os arquivos essenciais
+COPY --from=build /app/backend/dist ./dist
+COPY --from=build /app/backend/package.json ./
 
 RUN npm install --only=production
 
