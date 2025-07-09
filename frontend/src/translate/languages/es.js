@@ -42,15 +42,15 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "En servicio"
+            title: "En servicio",
           },
           waiting: {
-            title: "Esperando"
+            title: "Esperando",
           },
           closed: {
-            title: "Finalizado"
-          }
-        }
+            title: "Finalizado",
+          },
+        },
       },
       connections: {
         title: "Conexiones",
@@ -389,7 +389,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
+        placeholderOpen:
+          "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
         placeholderClosed:
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
         signMessage: "Firmar",
@@ -424,6 +425,7 @@ const messages = {
       messageOptionsMenu: {
         delete: "Borrar",
         reply: "Responder",
+        forward: "Reenviar",
         confirmationModal: {
           title: "¿Borrar mensaje?",
           message: "Esta acción no puede ser revertida.",
@@ -465,6 +467,15 @@ const messages = {
           "Este color ya está en uso, elija otro.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
+      },
+    },
+    messageForward: {
+      title: "Reenviar Mensaje",
+      fieldLabel: "Escribe para buscar un contacto",
+      add: "Añadir",
+      buttons: {
+        cancel: "Cancelar",
+        ok: "Enviar",
       },
     },
   },
