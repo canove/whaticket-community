@@ -126,7 +126,7 @@ const MessageForwardModal = ({
     setSelectedContact(null);
   };
 
-  const handleSaveTicket = async (contactId) => {
+  const handleForwardMessage = async (contactId) => {
     if (!contactId) return;
     setLoading(true);
     try {
@@ -152,7 +152,7 @@ const MessageForwardModal = ({
   };
 
   const handleAddNewContactTicket = (contact) => {
-    handleSaveTicket(contact.id);
+    handleForwardMessage(contact.id);
   };
 
   const createAddContactOption = (filterOptions, params) => {
@@ -223,7 +223,7 @@ const MessageForwardModal = ({
                 onKeyPress={(e) => {
                   if (loading || !selectedContact) return;
                   else if (e.key === "Enter") {
-                    handleSaveTicket(selectedContact.id);
+                    handleForwardMessage(selectedContact.id);
                   }
                 }}
                 InputProps={{
@@ -276,7 +276,7 @@ const MessageForwardModal = ({
             variant="contained"
             type="button"
             disabled={!selectedContact}
-            onClick={() => handleSaveTicket(selectedContact.id)}
+            onClick={() => handleForwardMessage(selectedContact.id)}
             color="primary"
             loading={loading}
           >
