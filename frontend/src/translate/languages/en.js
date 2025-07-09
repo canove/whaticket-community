@@ -41,15 +41,15 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "In Service"
+            title: "In Service",
           },
           waiting: {
-            title: "Waiting"
+            title: "Waiting",
           },
           closed: {
-            title: "Closed"
-          }
-        }
+            title: "Closed",
+          },
+        },
       },
       connections: {
         title: "Connections",
@@ -384,7 +384,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Type a message or press ''/'' to use the registered quick responses",
+        placeholderOpen:
+          "Type a message or press ''/'' to use the registered quick responses",
         placeholderClosed: "Reopen or accept this ticket to send a message.",
         signMessage: "Sign",
       },
@@ -417,6 +418,7 @@ const messages = {
       messageOptionsMenu: {
         delete: "Delete",
         reply: "Reply",
+        forward: "Forward",
         confirmationModal: {
           title: "Delete message?",
           message: "This action cannot be reverted.",
@@ -458,6 +460,15 @@ const messages = {
           "This color is already in use, pick another one.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
+      },
+    },
+    messageForward: {
+      title: "Forward Message",
+      fieldLabel: "Type to search for a contact",
+      add: "Add",
+      buttons: {
+        cancel: "Cancel",
+        ok: "Send",
       },
     },
   },

@@ -41,15 +41,15 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "Em Atendimento"
+            title: "Em Atendimento",
           },
           waiting: {
-            title: "Aguardando"
+            title: "Aguardando",
           },
           closed: {
-            title: "Finalizado"
-          }
-        }
+            title: "Finalizado",
+          },
+        },
       },
       connections: {
         title: "Conexões",
@@ -108,7 +108,7 @@ const messages = {
         form: {
           name: "Nome",
           default: "Padrão",
-          farewellMessage: "Mensagem de despedida"
+          farewellMessage: "Mensagem de despedida",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -388,7 +388,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
+        placeholderOpen:
+          "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
         placeholderClosed:
           "Reabra ou aceite esse ticket para enviar uma mensagem.",
         signMessage: "Assinar",
@@ -422,6 +423,7 @@ const messages = {
       messageOptionsMenu: {
         delete: "Deletar",
         reply: "Responder",
+        forward: "Encaminhar",
         confirmationModal: {
           title: "Apagar mensagem?",
           message: "Esta ação não pode ser revertida.",
@@ -462,6 +464,15 @@ const messages = {
           "Esta cor já está em uso, escolha outra.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
+      },
+    },
+    messageForward: {
+      title: "Encaminhar Mensagem",
+      fieldLabel: "Digite para pesquisar o contato",
+      add: "Adicionar",
+      buttons: {
+        cancel: "Cancelar",
+        ok: "Enviar",
       },
     },
   },
