@@ -8,7 +8,7 @@ module.exports = {
       onUpdate: "CASCADE",
       onDelete: "SET NULL",
       allowNull: true
-    },);
+    });
   },
 
   down: (queryInterface: QueryInterface) => {

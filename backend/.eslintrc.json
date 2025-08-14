@@ -15,12 +15,17 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+  ],
   "rules": {
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
-      { "argsIgnorePattern": "_" }
+      {
+        "argsIgnorePattern": "_"
+      }
     ],
     "import/prefer-default-export": "off",
     "no-console": "off",
@@ -39,11 +44,32 @@
       {
         "avoidEscape": true
       }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "optionalDependencies": true,
+        "peerDependencies": true
+      }
     ]
   },
   "settings": {
     "import/resolver": {
       "typescript": {}
+    },
+    "import/core-modules": [
+      "moment-timezone"
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/models/**/*.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off"
+      }
     }
-  }
+  ]
 }

@@ -16,7 +16,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
 type WhatsappData = {
   whatsappId: number;
-}
+};
 
 type MessageData = {
   body: string;
@@ -35,7 +35,7 @@ const createContact = async (
 ) => {
   await CheckIsValidContact(newContact);
 
-  const validNumber: any = await CheckContactNumber(newContact);
+  const validNumber = await CheckContactNumber(newContact);
 
   const profilePicUrl = await GetProfilePicUrl(validNumber);
 
@@ -50,23 +50,19 @@ const createContact = async (
 
   const contact = await CreateOrUpdateContactService(contactData);
 
-  let whatsapp:Whatsapp | null;
+  let whatsapp: Whatsapp | null;
 
-  if(whatsappId === undefined) {
+  if (whatsappId === undefined) {
     whatsapp = await GetDefaultWhatsApp();
   } else {
     whatsapp = await Whatsapp.findByPk(whatsappId);
 
-    if(whatsapp === null) {
+    if (whatsapp === null) {
       throw new AppError(`whatsapp #${whatsappId} not found`);
     }
   }
 
-  const createTicket = await FindOrCreateTicketService(
-    contact,
-    whatsapp.id,
-    1
-  );
+  const createTicket = await FindOrCreateTicketService(contact, whatsapp.id, 1);
 
   const ticket = await ShowTicketService(createTicket.id);
 
@@ -91,8 +87,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   try {
     await schema.validate(newContact);
-  } catch (err: any) {
-    throw new AppError(err.message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Validation error";
+    throw new AppError(message);
   }
 
   const contactAndTicket = await createContact(whatsappId, newContact.number);
