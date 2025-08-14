@@ -51,7 +51,7 @@ docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DAT
 # Before copy .env.example to .env first and set the variables in the file.
 docker-compose up -d mysql
 
-# To administer this mysql database easily using phpmyadmin. 
+# To administer this mysql database easily using phpmyadmin.
 # It will run by default on port 9000, but can be changed in .env using `PMA_PORT`
 docker-compose -f docker-compose.phpmyadmin.yaml up -d
 ```
@@ -92,6 +92,7 @@ DB_NAME=
 
 JWT_SECRET=3123123213123
 JWT_REFRESH_SECRET=75756756756
+ADMIN_INITIAL_PASSWORD=admin
 ```
 
 Install backend dependencies, build app, run migrations and seeds:
@@ -185,7 +186,7 @@ docker run --name whaticketdb -e MYSQL_ROOT_PASSWORD=strongpassword -e MYSQL_DAT
 # Before copy .env.example to .env first and set the variables in the file.
 docker-compose up -d mysql
 
-# To administer this mysql database easily using phpmyadmin. 
+# To administer this mysql database easily using phpmyadmin.
 # It will run by default on port 9000, but can be changed in .env using `PMA_PORT`
 docker-compose -f docker-compose.phpmyadmin.yaml up -d
 ```
@@ -400,7 +401,7 @@ To run WhaTicket using docker you must perform the following steps:
 cp .env.example .env
 ```
 
-Now it will be necessary to configure the .env using its information, the variables are the same as those mentioned in the deployment using ubuntu, with the exception of mysql settings that were not in the .env. 
+Now it will be necessary to configure the .env using its information, the variables are the same as those mentioned in the deployment using ubuntu, with the exception of mysql settings that were not in the .env.
 
 ```bash
 # MYSQL
@@ -472,7 +473,7 @@ certbot certonly --cert-name frontend --webroot --webroot-path ./ssl/www/ -d mya
 ## Access Data
 
 User: admin@whaticket.com
-Password: admin
+Password: ADMIN_INITIAL_PASSWORD
 
 ## Upgrading
 
