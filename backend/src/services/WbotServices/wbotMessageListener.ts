@@ -24,6 +24,7 @@ import { debounce } from "../../helpers/Debounce";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import formatBody from "../../helpers/Mustache";
+import CheckSettings from "../../helpers/CheckSettings";
 
 interface Session extends Client {
   id?: number;
@@ -295,6 +296,10 @@ const handleMessage = async (
     const chat = await msg.getChat();
 
     if (chat.isGroup) {
+      const ignoreGroups = await CheckSettings("ignoreGroupMessages").catch(
+        () => "disabled"
+      );
+      if (ignoreGroups === "enabled") return;
       let msgGroupContact;
 
       if (msg.fromMe) {
@@ -452,7 +457,17 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
     if (!messageToUpdate) {
       return;
     }
-    await messageToUpdate.update({ ack });
+    if (ack === null || ack === undefined) {
+      return;
+    }
+
+    const numericAck = Number(ack);
+    if (Number.isNaN(numericAck)) return;
+    if (numericAck < 0 || numericAck > 4) return;
+
+    if (messageToUpdate.ack !== numericAck) {
+      await messageToUpdate.update({ ack: numericAck });
+    }
 
     io.to(messageToUpdate.ticketId.toString()).emit("appMessage", {
       action: "update",

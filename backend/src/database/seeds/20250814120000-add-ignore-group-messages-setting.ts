@@ -3,7 +3,11 @@ import { ensureSetting } from "./helpers/settingUtils";
 
 module.exports = {
   up: async (queryInterface: QueryInterface) => {
-    await ensureSetting(queryInterface, "userCreation", () => "enabled");
+    await ensureSetting(
+      queryInterface,
+      "ignoreGroupMessages",
+      () => "disabled"
+    );
   },
 
   down: (queryInterface: QueryInterface) => {

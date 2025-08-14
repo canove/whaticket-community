@@ -42,15 +42,15 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "En servicio"
+            title: "En servicio",
           },
           waiting: {
-            title: "Esperando"
+            title: "Esperando",
           },
           closed: {
-            title: "Finalizado"
-          }
-        }
+            title: "Finalizado",
+          },
+        },
       },
       connections: {
         title: "Conexiones",
@@ -375,6 +375,13 @@ const messages = {
               disabled: "Deshabilitado",
             },
           },
+          ignoreGroupMessages: {
+            name: "Ignorar mensajes de grupos",
+            options: {
+              enabled: "Habilitado (ignorar grupos)",
+              disabled: "Deshabilitado (procesar grupos)",
+            },
+          },
         },
       },
       messagesList: {
@@ -389,7 +396,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
+        placeholderOpen:
+          "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
         placeholderClosed:
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
         signMessage: "Firmar",

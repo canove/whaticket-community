@@ -41,15 +41,15 @@ const messages = {
         },
         messages: {
           inAttendance: {
-            title: "In Service"
+            title: "In Service",
           },
           waiting: {
-            title: "Waiting"
+            title: "Waiting",
           },
           closed: {
-            title: "Closed"
-          }
-        }
+            title: "Closed",
+          },
+        },
       },
       connections: {
         title: "Connections",
@@ -370,6 +370,13 @@ const messages = {
               disabled: "Disabled",
             },
           },
+          ignoreGroupMessages: {
+            name: "Ignore group messages",
+            options: {
+              enabled: "Enabled (ignore groups)",
+              disabled: "Disabled (process groups)",
+            },
+          },
         },
       },
       messagesList: {
@@ -384,7 +391,8 @@ const messages = {
         },
       },
       messagesInput: {
-        placeholderOpen: "Type a message or press ''/'' to use the registered quick responses",
+        placeholderOpen:
+          "Type a message or press ''/'' to use the registered quick responses",
         placeholderClosed: "Reopen or accept this ticket to send a message.",
         signMessage: "Sign",
       },

@@ -1,20 +1,10 @@
 import { QueryInterface } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
+import { ensureSetting } from "./helpers/settingUtils";
 
 module.exports = {
-  up: (queryInterface: QueryInterface) => {
-    return queryInterface.bulkInsert(
-      "Settings",
-      [
-        {
-          key: "userApiToken",
-          value: uuidv4(),
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ],
-      {}
-    );
+  up: async (queryInterface: QueryInterface) => {
+    await ensureSetting(queryInterface, "userApiToken", () => uuidv4());
   },
 
   down: (queryInterface: QueryInterface) => {
