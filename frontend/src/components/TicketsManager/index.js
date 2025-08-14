@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     border: "none",
     borderRadius: 30,
-    color: theme.palette.text.primary, 
+    color: theme.palette.text.primary,
     backgroundColor: theme.palette.background.default,
   },
   badge: {
@@ -240,6 +240,7 @@ const TicketsManager = () => {
           <Tab
             label={
               <Badge
+                overlap="rectangular"
                 className={classes.badge}
                 badgeContent={openCount}
                 color="primary"
@@ -252,6 +253,7 @@ const TicketsManager = () => {
           <Tab
             label={
               <Badge
+                overlap="rectangular"
                 className={classes.badge}
                 badgeContent={pendingCount}
                 color="secondary"

@@ -81,7 +81,11 @@ const MainListItems = (props) => {
         to="/connections"
         primary={i18n.t("mainDrawer.listItems.connections")}
         icon={
-          <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
+          <Badge
+            overlap="rectangular"
+            badgeContent={connectionWarning ? "!" : 0}
+            color="error"
+          >
             <SyncAltIcon />
           </Badge>
         }
