@@ -1,12 +1,7 @@
-# Usa uma versão mais recente e suportada do Node.js (LTS)
-FROM node:20-alpine as build-deps
+FROM node:14-alpine as build-deps
 WORKDIR /usr/src/app
 COPY package*.json ./
-
-# Adiciona um passo para corrigir vulnerabilidades de segurança
 RUN npm install
-RUN npm audit fix --force
-
 COPY .env* ./
 COPY src/ ./src/
 COPY public/ ./public/

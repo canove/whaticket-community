@@ -1,4 +1,4 @@
-FROM node:20 as build-deps
+FROM node:14 as build-deps
 
 RUN apt-get update && apt-get install -y wget
 
@@ -24,9 +24,6 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
-
-# Remova esta linha, pois as vulnerabilidades não podem ser corrigidas automaticamente.
-# RUN npm audit fix --force
 
 COPY . .
 RUN npm run build
