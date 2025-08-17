@@ -1,0 +1,173 @@
+.asterisk-webphone-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.asterisk-webphone {
+  position: relative;
+  max-width: 280px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.webphone-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 14px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.text-positive {
+  color: #4caf50;
+}
+
+.number-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  text-align: center;
+  outline: none;
+}
+
+.number-input:focus {
+  border-color: #1976d2;
+}
+
+.keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.keypad-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.keypad-button {
+  flex: 1;
+  aspect-ratio: 1;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: #1976d2;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.keypad-button:hover {
+  background: #f0f0f0;
+}
+
+.keypad-button:active {
+  background: #e0e0e0;
+  transform: scale(0.95);
+}
+
+.call-controls {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.call-button,
+.hangup-button {
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.call-button {
+  background: #4caf50;
+  color: white;
+}
+
+.hangup-button {
+  background: #f44336;
+  color: white;
+}
+
+.call-button:hover:not(.disabled) {
+  background: #43a047;
+  transform: scale(1.05);
+}
+
+.hangup-button:hover:not(.disabled) {
+  background: #e53935;
+  transform: scale(1.05);
+}
+
+.call-button.disabled,
+.hangup-button.disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+  color: #9e9e9e;
+}
+
+.call-info {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.disconnected-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #f57c00;
+  font-size: 14px;
+  padding: 12px;
+  background: #fff3e0;
+  border-radius: 4px;
+}
+
+.close-webphone-btn {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+}
+
+.close-webphone-btn:hover {
+  color: #e53935;
+}
