@@ -20,9 +20,8 @@ interface Request {
 const CreateMessageService = async ({
   messageData
 }: Request): Promise<Message> => {
-  await Message.upsert(messageData);
-
-  const message = await Message.findByPk(messageData.id, {
+  const message = await Message.create(messageData);
+  await message.reload({
     include: [
       "contact",
       {

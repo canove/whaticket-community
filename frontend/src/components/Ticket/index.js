@@ -13,6 +13,7 @@ import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
 import TicketActionButtons from "../TicketActionButtons";
 import MessagesList from "../MessagesList";
+import TicketSearchButton from "../TicketSearchButton";
 import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
@@ -78,10 +79,12 @@ const Ticket = () => {
   const history = useHistory();
   const classes = useStyles();
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [contactDrawerOpen, setContactDrawerOpen] = useState(false);
+  const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+  const [scrollToMessage, setScrollToMessage] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -135,12 +138,19 @@ const Ticket = () => {
     };
   }, [ticketId, history]);
 
-  const handleDrawerOpen = () => {
-    setDrawerOpen(true);
+  const openContactDrawer = () => {
+    setSearchDrawerOpen(false);
+    setContactDrawerOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
+  const openSearchDrawer = () => {
+    setContactDrawerOpen(false);
+    setSearchDrawerOpen(true);
+  };
+
+  const closeDrawers = () => {
+    setContactDrawerOpen(false);
+    setSearchDrawerOpen(false);
   };
 
   return (
@@ -149,7 +159,7 @@ const Ticket = () => {
         variant="outlined"
         elevation={0}
         className={clsx(classes.mainWrapper, {
-          [classes.mainWrapperShift]: drawerOpen,
+          [classes.mainWrapperShift]: contactDrawerOpen || searchDrawerOpen,
         })}
       >
         <TicketHeader loading={loading}>
@@ -157,24 +167,32 @@ const Ticket = () => {
             <TicketInfo
               contact={contact}
               ticket={ticket}
-              onClick={handleDrawerOpen}
+              onClick={openContactDrawer}
             />
           </div>
           <div className={classes.ticketActionButtons}>
             <TicketActionButtons ticket={ticket} />
+            <TicketSearchButton
+              ticketId={ticketId}
+              open={searchDrawerOpen}
+              onOpen={openSearchDrawer}
+              onClose={closeDrawers}
+              onScrollToMessage={setScrollToMessage}
+            />
           </div>
         </TicketHeader>
         <ReplyMessageProvider>
           <MessagesList
             ticketId={ticketId}
             isGroup={ticket.isGroup}
+            scrollToMessage={scrollToMessage}
           ></MessagesList>
           <MessageInput ticketStatus={ticket.status} />
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
-        open={drawerOpen}
-        handleDrawerClose={handleDrawerClose}
+        open={contactDrawerOpen}
+        handleDrawerClose={closeDrawers}
         contact={contact}
         loading={loading}
       />

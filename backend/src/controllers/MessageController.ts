@@ -9,6 +9,8 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import SearchMessagesService from "../services/MessageServices/SearchMessageService";
+import GetClickedMessage from "../services/MessageServices/GetMessageService";
 
 type IndexQuery = {
   pageNumber: string;
@@ -72,4 +74,36 @@ export const remove = async (
   });
 
   return res.send();
+};
+
+export const search = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId } = req.params;
+  const { searchText, pageNumber } = req.query;
+
+  const result = await SearchMessagesService({
+    ticketId: Number(ticketId),
+    searchText: String(searchText),
+    pageNumber: Number(pageNumber) || 1
+  });
+
+  return res.json(result);
+};
+
+export const getMessage = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { ticketId, messageId } = req.params;
+  const { daysRange } = req.query;
+
+  const result = await GetClickedMessage({
+    ticketId: Number(ticketId),
+    messageId: String(messageId),
+    daysRange: Number(daysRange) || 1
+  });
+
+  return res.json(result);
 };

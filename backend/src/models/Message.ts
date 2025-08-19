@@ -8,13 +8,35 @@ import {
   PrimaryKey,
   Default,
   BelongsTo,
-  ForeignKey
+  ForeignKey,
+  BeforeCreate,
+  BeforeUpdate
 } from "sequelize-typescript";
 import Contact from "./Contact";
 import Ticket from "./Ticket";
 
 @Table
 class Message extends Model<Message> {
+  // Função de normalização
+  static normalizeText(text: string): string {
+    return text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/-/g, "")
+      .replace(/\s/g, "")
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toLowerCase();
+  }
+
+  @BeforeCreate
+  @BeforeUpdate
+  static setNormalizedBody(instance: Message) {
+    if (instance.body) {
+      instance.normalizedBody = Message.normalizeText(instance.body);
+    } else {
+      instance.normalizedBody = "";
+    }
+  }
   @PrimaryKey
   @Column
   id: string;
@@ -31,8 +53,12 @@ class Message extends Model<Message> {
   @Column
   fromMe: boolean;
 
+
   @Column(DataType.TEXT)
   body: string;
+
+  @Column(DataType.TEXT)
+  normalizedBody: string;
 
   @Column(DataType.STRING)
   get mediaUrl(): string | null {

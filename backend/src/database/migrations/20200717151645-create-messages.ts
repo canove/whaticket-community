@@ -1,8 +1,8 @@
 import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
-  up: (queryInterface: QueryInterface) => {
-    return queryInterface.createTable("Messages", {
+  up: async (queryInterface: QueryInterface) => {
+    await queryInterface.createTable("Messages", {
       id: {
         type: DataTypes.STRING,
         primaryKey: true,
@@ -11,6 +11,11 @@ module.exports = {
       body: {
         type: DataTypes.TEXT,
         allowNull: false
+      },
+      // 🔹 Coluna adicional para buscas performáticas
+      normalizedBody: {
+        type: DataTypes.TEXT,
+        allowNull: true, // preenchida via hook ou script de normalização
       },
       ack: {
         type: DataTypes.INTEGER,
@@ -50,9 +55,14 @@ module.exports = {
         allowNull: false
       }
     });
+
+    // 🔹 Criar índice FULLTEXT na coluna normalizada
+    await queryInterface.sequelize.query(`
+      ALTER TABLE Messages ADD FULLTEXT INDEX ft_normalizedBody (normalizedBody)
+    `);
   },
 
-  down: (queryInterface: QueryInterface) => {
-    return queryInterface.dropTable("Messages");
+  down: async (queryInterface: QueryInterface) => {
+    await queryInterface.dropTable("Messages");
   }
 };

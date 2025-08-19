@@ -33,6 +33,11 @@ import toastError from "../../errors/toastError";
 import Audio from "../Audio";
 
 const useStyles = makeStyles((theme) => ({
+  clickedMessage: {
+    boxShadow: '0 0 0 2px #1976d2',
+    backgroundColor: '#e3f2fd',
+    transition: 'background 0.3s, box-shadow 0.3s',
+  },
   messagesListWrapper: {
     overflow: "hidden",
     position: "relative",
@@ -307,7 +312,7 @@ const reducer = (state, action) => {
   }
 };
 
-const MessagesList = ({ ticketId, isGroup }) => {
+const MessagesList = ({ ticketId, isGroup, scrollToMessage }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -327,6 +332,31 @@ const MessagesList = ({ ticketId, isGroup }) => {
 
     currentTicketId.current = ticketId;
   }, [ticketId]);
+
+  useEffect(() => {
+    if (!scrollToMessage) return;
+    const fetchMessages = async () => {
+      try {
+        const { data } = await api.get(`/messages/${ticketId}/${scrollToMessage}`);
+
+        if (data.messages && data.messages.length > 0) {
+          dispatch({ type: "RESET" });
+          dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
+
+          setTimeout(() => {
+            const messageElement = document.getElementById(`msg-${scrollToMessage}`);
+            if (messageElement) {
+              messageElement.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 100);
+        }
+      } catch (err) {
+        toastError(err);
+      }
+    }
+
+      fetchMessages();
+  }, [scrollToMessage, ticketId]);
 
   useEffect(() => {
     setLoading(true);
@@ -593,12 +623,15 @@ const MessagesList = ({ ticketId, isGroup }) => {
   const renderMessages = () => {
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
+        const isClicked = message.id === scrollToMessage;
+        const leftClass = clsx(classes.messageLeft, { [classes.clickedMessage]: isClicked });
+        const rightClass = clsx(classes.messageRight, { [classes.clickedMessage]: isClicked });
         if (!message.fromMe) {
           return (
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageLeft}>
+              <div className={leftClass} id={`msg-${message.id}`}>
                 <IconButton
                   variant="contained"
                   size="small"
@@ -632,7 +665,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div className={rightClass} id={`msg-${message.id}`}>
                 <IconButton
                   variant="contained"
                   size="small"
