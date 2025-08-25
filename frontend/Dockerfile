@@ -4,8 +4,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Adiciona um passo para corrigir vulnerabilidades de segurança
-RUN npm install
-RUN npm audit fix --force
+RUN npm install --legacy-peer-deps
+# RUN npm audit fix --force  # Comentado: causava problemas com react-scripts
 
 COPY .env* ./
 COPY src/ ./src/
