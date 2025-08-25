@@ -1,8 +1,8 @@
 import React from "react";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
-import { CircularProgress, Button } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { green } from "@mui/material/colors";
+import { CircularProgress, Button } from "@mui/material";
 
 const useStyles = makeStyles(theme => ({
 	button: {

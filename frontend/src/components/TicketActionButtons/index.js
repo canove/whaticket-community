@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
-import { MoreVert, Replay } from "@material-ui/icons";
+import makeStyles from '@mui/styles/makeStyles';
+import { IconButton } from "@mui/material";
+import { MoreVert, Replay } from "@mui/icons-material";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -61,8 +61,8 @@ const TicketActionButtons = ({ ticket }) => {
 	};
 
 	return (
-		<div className={classes.actionButtons}>
-			{ticket.status === "closed" && (
+        <div className={classes.actionButtons}>
+            {ticket.status === "closed" && (
 				<ButtonWithSpinner
 					loading={loading}
 					startIcon={<Replay />}
@@ -72,7 +72,7 @@ const TicketActionButtons = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.reopen")}
 				</ButtonWithSpinner>
 			)}
-			{ticket.status === "open" && (
+            {ticket.status === "open" && (
 				<>
 					<ButtonWithSpinner
 						loading={loading}
@@ -91,7 +91,7 @@ const TicketActionButtons = ({ ticket }) => {
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
-					<IconButton onClick={handleOpenTicketOptionsMenu}>
+					<IconButton onClick={handleOpenTicketOptionsMenu} size="large">
 						<MoreVert />
 					</IconButton>
 					<TicketOptionsMenu
@@ -102,7 +102,7 @@ const TicketActionButtons = ({ ticket }) => {
 					/>
 				</>
 			)}
-			{ticket.status === "pending" && (
+            {ticket.status === "pending" && (
 				<ButtonWithSpinner
 					loading={loading}
 					size="small"
@@ -113,8 +113,8 @@ const TicketActionButtons = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.accept")}
 				</ButtonWithSpinner>
 			)}
-		</div>
-	);
+        </div>
+    );
 };
 
 export default TicketActionButtons;

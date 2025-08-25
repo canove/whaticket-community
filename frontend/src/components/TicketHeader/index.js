@@ -1,9 +1,9 @@
 import React from "react";
 
-import { Card, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Card, Button } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
-import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
+import ArrowBackIos from "@mui/icons-material/ArrowBackIos";
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#eee",
     flex: "none",
     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       flexWrap: "wrap",
     },
   },

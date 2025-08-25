@@ -1,14 +1,14 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import makeStyles from '@mui/styles/makeStyles';
 
 import TicketsManager from "../../components/TicketsManager/";
 import Ticket from "../../components/Ticket/";
 
 import { i18n } from "../../translate/i18n";
-import Hidden from "@material-ui/core/Hidden";
 
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     flexDirection: "column",
     overflowY: "hidden",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       display: "none",
     },
   },
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
   ticketsManager: {},
   ticketsManagerClosed: {
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       display: "none",
     },
   },
@@ -90,12 +90,12 @@ const Chat = () => {
                 <Ticket />
               </>
             ) : (
-              <Hidden only={["sm", "xs"]}>
+              <Box sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}>
                 <Paper className={classes.welcomeMsg}>
                   {/* <Paper square variant="outlined" className={classes.welcomeMsg}> */}
                   <span>{i18n.t("chat.noTicketMessage")}</span>
                 </Paper>
-              </Hidden>
+              </Box>
             )}
           </Grid>
         </Grid>

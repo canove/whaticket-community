@@ -1,8 +1,8 @@
 import React from "react";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { Avatar, Card, CardHeader } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
+import makeStyles from '@mui/styles/makeStyles';
+import { Avatar, Card, CardHeader } from "@mui/material";
+import Skeleton from '@mui/material/Skeleton';
 
 const useStyles = makeStyles(theme => ({
 	ticketHeader: {
@@ -17,20 +17,20 @@ const TicketHeaderSkeleton = () => {
 	const classes = useStyles();
 
 	return (
-		<Card square className={classes.ticketHeader}>
-			<CardHeader
+        <Card square className={classes.ticketHeader}>
+            <CardHeader
 				titleTypographyProps={{ noWrap: true }}
 				subheaderTypographyProps={{ noWrap: true }}
 				avatar={
-					<Skeleton animation="wave" variant="circle">
+					<Skeleton animation="wave" variant="circular">
 						<Avatar alt="contact_image" />
 					</Skeleton>
 				}
 				title={<Skeleton animation="wave" width={80} />}
 				subheader={<Skeleton animation="wave" width={140} />}
 			/>
-		</Card>
-	);
+        </Card>
+    );
 };
 
 export default TicketHeaderSkeleton;

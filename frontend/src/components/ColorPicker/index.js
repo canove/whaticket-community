@@ -1,4 +1,4 @@
-import { Dialog } from "@material-ui/core";
+import { Dialog } from "@mui/material";
 import React, { useState } from "react";
 
 import { GithubPicker } from "react-color";

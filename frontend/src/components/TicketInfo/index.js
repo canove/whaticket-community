@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Avatar, CardHeader } from "@material-ui/core";
+import { Avatar, CardHeader } from "@mui/material";
 
 import { i18n } from "../../translate/i18n";
 

@@ -18,12 +18,12 @@ import {
 	TextField,
 	InputAdornment,
 	IconButton
-  } from '@material-ui/core';
+  } from '@mui/material';
 
-import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
+import makeStyles from '@mui/styles/makeStyles';
+import { green } from "@mui/material/colors";
 
 import { i18n } from "../../translate/i18n";
 
@@ -131,8 +131,8 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	return (
-		<div className={classes.root}>
-			<Dialog
+        <div className={classes.root}>
+            <Dialog
 				open={open}
 				onClose={handleClose}
 				maxWidth="xs"
@@ -183,9 +183,9 @@ const UserModal = ({ open, onClose, userId }) => {
 										endAdornment: (
 											<InputAdornment position="end">
 											<IconButton
-												aria-label="toggle password visibility"
-												onClick={() => setShowPassword((e) => !e)}
-											>
+                                                aria-label="toggle password visibility"
+                                                onClick={() => setShowPassword((e) => !e)}
+                                                size="large">
 												{showPassword ? <VisibilityOff /> : <Visibility />}
 											</IconButton>
 											</InputAdornment>
@@ -297,8 +297,8 @@ const UserModal = ({ open, onClose, userId }) => {
 					)}
 				</Formik>
 			</Dialog>
-		</div>
-	);
+        </div>
+    );
 };
 
 export default UserModal;

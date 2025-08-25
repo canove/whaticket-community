@@ -4,14 +4,14 @@ import { format } from "date-fns";
 import openSocket from "../../services/socket-io";
 import useSound from "use-sound";
 
-import Popover from "@material-ui/core/Popover";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { makeStyles } from "@material-ui/core/styles";
-import Badge from "@material-ui/core/Badge";
-import ChatIcon from "@material-ui/icons/Chat";
+import Popover from "@mui/material/Popover";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import makeStyles from '@mui/styles/makeStyles';
+import Badge from "@mui/material/Badge";
+import ChatIcon from "@mui/icons-material/Chat";
 
 import TicketListItem from "../TicketListItem";
 import { i18n } from "../../translate/i18n";
@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 		maxWidth: 350,
 		marginLeft: theme.spacing(2),
 		marginRight: theme.spacing(1),
-		[theme.breakpoints.down("sm")]: {
+		[theme.breakpoints.down('md')]: {
 			maxWidth: 270,
 		},
 	},
@@ -189,18 +189,18 @@ const NotificationsPopOver = () => {
 	};
 
 	return (
-		<>
-			<IconButton
-				onClick={handleClick}
-				ref={anchorEl}
-				aria-label="Open Notifications"
-				className={classes.iconButton}
-			>
+        <>
+            <IconButton
+                onClick={handleClick}
+                ref={anchorEl}
+                aria-label="Open Notifications"
+                className={classes.iconButton}
+                size="large">
 				<Badge badgeContent={notifications.length} color="secondary">
 					<ChatIcon />
 				</Badge>
 			</IconButton>
-			<Popover
+            <Popover
 				disableScrollLock
 				open={isOpen}
 				anchorEl={anchorEl.current}
@@ -229,8 +229,8 @@ const NotificationsPopOver = () => {
 					)}
 				</List>
 			</Popover>
-		</>
-	);
+        </>
+    );
 };
 
 export default NotificationsPopOver;

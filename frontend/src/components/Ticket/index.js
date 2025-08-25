@@ -5,7 +5,9 @@ import { toast } from "react-toastify";
 import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
-import { Paper, makeStyles } from "@material-ui/core";
+import { Paper } from "@mui/material";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import ContactDrawer from "../ContactDrawer";
 import MessageInput from "../MessageInput/";
@@ -30,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   ticketInfo: {
     maxWidth: "50%",
     flexBasis: "50%",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       maxWidth: "80%",
       flexBasis: "80%",
     },
@@ -39,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "50%",
     flexBasis: "50%",
     display: "flex",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       maxWidth: "100%",
       flexBasis: "100%",
       marginBottom: "5px",

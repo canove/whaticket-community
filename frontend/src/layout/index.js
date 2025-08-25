@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
 import {
-  makeStyles,
   Drawer,
   AppBar,
   Toolbar,
@@ -12,11 +11,12 @@ import {
   IconButton,
   Menu,
   Switch,
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     height: "100vh",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       height: "calc(100vh - 56px)",
     },
   },
@@ -195,7 +195,7 @@ const LoggedInLayout = ({ children }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
-          <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
+          <IconButton onClick={() => setDrawerOpen(!drawerOpen)} size="large">
             <ChevronLeftIcon />
           </IconButton>
         </div>
@@ -223,7 +223,7 @@ const LoggedInLayout = ({ children }) => {
               classes.menuButton,
               drawerOpen && classes.menuButtonHidden
             )}
-          >
+            size="large">
             <MenuIcon />
           </IconButton>
           <Typography
@@ -256,7 +256,7 @@ const LoggedInLayout = ({ children }) => {
               aria-haspopup="true"
               onClick={handleMenu}
               className={classes.iconButton}
-            >
+              size="large">
               <AccountCircle />
             </IconButton>
             <Menu

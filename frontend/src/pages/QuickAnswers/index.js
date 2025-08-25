@@ -4,7 +4,6 @@ import openSocket from "../../services/socket-io";
 import {
   Button,
   IconButton,
-  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -13,9 +12,10 @@ import {
   TableRow,
   InputAdornment,
   TextField,
-} from "@material-ui/core";
-import { Edit, DeleteOutline } from "@material-ui/icons";
-import SearchIcon from "@material-ui/icons/Search";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Edit, DeleteOutline } from "@mui/icons-material";
+import SearchIcon from "@mui/icons-material/Search";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";

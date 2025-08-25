@@ -1,8 +1,8 @@
 import React from "react";
-import TableCell from "@material-ui/core/TableCell";
-import TableRow from "@material-ui/core/TableRow";
-import Skeleton from "@material-ui/lab/Skeleton";
-import { makeStyles } from "@material-ui/core";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import Skeleton from '@mui/material/Skeleton';
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles(theme => ({
 	customTableCell: {
@@ -15,14 +15,14 @@ const useStyles = makeStyles(theme => ({
 const TableRowSkeleton = ({ avatar, columns }) => {
 	const classes = useStyles();
 	return (
-		<>
-			<TableRow>
+        <>
+            <TableRow>
 				{avatar && (
 					<>
 						<TableCell style={{ paddingRight: 0 }}>
 							<Skeleton
 								animation="wave"
-								variant="circle"
+								variant="circular"
 								width={40}
 								height={40}
 							/>
@@ -45,8 +45,8 @@ const TableRowSkeleton = ({ avatar, columns }) => {
 					</TableCell>
 				))}
 			</TableRow>
-		</>
-	);
+        </>
+    );
 };
 
 export default TableRowSkeleton;

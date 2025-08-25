@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Paper } from "@material-ui/core";
+import { Box, Paper } from "@mui/material";
 
 const FlowBuilder = () => {
   const [nodes, setNodes] = useState([]);
