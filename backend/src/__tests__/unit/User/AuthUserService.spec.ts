@@ -24,7 +24,8 @@ describe("Auth", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email,
-      password
+      password,
+      tenantId: 1
     });
 
     const response = await AuthUserService({
@@ -52,7 +53,8 @@ describe("Auth", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email: "mail@test.com",
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      tenantId: 1
     });
 
     try {

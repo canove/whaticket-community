@@ -1,5 +1,5 @@
 import { Queue, Worker, Job, QueueEvents } from "bullmq";
-import { createRedisConnection } from "../../libs/redis";
+import { createRedisConnection, isRedisEnabled } from "../../libs/redis";
 import { logger } from "../../utils/logger";
 import Campaign, { CampaignStatus } from "../../models/Campaign";
 import CampaignExecution, { CampaignExecutionStatus } from "../../models/CampaignExecution";
@@ -22,40 +22,56 @@ export interface CampaignBatchJobData {
 }
 
 class CampaignQueueService {
-  private campaignQueue: Queue;
-  private campaignWorker: Worker;
-  private queueEvents: QueueEvents;
+  private campaignQueue: Queue | null = null;
+  private campaignWorker: Worker | null = null;
+  private queueEvents: QueueEvents | null = null;
   private redis = createRedisConnection();
+  private redisEnabled = false;
+  private mockJobs: Map<string, any> = new Map();
 
   constructor() {
-    const redisConnection = {
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB || "0")
-    };
+    this.redisEnabled = isRedisEnabled();
+    
+    if (this.redisEnabled) {
+      try {
+        const redisConnection = {
+          host: process.env.REDIS_HOST || "localhost",
+          port: parseInt(process.env.REDIS_PORT || "6379"),
+          password: process.env.REDIS_PASSWORD || undefined,
+          db: parseInt(process.env.REDIS_DB || "0")
+        };
 
-    this.campaignQueue = new Queue("campaign-queue", {
-      connection: redisConnection,
-      defaultJobOptions: {
-        removeOnComplete: 50,
-        removeOnFail: 100,
-        attempts: 3,
-        backoff: {
-          type: "exponential",
-          delay: 2000,
-        },
-      },
-    });
+        this.campaignQueue = new Queue("campaign-queue", {
+          connection: redisConnection,
+          defaultJobOptions: {
+            removeOnComplete: 50,
+            removeOnFail: 100,
+            attempts: 3,
+            backoff: {
+              type: "exponential",
+              delay: 2000,
+            },
+          },
+        });
 
-    this.queueEvents = new QueueEvents("campaign-queue", {
-      connection: redisConnection,
-    });
+        this.queueEvents = new QueueEvents("campaign-queue", {
+          connection: redisConnection,
+        });
 
-    this.setupEventListeners();
+        this.setupEventListeners();
+        logger.info("Campaign queue service initialized with Redis");
+      } catch (error) {
+        logger.warn("Failed to initialize Redis queue, falling back to mock mode:", error);
+        this.redisEnabled = false;
+      }
+    } else {
+      logger.info("Campaign queue service initialized in mock mode (Redis disabled)");
+    }
   }
 
   private setupEventListeners(): void {
+    if (!this.queueEvents) return;
+    
     this.queueEvents.on("completed", async ({ jobId, returnvalue }) => {
       logger.info(`Campaign job ${jobId} completed successfully`);
     });
@@ -76,11 +92,30 @@ class CampaignQueueService {
       priority?: number;
       attempts?: number;
     }
-  ): Promise<Job> {
-    return await this.campaignQueue.add("send-campaign-message", jobData, {
-      ...options,
-      jobId: `campaign-${jobData.campaignId}-contact-${jobData.contactId}`,
-    });
+  ): Promise<Job | any> {
+    const jobId = `campaign-${jobData.campaignId}-contact-${jobData.contactId}`;
+    
+    if (this.redisEnabled && this.campaignQueue) {
+      return await this.campaignQueue.add("send-campaign-message", jobData, {
+        ...options,
+        jobId,
+      });
+    } else {
+      // Mock job for fallback mode
+      const mockJob = {
+        id: jobId,
+        data: jobData,
+        opts: options || {},
+        processedOn: null,
+        finishedOn: null,
+        failedReason: null,
+        remove: async () => { this.mockJobs.delete(jobId); },
+        retry: async () => { logger.info(`Mock retry for job ${jobId}`); }
+      };
+      this.mockJobs.set(jobId, mockJob);
+      logger.info(`Mock campaign job added: ${jobId}`);
+      return mockJob;
+    }
   }
 
   async addBatchCampaignJob(
@@ -130,15 +165,29 @@ class CampaignQueueService {
   }
 
   async pauseCampaign(campaignId: number): Promise<void> {
-    // Get all pending jobs for this campaign
-    const jobs = await this.campaignQueue.getJobs(["waiting", "delayed"]);
-    const campaignJobs = jobs.filter(job => 
-      job.data.campaignId === campaignId
-    );
+    if (this.redisEnabled && this.campaignQueue) {
+      // Get all pending jobs for this campaign
+      const jobs = await this.campaignQueue.getJobs(["waiting", "delayed"]);
+      const campaignJobs = jobs.filter(job =>
+        job.data.campaignId === campaignId
+      );
 
-    // Remove all pending jobs
-    for (const job of campaignJobs) {
-      await job.remove();
+      // Remove all pending jobs
+      for (const job of campaignJobs) {
+        await job.remove();
+      }
+
+      logger.info(`Paused campaign ${campaignId} and removed ${campaignJobs.length} pending jobs`);
+    } else {
+      // Mock mode - remove jobs from memory
+      const removedJobs = [];
+      for (const [jobId, job] of this.mockJobs.entries()) {
+        if (job.data.campaignId === campaignId) {
+          this.mockJobs.delete(jobId);
+          removedJobs.push(jobId);
+        }
+      }
+      logger.info(`Mock: Paused campaign ${campaignId} and removed ${removedJobs.length} pending jobs`);
     }
 
     // Update campaign status
@@ -146,8 +195,6 @@ class CampaignQueueService {
       { status: CampaignStatus.PAUSED },
       { where: { id: campaignId } }
     );
-
-    logger.info(`Paused campaign ${campaignId} and removed ${campaignJobs.length} pending jobs`);
   }
 
   async resumeCampaign(campaignId: number): Promise<void> {
@@ -193,66 +240,119 @@ class CampaignQueueService {
   }
 
   async getCampaignStats(campaignId: number) {
-    const jobs = await this.campaignQueue.getJobs(["completed", "failed", "waiting", "active"]);
-    const campaignJobs = jobs.filter(job => job.data.campaignId === campaignId);
+    if (this.redisEnabled && this.campaignQueue) {
+      const jobs = await this.campaignQueue.getJobs(["completed", "failed", "waiting", "active"]);
+      const campaignJobs = jobs.filter(job => job.data.campaignId === campaignId);
 
-    return {
-      total: campaignJobs.length,
-      completed: campaignJobs.filter(job => job.finishedOn).length,
-      failed: campaignJobs.filter(job => job.failedReason).length,
-      pending: campaignJobs.filter(job => !job.processedOn).length,
-      active: campaignJobs.filter(job => job.processedOn && !job.finishedOn).length,
-    };
+      return {
+        total: campaignJobs.length,
+        completed: campaignJobs.filter(job => job.finishedOn).length,
+        failed: campaignJobs.filter(job => job.failedReason).length,
+        pending: campaignJobs.filter(job => !job.processedOn).length,
+        active: campaignJobs.filter(job => job.processedOn && !job.finishedOn).length,
+      };
+    } else {
+      // Mock stats from database
+      const executions = await CampaignExecution.findAll({
+        where: { campaignId }
+      });
+      
+      return {
+        total: executions.length,
+        completed: executions.filter(e => e.status === CampaignExecutionStatus.SENT || e.status === CampaignExecutionStatus.DELIVERED).length,
+        failed: executions.filter(e => e.status === CampaignExecutionStatus.FAILED).length,
+        pending: executions.filter(e => e.status === CampaignExecutionStatus.PENDING).length,
+        active: executions.filter(e => e.status === CampaignExecutionStatus.SENDING).length,
+      };
+    }
   }
 
   async getQueueHealth() {
-    const waiting = await this.campaignQueue.getWaiting();
-    const active = await this.campaignQueue.getActive();
-    const completed = await this.campaignQueue.getCompleted();
-    const failed = await this.campaignQueue.getFailed();
+    if (this.redisEnabled && this.campaignQueue) {
+      const waiting = await this.campaignQueue.getWaiting();
+      const active = await this.campaignQueue.getActive();
+      const completed = await this.campaignQueue.getCompleted();
+      const failed = await this.campaignQueue.getFailed();
 
-    return {
-      waiting: waiting.length,
-      active: active.length,
-      completed: completed.length,
-      failed: failed.length,
-      total: waiting.length + active.length + completed.length + failed.length,
-    };
+      return {
+        waiting: waiting.length,
+        active: active.length,
+        completed: completed.length,
+        failed: failed.length,
+        total: waiting.length + active.length + completed.length + failed.length,
+      };
+    } else {
+      // Mock health from database
+      const executions = await CampaignExecution.findAll();
+      return {
+        waiting: executions.filter(e => e.status === CampaignExecutionStatus.PENDING).length,
+        active: executions.filter(e => e.status === CampaignExecutionStatus.SENDING).length,
+        completed: executions.filter(e => e.status === CampaignExecutionStatus.SENT || e.status === CampaignExecutionStatus.DELIVERED).length,
+        failed: executions.filter(e => e.status === CampaignExecutionStatus.FAILED).length,
+        total: executions.length,
+      };
+    }
   }
 
   async retryFailedJobs(campaignId?: number): Promise<number> {
-    const failed = await this.campaignQueue.getFailed();
-    let retriedCount = 0;
+    if (this.redisEnabled && this.campaignQueue) {
+      const failed = await this.campaignQueue.getFailed();
+      let retriedCount = 0;
 
-    for (const job of failed) {
-      if (!campaignId || job.data.campaignId === campaignId) {
-        await job.retry();
-        retriedCount++;
+      for (const job of failed) {
+        if (!campaignId || job.data.campaignId === campaignId) {
+          await job.retry();
+          retriedCount++;
+        }
       }
-    }
 
-    logger.info(`Retried ${retriedCount} failed jobs` + (campaignId ? ` for campaign ${campaignId}` : ""));
-    return retriedCount;
+      logger.info(`Retried ${retriedCount} failed jobs` + (campaignId ? ` for campaign ${campaignId}` : ""));
+      return retriedCount;
+    } else {
+      // Mock retry - update failed executions to pending
+      const whereCondition: any = { status: CampaignExecutionStatus.FAILED };
+      if (campaignId) {
+        whereCondition.campaignId = campaignId;
+      }
+      
+      const [retriedCount] = await CampaignExecution.update(
+        { status: CampaignExecutionStatus.PENDING },
+        { where: whereCondition }
+      );
+
+      logger.info(`Mock: Retried ${retriedCount} failed jobs` + (campaignId ? ` for campaign ${campaignId}` : ""));
+      return retriedCount;
+    }
   }
 
   async cleanQueue(): Promise<void> {
-    await this.campaignQueue.clean(24 * 60 * 60 * 1000, 100, "completed"); // Clean completed jobs older than 24h
-    await this.campaignQueue.clean(48 * 60 * 60 * 1000, 50, "failed"); // Clean failed jobs older than 48h
-    logger.info("Queue cleanup completed");
+    if (this.redisEnabled && this.campaignQueue) {
+      await this.campaignQueue.clean(24 * 60 * 60 * 1000, 100, "completed"); // Clean completed jobs older than 24h
+      await this.campaignQueue.clean(48 * 60 * 60 * 1000, 50, "failed"); // Clean failed jobs older than 48h
+      logger.info("Queue cleanup completed");
+    } else {
+      // Mock cleanup - clear old mock jobs
+      this.mockJobs.clear();
+      logger.info("Mock queue cleanup completed");
+    }
   }
 
-  getQueue(): Queue {
+  getQueue(): Queue | null {
     return this.campaignQueue;
   }
 
-  getWorker(): Worker {
+  getWorker(): Worker | null {
     return this.campaignWorker;
   }
 
   async close(): Promise<void> {
-    await this.campaignWorker?.close();
-    await this.campaignQueue.close();
-    await this.queueEvents.close();
+    if (this.redisEnabled) {
+      await this.campaignWorker?.close();
+      await this.campaignQueue?.close();
+      await this.queueEvents?.close();
+    } else {
+      this.mockJobs.clear();
+    }
   }
 }
 

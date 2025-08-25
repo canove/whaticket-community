@@ -20,7 +20,8 @@ describe("User", () => {
     const user = await CreateUserService({
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      tenantId: 1
     });
 
     expect(user).toHaveProperty("id");
@@ -30,14 +31,16 @@ describe("User", () => {
     await CreateUserService({
       name: faker.name.findName(),
       email: "teste@sameemail.com",
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      tenantId: 1
     });
 
     try {
       await CreateUserService({
         name: faker.name.findName(),
         email: "teste@sameemail.com",
-        password: faker.internet.password()
+        password: faker.internet.password(),
+        tenantId: 1
       });
     } catch (err) {
       expect(err).toBeInstanceOf(AppError);

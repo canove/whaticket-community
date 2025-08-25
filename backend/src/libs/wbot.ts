@@ -43,20 +43,61 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         sessionCfg = JSON.parse(whatsapp.session);
       }
 
-      const args:String = process.env.CHROME_ARGS || "";
+      // Argumentos Docker-friendly para o Puppeteer/Chrome
+      const defaultArgs = [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-extensions',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+        '--disable-background-networking',
+        '--disable-default-apps',
+        '--disable-sync',
+        '--disable-translate',
+        '--disable-plugins',
+        '--disable-extensions-except',
+        '--disable-hang-monitor',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        `--user-data-dir=/tmp/chrome-user-data-${whatsapp.id}-${Date.now()}`,
+        '--disable-crash-reporter',
+        '--disable-in-process-stack-traces',
+        '--disable-logging',
+        '--silent'
+      ];
+
+      const customArgs = process.env.CHROME_ARGS ? process.env.CHROME_ARGS.split(' ') : [];
+      const chromeArgs = [...defaultArgs, ...customArgs];
 
       const wbot: Session = new Client({
         session: sessionCfg,
         authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
         puppeteer: {
+          headless: true,
           executablePath: process.env.CHROME_BIN || undefined,
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: args.split(' ')
+          args: chromeArgs,
+          timeout: 60000,
+          handleSIGINT: false,
+          handleSIGTERM: false,
+          handleSIGHUP: false
         }
       });
 
-      wbot.initialize();
+      // Tratamento robusto de inicialização
+      try {
+        wbot.initialize();
+      } catch (error) {
+        logger.error(`Error initializing WhatsApp session ${sessionName}:`, error);
+        // Não rejeitamos imediatamente, deixamos os event handlers lidarem com isso
+      }
 
       wbot.on("qr", async qr => {
         logger.info("Session:", sessionName);

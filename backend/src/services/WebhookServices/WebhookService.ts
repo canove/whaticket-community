@@ -1,5 +1,5 @@
 import { Queue, Worker, Job } from "bullmq";
-import { createRedisConnection } from "../../libs/redis";
+import { createRedisConnection, isRedisEnabled } from "../../libs/redis";
 import { logger } from "../../utils/logger";
 import Webhook from "../../models/Webhook";
 import axios from "axios";
@@ -19,59 +19,74 @@ export interface WebhookJobData extends WebhookEventData {
 }
 
 class WebhookService {
-  private webhookQueue: Queue;
-  private webhookWorker: Worker;
-  private deadLetterQueue: Queue;
+  private webhookQueue: Queue | null = null;
+  private webhookWorker: Worker | null = null;
+  private deadLetterQueue: Queue | null = null;
+  private redisEnabled: boolean = false;
 
   constructor() {
-    const redisConnection = {
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB || "0")
-    };
+    this.redisEnabled = isRedisEnabled();
+    
+    if (this.redisEnabled) {
+      try {
+        const redisConnection = {
+          host: process.env.REDIS_HOST || "localhost",
+          port: parseInt(process.env.REDIS_PORT || "6379"),
+          password: process.env.REDIS_PASSWORD || undefined,
+          db: parseInt(process.env.REDIS_DB || "0")
+        };
 
-    // Main webhook queue
-    this.webhookQueue = new Queue("webhook-delivery", {
-      connection: redisConnection,
-      defaultJobOptions: {
-        removeOnComplete: 100,
-        removeOnFail: 200,
-        attempts: 1, // We handle retries manually
-        backoff: {
-          type: "exponential",
-          delay: 2000,
-        },
-      },
-    });
+        // Main webhook queue
+        this.webhookQueue = new Queue("webhook-delivery", {
+          connection: redisConnection,
+          defaultJobOptions: {
+            removeOnComplete: 100,
+            removeOnFail: 200,
+            attempts: 1, // We handle retries manually
+            backoff: {
+              type: "exponential",
+              delay: 2000,
+            },
+          },
+        });
 
-    // Dead letter queue for persistent failures
-    this.deadLetterQueue = new Queue("webhook-dead-letter", {
-      connection: redisConnection,
-      defaultJobOptions: {
-        removeOnComplete: 500,
-        removeOnFail: 1000,
-      },
-    });
+        // Dead letter queue for persistent failures
+        this.deadLetterQueue = new Queue("webhook-dead-letter", {
+          connection: redisConnection,
+          defaultJobOptions: {
+            removeOnComplete: 500,
+            removeOnFail: 1000,
+          },
+        });
 
-    // Worker to process webhooks
-    this.webhookWorker = new Worker(
-      "webhook-delivery",
-      this.processWebhook.bind(this),
-      {
-        connection: redisConnection,
-        concurrency: parseInt(process.env.WEBHOOK_CONCURRENCY || "5"),
-        limiter: {
-          max: parseInt(process.env.WEBHOOK_RATE_LIMIT || "50"),
-          duration: 60000, // 1 minute
-        },
+        // Worker to process webhooks
+        this.webhookWorker = new Worker(
+          "webhook-delivery",
+          this.processWebhook.bind(this),
+          {
+            connection: redisConnection,
+            concurrency: parseInt(process.env.WEBHOOK_CONCURRENCY || "5"),
+            limiter: {
+              max: parseInt(process.env.WEBHOOK_RATE_LIMIT || "50"),
+              duration: 60000, // 1 minute
+            },
+          }
+        );
+
+        this.setupWorkerEvents();
+        logger.info("Webhook service initialized with Redis");
+      } catch (error) {
+        logger.warn("Failed to initialize Redis webhook service, falling back to direct delivery:", error);
+        this.redisEnabled = false;
       }
-    );
-
-    this.setupWorkerEvents();
+    } else {
+      logger.info("Webhook service initialized in direct delivery mode (Redis disabled)");
+    }
   }
 
   private setupWorkerEvents(): void {
+    if (!this.webhookWorker) return;
+    
     this.webhookWorker.on("completed", (job) => {
       logger.info(`Webhook job ${job.id} completed successfully`);
     });
@@ -109,30 +124,68 @@ class WebhookService {
         }
       });
 
-      // Add webhook delivery jobs
-      for (const webhook of webhooks) {
-        await this.addWebhookJob({
-          ...eventData,
-          webhookId: webhook.id
-        });
+      if (this.redisEnabled) {
+        // Add webhook delivery jobs to queue
+        for (const webhook of webhooks) {
+          await this.addWebhookJob({
+            ...eventData,
+            webhookId: webhook.id
+          });
+        }
+        logger.info(`Added ${webhooks.length} webhook jobs for event ${eventData.event}`);
+      } else {
+        // Direct delivery without queue
+        for (const webhook of webhooks) {
+          const jobData = {
+            ...eventData,
+            webhookId: webhook.id
+          };
+          
+          // Process webhook directly
+          setImmediate(async () => {
+            try {
+              const mockJob = {
+                id: `direct-${webhook.id}-${Date.now()}`,
+                data: jobData,
+                updateProgress: async (progress: number) => {
+                  logger.debug(`Direct webhook progress: ${progress}%`);
+                }
+              } as Job<WebhookJobData>;
+              
+              await this.processWebhook(mockJob);
+            } catch (error) {
+              logger.error("Error in direct webhook delivery:", error);
+            }
+          });
+        }
+        logger.info(`Started direct delivery for ${webhooks.length} webhooks for event ${eventData.event}`);
       }
-
-      logger.info(`Added ${webhooks.length} webhook jobs for event ${eventData.event}`);
     } catch (error) {
       logger.error("Error sending webhook:", error);
       throw error;
     }
   }
 
-  private async addWebhookJob(jobData: WebhookJobData): Promise<Job> {
-    return await this.webhookQueue.add(
-      "deliver-webhook",
-      jobData,
-      {
-        jobId: `webhook-${jobData.webhookId}-${Date.now()}`,
-        delay: 0
-      }
-    );
+  private async addWebhookJob(jobData: WebhookJobData): Promise<Job | any> {
+    if (this.redisEnabled && this.webhookQueue) {
+      return await this.webhookQueue.add(
+        "deliver-webhook",
+        jobData,
+        {
+          jobId: `webhook-${jobData.webhookId}-${Date.now()}`,
+          delay: 0
+        }
+      );
+    } else {
+      // Mock job for direct delivery
+      return {
+        id: `direct-${jobData.webhookId}-${Date.now()}`,
+        data: jobData,
+        updateProgress: async (progress: number) => {
+          logger.debug(`Direct webhook progress: ${progress}%`);
+        }
+      };
+    }
   }
 
   private async processWebhook(job: Job<WebhookJobData>): Promise<void> {
@@ -343,45 +396,70 @@ class WebhookService {
       throw new Error("Webhook not found");
     }
 
-    const jobs = await this.webhookQueue.getJobs(["completed", "failed", "waiting", "active"]);
-    const webhookJobs = jobs.filter(job => job.data.webhookId === webhookId);
+    if (this.redisEnabled && this.webhookQueue) {
+      const jobs = await this.webhookQueue.getJobs(["completed", "failed", "waiting", "active"]);
+      const webhookJobs = jobs.filter(job => job.data.webhookId === webhookId);
 
-    return {
-      successCount: webhook.successCount,
-      failureCount: webhook.failureCount,
-      lastDeliveryAt: webhook.lastDeliveryAt,
-      lastSuccessAt: webhook.lastSuccessAt,
-      lastFailureAt: webhook.lastFailureAt,
-      lastError: webhook.lastError,
-      queueStats: {
-        total: webhookJobs.length,
-        completed: webhookJobs.filter(job => job.finishedOn).length,
-        failed: webhookJobs.filter(job => job.failedReason).length,
-        pending: webhookJobs.filter(job => !job.processedOn).length,
-        active: webhookJobs.filter(job => job.processedOn && !job.finishedOn).length
-      }
-    };
+      return {
+        successCount: webhook.successCount,
+        failureCount: webhook.failureCount,
+        lastDeliveryAt: webhook.lastDeliveryAt,
+        lastSuccessAt: webhook.lastSuccessAt,
+        lastFailureAt: webhook.lastFailureAt,
+        lastError: webhook.lastError,
+        queueStats: {
+          total: webhookJobs.length,
+          completed: webhookJobs.filter(job => job.finishedOn).length,
+          failed: webhookJobs.filter(job => job.failedReason).length,
+          pending: webhookJobs.filter(job => !job.processedOn).length,
+          active: webhookJobs.filter(job => job.processedOn && !job.finishedOn).length
+        }
+      };
+    } else {
+      // Return basic stats from database when Redis is not available
+      return {
+        successCount: webhook.successCount,
+        failureCount: webhook.failureCount,
+        lastDeliveryAt: webhook.lastDeliveryAt,
+        lastSuccessAt: webhook.lastSuccessAt,
+        lastFailureAt: webhook.lastFailureAt,
+        lastError: webhook.lastError,
+        queueStats: {
+          total: 0,
+          completed: 0,
+          failed: 0,
+          pending: 0,
+          active: 0
+        }
+      };
+    }
   }
 
   async retryFailedWebhooks(webhookId?: number): Promise<number> {
-    const deadLetterJobs = await this.deadLetterQueue.getJobs(["completed"]);
-    let retriedCount = 0;
+    if (this.redisEnabled && this.deadLetterQueue) {
+      const deadLetterJobs = await this.deadLetterQueue.getJobs(["completed"]);
+      let retriedCount = 0;
 
-    for (const job of deadLetterJobs) {
-      if (!webhookId || job.data.webhookId === webhookId) {
-        // Reset retry count and re-add to main queue
-        await this.addWebhookJob({
-          ...job.data,
-          retryCount: 0
-        });
-        
-        await job.remove();
-        retriedCount++;
+      for (const job of deadLetterJobs) {
+        if (!webhookId || job.data.webhookId === webhookId) {
+          // Reset retry count and re-add to main queue
+          await this.addWebhookJob({
+            ...job.data,
+            retryCount: 0
+          });
+          
+          await job.remove();
+          retriedCount++;
+        }
       }
-    }
 
-    logger.info(`Retried ${retriedCount} dead letter webhook jobs` + (webhookId ? ` for webhook ${webhookId}` : ""));
-    return retriedCount;
+      logger.info(`Retried ${retriedCount} dead letter webhook jobs` + (webhookId ? ` for webhook ${webhookId}` : ""));
+      return retriedCount;
+    } else {
+      // In direct delivery mode, there are no failed jobs to retry
+      logger.info("Mock: No failed webhook jobs to retry in direct delivery mode");
+      return 0;
+    }
   }
 
   getAvailableEvents(): string[] {
@@ -401,9 +479,11 @@ class WebhookService {
   }
 
   async close(): Promise<void> {
-    await this.webhookWorker.close();
-    await this.webhookQueue.close();
-    await this.deadLetterQueue.close();
+    if (this.redisEnabled) {
+      await this.webhookWorker?.close();
+      await this.webhookQueue?.close();
+      await this.deadLetterQueue?.close();
+    }
   }
 }
 

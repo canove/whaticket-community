@@ -24,7 +24,7 @@ import {
   Image as MediaIcon,
   Input as InputIcon,
   AccountTree as ConditionIcon,
-  WebHook as WebhookIcon,
+  Webhook as WebhookIcon,
   SmartToy as AIIcon,
   PlayArrow as StartIcon,
   Stop as EndIcon,

@@ -1,5 +1,5 @@
 import { Worker, Job, Queue } from "bullmq";
-import { createRedisConnection } from "../../libs/redis";
+import { createRedisConnection, isRedisEnabled } from "../../libs/redis";
 import { logger } from "../../utils/logger";
 import Campaign, { CampaignStatus } from "../../models/Campaign";
 import CampaignExecution, { CampaignExecutionStatus } from "../../models/CampaignExecution";
@@ -11,40 +11,56 @@ import { WhatsAppAdapter } from "../ChannelServices/WhatsAppAdapter";
 import { CampaignJobData } from "./CampaignQueueService";
 
 class CampaignProcessorService {
-  private worker: Worker;
-  private queue: Queue;
+  private worker: Worker | null = null;
+  private queue: Queue | null = null;
   private isRunning: boolean = false;
+  private redisEnabled: boolean = false;
+  private mockProcessingInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    const redisConnection = {
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB || "0")
-    };
+    this.redisEnabled = isRedisEnabled();
+    
+    if (this.redisEnabled) {
+      try {
+        const redisConnection = {
+          host: process.env.REDIS_HOST || "localhost",
+          port: parseInt(process.env.REDIS_PORT || "6379"),
+          password: process.env.REDIS_PASSWORD || undefined,
+          db: parseInt(process.env.REDIS_DB || "0")
+        };
 
-    // Create queue instance for job management
-    this.queue = new Queue("campaign-queue", {
-      connection: redisConnection
-    });
+        // Create queue instance for job management
+        this.queue = new Queue("campaign-queue", {
+          connection: redisConnection
+        });
 
-    this.worker = new Worker(
-      "campaign-queue",
-      this.processJob.bind(this),
-      {
-        connection: redisConnection,
-        concurrency: parseInt(process.env.CAMPAIGN_CONCURRENCY || "1"),
-        limiter: {
-          max: parseInt(process.env.CAMPAIGN_MAX_JOBS || "10"),
-          duration: 60000, // 1 minute
-        }
+        this.worker = new Worker(
+          "campaign-queue",
+          this.processJob.bind(this),
+          {
+            connection: redisConnection,
+            concurrency: parseInt(process.env.CAMPAIGN_CONCURRENCY || "1"),
+            limiter: {
+              max: parseInt(process.env.CAMPAIGN_MAX_JOBS || "10"),
+              duration: 60000, // 1 minute
+            }
+          }
+        );
+
+        this.setupWorkerEvents();
+        logger.info("Campaign processor service initialized with Redis");
+      } catch (error) {
+        logger.warn("Failed to initialize Redis campaign processor, falling back to mock mode:", error);
+        this.redisEnabled = false;
       }
-    );
-
-    this.setupWorkerEvents();
+    } else {
+      logger.info("Campaign processor service initialized in mock mode (Redis disabled)");
+    }
   }
 
   private setupWorkerEvents(): void {
+    if (!this.worker) return;
+    
     this.worker.on("ready", () => {
       logger.info("Campaign processor worker is ready");
       this.isRunning = true;
@@ -65,6 +81,60 @@ class CampaignProcessorService {
     this.worker.on("completed", (job) => {
       logger.info(`Campaign job ${job.id} completed successfully`);
     });
+  }
+
+  private async startMockProcessor(): Promise<void> {
+    if (this.mockProcessingInterval) return;
+    
+    this.mockProcessingInterval = setInterval(async () => {
+      try {
+        // Process pending executions directly from database
+        const pendingExecutions = await CampaignExecution.findAll({
+          where: { status: CampaignExecutionStatus.PENDING },
+          limit: parseInt(process.env.CAMPAIGN_CONCURRENCY || "1"),
+          include: [
+            {
+              model: Contact,
+              include: [{ model: Tenant }]
+            },
+            { model: Campaign }
+          ]
+        });
+
+        for (const execution of pendingExecutions) {
+          const jobData: CampaignJobData = {
+            campaignId: execution.campaignId,
+            contactId: execution.contactId,
+            tenantId: execution.tenantId,
+            executionId: execution.id,
+            messageTemplate: execution.campaign.messageTemplate
+          };
+
+          // Create mock job
+          const mockJob = {
+            id: `mock-${execution.id}`,
+            data: jobData,
+            updateProgress: async (progress: number) => {
+              logger.info(`Mock job progress: ${progress}%`);
+            }
+          } as Job<CampaignJobData>;
+
+          await this.processJob(mockJob);
+        }
+      } catch (error) {
+        logger.error("Error in mock processor:", error);
+      }
+    }, 5000); // Process every 5 seconds
+
+    logger.info("Mock campaign processor started");
+  }
+
+  private stopMockProcessor(): void {
+    if (this.mockProcessingInterval) {
+      clearInterval(this.mockProcessingInterval);
+      this.mockProcessingInterval = null;
+      logger.info("Mock campaign processor stopped");
+    }
   }
 
   private async processJob(job: Job<CampaignJobData>): Promise<void> {
@@ -277,8 +347,16 @@ class CampaignProcessorService {
 
     try {
       logger.info("Starting campaign processor worker...");
-      // Worker starts automatically when created
-      this.isRunning = true;
+      
+      if (this.redisEnabled && this.worker) {
+        // Worker starts automatically when created
+        this.isRunning = true;
+      } else {
+        // Start mock processor
+        await this.startMockProcessor();
+        this.isRunning = true;
+      }
+      
       logger.info("Campaign processor worker started successfully");
     } catch (error) {
       logger.error("Error starting campaign processor:", error);
@@ -294,8 +372,14 @@ class CampaignProcessorService {
 
     try {
       logger.info("Stopping campaign processor worker...");
-      await this.worker.close();
-      await this.queue.close();
+      
+      if (this.redisEnabled) {
+        await this.worker?.close();
+        await this.queue?.close();
+      } else {
+        this.stopMockProcessor();
+      }
+      
       this.isRunning = false;
       logger.info("Campaign processor worker stopped successfully");
     } catch (error) {
@@ -308,39 +392,53 @@ class CampaignProcessorService {
     return this.isRunning;
   }
 
-  getWorker(): Worker {
+  getWorker(): Worker | null {
     return this.worker;
   }
 
   async getProcessorStats() {
     try {
-      // Get job counts from queue
-      const [active, waiting, completed, failed] = await Promise.all([
-        this.queue.getActive(),
-        this.queue.getWaiting(),
-        this.queue.getCompleted(),
-        this.queue.getFailed()
-      ]);
+      if (this.redisEnabled && this.queue) {
+        // Get job counts from queue
+        const [active, waiting, completed, failed] = await Promise.all([
+          this.queue.getActive(),
+          this.queue.getWaiting(),
+          this.queue.getCompleted(),
+          this.queue.getFailed()
+        ]);
 
-      const processing = active.length;
-      const pending = waiting.length;
-      const totalCompleted = completed.length;
-      const totalFailed = failed.length;
-      const total = processing + pending + totalCompleted + totalFailed;
+        const processing = active.length;
+        const pending = waiting.length;
+        const totalCompleted = completed.length;
+        const totalFailed = failed.length;
+        const total = processing + pending + totalCompleted + totalFailed;
 
-      return {
-        concurrency: this.worker.opts.concurrency || 1,
-        processing,
-        pending,
-        completed: totalCompleted,
-        failed: totalFailed,
-        total,
-        isRunning: this.isRunning
-      };
+        return {
+          concurrency: this.worker?.opts.concurrency || 1,
+          processing,
+          pending,
+          completed: totalCompleted,
+          failed: totalFailed,
+          total,
+          isRunning: this.isRunning
+        };
+      } else {
+        // Mock stats from database
+        const executions = await CampaignExecution.findAll();
+        return {
+          concurrency: parseInt(process.env.CAMPAIGN_CONCURRENCY || "1"),
+          processing: executions.filter(e => e.status === CampaignExecutionStatus.SENDING).length,
+          pending: executions.filter(e => e.status === CampaignExecutionStatus.PENDING).length,
+          completed: executions.filter(e => e.status === CampaignExecutionStatus.SENT || e.status === CampaignExecutionStatus.DELIVERED).length,
+          failed: executions.filter(e => e.status === CampaignExecutionStatus.FAILED).length,
+          total: executions.length,
+          isRunning: this.isRunning
+        };
+      }
     } catch (error) {
       logger.error("Error getting processor stats:", error);
       return {
-        concurrency: this.worker.opts.concurrency || 1,
+        concurrency: parseInt(process.env.CAMPAIGN_CONCURRENCY || "1"),
         processing: 0,
         pending: 0,
         completed: 0,
