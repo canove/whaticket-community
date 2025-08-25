@@ -34,16 +34,29 @@ const syncUnreadMessages = async (wbot: Session) => {
 
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
   return new Promise((resolve, reject) => {
+    const sessionName = whatsapp.name;
+    logger.info(`Iniciando sessão WhatsApp: ${sessionName} (ID: ${whatsapp.id})`);
+    
+    // Timeout da Promise para evitar travamento
+    const initTimeout = setTimeout(() => {
+      logger.error(`Timeout na inicialização da sessão ${sessionName} após 120 segundos`);
+      reject(new Error(`Timeout na inicialização da sessão ${sessionName}`));
+    }, 120000); // 2 minutos
+
     try {
       const io = getIO();
-      const sessionName = whatsapp.name;
       let sessionCfg;
 
       if (whatsapp && whatsapp.session) {
-        sessionCfg = JSON.parse(whatsapp.session);
+        try {
+          sessionCfg = JSON.parse(whatsapp.session);
+        } catch (parseError) {
+          logger.warn(`Erro ao fazer parse da sessão ${sessionName}, usando sessão limpa:`, parseError);
+          sessionCfg = null;
+        }
       }
 
-      // Argumentos Docker-friendly para o Puppeteer/Chrome
+      // Argumentos Docker-friendly melhorados para o Puppeteer/Chrome
       const defaultArgs = [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -65,11 +78,16 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
         '--disable-hang-monitor',
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor',
+        '--disable-ipc-flooding-protection',
+        '--disable-blink-features=AutomationControlled',
+        '--disable-client-side-phishing-detection',
         `--user-data-dir=/tmp/chrome-user-data-${whatsapp.id}-${Date.now()}`,
         '--disable-crash-reporter',
         '--disable-in-process-stack-traces',
         '--disable-logging',
-        '--silent'
+        '--silent',
+        '--memory-pressure-off',
+        '--max_old_space_size=512'
       ];
 
       const customArgs = process.env.CHROME_ARGS ? process.env.CHROME_ARGS.split(' ') : [];
@@ -84,23 +102,67 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           // @ts-ignore
           browserWSEndpoint: process.env.CHROME_WS || undefined,
           args: chromeArgs,
-          timeout: 60000,
+          timeout: 90000, // Aumentado para 90 segundos
           handleSIGINT: false,
           handleSIGTERM: false,
-          handleSIGHUP: false
+          handleSIGHUP: false,
+          // Configurações adicionais para estabilidade
+          slowMo: 100, // Adiciona delay entre ações
+          defaultViewport: null,
+          ignoreDefaultArgs: false
         }
       });
 
-      // Tratamento robusto de inicialização
+      // Variáveis de controle para evitar múltiplas resoluções/rejeições
+      let isResolved = false;
+      let isRejected = false;
+
+      // Função para limpar timeout e resolver
+      const cleanResolve = (result: Session) => {
+        if (!isResolved && !isRejected) {
+          isResolved = true;
+          clearTimeout(initTimeout);
+          resolve(result);
+        }
+      };
+
+      // Função para limpar timeout e rejeitar
+      const cleanReject = (error: Error) => {
+        if (!isResolved && !isRejected) {
+          isRejected = true;
+          clearTimeout(initTimeout);
+          reject(error);
+        }
+      };
+
+      // Tratamento de erro de inicialização
+      wbot.on('error', (error) => {
+        logger.error(`Erro na sessão ${sessionName}:`, error);
+        cleanReject(new Error(`Erro na sessão ${sessionName}: ${error.message}`));
+      });
+
+      // Tratamento de desconexão
+      wbot.on('disconnected', (reason) => {
+        logger.warn(`Sessão ${sessionName} desconectada: ${reason}`);
+        if (!isResolved) {
+          cleanReject(new Error(`Sessão ${sessionName} desconectada: ${reason}`));
+        }
+      });
+
+      // Inicialização com tratamento de erro robusto
       try {
-        wbot.initialize();
-      } catch (error) {
-        logger.error(`Error initializing WhatsApp session ${sessionName}:`, error);
-        // Não rejeitamos imediatamente, deixamos os event handlers lidarem com isso
+        logger.info(`Inicializando cliente WhatsApp para sessão: ${sessionName}`);
+        wbot.initialize().catch((initError) => {
+          logger.error(`Erro crítico na inicialização da sessão ${sessionName}:`, initError);
+          cleanReject(new Error(`Erro crítico na inicialização: ${initError.message}`));
+        });
+      } catch (syncError) {
+        logger.error(`Erro síncrono na inicialização da sessão ${sessionName}:`, syncError);
+        cleanReject(new Error(`Erro síncrono na inicialização: ${syncError.message}`));
       }
 
       wbot.on("qr", async qr => {
-        logger.info("Session:", sessionName);
+        logger.info(`QR Code gerado para sessão: ${sessionName}`);
         qrCode.generate(qr, { small: true });
         await whatsapp.update({ qrcode: qr, status: "qrcode", retries: 0 });
 
@@ -117,13 +179,11 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       });
 
       wbot.on("authenticated", async session => {
-        logger.info(`Session: ${sessionName} AUTHENTICATED`);
+        logger.info(`Sessão ${sessionName} AUTENTICADA com sucesso`);
       });
 
       wbot.on("auth_failure", async msg => {
-        console.error(
-          `Session: ${sessionName} AUTHENTICATION FAILURE! Reason: ${msg}`
-        );
+        logger.error(`FALHA DE AUTENTICAÇÃO na sessão ${sessionName}! Motivo: ${msg}`);
 
         if (whatsapp.retries > 1) {
           await whatsapp.update({ session: "", retries: 0 });
@@ -140,36 +200,45 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
           session: whatsapp
         });
 
-        reject(new Error("Error starting whatsapp session."));
+        cleanReject(new Error(`Falha de autenticação na sessão ${sessionName}: ${msg}`));
       });
 
       wbot.on("ready", async () => {
-        logger.info(`Session: ${sessionName} READY`);
+        logger.info(`Sessão ${sessionName} PRONTA e operacional`);
 
-        await whatsapp.update({
-          status: "CONNECTED",
-          qrcode: "",
-          retries: 0
-        });
+        try {
+          await whatsapp.update({
+            status: "CONNECTED",
+            qrcode: "",
+            retries: 0
+          });
 
-        io.emit("whatsappSession", {
-          action: "update",
-          session: whatsapp
-        });
+          io.emit("whatsappSession", {
+            action: "update",
+            session: whatsapp
+          });
 
-        const sessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
-        if (sessionIndex === -1) {
-          wbot.id = whatsapp.id;
-          sessions.push(wbot);
+          const sessionIndex = sessions.findIndex(s => s.id === whatsapp.id);
+          if (sessionIndex === -1) {
+            wbot.id = whatsapp.id;
+            sessions.push(wbot);
+          }
+
+          await wbot.sendPresenceAvailable();
+          await syncUnreadMessages(wbot);
+
+          logger.info(`Sessão ${sessionName} totalmente configurada e sincronizada`);
+          cleanResolve(wbot);
+        } catch (readyError) {
+          logger.error(`Erro ao finalizar configuração da sessão ${sessionName}:`, readyError);
+          cleanReject(new Error(`Erro ao finalizar configuração: ${readyError.message}`));
         }
-
-        wbot.sendPresenceAvailable();
-        await syncUnreadMessages(wbot);
-
-        resolve(wbot);
       });
+
     } catch (err) {
-      logger.error(err);
+      logger.error(`Erro geral na inicialização da sessão ${sessionName}:`, err);
+      clearTimeout(initTimeout);
+      reject(new Error(`Erro geral na inicialização: ${err.message}`));
     }
   });
 };
