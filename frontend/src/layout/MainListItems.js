@@ -15,6 +15,11 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import DeviceHubOutlinedIcon from "@mui/icons-material/DeviceHubOutlined";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import ApiIcon from "@mui/icons-material/Api";
 
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
@@ -102,6 +107,32 @@ const MainListItems = (props) => {
         primary={i18n.t("mainDrawer.listItems.quickAnswers")}
         icon={<QuestionAnswerOutlinedIcon />}
       />
+      <ListItemLink
+        to="/flows"
+        primary="Fluxos"
+        icon={<DeviceHubOutlinedIcon />}
+      />
+      
+      <Divider />
+      <ListSubheader inset>
+        Inteligência Artificial
+      </ListSubheader>
+      <ListItemLink
+        to="/ai-settings"
+        primary="Configurações de IA"
+        icon={<SmartToyIcon />}
+      />
+      <ListItemLink
+        to="/analytics"
+        primary="Analytics"
+        icon={<AnalyticsIcon />}
+      />
+      <ListItemLink
+        to="/developer-portal"
+        primary="Developer Portal"
+        icon={<ApiIcon />}
+      />
+      
       <Can
         role={user.profile}
         perform="drawer-admin-items:view"
@@ -120,6 +151,11 @@ const MainListItems = (props) => {
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
               icon={<AccountTreeOutlinedIcon />}
+            />
+            <ListItemLink
+              to="/tags"
+              primary={i18n.t("mainDrawer.listItems.tags")}
+              icon={<LocalOfferOutlinedIcon />}
             />
             <ListItemLink
               to="/settings"

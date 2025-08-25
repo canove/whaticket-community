@@ -20,7 +20,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
-    pageNumber
+    pageNumber,
+    tenantId: req.tenantId!
   });
 
   return res.json({ users, count, hasMore });
@@ -44,7 +45,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     name,
     profile,
     queueIds,
-    whatsappId
+    whatsappId,
+    tenantId: req.tenantId!
   });
 
   const io = getIO();

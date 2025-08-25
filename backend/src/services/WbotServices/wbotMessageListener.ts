@@ -13,6 +13,7 @@ import {
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
 import Message from "../../models/Message";
+import Whatsapp from "../../models/Whatsapp";
 
 import { getIO } from "../../libs/socket";
 import CreateMessageService from "../MessageServices/CreateMessageService";
@@ -25,6 +26,12 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
+
+// Importações do motor de fluxos
+import FlowEngineService from "../FlowServices/FlowEngineService";
+
+// Importações dos serviços de IA
+import AudioProcessorService from "../AIServices/AudioProcessorService";
 
 interface Session extends Client {
   id?: number;
@@ -124,6 +131,32 @@ const verifyMediaMessage = async (
 
   await ticket.update({ lastMessage: msg.body || media.filename });
   const newMessage = await CreateMessageService({ messageData });
+
+  // **PROCESSAMENTO AUTOMÁTICO DE TRANSCRIÇÃO DE ÁUDIO**
+  // Verifica se é mensagem de áudio e não foi enviada por mim
+  if (
+    !msg.fromMe &&
+    (msg.type === "audio" || msg.type === "ptt") &&
+    ticket.whatsapp?.tenantId
+  ) {
+    try {
+      // Adiciona à fila de transcrição de forma assíncrona
+      await AudioProcessorService.queueAudioTranscription(
+        newMessage.id,
+        ticket.whatsapp.tenantId,
+        {
+          priority: 1, // Prioridade normal para áudios
+          delay: 1000  // Delay de 1 segundo para dar tempo do arquivo ser salvo
+        }
+      );
+      
+      logger.info(`Áudio adicionado à fila de transcrição: ${newMessage.id}`);
+    } catch (error) {
+      // Não interrompe o fluxo se houver erro na transcrição
+      logger.error(`Erro ao adicionar áudio à fila de transcrição: ${newMessage.id}`, error);
+      Sentry.captureException(error);
+    }
+  }
 
   return newMessage;
 };
@@ -305,12 +338,49 @@ const handleMessage = async (
       groupContact
     );
 
+    let messageCreated: Message;
+
     if (msg.hasMedia) {
-      await verifyMediaMessage(msg, ticket, contact);
+      messageCreated = await verifyMediaMessage(msg, ticket, contact);
     } else {
       await verifyMessage(msg, ticket, contact);
+      // Busca a mensagem recém criada para usar no fluxo
+      messageCreated = await Message.findOne({
+        where: { id: msg.id.id }
+      }) as Message;
     }
 
+    // **INTEGRAÇÃO COM MOTOR DE FLUXOS**
+    // Verifica fluxos apenas para mensagens recebidas (não enviadas por mim)
+    // e antes da verificação de filas para não interferir no fluxo normal
+    if (
+      !msg.fromMe &&
+      !chat.isGroup &&
+      messageCreated &&
+      whatsapp.tenantId
+    ) {
+      try {
+        const flowProcessed = await FlowEngineService.processMessage({
+          message: messageCreated,
+          contact,
+          ticket,
+          tenantId: whatsapp.tenantId
+        });
+
+        // Se um fluxo foi processado, não executa verificação de filas
+        // para evitar conflitos entre automação e atendimento manual
+        if (flowProcessed) {
+          logger.info(`Fluxo processado para contato ${contact.number} no ticket ${ticket.id}`);
+          return;
+        }
+      } catch (error) {
+        // Log do erro mas não interrompe o fluxo normal
+        logger.error(`Erro ao processar fluxo para mensagem ${msg.id.id}:`, error);
+        Sentry.captureException(error);
+      }
+    }
+
+    // Verificação de filas (fluxo original) - só executa se nenhum fluxo foi processado
     if (
       !ticket.queue &&
       !chat.isGroup &&

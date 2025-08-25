@@ -2,10 +2,12 @@ import { Sequelize, Op } from "sequelize";
 import Queue from "../../models/Queue";
 import User from "../../models/User";
 import Whatsapp from "../../models/Whatsapp";
+import TenantHelper from "../../helpers/TenantHelper";
 
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
+  tenantId: number;
 }
 
 interface Response {
@@ -16,9 +18,10 @@ interface Response {
 
 const ListUsersService = async ({
   searchParam = "",
-  pageNumber = "1"
+  pageNumber = "1",
+  tenantId
 }: Request): Promise<Response> => {
-  const whereCondition = {
+  const whereCondition = TenantHelper.createTenantWhere({
     [Op.or]: [
       {
         "$User.name$": Sequelize.where(
@@ -29,7 +32,7 @@ const ListUsersService = async ({
       },
       { email: { [Op.like]: `%${searchParam.toLowerCase()}%` } }
     ]
-  };
+  }, tenantId);
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 

@@ -12,6 +12,8 @@ import UserQueue from "../models/UserQueue";
 import QuickAnswer from "../models/QuickAnswer";
 import Flow from "../models/Flow";
 import FlowNode from "../models/FlowNode";
+import Tenant from "../models/Tenant";
+import FlowExecution from "../models/FlowExecution";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -20,6 +22,7 @@ const dbConfig = require("../config/database");
 const sequelize = new Sequelize(dbConfig);
 
 const models = [
+  Tenant,
   User,
   Contact,
   Ticket,
@@ -32,7 +35,8 @@ const models = [
   UserQueue,
   QuickAnswer,
   Flow,
-  FlowNode
+  FlowNode,
+  FlowExecution
 ];
 
 sequelize.addModels(models);

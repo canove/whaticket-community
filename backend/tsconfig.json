@@ -23,7 +23,6 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": false,
-    "useUnknownInCatchVariables": false,
-    "suppressImplicitAnyIndexErrors": true
+    "useUnknownInCatchVariables": false
   }
 }

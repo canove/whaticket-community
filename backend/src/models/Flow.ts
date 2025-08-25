@@ -7,10 +7,15 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  HasMany
+  HasMany,
+  ForeignKey,
+  BelongsTo,
+  DataType,
+  Default
 } from "sequelize-typescript";
 
 import FlowNode from "./FlowNode";
+import Tenant from "./Tenant";
 
 @Table
 class Flow extends Model<Flow> {
@@ -19,9 +24,43 @@ class Flow extends Model<Flow> {
   @Column
   id: number;
 
+  @ForeignKey(() => Tenant)
+  @AllowNull(false)
+  @Column
+  tenantId: number;
+
+  @BelongsTo(() => Tenant)
+  tenant: Tenant;
+
   @AllowNull(false)
   @Column
   name: string;
+
+  @Column(DataType.TEXT)
+  description: string;
+
+  @AllowNull(false)
+  @Default(1)
+  @Column
+  version: number;
+
+  @AllowNull(false)
+  @Default("draft")
+  @Column(DataType.ENUM("draft", "active", "archived"))
+  status: "draft" | "active" | "archived";
+
+  @AllowNull(false)
+  @Default("manual")
+  @Column(DataType.ENUM("keyword", "intent", "event", "manual"))
+  triggerType: "keyword" | "intent" | "event" | "manual";
+
+  @Column(DataType.JSON)
+  triggerConfig: object;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column
+  isActive: boolean;
 
   @CreatedAt
   createdAt: Date;

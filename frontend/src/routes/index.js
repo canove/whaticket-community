@@ -13,6 +13,12 @@ import Users from "../pages/Users";
 import Contacts from "../pages/Contacts/";
 import QuickAnswers from "../pages/QuickAnswers/";
 import Queues from "../pages/Queues/";
+import Tags from "../pages/Tags/";
+import FlowList from "../pages/Flows/FlowList";
+import FlowEditor from "../pages/Flows/FlowEditor";
+import AISettings from "../pages/AISettings/";
+import Analytics from "../pages/Analytics/";
+import DeveloperPortal from "../pages/DeveloperPortal/";
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import { ThemeProvider } from "../context/DarkMode";
@@ -37,7 +43,14 @@ const Routes = () => {
                   <Route exact path="/users" component={Users} isPrivate />
                   <Route exact path="/quickAnswers" component={QuickAnswers} isPrivate />
                   <Route exact path="/Settings" component={Settings} isPrivate />
+                  <Route exact path="/ai-settings" component={AISettings} isPrivate />
+                  <Route exact path="/analytics" component={Analytics} isPrivate />
+                  <Route exact path="/developer-portal" component={DeveloperPortal} isPrivate />
                   <Route exact path="/Queues" component={Queues} isPrivate />
+                  <Route exact path="/Tags" component={Tags} isPrivate />
+                  <Route exact path="/flows" component={FlowList} isPrivate />
+                  <Route exact path="/flows/:flowId" component={FlowEditor} isPrivate />
+                  <Route exact path="/flows/:flowId/edit" component={FlowEditor} isPrivate />
                 </LoggedInLayout>
               </WhatsAppsProvider>
             </Switch>

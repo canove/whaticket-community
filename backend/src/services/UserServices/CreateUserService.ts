@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
+import TenantHelper from "../../helpers/TenantHelper";
 
 interface Request {
   email: string;
@@ -11,6 +12,7 @@ interface Request {
   queueIds?: number[];
   profile?: string;
   whatsappId?: number;
+  tenantId: number;
 }
 
 interface Response {
@@ -26,7 +28,8 @@ const CreateUserService = async ({
   name,
   queueIds = [],
   profile = "admin",
-  whatsappId
+  whatsappId,
+  tenantId
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().required().min(2),
@@ -39,7 +42,7 @@ const CreateUserService = async ({
         async value => {
           if (!value) return false;
           const emailExists = await User.findOne({
-            where: { email: value }
+            where: TenantHelper.createTenantWhere({ email: value }, tenantId)
           });
           return !emailExists;
         }
@@ -54,13 +57,13 @@ const CreateUserService = async ({
   }
 
   const user = await User.create(
-    {
+    TenantHelper.injectTenantData({
       email,
       password,
       name,
       profile,
       whatsappId: whatsappId ? whatsappId : null
-    },
+    }, tenantId),
     { include: ["queues", "whatsapp"] }
   );
 
