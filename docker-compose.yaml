@@ -14,6 +14,7 @@ services:
       - DB_USER=root
       - DB_PASS=${MYSQL_ROOT_PASSWORD:-strongpassword}
       - DB_NAME=${MYSQL_DATABASE:-whaticket}
+      - DB_DIALECT=mysql
       - JWT_SECRET=${JWT_SECRET:-3123123213123}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
       - BACKEND_URL=${BACKEND_URL:-http://localhost}
@@ -25,6 +26,9 @@ services:
     volumes:
       - ./backend/public/:/usr/src/app/public/
       - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
       - whaticket
 
@@ -43,12 +47,14 @@ services:
     volumes:
       - ./ssl/certs/:/etc/nginx/ssl/
       - ./ssl/www/:/var/www/letsencrypt/
+    depends_on:
+      - backend
     networks:
       - whaticket
 
   mysql:
     image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
     volumes:
       - ./.docker/data/:/var/lib/mysql
     environment:
@@ -58,5 +64,11 @@ services:
     ports:
       - ${MYSQL_PORT:-3306}:3306
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-strongpassword}"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+      start_period: 30s
     networks:
       - whaticket
