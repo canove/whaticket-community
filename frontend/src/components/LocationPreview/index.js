@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import toastError from "../../errors/toastError";
 
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 
 import { Button, Divider, } from "@mui/material";
 
@@ -24,7 +23,7 @@ const LocationPreview = ({ image, link, description }) => {
 			}}>
 				<div>
 					<div style={{ float: "left" }}>
-						<img src={image} onClick={handleLocation} style={{ width: "100px" }} />
+						<img src={image} onClick={handleLocation} style={{ width: "100px" }} alt="Preview da localização" />
 					</div>
 					{ description && (
 					<div style={{ display: "flex", flexWrap: "wrap" }}>

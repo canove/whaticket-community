@@ -1,32 +1,26 @@
 import React from "react";
-
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 
-const useStyles = makeStyles((theme) => ({
-  mainContainer: {
-    flex: 1,
-    // padding: theme.spacing(2),
-    // height: `calc(100% - 48px)`,
-    padding: 0,
-    height: "100%",
-  },
+const StyledMainContainer = styled(Container)(() => ({
+  flex: 1,
+  padding: 0,
+  height: "100%",
+}));
 
-  contentWrapper: {
-    height: "100%",
-    overflowY: "hidden",
-    display: "flex",
-    flexDirection: "column",
-  },
+const StyledContentWrapper = styled(Box)(() => ({
+  height: "100%",
+  overflowY: "hidden",
+  display: "flex",
+  flexDirection: "column",
 }));
 
 const MainContainer = ({ children }) => {
-  const classes = useStyles();
-
   return (
-    <Container className={classes.mainContainer} maxWidth={false}>
-      <div className={classes.contentWrapper}>{children}</div>
-    </Container>
+    <StyledMainContainer maxWidth={false}>
+      <StyledContentWrapper>{children}</StyledContentWrapper>
+    </StyledMainContainer>
   );
 };
 

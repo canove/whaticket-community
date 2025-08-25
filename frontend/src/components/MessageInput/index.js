@@ -3,9 +3,8 @@ import "emoji-mart/css/emoji-mart.css";
 import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
 import MicRecorder from "mic-recorder-to-mp3";
-import clsx from "clsx";
 
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -39,170 +38,162 @@ import toastError from "../../errors/toastError";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
-const useStyles = makeStyles((theme) => ({
-  mainWrapper: {
-    background: "#eee",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
-    [theme.breakpoints.down('md')]: {
-      position: "fixed",
-      bottom: 0,
-      width: "100%",
-    },
-  },
-
-  newMessageBox: {
-    background: "#eee",
+// Styled Components
+const StyledMainWrapper = styled(Paper)(({ theme }) => ({
+  background: "#eee",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+  [theme.breakpoints.down('md')]: {
+    position: "fixed",
+    bottom: 0,
     width: "100%",
-    display: "flex",
-    padding: "7px",
-    alignItems: "center",
   },
+}));
 
-  messageInputWrapper: {
-    padding: 6,
-    marginRight: 7,
-    background: "#fff",
-    display: "flex",
-    borderRadius: 20,
-    flex: 1,
-    position: "relative",
-  },
+const StyledNewMessageBox = styled(Box)(() => ({
+  background: "#eee",
+  width: "100%",
+  display: "flex",
+  padding: "7px",
+  alignItems: "center",
+}));
 
-  messageInput: {
-    paddingLeft: 10,
-    flex: 1,
-    border: "none",
-  },
+const StyledMessageInputWrapper = styled(Box)(() => ({
+  padding: 6,
+  marginRight: 7,
+  background: "#fff",
+  display: "flex",
+  borderRadius: 20,
+  flex: 1,
+  position: "relative",
+}));
 
-  sendMessageIcons: {
-    color: "grey",
-  },
+const StyledMessageInput = styled(InputBase)(() => ({
+  paddingLeft: 10,
+  flex: 1,
+  border: "none",
+}));
 
-  uploadInput: {
-    display: "none",
-  },
 
-  viewMediaInputWrapper: {
-    display: "flex",
-    padding: "10px 13px",
-    position: "relative",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#eee",
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
-  },
+const StyledUploadInput = styled("input")(() => ({
+  display: "none",
+}));
 
-  emojiBox: {
-    position: "absolute",
-    bottom: 63,
-    width: 40,
-    borderTop: "1px solid #e8e8e8",
-  },
+const StyledViewMediaInputWrapper = styled(Paper)(() => ({
+  display: "flex",
+  padding: "10px 13px",
+  position: "relative",
+  justifyContent: "space-between",
+  alignItems: "center",
+  backgroundColor: "#eee",
+  borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+}));
 
-  circleLoading: {
-    color: green[500],
-    opacity: "70%",
-    position: "absolute",
-    top: "20%",
-    left: "50%",
-    marginLeft: -12,
-  },
+const StyledEmojiBox = styled(Box)(() => ({
+  position: "absolute",
+  bottom: 63,
+  width: 40,
+  borderTop: "1px solid #e8e8e8",
+}));
 
-  audioLoading: {
-    color: green[500],
-    opacity: "70%",
-  },
+const StyledCircleLoading = styled(CircularProgress)(() => ({
+  color: green[500],
+  opacity: "70%",
+  position: "absolute",
+  top: "20%",
+  left: "50%",
+  marginLeft: -12,
+}));
 
-  recorderWrapper: {
-    display: "flex",
-    alignItems: "center",
-    alignContent: "middle",
-  },
+const StyledAudioLoading = styled(CircularProgress)(() => ({
+  color: green[500],
+  opacity: "70%",
+}));
 
-  cancelAudioIcon: {
-    color: "red",
-  },
+const StyledRecorderWrapper = styled(Box)(() => ({
+  display: "flex",
+  alignItems: "center",
+  alignContent: "middle",
+}));
 
-  sendAudioIcon: {
-    color: "green",
-  },
+const StyledCancelAudioIcon = styled(HighlightOffIcon)(() => ({
+  color: "red",
+}));
 
-  replyginMsgWrapper: {
-    display: "flex",
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 8,
-    paddingLeft: 73,
-    paddingRight: 7,
-  },
+const StyledSendAudioIcon = styled(CheckCircleOutlineIcon)(() => ({
+  color: "green",
+}));
 
-  replyginMsgContainer: {
-    flex: 1,
-    marginRight: 5,
-    overflowY: "hidden",
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    borderRadius: "7.5px",
-    display: "flex",
-    position: "relative",
-  },
+const StyledReplyMsgWrapper = styled(Box)(() => ({
+  display: "flex",
+  width: "100%",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingTop: 8,
+  paddingLeft: 73,
+  paddingRight: 7,
+}));
 
-  replyginMsgBody: {
-    padding: 10,
-    height: "auto",
-    display: "block",
-    whiteSpace: "pre-wrap",
-    overflow: "hidden",
-  },
+const StyledReplyMsgContainer = styled(Box)(() => ({
+  flex: 1,
+  marginRight: 5,
+  overflowY: "hidden",
+  backgroundColor: "rgba(0, 0, 0, 0.05)",
+  borderRadius: "7.5px",
+  display: "flex",
+  position: "relative",
+}));
 
-  replyginContactMsgSideColor: {
-    flex: "none",
-    width: "4px",
-    backgroundColor: "#35cd96",
-  },
+const StyledReplyMsgBody = styled(Box)(() => ({
+  padding: 10,
+  height: "auto",
+  display: "block",
+  whiteSpace: "pre-wrap",
+  overflow: "hidden",
+}));
 
-  replyginSelfMsgSideColor: {
-    flex: "none",
-    width: "4px",
-    backgroundColor: "#6bcbef",
-  },
+const StyledReplyContactMsgSideColor = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'fromMe'
+})(({ fromMe }) => ({
+  flex: "none",
+  width: "4px",
+  backgroundColor: fromMe ? "#6bcbef" : "#35cd96",
+}));
 
-  messageContactName: {
-    display: "flex",
-    color: "#6bcbef",
-    fontWeight: 500,
-  },
-  messageQuickAnswersWrapper: {
-    margin: 0,
-    position: "absolute",
-    bottom: "50px",
-    background: "#ffffff",
-    padding: "2px",
-    border: "1px solid #CCC",
-    left: 0,
-    width: "100%",
-    "& li": {
-      listStyle: "none",
-      "& a": {
-        display: "block",
-        padding: "8px",
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        maxHeight: "32px",
-        "&:hover": {
-          background: "#F1F1F1",
-          cursor: "pointer",
-        },
+const StyledMessageContactName = styled("span")(() => ({
+  display: "flex",
+  color: "#6bcbef",
+  fontWeight: 500,
+}));
+
+const StyledMessageQuickAnswersWrapper = styled("ul")(() => ({
+  margin: 0,
+  position: "absolute",
+  bottom: "50px",
+  background: "#ffffff",
+  padding: "2px",
+  border: "1px solid #CCC",
+  left: 0,
+  width: "100%",
+  "& li": {
+    listStyle: "none",
+    "& a": {
+      display: "block",
+      padding: "8px",
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+      maxHeight: "32px",
+      "&:hover": {
+        background: "#F1F1F1",
+        cursor: "pointer",
       },
     },
   },
 }));
 
 const MessageInput = ({ ticketStatus }) => {
-  const classes = useStyles();
   const { ticketId } = useParams();
 
   const [medias, setMedias] = useState([]);
@@ -387,47 +378,43 @@ const MessageInput = ({ ticketStatus }) => {
 
   const renderReplyingMessage = (message) => {
     return (
-      <div className={classes.replyginMsgWrapper}>
-        <div className={classes.replyginMsgContainer}>
-          <span
-            className={clsx(classes.replyginContactMsgSideColor, {
-              [classes.replyginSelfMsgSideColor]: !message.fromMe,
-            })}
-          ></span>
-          <div className={classes.replyginMsgBody}>
+      <StyledReplyMsgWrapper>
+        <StyledReplyMsgContainer>
+          <StyledReplyContactMsgSideColor fromMe={message.fromMe} />
+          <StyledReplyMsgBody>
             {!message.fromMe && (
-              <span className={classes.messageContactName}>
+              <StyledMessageContactName>
                 {message.contact?.name}
-              </span>
+              </StyledMessageContactName>
             )}
             {message.body}
-          </div>
-        </div>
+          </StyledReplyMsgBody>
+        </StyledReplyMsgContainer>
         <IconButton
           aria-label="showRecorder"
           component="span"
           disabled={loading || ticketStatus !== "open"}
           onClick={() => setReplyingMessage(null)}
           size="large">
-          <ClearIcon className={classes.sendMessageIcons} />
+          <ClearIcon sx={{ color: "grey" }} />
         </IconButton>
-      </div>
+      </StyledReplyMsgWrapper>
     );
   };
 
   if (medias.length > 0)
     return (
-      <Paper elevation={0} square className={classes.viewMediaInputWrapper}>
+      <StyledViewMediaInputWrapper elevation={0} square>
         <IconButton
           aria-label="cancel-upload"
           component="span"
           onClick={(e) => setMedias([])}
           size="large">
-          <CancelIcon className={classes.sendMessageIcons} />
+          <CancelIcon sx={{ color: "grey" }} />
         </IconButton>
         {loading ? (
           <div>
-            <CircularProgress className={classes.circleLoading} />
+            <StyledCircleLoading />
           </div>
         ) : (
           <span>
@@ -441,15 +428,15 @@ const MessageInput = ({ ticketStatus }) => {
           onClick={handleUploadMedia}
           disabled={loading}
           size="large">
-          <SendIcon className={classes.sendMessageIcons} />
+          <SendIcon sx={{ color: "grey" }} />
         </IconButton>
-      </Paper>
+      </StyledViewMediaInputWrapper>
     );
   else {
     return (
-      <Paper square elevation={0} className={classes.mainWrapper}>
+      <StyledMainWrapper square elevation={0}>
         {replyingMessage && renderReplyingMessage(replyingMessage)}
-        <div className={classes.newMessageBox}>
+        <StyledNewMessageBox>
           <Box sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}>
             <IconButton
               aria-label="emojiPicker"
@@ -457,10 +444,10 @@ const MessageInput = ({ ticketStatus }) => {
               disabled={loading || recording || ticketStatus !== "open"}
               onClick={(e) => setShowEmoji((prevState) => !prevState)}
               size="large">
-              <MoodIcon className={classes.sendMessageIcons} />
+              <MoodIcon sx={{ color: "grey" }} />
             </IconButton>
             {showEmoji ? (
-              <div className={classes.emojiBox}>
+              <StyledEmojiBox>
                 <ClickAwayListener onClickAway={(e) => setShowEmoji(false)}>
                   <Picker
                     perLine={16}
@@ -469,15 +456,14 @@ const MessageInput = ({ ticketStatus }) => {
                     onSelect={handleAddEmoji}
                   />
                 </ClickAwayListener>
-              </div>
+              </StyledEmojiBox>
             ) : null}
 
-            <input
+            <StyledUploadInput
               multiple
               type="file"
               id="upload-button"
               disabled={loading || recording || ticketStatus !== "open"}
-              className={classes.uploadInput}
               onChange={handleChangeMedias}
             />
             <label htmlFor="upload-button">
@@ -486,7 +472,7 @@ const MessageInput = ({ ticketStatus }) => {
                 component="span"
                 disabled={loading || recording || ticketStatus !== "open"}
                 size="large">
-                <AttachFileIcon className={classes.sendMessageIcons} />
+                <AttachFileIcon sx={{ color: "grey" }} />
               </IconButton>
             </label>
             <FormControlLabel
@@ -528,16 +514,15 @@ const MessageInput = ({ ticketStatus }) => {
                   disabled={loading || recording || ticketStatus !== "open"}
                   onClick={(e) => setShowEmoji((prevState) => !prevState)}
                   size="large">
-                  <MoodIcon className={classes.sendMessageIcons} />
+                  <MoodIcon sx={{ color: "grey" }} />
                 </IconButton>
               </MenuItem>
               <MenuItem onClick={handleMenuItemClick}>
-                <input
+                <StyledUploadInput
                   multiple
                   type="file"
                   id="upload-button"
                   disabled={loading || recording || ticketStatus !== "open"}
-                  className={classes.uploadInput}
                   onChange={handleChangeMedias}
                 />
                 <label htmlFor="upload-button">
@@ -546,7 +531,7 @@ const MessageInput = ({ ticketStatus }) => {
                     component="span"
                     disabled={loading || recording || ticketStatus !== "open"}
                     size="large">
-                    <AttachFileIcon className={classes.sendMessageIcons} />
+                    <AttachFileIcon sx={{ color: "grey" }} />
                   </IconButton>
                 </label>
               </MenuItem>
@@ -570,13 +555,12 @@ const MessageInput = ({ ticketStatus }) => {
               </MenuItem>
             </Menu>
           </Box>
-          <div className={classes.messageInputWrapper}>
-            <InputBase
+          <StyledMessageInputWrapper>
+            <StyledMessageInput
               inputRef={(input) => {
                 input && input.focus();
                 input && (inputRef.current = input);
               }}
-              className={classes.messageInput}
               placeholder={
                 ticketStatus === "open"
                   ? i18n.t("messagesInput.placeholderOpen")
@@ -598,13 +582,10 @@ const MessageInput = ({ ticketStatus }) => {
               }}
             />
             {typeBar ? (
-              <ul className={classes.messageQuickAnswersWrapper}>
+              <StyledMessageQuickAnswersWrapper>
                 {quickAnswers.map((value, index) => {
                   return (
-                    <li
-                      className={classes.messageQuickAnswersWrapperItem}
-                      key={index}
-                    >
+                    <li key={index}>
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a onClick={() => handleQuickAnswersClick(value.message)}>
                         {`${value.shortcut} - ${value.message}`}
@@ -612,11 +593,11 @@ const MessageInput = ({ ticketStatus }) => {
                     </li>
                   );
                 })}
-              </ul>
+              </StyledMessageQuickAnswersWrapper>
             ) : (
               <div></div>
             )}
-          </div>
+          </StyledMessageInputWrapper>
           {inputMessage ? (
             <IconButton
               aria-label="sendMessage"
@@ -624,10 +605,10 @@ const MessageInput = ({ ticketStatus }) => {
               onClick={handleSendMessage}
               disabled={loading}
               size="large">
-              <SendIcon className={classes.sendMessageIcons} />
+              <SendIcon sx={{ color: "grey" }} />
             </IconButton>
           ) : recording ? (
-            <div className={classes.recorderWrapper}>
+            <StyledRecorderWrapper>
               <IconButton
                 aria-label="cancelRecording"
                 component="span"
@@ -635,11 +616,11 @@ const MessageInput = ({ ticketStatus }) => {
                 disabled={loading}
                 onClick={handleCancelAudio}
                 size="large">
-                <HighlightOffIcon className={classes.cancelAudioIcon} />
+                <StyledCancelAudioIcon />
               </IconButton>
               {loading ? (
                 <div>
-                  <CircularProgress className={classes.audioLoading} />
+                  <StyledAudioLoading />
                 </div>
               ) : (
                 <RecordingTimer />
@@ -651,9 +632,9 @@ const MessageInput = ({ ticketStatus }) => {
                 onClick={handleUploadAudio}
                 disabled={loading}
                 size="large">
-                <CheckCircleOutlineIcon className={classes.sendAudioIcon} />
+                <StyledSendAudioIcon />
               </IconButton>
-            </div>
+            </StyledRecorderWrapper>
           ) : (
             <IconButton
               aria-label="showRecorder"
@@ -661,11 +642,11 @@ const MessageInput = ({ ticketStatus }) => {
               disabled={loading || ticketStatus !== "open"}
               onClick={handleStartRecording}
               size="large">
-              <MicIcon className={classes.sendMessageIcons} />
+              <MicIcon sx={{ color: "grey" }} />
             </IconButton>
           )}
-        </div>
-      </Paper>
+        </StyledNewMessageBox>
+      </StyledMainWrapper>
     );
   }
 };

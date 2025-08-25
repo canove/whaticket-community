@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 
 import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
-import clsx from "clsx";
 
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 import { green } from "@mui/material/colors";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -13,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import Badge from "@mui/material/Badge";
+import Box from "@mui/material/Box";
 
 import { i18n } from "../../translate/i18n";
 
@@ -23,101 +23,72 @@ import { Tooltip } from "@mui/material";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 
-const useStyles = makeStyles(theme => ({
-	ticket: {
-		position: "relative",
-	},
+const StyledListItem = styled(ListItem, {
+	shouldForwardProp: (prop) => prop !== 'pending'
+})(({ pending }) => ({
+	position: "relative",
+	cursor: pending ? "unset" : "pointer",
+}));
 
-	pendingTicket: {
-		cursor: "unset",
-	},
+const StyledContactNameWrapper = styled(Box)(() => ({
+	display: "flex",
+	justifyContent: "space-between",
+}));
 
-	noTicketsDiv: {
-		display: "flex",
-		height: "100px",
-		margin: 40,
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-	},
+const StyledLastMessageTime = styled(Typography)(() => ({
+	justifySelf: "flex-end",
+}));
 
-	noTicketsText: {
-		textAlign: "center",
-		color: "rgb(104, 121, 146)",
-		fontSize: "14px",
-		lineHeight: "1.4",
-	},
+const StyledClosedBadge = styled(Badge)(() => ({
+	alignSelf: "center",
+	justifySelf: "flex-end",
+	marginRight: 32,
+	marginLeft: "auto",
+}));
 
-	noTicketsTitle: {
-		textAlign: "center",
-		fontSize: "16px",
-		fontWeight: "600",
-		margin: "0px",
-	},
+const StyledContactLastMessage = styled(Typography)(() => ({
+	paddingRight: 20,
+}));
 
-	contactNameWrapper: {
-		display: "flex",
-		justifyContent: "space-between",
-	},
 
-	lastMessageTime: {
-		justifySelf: "flex-end",
-	},
-
-	closedBadge: {
-		alignSelf: "center",
-		justifySelf: "flex-end",
-		marginRight: 32,
-		marginLeft: "auto",
-	},
-
-	contactLastMessage: {
-		paddingRight: 20,
-	},
-
-	newMessagesCount: {
-		alignSelf: "center",
-		marginRight: 8,
-		marginLeft: "auto",
-	},
-
-	badgeStyle: {
+const StyledBadgeContent = styled(Badge)(() => ({
+	'& .MuiBadge-badge': {
 		color: "white",
 		backgroundColor: green[500],
-	},
+	}
+}));
 
-	acceptButton: {
-		position: "absolute",
-		left: "50%",
-	},
+const StyledAcceptButton = styled(ButtonWithSpinner)(() => ({
+	position: "absolute",
+	left: "50%",
+}));
 
-	ticketQueueColor: {
-		flex: "none",
-		width: "8px",
-		height: "100%",
-		position: "absolute",
-		top: "0%",
-		left: "0%",
-	},
+const StyledTicketQueueColor = styled(Box)(({ bgcolor }) => ({
+	flex: "none",
+	width: "8px",
+	height: "100%",
+	position: "absolute",
+	top: "0%",
+	left: "0%",
+	backgroundColor: bgcolor || "#7C7C7C",
+}));
 
-	userTag: {
-		position: "absolute",
-		marginRight: 5,
-		right: 5,
-		bottom: 5,
-		background: "#2576D2",
-		color: "#ffffff",
-		border: "1px solid #CCC",
-		padding: 1,
-		paddingLeft: 5,
-		paddingRight: 5,
-		borderRadius: 10,
-		fontSize: "0.9em"
-	},
+const StyledUserTag = styled(Box)(() => ({
+	position: "absolute",
+	marginRight: 5,
+	right: 5,
+	bottom: 5,
+	background: "#2576D2",
+	color: "#ffffff",
+	border: "1px solid #CCC",
+	padding: 1,
+	paddingLeft: 5,
+	paddingRight: 5,
+	borderRadius: 10,
+	fontSize: "0.9em"
 }));
 
 const TicketListItem = ({ ticket }) => {
-	const classes = useStyles();
 	const history = useHistory();
 	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
@@ -153,27 +124,22 @@ const TicketListItem = ({ ticket }) => {
 
 	return (
 		<React.Fragment key={ticket.id}>
-			<ListItem
+			<StyledListItem
 				dense
 				button
+				pending={ticket.status === "pending"}
 				onClick={e => {
 					if (ticket.status === "pending") return;
 					handleSelectTicket(ticket.id);
 				}}
 				selected={ticketId && +ticketId === ticket.id}
-				className={clsx(classes.ticket, {
-					[classes.pendingTicket]: ticket.status === "pending",
-				})}
 			>
 				<Tooltip
 					arrow
 					placement="right"
 					title={ticket.queue?.name || "Sem fila"}
 				>
-					<span
-						style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
-						className={classes.ticketQueueColor}
-					></span>
+					<StyledTicketQueueColor bgcolor={ticket.queue?.color} />
 				</Tooltip>
 				<ListItemAvatar>
 					<Avatar src={ticket?.contact?.profilePicUrl} />
@@ -181,7 +147,7 @@ const TicketListItem = ({ ticket }) => {
 				<ListItemText
 					disableTypography
 					primary={
-						<span className={classes.contactNameWrapper}>
+						<StyledContactNameWrapper>
 							<Typography
 								noWrap
 								component="span"
@@ -191,15 +157,13 @@ const TicketListItem = ({ ticket }) => {
 								{ticket.contact.name}
 							</Typography>
 							{ticket.status === "closed" && (
-								<Badge
-									className={classes.closedBadge}
+								<StyledClosedBadge
 									badgeContent={"closed"}
 									color="primary"
 								/>
 							)}
 							{ticket.lastMessage && (
-								<Typography
-									className={classes.lastMessageTime}
+								<StyledLastMessageTime
 									component="span"
 									variant="body2"
 									color="textSecondary"
@@ -209,17 +173,18 @@ const TicketListItem = ({ ticket }) => {
 									) : (
 										<>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
 									)}
-								</Typography>
+								</StyledLastMessageTime>
 							)}
 							{ticket.whatsappId && (
-								<div className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{ticket.whatsapp?.name}</div>
+								<StyledUserTag title={i18n.t("ticketsList.connectionTitle")}>
+									{ticket.whatsapp?.name}
+								</StyledUserTag>
 							)}
-						</span>
+						</StyledContactNameWrapper>
 					}
 					secondary={
-						<span className={classes.contactNameWrapper}>
-							<Typography
-								className={classes.contactLastMessage}
+						<StyledContactNameWrapper>
+							<StyledContactLastMessage
 								noWrap
 								component="span"
 								variant="body2"
@@ -230,31 +195,26 @@ const TicketListItem = ({ ticket }) => {
 								) : (
 									<br />
 								)}
-							</Typography>
+							</StyledContactLastMessage>
 
-							<Badge
-								className={classes.newMessagesCount}
+							<StyledBadgeContent
 								badgeContent={ticket.unreadMessages}
-								classes={{
-									badge: classes.badgeStyle,
-								}}
 							/>
-						</span>
+						</StyledContactNameWrapper>
 					}
 				/>
 				{ticket.status === "pending" && (
-					<ButtonWithSpinner
+					<StyledAcceptButton
 						color="primary"
 						variant="contained"
-						className={classes.acceptButton}
 						size="small"
 						loading={loading}
 						onClick={e => handleAcepptTicket(ticket.id)}
 					>
 						{i18n.t("ticketsList.buttons.accept")}
-					</ButtonWithSpinner>
+					</StyledAcceptButton>
 				)}
-			</ListItem>
+			</StyledListItem>
 			<Divider variant="inset" component="li" />
 		</React.Fragment>
 	);
