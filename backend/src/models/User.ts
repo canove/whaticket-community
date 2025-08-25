@@ -18,6 +18,7 @@ import {
 import { hash, compare } from "bcryptjs";
 import Ticket from "./Ticket";
 import Queue from "./Queue";
+import Distribution from "./Distribution";
 import UserQueue from "./UserQueue";
 import Whatsapp from "./Whatsapp";
 
@@ -66,6 +67,9 @@ class User extends Model<User> {
 
   @BelongsToMany(() => Queue, () => UserQueue)
   queues: Queue[];
+
+  @HasMany(() => Distribution, "currentUserId")
+  distributions: Distribution[];
 
   @BeforeUpdate
   @BeforeCreate

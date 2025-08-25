@@ -27,6 +27,7 @@ import { DeleteOutline, Edit } from "@material-ui/icons";
 import QueueModal from "../../components/QueueModal";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import DistributionSwitch from "../../components/DistributionSwitch/index";
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
@@ -101,7 +102,6 @@ const Queues = () => {
       try {
         const { data } = await api.get("/queue");
         dispatch({ type: "LOAD_QUEUES", payload: data });
-
         setLoading(false);
       } catch (err) {
         toastError(err);
@@ -201,6 +201,9 @@ const Queues = () => {
                 {i18n.t("queues.table.color")}
               </TableCell>
               <TableCell align="center">
+                {i18n.t("Distribuição Automática")}
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("queues.table.greeting")}
               </TableCell>
               <TableCell align="center">
@@ -224,6 +227,12 @@ const Queues = () => {
                         }}
                       />
                     </div>
+                  </TableCell>
+                  <TableCell align="center">
+                    <DistributionSwitch
+                      queueId={queue.id}
+                      name={`toggle-distribution-${queue.id}`}
+                    />
                   </TableCell>
                   <TableCell align="center">
                     <div className={classes.customTableCell}>

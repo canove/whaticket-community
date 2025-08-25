@@ -5,6 +5,8 @@ import Ticket from "../../models/Ticket";
 import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import ShowTicketService from "./ShowTicketService";
+import Distribution from "../../models/Distribution";
+import DistributeTicketService from "../DistributionService/DistributeTicketSerivce";
 
 interface TicketData {
   status?: string;
@@ -77,6 +79,17 @@ const UpdateTicketService = async ({
       action: "update",
       ticket
     });
+
+  if (ticketData.queueId) {
+    const distribution = await Distribution.findOne({ where: { queueId: ticketData.queueId, isActive: true } });
+    if (distribution) {
+      const distributedTicket = await DistributeTicketService({
+        queueId: ticketData.queueId,
+        ticket
+      });
+      return { ticket: distributedTicket, oldStatus, oldUserId };
+    }
+  }
 
   return { ticket, oldStatus, oldUserId };
 };

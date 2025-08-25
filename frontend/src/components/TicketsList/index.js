@@ -157,21 +157,22 @@ const reducer = (state, action) => {
 			props;
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
-	const [ticketsList, dispatch] = useReducer(reducer, []);
-	const { user } = useContext(AuthContext);
+		const [ticketsList, dispatch] = useReducer(reducer, []);
+		const { user } = useContext(AuthContext);
+		
+		const isAdmin = user?.profile?.toUpperCase() === "ADMIN";
+		useEffect(() => {
+			dispatch({ type: "RESET" });
+			setPageNumber(1);
+		}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
 
-	useEffect(() => {
-		dispatch({ type: "RESET" });
-		setPageNumber(1);
-	}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
-
-	const { tickets, hasMore, loading } = useTickets({
-		pageNumber,
-		searchParam,
-		status,
-		showAll,
-		queueIds: JSON.stringify(selectedQueueIds),
-	});
+		const { tickets, hasMore, loading } = useTickets({
+			pageNumber,
+			searchParam,
+			status,
+			showAll: isAdmin ? showAll : false,
+			queueIds: JSON.stringify(selectedQueueIds),
+		});
 
 	useEffect(() => {
 		if (!status && !searchParam) return;
@@ -184,9 +185,11 @@ const reducer = (state, action) => {
 	useEffect(() => {
 		const socket = openSocket();
 
-		const shouldUpdateTicket = ticket => !searchParam &&
-			(!ticket.userId || ticket.userId === user?.id || showAll) &&
-			(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+			const shouldUpdateTicket = ticket => !searchParam &&
+				(
+					!ticket.userId || ticket.userId === user?.id || isAdmin
+				) &&
+				(!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
 
 		const notBelongsToUserQueues = ticket =>
 			ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
@@ -247,11 +250,16 @@ const reducer = (state, action) => {
 	}, [status, searchParam, showAll, user, selectedQueueIds]);
 
 	useEffect(() => {
-    if (typeof updateCount === "function") {
-      updateCount(ticketsList.length);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketsList]);
+	if (typeof updateCount === "function") {
+		const visibleTickets = ticketsList.filter(
+			(ticket) => {
+				if (!ticket.userId) return true;
+				return isAdmin || ticket.userId === user.id;
+			}
+		);
+		updateCount(visibleTickets.length);
+	}
+}, [ticketsList, isAdmin, user]);
 
 	const loadMore = () => {
 		setPageNumber(prevState => prevState + 1);
@@ -289,9 +297,13 @@ const reducer = (state, action) => {
 						</div>
 					) : (
 						<>
-							{ticketsList.map(ticket => (
-								<TicketListItem ticket={ticket} key={ticket.id} />
-							))}
+											{ticketsList.filter((ticket) => {
+												if (!ticket.userId) return true;
+												return isAdmin || ticket.userId === user.id;
+											})
+											.map(ticket => (
+												<TicketListItem ticket={ticket} key={ticket.id} />
+											))}
 						</>
 					)}
 					{loading && <TicketsListSkeleton />}

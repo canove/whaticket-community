@@ -90,6 +90,7 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [whatsappId, setWhatsappId] = useState(false);
 	const {loading, whatsApps} = useWhatsApps();
+	const [originalQueueIds, setOriginalQueueIds] = useState([]);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -101,6 +102,7 @@ const UserModal = ({ open, onClose, userId }) => {
 				});
 				const userQueueIds = data.queues?.map(queue => queue.id);
 				setSelectedQueueIds(userQueueIds);
+				setOriginalQueueIds(userQueueIds);
 				setWhatsappId(data.whatsappId ? data.whatsappId : '');
 			} catch (err) {
 				toastError(err);
@@ -116,18 +118,24 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, whatsappId, queueIds: selectedQueueIds };
-		try {
-			if (userId) {
-				await api.put(`/users/${userId}`, userData);
-			} else {
-				await api.post("/users", userData);
+			const userData = { ...values, whatsappId, queueIds: selectedQueueIds };
+			try {
+				if (userId) {
+					await api.put(`/users/${userId}`, userData);
+				} else {
+					await api.post("/users", userData);
+				}
+				const removedQueueIds = originalQueueIds.filter((queue) => !selectedQueueIds.includes(queue));
+				const addedQueueIds = selectedQueueIds.filter((queue) => !originalQueueIds.includes(queue));
+				const allQueues = [...removedQueueIds, ...addedQueueIds];
+				if (allQueues.length > 0) {
+					await Promise.all(allQueues.map(queueId => api.put(`/distributions/${queueId}`)));
+				}
+				toast.success(i18n.t("userModal.success"));
+			} catch (err) {
+				toastError(err);
 			}
-			toast.success(i18n.t("userModal.success"));
-		} catch (err) {
-			toastError(err);
-		}
-		handleClose();
+			handleClose();
 	};
 
 	return (

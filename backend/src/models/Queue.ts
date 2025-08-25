@@ -8,11 +8,12 @@ import {
   AutoIncrement,
   AllowNull,
   Unique,
-  BelongsToMany
+  BelongsToMany,
+  HasMany
 } from "sequelize-typescript";
 import User from "./User";
 import UserQueue from "./UserQueue";
-
+import Distribution from "./Distribution";
 import Whatsapp from "./Whatsapp";
 import WhatsappQueue from "./WhatsappQueue";
 
@@ -47,6 +48,9 @@ class Queue extends Model<Queue> {
 
   @BelongsToMany(() => User, () => UserQueue)
   users: Array<User & { UserQueue: UserQueue }>;
+
+  @HasMany(() => Distribution)
+  distributions: Distribution[];
 }
 
 export default Queue;
