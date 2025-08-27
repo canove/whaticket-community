@@ -1,44 +1,23 @@
-version: '3.9'
-
 networks:
   whaticket:
 
 services:
 
-  mysql:
-    image: ${MYSQL_ENGINE}:${MYSQL_VERSION}
-    container_name: mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
-    volumes:
-      - ./.docker/data/:/var/lib/mysql
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - TZ=${TZ}
-    ports:
-      - "${MYSQL_PORT}:3306"
-    restart: always
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
-      timeout: 20s
-      retries: 10
-      interval: 30s
-      start_period: 30s
-    networks:
-      - whaticket
-
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     container_name: backend
     env_file:
       - ./backend/.env
-      - ./.env   # também carrega o .env da raiz (para MYSQL_*)
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=${MYSQL_USER}
+      - DB_PASS=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_DIALECT=mysql
     ports:
-      - "8080:8080"
+      - "${BACKEND_PORT:-8080}:3000"
     volumes:
       - ./backend/public/:/usr/src/app/public/
       - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
@@ -66,16 +45,26 @@ services:
     networks:
       - whaticket
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: always
+  mysql:
+    image: ${MYSQL_ENGINE}:${MYSQL_VERSION}
+    container_name: mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+    volumes:
+      - ./.docker/data/:/var/lib/mysql
     environment:
-      - PMA_HOST=mysql
-      - PMA_PORT=3306
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=${TZ}
     ports:
-      - "8081:80"
-    depends_on:
-      - mysql
+      - "${MYSQL_PORT}:3306"
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+      start_period: 30s
     networks:
       - whaticket
