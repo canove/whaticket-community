@@ -35,7 +35,7 @@ const VcardPreview = ({ contact, numbers }) => {
                     setContact(data)
 
                 } catch (err) {
-                    console.log(err)
+                    console.error(err)
                     toastError(err);
                 }
             };

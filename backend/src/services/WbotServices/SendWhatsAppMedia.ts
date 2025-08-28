@@ -1,9 +1,14 @@
 import fs from "fs";
-import { MessageMedia, Message as WbotMessage, MessageSendOptions } from "whatsapp-web.js";
+import {
+  MessageMedia,
+  Message as WbotMessage,
+  MessageSendOptions
+} from "whatsapp-web.js";
+import * as Sentry from "@sentry/node";
 import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Ticket from "../../models/Ticket";
-
+import { logger } from "../../utils/logger";
 import formatBody from "../../helpers/Mustache";
 
 interface Request {
@@ -24,16 +29,19 @@ const SendWhatsAppMedia = async ({
       : undefined;
 
     const newMedia = MessageMedia.fromFilePath(media.path);
-    
-    let mediaOptions:MessageSendOptions = {
-        caption: hasBody,
-        sendAudioAsVoice: true
+
+    const mediaOptions: MessageSendOptions = {
+      caption: hasBody,
+      sendAudioAsVoice: true
     };
 
-    if (newMedia.mimetype.startsWith('image/') && ! /^.*\.(jpe?g|png|gif)?$/i.exec(media.filename)) {
-       mediaOptions['sendMediaAsDocument'] = true;
+    if (
+      newMedia.mimetype.startsWith("image/") &&
+      !/^.*\.(jpe?g|png|gif)?$/i.exec(media.filename)
+    ) {
+      mediaOptions.sendMediaAsDocument = true;
     }
-    
+
     const sentMessage = await wbot.sendMessage(
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       newMedia,
@@ -46,7 +54,8 @@ const SendWhatsAppMedia = async ({
 
     return sentMessage;
   } catch (err) {
-    console.log(err);
+    Sentry.captureException(err);
+    logger.error(`Error sending whatsapp message: ${err}`);
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };

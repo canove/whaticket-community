@@ -1,10 +1,6 @@
 import { getIO } from "../../libs/socket";
 import Contact from "../../models/Contact";
-
-interface ExtraInfo {
-  name: string;
-  value: string;
-}
+import ContactCustomField from "../../models/ContactCustomField";
 
 interface Request {
   name: string;
@@ -12,7 +8,7 @@ interface Request {
   isGroup: boolean;
   email?: string;
   profilePicUrl?: string;
-  extraInfo?: ExtraInfo[];
+  extraInfo?: { name: string; value: string }[];
 }
 
 const CreateOrUpdateContactService = async ({
@@ -31,7 +27,8 @@ const CreateOrUpdateContactService = async ({
   contact = await Contact.findOne({ where: { number } });
 
   if (contact) {
-    contact.update({ profilePicUrl });
+    await contact.update({ name, email, profilePicUrl });
+    await contact.reload();
 
     io.emit("contact", {
       action: "update",
@@ -44,7 +41,7 @@ const CreateOrUpdateContactService = async ({
       profilePicUrl,
       email,
       isGroup,
-      extraInfo
+      extraInfo: extraInfo as ContactCustomField[]
     });
 
     io.emit("contact", {

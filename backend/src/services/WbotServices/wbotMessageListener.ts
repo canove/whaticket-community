@@ -49,7 +49,7 @@ const verifyContact = async (msgContact: WbotContact): Promise<Contact> => {
     isGroup: msgContact.isGroup
   };
 
-  const contact = CreateOrUpdateContactService(contactData);
+  const contact = await CreateOrUpdateContactService(contactData);
 
   return contact;
 };
@@ -415,7 +415,8 @@ const handleMessage = async (
           });
         }
       } catch (error) {
-        console.log(error);
+        Sentry.captureException(error);
+        logger.error(error);
       }
     }
 
@@ -518,15 +519,15 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
 
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
-    handleMessage(msg, wbot);
+    await handleMessage(msg, wbot);
   });
 
   wbot.on("media_uploaded", async msg => {
-    handleMessage(msg, wbot);
+    await handleMessage(msg, wbot);
   });
 
   wbot.on("message_ack", async (msg, ack) => {
-    handleMsgAck(msg, ack);
+    await handleMsgAck(msg, ack);
   });
 };
 
