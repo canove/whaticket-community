@@ -16,7 +16,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
 type WhatsappData = {
   whatsappId: number;
-}
+};
 
 type MessageData = {
   body: string;
@@ -50,23 +50,19 @@ const createContact = async (
 
   const contact = await CreateOrUpdateContactService(contactData);
 
-  let whatsapp:Whatsapp | null;
+  let whatsapp: Whatsapp | null;
 
-  if(whatsappId === undefined) {
+  if (whatsappId === undefined) {
     whatsapp = await GetDefaultWhatsApp();
   } else {
     whatsapp = await Whatsapp.findByPk(whatsappId);
 
-    if(whatsapp === null) {
+    if (whatsapp === null) {
       throw new AppError(`whatsapp #${whatsappId} not found`);
     }
   }
 
-  const createTicket = await FindOrCreateTicketService(
-    contact,
-    whatsapp.id,
-    1
-  );
+  const createTicket = await FindOrCreateTicketService(contact, whatsapp.id, 1);
 
   const ticket = await ShowTicketService(createTicket.id);
 

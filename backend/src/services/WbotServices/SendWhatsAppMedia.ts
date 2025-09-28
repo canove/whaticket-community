@@ -1,5 +1,9 @@
 import fs from "fs";
-import { MessageMedia, Message as WbotMessage, MessageSendOptions } from "whatsapp-web.js";
+import {
+  MessageMedia,
+  Message as WbotMessage,
+  MessageSendOptions
+} from "whatsapp-web.js";
 import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Ticket from "../../models/Ticket";
@@ -24,16 +28,19 @@ const SendWhatsAppMedia = async ({
       : undefined;
 
     const newMedia = MessageMedia.fromFilePath(media.path);
-    
-    let mediaOptions:MessageSendOptions = {
-        caption: hasBody,
-        sendAudioAsVoice: true
+
+    let mediaOptions: MessageSendOptions = {
+      caption: hasBody,
+      sendAudioAsVoice: true
     };
 
-    if (newMedia.mimetype.startsWith('image/') && ! /^.*\.(jpe?g|png|gif)?$/i.exec(media.filename)) {
-       mediaOptions['sendMediaAsDocument'] = true;
+    if (
+      newMedia.mimetype.startsWith("image/") &&
+      !/^.*\.(jpe?g|png|gif)?$/i.exec(media.filename)
+    ) {
+      mediaOptions["sendMediaAsDocument"] = true;
     }
-    
+
     const sentMessage = await wbot.sendMessage(
       `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`,
       newMedia,

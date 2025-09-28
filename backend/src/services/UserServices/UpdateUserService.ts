@@ -38,7 +38,14 @@ const UpdateUserService = async ({
     password: Yup.string()
   });
 
-  const { email, password, profile, name, queueIds = [], whatsappId } = userData;
+  const {
+    email,
+    password,
+    profile,
+    name,
+    queueIds = [],
+    whatsappId
+  } = userData;
 
   try {
     await schema.validate({ email, password, profile, name });
