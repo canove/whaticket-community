@@ -10,7 +10,13 @@ module.exports = {
           value: "enabled",
           createdAt: new Date(),
           updatedAt: new Date()
-        }
+        },
+        {
+          key: "userApiToken",
+          value: "",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );
@@ -18,5 +24,6 @@ module.exports = {
 
   down: (queryInterface: QueryInterface) => {
     return queryInterface.bulkDelete("Settings", {});
+          key: ["userCreation", "userApiToken"],
   }
 };
