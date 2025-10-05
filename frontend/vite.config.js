@@ -14,6 +14,17 @@ export default defineConfig({
   build: {
     outDir: "build",
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "material-ui": [
+            "@material-ui/core",
+            "@material-ui/icons",
+            "@material-ui/lab",
+          ],
+        },
+      },
+    },
   },
   envPrefix: "VITE_",
   esbuild: {
@@ -25,7 +36,17 @@ export default defineConfig({
     global: "globalThis",
   },
   optimizeDeps: {
-    include: ["mic-recorder-to-mp3"],
+    include: [
+      "mic-recorder-to-mp3",
+      "@material-ui/core",
+      "@material-ui/icons",
+      "@material-ui/lab",
+    ],
     exclude: [],
+  },
+  resolve: {
+    alias: {
+      "jss-plugin-globalThis": "jss-plugin-global",
+    },
   },
 });
