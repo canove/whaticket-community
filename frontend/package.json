@@ -23,7 +23,6 @@
     "react-dom": "^16.13.1",
     "react-modal-image": "^2.5.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3",
     "react-toastify": "^6.0.9",
     "recharts": "^2.0.2",
     "socket.io-client": "^3.0.5",
@@ -31,13 +30,10 @@
     "yup": "^0.32.8"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "browserslist": {
     "production": [
@@ -51,5 +47,11 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "vite": "^4.5.0",
+    "@vitejs/plugin-react": "^4.1.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.32.0",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  }
 }
