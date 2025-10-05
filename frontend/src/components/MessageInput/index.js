@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import "emoji-mart/css/emoji-mart.css";
 import { useParams } from "react-router-dom";
 import { Picker } from "emoji-mart";
-import MicRecorder from "mic-recorder-to-mp3";
 import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -37,9 +36,22 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
 
-const Mp3Recorder = new MicRecorder({ bitRate: 128 });
+let Mp3Recorder = null;
 
-const useStyles = makeStyles((theme) => ({
+const initRecorder = async () => {
+  if (!Mp3Recorder) {
+    try {
+      const MicRecorder = (await import("mic-recorder-to-mp3")).default;
+      Mp3Recorder = new MicRecorder({ bitRate: 128 });
+    } catch (error) {
+      console.error("Failed to initialize recorder:", error);
+      return null;
+    }
+  }
+  return Mp3Recorder;
+};
+
+const useStyles = makeStyles(theme => ({
   mainWrapper: {
     background: "#eee",
     display: "flex",
@@ -234,22 +246,22 @@ const MessageInput = ({ ticketStatus }) => {
     };
   }, [ticketId, setReplyingMessage]);
 
-  const handleChangeInput = (e) => {
+  const handleChangeInput = e => {
     setInputMessage(e.target.value);
     handleLoadQuickAnswer(e.target.value);
   };
 
-  const handleQuickAnswersClick = (value) => {
+  const handleQuickAnswersClick = value => {
     setInputMessage(value);
     setTypeBar(false);
   };
 
-  const handleAddEmoji = (e) => {
+  const handleAddEmoji = e => {
     let emoji = e.native;
-    setInputMessage((prevState) => prevState + emoji);
+    setInputMessage(prevState => prevState + emoji);
   };
 
-  const handleChangeMedias = (e) => {
+  const handleChangeMedias = e => {
     if (!e.target.files) {
       return;
     }
@@ -258,19 +270,19 @@ const MessageInput = ({ ticketStatus }) => {
     setMedias(selectedMedias);
   };
 
-  const handleInputPaste = (e) => {
+  const handleInputPaste = e => {
     if (e.clipboardData.files[0]) {
       setMedias([e.clipboardData.files[0]]);
     }
   };
 
-  const handleUploadMedia = async (e) => {
+  const handleUploadMedia = async e => {
     setLoading(true);
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("fromMe", true);
-    medias.forEach((media) => {
+    medias.forEach(media => {
       formData.append("medias", media);
       formData.append("body", media.name);
     });
@@ -313,8 +325,12 @@ const MessageInput = ({ ticketStatus }) => {
   const handleStartRecording = async () => {
     setLoading(true);
     try {
+      const recorder = await initRecorder();
+      if (!recorder) {
+        throw new Error("Recorder not available");
+      }
       await navigator.mediaDevices.getUserMedia({ audio: true });
-      await Mp3Recorder.start();
+      await recorder.start();
       setRecording(true);
       setLoading(false);
     } catch (err) {
@@ -323,7 +339,7 @@ const MessageInput = ({ ticketStatus }) => {
     }
   };
 
-  const handleLoadQuickAnswer = async (value) => {
+  const handleLoadQuickAnswer = async value => {
     if (value && value.indexOf("/") === 0) {
       try {
         const { data } = await api.get("/quickAnswers/", {
@@ -346,7 +362,11 @@ const MessageInput = ({ ticketStatus }) => {
   const handleUploadAudio = async () => {
     setLoading(true);
     try {
-      const [, blob] = await Mp3Recorder.stop().getMp3();
+      const recorder = await initRecorder();
+      if (!recorder) {
+        throw new Error("Recorder not available");
+      }
+      const [, blob] = await recorder.stop().getMp3();
       if (blob.size < 10000) {
         setLoading(false);
         setRecording(false);
@@ -370,22 +390,25 @@ const MessageInput = ({ ticketStatus }) => {
 
   const handleCancelAudio = async () => {
     try {
-      await Mp3Recorder.stop().getMp3();
+      const recorder = await initRecorder();
+      if (recorder) {
+        await recorder.stop().getMp3();
+      }
       setRecording(false);
     } catch (err) {
       toastError(err);
     }
   };
 
-  const handleOpenMenuClick = (event) => {
+  const handleOpenMenuClick = event => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuItemClick = (event) => {
+  const handleMenuItemClick = event => {
     setAnchorEl(null);
   };
 
-  const renderReplyingMessage = (message) => {
+  const renderReplyingMessage = message => {
     return (
       <div className={classes.replyginMsgWrapper}>
         <div className={classes.replyginMsgContainer}>
@@ -421,7 +444,7 @@ const MessageInput = ({ ticketStatus }) => {
         <IconButton
           aria-label="cancel-upload"
           component="span"
-          onClick={(e) => setMedias([])}
+          onClick={e => setMedias([])}
         >
           <CancelIcon className={classes.sendMessageIcons} />
         </IconButton>
@@ -456,13 +479,13 @@ const MessageInput = ({ ticketStatus }) => {
               aria-label="emojiPicker"
               component="span"
               disabled={loading || recording || ticketStatus !== "open"}
-              onClick={(e) => setShowEmoji((prevState) => !prevState)}
+              onClick={e => setShowEmoji(prevState => !prevState)}
             >
               <MoodIcon className={classes.sendMessageIcons} />
             </IconButton>
             {showEmoji ? (
               <div className={classes.emojiBox}>
-                <ClickAwayListener onClickAway={(e) => setShowEmoji(false)}>
+                <ClickAwayListener onClickAway={e => setShowEmoji(false)}>
                   <Picker
                     perLine={16}
                     showPreview={false}
@@ -498,7 +521,7 @@ const MessageInput = ({ ticketStatus }) => {
                 <Switch
                   size="small"
                   checked={signMessage}
-                  onChange={(e) => {
+                  onChange={e => {
                     setSignMessage(e.target.checked);
                   }}
                   name="showAllTickets"
@@ -527,7 +550,7 @@ const MessageInput = ({ ticketStatus }) => {
                   aria-label="emojiPicker"
                   component="span"
                   disabled={loading || recording || ticketStatus !== "open"}
-                  onClick={(e) => setShowEmoji((prevState) => !prevState)}
+                  onClick={e => setShowEmoji(prevState => !prevState)}
                 >
                   <MoodIcon className={classes.sendMessageIcons} />
                 </IconButton>
@@ -560,7 +583,7 @@ const MessageInput = ({ ticketStatus }) => {
                     <Switch
                       size="small"
                       checked={signMessage}
-                      onChange={(e) => {
+                      onChange={e => {
                         setSignMessage(e.target.checked);
                       }}
                       name="showAllTickets"
@@ -573,7 +596,7 @@ const MessageInput = ({ ticketStatus }) => {
           </Hidden>
           <div className={classes.messageInputWrapper}>
             <InputBase
-              inputRef={(input) => {
+              inputRef={input => {
                 input && input.focus();
                 input && (inputRef.current = input);
               }}
@@ -588,10 +611,10 @@ const MessageInput = ({ ticketStatus }) => {
               value={inputMessage}
               onChange={handleChangeInput}
               disabled={recording || loading || ticketStatus !== "open"}
-              onPaste={(e) => {
+              onPaste={e => {
                 ticketStatus === "open" && handleInputPaste(e);
               }}
-              onKeyPress={(e) => {
+              onKeyPress={e => {
                 if (loading || e.shiftKey) return;
                 else if (e.key === "Enter") {
                   handleSendMessage();
