@@ -3,6 +3,7 @@ version: '3'
 networks:
   whaticket:
 
+
 services:
 
   backend:
@@ -37,7 +38,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       - URL_BACKEND=backend:3000
-      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
+      - VITE_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
       - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
       - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
     volumes:
@@ -48,7 +49,7 @@ services:
 
   mysql:
     image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
     volumes:
       - ./.docker/data/:/var/lib/mysql
     environment:
