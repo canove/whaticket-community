@@ -13,6 +13,7 @@
     "posttest": "NODE_ENV=test sequelize db:migrate:undo:all",
     "db:migrate": "sequelize db:migrate",
     "db:seed": "sequelize db:seed:all",
+    "db:seed:performance": "node src/scripts/seed-messages.js",
     "format": "prettier --write \"src/**/*.ts\""
   },
   "author": "",
@@ -43,7 +44,7 @@
     "sequelize-typescript": "^1.1.0",
     "socket.io": "^3.0.5",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "^1.31.0",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
     "yup": "^0.32.8"
   },
   "devDependencies": {

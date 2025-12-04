@@ -270,6 +270,8 @@ const handleMessage = async (
     return;
   }
 
+  console.log(`[DEBUG] handleMessage received message: ${msg.id.id}, fromMe: ${msg.fromMe}, type: ${msg.type}, body: ${msg.body}`);
+
   try {
     let msgContact: WbotContact;
     let groupContact: Contact | undefined;
@@ -277,7 +279,10 @@ const handleMessage = async (
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
       // if so, this message was already been stored in database;
-      if (/\u200e/.test(msg.body[0])) return;
+      if (/\u200e/.test(msg.body[0])) {
+        console.log(`[DEBUG] handleMessage ignoring auto message: ${msg.id.id}`);
+        return;
+      }
 
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"

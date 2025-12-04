@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
@@ -6,6 +7,7 @@ import ShowTicketService from "../TicketServices/ShowTicketService";
 interface Request {
   ticketId: string;
   pageNumber?: string;
+  anchorId?: string;
 }
 
 interface Response {
@@ -17,7 +19,8 @@ interface Response {
 
 const ListMessagesService = async ({
   pageNumber = "1",
-  ticketId
+  ticketId,
+  anchorId
 }: Request): Promise<Response> => {
   const ticket = await ShowTicketService(ticketId);
 
@@ -25,8 +28,60 @@ const ListMessagesService = async ({
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
-  // await setMessagesAsRead(ticket);
   const limit = 20;
+
+  if (anchorId) {
+    const anchorMessage = await Message.findByPk(anchorId);
+    if (!anchorMessage) {
+      throw new AppError("ERR_NO_MESSAGE_FOUND", 404);
+    }
+
+    const count = await Message.count({ where: { ticketId } });
+
+    const messagesBefore = await Message.findAll({
+      where: {
+        ticketId,
+        createdAt: { [Op.lt]: anchorMessage.createdAt }
+      },
+      limit,
+      include: [
+        "contact",
+        {
+          model: Message,
+          as: "quotedMsg",
+          include: ["contact"]
+        }
+      ],
+      order: [["createdAt", "DESC"]]
+    });
+
+    const messagesAfter = await Message.findAll({
+      where: {
+        ticketId,
+        createdAt: { [Op.gte]: anchorMessage.createdAt }
+      },
+      limit,
+      include: [
+        "contact",
+        {
+          model: Message,
+          as: "quotedMsg",
+          include: ["contact"]
+        }
+      ],
+      order: [["createdAt", "ASC"]]
+    });
+
+    const messages = [...messagesBefore.reverse(), ...messagesAfter];
+
+    return {
+      messages,
+      ticket,
+      count,
+      hasMore: true // Simplification for context view
+    };
+  }
+
   const offset = limit * (+pageNumber - 1);
 
   const { count, rows: messages } = await Message.findAndCountAll({

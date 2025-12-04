@@ -5,6 +5,7 @@ import { getIO } from "../libs/socket";
 import Message from "../models/Message";
 
 import ListMessagesService from "../services/MessageServices/ListMessagesService";
+import SearchMessageService from "../services/MessageServices/SearchMessageService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
@@ -12,6 +13,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 
 type IndexQuery = {
   pageNumber: string;
+  searchParam?: string;
 };
 
 type MessageData = {
@@ -23,12 +25,24 @@ type MessageData = {
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { pageNumber } = req.query as IndexQuery;
+  const { pageNumber, searchParam } = req.query as IndexQuery;
+
+  if (searchParam) {
+    const { count, messages, hasMore } = await SearchMessageService({
+      pageNumber,
+      ticketId,
+      searchParam
+    });
+
+    return res.json({ count, messages, hasMore });
+  }
 
   const { count, messages, ticket, hasMore } = await ListMessagesService({
     pageNumber,
     ticketId
   });
+
+  console.log(`[DEBUG] ListMessagesService returned ${count} messages for ticket ${ticketId}`);
 
   SetTicketMessagesAsRead(ticket);
 

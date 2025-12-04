@@ -41,6 +41,8 @@ const useAuth = () => {
 				if (data) {
 					localStorage.setItem("token", JSON.stringify(data.token));
 					api.defaults.headers.Authorization = `Bearer ${data.token}`;
+					originalRequest.headers["Authorization"] = `Bearer ${data.token}`;
+					setUser(data.user);
 				}
 				return api(originalRequest);
 			}

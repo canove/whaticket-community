@@ -13,6 +13,7 @@ import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
 import TicketActionButtons from "../TicketActionButtons";
 import MessagesList from "../MessagesList";
+import MessageSearch from "../MessageSearch";
 import api from "../../services/api";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
@@ -79,9 +80,11 @@ const Ticket = () => {
   const classes = useStyles();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+  const [anchorId, setAnchorId] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -143,6 +146,19 @@ const Ticket = () => {
     setDrawerOpen(false);
   };
 
+  const handleOpenSearch = () => {
+    setSearchOpen(true);
+  };
+
+  const handleCloseSearch = () => {
+    setSearchOpen(false);
+  };
+
+  const handleJump = (messageId) => {
+    setAnchorId(messageId);
+    setSearchOpen(false);
+  };
+
   return (
     <div className={classes.root} id="drawer-container">
       <Paper
@@ -152,7 +168,7 @@ const Ticket = () => {
           [classes.mainWrapperShift]: drawerOpen,
         })}
       >
-        <TicketHeader loading={loading}>
+        <TicketHeader loading={loading} handleOpenSearch={handleOpenSearch}>
           <div className={classes.ticketInfo}>
             <TicketInfo
               contact={contact}
@@ -168,6 +184,7 @@ const Ticket = () => {
           <MessagesList
             ticketId={ticketId}
             isGroup={ticket.isGroup}
+            anchorId={anchorId}
           ></MessagesList>
           <MessageInput ticketStatus={ticket.status} />
         </ReplyMessageProvider>
@@ -177,6 +194,12 @@ const Ticket = () => {
         handleDrawerClose={handleDrawerClose}
         contact={contact}
         loading={loading}
+      />
+      <MessageSearch
+        open={searchOpen}
+        handleDrawerClose={handleCloseSearch}
+        ticketId={ticketId}
+        handleJump={handleJump}
       />
     </div>
   );

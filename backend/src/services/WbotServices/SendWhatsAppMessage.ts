@@ -37,6 +37,8 @@ const SendWhatsAppMessage = async ({
       }
     );
 
+    console.log(`[DEBUG] SendWhatsAppMessage sent message: ${sentMessage.id.id}`);
+
     await ticket.update({ lastMessage: body });
     return sentMessage;
   } catch (err) {

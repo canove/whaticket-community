@@ -4,6 +4,7 @@ import { Card, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
+import SearchIcon from "@material-ui/icons/Search";
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TicketHeader = ({ loading, children }) => {
+const TicketHeader = ({ loading, children, handleOpenSearch }) => {
   const classes = useStyles();
   const history = useHistory();
   const handleBack = () => {
@@ -35,6 +36,9 @@ const TicketHeader = ({ loading, children }) => {
             <ArrowBackIos />
           </Button>
           {children}
+          <Button color="primary" onClick={handleOpenSearch}>
+            <SearchIcon />
+          </Button>
         </Card>
       )}
     </>

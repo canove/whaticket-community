@@ -307,7 +307,7 @@ const reducer = (state, action) => {
   }
 };
 
-const MessagesList = ({ ticketId, isGroup }) => {
+const MessagesList = ({ ticketId, isGroup, anchorId }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -326,7 +326,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
     setPageNumber(1);
 
     currentTicketId.current = ticketId;
-  }, [ticketId]);
+  }, [ticketId, anchorId]);
 
   useEffect(() => {
     setLoading(true);
@@ -334,7 +334,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
       const fetchMessages = async () => {
         try {
           const { data } = await api.get("/messages/" + ticketId, {
-            params: { pageNumber },
+            params: { pageNumber, anchorId },
           });
 
           if (currentTicketId.current === ticketId) {
@@ -356,7 +356,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
     return () => {
       clearTimeout(delayDebounceFn);
     };
-  }, [pageNumber, ticketId]);
+  }, [pageNumber, ticketId, anchorId]);
 
   useEffect(() => {
     const socket = openSocket();
@@ -388,6 +388,15 @@ const MessagesList = ({ ticketId, isGroup }) => {
       lastMessageRef.current.scrollIntoView({});
     }
   };
+
+  useEffect(() => {
+    if (anchorId && !loading) {
+      const messageElement = document.getElementById(`message-${anchorId}`);
+      if (messageElement) {
+        messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [anchorId, messagesList, loading]);
 
   const handleScroll = (e) => {
     if (!hasMore) return;
@@ -465,7 +474,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
         )
       } else return (<></>)
     }*/
-    else if ( /^.*\.(jpe?g|png|gif)?$/i.exec(message.mediaUrl) && message.mediaType === "image") {
+    else if (/^.*\.(jpe?g|png|gif)?$/i.exec(message.mediaUrl) && message.mediaType === "image") {
       return <ModalImageCors imageUrl={message.mediaUrl} />;
     } else if (message.mediaType === "audio") {
       return <Audio url={message.mediaUrl} />
@@ -598,7 +607,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageLeft}>
+              <div className={classes.messageLeft} id={`message-${message.id}`}>
                 <IconButton
                   variant="contained"
                   size="small"
@@ -632,7 +641,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div className={classes.messageRight} id={`message-${message.id}`}>
                 <IconButton
                   variant="contained"
                   size="small"
