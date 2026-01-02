@@ -1,84 +1,75 @@
 import {
   Table,
   Column,
+  Model,
   CreatedAt,
   UpdatedAt,
-  Model,
   DataType,
-  PrimaryKey,
-  Default,
   BelongsTo,
-  ForeignKey
+  ForeignKey,
+  Default
 } from "sequelize-typescript";
-import Contact from "./Contact";
-import Ticket from "./Ticket";
+import Ticket from "./Ticket.js";
+import Contact from "./Contact.js";
+import Company from "./Company.js";
 
-@Table
+@Table({ tableName: "Messages" })
 class Message extends Model<Message> {
-  @PrimaryKey
-  @Column
-  id: string;
-
-  @Default(0)
-  @Column
-  ack: number;
-
-  @Default(false)
-  @Column
-  read: boolean;
-
-  @Default(false)
-  @Column
-  fromMe: boolean;
-
   @Column(DataType.TEXT)
   body: string;
 
-  @Column(DataType.STRING)
-  get mediaUrl(): string | null {
-    if (this.getDataValue("mediaUrl")) {
-      return `${process.env.BACKEND_URL}:${
-        process.env.PROXY_PORT
-      }/public/${this.getDataValue("mediaUrl")}`;
-    }
-    return null;
-  }
+  @Column
+  ack: number;
+
+  @Column
+  read: boolean;
 
   @Column
   mediaType: string;
 
+  @Column
+  mediaUrl: string;
+
   @Default(false)
   @Column
-  isDeleted: boolean;
+  isRecorded: boolean;
 
-  @CreatedAt
-  @Column(DataType.DATE(6))
-  createdAt: Date;
-
-  @UpdatedAt
-  @Column(DataType.DATE(6))
-  updatedAt: Date;
+  @Column
+  remoteJid: string; // WhatsApp ID (e.g. 3EB0...)
 
   @ForeignKey(() => Message)
   @Column
-  quotedMsgId: string;
-
-  @BelongsTo(() => Message, "quotedMsgId")
-  quotedMsg: Message;
+  quotedMsgId: number;
 
   @ForeignKey(() => Ticket)
   @Column
   ticketId: number;
 
-  @BelongsTo(() => Ticket)
-  ticket: Ticket;
-
   @ForeignKey(() => Contact)
   @Column
   contactId: number;
 
-  @BelongsTo(() => Contact, "contactId")
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
+
+  @CreatedAt
+  createdAt: Date;
+
+  @UpdatedAt
+  updatedAt: Date;
+
+  @BelongsTo(() => Ticket)
+  ticket: Ticket;
+
+  @BelongsTo(() => Contact)
   contact: Contact;
+
+  @BelongsTo(() => Message)
+  quotedMsg: Message;
+
+  @BelongsTo(() => Company)
+  company: Company;
 }
 
 export default Message;

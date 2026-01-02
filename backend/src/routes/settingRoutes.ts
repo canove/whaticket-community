@@ -1,7 +1,7 @@
 import { Router } from "express";
-import isAuth from "../middleware/isAuth";
+import isAuth from "../middleware/isAuth.js";
 
-import * as SettingController from "../controllers/SettingController";
+import * as SettingController from "../controllers/SettingController.js";
 
 const settingRoutes = Router();
 

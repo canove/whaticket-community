@@ -1,7 +1,7 @@
-import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
-import { getWbot } from "../../libs/wbot";
-import Contact from "../../models/Contact";
-import { logger } from "../../utils/logger";
+import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp.js";
+import { getWbot } from "../../libs/wbot.js";
+import Contact from "../../models/Contact.js";
+import { logger } from "../../utils/logger.js";
 
 const ImportContactsService = async (userId: number): Promise<void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp(userId);

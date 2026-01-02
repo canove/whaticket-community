@@ -1,45 +1,43 @@
 import {
   Table,
   Column,
+  Model,
   CreatedAt,
   UpdatedAt,
-  Model,
-  PrimaryKey,
-  AutoIncrement,
-  AllowNull,
-  Unique,
-  Default,
-  HasMany
+  DataType,
+  HasMany,
+  BelongsTo,
+  ForeignKey
 } from "sequelize-typescript";
-import ContactCustomField from "./ContactCustomField";
-import Ticket from "./Ticket";
+import ContactCustomField from "./ContactCustomField.js";
+import Ticket from "./Ticket.js";
+import Company from "./Company.js";
+import User from "./User.js";
 
-@Table
+@Table({ tableName: "Contacts" })
 class Contact extends Model<Contact> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
-  id: number;
-
   @Column
   name: string;
 
-  @AllowNull(false)
-  @Unique
-  @Column
+  @Column(DataType.STRING)
   number: string;
 
-  @AllowNull(false)
-  @Default("")
-  @Column
+  @Column(DataType.STRING)
   email: string;
 
   @Column
   profilePicUrl: string;
 
-  @Default(false)
   @Column
   isGroup: boolean;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
+
+  @ForeignKey(() => User)
+  @Column
+  walletId: number;
 
   @CreatedAt
   createdAt: Date;
@@ -47,11 +45,17 @@ class Contact extends Model<Contact> {
   @UpdatedAt
   updatedAt: Date;
 
+  @HasMany(() => ContactCustomField)
+  extraInfo: ContactCustomField[];
+
   @HasMany(() => Ticket)
   tickets: Ticket[];
 
-  @HasMany(() => ContactCustomField)
-  extraInfo: ContactCustomField[];
+  @BelongsTo(() => Company)
+  company: Company;
+
+  @BelongsTo(() => User)
+  wallet: User;
 }
 
 export default Contact;

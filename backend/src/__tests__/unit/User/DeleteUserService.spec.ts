@@ -1,8 +1,8 @@
 import faker from "faker";
-import AppError from "../../../errors/AppError";
-import CreateUserService from "../../../services/UserServices/CreateUserService";
-import DeleteUserService from "../../../services/UserServices/DeleteUserService";
-import { disconnect, truncate } from "../../utils/database";
+import AppError from "../../../errors/AppError.js";
+import CreateUserService from "../../../services/UserServices/CreateUserService.js";
+import DeleteUserService from "../../../services/UserServices/DeleteUserService.js";
+import { disconnect, truncate } from "../../utils/database.js";
 
 describe("User", () => {
   beforeEach(async () => {

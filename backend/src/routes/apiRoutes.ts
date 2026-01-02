@@ -1,9 +1,9 @@
 import express from "express";
 import multer from "multer";
-import uploadConfig from "../config/upload";
+import uploadConfig from "../config/upload.js";
 
-import * as ApiController from "../controllers/ApiController";
-import isAuthApi from "../middleware/isAuthApi";
+import * as ApiController from "../controllers/ApiController.js";
+import isAuthApi from "../middleware/isAuthApi.js";
 
 const upload = multer(uploadConfig);
 

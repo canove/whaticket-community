@@ -1,9 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
-import isAuth from "../middleware/isAuth";
-import uploadConfig from "../config/upload";
+import isAuth from "../middleware/isAuth.js";
+import uploadConfig from "../config/upload.js";
 
-import * as MessageController from "../controllers/MessageController";
+import * as MessageController from "../controllers/MessageController.js";
 
 const messageRoutes = Router();
 

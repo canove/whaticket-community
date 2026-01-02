@@ -1,8 +1,8 @@
 import * as Yup from "yup";
 
-import AppError from "../../errors/AppError";
-import { SerializeUser } from "../../helpers/SerializeUser";
-import User from "../../models/User";
+import AppError from "../../errors/AppError.js";
+import { SerializeUser } from "../../helpers/SerializeUser.js";
+import User from "../../models/User.js";
 
 interface Request {
   email: string;

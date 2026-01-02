@@ -4,11 +4,11 @@ import {
   Message as WbotMessage,
   MessageSendOptions
 } from "whatsapp-web.js";
-import AppError from "../../errors/AppError";
-import GetTicketWbot from "../../helpers/GetTicketWbot";
-import Ticket from "../../models/Ticket";
+import AppError from "../../errors/AppError.js";
+import GetTicketWbot from "../../helpers/GetTicketWbot.js";
+import Ticket from "../../models/Ticket.js";
 
-import formatBody from "../../helpers/Mustache";
+import formatBody from "../../helpers/Mustache.js";
 
 interface Request {
   media: Express.Multer.File;

@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
+import { getIO } from "../libs/socket.js";
 
-import CheckSettingsHelper from "../helpers/CheckSettings";
-import AppError from "../errors/AppError";
+import CheckSettingsHelper from "../helpers/CheckSettings.js";
+import AppError from "../errors/AppError.js";
 
-import CreateUserService from "../services/UserServices/CreateUserService";
-import ListUsersService from "../services/UserServices/ListUsersService";
-import UpdateUserService from "../services/UserServices/UpdateUserService";
-import ShowUserService from "../services/UserServices/ShowUserService";
-import DeleteUserService from "../services/UserServices/DeleteUserService";
+import CreateUserService from "../services/UserServices/CreateUserService.js";
+import ListUsersService from "../services/UserServices/ListUsersService.js";
+import UpdateUserService from "../services/UserServices/UpdateUserService.js";
+import ShowUserService from "../services/UserServices/ShowUserService.js";
+import DeleteUserService from "../services/UserServices/DeleteUserService.js";
 
 type IndexQuery = {
   searchParam: string;

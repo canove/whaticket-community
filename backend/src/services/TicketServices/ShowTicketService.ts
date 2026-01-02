@@ -1,9 +1,9 @@
-import Ticket from "../../models/Ticket";
-import AppError from "../../errors/AppError";
-import Contact from "../../models/Contact";
-import User from "../../models/User";
-import Queue from "../../models/Queue";
-import Whatsapp from "../../models/Whatsapp";
+import Ticket from "../../models/Ticket.js";
+import AppError from "../../errors/AppError.js";
+import Contact from "../../models/Contact.js";
+import User from "../../models/User.js";
+import Queue from "../../models/Queue.js";
+import Whatsapp from "../../models/Whatsapp.js";
 
 const ShowTicketService = async (id: string | number): Promise<Ticket> => {
   const ticket = await Ticket.findByPk(id, {

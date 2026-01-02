@@ -1,7 +1,7 @@
-import User from "../../models/User";
-import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
-import Whatsapp from "../../models/Whatsapp";
+import User from "../../models/User.js";
+import AppError from "../../errors/AppError.js";
+import Queue from "../../models/Queue.js";
+import Whatsapp from "../../models/Whatsapp.js";
 
 const ShowUserService = async (id: string | number): Promise<User> => {
   const user = await User.findByPk(id, {

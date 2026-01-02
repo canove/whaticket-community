@@ -1,26 +1,21 @@
 import {
   Table,
   Column,
-  DataType,
-  CreatedAt,
-  UpdatedAt,
   Model,
-  PrimaryKey,
-  AutoIncrement
+  CreatedAt,
+  UpdatedAt
 } from "sequelize-typescript";
 
-@Table
+@Table({ tableName: "QuickAnswers" })
 class QuickAnswer extends Model<QuickAnswer> {
-  @PrimaryKey
-  @AutoIncrement
   @Column
-  id: number;
-
-  @Column(DataType.TEXT)
   shortcut: string;
 
-  @Column(DataType.TEXT)
+  @Column
   message: string;
+
+  @Column
+  companyId: number;
 
   @CreatedAt
   createdAt: Date;

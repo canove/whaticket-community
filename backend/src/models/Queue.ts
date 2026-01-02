@@ -1,40 +1,36 @@
 import {
   Table,
   Column,
+  Model,
   CreatedAt,
   UpdatedAt,
-  Model,
-  PrimaryKey,
-  AutoIncrement,
-  AllowNull,
-  Unique,
+  DataType,
+  HasMany,
+  BelongsTo,
+  ForeignKey,
   BelongsToMany
 } from "sequelize-typescript";
-import User from "./User";
-import UserQueue from "./UserQueue";
+import Ticket from "./Ticket.js";
+import User from "./User.js";
+import Company from "./Company.js";
+import Whatsapp from "./Whatsapp.js";
+import WhatsappQueue from "./WhatsappQueue.js";
+import UserQueue from "./UserQueue.js";
 
-import Whatsapp from "./Whatsapp";
-import WhatsappQueue from "./WhatsappQueue";
-
-@Table
+@Table({ tableName: "Queues" })
 class Queue extends Model<Queue> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
-  id: number;
-
-  @AllowNull(false)
-  @Unique
   @Column
   name: string;
 
-  @AllowNull(false)
-  @Unique
   @Column
   color: string;
 
   @Column
   greetingMessage: string;
+
+  @ForeignKey(() => Company)
+  @Column
+  companyId: number;
 
   @CreatedAt
   createdAt: Date;
@@ -42,11 +38,17 @@ class Queue extends Model<Queue> {
   @UpdatedAt
   updatedAt: Date;
 
+  @BelongsTo(() => Company)
+  company: Company;
+
+  @HasMany(() => Ticket)
+  tickets: Ticket[];
+
   @BelongsToMany(() => Whatsapp, () => WhatsappQueue)
-  whatsapps: Array<Whatsapp & { WhatsappQueue: WhatsappQueue }>;
+  whatsapps: Whatsapp[];
 
   @BelongsToMany(() => User, () => UserQueue)
-  users: Array<User & { UserQueue: UserQueue }>;
+  users: User[];
 }
 
 export default Queue;

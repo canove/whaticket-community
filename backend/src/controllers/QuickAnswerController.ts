@@ -1,14 +1,14 @@
 import * as Yup from "yup";
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
+import { getIO } from "../libs/socket.js";
 
-import ListQuickAnswerService from "../services/QuickAnswerService/ListQuickAnswerService";
-import CreateQuickAnswerService from "../services/QuickAnswerService/CreateQuickAnswerService";
-import ShowQuickAnswerService from "../services/QuickAnswerService/ShowQuickAnswerService";
-import UpdateQuickAnswerService from "../services/QuickAnswerService/UpdateQuickAnswerService";
-import DeleteQuickAnswerService from "../services/QuickAnswerService/DeleteQuickAnswerService";
+import ListQuickAnswerService from "../services/QuickAnswerService/ListQuickAnswerService.js";
+import CreateQuickAnswerService from "../services/QuickAnswerService/CreateQuickAnswerService.js";
+import ShowQuickAnswerService from "../services/QuickAnswerService/ShowQuickAnswerService.js";
+import UpdateQuickAnswerService from "../services/QuickAnswerService/UpdateQuickAnswerService.js";
+import DeleteQuickAnswerService from "../services/QuickAnswerService/DeleteQuickAnswerService.js";
 
-import AppError from "../errors/AppError";
+import AppError from "../errors/AppError.js";
 
 type IndexQuery = {
   searchParam: string;

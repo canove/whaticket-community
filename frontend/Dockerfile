@@ -1,27 +1,40 @@
-FROM node:14-alpine as build-deps
-WORKDIR /usr/src/app
+# Stage 1: Build
+FROM node:22-alpine AS build-deps
+WORKDIR /app
+
+# Install dependencies
 COPY package*.json ./
 RUN npm install
-COPY .env* ./
-COPY src/ ./src/
-COPY public/ ./public/
-COPY index.html ./
-COPY vite.config.js ./
+
+# Copy source code
+COPY . .
+
+# Build
 RUN npm run build
 
+# Stage 2: Serve
 FROM nginx:alpine
-RUN apk add --no-cache jq openssl
 
+# Install tools
+RUN apk add --no-cache jq openssl bash
+
+# Install dockerize (still useful for runtime env vars if needed)
 ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-ENV PUBLIC_HTML=/var/www/public/
+ENV PUBLIC_HTML=/usr/share/nginx/html
 
-COPY .docker/nginx /etc/nginx/
-COPY --from=build-deps /usr/src/app/build ${PUBLIC_HTML}
+# Copy Nginx config
+COPY .docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Copy build artifacts
+COPY --from=build-deps /app/dist ${PUBLIC_HTML}
+
 EXPOSE 80
 
 COPY .docker/add-env-vars.sh /docker-entrypoint.d/01-add-env-vars.sh
 RUN chmod +x /docker-entrypoint.d/01-add-env-vars.sh
+
+CMD ["nginx", "-g", "daemon off;"]

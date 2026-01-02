@@ -1,5 +1,5 @@
-import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
-import { getWbot } from "../../libs/wbot";
+import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp.js";
+import { getWbot } from "../../libs/wbot.js";
 
 const CheckContactNumber = async (number: string): Promise<void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp();

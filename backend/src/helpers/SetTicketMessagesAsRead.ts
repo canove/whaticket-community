@@ -1,8 +1,8 @@
-import { getIO } from "../libs/socket";
-import Message from "../models/Message";
-import Ticket from "../models/Ticket";
-import { logger } from "../utils/logger";
-import GetTicketWbot from "./GetTicketWbot";
+import { getIO } from "../libs/socket.js";
+import Message from "../models/Message.js";
+import Ticket from "../models/Ticket.js";
+import { logger } from "../utils/logger.js";
+import GetTicketWbot from "./GetTicketWbot.js";
 
 const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
   await Message.update(

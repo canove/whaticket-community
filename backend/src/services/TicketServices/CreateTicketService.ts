@@ -1,9 +1,9 @@
-import AppError from "../../errors/AppError";
-import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
-import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
-import Ticket from "../../models/Ticket";
-import User from "../../models/User";
-import ShowContactService from "../ContactServices/ShowContactService";
+import AppError from "../../errors/AppError.js";
+import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets.js";
+import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp.js";
+import Ticket from "../../models/Ticket.js";
+import User from "../../models/User.js";
+import ShowContactService from "../ContactServices/ShowContactService.js";
 
 interface Request {
   contactId: number;

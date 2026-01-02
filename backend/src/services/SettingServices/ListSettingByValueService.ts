@@ -1,5 +1,5 @@
-import AppError from "../../errors/AppError";
-import Setting from "../../models/Setting";
+import AppError from "../../errors/AppError.js";
+import Setting from "../../models/Setting.js";
 
 interface Response {
   key: string;

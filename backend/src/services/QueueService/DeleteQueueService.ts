@@ -1,4 +1,4 @@
-import ShowQueueService from "./ShowQueueService";
+import ShowQueueService from "./ShowQueueService.js";
 
 const DeleteQueueService = async (queueId: number | string): Promise<void> => {
   const queue = await ShowQueueService(queueId);

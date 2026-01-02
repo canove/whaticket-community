@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import * as Yup from "yup";
-import AppError from "../errors/AppError";
-import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp";
-import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
-import Message from "../models/Message";
-import Whatsapp from "../models/Whatsapp";
-import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
-import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
-import ShowTicketService from "../services/TicketServices/ShowTicketService";
-import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
-import CheckContactNumber from "../services/WbotServices/CheckNumber";
-import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
-import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
-import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import AppError from "../errors/AppError.js";
+import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp.js";
+import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead.js";
+import Message from "../models/Message.js";
+import Whatsapp from "../models/Whatsapp.js";
+import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService.js";
+import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService.js";
+import ShowTicketService from "../services/TicketServices/ShowTicketService.js";
+import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact.js";
+import CheckContactNumber from "../services/WbotServices/CheckNumber.js";
+import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl.js";
+import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia.js";
+import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage.js";
 
 type WhatsappData = {
   whatsappId: number;

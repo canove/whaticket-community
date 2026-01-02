@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
-import AppError from "../errors/AppError";
-import Ticket from "../models/Ticket";
+import AppError from "../errors/AppError.js";
+import Ticket from "../models/Ticket.js";
 
 const CheckContactOpenTickets = async (
   contactId: number,

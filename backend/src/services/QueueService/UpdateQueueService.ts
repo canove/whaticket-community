@@ -1,8 +1,8 @@
 import { Op } from "sequelize";
 import * as Yup from "yup";
-import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
-import ShowQueueService from "./ShowQueueService";
+import AppError from "../../errors/AppError.js";
+import Queue from "../../models/Queue.js";
+import ShowQueueService from "./ShowQueueService.js";
 
 interface QueueData {
   name?: string;

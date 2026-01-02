@@ -1,7 +1,7 @@
 import { Router } from "express";
-import isAuth from "../middleware/isAuth";
+import isAuth from "../middleware/isAuth.js";
 
-import * as QueueController from "../controllers/QueueController";
+import * as QueueController from "../controllers/QueueController.js";
 
 const queueRoutes = Router();
 

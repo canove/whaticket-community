@@ -1,4 +1,4 @@
-import Whatsapp from "../../models/Whatsapp";
+import Whatsapp from "../../models/Whatsapp.js";
 
 const AssociateWhatsappQueue = async (
   whatsapp: Whatsapp,

@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
+import { getIO } from "../libs/socket.js";
 
-import CreateTicketService from "../services/TicketServices/CreateTicketService";
-import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
-import ListTicketsService from "../services/TicketServices/ListTicketsService";
-import ShowTicketService from "../services/TicketServices/ShowTicketService";
-import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
-import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
-import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
-import formatBody from "../helpers/Mustache";
+import CreateTicketService from "../services/TicketServices/CreateTicketService.js";
+import DeleteTicketService from "../services/TicketServices/DeleteTicketService.js";
+import ListTicketsService from "../services/TicketServices/ListTicketsService.js";
+import ShowTicketService from "../services/TicketServices/ShowTicketService.js";
+import UpdateTicketService from "../services/TicketServices/UpdateTicketService.js";
+import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage.js";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService.js";
+import formatBody from "../helpers/Mustache.js";
 
 type IndexQuery = {
   searchParam: string;

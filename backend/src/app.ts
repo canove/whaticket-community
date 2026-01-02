@@ -7,10 +7,10 @@ import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 
 import "./database";
-import uploadConfig from "./config/upload";
-import AppError from "./errors/AppError";
-import routes from "./routes";
-import { logger } from "./utils/logger";
+import uploadConfig from "./config/upload.js";
+import AppError from "./errors/AppError.js";
+import routes from "./routes.js";
+import { logger } from "./utils/logger.js";
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 

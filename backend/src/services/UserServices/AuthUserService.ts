@@ -1,11 +1,11 @@
-import User from "../../models/User";
-import AppError from "../../errors/AppError";
+import User from "../../models/User.js";
+import AppError from "../../errors/AppError.js";
 import {
   createAccessToken,
   createRefreshToken
-} from "../../helpers/CreateTokens";
-import { SerializeUser } from "../../helpers/SerializeUser";
-import Queue from "../../models/Queue";
+} from "../../helpers/CreateTokens.js";
+import { SerializeUser } from "../../helpers/SerializeUser.js";
+import Queue from "../../models/Queue.js";
 
 interface SerializedUser {
   id: number;

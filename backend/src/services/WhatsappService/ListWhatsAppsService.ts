@@ -1,5 +1,5 @@
-import Queue from "../../models/Queue";
-import Whatsapp from "../../models/Whatsapp";
+import Queue from "../../models/Queue.js";
+import Whatsapp from "../../models/Whatsapp.js";
 
 const ListWhatsAppsService = async (): Promise<Whatsapp[]> => {
   const whatsapps = await Whatsapp.findAll({

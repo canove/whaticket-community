@@ -1,5 +1,5 @@
-import { getIO } from "../../libs/socket";
-import Contact from "../../models/Contact";
+import { getIO } from "../../libs/socket.js";
+import Contact from "../../models/Contact.js";
 
 interface ExtraInfo {
   name: string;

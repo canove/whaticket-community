@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { getWbot } from "../libs/wbot";
-import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
-import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
-import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
+import { getWbot } from "../libs/wbot.js";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService.js";
+import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession.js";
+import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService.js";
 
 const store = async (req: Request, res: Response): Promise<Response> => {
   const { whatsappId } = req.params;

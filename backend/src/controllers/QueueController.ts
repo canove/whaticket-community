@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
-import CreateQueueService from "../services/QueueService/CreateQueueService";
-import DeleteQueueService from "../services/QueueService/DeleteQueueService";
-import ListQueuesService from "../services/QueueService/ListQueuesService";
-import ShowQueueService from "../services/QueueService/ShowQueueService";
-import UpdateQueueService from "../services/QueueService/UpdateQueueService";
+import { getIO } from "../libs/socket.js";
+import CreateQueueService from "../services/QueueService/CreateQueueService.js";
+import DeleteQueueService from "../services/QueueService/DeleteQueueService.js";
+import ListQueuesService from "../services/QueueService/ListQueuesService.js";
+import ShowQueueService from "../services/QueueService/ShowQueueService.js";
+import UpdateQueueService from "../services/QueueService/UpdateQueueService.js";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const queues = await ListQueuesService();

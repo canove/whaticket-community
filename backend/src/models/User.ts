@@ -1,59 +1,41 @@
 import {
   Table,
   Column,
+  Model,
   CreatedAt,
   UpdatedAt,
-  Model,
   DataType,
-  BeforeCreate,
-  BeforeUpdate,
-  PrimaryKey,
-  AutoIncrement,
-  Default,
   HasMany,
-  BelongsToMany,
+  BelongsTo,
   ForeignKey,
-  BelongsTo
+  BelongsToMany
 } from "sequelize-typescript";
-import { hash, compare } from "bcryptjs";
-import Ticket from "./Ticket";
-import Queue from "./Queue";
-import UserQueue from "./UserQueue";
-import Whatsapp from "./Whatsapp";
+import Ticket from "./Ticket.js";
+import Queue from "./Queue.js";
+import UserQueue from "./UserQueue.js";
+import Company from "./Company.js";
+import QuickAnswer from "./QuickAnswer.js";
 
-@Table
+@Table({ tableName: "Users" })
 class User extends Model<User> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
-  id: number;
-
   @Column
   name: string;
 
   @Column
   email: string;
 
-  @Column(DataType.VIRTUAL)
-  password: string;
-
   @Column
   passwordHash: string;
 
-  @Default(0)
+  @Column({ defaultValue: "admin" })
+  profile: string;
+
   @Column
   tokenVersion: number;
 
-  @Default("admin")
+  @ForeignKey(() => Company)
   @Column
-  profile: string;
-
-  @ForeignKey(() => Whatsapp)
-  @Column
-  whatsappId: number;
-
-  @BelongsTo(() => Whatsapp)
-  whatsapp: Whatsapp;
+  companyId: number;
 
   @CreatedAt
   createdAt: Date;
@@ -61,23 +43,17 @@ class User extends Model<User> {
   @UpdatedAt
   updatedAt: Date;
 
+  @BelongsTo(() => Company)
+  company: Company;
+
   @HasMany(() => Ticket)
   tickets: Ticket[];
 
+  @HasMany(() => QuickAnswer)
+  quickAnswers: QuickAnswer[];
+
   @BelongsToMany(() => Queue, () => UserQueue)
   queues: Queue[];
-
-  @BeforeUpdate
-  @BeforeCreate
-  static hashPassword = async (instance: User): Promise<void> => {
-    if (instance.password) {
-      instance.passwordHash = await hash(instance.password, 8);
-    }
-  };
-
-  public checkPassword = async (password: string): Promise<boolean> => {
-    return compare(password, this.getDataValue("passwordHash"));
-  };
 }
 
 export default User;

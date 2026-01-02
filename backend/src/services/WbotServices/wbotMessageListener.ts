@@ -10,21 +10,21 @@ import {
   Client
 } from "whatsapp-web.js";
 
-import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
-import Message from "../../models/Message";
+import Contact from "../../models/Contact.js";
+import Ticket from "../../models/Ticket.js";
+import Message from "../../models/Message.js";
 
-import { getIO } from "../../libs/socket";
-import CreateMessageService from "../MessageServices/CreateMessageService";
-import { logger } from "../../utils/logger";
-import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
-import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
-import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
-import { debounce } from "../../helpers/Debounce";
-import UpdateTicketService from "../TicketServices/UpdateTicketService";
-import CreateContactService from "../ContactServices/CreateContactService";
-import GetContactService from "../ContactServices/GetContactService";
-import formatBody from "../../helpers/Mustache";
+import { getIO } from "../../libs/socket.js";
+import CreateMessageService from "../MessageServices/CreateMessageService.js";
+import { logger } from "../../utils/logger.js";
+import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService.js";
+import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService.js";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService.js";
+import { debounce } from "../../helpers/Debounce.js";
+import UpdateTicketService from "../TicketServices/UpdateTicketService.js";
+import CreateContactService from "../ContactServices/CreateContactService.js";
+import GetContactService from "../ContactServices/GetContactService.js";
+import formatBody from "../../helpers/Mustache.js";
 
 interface Session extends Client {
   id?: number;

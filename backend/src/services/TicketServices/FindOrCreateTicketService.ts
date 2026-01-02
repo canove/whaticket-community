@@ -1,8 +1,8 @@
 import { subHours } from "date-fns";
 import { Op } from "sequelize";
-import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
-import ShowTicketService from "./ShowTicketService";
+import Contact from "../../models/Contact.js";
+import Ticket from "../../models/Ticket.js";
+import ShowTicketService from "./ShowTicketService.js";
 
 const FindOrCreateTicketService = async (
   contact: Contact,

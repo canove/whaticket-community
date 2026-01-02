@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import AppError from "../errors/AppError";
+import AppError from "../errors/AppError.js";
 
-import AuthUserService from "../services/UserServices/AuthUserService";
-import { SendRefreshToken } from "../helpers/SendRefreshToken";
-import { RefreshTokenService } from "../services/AuthServices/RefreshTokenService";
+import AuthUserService from "../services/UserServices/AuthUserService.js";
+import { SendRefreshToken } from "../helpers/SendRefreshToken.js";
+import { RefreshTokenService } from "../services/AuthServices/RefreshTokenService.js";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { email, password } = req.body;

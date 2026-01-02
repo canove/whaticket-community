@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 
-import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead";
-import { getIO } from "../libs/socket";
-import Message from "../models/Message";
+import SetTicketMessagesAsRead from "../helpers/SetTicketMessagesAsRead.js";
+import { getIO } from "../libs/socket.js";
+import Message from "../models/Message.js";
 
-import ListMessagesService from "../services/MessageServices/ListMessagesService";
-import ShowTicketService from "../services/TicketServices/ShowTicketService";
-import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
-import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
-import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import ListMessagesService from "../services/MessageServices/ListMessagesService.js";
+import ShowTicketService from "../services/TicketServices/ShowTicketService.js";
+import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage.js";
+import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia.js";
+import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage.js";
 
 type IndexQuery = {
   pageNumber: string;

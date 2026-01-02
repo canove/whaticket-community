@@ -1,0 +1,84 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: whaticket_backend
+    restart: always
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=whaticket
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - whaticket_network
+    depends_on:
+      - postgres
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: whaticket_frontend
+    restart: always
+    environment:
+      - REACT_APP_BACKEND_URL=/
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - whaticket_network
+
+  postgres:
+    image: postgres:alpine
+    container_name: whaticket_postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=whaticket
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - whaticket_network
+
+  redis:
+    image: redis:alpine
+    container_name: whaticket_redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - whaticket_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: whaticket_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - whaticket_network
+
+networks:
+  whaticket_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

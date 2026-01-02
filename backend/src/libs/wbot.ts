@@ -1,10 +1,10 @@
 import qrCode from "qrcode-terminal";
 import { Client, LocalAuth } from "whatsapp-web.js";
-import { getIO } from "./socket";
-import Whatsapp from "../models/Whatsapp";
-import AppError from "../errors/AppError";
-import { logger } from "../utils/logger";
-import { handleMessage } from "../services/WbotServices/wbotMessageListener";
+import { getIO } from "./socket.js";
+import Whatsapp from "../models/Whatsapp.js";
+import AppError from "../errors/AppError.js";
+import { logger } from "../utils/logger.js";
+import { handleMessage } from "../services/WbotServices/wbotMessageListener.js";
 
 interface Session extends Client {
   id?: number;

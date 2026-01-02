@@ -1,12 +1,12 @@
 import { Message as WbotMessage } from "whatsapp-web.js";
-import AppError from "../../errors/AppError";
-import GetTicketWbot from "../../helpers/GetTicketWbot";
-import GetWbotMessage from "../../helpers/GetWbotMessage";
-import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
+import AppError from "../../errors/AppError.js";
+import GetTicketWbot from "../../helpers/GetTicketWbot.js";
+import GetWbotMessage from "../../helpers/GetWbotMessage.js";
+import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId.js";
+import Message from "../../models/Message.js";
+import Ticket from "../../models/Ticket.js";
 
-import formatBody from "../../helpers/Mustache";
+import formatBody from "../../helpers/Mustache.js";
 
 interface Request {
   body: string;

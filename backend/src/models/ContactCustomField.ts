@@ -1,23 +1,16 @@
 import {
   Table,
   Column,
+  Model,
   CreatedAt,
   UpdatedAt,
-  Model,
-  PrimaryKey,
-  AutoIncrement,
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
-import Contact from "./Contact";
+import Contact from "./Contact.js";
 
-@Table
+@Table({ tableName: "ContactCustomFields" })
 class ContactCustomField extends Model<ContactCustomField> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
-  id: number;
-
   @Column
   name: string;
 
@@ -28,14 +21,14 @@ class ContactCustomField extends Model<ContactCustomField> {
   @Column
   contactId: number;
 
-  @BelongsTo(() => Contact)
-  contact: Contact;
-
   @CreatedAt
   createdAt: Date;
 
   @UpdatedAt
   updatedAt: Date;
+
+  @BelongsTo(() => Contact)
+  contact: Contact;
 }
 
 export default ContactCustomField;

@@ -1,10 +1,10 @@
-import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
-import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
-import { getIO } from "../../libs/socket";
-import Ticket from "../../models/Ticket";
-import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
-import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
-import ShowTicketService from "./ShowTicketService";
+import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets.js";
+import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead.js";
+import { getIO } from "../../libs/socket.js";
+import Ticket from "../../models/Ticket.js";
+import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage.js";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService.js";
+import ShowTicketService from "./ShowTicketService.js";
 
 interface TicketData {
   status?: string;

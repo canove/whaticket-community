@@ -1,5 +1,5 @@
-import Message from "../models/Message";
-import Ticket from "../models/Ticket";
+import Message from "../models/Message.js";
+import Ticket from "../models/Ticket.js";
 
 const SerializeWbotMsgId = (ticket: Ticket, message: Message): string => {
   const serializedMsgId = `${message.fromMe}_${ticket.contact.number}@${
