@@ -1,0 +1,505 @@
+// Prisma Schema for Whaticket Enterprise
+// Database: PostgreSQL 16
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum UserProfile {
+  admin
+  user
+  supervisor
+}
+
+enum TicketStatus {
+  open
+  pending
+  closed
+}
+
+enum MessageType {
+  chat
+  image
+  audio
+  video
+  document
+  sticker
+  location
+  vcard
+  ptt
+}
+
+enum WhatsappStatus {
+  DISCONNECTED
+  CONNECTED
+  OPENING
+  TIMEOUT
+  qrcode
+}
+
+// ==================== MODELS ====================
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  profile       UserProfile @default(user)
+  tokenVersion  Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  tickets       Ticket[]
+  queues        UserQueue[]
+  messages      Message[]
+  sessions      Session[]
+  tags          Tag[]
+  schedules           Schedule[]
+  sentInternalMessages InternalMessage[] @relation("SentInternalMessages")
+  receivedInternalMessages InternalMessage[] @relation("ReceivedInternalMessages")
+  campaigns     Campaign[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id            String    @id @default(uuid())
+  userId        Int
+  refreshToken  String    @unique
+  userAgent     String?
+  ipAddress     String?
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@map("sessions")
+}
+
+model Whatsapp {
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
+  session         String?       @db.Text
+  qrcode          String?       @db.Text
+  status          WhatsappStatus @default(DISCONNECTED)
+  battery         String?
+  plugged         Boolean?
+  retries         Int           @default(0)
+  greetingMessage String?       @db.Text
+  farewellMessage String?       @db.Text
+  isDefault       Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  tickets         Ticket[]
+  queues          WhatsappQueue[]
+  messages        Message[]
+  promptId        Int?
+  prompt          Prompt?       @relation(fields: [promptId], references: [id])
+
+
+  @@map("whatsapps")
+}
+
+model Contact {
+  id              Int       @id @default(autoincrement())
+  name            String
+  number          String    @unique
+  email           String?
+  profilePicUrl   String?
+  isGroup         Boolean   @default(false)
+  extraInfo       Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  tickets         Ticket[]
+  messages        Message[]
+  customFields    ContactCustomField[]
+  tags            TagContact[]
+  schedules       Schedule[]
+  campaignContacts CampaignContact[]
+
+  @@index([number])
+  @@index([name])
+  @@map("contacts")
+}
+
+model ContactCustomField {
+  id        Int      @id @default(autoincrement())
+  contactId Int
+  name      String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@map("contact_custom_fields")
+}
+
+model Queue {
+  id              Int       @id @default(autoincrement())
+  name            String    @unique
+  color           String
+  greetingMessage String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  tickets         Ticket[]
+  users           UserQueue[]
+  whatsapps       WhatsappQueue[]
+  promptId        Int?
+  prompt          Prompt?   @relation(fields: [promptId], references: [id])
+
+
+  @@map("queues")
+}
+
+model UserQueue {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  queueId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  queue     Queue    @relation(fields: [queueId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, queueId])
+  @@map("user_queues")
+}
+
+model WhatsappQueue {
+  id          Int       @id @default(autoincrement())
+  whatsappId  Int
+  queueId     Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  whatsapp    Whatsapp  @relation(fields: [whatsappId], references: [id], onDelete: Cascade)
+  queue       Queue     @relation(fields: [queueId], references: [id], onDelete: Cascade)
+
+  @@unique([whatsappId, queueId])
+  @@map("whatsapp_queues")
+}
+
+model Ticket {
+  id            Int           @id @default(autoincrement())
+  status        TicketStatus  @default(pending)
+  unreadMessages Int          @default(0)
+  lastMessage   String?       @db.Text
+  isGroup       Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Foreign Keys
+  contactId     Int
+  whatsappId    Int
+  userId        Int?
+  queueId       Int?
+
+  // Relations
+  contact       Contact       @relation(fields: [contactId], references: [id])
+  whatsapp      Whatsapp      @relation(fields: [whatsappId], references: [id])
+  user          User?         @relation(fields: [userId], references: [id])
+  queue         Queue?        @relation(fields: [queueId], references: [id])
+  messages      Message[]
+  tags          TagTicket[]
+  schedules     Schedule[]
+
+  @@index([status])
+  @@index([contactId])
+  @@index([whatsappId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+model Message {
+  id            String      @id
+  body          String      @db.Text
+  ack           Int         @default(0)
+  read          Boolean     @default(false)
+  mediaType     MessageType?
+  mediaUrl      String?
+  fromMe        Boolean     @default(false)
+  isDeleted     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Foreign Keys
+  ticketId      Int
+  contactId     Int?
+  userId        Int?
+  whatsappId    Int?
+  quotedMsgId   String?
+
+  // Relations
+  ticket        Ticket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  contact       Contact?    @relation(fields: [contactId], references: [id])
+  user          User?       @relation(fields: [userId], references: [id])
+  whatsapp      Whatsapp?   @relation(fields: [whatsappId], references: [id])
+  quotedMsg     Message?    @relation("QuotedMessage", fields: [quotedMsgId], references: [id])
+  quotedBy      Message[]   @relation("QuotedMessage")
+
+  @@index([ticketId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+model QuickAnswer {
+  id          Int       @id @default(autoincrement())
+  shortcut    String    @unique
+  message     String    @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([shortcut])
+  @@map("quick_answers")
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+// ==================== AUDIT LOG ====================
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  action      String
+  entityType  String
+  entityId    String
+  userId      Int?
+  oldData     Json?
+  newData     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ==================== WEBHOOKS ====================
+
+model Webhook {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  enabled   Boolean  @default(true)
+  events    String[]
+  token     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("webhooks")
+}
+
+// ==================== AI PROMPTS ====================
+
+model Prompt {
+  id               Int      @id @default(autoincrement())
+  name             String
+  apiKey           String
+  prompt           String   @db.Text
+  maxTokens        Int      @default(1000)
+  temperature      Float    @default(0.7)
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  voice            String?
+  voiceKey         String?
+  voiceRegion      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  queues           Queue[]
+  whatsapps        Whatsapp[]
+
+  @@map("prompts")
+}
+
+// ==================== TAGS ====================
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String
+  color     String    @default("#3498db")
+  userId    Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tickets   TagTicket[]
+  contacts  TagContact[]
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@map("tags")
+}
+
+model TagTicket {
+  id        Int      @id @default(autoincrement())
+  tagId     Int
+  ticketId  Int
+  createdAt DateTime @default(now())
+
+  // Relations
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, ticketId])
+  @@index([ticketId])
+  @@map("tag_tickets")
+}
+
+model TagContact {
+  id        Int      @id @default(autoincrement())
+  tagId     Int
+  contactId Int
+  createdAt DateTime @default(now())
+
+  // Relations
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, contactId])
+  @@index([contactId])
+  @@map("tag_contacts")
+}
+
+// ==================== SCHEDULES ====================
+
+enum ScheduleStatus {
+  pending
+  sent
+  failed
+  cancelled
+}
+
+model Schedule {
+  id          Int            @id @default(autoincrement())
+  body        String         @db.Text
+  sendAt      DateTime
+  sentAt      DateTime?
+  status      ScheduleStatus @default(pending)
+  contactId   Int
+  ticketId    Int?
+  userId      Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  contact     Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  ticket      Ticket?        @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sendAt])
+  @@index([status])
+  @@index([userId])
+  @@map("schedules")
+}
+
+// ==================== INTERNAL CHAT ====================
+
+model InternalMessage {
+  id          Int      @id @default(autoincrement())
+  body        String   @db.Text
+  fromUserId  Int
+  toUserId    Int
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  fromUser    User     @relation("SentInternalMessages", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser      User     @relation("ReceivedInternalMessages", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([createdAt])
+  @@map("internal_messages")
+}
+
+// ==================== CAMPAIGNS ====================
+
+enum CampaignStatus {
+  draft
+  scheduled
+  running
+  completed
+  cancelled
+}
+
+enum CampaignContactStatus {
+  pending
+  sent
+  failed
+}
+
+model Campaign {
+  id          Int            @id @default(autoincrement())
+  name        String
+  message     String         @db.Text
+  status      CampaignStatus @default(draft)
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  userId      Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contacts    CampaignContact[]
+
+  @@index([status])
+  @@index([userId])
+  @@map("campaigns")
+}
+
+model CampaignContact {
+  id          Int                   @id @default(autoincrement())
+  campaignId  Int
+  contactId   Int
+  status      CampaignContactStatus @default(pending)
+  sentAt      DateTime?
+  createdAt   DateTime              @default(now())
+
+  // Relations
+  campaign    Campaign              @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact     Contact               @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, contactId])
+  @@index([campaignId])
+  @@index([contactId])
+  @@map("campaign_contacts")
+}

@@ -1,40 +1,61 @@
-FROM node:14 as build-deps
+# Build stage
+FROM node:22-alpine AS builder
 
-RUN apt-get update && apt-get install -y wget
+WORKDIR /app
 
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-
-RUN apt-get update \
-    && apt-get install -y wget gnupg \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
-      --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-
-ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64 /usr/local/bin/dumb-init
-RUN chmod +x /usr/local/bin/dumb-init
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
-
-WORKDIR /usr/src/app
+# Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production=false
 
+# Copy source
 COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build application
 RUN npm run build
 
+# Prune dev dependencies
+RUN npm prune --production
+
+# ================================
+# Production stage
+# ================================
+FROM node:22-alpine AS production
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init wget
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001 -G nodejs
+
+# Copy built application
+COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nestjs:nodejs /app/prisma.config.ts ./
+
+# Create directories
+RUN mkdir -p sessions public && chown -R nestjs:nodejs sessions public
+
+# Switch to non-root user
+USER nestjs
+
+# Environment
 ENV NODE_ENV=production
-ENV PORT=3000
-ENV CHROME_BIN=google-chrome-stable
+ENV PORT=3001
 
-EXPOSE 3000
+EXPOSE 3001
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/v1/health || exit 1
+
+# Start application
 ENTRYPOINT ["dumb-init", "--"]
-CMD dockerize -wait tcp://${DB_HOST}:3306 \
-  && npx sequelize db:migrate \
-  && node dist/server.js
+CMD ["sh", "-c", "npx prisma db push --url $DATABASE_URL && node dist/main.js"]

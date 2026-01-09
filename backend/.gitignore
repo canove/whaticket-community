@@ -1,18 +1,7 @@
 node_modules
-public/*
-dist
-!public/.gitkeep
+# Keep environment variables out of version control
 .env
-.env.test
 
-package-lock.json
-yarn.lock
-yarn-error.log
-
-/src/config/sentry.js
-
-# Ignore test-related files
-/coverage.data
-/coverage/
-
-.wwebjs_auth/
+/generated/prisma
+/dist
+/build

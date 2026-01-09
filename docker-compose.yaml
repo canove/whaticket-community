@@ -1,62 +1,162 @@
-version: '3'
-
 networks:
   whaticket:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  whatsapp_sessions:
+
 
 services:
+  # ================================
+  # PostgreSQL Database
+  # ================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: whaticket_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-whaticket}
+      POSTGRES_USER: ${POSTGRES_USER:-whaticket}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-whaticket_secret}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - whaticket
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-whaticket} -d ${POSTGRES_DB:-whaticket}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ================================
+  # Redis Cache & Message Queue
+  # ================================
+  redis:
+    image: redis:7-alpine
+    container_name: whaticket_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - whaticket
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================================
+  # Backend API (NestJS + Baileys)
+  # ================================
   backend:
     build:
       context: ./backend
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
+    container_name: whaticket_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - DB_HOST=mysql
-      - DB_USER=root
-      - DB_PASS=${MYSQL_ROOT_PASSWORD:-strongpassword}
-      - DB_NAME=${MYSQL_DATABASE:-whaticket}
-      - JWT_SECRET=${JWT_SECRET:-3123123213123}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
-      - BACKEND_URL=${BACKEND_URL:-http://localhost}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
-      - PROXY_PORT=${PROXY_PORT:-8080}
-      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
-    ports:
-      - ${BACKEND_PORT:-8080}:3000
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      API_PREFIX: api/v1
+
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-whaticket}:${POSTGRES_PASSWORD:-whaticket_secret}@postgres:5432/${POSTGRES_DB:-whaticket}?schema=public
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-change-this-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-this-refresh-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+
+      # CORS
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:3001}
+
+      # WhatsApp
+      WHATSAPP_SESSIONS_PATH: /app/sessions
+
+      # Sentry (optional)
+      SENTRY_DSN: ${SENTRY_DSN:-}
     volumes:
-      - ./backend/public/:/usr/src/app/public/
-      - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
+      - whatsapp_sessions:/app/sessions
+      - ./backend/public:/app/public
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
     networks:
       - whaticket
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # ================================
+  # Frontend (Vite + React)
+  # ================================
   frontend:
-    ports:
-      - ${FRONTEND_PORT:-3000}:80
-      - ${FRONTEND_SSL_PORT:-3001}:443
     build:
       context: ./frontend
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
+    container_name: whaticket_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
     environment:
-      - URL_BACKEND=backend:3000
-      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
-      - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
-      - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
-    volumes:
-      - ./ssl/certs/:/etc/nginx/ssl/
-      - ./ssl/www/:/var/www/letsencrypt/
+      VITE_BACKEND_URL: ${BACKEND_URL:-http://localhost:3001}
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
     networks:
       - whaticket
 
-  mysql:
-    image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin    
-    volumes:
-      - ./.docker/data/:/var/lib/mysql
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE:-whaticket}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strongpassword}
-      - TZ=${TZ:-America/Fortaleza}
+  # ================================
+  # Adminer (Database Management - Dev Only)
+  # ================================
+  adminer:
+    image: adminer:latest
+    container_name: whaticket_adminer
+    restart: unless-stopped
+    depends_on:
+      - postgres
     ports:
-      - ${MYSQL_PORT:-3306}:3306
-    restart: always
+      - "${ADMINER_PORT:-8080}:8080"
     networks:
       - whaticket
+    profiles:
+      - dev
+
+  # ================================
+  # Redis Commander (Redis Management - Dev Only)
+  # ================================
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: whaticket_redis_commander
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:${REDIS_PASSWORD:-}
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
+    networks:
+      - whaticket
+    profiles:
+      - dev
