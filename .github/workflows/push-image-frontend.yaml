@@ -20,7 +20,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Log in to the Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
@@ -35,6 +37,19 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
 
+      - name: Compute version
+        id: version
+        run: |
+          cd frontend
+          MAJOR=$(jq -r '.version | split(".")[0]' package.json)
+          MINOR=$(jq -r '.version | split(".")[1]' package.json)
+          COUNT=$(git rev-list --count HEAD)
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "app_version=${MAJOR}.${MINOR}.${COUNT}" >> "$GITHUB_OUTPUT"
+          echo "git_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
@@ -42,3 +57,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_APP_VERSION=${{ steps.version.outputs.app_version }}
+            VITE_GIT_SHA=${{ steps.version.outputs.git_sha }}
+            VITE_BUILD_DATE=${{ steps.version.outputs.build_date }}

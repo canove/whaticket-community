@@ -15,12 +15,14 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { Menu as MenuIcon, ChevronLeft, LogOut, User, MessageSquareText } from "lucide-react";
 
+import Tooltip from "@mui/material/Tooltip";
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
 import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
+import { APP_VERSION, GIT_SHA, BUILD_DATE, formatBuildDate } from "../version";
 
 const drawerWidth = 232;
 
@@ -168,6 +170,21 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "auto",
     overflowX: "hidden",
     ...theme.scrollbarStyles,
+  },
+
+  drawerFooter: {
+    borderTop: "1px solid #E7E5E4",
+    padding: "10px 14px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: '"DM Sans", system-ui, sans-serif',
+    fontSize: 11,
+    fontWeight: 500,
+    color: "#A8A29E",
+    letterSpacing: "0.2px",
+    userSelect: "none",
+    cursor: "default",
   },
 
   appBarSpacer: {
@@ -374,6 +391,16 @@ const LoggedInLayout = ({ children }) => {
             <MainListItems drawerClose={drawerClose} collapsed={!drawerOpen} />
           </List>
         </div>
+
+        <Tooltip
+          title={`git ${GIT_SHA}${BUILD_DATE ? ` • ${formatBuildDate()}` : ""}`}
+          placement="top"
+          arrow
+        >
+          <div className={classes.drawerFooter}>
+            {drawerOpen ? `v${APP_VERSION}` : `v${APP_VERSION.split(".").pop()}`}
+          </div>
+        </Tooltip>
       </Drawer>
 
       <UserModal

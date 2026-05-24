@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
     
 WORKDIR /usr/src/app
+
+ARG GIT_SHA
+ARG BUILD_DATE
+ENV GIT_SHA=$GIT_SHA \
+    BUILD_DATE=$BUILD_DATE
+
 COPY package*.json ./
 RUN npm ci
 

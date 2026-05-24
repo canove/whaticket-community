@@ -1,5 +1,13 @@
 FROM node:22-alpine AS build-deps
 WORKDIR /usr/src/app
+
+ARG VITE_APP_VERSION
+ARG VITE_GIT_SHA
+ARG VITE_BUILD_DATE
+ENV VITE_APP_VERSION=$VITE_APP_VERSION \
+    VITE_GIT_SHA=$VITE_GIT_SHA \
+    VITE_BUILD_DATE=$VITE_BUILD_DATE
+
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 COPY .env* ./
