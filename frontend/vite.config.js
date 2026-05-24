@@ -42,17 +42,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          "material-ui": [
-            "@mui/material",
-            "@mui/icons-material",
-            "@mui/lab",
-            "@mui/styles",
-            "@emotion/react",
-            "@emotion/styled",
+          "vendor": [
+            "react", "react-dom", "react-router-dom",
+            "@mui/material", "@mui/icons-material", "@mui/lab", "@mui/styles",
+            "@emotion/react", "@emotion/styled",
           ],
           "recharts": ["recharts"],
           "emoji": ["@emoji-mart/data", "emoji-mart"],
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
           "socket": ["socket.io-client"],
         },
       },
