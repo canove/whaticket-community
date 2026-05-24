@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": false,
+    "useDefineForClassFields": false,
     "incremental": true,
     "tsBuildInfoFile": "./.tsbuildinfo"
   }
