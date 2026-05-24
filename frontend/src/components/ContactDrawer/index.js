@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import { X as CloseIcon } from "lucide-react";
-import Drawer from "@material-ui/core/Drawer";
-import Link from "@material-ui/core/Link";
-import InputLabel from "@material-ui/core/InputLabel";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
+import Drawer from "@mui/material/Drawer";
+import Link from "@mui/material/Link";
+import InputLabel from "@mui/material/InputLabel";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
 
 import { i18n } from "../../translate/i18n";
 
@@ -125,7 +125,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 	const [modalOpen, setModalOpen] = useState(false);
 
 	return (
-		<Drawer
+        <Drawer
 			className={classes.drawer}
 			variant="persistent"
 			anchor="right"
@@ -141,7 +141,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 			}}
 		>
 			<div className={classes.header}>
-				<IconButton onClick={handleDrawerClose}>
+				<IconButton onClick={handleDrawerClose} size="large">
 					<CloseIcon size={18} />
 				</IconButton>
 				<Typography style={{ justifySelf: "center" }}>
@@ -207,7 +207,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, loading }) => {
 				</div>
 			)}
 		</Drawer>
-	);
+    );
 };
 
 export default ContactDrawer;

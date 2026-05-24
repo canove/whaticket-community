@@ -32,7 +32,7 @@ export const update = async (
   });
 
   const io = getIO();
-  io.emit("settings", {
+  io.to("notification").emit("settings", {
     action: "update",
     setting
   });

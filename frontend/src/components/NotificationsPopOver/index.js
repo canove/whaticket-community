@@ -4,13 +4,13 @@ import { format } from "date-fns";
 import openSocket from "../../services/socket-io";
 import useSound from "use-sound";
 
-import Popover from "@material-ui/core/Popover";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { makeStyles } from "@material-ui/core/styles";
-import Badge from "@material-ui/core/Badge";
+import Popover from "@mui/material/Popover";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import makeStyles from '@mui/styles/makeStyles';
+import Badge from "@mui/material/Badge";
 import { MessageSquare as ChatIcon } from "lucide-react";
 
 import TicketListItem from "../TicketListItem";
@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 		maxWidth: 350,
 		marginLeft: theme.spacing(2),
 		marginRight: theme.spacing(1),
-		[theme.breakpoints.down("sm")]: {
+		[theme.breakpoints.down('md')]: {
 			maxWidth: 270,
 		},
 	},
@@ -189,49 +189,47 @@ const NotificationsPopOver = () => {
 		return <div onClick={handleClickAway}>{children}</div>;
 	};
 
-	return (
-		<>
-			<IconButton
-				onClick={handleClick}
-				ref={anchorEl}
-				aria-label="Open Notifications"
-				className={classes.iconButton}
-			>
-				<Badge badgeContent={notifications.length} color="secondary">
-					<ChatIcon size={20} />
-				</Badge>
-			</IconButton>
-			<Popover
-				disableScrollLock
-				open={isOpen}
-				anchorEl={anchorEl.current}
-				anchorOrigin={{
-					vertical: "bottom",
-					horizontal: "right",
-				}}
-				transformOrigin={{
-					vertical: "top",
-					horizontal: "right",
-				}}
-				classes={{ paper: classes.popoverPaper }}
-				onClose={handleClickAway}
-			>
-				<List dense className={classes.tabContainer}>
-					{notifications.length === 0 ? (
-						<ListItem>
-							<ListItemText>{i18n.t("notifications.noTickets")}</ListItemText>
-						</ListItem>
-					) : (
-						notifications.map(ticket => (
-							<NotificationTicket key={ticket.id}>
-								<TicketListItem ticket={ticket} />
-							</NotificationTicket>
-						))
-					)}
-				</List>
-			</Popover>
-		</>
-	);
+	return <>
+        <IconButton
+            onClick={handleClick}
+            ref={anchorEl}
+            aria-label="Open Notifications"
+            className={classes.iconButton}
+            size="large">
+            <Badge badgeContent={notifications.length} color="secondary">
+                <ChatIcon size={20} />
+            </Badge>
+        </IconButton>
+        <Popover
+            disableScrollLock
+            open={isOpen}
+            anchorEl={anchorEl.current}
+            anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+            }}
+            transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+            }}
+            classes={{ paper: classes.popoverPaper }}
+            onClose={handleClickAway}
+        >
+            <List dense className={classes.tabContainer}>
+                {notifications.length === 0 ? (
+                    <ListItem>
+                        <ListItemText>{i18n.t("notifications.noTickets")}</ListItemText>
+                    </ListItem>
+                ) : (
+                    notifications.map(ticket => (
+                        <NotificationTicket key={ticket.id}>
+                            <TicketListItem ticket={ticket} />
+                        </NotificationTicket>
+                    ))
+                )}
+            </List>
+        </Popover>
+    </>;
 };
 
 export default NotificationsPopOver;

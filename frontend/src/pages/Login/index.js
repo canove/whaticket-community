@@ -13,11 +13,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { Eye, EyeOff, MessageSquareText as WhatsAppIcon } from "lucide-react";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "48px 64px",
     position: "relative",
     overflow: "hidden",
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down('lg')]: {
       display: "none",
     },
   },
@@ -270,7 +270,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: "#FAFAF9",
     padding: "48px 40px",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       padding: "36px 24px",
     },
   },
@@ -286,7 +286,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     gap: 10,
     marginBottom: 40,
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down('lg')]: {
       display: "flex",
     },
   },
@@ -652,7 +652,7 @@ const Login = () => {
         fullWidth
         scroll="paper"
       >
-        <DialogTitle disableTypography>
+        <DialogTitle>
           <Typography className={classes.dialogTitle}>
             Política de Privacidade
           </Typography>

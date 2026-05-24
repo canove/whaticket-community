@@ -5,14 +5,15 @@ import openSocket from "../../services/socket-io";
 import {
   Button,
   IconButton,
-  makeStyles,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-} from "@material-ui/core";
+} from "@mui/material";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";

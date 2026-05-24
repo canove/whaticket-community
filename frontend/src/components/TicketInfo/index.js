@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar } from "@material-ui/core";
+import { Avatar } from "@mui/material";
 import { i18n } from "../../translate/i18n";
 
 const TicketInfo = ({ contact, ticket, onClick }) => {

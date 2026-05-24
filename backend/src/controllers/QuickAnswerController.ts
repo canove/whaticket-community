@@ -50,7 +50,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("quickAnswer", {
+  io.to("notification").emit("quickAnswer", {
     action: "create",
     quickAnswer
   });
@@ -91,7 +91,7 @@ export const update = async (
   });
 
   const io = getIO();
-  io.emit("quickAnswer", {
+  io.to("notification").emit("quickAnswer", {
     action: "update",
     quickAnswer
   });
@@ -108,7 +108,7 @@ export const remove = async (
   await DeleteQuickAnswerService(quickAnswerId);
 
   const io = getIO();
-  io.emit("quickAnswer", {
+  io.to("notification").emit("quickAnswer", {
     action: "delete",
     quickAnswerId
   });

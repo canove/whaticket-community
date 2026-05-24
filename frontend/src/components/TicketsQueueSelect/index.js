@@ -1,9 +1,9 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import { Checkbox, ListItemText } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { Checkbox, ListItemText } from "@mui/material";
 import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles(() => ({

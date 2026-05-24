@@ -48,7 +48,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("user", {
+  io.to("notification").emit("user", {
     action: "create",
     user
   });
@@ -78,7 +78,7 @@ export const update = async (
   const user = await UpdateUserService({ userData, userId });
 
   const io = getIO();
-  io.emit("user", {
+  io.to("notification").emit("user", {
     action: "update",
     user
   });
@@ -99,7 +99,7 @@ export const remove = async (
   await DeleteUserService(userId);
 
   const io = getIO();
-  io.emit("user", {
+  io.to("notification").emit("user", {
     action: "delete",
     userId
   });

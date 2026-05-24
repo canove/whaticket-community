@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   TextField,
   CircularProgress,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";

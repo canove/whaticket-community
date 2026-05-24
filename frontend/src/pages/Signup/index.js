@@ -14,9 +14,9 @@ import {
   InputAdornment,
   IconButton,
   Link,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Eye as Visibility, EyeOff as VisibilityOff, MessageSquareText as WhatsAppIcon } from "lucide-react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "52px 72px",
     position: "relative",
     overflow: "hidden",
-    [theme.breakpoints.down("md")]: { display: "none" },
+    [theme.breakpoints.down('lg')]: { display: "none" },
   },
   brand: { display: "flex", alignItems: "center", gap: 12, zIndex: 1, position: "relative" },
   logoMark: {
@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: "#F7F8FA",
     padding: "48px 40px",
-    [theme.breakpoints.down("sm")]: { padding: "36px 24px" },
+    [theme.breakpoints.down('md')]: { padding: "36px 24px" },
   },
   formBox: {
     width: "100%",
@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     gap: 10,
     marginBottom: 40,
-    [theme.breakpoints.down("md")]: { display: "flex" },
+    [theme.breakpoints.down('lg')]: { display: "flex" },
   },
   mobileLogo: {
     width: 36,

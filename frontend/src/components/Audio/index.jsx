@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import React, { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -53,7 +53,7 @@ export default function({url}) {
 
     return (
         <>
-            <audio ref={audioRef} controls>
+            <audio ref={audioRef} controls preload="metadata">
                 <source src={url} type="audio/ogg"></source>
             </audio>
             {showButtonRate && <Button style={{marginLeft: "5px", marginTop: "-45px"}} onClick={toogleRate}>{audioRate}x</Button>}

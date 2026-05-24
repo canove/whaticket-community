@@ -1,16 +1,16 @@
 import React from "react";
-import Skeleton from "@material-ui/lab/Skeleton";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
+import Skeleton from '@mui/material/Skeleton';
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 import { i18n } from "../../translate/i18n";
 
 const ContactDrawerSkeleton = ({ classes }) => {
 	return (
-		<div className={classes.content}>
+        <div className={classes.content}>
 			<Paper square variant="outlined" className={classes.contactHeader}>
 				<Skeleton
 					animation="wave"
-					variant="circle"
+					variant="circular"
 					width={160}
 					height={160}
 					className={classes.contactAvatar}
@@ -37,7 +37,7 @@ const ContactDrawerSkeleton = ({ classes }) => {
 				</Paper>
 			</Paper>
 		</div>
-	);
+    );
 };
 
 export default ContactDrawerSkeleton;

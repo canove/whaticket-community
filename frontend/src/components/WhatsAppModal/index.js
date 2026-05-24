@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
 	Dialog,
 	DialogContent,
@@ -14,7 +14,7 @@ import {
 	Switch,
 	FormControlLabel,
 	Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";

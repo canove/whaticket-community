@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
 import {
-  makeStyles,
   Drawer,
   AppBar,
   Toolbar,
@@ -12,7 +11,8 @@ import {
   Menu,
   Avatar,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { Menu as MenuIcon, ChevronLeft, LogOut, User, MessageSquareText } from "lucide-react";
 
 import MainListItems from "./MainListItems";
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     height: "100vh",
     backgroundColor: "#FAFAF9",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       height: "calc(100vh - 56px)",
     },
   },
@@ -223,7 +223,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       display: "none",
     },
   },

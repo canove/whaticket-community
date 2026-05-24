@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
+import { IconButton } from "@mui/material";
 import { MoreVertical as MoreVert, RotateCcw as Replay } from "lucide-react";
 
 import { i18n } from "../../translate/i18n";
@@ -61,7 +61,7 @@ const TicketActionButtons = ({ ticket }) => {
 	};
 
 	return (
-		<div className={classes.actionButtons}>
+        <div className={classes.actionButtons}>
 			{ticket.status === "closed" && (
 				<ButtonWithSpinner
 					loading={loading}
@@ -91,7 +91,7 @@ const TicketActionButtons = ({ ticket }) => {
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
-					<IconButton onClick={handleOpenTicketOptionsMenu}>
+					<IconButton onClick={handleOpenTicketOptionsMenu} size="large">
 						<MoreVert size={20} />
 					</IconButton>
 					<TicketOptionsMenu
@@ -114,7 +114,7 @@ const TicketActionButtons = ({ ticket }) => {
 				</ButtonWithSpinner>
 			)}
 		</div>
-	);
+    );
 };
 
 export default TicketActionButtons;

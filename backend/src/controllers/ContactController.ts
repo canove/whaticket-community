@@ -96,7 +96,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   const io = getIO();
-  io.emit("contact", {
+  io.to("notification").emit("contact", {
     action: "create",
     contact
   });
@@ -139,7 +139,7 @@ export const update = async (
   const contact = await UpdateContactService({ contactData, contactId });
 
   const io = getIO();
-  io.emit("contact", {
+  io.to("notification").emit("contact", {
     action: "update",
     contact
   });
@@ -156,7 +156,7 @@ export const remove = async (
   await DeleteContactService(contactId);
 
   const io = getIO();
-  io.emit("contact", {
+  io.to("notification").emit("contact", {
     action: "delete",
     contactId
   });

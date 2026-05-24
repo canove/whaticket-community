@@ -12,6 +12,7 @@ import { getRedisClient } from "../../libs/redisStore";
 interface Request {
   searchParam?: string;
   pageNumber?: string;
+  cursor?: string; // ISO updatedAt — fetch tickets updated before this timestamp
   status?: string;
   date?: string;
   showAll?: string;
@@ -67,6 +68,7 @@ export const invalidateTicketListCache = async (
 const ListTicketsService = async ({
   searchParam = "",
   pageNumber = "1",
+  cursor,
   queueIds,
   status,
   date,
@@ -183,11 +185,19 @@ const ListTicketsService = async ({
   }
 
   const limit = 40;
-  const offset = limit * (+pageNumber - 1);
+  const offset = cursor ? 0 : limit * (+pageNumber - 1);
 
-  // Only cache standard list views — search queries are too dynamic to cache
+  // Cursor pagination: restrict to tickets updated before the cursor timestamp
+  if (cursor) {
+    whereCondition = {
+      ...whereCondition,
+      updatedAt: { [Op.lt]: new Date(cursor) }
+    };
+  }
+
+  // Only cache standard list views — search and cursor queries are too dynamic
   const isSearchQuery = !!searchParam;
-  const redis = isSearchQuery ? null : getRedisClient();
+  const redis = isSearchQuery || !!cursor ? null : getRedisClient();
   const cacheKey = redis
     ? buildCacheKey(
         userId,

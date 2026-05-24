@@ -2,7 +2,7 @@ import React, { useState, useCallback, useContext } from "react";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Button,
   IconButton,
@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
   Chip,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Pencil as Edit, CheckCircle2 as CheckCircle, WifiOff, PlusCircle as AddCircleOutline, Trash2 as DeleteOutline, RefreshCw as Sync } from "lucide-react";
 
 import api from "../../services/api";

@@ -8,6 +8,7 @@ import { startAutoCloseJob } from "./jobs/AutoCloseTicketsJob";
 import { refreshInstagramTokens } from "./providers/WhatsApp/Implementations/instagram";
 import { TOKEN_REFRESH_INTERVAL_MS } from "./helpers/instagram";
 import { startMessageWorker } from "./workers/messageWorker";
+import { startOutboundWorker } from "./workers/outboundWorker";
 import { closeQueues } from "./libs/queue";
 
 const server = app.listen(process.env.PORT, () => {
@@ -22,6 +23,7 @@ const bootstrap = async () => {
   await initRedis();
   if (process.env.REDIS_URL) {
     startMessageWorker();
+    startOutboundWorker();
   }
 
   StartAllWhatsAppsSessions();

@@ -13,15 +13,23 @@ export default defineConfig({
   },
   build: {
     outDir: "build",
-    sourcemap: true,
+    sourcemap: false,
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
         manualChunks: {
           "material-ui": [
-            "@material-ui/core",
-            "@material-ui/icons",
-            "@material-ui/lab",
+            "@mui/material",
+            "@mui/icons-material",
+            "@mui/lab",
+            "@mui/styles",
+            "@emotion/react",
+            "@emotion/styled",
           ],
+          "recharts": ["recharts"],
+          "emoji": ["@emoji-mart/data", "emoji-mart"],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "socket": ["socket.io-client"],
         },
       },
     },
@@ -38,15 +46,11 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       "mic-recorder-to-mp3",
-      "@material-ui/core",
-      "@material-ui/icons",
-      "@material-ui/lab",
+      "@mui/material",
+      "@mui/icons-material",
+      "@mui/lab",
+      "@mui/styles",
     ],
     exclude: [],
-  },
-  resolve: {
-    alias: {
-      "jss-plugin-globalThis": "jss-plugin-global",
-    },
   },
 });

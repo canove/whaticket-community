@@ -4,13 +4,8 @@ import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
-import {
-  Button,
-  CircularProgress,
-  Divider,
-  IconButton,
-  makeStyles,
-} from "@material-ui/core";
+import { Button, CircularProgress, Divider, IconButton } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { Clock as AccessTime, Ban as Block, Check as Done, CheckCheck as DoneAll, ChevronDown as ExpandMore, Download as GetApp } from "lucide-react";
 
 import MarkdownWrapper from "../MarkdownWrapper";
@@ -40,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: "20px 20px 20px 20px",
     overflowY: "scroll",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       paddingBottom: "90px",
     },
     ...theme.scrollbarStyles,
@@ -309,10 +304,11 @@ const MessagesList = ({ ticketId, isGroup }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
-  const [pageNumber, setPageNumber] = useState(1);
+  const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const lastMessageRef = useRef();
+  const isFirstLoad = useRef(true);
 
   const [selectedMessage, setSelectedMessage] = useState({});
   const [anchorEl, setAnchorEl] = useState(null);
@@ -321,8 +317,8 @@ const MessagesList = ({ ticketId, isGroup }) => {
 
   useEffect(() => {
     dispatch({ type: "RESET" });
-    setPageNumber(1);
-
+    setCursor(null);
+    isFirstLoad.current = true;
     currentTicketId.current = ticketId;
   }, [ticketId]);
 
@@ -331,9 +327,8 @@ const MessagesList = ({ ticketId, isGroup }) => {
     const delayDebounceFn = setTimeout(() => {
       const fetchMessages = async () => {
         try {
-          const { data } = await api.get("/messages/" + ticketId, {
-            params: { pageNumber },
-          });
+          const params = cursor ? { cursor } : { pageNumber: 1 };
+          const { data } = await api.get("/messages/" + ticketId, { params });
 
           if (currentTicketId.current === ticketId) {
             dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
@@ -341,8 +336,9 @@ const MessagesList = ({ ticketId, isGroup }) => {
             setLoading(false);
           }
 
-          if (pageNumber === 1 && data.messages.length > 1) {
+          if (isFirstLoad.current && data.messages.length > 1) {
             scrollToBottom();
+            isFirstLoad.current = false;
           }
         } catch (err) {
           setLoading(false);
@@ -354,7 +350,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
     return () => {
       clearTimeout(delayDebounceFn);
     };
-  }, [pageNumber, ticketId]);
+  }, [cursor, ticketId]);
 
   useEffect(() => {
     const socket = openSocket();
@@ -401,7 +397,10 @@ const MessagesList = ({ ticketId, isGroup }) => {
   }, [ticketId]);
 
   const loadMore = () => {
-    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+    if (messagesList.length > 0) {
+      // Use the oldest visible message as cursor — fetches messages older than it
+      setCursor(messagesList[0].createdAt);
+    }
   };
 
   const scrollToBottom = () => {
@@ -501,6 +500,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
           className={classes.messageMedia}
           src={message.mediaUrl}
           controls
+          preload="none"
         />
       );
     } else {

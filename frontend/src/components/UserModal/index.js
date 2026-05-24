@@ -19,11 +19,11 @@ import {
 	InputAdornment,
 	IconButton,
 	Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { Eye as Visibility, EyeOff as VisibilityOff } from "lucide-react";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 import { i18n } from "../../translate/i18n";
 
