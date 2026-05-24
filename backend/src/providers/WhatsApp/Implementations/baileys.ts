@@ -1263,7 +1263,7 @@ const logout = async (sessionId: number): Promise<void> => {
 
     const updatedWhatsapp = await Whatsapp.findByPk(sessionId);
     if (updatedWhatsapp) {
-      getIO().emit("whatsappSession", {
+      getIO().to("notification").emit("whatsappSession", {
         action: "update",
         session: updatedWhatsapp
       });

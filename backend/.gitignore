@@ -1,4 +1,5 @@
 node_modules
+.tsbuildinfo
 public/*
 dist
 !public/.gitkeep

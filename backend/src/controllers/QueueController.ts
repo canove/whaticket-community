@@ -18,7 +18,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   const queue = await CreateQueueService({ name, color, greetingMessage });
 
   const io = getIO();
-  io.emit("queue", {
+  io.to("notification").emit("queue", {
     action: "update",
     queue
   });
@@ -43,7 +43,7 @@ export const update = async (
   const queue = await UpdateQueueService(queueId, req.body);
 
   const io = getIO();
-  io.emit("queue", {
+  io.to("notification").emit("queue", {
     action: "update",
     queue
   });
@@ -60,7 +60,7 @@ export const remove = async (
   await DeleteQueueService(queueId);
 
   const io = getIO();
-  io.emit("queue", {
+  io.to("notification").emit("queue", {
     action: "delete",
     queueId: +queueId
   });

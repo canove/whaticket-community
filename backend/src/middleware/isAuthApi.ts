@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import AppError from "../errors/AppError";
+import { logger } from "../utils/logger";
 import ListSettingByValueService from "../services/SettingServices/ListSettingByValueService";
 
 const isAuthApi = async (
@@ -26,7 +27,7 @@ const isAuthApi = async (
       throw new AppError("ERR_SESSION_EXPIRED", 401);
     }
   } catch (err) {
-    console.log(err);
+    logger.error({ err }, "isAuthApi token validation failed");
     throw new AppError(
       "Invalid token. We'll try to assign a new one on next request",
       403

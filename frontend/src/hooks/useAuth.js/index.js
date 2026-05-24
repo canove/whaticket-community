@@ -14,44 +14,46 @@ const useAuth = () => {
 	const [loading, setLoading] = useState(true);
 	const [user, setUser] = useState({});
 
-	api.interceptors.request.use(
-		config => {
-			const token = localStorage.getItem("token");
-			if (token) {
-				config.headers["Authorization"] = `Bearer ${JSON.parse(token)}`;
-				setIsAuth(true);
-			}
-			return config;
-		},
-		error => {
-			Promise.reject(error);
-		}
-	);
-
-	api.interceptors.response.use(
-		response => {
-			return response;
-		},
-		async error => {
-			const originalRequest = error.config;
-			if (error?.response?.status === 403 && !originalRequest._retry) {
-				originalRequest._retry = true;
-
-				const { data } = await api.post("/auth/refresh_token");
-				if (data) {
-					localStorage.setItem("token", JSON.stringify(data.token));
-					api.defaults.headers.Authorization = `Bearer ${data.token}`;
+	useEffect(() => {
+		const requestId = api.interceptors.request.use(
+			config => {
+				const token = localStorage.getItem("token");
+				if (token) {
+					config.headers["Authorization"] = `Bearer ${JSON.parse(token)}`;
 				}
-				return api(originalRequest);
+				return config;
+			},
+			error => Promise.reject(error)
+		);
+
+		const responseId = api.interceptors.response.use(
+			response => response,
+			async error => {
+				const originalRequest = error.config;
+				if (error?.response?.status === 403 && !originalRequest._retry) {
+					originalRequest._retry = true;
+
+					const { data } = await api.post("/auth/refresh_token");
+					if (data) {
+						localStorage.setItem("token", JSON.stringify(data.token));
+						api.defaults.headers.Authorization = `Bearer ${data.token}`;
+					}
+					return api(originalRequest);
+				}
+				if (error?.response?.status === 401) {
+					localStorage.removeItem("token");
+					api.defaults.headers.Authorization = undefined;
+					setIsAuth(false);
+				}
+				return Promise.reject(error);
 			}
-			if (error?.response?.status === 401) {
-				localStorage.removeItem("token");
-				api.defaults.headers.Authorization = undefined;
-				setIsAuth(false);
-			}
-			return Promise.reject(error);
-		}
-	);
+		);
+
+		return () => {
+			api.interceptors.request.eject(requestId);
+			api.interceptors.response.eject(responseId);
+		};
+	}, []);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -82,7 +84,7 @@ const useAuth = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [user]);
+	}, [user.id]);
 
 	const handleLogin = async userData => {
 		setLoading(true);
