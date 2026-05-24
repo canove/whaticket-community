@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import IconButton from "@material-ui/core/IconButton";
+import makeStyles from '@mui/styles/makeStyles';
+import Dialog from "@mui/material/Dialog";
+import IconButton from "@mui/material/IconButton";
 import { X as CloseIcon, Download as DownloadIcon } from "lucide-react";
 import api from "../../services/api";
 

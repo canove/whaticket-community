@@ -4,20 +4,20 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import clsx from "clsx";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import InputBase from "@material-ui/core/InputBase";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import makeStyles from '@mui/styles/makeStyles';
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Paperclip as AttachFileIcon, MoreVertical as MoreVert, Smile as MoodIcon, Send as SendIcon, XCircle as CancelIcon, X as ClearIcon, Mic as MicIcon, CheckCircle2 as CheckCircleOutlineIcon, XCircle as HighlightOffIcon } from "lucide-react";
-import IconButton from "@material-ui/core/IconButton";
+import IconButton from "@mui/material/IconButton";
 import {
   FormControlLabel,
   Hidden,
   Menu,
   MenuItem,
   Switch,
-} from "@material-ui/core";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+} from "@mui/material";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "column",
     alignItems: "center",
     borderTop: "1px solid #E5E9EF",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       position: "fixed",
       bottom: 0,
       width: "100%",
@@ -439,7 +439,7 @@ const MessageInput = ({ ticketStatus }) => {
           component="span"
           disabled={loading || ticketStatus !== "open"}
           onClick={() => setReplyingMessage(null)}
-        >
+          size="large">
           <ClearIcon size={18} className={classes.sendMessageIcons} />
         </IconButton>
       </div>
@@ -453,7 +453,7 @@ const MessageInput = ({ ticketStatus }) => {
           aria-label="cancel-upload"
           component="span"
           onClick={e => setMedias([])}
-        >
+          size="large">
           <CancelIcon size={18} className={classes.sendMessageIcons} />
         </IconButton>
 
@@ -472,7 +472,7 @@ const MessageInput = ({ ticketStatus }) => {
           component="span"
           onClick={handleUploadMedia}
           disabled={loading}
-        >
+          size="large">
           <SendIcon className={classes.sendMessageIcons} />
         </IconButton>
       </Paper>
@@ -488,7 +488,7 @@ const MessageInput = ({ ticketStatus }) => {
               component="span"
               disabled={loading || recording || ticketStatus !== "open"}
               onClick={e => setShowEmoji(prevState => !prevState)}
-            >
+              size="large">
               <MoodIcon size={18} className={classes.sendMessageIcons} />
             </IconButton>
             {showEmoji ? (
@@ -518,7 +518,7 @@ const MessageInput = ({ ticketStatus }) => {
                 aria-label="upload"
                 component="span"
                 disabled={loading || recording || ticketStatus !== "open"}
-              >
+                size="large">
                 <AttachFileIcon size={18} className={classes.sendMessageIcons} />
               </IconButton>
             </label>
@@ -544,7 +544,7 @@ const MessageInput = ({ ticketStatus }) => {
               aria-controls="simple-menu"
               aria-haspopup="true"
               onClick={handleOpenMenuClick}
-            >
+              size="large">
               <MoreVert size={18} />
             </IconButton>
             <Menu
@@ -560,7 +560,7 @@ const MessageInput = ({ ticketStatus }) => {
                   component="span"
                   disabled={loading || recording || ticketStatus !== "open"}
                   onClick={e => setShowEmoji(prevState => !prevState)}
-                >
+                  size="large">
                   <MoodIcon size={18} className={classes.sendMessageIcons} />
                 </IconButton>
               </MenuItem>
@@ -578,7 +578,7 @@ const MessageInput = ({ ticketStatus }) => {
                     aria-label="upload"
                     component="span"
                     disabled={loading || recording || ticketStatus !== "open"}
-                  >
+                    size="large">
                     <AttachFileIcon size={18} className={classes.sendMessageIcons} />
                   </IconButton>
                 </label>
@@ -656,7 +656,7 @@ const MessageInput = ({ ticketStatus }) => {
               component="span"
               onClick={handleSendMessage}
               disabled={loading}
-            >
+              size="large">
               <SendIcon size={18} className={classes.sendMessageIcons} />
             </IconButton>
           ) : recording ? (
@@ -667,7 +667,7 @@ const MessageInput = ({ ticketStatus }) => {
                 fontSize="large"
                 disabled={loading}
                 onClick={handleCancelAudio}
-              >
+                size="large">
                 <HighlightOffIcon size={18} className={classes.cancelAudioIcon} />
               </IconButton>
               {loading ? (
@@ -683,7 +683,7 @@ const MessageInput = ({ ticketStatus }) => {
                 component="span"
                 onClick={handleUploadAudio}
                 disabled={loading}
-              >
+                size="large">
                 <CheckCircleOutlineIcon size={18} className={classes.sendAudioIcon} />
               </IconButton>
             </div>
@@ -693,7 +693,7 @@ const MessageInput = ({ ticketStatus }) => {
               component="span"
               disabled={loading || ticketStatus !== "open"}
               onClick={handleStartRecording}
-            >
+              size="large">
               <MicIcon size={18} className={classes.sendMessageIcons} />
             </IconButton>
           )}

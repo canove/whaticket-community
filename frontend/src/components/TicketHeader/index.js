@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Card, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Card, Button } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 import { ChevronLeft as ArrowBackIos } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#ffffff",
     flex: "none",
     borderBottom: "1px solid #E5E9EF",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       flexWrap: "wrap",
     },
   },

@@ -11,6 +11,7 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import { getOutboundQueue } from "../libs/queue";
 
 type IndexQuery = {
   pageNumber: string;
@@ -49,20 +50,38 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   SetTicketMessagesAsRead(ticket);
 
   if (medias) {
-    // Sequential sends — prevents anti-spam triggers and respects rate limiting
-    for (const media of medias) {
-      const sentMedia = await SendWhatsAppMedia({ media, ticket });
-      await CreateMessageService({
-        messageData: {
-          id: sentMedia.id,
-          ticketId: ticket.id,
-          body: sentMedia.body || media.originalname,
-          fromMe: true,
-          read: true,
-          mediaType: sentMedia.type || "image",
-          ack: sentMedia.ack || 1
-        }
-      });
+    const queue = getOutboundQueue();
+    if (queue) {
+      // Enqueue each media file — worker sends sequentially with rate limiting
+      for (const media of medias) {
+        await queue.add(
+          "send-media",
+          {
+            ticketId: ticket.id,
+            mediaPath: media.path,
+            mediaFilename: media.filename,
+            mediaMimetype: media.mimetype,
+            mediaBody: body || undefined
+          },
+          { jobId: `media-${ticket.id}-${Date.now()}-${Math.random()}` }
+        );
+      }
+    } else {
+      // Fallback: direct sequential send when queue is not configured
+      for (const media of medias) {
+        const sentMedia = await SendWhatsAppMedia({ media, ticket });
+        await CreateMessageService({
+          messageData: {
+            id: sentMedia.id,
+            ticketId: ticket.id,
+            body: sentMedia.body || media.originalname,
+            fromMe: true,
+            read: true,
+            mediaType: sentMedia.type || "image",
+            ack: sentMedia.ack || 1
+          }
+        });
+      }
     }
   } else {
     const sentMessage = await SendWhatsAppMessage({ body, ticket, quotedMsg });

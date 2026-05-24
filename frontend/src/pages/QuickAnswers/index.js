@@ -4,7 +4,6 @@ import openSocket from "../../services/socket-io";
 import {
   Button,
   IconButton,
-  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -13,7 +12,8 @@ import {
   TableRow,
   InputAdornment,
   TextField,
-} from "@material-ui/core";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { Pencil as Edit, Trash2 as DeleteOutline, Search as SearchIcon } from "lucide-react";
 
 import MainContainer from "../../components/MainContainer";

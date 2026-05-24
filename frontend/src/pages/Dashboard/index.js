@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 import useTickets from "../../hooks/useTickets";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -8,7 +8,7 @@ import Chart from "./Chart";
 import api from "../../services/api";
 
 import { MessageSquareText, Hourglass, CheckCircle2 } from "lucide-react";
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from "@mui/material/Avatar";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     gap: 14,
     marginBottom: 20,
     flexWrap: "wrap",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       flexDirection: "column",
     },
   },

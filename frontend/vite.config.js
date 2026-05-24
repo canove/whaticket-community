@@ -19,9 +19,12 @@ export default defineConfig({
       output: {
         manualChunks: {
           "material-ui": [
-            "@material-ui/core",
-            "@material-ui/icons",
-            "@material-ui/lab",
+            "@mui/material",
+            "@mui/icons-material",
+            "@mui/lab",
+            "@mui/styles",
+            "@emotion/react",
+            "@emotion/styled",
           ],
           "recharts": ["recharts"],
           "emoji": ["@emoji-mart/data", "emoji-mart"],
@@ -43,15 +46,11 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       "mic-recorder-to-mp3",
-      "@material-ui/core",
-      "@material-ui/icons",
-      "@material-ui/lab",
+      "@mui/material",
+      "@mui/icons-material",
+      "@mui/lab",
+      "@mui/styles",
     ],
     exclude: [],
-  },
-  resolve: {
-    alias: {
-      "jss-plugin-globalThis": "jss-plugin-global",
-    },
   },
 });

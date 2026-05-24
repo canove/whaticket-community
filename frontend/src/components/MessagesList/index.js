@@ -4,13 +4,8 @@ import { isSameDay, parseISO, format } from "date-fns";
 import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
-import {
-  Button,
-  CircularProgress,
-  Divider,
-  IconButton,
-  makeStyles,
-} from "@material-ui/core";
+import { Button, CircularProgress, Divider, IconButton } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { Clock as AccessTime, Ban as Block, Check as Done, CheckCheck as DoneAll, ChevronDown as ExpandMore, Download as GetApp } from "lucide-react";
 
 import MarkdownWrapper from "../MarkdownWrapper";
@@ -40,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: "20px 20px 20px 20px",
     overflowY: "scroll",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       paddingBottom: "90px",
     },
     ...theme.scrollbarStyles,

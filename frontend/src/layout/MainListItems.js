@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link as RouterLink, useMatch } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import Divider from "@material-ui/core/Divider";
-import Tooltip from "@material-ui/core/Tooltip";
-import { Badge } from "@material-ui/core";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import Divider from "@mui/material/Divider";
+import Tooltip from "@mui/material/Tooltip";
+import { Badge } from "@mui/material";
 import {
   LayoutDashboard,
   MessageSquare as WhatsAppNavIcon,
