@@ -54,7 +54,17 @@ app.use(
 );
 
 // Health check endpoint for Docker/load balancer probes
-app.get("/health", (_req, res) => res.json({ status: "ok", ts: Date.now() }));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const PKG_VERSION: string = require("../package.json").version;
+app.get("/health", (_req, res) =>
+  res.json({
+    status: "ok",
+    ts: Date.now(),
+    version: PKG_VERSION,
+    commit: process.env.GIT_SHA || "local",
+    builtAt: process.env.BUILD_DATE || null
+  })
+);
 
 app.use(routes);
 
