@@ -2,6 +2,7 @@ import { Op, fn, col, literal } from "sequelize";
 import { startOfDay, endOfDay } from "date-fns";
 import Ticket from "../../models/Ticket";
 import User from "../../models/User";
+import { getRedisClient } from "../../libs/redisStore";
 
 interface UserTicketCount {
   userId: number;
@@ -12,8 +13,19 @@ interface UserTicketCount {
   total: number;
 }
 
+const CACHE_TTL = 60;
+
 const CountTicketsByUserService = async (): Promise<UserTicketCount[]> => {
   const today = new Date();
+  const dateKey = today.toISOString().slice(0, 10);
+
+  const redis = getRedisClient();
+  const cacheKey = `dashboard:ticket-counts:${dateKey}`;
+
+  if (redis) {
+    const cached = await redis.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+  }
 
   const results = await Ticket.findAll({
     where: {
@@ -45,7 +57,7 @@ const CountTicketsByUserService = async (): Promise<UserTicketCount[]> => {
     nest: true
   });
 
-  return (results as any[]).map(r => ({
+  const result = (results as any[]).map(r => ({
     userId: r.userId,
     userName: r.user?.name || "Sem nome",
     open: Number(r.open) || 0,
@@ -53,6 +65,12 @@ const CountTicketsByUserService = async (): Promise<UserTicketCount[]> => {
     pending: Number(r.pending) || 0,
     total: Number(r.total) || 0
   }));
+
+  if (redis) {
+    await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(result)).catch(() => {});
+  }
+
+  return result;
 };
 
 export default CountTicketsByUserService;

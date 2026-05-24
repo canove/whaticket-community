@@ -501,6 +501,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
           className={classes.messageMedia}
           src={message.mediaUrl}
           controls
+          preload="none"
         />
       );
     } else {

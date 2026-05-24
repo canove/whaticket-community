@@ -82,7 +82,6 @@ const UpdateTicketService = async ({
 
   // Evict list cache for the affected user so the next poll sees fresh data
   invalidateTicketListCache(ticket.userId?.toString()).catch(() => {});
-  invalidateTicketListCache().catch(() => {}); // also clear admin (showAll) caches
 
   const io = getIO();
 

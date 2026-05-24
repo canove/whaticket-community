@@ -47,24 +47,24 @@ export const initIO = async (httpServer: Server): Promise<SocketIO> => {
       return io;
     }
 
-    logger.info("Client Connected");
+    logger.debug("Client Connected");
     socket.on("joinChatBox", (ticketId: string) => {
-      logger.info("A client joined a ticket channel");
+      logger.debug("A client joined a ticket channel");
       socket.join(ticketId);
     });
 
     socket.on("joinNotification", () => {
-      logger.info("A client joined notification channel");
+      logger.debug("A client joined notification channel");
       socket.join("notification");
     });
 
     socket.on("joinTickets", (status: string) => {
-      logger.info(`A client joined to ${status} tickets channel.`);
+      logger.debug(`A client joined to ${status} tickets channel.`);
       socket.join(status);
     });
 
     socket.on("disconnect", () => {
-      logger.info("Client disconnected");
+      logger.debug("Client disconnected");
     });
 
     return socket;

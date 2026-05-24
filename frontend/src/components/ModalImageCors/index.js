@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import IconButton from "@material-ui/core/IconButton";
@@ -91,29 +91,33 @@ const useStyles = makeStyles(() => ({
 
 const ModalImageCors = ({ imageUrl }) => {
 	const classes = useStyles();
-	const [fetching, setFetching] = useState(true);
 	const [blobUrl, setBlobUrl] = useState("");
 	const [open, setOpen] = useState(false);
+	const [fetching, setFetching] = useState(false);
+	const fetchedRef = useRef(false);
 
-	useEffect(() => {
-		if (!imageUrl) return;
-		const fetchImage = async () => {
-			try {
-				const { data, headers } = await api.get(imageUrl, {
-					responseType: "blob",
-				});
-				const url = window.URL.createObjectURL(
-					new Blob([data], { type: headers["content-type"] })
-				);
-				setBlobUrl(url);
-			} catch {
-				// fallback to direct URL
-				setBlobUrl(imageUrl);
-			}
-			setFetching(false);
-		};
-		fetchImage();
-	}, [imageUrl]);
+	const fetchBlob = async () => {
+		if (fetchedRef.current) return;
+		fetchedRef.current = true;
+		setFetching(true);
+		try {
+			const { data, headers } = await api.get(imageUrl, {
+				responseType: "blob",
+			});
+			const url = window.URL.createObjectURL(
+				new Blob([data], { type: headers["content-type"] })
+			);
+			setBlobUrl(url);
+		} catch {
+			setBlobUrl(imageUrl);
+		}
+		setFetching(false);
+	};
+
+	const handleOpen = () => {
+		setOpen(true);
+		fetchBlob();
+	};
 
 	const handleDownload = (e) => {
 		e.stopPropagation();
@@ -123,21 +127,14 @@ const ModalImageCors = ({ imageUrl }) => {
 		a.click();
 	};
 
-	if (fetching) {
-		return (
-			<div className={classes.imagePlaceholder}>
-				<div className={classes.placeholderPulse} />
-			</div>
-		);
-	}
-
 	return (
 		<>
-			<div className={classes.imageWrapper} onClick={() => setOpen(true)}>
+			<div className={classes.imageWrapper} onClick={handleOpen}>
 				<img
-					src={blobUrl}
+					src={imageUrl}
 					alt=""
 					className={classes.image}
+					loading="lazy"
 				/>
 			</div>
 
@@ -149,11 +146,17 @@ const ModalImageCors = ({ imageUrl }) => {
 				PaperProps={{ className: classes.dialogPaper }}
 			>
 				<div className={classes.dialogContent}>
-					<img
-						src={blobUrl}
-						alt=""
-						className={classes.dialogImage}
-					/>
+					{fetching ? (
+						<div className={classes.imagePlaceholder}>
+							<div className={classes.placeholderPulse} />
+						</div>
+					) : (
+						<img
+							src={blobUrl || imageUrl}
+							alt=""
+							className={classes.dialogImage}
+						/>
+					)}
 					<div className={classes.toolbar}>
 						<IconButton
 							className={classes.toolbarBtn}

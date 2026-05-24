@@ -14,6 +14,7 @@ export default defineConfig({
   build: {
     outDir: "build",
     sourcemap: false,
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -22,6 +23,10 @@ export default defineConfig({
             "@material-ui/icons",
             "@material-ui/lab",
           ],
+          "recharts": ["recharts"],
+          "emoji": ["@emoji-mart/data", "emoji-mart"],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "socket": ["socket.io-client"],
         },
       },
     },

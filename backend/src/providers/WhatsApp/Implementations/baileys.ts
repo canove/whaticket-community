@@ -947,17 +947,19 @@ const init = async (whatsapp: Whatsapp): Promise<void> => {
   wbot.ev.on("messages.upsert", async ({ messages, type }) => {
     messages.forEach(msg => {
       msgCache.save(msg);
-      logger.debug({
-        info: "[RAW] Message received",
-        sessionId,
-        type,
-        key: msg.key,
-        messageTimestamp: msg.messageTimestamp,
-        pushName: msg.pushName,
-        status: msg.status,
-        messageType: Object.keys(msg.message || {}),
-        rawMessage: JSON.stringify(msg, null, 2)
-      });
+      if (logger.isLevelEnabled("debug")) {
+        logger.debug({
+          info: "[RAW] Message received",
+          sessionId,
+          type,
+          key: msg.key,
+          messageTimestamp: msg.messageTimestamp,
+          pushName: msg.pushName,
+          status: msg.status,
+          messageType: Object.keys(msg.message || {}),
+          rawMessage: JSON.stringify(msg, null, 2)
+        });
+      }
     });
 
     const validMessages = messages.filter(msg => {

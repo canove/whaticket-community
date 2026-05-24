@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import openSocket, { disconnectSocket } from "../../services/socket-io";
 
@@ -86,7 +86,7 @@ const useAuth = () => {
 		};
 	}, [user.id]);
 
-	const handleLogin = async userData => {
+	const handleLogin = useCallback(async userData => {
 		setLoading(true);
 
 		try {
@@ -102,9 +102,9 @@ const useAuth = () => {
 			toastError(err);
 			setLoading(false);
 		}
-	};
+	}, [navigate]);
 
-	const handleLogout = async () => {
+	const handleLogout = useCallback(async () => {
 		setLoading(true);
 
 		try {
@@ -120,7 +120,7 @@ const useAuth = () => {
 			toastError(err);
 			setLoading(false);
 		}
-	};
+	}, [navigate]);
 
 	return { isAuth, user, loading, handleLogin, handleLogout };
 };
