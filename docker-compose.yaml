@@ -29,6 +29,7 @@ services:
       - IG_APP_ID=${IG_APP_ID}
       - IG_APP_SECRET=${IG_APP_SECRET}
       - INSTAGRAM_WEBHOOK_VERIFY_TOKEN=${INSTAGRAM_WEBHOOK_VERIFY_TOKEN:-whaticket_ig_verify}
+      - NODE_OPTIONS=--max-old-space-size=2048
     ports:
       - ${BACKEND_PORT:-8080}:3000
     volumes:
@@ -36,6 +37,10 @@ services:
     networks:
       - whaticket
     restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,14 +92,17 @@ services:
     command: >
       postgres
         -c max_connections=200
-        -c shared_buffers=256MB
-        -c effective_cache_size=768MB
+        -c shared_buffers=512MB
+        -c effective_cache_size=1536MB
         -c work_mem=8MB
         -c maintenance_work_mem=64MB
         -c checkpoint_completion_target=0.9
         -c wal_buffers=16MB
         -c random_page_cost=1.1
         -c effective_io_concurrency=200
+        -c shared_preload_libraries=pg_stat_statements
+        -c pg_stat_statements.max=10000
+        -c pg_stat_statements.track=all
     restart: always
     networks:
       - whaticket

@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
@@ -6,6 +7,7 @@ import ShowTicketService from "../TicketServices/ShowTicketService";
 interface Request {
   ticketId: string;
   pageNumber?: string;
+  cursor?: string; // ISO datetime — load messages older than this (cursor-based pagination)
 }
 
 interface Response {
@@ -15,9 +17,12 @@ interface Response {
   hasMore: boolean;
 }
 
+const LIMIT = 20;
+
 const ListMessagesService = async ({
   pageNumber = "1",
-  ticketId
+  ticketId,
+  cursor
 }: Request): Promise<Response> => {
   const ticket = await ShowTicketService(ticketId);
 
@@ -25,13 +30,16 @@ const ListMessagesService = async ({
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
-  // await setMessagesAsRead(ticket);
-  const limit = 20;
-  const offset = limit * (+pageNumber - 1);
+  const baseWhere: any = { ticketId };
 
-  const { count, rows: messages } = await Message.findAndCountAll({
-    where: { ticketId },
-    limit,
+  if (cursor) {
+    // Cursor pagination: load messages older than the given timestamp — no OFFSET needed
+    baseWhere.createdAt = { [Op.lt]: new Date(cursor) };
+  }
+
+  const messages = await Message.findAll({
+    where: baseWhere,
+    limit: LIMIT,
     include: [
       "contact",
       {
@@ -40,11 +48,15 @@ const ListMessagesService = async ({
         include: ["contact"]
       }
     ],
-    offset,
-    order: [["createdAt", "DESC"]]
+    // Fetch newest-first so LIMIT cuts at the right end; we reverse before returning
+    order: [["createdAt", "DESC"]],
+    ...(cursor ? {} : { offset: LIMIT * (+pageNumber - 1) })
   });
 
-  const hasMore = count > offset + messages.length;
+  const hasMore = messages.length === LIMIT;
+
+  // For the first page (no cursor) return an accurate count so the UI can show it
+  const count = cursor ? 0 : await Message.count({ where: { ticketId } });
 
   return {
     messages: messages.reverse(),

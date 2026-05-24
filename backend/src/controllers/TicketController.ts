@@ -14,6 +14,7 @@ import formatBody from "../helpers/Mustache";
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
+  cursor?: string;
   status: string;
   date: string;
   showAll: string;
@@ -32,6 +33,7 @@ interface TicketData {
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const {
     pageNumber,
+    cursor,
     status,
     date,
     searchParam,
@@ -52,6 +54,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const { tickets, count, hasMore } = await ListTicketsService({
     searchParam,
     pageNumber,
+    cursor,
     status,
     date,
     showAll,
