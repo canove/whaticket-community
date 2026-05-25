@@ -1,16 +1,16 @@
-import "../bootstrap";
+import "../bootstrap.js";
 import { Job } from "bullmq";
 import * as Sentry from "@sentry/node";
 
-import { createWorker } from "../libs/queue";
+import { createWorker } from "../libs/queue.js";
 import {
   handleMessage,
   MessagePayload,
   ContactPayload,
   MediaPayload,
   WhatsappContextPayload
-} from "../handlers/handleWhatsappEvents";
-import { logger } from "../utils/logger";
+} from "../handlers/handleWhatsappEvents.js";
+import { logger } from "../utils/logger.js";
 
 export interface InboundMessageJobData {
   messagePayload: MessagePayload;

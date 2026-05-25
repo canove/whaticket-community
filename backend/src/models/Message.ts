@@ -10,8 +10,9 @@ import {
   BelongsTo,
   ForeignKey
 } from "sequelize-typescript";
-import Contact from "./Contact";
-import Ticket from "./Ticket";
+import Contact from "./Contact.js";
+import Ticket from "./Ticket.js";
+import type { ModelRef } from "./helpers.js";
 
 @Table
 class Message extends Model<Message> {
@@ -71,7 +72,7 @@ class Message extends Model<Message> {
   ticketId: number;
 
   @BelongsTo(() => Ticket)
-  ticket: Ticket;
+  ticket: ModelRef<Ticket>;
 
   @ForeignKey(() => Contact)
   @Column

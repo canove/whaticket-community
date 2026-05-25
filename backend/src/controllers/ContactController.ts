@@ -1,18 +1,18 @@
 import * as Yup from "yup";
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
+import { getIO } from "../libs/socket.js";
 
-import ListContactsService from "../services/ContactServices/ListContactsService";
-import CreateContactService from "../services/ContactServices/CreateContactService";
-import ShowContactService from "../services/ContactServices/ShowContactService";
-import UpdateContactService from "../services/ContactServices/UpdateContactService";
-import DeleteContactService from "../services/ContactServices/DeleteContactService";
+import ListContactsService from "../services/ContactServices/ListContactsService.js";
+import CreateContactService from "../services/ContactServices/CreateContactService.js";
+import ShowContactService from "../services/ContactServices/ShowContactService.js";
+import UpdateContactService from "../services/ContactServices/UpdateContactService.js";
+import DeleteContactService from "../services/ContactServices/DeleteContactService.js";
 
-import CheckContactNumber from "../services/WbotServices/CheckNumber";
-import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
-import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
-import AppError from "../errors/AppError";
-import GetContactService from "../services/ContactServices/GetContactService";
+import CheckContactNumber from "../services/WbotServices/CheckNumber.js";
+import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact.js";
+import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl.js";
+import AppError from "../errors/AppError.js";
+import GetContactService from "../services/ContactServices/GetContactService.js";
 
 type IndexQuery = {
   searchParam: string;

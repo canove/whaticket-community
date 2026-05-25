@@ -1,7 +1,7 @@
-import User from "../../models/User";
-import AppError from "../../errors/AppError";
-import Ticket from "../../models/Ticket";
-import UpdateDeletedUserOpenTicketsStatus from "../../helpers/UpdateDeletedUserOpenTicketsStatus";
+import User from "../../models/User.js";
+import AppError from "../../errors/AppError.js";
+import Ticket from "../../models/Ticket.js";
+import UpdateDeletedUserOpenTicketsStatus from "../../helpers/UpdateDeletedUserOpenTicketsStatus.js";
 
 const DeleteUserService = async (id: string | number): Promise<void> => {
   const user = await User.findOne({

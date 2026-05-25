@@ -1,4 +1,4 @@
-import Setting from "../../models/Setting";
+import Setting from "../../models/Setting.js";
 
 interface Request {
   key: string;

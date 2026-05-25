@@ -1,15 +1,15 @@
 import axios from "axios";
-import Whatsapp from "../models/Whatsapp";
-import { logger } from "../utils/logger";
-import instagramConfig from "../config/instagram";
-import { emitWhatsappSessionUpdate } from "./emitWhatsappSessionUpdate";
+import Whatsapp from "../models/Whatsapp.js";
+import { logger } from "../utils/logger.js";
+import instagramConfig from "../config/instagram.js";
+import { emitWhatsappSessionUpdate } from "./emitWhatsappSessionUpdate.js";
 import {
   metaGraphGet,
   metaGraphPost,
   metaGraphDelete,
   GRAPH_TIMEOUT_MS as META_GRAPH_TIMEOUT_MS
-} from "./metaGraph";
-import AppError from "../errors/AppError";
+} from "./metaGraph.js";
+import AppError from "../errors/AppError.js";
 
 // ─── Shared types ────────────────────────────────────────────────────────────
 

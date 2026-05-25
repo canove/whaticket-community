@@ -32,13 +32,13 @@ import { Boom } from "@hapi/boom";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import NodeCache from "node-cache";
 
-import Whatsapp from "../../../models/Whatsapp";
-import { getIO } from "../../../libs/socket";
-import { logger } from "../../../utils/logger";
-import AppError from "../../../errors/AppError";
-import StoreWppSessionKeys from "../../../services/WppKeyServices/StoreWppSessionKeys";
-import GetWppSessionKeys from "../../../services/WppKeyServices/GetWppSessionKeys";
-import { getRedisClient } from "../../../libs/redisStore";
+import Whatsapp from "../../../models/Whatsapp.js";
+import { getIO } from "../../../libs/socket.js";
+import { logger } from "../../../utils/logger.js";
+import AppError from "../../../errors/AppError.js";
+import StoreWppSessionKeys from "../../../services/WppKeyServices/StoreWppSessionKeys.js";
+import GetWppSessionKeys from "../../../services/WppKeyServices/GetWppSessionKeys.js";
+import { getRedisClient } from "../../../libs/redisStore.js";
 import {
   SendMessageOptions,
   ProviderMessage,
@@ -47,9 +47,9 @@ import {
   ProviderContact,
   MessageType,
   MessageAck
-} from "../types";
-import { WhatsappProvider } from "../whatsappProvider";
-import { sleep } from "../../../utils/sleep";
+} from "../types/index.js";
+import { WhatsappProvider } from "../whatsappProvider.js";
+import { sleep } from "../../../utils/sleep.js";
 import {
   handleMessage,
   handleMessageAck,
@@ -57,8 +57,8 @@ import {
   MessagePayload,
   MediaPayload,
   WhatsappContextPayload
-} from "../../../handlers/handleWhatsappEvents";
-import { getInboundQueue } from "../../../libs/queue";
+} from "../../../handlers/handleWhatsappEvents.js";
+import { getInboundQueue } from "../../../libs/queue.js";
 
 const PINO_LEVELS = [
   "fatal",

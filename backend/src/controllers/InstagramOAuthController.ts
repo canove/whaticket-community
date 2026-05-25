@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import axios from "axios";
-import { sign, verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { sign, verify } = jwt;
 
-import Whatsapp from "../models/Whatsapp";
-import { logger } from "../utils/logger";
-import authConfig from "../config/auth";
-import instagramConfig from "../config/instagram";
+import Whatsapp from "../models/Whatsapp.js";
+import { logger } from "../utils/logger.js";
+import authConfig from "../config/auth.js";
+import instagramConfig from "../config/instagram.js";
 import {
   InstagramSession,
   TOKEN_EXPIRY_SECONDS,
@@ -17,9 +18,9 @@ import {
   subscribeInstagramWebhooks,
   parseInstagramSession,
   graphGet
-} from "../helpers/instagram";
-import { disconnectInstagramConnection } from "../helpers/instagramSessionRegistry";
-import { closePopupHtml } from "../views/instagramOAuthPopup";
+} from "../helpers/instagram.js";
+import { disconnectInstagramConnection } from "../helpers/instagramSessionRegistry.js";
+import { closePopupHtml } from "../views/instagramOAuthPopup.js";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

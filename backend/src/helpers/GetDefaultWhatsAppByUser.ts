@@ -1,6 +1,6 @@
-import User from "../models/User";
-import Whatsapp from "../models/Whatsapp";
-import { logger } from "../utils/logger";
+import User from "../models/User.js";
+import Whatsapp from "../models/Whatsapp.js";
+import { logger } from "../utils/logger.js";
 
 const GetDefaultWhatsAppByUser = async (
   userId: number

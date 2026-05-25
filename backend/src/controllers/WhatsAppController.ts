@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { getIO } from "../libs/socket";
-import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
+import { getIO } from "../libs/socket.js";
+import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession.js";
 
-import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService";
-import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppService";
-import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService";
-import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
-import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService";
-import { getProvider } from "../providers/WhatsApp";
+import CreateWhatsAppService from "../services/WhatsappService/CreateWhatsAppService.js";
+import DeleteWhatsAppService from "../services/WhatsappService/DeleteWhatsAppService.js";
+import ListWhatsAppsService from "../services/WhatsappService/ListWhatsAppsService.js";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService.js";
+import UpdateWhatsAppService from "../services/WhatsappService/UpdateWhatsAppService.js";
+import { getProvider } from "../providers/WhatsApp/index.js";
 
 interface WhatsappData {
   name: string;

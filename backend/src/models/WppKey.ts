@@ -10,7 +10,7 @@ import {
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
-import Whatsapp from "./Whatsapp";
+import Whatsapp from "./Whatsapp.js";
 
 @Table
 class WppKey extends Model<WppKey> {

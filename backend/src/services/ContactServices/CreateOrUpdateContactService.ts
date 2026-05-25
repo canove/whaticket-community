@@ -1,8 +1,8 @@
-import { getIO } from "../../libs/socket";
-import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
-import { logger } from "../../utils/logger";
-import { withRedisLock } from "../../helpers/withRedisLock";
+import { getIO } from "../../libs/socket.js";
+import Contact from "../../models/Contact.js";
+import Ticket from "../../models/Ticket.js";
+import { logger } from "../../utils/logger.js";
+import { withRedisLock } from "../../helpers/withRedisLock.js";
 
 interface ExtraInfo {
   name: string;

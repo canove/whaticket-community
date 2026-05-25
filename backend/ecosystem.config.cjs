@@ -3,7 +3,7 @@
  *
  * Usage:
  *   npm run build
- *   pm2 start ecosystem.config.js --env production
+ *   pm2 start ecosystem.config.cjs --env production
  *   pm2 logs
  *   pm2 monit
  *
@@ -35,7 +35,6 @@ module.exports = {
         NODE_ENV: "production",
         PORT: 3000
       },
-      // Restart on memory threshold — prevents gradual leaks from degrading service
       exp_backoff_restart_delay: 100,
       log_date_format: "YYYY-MM-DD HH:mm:ss Z"
     }

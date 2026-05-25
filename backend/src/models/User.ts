@@ -15,11 +15,12 @@ import {
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
-import { hash, compare } from "bcryptjs";
-import Ticket from "./Ticket";
-import Queue from "./Queue";
-import UserQueue from "./UserQueue";
-import Whatsapp from "./Whatsapp";
+import bcryptjs from "bcryptjs";
+const { hash, compare } = bcryptjs;
+import Ticket from "./Ticket.js";
+import Queue from "./Queue.js";
+import UserQueue from "./UserQueue.js";
+import Whatsapp from "./Whatsapp.js";
 
 @Table
 class User extends Model<User> {

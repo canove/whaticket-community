@@ -1,7 +1,7 @@
 import axios from "axios";
 import { basename } from "node:path";
-import Whatsapp from "../../../models/Whatsapp";
-import { logger } from "../../../utils/logger";
+import Whatsapp from "../../../models/Whatsapp.js";
+import { logger } from "../../../utils/logger.js";
 import {
   InstagramSession,
   GraphApiSendResponse,
@@ -16,20 +16,20 @@ import {
   graphPost,
   isInvalidTokenError,
   refreshLongLivedToken
-} from "../../../helpers/instagram";
+} from "../../../helpers/instagram.js";
 import {
   instagramSessionRegistry,
   disconnectInstagramConnection
-} from "../../../helpers/instagramSessionRegistry";
-import AppError from "../../../errors/AppError";
-import type { WhatsappProvider } from "../whatsappProvider";
+} from "../../../helpers/instagramSessionRegistry.js";
+import AppError from "../../../errors/AppError.js";
+import type { WhatsappProvider } from "../whatsappProvider.js";
 import type {
   ProviderMessage,
   ProviderContact,
   ProviderMediaInput,
   SendMessageOptions,
   SendMediaOptions
-} from "../types";
+} from "../types/index.js";
 
 // ─── Utilities ───────────────────────────────────────────────────────────────
 

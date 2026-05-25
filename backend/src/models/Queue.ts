@@ -10,11 +10,11 @@ import {
   Unique,
   BelongsToMany
 } from "sequelize-typescript";
-import User from "./User";
-import UserQueue from "./UserQueue";
+import User from "./User.js";
+import UserQueue from "./UserQueue.js";
 
-import Whatsapp from "./Whatsapp";
-import WhatsappQueue from "./WhatsappQueue";
+import Whatsapp from "./Whatsapp.js";
+import WhatsappQueue from "./WhatsappQueue.js";
 
 @Table
 class Queue extends Model<Queue> {

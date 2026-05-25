@@ -1,15 +1,15 @@
 import gracefulShutdown from "http-graceful-shutdown";
-import app from "./app";
-import { initIO } from "./libs/socket";
-import { logger } from "./utils/logger";
-import { initRedis } from "./libs/redisStore";
-import { StartAllWhatsAppsSessions } from "./services/WbotServices/StartAllWhatsAppsSessions";
-import { startAutoCloseJob } from "./jobs/AutoCloseTicketsJob";
-import { refreshInstagramTokens } from "./providers/WhatsApp/Implementations/instagram";
-import { TOKEN_REFRESH_INTERVAL_MS } from "./helpers/instagram";
-import { startMessageWorker } from "./workers/messageWorker";
-import { startOutboundWorker } from "./workers/outboundWorker";
-import { closeQueues } from "./libs/queue";
+import app from "./app.js";
+import { initIO } from "./libs/socket.js";
+import { logger } from "./utils/logger.js";
+import { initRedis } from "./libs/redisStore.js";
+import { StartAllWhatsAppsSessions } from "./services/WbotServices/StartAllWhatsAppsSessions.js";
+import { startAutoCloseJob } from "./jobs/AutoCloseTicketsJob.js";
+import { refreshInstagramTokens } from "./providers/WhatsApp/Implementations/instagram.js";
+import { TOKEN_REFRESH_INTERVAL_MS } from "./helpers/instagram.js";
+import { startMessageWorker } from "./workers/messageWorker.js";
+import { startOutboundWorker } from "./workers/outboundWorker.js";
+import { closeQueues } from "./libs/queue.js";
 
 const server = app.listen(process.env.PORT, () => {
   logger.info(`Server started on port: ${process.env.PORT}`);

@@ -1,5 +1,5 @@
-import Whatsapp from "../models/Whatsapp";
-import { getIO } from "../libs/socket";
+import Whatsapp from "../models/Whatsapp.js";
+import { getIO } from "../libs/socket.js";
 
 export const emitWhatsappSessionUpdate = (whatsapp: Whatsapp): void => {
   getIO().to("notification").emit("whatsappSession", {

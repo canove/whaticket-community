@@ -1,8 +1,8 @@
 import express from "express";
-import isAuth from "../middleware/isAuth";
+import isAuth from "../middleware/isAuth.js";
 
-import * as ContactController from "../controllers/ContactController";
-import * as ImportPhoneContactsController from "../controllers/ImportPhoneContactsController";
+import * as ContactController from "../controllers/ContactController.js";
+import * as ImportPhoneContactsController from "../controllers/ImportPhoneContactsController.js";
 
 const contactRoutes = express.Router();
 

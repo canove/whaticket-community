@@ -1,8 +1,8 @@
 import { BufferJSON } from "@whiskeysockets/baileys";
 
-import WppKey from "../../models/WppKey";
-import { getFromRedis } from "../../libs/redisStore";
-import { logger } from "../../utils/logger";
+import WppKey from "../../models/WppKey.js";
+import { getFromRedis } from "../../libs/redisStore.js";
+import { logger } from "../../utils/logger.js";
 
 interface GetKeysRequest {
   connectionId: number;

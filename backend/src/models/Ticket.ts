@@ -13,11 +13,12 @@ import {
   Default
 } from "sequelize-typescript";
 
-import Contact from "./Contact";
-import Message from "./Message";
-import Queue from "./Queue";
-import User from "./User";
-import Whatsapp from "./Whatsapp";
+import Contact from "./Contact.js";
+import Message from "./Message.js";
+import Queue from "./Queue.js";
+import User from "./User.js";
+import Whatsapp from "./Whatsapp.js";
+import type { ModelRef } from "./helpers.js";
 
 @Table
 class Ticket extends Model<Ticket> {
@@ -53,28 +54,28 @@ class Ticket extends Model<Ticket> {
   userId: number | null;
 
   @BelongsTo(() => User)
-  user: User;
+  user: ModelRef<User>;
 
   @ForeignKey(() => Contact)
   @Column
   contactId: number;
 
   @BelongsTo(() => Contact)
-  contact: Contact;
+  contact: ModelRef<Contact>;
 
   @ForeignKey(() => Whatsapp)
   @Column
   whatsappId: number;
 
   @BelongsTo(() => Whatsapp)
-  whatsapp: Whatsapp;
+  whatsapp: ModelRef<Whatsapp>;
 
   @ForeignKey(() => Queue)
   @Column(DataType.INTEGER)
   queueId: number | null;
 
   @BelongsTo(() => Queue)
-  queue: Queue;
+  queue: ModelRef<Queue>;
 
   @HasMany(() => Message)
   messages: Message[];

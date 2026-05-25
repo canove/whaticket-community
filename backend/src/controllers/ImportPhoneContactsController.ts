@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import ImportContactsService from "../services/WbotServices/ImportContactsService";
+import ImportContactsService from "../services/WbotServices/ImportContactsService.js";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const userId: number = parseInt(req.user.id);

@@ -1,10 +1,10 @@
 import { Op } from "sequelize";
 import { subHours } from "date-fns";
-import Ticket from "../models/Ticket";
-import { getIO } from "../libs/socket";
-import { logger } from "../utils/logger";
-import { getRedisClient } from "../libs/redisStore";
-import { invalidateTicketListCache } from "../services/TicketServices/ListTicketsService";
+import Ticket from "../models/Ticket.js";
+import { getIO } from "../libs/socket.js";
+import { logger } from "../utils/logger.js";
+import { getRedisClient } from "../libs/redisStore.js";
+import { invalidateTicketListCache } from "../services/TicketServices/ListTicketsService.js";
 
 const WINDOW_HOURS = 24;
 const INTERVAL_MS = 5 * 60 * 1000; // 5 minutes

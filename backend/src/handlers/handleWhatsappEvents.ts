@@ -1,29 +1,32 @@
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "util";
 import { writeFile } from "fs";
 import * as Sentry from "@sentry/node";
 
-import { getIO } from "../libs/socket";
-import { logger } from "../utils/logger";
-import { debounce } from "../helpers/Debounce";
-import formatBody from "../helpers/Mustache";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-import Contact from "../models/Contact";
-import Ticket from "../models/Ticket";
-import Message from "../models/Message";
+import { getIO } from "../libs/socket.js";
+import { logger } from "../utils/logger.js";
+import { debounce } from "../helpers/Debounce.js";
+import formatBody from "../helpers/Mustache.js";
+
+import Contact from "../models/Contact.js";
+import Ticket from "../models/Ticket.js";
+import Message from "../models/Message.js";
 
 import CreateMessageService, {
   invalidateTicketCache
-} from "../services/MessageServices/CreateMessageService";
-import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
-import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
-import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
-import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
-import CreateContactService from "../services/ContactServices/CreateContactService";
+} from "../services/MessageServices/CreateMessageService.js";
+import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService.js";
+import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService.js";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService.js";
+import UpdateTicketService from "../services/TicketServices/UpdateTicketService.js";
+import CreateContactService from "../services/ContactServices/CreateContactService.js";
 
-import { getProvider } from "../providers/WhatsApp/whatsappProvider";
-import { buildChatId } from "../helpers/buildChatId";
-import { MessageType, MessageAck } from "../providers/WhatsApp/types";
+import { getProvider } from "../providers/WhatsApp/whatsappProvider.js";
+import { buildChatId } from "../helpers/buildChatId.js";
+import { MessageType, MessageAck } from "../providers/WhatsApp/types/index.js";
 
 const writeFileAsync = promisify(writeFile);
 

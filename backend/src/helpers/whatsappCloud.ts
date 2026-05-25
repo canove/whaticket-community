@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Request } from "express";
-import whatsappCloudConfig from "../config/whatsappCloud";
-import { metaGraphGet, metaGraphPost } from "./metaGraph";
-import { verifyMetaSignature } from "./metaWebhookSignature";
+import whatsappCloudConfig from "../config/whatsappCloud.js";
+import { metaGraphGet, metaGraphPost } from "./metaGraph.js";
+import { verifyMetaSignature } from "./metaWebhookSignature.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

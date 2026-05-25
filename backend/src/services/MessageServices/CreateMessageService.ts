@@ -1,8 +1,8 @@
 import { LRUCache } from "lru-cache";
-import { getIO } from "../../libs/socket";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
-import Whatsapp from "../../models/Whatsapp";
+import { getIO } from "../../libs/socket.js";
+import Message from "../../models/Message.js";
+import Ticket from "../../models/Ticket.js";
+import Whatsapp from "../../models/Whatsapp.js";
 
 interface MessageData {
   id: string;

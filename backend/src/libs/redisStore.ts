@@ -1,6 +1,6 @@
-import Redis from "ioredis";
+import { Redis } from "ioredis";
 
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
 
 let redisClient: Redis | null = null;
 
@@ -21,7 +21,7 @@ export const initRedis = async () => {
       logger.info("Redis connected successfully");
     });
 
-    redisClient.on("error", err => {
+    redisClient.on("error", (err: unknown) => {
       logger.error({ info: "Redis connection error", err });
     });
 

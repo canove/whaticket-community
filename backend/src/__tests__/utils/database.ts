@@ -1,4 +1,4 @@
-import database from "../../database";
+import database from "../../database/index.js";
 
 const truncate = async (): Promise<void> => {
   await database.truncate({ force: true, cascade: true });

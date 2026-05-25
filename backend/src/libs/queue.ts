@@ -1,6 +1,6 @@
 import { Queue, Worker, Job, QueueEvents } from "bullmq";
-import { getRedisClient } from "./redisStore";
-import { logger } from "../utils/logger";
+import { getRedisClient } from "./redisStore.js";
+import { logger } from "../utils/logger.js";
 
 // Re-use the existing Redis connection options — BullMQ needs its own client
 // instances (publisher + subscriber internally), so we pass connection options

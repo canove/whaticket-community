@@ -1,5 +1,5 @@
-import { getRedisClient } from "../libs/redisStore";
-import { logger } from "../utils/logger";
+import { getRedisClient } from "../libs/redisStore.js";
+import { logger } from "../utils/logger.js";
 
 const LOCK_TTL_SECONDS = 10;
 const RETRY_DELAY_MS = 150;
@@ -35,7 +35,7 @@ export const withRedisLock = async <T>(
       try {
         return await fn();
       } finally {
-        await redis.del(lockKey).catch(err => {
+        await redis.del(lockKey).catch((err: unknown) => {
           logger.warn({ info: "Failed to release Redis lock", lockKey, err });
         });
       }

@@ -9,7 +9,8 @@ import {
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
-import Contact from "./Contact";
+import Contact from "./Contact.js";
+import type { ModelRef } from "./helpers.js";
 
 @Table
 class ContactCustomField extends Model<ContactCustomField> {
@@ -29,7 +30,7 @@ class ContactCustomField extends Model<ContactCustomField> {
   contactId: number;
 
   @BelongsTo(() => Contact)
-  contact: Contact;
+  contact: ModelRef<Contact>;
 
   @CreatedAt
   createdAt: Date;

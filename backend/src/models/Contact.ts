@@ -12,8 +12,8 @@ import {
   HasMany,
   DataType
 } from "sequelize-typescript";
-import ContactCustomField from "./ContactCustomField";
-import Ticket from "./Ticket";
+import ContactCustomField from "./ContactCustomField.js";
+import Ticket from "./Ticket.js";
 
 @Table
 class Contact extends Model<Contact> {

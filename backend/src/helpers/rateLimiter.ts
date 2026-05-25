@@ -1,5 +1,5 @@
-import { getRedisClient } from "../libs/redisStore";
-import { logger } from "../utils/logger";
+import { getRedisClient } from "../libs/redisStore.js";
+import { logger } from "../utils/logger.js";
 
 const WINDOW_MS = 60_000; // 1 minute sliding window
 const parsedRateLimit = parseInt(process.env.OUTBOUND_RATE_LIMIT || "", 10);

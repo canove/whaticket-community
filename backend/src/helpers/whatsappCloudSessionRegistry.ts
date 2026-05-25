@@ -1,10 +1,10 @@
-import Whatsapp from "../models/Whatsapp";
+import Whatsapp from "../models/Whatsapp.js";
 import {
   WhatsAppCloudSession,
   parseWhatsAppCloudSession
-} from "./whatsappCloud";
-import { MetaSessionRegistry } from "./metaSessionRegistry";
-import { emitWhatsappSessionUpdate } from "./emitWhatsappSessionUpdate";
+} from "./whatsappCloud.js";
+import { MetaSessionRegistry } from "./metaSessionRegistry.js";
+import { emitWhatsappSessionUpdate } from "./emitWhatsappSessionUpdate.js";
 
 // ─── Registry ────────────────────────────────────────────────────────────────
 

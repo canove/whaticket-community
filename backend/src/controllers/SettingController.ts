@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 
-import { getIO } from "../libs/socket";
-import AppError from "../errors/AppError";
+import { getIO } from "../libs/socket.js";
+import AppError from "../errors/AppError.js";
 
-import UpdateSettingService from "../services/SettingServices/UpdateSettingService";
-import ListSettingsService from "../services/SettingServices/ListSettingsService";
+import UpdateSettingService from "../services/SettingServices/UpdateSettingService.js";
+import ListSettingsService from "../services/SettingServices/ListSettingsService.js";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   if (req.user.profile !== "admin") {

@@ -1,22 +1,20 @@
 import { Sequelize } from "sequelize-typescript";
-import User from "../models/User";
-import Setting from "../models/Setting";
-import Contact from "../models/Contact";
-import Ticket from "../models/Ticket";
-import Whatsapp from "../models/Whatsapp";
-import ContactCustomField from "../models/ContactCustomField";
-import Message from "../models/Message";
-import Queue from "../models/Queue";
-import WhatsappQueue from "../models/WhatsappQueue";
-import UserQueue from "../models/UserQueue";
-import QuickAnswer from "../models/QuickAnswer";
-import WppKey from "../models/WppKey";
+import User from "../models/User.js";
+import Setting from "../models/Setting.js";
+import Contact from "../models/Contact.js";
+import Ticket from "../models/Ticket.js";
+import Whatsapp from "../models/Whatsapp.js";
+import ContactCustomField from "../models/ContactCustomField.js";
+import Message from "../models/Message.js";
+import Queue from "../models/Queue.js";
+import WhatsappQueue from "../models/WhatsappQueue.js";
+import UserQueue from "../models/UserQueue.js";
+import QuickAnswer from "../models/QuickAnswer.js";
+import WppKey from "../models/WppKey.js";
 
-// eslint-disable-next-line
-const dbConfig = require("../config/database");
-// import dbConfig from "../config/database";
+import dbConfig from "../config/database.js";
 
-const sequelize = new Sequelize(dbConfig);
+const sequelize = new Sequelize(dbConfig as any);
 
 const models = [
   User,

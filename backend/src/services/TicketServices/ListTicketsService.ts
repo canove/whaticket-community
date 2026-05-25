@@ -1,13 +1,13 @@
 import { Op, fn, where, col, Filterable, Includeable } from "sequelize";
 import { startOfDay, endOfDay, parseISO } from "date-fns";
 
-import Ticket from "../../models/Ticket";
-import Contact from "../../models/Contact";
-import Message from "../../models/Message";
-import Queue from "../../models/Queue";
-import ShowUserService from "../UserServices/ShowUserService";
-import Whatsapp from "../../models/Whatsapp";
-import { getRedisClient } from "../../libs/redisStore";
+import Ticket from "../../models/Ticket.js";
+import Contact from "../../models/Contact.js";
+import Message from "../../models/Message.js";
+import Queue from "../../models/Queue.js";
+import ShowUserService from "../UserServices/ShowUserService.js";
+import Whatsapp from "../../models/Whatsapp.js";
+import { getRedisClient } from "../../libs/redisStore.js";
 
 interface Request {
   searchParam?: string;

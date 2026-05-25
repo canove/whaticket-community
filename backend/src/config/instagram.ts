@@ -1,4 +1,4 @@
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
 
 const GRAPH_API_VERSION = "v23.0";
 

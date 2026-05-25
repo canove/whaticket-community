@@ -2,10 +2,11 @@ import { Server as SocketIO } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import { Server } from "http";
-import { verify } from "jsonwebtoken";
-import AppError from "../errors/AppError";
-import { logger } from "../utils/logger";
-import authConfig from "../config/auth";
+import jwt from "jsonwebtoken";
+const { verify } = jwt;
+import AppError from "../errors/AppError.js";
+import { logger } from "../utils/logger.js";
+import authConfig from "../config/auth.js";
 
 let io: SocketIO;
 

@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import Whatsapp from "../models/Whatsapp";
-import { logger } from "../utils/logger";
+import Whatsapp from "../models/Whatsapp.js";
+import { logger } from "../utils/logger.js";
 import {
   graphGet,
   graphPost,
   parseWhatsAppCloudSession,
   WhatsAppCloudSession
-} from "../helpers/whatsappCloud";
+} from "../helpers/whatsappCloud.js";
 import {
   whatsappCloudSessionRegistry,
   disconnectWhatsAppCloudConnection
-} from "../helpers/whatsappCloudSessionRegistry";
-import { emitWhatsappSessionUpdate } from "../helpers/emitWhatsappSessionUpdate";
+} from "../helpers/whatsappCloudSessionRegistry.js";
+import { emitWhatsappSessionUpdate } from "../helpers/emitWhatsappSessionUpdate.js";
 
 // ─── POST /whatsapp-cloud/connect ────────────────────────────────────────────
 

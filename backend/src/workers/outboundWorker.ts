@@ -1,10 +1,10 @@
-import "../bootstrap";
+import "../bootstrap.js";
 import { Job } from "bullmq";
-import { createWorker } from "../libs/queue";
-import CreateMessageService from "../services/MessageServices/CreateMessageService";
-import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
-import ShowTicketService from "../services/TicketServices/ShowTicketService";
-import { logger } from "../utils/logger";
+import { createWorker } from "../libs/queue.js";
+import CreateMessageService from "../services/MessageServices/CreateMessageService.js";
+import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia.js";
+import ShowTicketService from "../services/TicketServices/ShowTicketService.js";
+import { logger } from "../utils/logger.js";
 
 export interface OutboundMediaJobData {
   ticketId: number;

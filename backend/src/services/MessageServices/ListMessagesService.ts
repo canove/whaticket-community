@@ -1,8 +1,8 @@
 import { Op } from "sequelize";
-import AppError from "../../errors/AppError";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
-import ShowTicketService from "../TicketServices/ShowTicketService";
+import AppError from "../../errors/AppError.js";
+import Message from "../../models/Message.js";
+import Ticket from "../../models/Ticket.js";
+import ShowTicketService from "../TicketServices/ShowTicketService.js";
 
 interface Request {
   ticketId: string;

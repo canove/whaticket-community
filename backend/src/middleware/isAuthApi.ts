@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 
-import AppError from "../errors/AppError";
-import { logger } from "../utils/logger";
-import ListSettingByValueService from "../services/SettingServices/ListSettingByValueService";
+import AppError from "../errors/AppError.js";
+import { logger } from "../utils/logger.js";
+import ListSettingByValueService from "../services/SettingServices/ListSettingByValueService.js";
 
 const isAuthApi = async (
   req: Request,

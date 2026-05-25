@@ -1,8 +1,9 @@
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { verify } = jwt;
 import { Request, Response, NextFunction } from "express";
 
-import AppError from "../errors/AppError";
-import authConfig from "../config/auth";
+import AppError from "../errors/AppError.js";
+import authConfig from "../config/auth.js";
 
 interface TokenPayload {
   id: string;

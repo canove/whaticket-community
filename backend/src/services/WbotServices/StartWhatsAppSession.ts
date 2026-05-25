@@ -1,7 +1,7 @@
-import Whatsapp from "../../models/Whatsapp";
-import { getProvider } from "../../providers/WhatsApp";
-import { getIO } from "../../libs/socket";
-import { logger } from "../../utils/logger";
+import Whatsapp from "../../models/Whatsapp.js";
+import { getProvider } from "../../providers/WhatsApp/index.js";
+import { getIO } from "../../libs/socket.js";
+import { logger } from "../../utils/logger.js";
 
 export const StartWhatsAppSession = async (
   whatsapp: Whatsapp

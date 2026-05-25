@@ -1,8 +1,8 @@
 import { Op } from "sequelize";
-import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
-import { whatsappProvider } from "../../providers/WhatsApp";
-import Contact from "../../models/Contact";
-import { logger } from "../../utils/logger";
+import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp.js";
+import { whatsappProvider } from "../../providers/WhatsApp/index.js";
+import Contact from "../../models/Contact.js";
+import { logger } from "../../utils/logger.js";
 
 const ImportContactsService = async (userId: number): Promise<void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp(userId);

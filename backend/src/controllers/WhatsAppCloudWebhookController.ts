@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
-import { handleMessage } from "../handlers/handleWhatsappEvents";
-import { logger } from "../utils/logger";
-import whatsappCloudConfig from "../config/whatsappCloud";
+import { handleMessage } from "../handlers/handleWhatsappEvents.js";
+import { logger } from "../utils/logger.js";
+import whatsappCloudConfig from "../config/whatsappCloud.js";
 import {
   WACWebhookPayload,
   WACMessage,
   verifyWACSignature,
   downloadWACMedia
-} from "../helpers/whatsappCloud";
+} from "../helpers/whatsappCloud.js";
 import {
   whatsappCloudSessionRegistry,
   resolveWhatsappIdByPhoneNumberId
-} from "../helpers/whatsappCloudSessionRegistry";
+} from "../helpers/whatsappCloudSessionRegistry.js";
 import type {
   ContactPayload,
   MediaPayload
-} from "../handlers/handleWhatsappEvents";
-import type { ProviderMessage } from "../providers/WhatsApp/types";
+} from "../handlers/handleWhatsappEvents.js";
+import type { ProviderMessage } from "../providers/WhatsApp/types/index.js";
 
 // ─── Type map ────────────────────────────────────────────────────────────────
 

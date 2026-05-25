@@ -1,2 +1,2 @@
-export * from "./types";
-export * from "./whatsappProvider";
+export * from "./types/index.js";
+export * from "./whatsappProvider.js";

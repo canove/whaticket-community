@@ -1,13 +1,13 @@
-import AppError from "../../errors/AppError";
-import Message from "../../models/Message";
-import Ticket from "../../models/Ticket";
-import Whatsapp from "../../models/Whatsapp";
-import { getProvider, ProviderMessage } from "../../providers/WhatsApp";
-import { logger } from "../../utils/logger";
-import { checkOutboundRateLimit } from "../../helpers/rateLimiter";
-import { buildChatId } from "../../helpers/buildChatId";
+import AppError from "../../errors/AppError.js";
+import Message from "../../models/Message.js";
+import Ticket from "../../models/Ticket.js";
+import Whatsapp from "../../models/Whatsapp.js";
+import { getProvider, ProviderMessage } from "../../providers/WhatsApp/index.js";
+import { logger } from "../../utils/logger.js";
+import { checkOutboundRateLimit } from "../../helpers/rateLimiter.js";
+import { buildChatId } from "../../helpers/buildChatId.js";
 
-import formatBody from "../../helpers/Mustache";
+import formatBody from "../../helpers/Mustache.js";
 
 interface Request {
   body: string;

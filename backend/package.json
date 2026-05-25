@@ -2,26 +2,27 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-cjs-overrides.mjs",
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
-    "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
-    "test": "NODE_ENV=test jest",
-    "posttest": "NODE_ENV=test sequelize db:migrate:undo:all",
-    "db:migrate": "npm run build && sequelize db:migrate",
-    "db:seed": "sequelize db:seed:all",
-    "format": "prettier --write \"src/**/*.ts\""
+    "dev": "tsx watch src/server.ts",
+    "pretest": "NODE_ENV=test sequelize --options-path .sequelizerc.cjs db:migrate && NODE_ENV=test sequelize --options-path .sequelizerc.cjs db:seed:all",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs",
+    "posttest": "NODE_ENV=test sequelize --options-path .sequelizerc.cjs db:migrate:undo:all",
+    "db:migrate": "npm run build && sequelize --options-path .sequelizerc.cjs db:migrate",
+    "db:seed": "sequelize --options-path .sequelizerc.cjs db:seed:all",
+    "format": "prettier --config prettier.config.cjs --write \"src/**/*.ts\""
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@material-ui/core": "^4.12.4",
-    "@material-ui/icons": "^4.11.3",
-    "@material-ui/lab": "^4.0.0-alpha.61",
     "@sentry/node": "^8.55.1",
     "@socket.io/redis-adapter": "^8.3.0",
     "@types/compression": "^1.8.1",
@@ -92,7 +93,7 @@
     "prettier": "^3.8.3",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3"
   }
 }

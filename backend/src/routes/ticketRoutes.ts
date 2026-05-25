@@ -1,7 +1,7 @@
 import express from "express";
-import isAuth from "../middleware/isAuth";
+import isAuth from "../middleware/isAuth.js";
 
-import * as TicketController from "../controllers/TicketController";
+import * as TicketController from "../controllers/TicketController.js";
 
 const ticketRoutes = express.Router();
 

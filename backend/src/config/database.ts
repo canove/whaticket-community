@@ -1,5 +1,3 @@
-require("../bootstrap");
-
 const SUPPORTED_DIALECTS = [
   "mssql",
   "mariadb",
@@ -15,7 +13,7 @@ const dialect =
     ? envDialect
     : "postgres";
 
-module.exports = {
+export default {
   dialect,
   timezone: "America/Sao_Paulo",
   host: process.env.DB_HOST,

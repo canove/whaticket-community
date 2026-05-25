@@ -1,6 +1,6 @@
-import Queue from "../models/Queue";
-import User from "../models/User";
-import Whatsapp from "../models/Whatsapp";
+import Queue from "../models/Queue.js";
+import User from "../models/User.js";
+import Whatsapp from "../models/Whatsapp.js";
 
 interface SerializedUser {
   id: number;

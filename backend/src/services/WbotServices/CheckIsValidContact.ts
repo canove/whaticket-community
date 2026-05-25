@@ -1,6 +1,6 @@
-import AppError from "../../errors/AppError";
-import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
-import { whatsappProvider } from "../../providers/WhatsApp";
+import AppError from "../../errors/AppError.js";
+import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp.js";
+import { whatsappProvider } from "../../providers/WhatsApp/index.js";
 
 const CheckIsValidContact = async (number: string): Promise<void> => {
   const defaultWhatsapp = await GetDefaultWhatsApp();

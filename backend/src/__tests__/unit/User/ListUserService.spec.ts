@@ -1,8 +1,8 @@
 import faker from "faker";
-import User from "../../../models/User";
-import CreateUserService from "../../../services/UserServices/CreateUserService";
-import ListUsersService from "../../../services/UserServices/ListUsersService";
-import { disconnect, truncate } from "../../utils/database";
+import User from "../../../models/User.js";
+import CreateUserService from "../../../services/UserServices/CreateUserService.js";
+import ListUsersService from "../../../services/UserServices/ListUsersService.js";
+import { disconnect, truncate } from "../../utils/database.js";
 
 describe("User", () => {
   beforeEach(async () => {

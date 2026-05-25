@@ -1,6 +1,6 @@
-import AppError from "../errors/AppError";
-import Whatsapp from "../models/Whatsapp";
-import GetDefaultWhatsAppByUser from "./GetDefaultWhatsAppByUser";
+import AppError from "../errors/AppError.js";
+import Whatsapp from "../models/Whatsapp.js";
+import GetDefaultWhatsAppByUser from "./GetDefaultWhatsAppByUser.js";
 
 const GetDefaultWhatsApp = async (userId?: number): Promise<Whatsapp> => {
   if (userId) {

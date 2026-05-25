@@ -1,5 +1,5 @@
-import QuickAnswer from "../../models/QuickAnswer";
-import AppError from "../../errors/AppError";
+import QuickAnswer from "../../models/QuickAnswer.js";
+import AppError from "../../errors/AppError.js";
 
 interface QuickAnswerData {
   shortcut?: string;

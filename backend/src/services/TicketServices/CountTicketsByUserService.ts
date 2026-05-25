@@ -1,8 +1,8 @@
 import { Op, fn, col, literal } from "sequelize";
 import { startOfDay, endOfDay } from "date-fns";
-import Ticket from "../../models/Ticket";
-import User from "../../models/User";
-import { getRedisClient } from "../../libs/redisStore";
+import Ticket from "../../models/Ticket.js";
+import User from "../../models/User.js";
+import { getRedisClient } from "../../libs/redisStore.js";
 
 interface UserTicketCount {
   userId: number;

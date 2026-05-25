@@ -1,11 +1,11 @@
-import Whatsapp from "../models/Whatsapp";
+import Whatsapp from "../models/Whatsapp.js";
 import {
   InstagramSession,
   parseInstagramSession,
   unsubscribeInstagramWebhooks,
   emitSessionUpdate
-} from "./instagram";
-import { MetaSessionRegistry } from "./metaSessionRegistry";
+} from "./instagram.js";
+import { MetaSessionRegistry } from "./metaSessionRegistry.js";
 
 // ─── Registry ────────────────────────────────────────────────────────────────
 

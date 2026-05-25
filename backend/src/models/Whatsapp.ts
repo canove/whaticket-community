@@ -13,9 +13,9 @@ import {
   Unique,
   BelongsToMany
 } from "sequelize-typescript";
-import Queue from "./Queue";
-import Ticket from "./Ticket";
-import WhatsappQueue from "./WhatsappQueue";
+import Queue from "./Queue.js";
+import Ticket from "./Ticket.js";
+import WhatsappQueue from "./WhatsappQueue.js";
 
 @Table
 class Whatsapp extends Model<Whatsapp> {

@@ -1,14 +1,15 @@
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { verify } = jwt;
 import { Response as Res } from "express";
 
-import User from "../../models/User";
-import AppError from "../../errors/AppError";
-import ShowUserService from "../UserServices/ShowUserService";
-import authConfig from "../../config/auth";
+import User from "../../models/User.js";
+import AppError from "../../errors/AppError.js";
+import ShowUserService from "../UserServices/ShowUserService.js";
+import authConfig from "../../config/auth.js";
 import {
   createAccessToken,
   createRefreshToken
-} from "../../helpers/CreateTokens";
+} from "../../helpers/CreateTokens.js";
 
 interface RefreshTokenPayload {
   id: string;

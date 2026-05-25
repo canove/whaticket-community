@@ -7,8 +7,9 @@ import {
   ForeignKey,
   BelongsTo
 } from "sequelize-typescript";
-import Queue from "./Queue";
-import Whatsapp from "./Whatsapp";
+import Queue from "./Queue.js";
+import Whatsapp from "./Whatsapp.js";
+import type { ModelRef } from "./helpers.js";
 
 @Table
 class WhatsappQueue extends Model<WhatsappQueue> {
@@ -27,7 +28,7 @@ class WhatsappQueue extends Model<WhatsappQueue> {
   updatedAt: Date;
 
   @BelongsTo(() => Queue)
-  queue: Queue;
+  queue: ModelRef<Queue>;
 }
 
 export default WhatsappQueue;

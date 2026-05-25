@@ -1,10 +1,10 @@
-import { getIO } from "../libs/socket";
-import Message from "../models/Message";
-import Ticket from "../models/Ticket";
-import Whatsapp from "../models/Whatsapp";
-import { logger } from "../utils/logger";
-import { getProvider } from "../providers/WhatsApp";
-import { buildChatId } from "./buildChatId";
+import { getIO } from "../libs/socket.js";
+import Message from "../models/Message.js";
+import Ticket from "../models/Ticket.js";
+import Whatsapp from "../models/Whatsapp.js";
+import { logger } from "../utils/logger.js";
+import { getProvider } from "../providers/WhatsApp/index.js";
+import { buildChatId } from "./buildChatId.js";
 
 const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
   await Message.update(

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import isAuth from "../middleware/isAuth";
-import WhatsAppCloudController from "../controllers/WhatsAppCloudController";
+import isAuth from "../middleware/isAuth.js";
+import WhatsAppCloudController from "../controllers/WhatsAppCloudController.js";
 
 const whatsappCloudRoutes = Router();
 

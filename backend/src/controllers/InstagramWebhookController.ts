@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import axios from "axios";
-import { handleMessage } from "../handlers/handleWhatsappEvents";
-import { logger } from "../utils/logger";
-import instagramConfig from "../config/instagram";
+import { handleMessage } from "../handlers/handleWhatsappEvents.js";
+import { logger } from "../utils/logger.js";
+import instagramConfig from "../config/instagram.js";
 import {
   MetaWebhookPayload,
   MetaMessagingEvent,
@@ -10,17 +10,17 @@ import {
   fromIgsid,
   graphGet,
   GRAPH_TIMEOUT_MS
-} from "../helpers/instagram";
+} from "../helpers/instagram.js";
 import {
   instagramSessionRegistry,
   resolveWhatsappIdByInstagramAccount
-} from "../helpers/instagramSessionRegistry";
-import { verifyMetaSignature } from "../helpers/metaWebhookSignature";
+} from "../helpers/instagramSessionRegistry.js";
+import { verifyMetaSignature } from "../helpers/metaWebhookSignature.js";
 import type {
   ContactPayload,
   MediaPayload
-} from "../handlers/handleWhatsappEvents";
-import type { ProviderMessage } from "../providers/WhatsApp/types";
+} from "../handlers/handleWhatsappEvents.js";
+import type { ProviderMessage } from "../providers/WhatsApp/types/index.js";
 
 // ─── Attachment type map (module-scope constant) ──────────────────────────────
 

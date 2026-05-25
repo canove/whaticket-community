@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import isAuth from "../middleware/isAuth";
-import * as UserController from "../controllers/UserController";
+import isAuth from "../middleware/isAuth.js";
+import * as UserController from "../controllers/UserController.js";
 
 const userRoutes = Router();
 

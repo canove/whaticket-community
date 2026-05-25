@@ -1,7 +1,7 @@
 import express from "express";
-import isAuth from "../middleware/isAuth";
+import isAuth from "../middleware/isAuth.js";
 
-import * as QuickAnswerController from "../controllers/QuickAnswerController";
+import * as QuickAnswerController from "../controllers/QuickAnswerController.js";
 
 const quickAnswerRoutes = express.Router();
 

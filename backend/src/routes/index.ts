@@ -1,18 +1,18 @@
 import { Router } from "express";
 
-import userRoutes from "./userRoutes";
-import authRoutes from "./authRoutes";
-import settingRoutes from "./settingRoutes";
-import contactRoutes from "./contactRoutes";
-import ticketRoutes from "./ticketRoutes";
-import whatsappRoutes from "./whatsappRoutes";
-import messageRoutes from "./messageRoutes";
-import whatsappSessionRoutes from "./whatsappSessionRoutes";
-import queueRoutes from "./queueRoutes";
-import quickAnswerRoutes from "./quickAnswerRoutes";
-import apiRoutes from "./apiRoutes";
-import instagramRoutes from "./instagramRoutes";
-import whatsappCloudRoutes from "./whatsappCloudRoutes";
+import userRoutes from "./userRoutes.js";
+import authRoutes from "./authRoutes.js";
+import settingRoutes from "./settingRoutes.js";
+import contactRoutes from "./contactRoutes.js";
+import ticketRoutes from "./ticketRoutes.js";
+import whatsappRoutes from "./whatsappRoutes.js";
+import messageRoutes from "./messageRoutes.js";
+import whatsappSessionRoutes from "./whatsappSessionRoutes.js";
+import queueRoutes from "./queueRoutes.js";
+import quickAnswerRoutes from "./quickAnswerRoutes.js";
+import apiRoutes from "./apiRoutes.js";
+import instagramRoutes from "./instagramRoutes.js";
+import whatsappCloudRoutes from "./whatsappCloudRoutes.js";
 
 const routes = Router();
 

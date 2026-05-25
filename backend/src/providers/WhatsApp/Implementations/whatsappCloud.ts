@@ -1,26 +1,26 @@
 import { basename } from "node:path";
-import Whatsapp from "../../../models/Whatsapp";
-import { logger } from "../../../utils/logger";
-import AppError from "../../../errors/AppError";
+import Whatsapp from "../../../models/Whatsapp.js";
+import { logger } from "../../../utils/logger.js";
+import AppError from "../../../errors/AppError.js";
 import {
   parseWhatsAppCloudSession,
   graphGet,
   graphPost,
   downloadWACMedia
-} from "../../../helpers/whatsappCloud";
+} from "../../../helpers/whatsappCloud.js";
 import {
   whatsappCloudSessionRegistry,
   disconnectWhatsAppCloudConnection
-} from "../../../helpers/whatsappCloudSessionRegistry";
-import { emitWhatsappSessionUpdate as emitSessionUpdate } from "../../../helpers/emitWhatsappSessionUpdate";
-import type { WhatsappProvider } from "../whatsappProvider";
+} from "../../../helpers/whatsappCloudSessionRegistry.js";
+import { emitWhatsappSessionUpdate as emitSessionUpdate } from "../../../helpers/emitWhatsappSessionUpdate.js";
+import type { WhatsappProvider } from "../whatsappProvider.js";
 import type {
   ProviderMessage,
   ProviderContact,
   ProviderMediaInput,
   SendMessageOptions,
   SendMediaOptions
-} from "../types";
+} from "../types/index.js";
 
 const MEDIA_TYPE_MAP: Record<string, string> = {
   "image/": "image",

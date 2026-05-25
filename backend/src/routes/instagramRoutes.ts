@@ -1,6 +1,6 @@
 import { Router } from "express";
-import isAuth from "../middleware/isAuth";
-import InstagramOAuthController from "../controllers/InstagramOAuthController";
+import isAuth from "../middleware/isAuth.js";
+import InstagramOAuthController from "../controllers/InstagramOAuthController.js";
 
 const instagramRoutes = Router();
 

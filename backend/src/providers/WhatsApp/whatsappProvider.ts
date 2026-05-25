@@ -1,14 +1,14 @@
-import Whatsapp from "../../models/Whatsapp";
+import Whatsapp from "../../models/Whatsapp.js";
 import {
   ProviderMessage,
   ProviderMediaInput,
   ProviderContact,
   SendMessageOptions,
   SendMediaOptions
-} from "./types";
-import { BaileysProvider } from "./Implementations/baileys";
-import { InstagramProvider } from "./Implementations/instagram";
-import { WhatsAppCloudProvider } from "./Implementations/whatsappCloud";
+} from "./types/index.js";
+import { BaileysProvider } from "./Implementations/baileys.js";
+import { InstagramProvider } from "./Implementations/instagram.js";
+import { WhatsAppCloudProvider } from "./Implementations/whatsappCloud.js";
 
 export interface WhatsappProvider {
   init(whatsapp: Whatsapp): Promise<void>;

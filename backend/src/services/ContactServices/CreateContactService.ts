@@ -1,5 +1,5 @@
-import AppError from "../../errors/AppError";
-import Contact from "../../models/Contact";
+import AppError from "../../errors/AppError.js";
+import Contact from "../../models/Contact.js";
 
 interface ExtraInfo {
   name: string;

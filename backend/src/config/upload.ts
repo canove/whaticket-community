@@ -1,6 +1,8 @@
 import path from "path";
+import { fileURLToPath } from "node:url";
 import multer from "multer";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicFolder = path.resolve(__dirname, "..", "..", "public");
 export default {
   directory: publicFolder,

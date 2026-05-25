@@ -1,22 +1,30 @@
-import "./bootstrap";
+import "./bootstrap.js";
 import "reflect-metadata";
 import "express-async-errors";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import * as Sentry from "@sentry/node";
 
-import "./database";
-import uploadConfig from "./config/upload";
-import AppError from "./errors/AppError";
-import routes from "./routes";
-import { logger } from "./utils/logger";
-import InstagramWebhookController from "./controllers/InstagramWebhookController";
-import WhatsAppCloudWebhookController from "./controllers/WhatsAppCloudWebhookController";
-import { rawBodyMiddleware } from "./middleware/rawBody";
+import "./database/index.js";
+import uploadConfig from "./config/upload.js";
+import AppError from "./errors/AppError.js";
+import routes from "./routes/index.js";
+import { logger } from "./utils/logger.js";
+import InstagramWebhookController from "./controllers/InstagramWebhookController.js";
+import WhatsAppCloudWebhookController from "./controllers/WhatsAppCloudWebhookController.js";
+import { rawBodyMiddleware } from "./middleware/rawBody.js";
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PKG_VERSION: string = JSON.parse(
+  readFileSync(join(__dirname, "..", "package.json"), "utf8")
+).version;
 
 const app = express();
 
@@ -54,8 +62,6 @@ app.use(
 );
 
 // Health check endpoint for Docker/load balancer probes
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const PKG_VERSION: string = require("../package.json").version;
 app.get("/health", (_req, res) =>
   res.json({
     status: "ok",

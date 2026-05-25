@@ -1,8 +1,8 @@
 import OpenAI from "openai";
-import Message from "../../models/Message";
-import Contact from "../../models/Contact";
-import CheckSettings from "../../helpers/CheckSettings";
-import AppError from "../../errors/AppError";
+import Message from "../../models/Message.js";
+import Contact from "../../models/Contact.js";
+import CheckSettings from "../../helpers/CheckSettings.js";
+import AppError from "../../errors/AppError.js";
 
 const SummarizeMessagesService = async (
   ticketId: string | number

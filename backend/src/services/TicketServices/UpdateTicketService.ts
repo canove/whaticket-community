@@ -1,16 +1,16 @@
-import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
-import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
-import { getIO } from "../../libs/socket";
-import Ticket from "../../models/Ticket";
-import Contact from "../../models/Contact";
-import Queue from "../../models/Queue";
-import User from "../../models/User";
-import Whatsapp from "../../models/Whatsapp";
-import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
-import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
-import ShowTicketService from "./ShowTicketService";
-import { invalidateTicketCache } from "../MessageServices/CreateMessageService";
-import { invalidateTicketListCache } from "./ListTicketsService";
+import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets.js";
+import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead.js";
+import { getIO } from "../../libs/socket.js";
+import Ticket from "../../models/Ticket.js";
+import Contact from "../../models/Contact.js";
+import Queue from "../../models/Queue.js";
+import User from "../../models/User.js";
+import Whatsapp from "../../models/Whatsapp.js";
+import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage.js";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService.js";
+import ShowTicketService from "./ShowTicketService.js";
+import { invalidateTicketCache } from "../MessageServices/CreateMessageService.js";
+import { invalidateTicketListCache } from "./ListTicketsService.js";
 
 interface TicketData {
   status?: string;
