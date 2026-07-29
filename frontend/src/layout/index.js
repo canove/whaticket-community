@@ -43,9 +43,18 @@ const useStyles = makeStyles((theme) => ({
   toolbarIcon: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
-    padding: "0 8px",
-    minHeight: "48px",
+    justifyContent: "space-between",
+    padding: "0 8px 0 16px",
+    minHeight: "56px",
+  },
+  brand: {
+    fontWeight: 700,
+    fontSize: "1.05rem",
+    letterSpacing: "-0.01em",
+    color: theme.palette.primary.main,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -99,11 +108,14 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(9),
     },
-    // Collapsed: show only the icons — hide the labels and section headers.
+    // Collapsed: show only the icons — hide the labels, section headers and brand.
     "& .MuiListItemText-root": {
       display: "none",
     },
     "& .MuiListSubheader-root": {
+      display: "none",
+    },
+    "& $brand": {
       display: "none",
     },
   },
@@ -208,6 +220,9 @@ const LoggedInLayout = ({ children }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
+          <Typography className={classes.brand} noWrap>
+            {appName || "WhaTicket"}
+          </Typography>
           <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
             <ChevronLeftIcon />
           </IconButton>
@@ -239,14 +254,7 @@ const LoggedInLayout = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            noWrap
-            className={classes.title}
-          >
-            {appName || "WhaTicket"}
-          </Typography>
+          <div className={classes.title} />
 
           <Tooltip title={darkMode ? "Modo claro" : "Modo escuro"}>
             <IconButton

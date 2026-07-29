@@ -17,10 +17,11 @@ import { useThemeContext } from "../../context/DarkMode";
 
 const useStyles = makeStyles(theme => ({
 	root: {
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "stretch",
-		padding: theme.spacing(1, 0, 3),
+		padding: theme.spacing(1, 3, 3, 3),
+	},
+
+	content: {
+		maxWidth: 680,
 	},
 
 	paper: {
@@ -197,7 +198,7 @@ const Settings = () => {
 
 	return (
 		<div className={classes.root}>
-			<Container className={classes.container} maxWidth="sm">
+			<div className={classes.content}>
 				<Typography variant="body2" gutterBottom>
 					{i18n.t("settings.title")}
 				</Typography>
@@ -268,7 +269,7 @@ const Settings = () => {
 						value={settings && settings.length > 0 && getSettingValue("userApiToken")}
 					/>
 				</Paper>
-			</Container>
+			</div>
 		</div>
 	);
 };
