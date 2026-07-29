@@ -99,6 +99,13 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(9),
     },
+    // Collapsed: show only the icons — hide the labels and section headers.
+    "& .MuiListItemText-root": {
+      display: "none",
+    },
+    "& .MuiListSubheader-root": {
+      display: "none",
+    },
   },
   appBarSpacer: {
     minHeight: "64px",

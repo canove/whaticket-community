@@ -44,13 +44,16 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiListItemText-primary": { fontWeight: 600 },
   },
   icon: {
-    minWidth: 34,
+    minWidth: 32,
     color: "inherit",
+    "& svg": {
+      fontSize: 19,
+    },
   },
   text: {
     margin: 0,
     "& .MuiListItemText-primary": {
-      fontSize: "0.86rem",
+      fontSize: "0.82rem",
       fontWeight: 500,
     },
   },
@@ -118,7 +121,6 @@ function ComingSoonItem({ icon, primary }) {
       <ListItem className={clsx(classes.listItem, classes.comingSoon)}>
         {icon ? <ListItemIcon className={classes.icon}>{icon}</ListItemIcon> : null}
         <ListItemText className={classes.text} primary={primary} />
-        <span className={classes.soonBadge}>em breve</span>
       </ListItem>
     </li>
   );

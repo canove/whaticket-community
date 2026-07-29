@@ -177,17 +177,19 @@ const Settings = () => {
 					type="color"
 					className={classes.swatch}
 					value={branding[key]}
-					onChange={e =>
-						setBranding(b => ({ ...b, [key]: e.target.value }))
-					}
+					onChange={e => {
+						const value = e.target.value;
+						setBranding(b => ({ ...b, [key]: value }));
+					}}
 				/>
 				<TextField
 					variant="outlined"
 					margin="dense"
 					value={branding[key]}
-					onChange={e =>
-						setBranding(b => ({ ...b, [key]: e.target.value }))
-					}
+					onChange={e => {
+						const value = e.target.value;
+						setBranding(b => ({ ...b, [key]: value }));
+					}}
 				/>
 			</div>
 		</div>
@@ -210,9 +212,10 @@ const Settings = () => {
 						margin="dense"
 						fullWidth
 						value={branding.appName}
-						onChange={e =>
-							setBranding(b => ({ ...b, appName: e.target.value }))
-						}
+						onChange={e => {
+							const value = e.target.value;
+							setBranding(b => ({ ...b, appName: value }));
+						}}
 					/>
 					<div className={classes.colorsRow}>
 						{renderColorField("Cor primária", "primaryColor")}
