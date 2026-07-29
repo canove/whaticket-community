@@ -27,7 +27,7 @@ import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
 import { useThemeContext } from "../context/DarkMode";
 
-const drawerWidth = 240;
+const drawerWidth = 208;
 
 const useStyles = makeStyles((theme) => ({
   root: {

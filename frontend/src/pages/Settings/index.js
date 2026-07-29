@@ -18,8 +18,9 @@ import { useThemeContext } from "../../context/DarkMode";
 const useStyles = makeStyles(theme => ({
 	root: {
 		display: "flex",
-		alignItems: "center",
-		padding: theme.spacing(8, 8, 3),
+		flexDirection: "column",
+		alignItems: "stretch",
+		padding: theme.spacing(1, 0, 3),
 	},
 
 	paper: {
