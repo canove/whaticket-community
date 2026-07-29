@@ -392,6 +392,7 @@ const messages = {
         placeholderOpen: "Escriba un mensaje o presione '' / '' para usar las respuestas rápidas registradas",
         placeholderClosed:
           "Vuelva a abrir o acepte este ticket para enviar un mensaje.",
+        placeholderPending: "Acepte la conversación para responder.",
         signMessage: "Firmar",
       },
       contactDrawer: {

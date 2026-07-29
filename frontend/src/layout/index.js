@@ -11,12 +11,13 @@ import {
   MenuItem,
   IconButton,
   Menu,
-  Switch,
+  Tooltip,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -26,7 +27,7 @@ import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
 import { useThemeContext } from "../context/DarkMode";
 
-const drawerWidth = 240;
+const drawerWidth = 208;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,9 +43,18 @@ const useStyles = makeStyles((theme) => ({
   toolbarIcon: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
-    padding: "0 8px",
-    minHeight: "48px",
+    justifyContent: "space-between",
+    padding: "0 8px 0 16px",
+    minHeight: "56px",
+  },
+  brand: {
+    fontWeight: 700,
+    fontSize: "1.05rem",
+    letterSpacing: "-0.01em",
+    color: theme.palette.primary.main,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -52,7 +62,10 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    boxShadow: "none",
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -72,6 +85,8 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
     color: theme.palette.text.primary,
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
   },
   drawerPaper: {
     position: "relative",
@@ -93,9 +108,19 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(9),
     },
+    // Collapsed: show only the icons — hide the labels, section headers and brand.
+    "& .MuiListItemText-root": {
+      display: "none",
+    },
+    "& .MuiListSubheader-root": {
+      display: "none",
+    },
+    "& $brand": {
+      display: "none",
+    },
   },
   appBarSpacer: {
-    minHeight: "48px",
+    minHeight: "64px",
   },
   content: {
     flex: 1,
@@ -135,7 +160,7 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
-  const { darkMode, toggleTheme } = useThemeContext();
+  const { darkMode, toggleTheme, appName } = useThemeContext();
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -195,13 +220,18 @@ const LoggedInLayout = ({ children }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
+          {drawerOpen && (
+            <Typography className={classes.brand} noWrap>
+              {appName || "WhaTicket"}
+            </Typography>
+          )}
           <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
             <ChevronLeftIcon />
           </IconButton>
         </div>
         <Divider />
         <List>
-          <MainListItems drawerClose={drawerClose} />
+          <MainListItems drawerClose={drawerClose} drawerOpen={drawerOpen} />
         </List>
         <Divider />
       </Drawer>
@@ -226,24 +256,17 @@ const LoggedInLayout = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            noWrap
-            className={classes.title}
-          >
-            WhaTicket
-          </Typography>
+          <div className={classes.title} />
 
-          <div className={classes.themeSwitchContainer}>
-            <Brightness4Icon className={classes.themeIcon} />
-            <Switch
-              checked={darkMode}
-              onChange={toggleTheme}
-              color="default"
-              className={classes.switch}
-            />
-          </div>
+          <Tooltip title={darkMode ? "Modo claro" : "Modo escuro"}>
+            <IconButton
+              onClick={toggleTheme}
+              className={classes.iconButton}
+              aria-label="alternar tema"
+            >
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </Tooltip>
 
           {user.id && (
             <NotificationsPopOver className={classes.iconButton} />

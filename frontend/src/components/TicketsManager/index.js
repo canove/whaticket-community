@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import Badge from "@material-ui/core/Badge";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import AddIcon from "@material-ui/icons/Add";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import NewTicketModal from "../NewTicketModal";
@@ -15,9 +16,8 @@ import TicketsList from "../TicketsList";
 import TabPanel from "../TabPanel";
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../Can";
 import TicketsQueueSelect from "../TicketsQueueSelect";
-import { Button } from "@material-ui/core";
+import { IconButton, Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   ticketsWrapper: {
@@ -34,22 +34,112 @@ const useStyles = makeStyles((theme) => ({
   tabsHeader: {
     flex: "none",
     backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(1, 1, 0.5, 1),
+  },
+  subTabsHeader: {
+    flex: "none",
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(0.5, 1, 1, 1),
+  },
+  segment: {
+    minHeight: 38,
+    backgroundColor: theme.palette.background.default,
+    borderRadius: 10,
+    padding: 4,
+  },
+  segmentTab: {
+    minHeight: 30,
+    minWidth: 0,
+    borderRadius: 8,
+    textTransform: "none",
+    fontSize: "0.8rem",
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+    "&.Mui-selected": {
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.primary.main,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+    },
   },
   settingsIcon: {
     alignSelf: "center",
     marginLeft: "auto",
     padding: 8,
   },
+  mainTabs: {
+    minHeight: 44,
+  },
   tab: {
-    minWidth: 120,
-    width: 120,
+    minWidth: 0,
+    minHeight: 44,
+    padding: "4px 8px",
+    textTransform: "none",
+    fontSize: "0.8rem",
+    fontWeight: 600,
+  },
+  tabLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  },
+  subTabs: {
+    minHeight: 40,
+  },
+  subTab: {
+    minHeight: 40,
+    textTransform: "none",
+    fontSize: "0.82rem",
+    fontWeight: 600,
+  },
+  segmentTabLabel: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+  },
+  countPill: {
+    minWidth: 20,
+    height: 18,
+    padding: "0 6px",
+    borderRadius: 999,
+    fontSize: "0.68rem",
+    fontWeight: 700,
+    lineHeight: "18px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#fff",
+  },
+  countPillOpen: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  countPillPending: {
+    backgroundColor: theme.palette.secondary.main,
+  },
+  optionsGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: theme.spacing(0.5),
+  },
+  showAllLabel: {
+    marginLeft: 0,
+    marginRight: 0,
+    "& .MuiFormControlLabel-label": {
+      fontSize: "0.82rem",
+      color: theme.palette.text.secondary,
+    },
+  },
+  newButton: {
+    padding: 6,
+    color: theme.palette.primary.main,
+    border: `1px solid ${theme.palette.primary.main}`,
+    borderRadius: 8,
   },
   ticketOptionsBox: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     background: theme.palette.background.paper,
-    padding: theme.spacing(1),
+    padding: theme.spacing(0.75, 1),
   },
   serachInputWrapper: {
     flex: 1,
@@ -72,9 +162,6 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.primary, 
     backgroundColor: theme.palette.background.default,
   },
-  badge: {
-    right: "-10px",
-  },
   show: {
     display: "block",
   },
@@ -89,20 +176,13 @@ const TicketsManager = () => {
   const [tab, setTab] = useState("open");
   const [tabOpen, setTabOpen] = useState("open");
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
-  const [showAllTickets, setShowAllTickets] = useState(false);
+  const [showAllTickets, setShowAllTickets] = useState(true);
   const searchInputRef = useRef();
   const { user } = useContext(AuthContext);
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
-
-  useEffect(() => {
-    if (user.profile.toUpperCase() === "ADMIN") {
-      setShowAllTickets(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (tab === "search") {
@@ -154,114 +234,141 @@ const TicketsManager = () => {
           value={tab}
           onChange={handleChangeTab}
           variant="fullWidth"
-          indicatorColor="primary"
-          textColor="primary"
-          aria-label="icon label tabs example"
+          className={classes.segment}
+          TabIndicatorProps={{ style: { display: "none" } }}
+          aria-label="ticket views"
         >
           <Tab
             value={"open"}
-            icon={<MoveToInboxIcon />}
-            label={i18n.t("tickets.tabs.open.title")}
-            classes={{ root: classes.tab }}
+            classes={{ root: classes.segmentTab }}
+            label={
+              <span className={classes.tabLabel}>
+                <MoveToInboxIcon fontSize="small" />
+                {i18n.t("tickets.tabs.open.title")}
+              </span>
+            }
           />
           <Tab
             value={"closed"}
-            icon={<CheckBoxIcon />}
-            label={i18n.t("tickets.tabs.closed.title")}
-            classes={{ root: classes.tab }}
+            classes={{ root: classes.segmentTab }}
+            label={
+              <span className={classes.tabLabel}>
+                <CheckBoxIcon fontSize="small" />
+                {i18n.t("tickets.tabs.closed.title")}
+              </span>
+            }
           />
           <Tab
             value={"search"}
-            icon={<SearchIcon />}
-            label={i18n.t("tickets.tabs.search.title")}
-            classes={{ root: classes.tab }}
+            classes={{ root: classes.segmentTab }}
+            label={
+              <span className={classes.tabLabel}>
+                <SearchIcon fontSize="small" />
+                {i18n.t("tickets.tabs.search.title")}
+              </span>
+            }
           />
         </Tabs>
       </Paper>
       <Paper square elevation={0} className={classes.ticketOptionsBox}>
         {tab === "search" ? (
-          <div className={classes.serachInputWrapper}>
-            <SearchIcon className={classes.searchIcon} />
-            <InputBase
-              className={classes.searchInput}
-              inputRef={searchInputRef}
-              placeholder={i18n.t("tickets.search.placeholder")}
-              type="search"
-              onChange={handleSearch}
-            />
-          </div>
-        ) : (
           <>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => setNewTicketModalOpen(true)}
-            >
-              {i18n.t("ticketsManager.buttons.newTicket")}
-            </Button>
-            <Can
-              role={user.profile}
-              perform="tickets-manager:showall"
-              yes={() => (
-                <FormControlLabel
-                  label={i18n.t("tickets.buttons.showAll")}
-                  labelPlacement="start"
-                  control={
-                    <Switch
-                      size="small"
-                      checked={showAllTickets}
-                      onChange={() =>
-                        setShowAllTickets((prevState) => !prevState)
-                      }
-                      name="showAllTickets"
-                      color="primary"
-                    />
-                  }
-                />
-              )}
+            <div className={classes.serachInputWrapper}>
+              <SearchIcon className={classes.searchIcon} />
+              <InputBase
+                className={classes.searchInput}
+                inputRef={searchInputRef}
+                placeholder={i18n.t("tickets.search.placeholder")}
+                type="search"
+                onChange={handleSearch}
+              />
+            </div>
+            <TicketsQueueSelect
+              selectedQueueIds={selectedQueueIds}
+              userQueues={user?.queues}
+              onChange={(values) => setSelectedQueueIds(values)}
             />
           </>
+        ) : (
+          <>
+            <Tooltip title={i18n.t("ticketsManager.buttons.newTicket")}>
+              <IconButton
+                size="small"
+                className={classes.newButton}
+                onClick={() => setNewTicketModalOpen(true)}
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <div className={classes.optionsGroup}>
+              <FormControlLabel
+                className={classes.showAllLabel}
+                label={i18n.t("tickets.buttons.showAll")}
+                labelPlacement="start"
+                control={
+                  <Switch
+                    size="small"
+                    checked={showAllTickets}
+                    onChange={() =>
+                      setShowAllTickets((prevState) => !prevState)
+                    }
+                    name="showAllTickets"
+                    color="primary"
+                  />
+                }
+              />
+              <TicketsQueueSelect
+                selectedQueueIds={selectedQueueIds}
+                userQueues={user?.queues}
+                onChange={(values) => setSelectedQueueIds(values)}
+              />
+            </div>
+          </>
         )}
-        <TicketsQueueSelect
-          style={{ marginLeft: 6 }}
-          selectedQueueIds={selectedQueueIds}
-          userQueues={user?.queues}
-          onChange={(values) => setSelectedQueueIds(values)}
-        />
       </Paper>
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
+        <div className={classes.subTabsHeader}>
         <Tabs
           value={tabOpen}
           onChange={handleChangeTabOpen}
-          indicatorColor="primary"
-          textColor="primary"
           variant="fullWidth"
+          className={classes.segment}
+          TabIndicatorProps={{ style: { display: "none" } }}
         >
           <Tab
+            classes={{ root: classes.segmentTab }}
             label={
-              <Badge
-                className={classes.badge}
-                badgeContent={openCount}
-                color="primary"
-              >
+              <span className={classes.segmentTabLabel}>
                 {i18n.t("ticketsList.assignedHeader")}
-              </Badge>
+                {openCount > 0 && (
+                  <span
+                    className={clsx(classes.countPill, classes.countPillOpen)}
+                  >
+                    {openCount}
+                  </span>
+                )}
+              </span>
             }
             value={"open"}
           />
           <Tab
+            classes={{ root: classes.segmentTab }}
             label={
-              <Badge
-                className={classes.badge}
-                badgeContent={pendingCount}
-                color="secondary"
-              >
+              <span className={classes.segmentTabLabel}>
                 {i18n.t("ticketsList.pendingHeader")}
-              </Badge>
+                {pendingCount > 0 && (
+                  <span
+                    className={clsx(classes.countPill, classes.countPillPending)}
+                  >
+                    {pendingCount}
+                  </span>
+                )}
+              </span>
             }
             value={"pending"}
           />
         </Tabs>
+        </div>
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
             status="open"

@@ -1,0 +1,29 @@
+# Optimized backend image for Railway / one-click PaaS — used via backend/railway.json.
+#
+# Why a second Dockerfile: the default backend/Dockerfile installs Google Chrome
+# (needed by the `wwebjs` provider) on top of node:14, whose EOL Debian "buster"
+# apt repos are slow/404. The `wame` provider talks to wame.api.br over HTTP and
+# NEVER launches a browser, so here we drop Chrome and apt entirely and move to
+# Node 18 (its npm is far faster than the npm 6 shipped with node:14). Result:
+# a much smaller, much faster build. Root Directory stays = `backend`.
+
+FROM node:18
+
+# whatsapp-web.js pulls puppeteer transitively; never download Chromium.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+WORKDIR /usr/src/app
+
+# Install deps (incl. dev, needed for the TypeScript build).
+COPY package*.json ./
+RUN npm install --no-audit --no-fund
+
+COPY . .
+RUN npm run build
+
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+
+# Wait for the database (retry migrate until reachable), then start.
+CMD ["sh", "-c", "until npx sequelize db:migrate; do echo 'waiting for database...'; sleep 3; done && node dist/server.js"]

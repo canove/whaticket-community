@@ -16,7 +16,11 @@ import {
 	TextField,
 	Switch,
 	FormControlLabel,
+	InputAdornment,
+	IconButton,
 } from "@material-ui/core";
+
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
@@ -59,14 +63,21 @@ const SessionSchema = Yup.object().shape({
 
 const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const classes = useStyles();
+	const isWame =
+		(window.ENV?.VITE_WHATSAPP_PROVIDER ||
+			import.meta.env.VITE_WHATSAPP_PROVIDER) === "wame";
+
 	const initialState = {
 		name: "",
 		greetingMessage: "",
 		farewellMessage: "",
 		isDefault: false,
+		server: "",
+		key: "",
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
+	const [showKey, setShowKey] = useState(false);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -196,6 +207,45 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										margin="dense"
 									/>
 								</div>
+								{isWame && (
+									<>
+										<div>
+											<Field
+												as={TextField}
+												label="Server (wame)"
+												name="server"
+												fullWidth
+												variant="outlined"
+												margin="dense"
+												helperText="Ex.: https://us.api-wa.me"
+											/>
+										</div>
+										<div>
+											<Field
+												as={TextField}
+												label="Key (instância wame)"
+												name="key"
+												fullWidth
+												variant="outlined"
+												margin="dense"
+												type={showKey ? "text" : "password"}
+												InputProps={{
+													endAdornment: (
+														<InputAdornment position="end">
+															<IconButton
+																aria-label="toggle key visibility"
+																onClick={() => setShowKey(e => !e)}
+																edge="end"
+															>
+																{showKey ? <VisibilityOff /> : <Visibility />}
+															</IconButton>
+														</InputAdornment>
+													)
+												}}
+											/>
+										</div>
+									</>
+								)}
 								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
 									onChange={selectedIds => setSelectedQueueIds(selectedIds)}

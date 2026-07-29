@@ -7,6 +7,25 @@
 
 # WhaTicket!
 
+> ## 🆕 Now with the **Official WhatsApp API** via [Wame API](https://api-wa.me) — no risk of losing your number
+>
+> This fork adds a **`wame` provider** that connects WhaTicket to the **official
+> WhatsApp API** through [Wame API](https://api-wa.me). No `whatsapp-web.js`,
+> no browser automation, **no risk of getting your number banned** — and **no Meta
+> app / Tech Provider onboarding** to deal with.
+>
+> **Just create an instance at [Wame API](https://api-wa.me), paste the
+> `Server` + `Key` into a WhatsApp connection, and connect.** See
+> [Official WhatsApp API via Wame API](#official-whatsapp-api-via-wame-api).
+
+### 🚀 One-click deploy on Railway
+
+Deploy the whole stack (backend + frontend + MySQL) with the `wame` provider ready to go — the backend gets a **public HTTPS domain**, so the webhook works with no tunnel.
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/wyE_J-?referralCode=U2lC8P&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+See **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)** for the full setup and how to publish your own shareable template.
+
 **NOTE**: The new version of whatsapp-web.js required Node 14. Upgrade your installations to keep using it.
 
 A _very simple_ Ticket System based on WhatsApp messages.
@@ -38,6 +57,33 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 - Send and receive message ✅
 - Send media (images/audio/documents) ✅
 - Receive media (images/audio/video/documents) ✅
+- Official WhatsApp API via **Wame API** — no Meta app, no Tech Provider onboarding ✅ 🆕
+
+## Official WhatsApp API via Wame API
+
+Besides the default `whatsapp-web.js` (and `whaileys`) providers, this fork ships a **`wame` provider** that connects WhaTicket to the official WhatsApp API through [Wame API](https://api-wa.me).
+
+**Why it's easy:** you **don't** need to create a Meta/Facebook app, request permissions, or go through the WhatsApp Cloud API / Tech Provider approval process yourself. Just:
+
+1. Sign in at [Wame API](https://api-wa.me) and **create an instance** (you get a `Server` URL and a `Key`).
+2. In WhaTicket, add a new **WhatsApp Connection** and fill in the **Server** and **Key** fields.
+3. **Connect** — scan the QR Code (shown right in the WhaTicket panel) and you're online.
+
+Sending is done over HTTP through the [`@raphaelvserafim/client-api-whatsapp`](https://www.npmjs.com/package/@raphaelvserafim/client-api-whatsapp) SDK, and incoming messages arrive via webhook — so WhaTicket keeps working exactly as usual (tickets, media, acks), just backed by the official API.
+
+**Enabling the provider:**
+
+```bash
+# backend/.env
+WHATSAPP_PROVIDER=wame
+BACKEND_URL=https://your-public-backend.example.com   # must be reachable by wame (use a tunnel like ngrok/cloudflared in dev)
+WAME_WEBHOOK_SECRET=change-me
+
+# frontend/.env
+REACT_APP_WHATSAPP_PROVIDER=wame
+```
+
+> The `wame` provider is **opt-in**. With the default `WHATSAPP_PROVIDER` (`wwebjs`) nothing changes. Because messages are delivered by webhook, the backend must be reachable from the internet at `BACKEND_URL`.
 
 ## Installation and Usage (Linux Ubuntu - Development)
 

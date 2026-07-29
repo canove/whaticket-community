@@ -1,5 +1,13 @@
 FROM node:14 as build-deps
 
+# Debian "buster" (the base of node:14) is EOL — its apt repositories were moved
+# to archive.debian.org, so the original mirrors now return 404. Repoint apt at
+# the archive (and skip the expired "Valid-Until" check) so the build keeps working.
+RUN sed -i -e 's|deb.debian.org|archive.debian.org|g' \
+           -e 's|security.debian.org|archive.debian.org|g' \
+           -e '/buster-updates/d' /etc/apt/sources.list \
+    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid
+
 RUN apt-get update && apt-get install -y wget
 
 ENV DOCKERIZE_VERSION v0.6.1

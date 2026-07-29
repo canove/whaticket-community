@@ -4,3 +4,6 @@ ssl/
 .wwebjs_auth
 .wwebjs_cache
 .idea
+.superpowers/
+docs/*
+!docs/DEPLOY-RAILWAY.md

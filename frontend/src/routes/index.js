@@ -7,6 +7,7 @@ import Dashboard from "../pages/Dashboard/";
 import Tickets from "../pages/Tickets/";
 import Signup from "../pages/Signup/";
 import Login from "../pages/Login/";
+import Setup from "../pages/Setup/";
 import Connections from "../pages/Connections/";
 import Settings from "../pages/Settings/";
 import Users from "../pages/Users";
@@ -26,6 +27,7 @@ const Routes = () => {
           <Switch>
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
+            <Route exact path="/setup" component={Setup} />
             <WhatsAppsProvider>
               <LoggedInLayout>
                 <Route exact path="/" component={Dashboard} isPrivate />

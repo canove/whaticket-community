@@ -6,7 +6,9 @@ import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
 import { Paper, makeStyles } from "@material-ui/core";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
+import { i18n } from "../../translate/i18n";
 import ContactDrawer from "../ContactDrawer";
 import MessageInput from "../MessageInput/";
 import TicketHeader from "../TicketHeader";
@@ -70,6 +72,18 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
     marginRight: 0,
+  },
+
+  pendingHint: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: theme.spacing(1.5),
+    backgroundColor: theme.palette.background.paper,
+    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+    color: theme.palette.text.secondary,
+    fontSize: "0.85rem",
   },
 }));
 
@@ -169,7 +183,14 @@ const Ticket = () => {
             ticketId={ticketId}
             isGroup={ticket.isGroup}
           ></MessagesList>
-          <MessageInput ticketStatus={ticket.status} />
+          {ticket.status === "pending" ? (
+            <div className={classes.pendingHint}>
+              <LockOutlinedIcon fontSize="small" />
+              {i18n.t("messagesInput.placeholderPending")}
+            </div>
+          ) : (
+            <MessageInput ticketStatus={ticket.status} />
+          )}
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer
