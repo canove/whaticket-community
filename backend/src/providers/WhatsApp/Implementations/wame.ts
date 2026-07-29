@@ -162,6 +162,27 @@ export const WameProvider: WhatsappProvider = {
         webhookHistory: ""
       } as any);
       await client.instance.connect();
+
+      // Official accounts are usually already connected on Meta's side, so no
+      // "connection open" webhook fires — reflect the real state right now so
+      // the connection doesn't sit as DISCONNECTED while actually online.
+      try {
+        const res = await client.instance.info();
+        const inst = (res?.instance ?? {}) as unknown as RawWameInstance;
+        if (inst.connected ?? inst.phoneConnected) {
+          await whatsapp.update({
+            status: "CONNECTED",
+            qrcode: "",
+            retries: 0
+          });
+          getIO().emit("whatsappSession", {
+            action: "update",
+            session: whatsapp
+          });
+        }
+      } catch (infoErr) {
+        logger.error(`wame init info error: ${infoErr}`);
+      }
     } catch (err) {
       logger.error(`wame init error: ${err}`);
       await whatsapp.update({ status: "DISCONNECTED" });
