@@ -17,11 +17,11 @@ export const receive = async (req: Request, res: Response): Promise<Response> =>
     const body = req.body || {};
 
     // Arrival log — confirms the webhook actually reached us (whaticket does not
-    // log HTTP requests by default).
+    // log HTTP requests by default) and shows the raw payload for debugging.
     logger.info(
       `wame webhook hit: wa=${whatsappId} kind=${
         body?.object ? "meta" : body?.type || "unknown"
-      }`
+      } body=${JSON.stringify(body).slice(0, 1000)}`
     );
 
     const token = (req.query.token as string) || req.header("x-wame-token") || "";
