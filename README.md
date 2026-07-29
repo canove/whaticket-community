@@ -38,6 +38,33 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 - Send and receive message ✅
 - Send media (images/audio/documents) ✅
 - Receive media (images/audio/video/documents) ✅
+- Official WhatsApp API via **wame.api.br** — no Meta app, no Tech Provider onboarding ✅ 🆕
+
+## Official WhatsApp API via wame.api.br
+
+Besides the default `whatsapp-web.js` (and `whaileys`) providers, this fork ships a **`wame` provider** that connects WhaTicket to the official WhatsApp API through [wame.api.br](https://wame.api.br).
+
+**Why it's easy:** you **don't** need to create a Meta/Facebook app, request permissions, or go through the WhatsApp Cloud API / Tech Provider approval process yourself. Just:
+
+1. Sign in at [wame.api.br](https://wame.api.br) and **create an instance** (you get a `Server` URL and a `Key`).
+2. In WhaTicket, add a new **WhatsApp Connection** and fill in the **Server** and **Key** fields.
+3. **Connect** — scan the QR Code (shown right in the WhaTicket panel) and you're online.
+
+Sending is done over HTTP through the [`@raphaelvserafim/client-api-whatsapp`](https://www.npmjs.com/package/@raphaelvserafim/client-api-whatsapp) SDK, and incoming messages arrive via webhook — so WhaTicket keeps working exactly as usual (tickets, media, acks), just backed by the official API.
+
+**Enabling the provider:**
+
+```bash
+# backend/.env
+WHATSAPP_PROVIDER=wame
+BACKEND_URL=https://your-public-backend.example.com   # must be reachable by wame (use a tunnel like ngrok/cloudflared in dev)
+WAME_WEBHOOK_SECRET=change-me
+
+# frontend/.env
+REACT_APP_WHATSAPP_PROVIDER=wame
+```
+
+> The `wame` provider is **opt-in**. With the default `WHATSAPP_PROVIDER` (`wwebjs`) nothing changes. Because messages are delivered by webhook, the backend must be reachable from the internet at `BACKEND_URL`.
 
 ## Installation and Usage (Linux Ubuntu - Development)
 
