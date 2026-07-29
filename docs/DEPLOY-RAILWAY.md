@@ -100,8 +100,8 @@ FRONTEND_URL=https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}
 
 | Variable | Value |
 | --- | --- |
-| `REACT_APP_BACKEND_URL` | the backend service's public URL |
-| `REACT_APP_WHATSAPP_PROVIDER` | `wame` |
+| `VITE_BACKEND_URL` | the backend service's public URL |
+| `VITE_WHATSAPP_PROVIDER` | `wame` |
 
 > The frontend injects `REACT_APP_*` at runtime (via
 > `.docker/add-env-vars.sh`), so these can be set on the service without
@@ -110,9 +110,13 @@ FRONTEND_URL=https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}
 **Copy-paste (frontend → Variables → Raw Editor):**
 
 ```dotenv
-REACT_APP_BACKEND_URL=https://${{backend.RAILWAY_PUBLIC_DOMAIN}}
-REACT_APP_WHATSAPP_PROVIDER=wame
+VITE_BACKEND_URL=https://${{backend.RAILWAY_PUBLIC_DOMAIN}}
+VITE_WHATSAPP_PROVIDER=wame
 ```
+
+> This frontend is **Vite** — it reads `VITE_*` variables (via `src/config.js` →
+> `window.ENV`, injected at runtime by `.docker/add-env-vars.sh`). Use the
+> `VITE_` prefix, **not** `REACT_APP_`.
 
 > Railway's **Raw Editor** (Variables tab) lets you paste a whole `KEY=VALUE`
 > block at once. The `${{MySQL.*}}` / `${{Redis.*}}` references resolve

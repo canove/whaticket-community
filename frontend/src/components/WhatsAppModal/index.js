@@ -59,7 +59,9 @@ const SessionSchema = Yup.object().shape({
 
 const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const classes = useStyles();
-	const isWame = process.env.REACT_APP_WHATSAPP_PROVIDER === "wame";
+	const isWame =
+		(window.ENV?.VITE_WHATSAPP_PROVIDER ||
+			import.meta.env.VITE_WHATSAPP_PROVIDER) === "wame";
 
 	const initialState = {
 		name: "",
