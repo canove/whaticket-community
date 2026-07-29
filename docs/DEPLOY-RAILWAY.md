@@ -149,7 +149,7 @@ Once the project runs end to end:
 
 Anyone can then click it and get their own WhaTicket + wame stack (MySQL + Redis
 + backend + frontend) provisioned automatically — great for sharing and for
-promoting the wame.api.br integration.
+promoting the Wame API integration.
 
 ## Gotchas
 

@@ -7,16 +7,16 @@
 
 # WhaTicket!
 
-> ## 🆕 Now with the **Official WhatsApp API** via [wame.api.br](https://wame.api.br) — no risk of losing your number
+> ## 🆕 Now with the **Official WhatsApp API** via [Wame API](https://api-wa.me) — no risk of losing your number
 >
 > This fork adds a **`wame` provider** that connects WhaTicket to the **official
-> WhatsApp API** through [wame.api.br](https://wame.api.br). No `whatsapp-web.js`,
+> WhatsApp API** through [Wame API](https://api-wa.me). No `whatsapp-web.js`,
 > no browser automation, **no risk of getting your number banned** — and **no Meta
 > app / Tech Provider onboarding** to deal with.
 >
-> **Just create an instance at [wame.api.br](https://wame.api.br), paste the
+> **Just create an instance at [Wame API](https://api-wa.me), paste the
 > `Server` + `Key` into a WhatsApp connection, and connect.** See
-> [Official WhatsApp API via wame.api.br](#official-whatsapp-api-via-wameapibr).
+> [Official WhatsApp API via Wame API](#official-whatsapp-api-via-wame-api).
 
 ### 🚀 One-click deploy on Railway
 
@@ -57,15 +57,15 @@ If a contact sent a new message in less than 2 hours interval, and there is no t
 - Send and receive message ✅
 - Send media (images/audio/documents) ✅
 - Receive media (images/audio/video/documents) ✅
-- Official WhatsApp API via **wame.api.br** — no Meta app, no Tech Provider onboarding ✅ 🆕
+- Official WhatsApp API via **Wame API** — no Meta app, no Tech Provider onboarding ✅ 🆕
 
-## Official WhatsApp API via wame.api.br
+## Official WhatsApp API via Wame API
 
-Besides the default `whatsapp-web.js` (and `whaileys`) providers, this fork ships a **`wame` provider** that connects WhaTicket to the official WhatsApp API through [wame.api.br](https://wame.api.br).
+Besides the default `whatsapp-web.js` (and `whaileys`) providers, this fork ships a **`wame` provider** that connects WhaTicket to the official WhatsApp API through [Wame API](https://api-wa.me).
 
 **Why it's easy:** you **don't** need to create a Meta/Facebook app, request permissions, or go through the WhatsApp Cloud API / Tech Provider approval process yourself. Just:
 
-1. Sign in at [wame.api.br](https://wame.api.br) and **create an instance** (you get a `Server` URL and a `Key`).
+1. Sign in at [Wame API](https://api-wa.me) and **create an instance** (you get a `Server` URL and a `Key`).
 2. In WhaTicket, add a new **WhatsApp Connection** and fill in the **Server** and **Key** fields.
 3. **Connect** — scan the QR Code (shown right in the WhaTicket panel) and you're online.
 

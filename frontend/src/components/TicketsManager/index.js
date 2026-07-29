@@ -34,6 +34,32 @@ const useStyles = makeStyles((theme) => ({
   tabsHeader: {
     flex: "none",
     backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(1, 1, 0.5, 1),
+  },
+  subTabsHeader: {
+    flex: "none",
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(0.5, 1, 1, 1),
+  },
+  segment: {
+    minHeight: 38,
+    backgroundColor: theme.palette.background.default,
+    borderRadius: 10,
+    padding: 4,
+  },
+  segmentTab: {
+    minHeight: 30,
+    minWidth: 0,
+    borderRadius: 8,
+    textTransform: "none",
+    fontSize: "0.8rem",
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+    "&.Mui-selected": {
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.primary.main,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+    },
   },
   settingsIcon: {
     alignSelf: "center",
@@ -175,14 +201,13 @@ const TicketsManager = () => {
           value={tab}
           onChange={handleChangeTab}
           variant="fullWidth"
-          indicatorColor="primary"
-          textColor="primary"
-          className={classes.mainTabs}
-          aria-label="icon label tabs example"
+          className={classes.segment}
+          TabIndicatorProps={{ style: { display: "none" } }}
+          aria-label="ticket views"
         >
           <Tab
             value={"open"}
-            classes={{ root: classes.tab }}
+            classes={{ root: classes.segmentTab }}
             label={
               <span className={classes.tabLabel}>
                 <MoveToInboxIcon fontSize="small" />
@@ -192,7 +217,7 @@ const TicketsManager = () => {
           />
           <Tab
             value={"closed"}
-            classes={{ root: classes.tab }}
+            classes={{ root: classes.segmentTab }}
             label={
               <span className={classes.tabLabel}>
                 <CheckBoxIcon fontSize="small" />
@@ -202,7 +227,7 @@ const TicketsManager = () => {
           />
           <Tab
             value={"search"}
-            classes={{ root: classes.tab }}
+            classes={{ root: classes.segmentTab }}
             label={
               <span className={classes.tabLabel}>
                 <SearchIcon fontSize="small" />
@@ -264,16 +289,16 @@ const TicketsManager = () => {
         />
       </Paper>
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
+        <div className={classes.subTabsHeader}>
         <Tabs
           value={tabOpen}
           onChange={handleChangeTabOpen}
-          indicatorColor="primary"
-          textColor="primary"
           variant="fullWidth"
-          className={classes.subTabs}
+          className={classes.segment}
+          TabIndicatorProps={{ style: { display: "none" } }}
         >
           <Tab
-            classes={{ root: classes.subTab }}
+            classes={{ root: classes.segmentTab }}
             label={
               <Badge
                 className={classes.badge}
@@ -286,7 +311,7 @@ const TicketsManager = () => {
             value={"open"}
           />
           <Tab
-            classes={{ root: classes.subTab }}
+            classes={{ root: classes.segmentTab }}
             label={
               <Badge
                 className={classes.badge}
@@ -299,6 +324,7 @@ const TicketsManager = () => {
             value={"pending"}
           />
         </Tabs>
+        </div>
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
             status="open"
