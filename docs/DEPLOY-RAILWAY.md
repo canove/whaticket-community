@@ -80,18 +80,21 @@ WHATSAPP_PROVIDER=wame
 WAME_WEBHOOK_SECRET=change-me-strong-secret
 DB_DIALECT=mysql
 DB_HOST=${{MySQL.MYSQLHOST}}
-DB_PORT=${{MySQL.MYSQLPORT}}
-DB_NAME=${{MySQL.MYSQLDATABASE}}
-DB_USER=${{MySQL.MYSQLUSER}}
-DB_PASS=${{MySQL.MYSQLPASSWORD}}
-IO_REDIS_SERVER=${{Redis.REDISHOST}}
-IO_REDIS_PORT=${{Redis.REDISPORT}}
-IO_REDIS_PASSWORD=${{Redis.REDISPASSWORD}}
+DB_NAME=${{MySQL.MYSQL_DATABASE}}
+DB_USER=root
+DB_PASS=${{MySQL.MYSQL_ROOT_PASSWORD}}
 JWT_SECRET=change-me-random
 JWT_REFRESH_SECRET=change-me-another-random
 BACKEND_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}
-FRONTEND_URL=https://REPLACE-WITH-FRONTEND-DOMAIN
+FRONTEND_URL=https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}
 ```
+
+> **Why the "base" MySQL vars?** `${{MySQL.MYSQLPASSWORD}}` / `${{MySQL.MYSQLDATABASE}}`
+> are themselves references on the MySQL service and can resolve to an **empty
+> string** when referenced from another service — which produces
+> `Access denied for user ''`. Use the source variables
+> `${{MySQL.MYSQL_ROOT_PASSWORD}}` and `${{MySQL.MYSQL_DATABASE}}` (and
+> `DB_USER=root`), which always resolve.
 
 ### frontend service
 
@@ -107,7 +110,7 @@ FRONTEND_URL=https://REPLACE-WITH-FRONTEND-DOMAIN
 **Copy-paste (frontend → Variables → Raw Editor):**
 
 ```dotenv
-REACT_APP_BACKEND_URL=https://REPLACE-WITH-BACKEND-DOMAIN
+REACT_APP_BACKEND_URL=https://${{backend.RAILWAY_PUBLIC_DOMAIN}}
 REACT_APP_WHATSAPP_PROVIDER=wame
 ```
 
