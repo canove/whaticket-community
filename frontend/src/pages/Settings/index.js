@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -7,11 +7,13 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 import { toast } from "react-toastify";
 
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n.js";
 import toastError from "../../errors/toastError";
+import { useThemeContext } from "../../context/DarkMode";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -25,22 +27,68 @@ const useStyles = makeStyles(theme => ({
 		display: "flex",
 		alignItems: "center",
 		marginBottom: 12,
+	},
 
+	brandingPaper: {
+		padding: theme.spacing(3),
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "stretch",
+		marginBottom: 12,
+	},
+
+	sectionTitle: {
+		fontWeight: 700,
+		marginBottom: theme.spacing(2),
+	},
+
+	colorsRow: {
+		display: "flex",
+		gap: 16,
+		marginTop: 12,
+	},
+
+	colorField: {
+		flex: 1,
+	},
+
+	colorControls: {
+		display: "flex",
+		alignItems: "center",
+		gap: 8,
+		marginTop: 4,
+	},
+
+	swatch: {
+		width: 42,
+		height: 42,
+		padding: 0,
+		border: "none",
+		background: "none",
+		cursor: "pointer",
+	},
+
+	saveButton: {
+		alignSelf: "flex-start",
+		marginTop: theme.spacing(2),
 	},
 
 	settingOption: {
 		marginLeft: "auto",
 	},
-	margin: {
-		margin: theme.spacing(1),
-	},
-
 }));
 
 const Settings = () => {
 	const classes = useStyles();
+	const { refreshBranding } = useThemeContext();
 
 	const [settings, setSettings] = useState([]);
+	const [branding, setBranding] = useState({
+		appName: "",
+		primaryColor: "#0E7C6B",
+		secondaryColor: "#25D366",
+	});
+	const [savingBranding, setSavingBranding] = useState(false);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -52,6 +100,18 @@ const Settings = () => {
 			}
 		};
 		fetchSession();
+	}, []);
+
+	useEffect(() => {
+		const fetchBranding = async () => {
+			try {
+				const { data } = await api.get("/branding");
+				if (data) setBranding(data);
+			} catch (err) {
+				// keep defaults
+			}
+		};
+		fetchBranding();
 	}, []);
 
 	useEffect(() => {
@@ -87,10 +147,48 @@ const Settings = () => {
 		}
 	};
 
+	const handleSaveBranding = async () => {
+		setSavingBranding(true);
+		try {
+			await api.put("/branding", branding);
+			await refreshBranding();
+			toast.success("Marca atualizada!");
+		} catch (err) {
+			toastError(err);
+		}
+		setSavingBranding(false);
+	};
+
 	const getSettingValue = key => {
 		const setting = settings.find(s => s.key === key);
 		return setting ? setting.value : "";
 	};
+
+	const renderColorField = (label, key) => (
+		<div className={classes.colorField}>
+			<Typography variant="caption" color="textSecondary">
+				{label}
+			</Typography>
+			<div className={classes.colorControls}>
+				<input
+					type="color"
+					className={classes.swatch}
+					value={branding[key]}
+					onChange={e =>
+						setBranding(b => ({ ...b, [key]: e.target.value }))
+					}
+				/>
+				<TextField
+					variant="outlined"
+					margin="dense"
+					value={branding[key]}
+					onChange={e =>
+						setBranding(b => ({ ...b, [key]: e.target.value }))
+					}
+				/>
+			</div>
+		</div>
+	);
 
 	return (
 		<div className={classes.root}>
@@ -98,6 +196,36 @@ const Settings = () => {
 				<Typography variant="body2" gutterBottom>
 					{i18n.t("settings.title")}
 				</Typography>
+
+				<Paper className={classes.brandingPaper}>
+					<Typography variant="body1" className={classes.sectionTitle}>
+						Marca
+					</Typography>
+					<TextField
+						label="Nome do sistema"
+						variant="outlined"
+						margin="dense"
+						fullWidth
+						value={branding.appName}
+						onChange={e =>
+							setBranding(b => ({ ...b, appName: e.target.value }))
+						}
+					/>
+					<div className={classes.colorsRow}>
+						{renderColorField("Cor primária", "primaryColor")}
+						{renderColorField("Cor secundária", "secondaryColor")}
+					</div>
+					<Button
+						className={classes.saveButton}
+						variant="contained"
+						color="primary"
+						disabled={savingBranding}
+						onClick={handleSaveBranding}
+					>
+						{savingBranding ? "Salvando..." : "Salvar marca"}
+					</Button>
+				</Paper>
+
 				<Paper className={classes.paper}>
 					<Typography variant="body1">
 						{i18n.t("settings.settings.userCreation.name")}
@@ -121,7 +249,6 @@ const Settings = () => {
 							{i18n.t("settings.settings.userCreation.options.disabled")}
 						</option>
 					</Select>
-
 				</Paper>
 
 				<Paper className={classes.paper}>
@@ -135,7 +262,6 @@ const Settings = () => {
 						value={settings && settings.length > 0 && getSettingValue("userApiToken")}
 					/>
 				</Paper>
-
 			</Container>
 		</div>
 	);

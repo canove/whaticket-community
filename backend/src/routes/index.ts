@@ -14,6 +14,7 @@ import apiRoutes from "./apiRoutes";
 import wameWebhookRoutes from "./wameWebhookRoutes";
 import wameRoutes from "./wameRoutes";
 import setupRoutes from "./setupRoutes";
+import brandingRoutes from "./brandingRoutes";
 
 const routes = Router();
 
@@ -50,5 +51,6 @@ routes.use("/api/messages", apiRoutes);
 routes.use(wameWebhookRoutes);
 routes.use(wameRoutes);
 routes.use(setupRoutes);
+routes.use(brandingRoutes);
 
 export default routes;

@@ -11,12 +11,13 @@ import {
   MenuItem,
   IconButton,
   Menu,
-  Switch,
+  Tooltip,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
@@ -52,7 +53,10 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    boxShadow: "none",
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -72,6 +76,8 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
     color: theme.palette.text.primary,
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
   },
   drawerPaper: {
     position: "relative",
@@ -95,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   appBarSpacer: {
-    minHeight: "48px",
+    minHeight: "64px",
   },
   content: {
     flex: 1,
@@ -135,7 +141,7 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
-  const { darkMode, toggleTheme } = useThemeContext();
+  const { darkMode, toggleTheme, appName } = useThemeContext();
 
   useEffect(() => {
     if (document.body.offsetWidth > 600) {
@@ -232,18 +238,18 @@ const LoggedInLayout = ({ children }) => {
             noWrap
             className={classes.title}
           >
-            WhaTicket
+            {appName || "WhaTicket"}
           </Typography>
 
-          <div className={classes.themeSwitchContainer}>
-            <Brightness4Icon className={classes.themeIcon} />
-            <Switch
-              checked={darkMode}
-              onChange={toggleTheme}
-              color="default"
-              className={classes.switch}
-            />
-          </div>
+          <Tooltip title={darkMode ? "Modo claro" : "Modo escuro"}>
+            <IconButton
+              onClick={toggleTheme}
+              className={classes.iconButton}
+              aria-label="alternar tema"
+            >
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </Tooltip>
 
           {user.id && (
             <NotificationsPopOver className={classes.iconButton} />
