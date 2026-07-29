@@ -66,6 +66,16 @@ REACT_APP_WHATSAPP_PROVIDER=wame
 
 > The `wame` provider is **opt-in**. With the default `WHATSAPP_PROVIDER` (`wwebjs`) nothing changes. Because messages are delivered by webhook, the backend must be reachable from the internet at `BACKEND_URL`.
 
+### One-click deploy on Railway
+
+WhaTicket is a monorepo (separate `backend/` and `frontend/` apps + MySQL +
+Redis). Deploying gives the backend a **public HTTPS domain**, so the `wame`
+webhook works with no tunnel. See **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**
+for the full setup and how to publish your own shareable template.
+
+<!-- After publishing your template on Railway, replace XXXXXX with its code: -->
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/XXXXXX)
+
 ## Installation and Usage (Linux Ubuntu - Development)
 
 Create Mysql Database using docker:
