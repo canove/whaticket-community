@@ -20,9 +20,8 @@ export const receive = async (req: Request, res: Response): Promise<Response> =>
     }
 
     const body = req.body || {};
-    const event = { type: body.type, data: body.data };
 
-    await handleWameWebhook(whatsappId, event, {
+    await handleWameWebhook(whatsappId, body, {
       onMessage: (msg, contact, context, media) =>
         handleMessage(msg, contact, context, media),
       onAck: (messageId, ack) => handleMessageAck(messageId, ack as any),

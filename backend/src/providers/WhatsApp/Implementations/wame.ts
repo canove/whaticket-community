@@ -102,10 +102,10 @@ export const WameProvider: WhatsappProvider = {
       await client.instance.updateWebhook({
         allowWebhook: true,
         allowNumber: "all",
-        // Force the "native" envelope ({ instance, type, data }) — our webhook
-        // handler/mapper is built for it. Without this the instance may keep the
-        // Meta Cloud API format and incoming messages won't be parsed.
-        webhookFormat: "native",
+        // Official focus: use the Meta / WhatsApp Cloud API envelope for
+        // messages & statuses. (Connection/QR events still arrive in the native
+        // shape — the webhook handler detects both.)
+        webhookFormat: "meta",
         webhookMessage: base,
         webhookMessageFromMe: base,
         webhookConnection: base,
