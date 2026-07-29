@@ -20,6 +20,7 @@
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
     "@hapi/boom": "^10.0.1",
+    "@raphaelvserafim/client-api-whatsapp": "^1.7.0",
     "@sentry/node": "^5.29.2",
     "@types/lodash": "^4.17.5",
     "@types/pino": "^6.3.4",

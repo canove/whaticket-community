@@ -59,11 +59,15 @@ const SessionSchema = Yup.object().shape({
 
 const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	const classes = useStyles();
+	const isWame = process.env.REACT_APP_WHATSAPP_PROVIDER === "wame";
+
 	const initialState = {
 		name: "",
 		greetingMessage: "",
 		farewellMessage: "",
 		isDefault: false,
+		server: "",
+		key: "",
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -196,6 +200,31 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										margin="dense"
 									/>
 								</div>
+								{isWame && (
+									<>
+										<div>
+											<Field
+												as={TextField}
+												label="Server (wame)"
+												name="server"
+												fullWidth
+												variant="outlined"
+												margin="dense"
+												helperText="Ex.: https://us.api-wa.me"
+											/>
+										</div>
+										<div>
+											<Field
+												as={TextField}
+												label="Key (instância wame)"
+												name="key"
+												fullWidth
+												variant="outlined"
+												margin="dense"
+											/>
+										</div>
+									</>
+								)}
 								<QueueSelect
 									selectedQueueIds={selectedQueueIds}
 									onChange={selectedIds => setSelectedQueueIds(selectedIds)}

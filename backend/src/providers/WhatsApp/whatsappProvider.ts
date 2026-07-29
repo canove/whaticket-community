@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { WhatsappWebJsProvider } from "./Implementations/wwebjs";
 import { WhaileysProvider } from "./Implementations/whaileys";
+import { WameProvider } from "./Implementations/wame";
 
 export interface WhatsappProvider {
   init(whatsapp: Whatsapp): Promise<void>;
@@ -46,7 +47,8 @@ const provider = process.env.WHATSAPP_PROVIDER || "wwebjs";
 
 const providersMap: Record<string, WhatsappProvider> = {
   wwebjs: WhatsappWebJsProvider,
-  whaileys: WhaileysProvider
+  whaileys: WhaileysProvider,
+  wame: WameProvider
 };
 
 const whatsappProvider = providersMap[provider];
