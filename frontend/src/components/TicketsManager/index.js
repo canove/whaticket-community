@@ -40,16 +40,37 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "auto",
     padding: 8,
   },
+  mainTabs: {
+    minHeight: 44,
+  },
   tab: {
-    minWidth: 120,
-    width: 120,
+    minWidth: 0,
+    minHeight: 44,
+    padding: "4px 8px",
+    textTransform: "none",
+    fontSize: "0.8rem",
+    fontWeight: 600,
+  },
+  tabLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  },
+  subTabs: {
+    minHeight: 40,
+  },
+  subTab: {
+    minHeight: 40,
+    textTransform: "none",
+    fontSize: "0.82rem",
+    fontWeight: 600,
   },
   ticketOptionsBox: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     background: theme.palette.background.paper,
-    padding: theme.spacing(1),
+    padding: theme.spacing(0.75, 1),
   },
   serachInputWrapper: {
     flex: 1,
@@ -156,25 +177,38 @@ const TicketsManager = () => {
           variant="fullWidth"
           indicatorColor="primary"
           textColor="primary"
+          className={classes.mainTabs}
           aria-label="icon label tabs example"
         >
           <Tab
             value={"open"}
-            icon={<MoveToInboxIcon />}
-            label={i18n.t("tickets.tabs.open.title")}
             classes={{ root: classes.tab }}
+            label={
+              <span className={classes.tabLabel}>
+                <MoveToInboxIcon fontSize="small" />
+                {i18n.t("tickets.tabs.open.title")}
+              </span>
+            }
           />
           <Tab
             value={"closed"}
-            icon={<CheckBoxIcon />}
-            label={i18n.t("tickets.tabs.closed.title")}
             classes={{ root: classes.tab }}
+            label={
+              <span className={classes.tabLabel}>
+                <CheckBoxIcon fontSize="small" />
+                {i18n.t("tickets.tabs.closed.title")}
+              </span>
+            }
           />
           <Tab
             value={"search"}
-            icon={<SearchIcon />}
-            label={i18n.t("tickets.tabs.search.title")}
             classes={{ root: classes.tab }}
+            label={
+              <span className={classes.tabLabel}>
+                <SearchIcon fontSize="small" />
+                {i18n.t("tickets.tabs.search.title")}
+              </span>
+            }
           />
         </Tabs>
       </Paper>
@@ -236,8 +270,10 @@ const TicketsManager = () => {
           indicatorColor="primary"
           textColor="primary"
           variant="fullWidth"
+          className={classes.subTabs}
         >
           <Tab
+            classes={{ root: classes.subTab }}
             label={
               <Badge
                 className={classes.badge}
@@ -250,6 +286,7 @@ const TicketsManager = () => {
             value={"open"}
           />
           <Tab
+            classes={{ root: classes.subTab }}
             label={
               <Badge
                 className={classes.badge}
