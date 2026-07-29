@@ -16,7 +16,11 @@ import {
 	TextField,
 	Switch,
 	FormControlLabel,
+	InputAdornment,
+	IconButton,
 } from "@material-ui/core";
+
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
@@ -73,6 +77,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 	};
 	const [whatsApp, setWhatsApp] = useState(initialState);
 	const [selectedQueueIds, setSelectedQueueIds] = useState([]);
+	const [showKey, setShowKey] = useState(false);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -223,6 +228,20 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 												fullWidth
 												variant="outlined"
 												margin="dense"
+												type={showKey ? "text" : "password"}
+												InputProps={{
+													endAdornment: (
+														<InputAdornment position="end">
+															<IconButton
+																aria-label="toggle key visibility"
+																onClick={() => setShowKey(e => !e)}
+																edge="end"
+															>
+																{showKey ? <VisibilityOff /> : <Visibility />}
+															</IconButton>
+														</InputAdornment>
+													)
+												}}
 											/>
 										</div>
 									</>

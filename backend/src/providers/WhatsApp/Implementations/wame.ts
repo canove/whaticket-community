@@ -102,13 +102,17 @@ export const WameProvider: WhatsappProvider = {
       await client.instance.updateWebhook({
         allowWebhook: true,
         allowNumber: "all",
+        // Force the "native" envelope ({ instance, type, data }) — our webhook
+        // handler/mapper is built for it. Without this the instance may keep the
+        // Meta Cloud API format and incoming messages won't be parsed.
+        webhookFormat: "native",
         webhookMessage: base,
         webhookMessageFromMe: base,
         webhookConnection: base,
         webhookQrCode: base,
         webhookGroup: "",
         webhookHistory: ""
-      });
+      } as any);
       await client.instance.connect();
     } catch (err) {
       logger.error(`wame init error: ${err}`);
