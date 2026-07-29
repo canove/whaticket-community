@@ -8,6 +8,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import AddIcon from "@material-ui/icons/Add";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import NewTicketModal from "../NewTicketModal";
@@ -16,7 +17,7 @@ import TabPanel from "../TabPanel";
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import TicketsQueueSelect from "../TicketsQueueSelect";
-import { Button } from "@material-ui/core";
+import { IconButton, Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   ticketsWrapper: {
@@ -117,11 +118,21 @@ const useStyles = makeStyles((theme) => ({
   optionsGroup: {
     display: "flex",
     alignItems: "center",
-    gap: theme.spacing(1),
+    gap: theme.spacing(0.5),
   },
   showAllLabel: {
     marginLeft: 0,
     marginRight: 0,
+    "& .MuiFormControlLabel-label": {
+      fontSize: "0.82rem",
+      color: theme.palette.text.secondary,
+    },
+  },
+  newButton: {
+    padding: 6,
+    color: theme.palette.primary.main,
+    border: `1px solid ${theme.palette.primary.main}`,
+    borderRadius: 8,
   },
   ticketOptionsBox: {
     display: "flex",
@@ -280,13 +291,15 @@ const TicketsManager = () => {
           </>
         ) : (
           <>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => setNewTicketModalOpen(true)}
-            >
-              {i18n.t("ticketsManager.buttons.newTicket")}
-            </Button>
+            <Tooltip title={i18n.t("ticketsManager.buttons.newTicket")}>
+              <IconButton
+                size="small"
+                className={classes.newButton}
+                onClick={() => setNewTicketModalOpen(true)}
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
             <div className={classes.optionsGroup}>
               <FormControlLabel
                 className={classes.showAllLabel}

@@ -35,14 +35,14 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	avatar: {
-		width: 46,
-		height: 46,
+		width: 38,
+		height: 38,
 	},
 
 	content: {
 		flex: 1,
 		minWidth: 0,
-		marginLeft: 12,
+		marginLeft: 10,
 		marginRight: 8,
 	},
 

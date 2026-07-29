@@ -13,18 +13,23 @@ import Hidden from "@material-ui/core/Hidden";
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
     flex: 1,
-    // // backgroundColor: "#eee",
-    // padding: theme.spacing(4),
     height: `calc(100% - 48px)`,
     overflowY: "hidden",
     backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(2),
+    boxSizing: "border-box",
+    [theme.breakpoints.down("sm")]: {
+      padding: 0,
+    },
   },
 
   chatPapper: {
-    // backgroundColor: "red",
     display: "flex",
     height: "100%",
     backgroundColor: theme.palette.background.paper,
+    borderRadius: 12,
+    overflow: "hidden",
+    border: `1px solid ${theme.palette.divider}`,
   },
 
   contactsWrapper: {
