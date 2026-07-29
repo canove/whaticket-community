@@ -70,10 +70,17 @@ export const ThemeProvider = ({ children }) => {
       branding.secondaryColor || DEFAULT_BRANDING.secondaryColor;
     return createMuiTheme({
       scrollbarStyles: {
-        "&::-webkit-scrollbar": { width: "8px", height: "8px" },
+        scrollbarWidth: "thin",
+        scrollbarColor: `${darkMode ? "#3A4A44" : "#C9D2CE"} transparent`,
+        "&::-webkit-scrollbar": { width: "6px", height: "6px" },
+        "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
+        "&::-webkit-scrollbar-button": { display: "none", height: 0, width: 0 },
         "&::-webkit-scrollbar-thumb": {
           borderRadius: "8px",
-          backgroundColor: darkMode ? "#2A3A34" : "#D3DBD7",
+          backgroundColor: darkMode ? "#3A4A44" : "#C9D2CE",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          backgroundColor: darkMode ? "#4A5A54" : "#AEBAB4",
         },
       },
       palette: {

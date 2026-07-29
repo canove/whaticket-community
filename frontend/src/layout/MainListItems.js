@@ -20,7 +20,7 @@ import QuestionAnswerOutlinedIcon from "@material-ui/icons/QuestionAnswerOutline
 import SendOutlinedIcon from "@material-ui/icons/SendOutlined";
 import BarChartOutlinedIcon from "@material-ui/icons/BarChartOutlined";
 import DescriptionOutlinedIcon from "@material-ui/icons/DescriptionOutlined";
-import AndroidOutlinedIcon from "@material-ui/icons/AndroidOutlined";
+import MemoryOutlinedIcon from "@material-ui/icons/MemoryOutlined";
 
 import { i18n } from "../translate/i18n";
 import { WhatsAppsContext } from "../context/WhatsApp/WhatsAppsContext";
@@ -201,7 +201,7 @@ const MainListItems = (props) => {
       <ComingSoonItem primary="Campanhas" collapsed={collapsed} icon={<SendOutlinedIcon />} />
       <ComingSoonItem primary="Relatórios" collapsed={collapsed} icon={<BarChartOutlinedIcon />} />
       <ComingSoonItem primary="Templates" collapsed={collapsed} icon={<DescriptionOutlinedIcon />} />
-      <ComingSoonItem primary="Agentes" collapsed={collapsed} icon={<AndroidOutlinedIcon />} />
+      <ComingSoonItem primary="IA" collapsed={collapsed} icon={<MemoryOutlinedIcon />} />
 
       <Can
         role={user.profile}

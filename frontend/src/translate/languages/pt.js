@@ -391,6 +391,7 @@ const messages = {
         placeholderOpen: "Digite uma mensagem ou tecle ''/'' para utilizar as respostas rápidas cadastrada",
         placeholderClosed:
           "Reabra ou aceite esse ticket para enviar uma mensagem.",
+        placeholderPending: "Aceite o atendimento para responder.",
         signMessage: "Assinar",
       },
       contactDrawer: {

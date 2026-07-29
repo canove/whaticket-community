@@ -386,6 +386,7 @@ const messages = {
       messagesInput: {
         placeholderOpen: "Type a message or press ''/'' to use the registered quick responses",
         placeholderClosed: "Reopen or accept this ticket to send a message.",
+        placeholderPending: "Accept the ticket to reply.",
         signMessage: "Sign",
       },
       contactDrawer: {

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React from "react";
 
 import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
-import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
 import ListItem from "@material-ui/core/ListItem";
@@ -12,11 +11,7 @@ import { Tooltip } from "@material-ui/core";
 
 import { i18n } from "../../translate/i18n";
 
-import api from "../../services/api";
-import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -28,10 +23,6 @@ const useStyles = makeStyles(theme => ({
 		"&:hover": {
 			backgroundColor: theme.palette.action.hover,
 		},
-	},
-
-	pendingTicket: {
-		cursor: "unset",
 	},
 
 	queueStripe: {
@@ -119,41 +110,12 @@ const useStyles = makeStyles(theme => ({
 		flexShrink: 0,
 	},
 
-	acceptButton: {
-		flexShrink: 0,
-	},
 }));
 
 const TicketListItem = ({ ticket }) => {
 	const classes = useStyles();
 	const history = useHistory();
-	const [loading, setLoading] = useState(false);
 	const { ticketId } = useParams();
-	const isMounted = useRef(true);
-	const { user } = useContext(AuthContext);
-
-	useEffect(() => {
-		return () => {
-			isMounted.current = false;
-		};
-	}, []);
-
-	const handleAcepptTicket = async id => {
-		setLoading(true);
-		try {
-			await api.put(`/tickets/${id}`, {
-				status: "open",
-				userId: user?.id,
-			});
-		} catch (err) {
-			setLoading(false);
-			toastError(err);
-		}
-		if (isMounted.current) {
-			setLoading(false);
-		}
-		history.push(`/tickets/${id}`);
-	};
 
 	const handleSelectTicket = id => {
 		history.push(`/tickets/${id}`);
@@ -163,14 +125,9 @@ const TicketListItem = ({ ticket }) => {
 		<ListItem
 			dense
 			button
-			onClick={() => {
-				if (ticket.status === "pending") return;
-				handleSelectTicket(ticket.id);
-			}}
+			onClick={() => handleSelectTicket(ticket.id)}
 			selected={ticketId && +ticketId === ticket.id}
-			className={clsx(classes.ticket, {
-				[classes.pendingTicket]: ticket.status === "pending",
-			})}
+			className={classes.ticket}
 		>
 			<Tooltip arrow placement="right" title={ticket.queue?.name || "Sem fila"}>
 				<span
@@ -217,21 +174,8 @@ const TicketListItem = ({ ticket }) => {
 				</div>
 			</div>
 
-			{ticket.status === "pending" ? (
-				<ButtonWithSpinner
-					color="primary"
-					variant="contained"
-					className={classes.acceptButton}
-					size="small"
-					loading={loading}
-					onClick={() => handleAcepptTicket(ticket.id)}
-				>
-					{i18n.t("ticketsList.buttons.accept")}
-				</ButtonWithSpinner>
-			) : (
-				ticket.unreadMessages > 0 && (
-					<span className={classes.unread}>{ticket.unreadMessages}</span>
-				)
+			{ticket.unreadMessages > 0 && (
+				<span className={classes.unread}>{ticket.unreadMessages}</span>
 			)}
 		</ListItem>
 	);

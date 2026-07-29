@@ -11,13 +11,26 @@ const App = () => {
   const theme = createTheme(
     {
       scrollbarStyles: {
+        scrollbarWidth: "thin",
+        scrollbarColor: "#C9D2CE transparent",
         "&::-webkit-scrollbar": {
-          width: "8px",
-          height: "8px",
+          width: "6px",
+          height: "6px",
+        },
+        "&::-webkit-scrollbar-track": {
+          backgroundColor: "transparent",
+        },
+        "&::-webkit-scrollbar-button": {
+          display: "none",
+          height: 0,
+          width: 0,
         },
         "&::-webkit-scrollbar-thumb": {
-          boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
-          backgroundColor: "#e8e8e8",
+          borderRadius: "8px",
+          backgroundColor: "#C9D2CE",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          backgroundColor: "#AEBAB4",
         },
       },
       palette: {
