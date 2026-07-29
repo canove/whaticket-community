@@ -220,16 +220,18 @@ const LoggedInLayout = ({ children }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
-          <Typography className={classes.brand} noWrap>
-            {appName || "WhaTicket"}
-          </Typography>
+          {drawerOpen && (
+            <Typography className={classes.brand} noWrap>
+              {appName || "WhaTicket"}
+            </Typography>
+          )}
           <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
             <ChevronLeftIcon />
           </IconButton>
         </div>
         <Divider />
         <List>
-          <MainListItems drawerClose={drawerClose} />
+          <MainListItems drawerClose={drawerClose} drawerOpen={drawerOpen} />
         </List>
         <Divider />
       </Drawer>

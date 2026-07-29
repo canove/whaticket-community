@@ -84,7 +84,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ListItemLink({ icon, primary, to }) {
+function ListItemLink({ icon, primary, to, collapsed }) {
   const classes = useStyles();
   const location = useLocation();
   const selected =
@@ -108,19 +108,23 @@ function ListItemLink({ icon, primary, to }) {
         className={clsx(classes.listItem, { [classes.active]: selected })}
       >
         {icon ? <ListItemIcon className={classes.icon}>{icon}</ListItemIcon> : null}
-        <ListItemText className={classes.text} primary={primary} />
+        {!collapsed && (
+          <ListItemText className={classes.text} primary={primary} />
+        )}
       </ListItem>
     </li>
   );
 }
 
-function ComingSoonItem({ icon, primary }) {
+function ComingSoonItem({ icon, primary, collapsed }) {
   const classes = useStyles();
   return (
     <li>
       <ListItem className={clsx(classes.listItem, classes.comingSoon)}>
         {icon ? <ListItemIcon className={classes.icon}>{icon}</ListItemIcon> : null}
-        <ListItemText className={classes.text} primary={primary} />
+        {!collapsed && (
+          <ListItemText className={classes.text} primary={primary} />
+        )}
       </ListItem>
     </li>
   );
@@ -128,7 +132,8 @@ function ComingSoonItem({ icon, primary }) {
 
 const MainListItems = (props) => {
   const classes = useStyles();
-  const { drawerClose } = props;
+  const { drawerClose, drawerOpen } = props;
+  const collapsed = drawerOpen === false;
   const { whatsApps } = useContext(WhatsAppsContext);
   const { user } = useContext(AuthContext);
   const [connectionWarning, setConnectionWarning] = useState(false);
@@ -153,10 +158,16 @@ const MainListItems = (props) => {
 
   return (
     <div onClick={drawerClose}>
-      <ListItemLink to="/" primary="Dashboard" icon={<DashboardOutlinedIcon />} />
+      <ListItemLink
+        to="/"
+        primary="Dashboard"
+        collapsed={collapsed}
+        icon={<DashboardOutlinedIcon />}
+      />
       <ListItemLink
         to="/connections"
         primary={i18n.t("mainDrawer.listItems.connections")}
+        collapsed={collapsed}
         icon={
           <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
             <SyncAltIcon />
@@ -166,26 +177,31 @@ const MainListItems = (props) => {
       <ListItemLink
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
+        collapsed={collapsed}
         icon={<WhatsAppIcon />}
       />
       <ListItemLink
         to="/contacts"
         primary={i18n.t("mainDrawer.listItems.contacts")}
+        collapsed={collapsed}
         icon={<ContactPhoneOutlinedIcon />}
       />
       <ListItemLink
         to="/quickAnswers"
         primary={i18n.t("mainDrawer.listItems.quickAnswers")}
+        collapsed={collapsed}
         icon={<QuestionAnswerOutlinedIcon />}
       />
 
-      <ListSubheader className={classes.subheader} disableSticky>
-        Em breve
-      </ListSubheader>
-      <ComingSoonItem primary="Campanhas" icon={<SendOutlinedIcon />} />
-      <ComingSoonItem primary="Relatórios" icon={<BarChartOutlinedIcon />} />
-      <ComingSoonItem primary="Templates" icon={<DescriptionOutlinedIcon />} />
-      <ComingSoonItem primary="Agentes" icon={<AndroidOutlinedIcon />} />
+      {!collapsed && (
+        <ListSubheader className={classes.subheader} disableSticky>
+          Em breve
+        </ListSubheader>
+      )}
+      <ComingSoonItem primary="Campanhas" collapsed={collapsed} icon={<SendOutlinedIcon />} />
+      <ComingSoonItem primary="Relatórios" collapsed={collapsed} icon={<BarChartOutlinedIcon />} />
+      <ComingSoonItem primary="Templates" collapsed={collapsed} icon={<DescriptionOutlinedIcon />} />
+      <ComingSoonItem primary="Agentes" collapsed={collapsed} icon={<AndroidOutlinedIcon />} />
 
       <Can
         role={user.profile}
@@ -193,22 +209,27 @@ const MainListItems = (props) => {
         yes={() => (
           <>
             <Divider />
-            <ListSubheader className={classes.subheader} disableSticky>
-              {i18n.t("mainDrawer.listItems.administration")}
-            </ListSubheader>
+            {!collapsed && (
+              <ListSubheader className={classes.subheader} disableSticky>
+                {i18n.t("mainDrawer.listItems.administration")}
+              </ListSubheader>
+            )}
             <ListItemLink
               to="/users"
               primary={i18n.t("mainDrawer.listItems.users")}
+              collapsed={collapsed}
               icon={<PeopleAltOutlinedIcon />}
             />
             <ListItemLink
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
+              collapsed={collapsed}
               icon={<AccountTreeOutlinedIcon />}
             />
             <ListItemLink
               to="/settings"
               primary={i18n.t("mainDrawer.listItems.settings")}
+              collapsed={collapsed}
               icon={<SettingsOutlinedIcon />}
             />
           </>
