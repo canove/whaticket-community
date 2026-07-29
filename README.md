@@ -7,6 +7,26 @@
 
 # WhaTicket!
 
+> ## 🆕 Now with the **Official WhatsApp API** via [wame.api.br](https://wame.api.br) — no risk of losing your number
+>
+> This fork adds a **`wame` provider** that connects WhaTicket to the **official
+> WhatsApp API** through [wame.api.br](https://wame.api.br). No `whatsapp-web.js`,
+> no browser automation, **no risk of getting your number banned** — and **no Meta
+> app / Tech Provider onboarding** to deal with.
+>
+> **Just create an instance at [wame.api.br](https://wame.api.br), paste the
+> `Server` + `Key` into a WhatsApp connection, and connect.** See
+> [Official WhatsApp API via wame.api.br](#official-whatsapp-api-via-wameapibr).
+
+### 🚀 One-click deploy on Railway
+
+Deploy the whole stack (backend + frontend + MySQL) with the `wame` provider ready to go — the backend gets a **public HTTPS domain**, so the webhook works with no tunnel.
+
+<!-- After publishing your template on Railway, replace XXXXXX with its code: -->
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/XXXXXX)
+
+See **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)** for the full setup and how to publish your own shareable template.
+
 **NOTE**: The new version of whatsapp-web.js required Node 14. Upgrade your installations to keep using it.
 
 A _very simple_ Ticket System based on WhatsApp messages.
@@ -65,16 +85,6 @@ REACT_APP_WHATSAPP_PROVIDER=wame
 ```
 
 > The `wame` provider is **opt-in**. With the default `WHATSAPP_PROVIDER` (`wwebjs`) nothing changes. Because messages are delivered by webhook, the backend must be reachable from the internet at `BACKEND_URL`.
-
-### One-click deploy on Railway
-
-WhaTicket is a monorepo (separate `backend/` and `frontend/` apps + MySQL +
-Redis). Deploying gives the backend a **public HTTPS domain**, so the `wame`
-webhook works with no tunnel. See **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**
-for the full setup and how to publish your own shareable template.
-
-<!-- After publishing your template on Railway, replace XXXXXX with its code: -->
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/XXXXXX)
 
 ## Installation and Usage (Linux Ubuntu - Development)
 
