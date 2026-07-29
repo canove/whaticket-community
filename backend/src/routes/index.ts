@@ -12,6 +12,7 @@ import queueRoutes from "./queueRoutes";
 import quickAnswerRoutes from "./quickAnswerRoutes";
 import apiRoutes from "./apiRoutes";
 import wameWebhookRoutes from "./wameWebhookRoutes";
+import wameRoutes from "./wameRoutes";
 import setupRoutes from "./setupRoutes";
 
 const routes = Router();
@@ -47,6 +48,7 @@ routes.use(queueRoutes);
 routes.use(quickAnswerRoutes);
 routes.use("/api/messages", apiRoutes);
 routes.use(wameWebhookRoutes);
+routes.use(wameRoutes);
 routes.use(setupRoutes);
 
 export default routes;

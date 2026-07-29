@@ -37,6 +37,8 @@ import api from "../../services/api";
 import WhatsAppModal from "../../components/WhatsAppModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import QrcodeModal from "../../components/QrcodeModal";
+import WameOfficialModal from "../../components/WameOfficialModal";
+import WameConnectionInfo from "../../components/WameConnectionInfo";
 import { i18n } from "../../translate/i18n";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 import toastError from "../../errors/toastError";
@@ -98,6 +100,7 @@ const Connections = () => {
 	const { whatsApps, loading } = useContext(WhatsAppsContext);
 	const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
 	const [qrModalOpen, setQrModalOpen] = useState(false);
+	const [wameModalOpen, setWameModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const confirmationModalInitialState = {
@@ -146,6 +149,16 @@ const Connections = () => {
 		setSelectedWhatsApp(null);
 		setQrModalOpen(false);
 	}, [setQrModalOpen, setSelectedWhatsApp]);
+
+	const handleOpenWameModal = whatsApp => {
+		setSelectedWhatsApp(whatsApp);
+		setWameModalOpen(true);
+	};
+
+	const handleCloseWameModal = useCallback(() => {
+		setSelectedWhatsApp(null);
+		setWameModalOpen(false);
+	}, [setWameModalOpen, setSelectedWhatsApp]);
 
 	const handleEditWhatsApp = whatsApp => {
 		setSelectedWhatsApp(whatsApp);
@@ -217,14 +230,25 @@ const Connections = () => {
 						>
 							{i18n.t("connections.buttons.tryAgain")}
 						</Button>{" "}
-						<Button
-							size="small"
-							variant="outlined"
-							color="secondary"
-							onClick={() => handleRequestNewQrCode(whatsApp.id)}
-						>
-							{i18n.t("connections.buttons.newQr")}
-						</Button>
+						{whatsApp.key ? (
+							<Button
+								size="small"
+								variant="outlined"
+								color="primary"
+								onClick={() => handleOpenWameModal(whatsApp)}
+							>
+								Conectar (Meta)
+							</Button>
+						) : (
+							<Button
+								size="small"
+								variant="outlined"
+								color="secondary"
+								onClick={() => handleRequestNewQrCode(whatsApp.id)}
+							>
+								{i18n.t("connections.buttons.newQr")}
+							</Button>
+						)}
 					</>
 				)}
 				{(whatsApp.status === "CONNECTED" ||
@@ -304,6 +328,11 @@ const Connections = () => {
 				onClose={handleCloseQrModal}
 				whatsAppId={!whatsAppModalOpen && selectedWhatsApp?.id}
 			/>
+			<WameOfficialModal
+				open={wameModalOpen}
+				onClose={handleCloseWameModal}
+				whatsAppId={wameModalOpen ? selectedWhatsApp?.id : null}
+			/>
 			<WhatsAppModal
 				open={whatsAppModalOpen}
 				onClose={handleCloseWhatsAppModal}
@@ -353,7 +382,9 @@ const Connections = () => {
 								{whatsApps?.length > 0 &&
 									whatsApps.map(whatsApp => (
 										<TableRow key={whatsApp.id}>
-											<TableCell align="center">{whatsApp.name}</TableCell>
+											<TableCell align="center">
+											<WameConnectionInfo whatsApp={whatsApp} />
+										</TableCell>
 											<TableCell align="center">
 												{renderStatusToolTips(whatsApp)}
 											</TableCell>

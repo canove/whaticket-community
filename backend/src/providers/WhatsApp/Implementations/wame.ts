@@ -82,6 +82,54 @@ export async function wameGetMedia(
   }
 }
 
+export interface WameInstanceInfo {
+  official: boolean;
+  connected: boolean;
+  number: string;
+  name: string;
+  profilePicUrl: string;
+}
+
+// The SDK's typed `Instance` omits fields the API returns at runtime (official
+// flag, meta.phone, connected). Describe just the ones we read — no `any`.
+interface RawWameInstance {
+  official?: boolean;
+  connected?: boolean;
+  phoneConnected?: boolean;
+  user?: { id?: string; name?: string; imageProfile?: string };
+  meta?: {
+    phone?: { displayPhoneNumber?: string };
+    profile?: { profilePictureUrl?: string };
+  };
+}
+
+// On-demand: builds a client from the stored server+key and pulls live instance
+// info (official flag, number, profile picture). Nothing is persisted — the key
+// is the source of truth.
+export async function wameGetInfo(
+  whatsappId: number
+): Promise<WameInstanceInfo | null> {
+  const whatsapp = await Whatsapp.findByPk(whatsappId);
+  if (!whatsapp?.server || !whatsapp?.key) return null;
+
+  const client = new WhatsApp({ server: whatsapp.server, key: whatsapp.key });
+  try {
+    const res = await client.instance.info();
+    const inst = (res?.instance ?? {}) as unknown as RawWameInstance;
+    return {
+      official: Boolean(inst.official),
+      connected: Boolean(inst.connected ?? inst.phoneConnected),
+      number: inst.meta?.phone?.displayPhoneNumber || inst.user?.id || "",
+      name: inst.user?.name || "",
+      profilePicUrl:
+        inst.user?.imageProfile || inst.meta?.profile?.profilePictureUrl || ""
+    };
+  } catch (err) {
+    logger.error(`wame instance.info error: ${err}`);
+    return null;
+  }
+}
+
 const notImplemented = (name: string) => {
   throw new Error(`wame provider: ${name} not implemented yet`);
 };

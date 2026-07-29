@@ -22,8 +22,7 @@
 
 Deploy the whole stack (backend + frontend + MySQL) with the `wame` provider ready to go — the backend gets a **public HTTPS domain**, so the webhook works with no tunnel.
 
-<!-- After publishing your template on Railway, replace XXXXXX with its code: -->
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/XXXXXX)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/wyE_J-?referralCode=U2lC8P&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 See **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)** for the full setup and how to publish your own shareable template.
 
