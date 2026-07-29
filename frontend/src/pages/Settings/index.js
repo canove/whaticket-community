@@ -88,8 +88,8 @@ const Settings = () => {
 	};
 
 	const getSettingValue = key => {
-		const { value } = settings.find(s => s.key === key);
-		return value;
+		const setting = settings.find(s => s.key === key);
+		return setting ? setting.value : "";
 	};
 
 	return (
