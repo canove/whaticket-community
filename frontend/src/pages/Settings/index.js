@@ -118,11 +118,13 @@ const Settings = () => {
 		const socket = openSocket();
 
 		socket.on("settings", data => {
-			if (data.action === "update") {
+			if (data.action === "update" && data.setting) {
 				setSettings(prevState => {
 					const aux = [...prevState];
 					const settingIndex = aux.findIndex(s => s.key === data.setting.key);
-					aux[settingIndex].value = data.setting.value;
+					if (settingIndex !== -1) {
+						aux[settingIndex].value = data.setting.value;
+					}
 					return aux;
 				});
 			}
