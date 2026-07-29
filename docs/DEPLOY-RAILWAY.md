@@ -6,11 +6,11 @@ database. Pointing Railway at the repository root fails in a few seconds
 `package.json` / `Dockerfile`, only the two subfolders, each with its own
 `Dockerfile`).
 
-The fix is to create **one Railway service per app**. To keep it simple, this
-repo ships a **root `Dockerfile`** that builds the backend — so the backend
-service builds straight from the repo root (leave its **Root Directory empty**),
-with no Chrome and no EOL-Debian issues. The frontend service points its **Root
-Directory** at `frontend`. Once done, you can turn the finished project into a
+The fix is to create **one Railway service per app**, each with its **Root
+Directory** set to the right subfolder. The backend ships a `railway.json` that
+points Railway at an **optimized `Dockerfile.railway`** (Node 18, no Chrome, no
+EOL-Debian apt) — so the backend build is small and fast. The frontend uses its
+own `frontend/Dockerfile`. Once done, you can turn the finished project into a
 **public template** with a one-click *Deploy on Railway* button.
 
 ## Service topology
@@ -19,19 +19,20 @@ Directory** at `frontend`. Once done, you can turn the finished project into a
 | --- | --- | --- | --- |
 | **MySQL** | — | Railway plugin | `New → Database → Add MySQL` |
 | **Redis** | — | Railway plugin | `New → Database → Add Redis` (used for sessions/sockets) |
-| **backend** | *(empty / root)* | root `Dockerfile` (slim, Node 18, no Chrome) | REST API + WhatsApp provider + webhook |
+| **backend** | `backend` | `backend/Dockerfile.railway` (via `railway.json`) — Node 18, no Chrome | REST API + WhatsApp provider + webhook |
 | **frontend** | `frontend` | `frontend/Dockerfile` | React/Vite app served by nginx |
 
-> The backend can also be built from `backend/Dockerfile` (Root Directory =
-> `backend`) — that image includes Chrome for the `wwebjs` provider and is what
-> the VPS `docker-compose` uses. For a `wame`-only Railway deploy the slim root
-> `Dockerfile` is lighter and faster.
+> `backend/railway.json` sets `dockerfilePath: Dockerfile.railway`, so with Root
+> Directory `backend` Railway builds the optimized image automatically. The
+> original `backend/Dockerfile` (with Chrome, for the `wwebjs` provider) is left
+> untouched and is still what the VPS `docker-compose` uses.
 
 ## Step by step (first deploy)
 
 1. **Create the project** → `New Project → Deploy from GitHub repo` → pick this fork.
-2. This first service is the **backend** — leave its **Settings → Root Directory
-   empty** so Railway builds the root `Dockerfile` (slim, Node 18, no Chrome).
+2. This first service is the **backend** — set its **Settings → Root Directory**
+   to `backend`. Railway reads `backend/railway.json` and builds the optimized
+   `Dockerfile.railway` (Node 18, no Chrome).
 3. **Add MySQL:** `New → Database → Add MySQL`.
 4. **Add Redis:** `New → Database → Add Redis`.
 5. **Add the frontend service:** `New → GitHub Repo` (same repo) → Settings →
@@ -42,7 +43,7 @@ Directory** at `frontend`. Once done, you can turn the finished project into a
    (and do the same for **frontend**). Put those public URLs into `BACKEND_URL` /
    `FRONTEND_URL` and `REACT_APP_BACKEND_URL`.
 8. Redeploy. The backend waits for MySQL and runs DB migrations automatically on
-   boot (part of the root `Dockerfile` `CMD`).
+   boot (part of the `Dockerfile.railway` `CMD`).
 
 ## Environment variables
 
@@ -145,12 +146,13 @@ promoting the wame.api.br integration.
 
 ## Gotchas
 
-- The "Failed to build an image" (root ambiguity) error is solved by the root
-  `Dockerfile` (backend) + Root Directory `frontend` (frontend).
-- The slim root `Dockerfile` does **not** install Chrome — the `wame` provider
-  never launches a browser. (`backend/Dockerfile` still installs Chrome for
-  `wwebjs`; both were fixed to use `archive.debian.org` since Node 14's Debian
-  "buster" repos are EOL and 404.)
+- The "Failed to build an image" (root ambiguity) error is solved by setting each
+  service's Root Directory (`backend` / `frontend`).
+- `backend/Dockerfile.railway` (used on Railway) does **not** install Chrome and
+  runs on Node 18 — the `wame` provider never launches a browser, and Node 18's
+  npm is far faster than node:14's npm 6. The original `backend/Dockerfile` (with
+  Chrome, for `wwebjs` / the VPS `docker-compose`) was also fixed to use
+  `archive.debian.org` since Node 14's Debian "buster" repos are EOL and 404.
 - The backend waits for MySQL and runs migrations on boot — make sure the `DB_*`
   variables are set or boot will keep retrying.
 - Frontend Vite output dir is `build` (set in `vite.config.js`), which matches
