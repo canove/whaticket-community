@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 
 import {
   Avatar,
@@ -22,6 +22,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
+import api from "../../services/api";
 
 // const Copyright = () => {
 // 	return (
@@ -63,6 +64,22 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const { handleLogin } = useContext(AuthContext);
+  const history = useHistory();
+
+  // First-run: if no admin exists yet, send the user to the install wizard.
+  useEffect(() => {
+    const checkSetup = async () => {
+      try {
+        const { data } = await api.get("/setup/status");
+        if (data.needsSetup) {
+          history.push("/setup");
+        }
+      } catch (err) {
+        // ignore — fall back to the normal login screen
+      }
+    };
+    checkSetup();
+  }, [history]);
 
   const handleChangeInput = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
