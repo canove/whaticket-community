@@ -85,6 +85,7 @@ PROXY_PORT=8080
 PORT=8080
 
 DB_HOST=                  #DB host IP, usually localhost
+DB_PORT= # if you leave configuration default is 3306
 DB_DIALECT=
 DB_USER=
 DB_PASS=

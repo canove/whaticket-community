@@ -5,7 +5,6 @@ dist
 .env
 .env.test
 
-package-lock.json
 yarn.lock
 yarn-error.log
 

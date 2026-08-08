@@ -62,7 +62,6 @@ const Dashboard = () => {
 		});
 		return count;
 	}
-
 	return (
 		<div>
 			<Container maxWidth="lg" className={classes.container}>

@@ -75,7 +75,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const newContact: ContactData = req.body;
   const { whatsappId }: WhatsappData = req.body;
   const { body, quotedMsg }: MessageData = req.body;
-  const medias = req.files as Express.Multer.File[];
+  const medias = req.files as Express.Multer.File[];  
 
   newContact.number = newContact.number.replace("-", "").replace(" ", "");
 

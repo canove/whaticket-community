@@ -248,8 +248,7 @@ const Connections = () => {
 				)}
 			</>
 		);
-	};
-
+	};	
 	const renderStatusToolTips = whatsApp => {
 		return (
 			<div className={classes.customTableCell}>

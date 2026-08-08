@@ -100,7 +100,7 @@ const Ticket = () => {
       };
       fetchTicket();
     }, 500);
-    return () => clearTimeout(delayDebounceFn);
+    return () => clearTimeout(delayDebounceFn);    
   }, [ticketId, history]);
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import Ticket from "../../models/Ticket";
 import { whatsappProvider, ProviderMessage } from "../../providers/WhatsApp";
 
 import formatBody from "../../helpers/Mustache";
+import { logger } from "../../utils/logger";
 
 interface Request {
   media: Express.Multer.File;
@@ -16,7 +17,7 @@ const SendWhatsAppMedia = async ({
   ticket,
   body
 }: Request): Promise<ProviderMessage> => {
-  try {
+  try {    
     if (!ticket.whatsappId) {
       throw new AppError("ERR_TICKET_NO_WHATSAPP");
     }
@@ -54,7 +55,7 @@ const SendWhatsAppMedia = async ({
 
     return sentMessage;
   } catch (err) {
-    console.log(err);
+    logger.error(`Could not send whatsapp media. Err: ${err}`);
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };

@@ -124,7 +124,7 @@ const Contacts = () => {
           toastError(err);
         }
       };
-      fetchContacts();
+      fetchContacts();      
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, pageNumber]);

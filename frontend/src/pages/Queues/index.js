@@ -121,8 +121,7 @@ const Queues = () => {
       if (data.action === "delete") {
         dispatch({ type: "DELETE_QUEUE", payload: data.queueId });
       }
-    });
-
+    });    
     return () => {
       socket.disconnect();
     };

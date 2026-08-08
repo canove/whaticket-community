@@ -66,8 +66,7 @@ const Settings = () => {
 					return aux;
 				});
 			}
-		});
-
+		});		
 		return () => {
 			socket.disconnect();
 		};

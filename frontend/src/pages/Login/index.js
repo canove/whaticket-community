@@ -71,8 +71,7 @@ const Login = () => {
   const handlSubmit = (e) => {
     e.preventDefault();
     handleLogin(user);
-  };
-
+  };  
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />

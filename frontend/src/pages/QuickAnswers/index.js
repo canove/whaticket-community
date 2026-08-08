@@ -135,8 +135,7 @@ const QuickAnswers = () => {
           payload: +data.quickAnswerId,
         });
       }
-    });
-
+    });    
     return () => {
       socket.disconnect();
     };

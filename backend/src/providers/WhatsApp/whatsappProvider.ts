@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { WhatsappWebJsProvider } from "./Implementations/wwebjs";
 import { WhaileysProvider } from "./Implementations/whaileys";
+import { MessageContent } from "whatsapp-web.js";
 
 export interface WhatsappProvider {
   init(whatsapp: Whatsapp): Promise<void>;
@@ -19,6 +20,13 @@ export interface WhatsappProvider {
     body: string,
     options?: SendMessageOptions
   ): Promise<ProviderMessage>;
+  sendReply(
+    sessionId: number,
+    messageId: string,
+    content: MessageContent,
+    chatId: string,  
+    fromMe: boolean
+  ): Promise<ProviderMessage>
   sendMedia(
     sessionId: number,
     to: string,

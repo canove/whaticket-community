@@ -107,6 +107,7 @@ const messages = {
         form: {
           name: "Name",
           default: "Default",
+          farewellMessage: 'Farewell Message'
         },
         buttons: {
           okAdd: "Add",
@@ -188,8 +189,8 @@ const messages = {
         form: {
           name: "Name",
           color: "Color",
-          greetingMessage: "Greeting Message",
-        },
+          greetingMessage: "Greeting Message",          
+        },        
         buttons: {
           okAdd: "Add",
           okEdit: "Save",
