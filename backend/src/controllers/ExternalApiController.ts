@@ -44,6 +44,7 @@ import utc from "dayjs/plugin/utc";
 import Country from "../models/Country";
 import WhatsappCountry from "../models/WhatsappCountry";
 import Queue from "../models/Queue";
+import SendMessageRequest from "../models/SendMessageRequest";
 import { addMessageToQueue } from "../services/WbotServices/SendExternalWhatsAppMessageV2";
 
 dayjs.extend(utc);
@@ -98,16 +99,43 @@ export const sendMessageV2 = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { fromNumber, toNumber, message, mediaUrl } = req.body;
+  const {
+    fromNumber,
+    toNumber,
+    message,
+    mediaUrl,
+    channel,
+    localId,
+    recipientName,
+    notificationType,
+    surveyName,
+    classification,
+    clientName,
+    clientPhone
+  } = req.body;
 
   const sendExternalWhatsAppMessage = await addMessageToQueue({
     fromNumber,
     toNumber,
     message,
-    mediaUrl
+    mediaUrl,
+    channel,
+    localId,
+    recipientName,
+    notificationType,
+    surveyName,
+    classification,
+    clientName,
+    clientPhone
   });
 
-  return res.status(200).json(sendExternalWhatsAppMessage);
+  // El cliente PHP (Utility::peticionPublica) da la peticion por fallida cuando la respuesta
+  // no trae "tipo", aunque el mensaje si se haya encolado. Se responde con el mismo contrato
+  // que el resto de endpoints externos: "1" ok, "3" error.
+  return res.status(200).json({
+    ...sendExternalWhatsAppMessage,
+    tipo: sendExternalWhatsAppMessage.mensajes.length ? "3" : "1"
+  });
 };
 
 export const sendMessageAddon = async (
@@ -1626,6 +1654,91 @@ export const sendMessageToContact = async (
       message: `Error interno del servidor: ${error.message}`
     });
   }
+};
+
+const NOTIFICATION_STATUS_MAP: Record<string, string> = {
+  pending: "pendiente",
+  sent: "enviado",
+  failed: "fallido"
+};
+
+export const getNotificationHistory = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const {
+    localIds,
+    channel = "encuesta",
+    from,
+    to,
+    limit
+  } = req.query as {
+    localIds?: string;
+    channel?: string;
+    from?: string;
+    to?: string;
+    limit?: string;
+  };
+
+  const where: any = {};
+
+  if (channel) {
+    where.channel = channel;
+  }
+
+  const parsedLocalIds = localIds
+    ? localIds
+        .split(",")
+        .map((id) => Number(id.trim()))
+        .filter((id) => !isNaN(id))
+    : [];
+
+  if (parsedLocalIds.length > 0) {
+    where.localId = { [Op.in]: parsedLocalIds };
+  }
+
+  if (from || to) {
+    where.createdAt = {};
+    if (from) {
+      where.createdAt[Op.gte] = dayjs(from).toDate();
+    }
+    if (to) {
+      where.createdAt[Op.lte] = dayjs(to).toDate();
+    }
+  }
+
+  const parsedLimit = limit
+    ? Math.min(Math.max(Number(limit), 1), 500)
+    : 100;
+
+  const requests = await SendMessageRequest.findAll({
+    where,
+    order: [["createdAt", "DESC"]],
+    limit: parsedLimit
+  });
+
+  const data = requests.map((request) => ({
+    id: request.id,
+    notificationType: request.notificationType,
+    recipientName: request.recipientName,
+    recipientPhone: request.toNumber,
+    surveyName: request.surveyName,
+    classification: request.classification,
+    clientName: request.clientName,
+    clientPhone: request.clientPhone,
+    localId: request.localId,
+    channel: request.channel,
+    status: NOTIFICATION_STATUS_MAP[request.status] || request.status,
+    sentAt: request.createdAt,
+    message: request.message,
+    fromNumber: request.fromNumber
+  }));
+
+  return res.status(200).json({
+    mensajes: [],
+    tipo: "1",
+    data
+  });
 };
 
 export const getTicketsByClientelicenciaId = async (

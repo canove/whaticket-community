@@ -25,6 +25,30 @@ class SendMessageRequest extends Model<SendMessageRequest> {
   @Column
   message: string;
 
+  @Column
+  channel: string;
+
+  @Column
+  localId: number;
+
+  @Column
+  recipientName: string;
+
+  @Column
+  notificationType: string;
+
+  @Column
+  surveyName: string;
+
+  @Column
+  classification: string;
+
+  @Column
+  clientName: string;
+
+  @Column
+  clientPhone: string;
+
   @Default("pending")
   @Column
   status: string;

@@ -85,4 +85,9 @@ externalRoutes.get(
   ExternalApiController.getTicketsByClientelicenciaId
 );
 
+externalRoutes.get(
+  "/getNotificationHistory",
+  ExternalApiController.getNotificationHistory
+);
+
 export default externalRoutes;

@@ -10,6 +10,14 @@ interface QueuedMessage {
   sendMessageRequest: SendMessageRequest;
   mediaUrl?: string | null;
   selectionMode: "round-robin";
+  channel?: string | null;
+  localId?: number | null;
+  recipientName?: string | null;
+  notificationType?: string | null;
+  surveyName?: string | null;
+  classification?: string | null;
+  clientName?: string | null;
+  clientPhone?: string | null;
 }
 
 interface QueueConfig {
@@ -384,12 +392,28 @@ export const addMessageToQueue = async ({
   fromNumber,
   toNumber,
   message,
-  mediaUrl = null
+  mediaUrl = null,
+  channel = null,
+  localId = null,
+  recipientName = null,
+  notificationType = null,
+  surveyName = null,
+  classification = null,
+  clientName = null,
+  clientPhone = null
 }: {
   fromNumber?: string;
   toNumber: string;
   message: string;
   mediaUrl?: string | null;
+  channel?: string | null;
+  localId?: number | null;
+  recipientName?: string | null;
+  notificationType?: string | null;
+  surveyName?: string | null;
+  classification?: string | null;
+  clientName?: string | null;
+  clientPhone?: string | null;
 }) => {
   const mensajes: string[] = [];
   let data = null;
@@ -435,6 +459,24 @@ export const addMessageToQueue = async ({
     });
 
     if (!resolvedConnection.selectedFromNumber) {
+      // Se registra el intento aunque no haya conexion para enviarlo: el historial de
+      // notificaciones se alimenta de esta tabla, y sin esta fila un envio que nunca sale
+      // resulta invisible para quien lo configuro.
+      await SendMessageRequest.create({
+        fromNumber: fromNumber || '',
+        toNumber,
+        message,
+        status: 'failed',
+        channel,
+        localId,
+        recipientName,
+        notificationType,
+        surveyName,
+        classification,
+        clientName,
+        clientPhone
+      });
+
       mensajes.push('No hay conexiones elegibles disponibles para este envío');
       return { mensajes, data };
     }
@@ -445,6 +487,14 @@ export const addMessageToQueue = async ({
       fromNumber,
       toNumber,
       message,
+      channel,
+      localId,
+      recipientName,
+      notificationType,
+      surveyName,
+      classification,
+      clientName,
+      clientPhone
     });
 
     queueState.queue.push({
@@ -453,7 +503,15 @@ export const addMessageToQueue = async ({
       message,
       mediaUrl,
       sendMessageRequest,
-      selectionMode: resolvedConnection.selectionMode
+      selectionMode: resolvedConnection.selectionMode,
+      channel,
+      localId,
+      recipientName,
+      notificationType,
+      surveyName,
+      classification,
+      clientName,
+      clientPhone
     });
     console.log(`[wbot-queue] 📨 Mensaje agregado a la cola. Total en cola: ${queueState.queue.length}`);
 
