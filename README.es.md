@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-logo" target="_blank">
+  <a href="https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-logo" target="_blank">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="images/whaticket-logo-white.png">
       <img src="images/whaticket-logo-black.png" width="300" alt="Whaticket">
@@ -7,7 +7,7 @@
   </a>
 </p>
 
-<h1 align="center">Whaticket Community</h1>
+<h1 align="center">Whaticket Open Source</h1>
 
 <p align="center">
   <strong>El sistema de tickets de WhatsApp, de código abierto, que dio origen a Whaticket.</strong><br>
@@ -18,7 +18,7 @@
   <a href="LICENSE"><img alt="Licencia: MIT" src="https://img.shields.io/badge/license-MIT-3956FF.svg"></a>
   <a href="https://github.com/canove/whaticket/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/canove/whaticket?color=3956FF"></a>
   <a href="https://discord.gg/Dp2tTZRYHg"><img alt="Discord" src="https://img.shields.io/discord/784109818247774249?logo=discord&logoColor=white&label=discord&color=3956FF"></a>
-  <a href="https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-badge"><img alt="Whaticket Cloud" src="https://img.shields.io/badge/cloud-whaticket.com-3956FF"></a>
+  <a href="https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-badge"><img alt="Whaticket" src="https://img.shields.io/badge/whaticket.com-3956FF"></a>
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 <p align="center">
   <a href="#qué-es-esto">Qué es esto</a> ·
-  <a href="#community-vs-cloud">Community vs Cloud</a> ·
+  <a href="#open-source-vs-whaticket">Open Source vs Whaticket</a> ·
   <a href="#capturas-de-pantalla">Capturas de pantalla</a> ·
   <a href="#inicio-rápido-con-docker">Inicio rápido</a> ·
   <a href="#configuración">Configuración</a> ·
@@ -41,10 +41,10 @@
 En 2020 este repositorio era un experimento de fin de semana: convertir mensajes de WhatsApp
 en tickets de soporte para que todo un equipo pudiera responder desde un único número. Se
 convirtió en uno de los proyectos de helpdesk para WhatsApp más forkeados de GitHub — y en
-**[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-intro)**, la plataforma comercial que hoy atiende a **más de
+**[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-intro)**, la plataforma comercial que hoy atiende a **más de
 4.500 empresas** en América Latina.
 
-Este repositorio es la **Community Edition**: el código original, con licencia MIT. Es libre
+Este repositorio es **Whaticket Open Source**: el código original, con licencia MIT. Es libre
 para alojar, forkear y construir encima. No es una prueba gratuita, ni una demo recortada, ni
 un anzuelo comercial — es el código del que nació la empresa, mantenido en público.
 
@@ -56,17 +56,17 @@ o [whaileys](https://github.com/canove/whaileys)), guardando todo en MySQL/Maria
 comunica con el backend mediante REST y WebSockets, en español, portugués e inglés.
 
 > [!NOTE]
-> **¿Quieres esto sin administrar servidores?** [Whaticket Cloud](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-cloud-callout) es el
+> **¿Quieres esto sin administrar servidores?** [Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-product-callout) es el
 > producto gestionado creado por el mismo equipo — API oficial de WhatsApp, Instagram,
 > Facebook, TikTok, Telegram y chat web en una sola bandeja de entrada, chatbots con IA,
 > campañas masivas y soporte 24/7.
-> [14 días gratis, sin tarjeta de crédito](https://whaticket.com/precios/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-cloud-trial).
+> [14 días gratis, sin tarjeta de crédito](https://whaticket.com/precios/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-trial).
 
-## Community vs Cloud
+## Open Source vs Whaticket
 
 Ambos están hechos por las mismas personas. Elige según cuánta operación quieras llevar tú.
 
-| | **Community Edition** | **[Whaticket Cloud](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-comparison-table)** |
+| | **Whaticket Open Source** | **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-comparison-table)** |
 |---|:---:|:---:|
 | Licencia / precio | MIT, gratis para siempre | Desde US$ 49/mes |
 | Alojamiento, actualizaciones, respaldos | Por tu cuenta | Gestionado |
@@ -146,7 +146,7 @@ uno nuevo.
 > Los proveedores por código QR que se usan aquí son clientes **no oficiales** de WhatsApp.
 > WhatsApp no permite bots ni clientes no oficiales en su plataforma, así que tu número puede
 > ser bloqueado. Si necesitas una ruta soportada y sin riesgo de bloqueo, usa la API oficial de
-> WhatsApp — [disponible en Whaticket Cloud](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-ban-warning).
+> WhatsApp — [disponible en Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-ban-warning).
 
 ## Inicio rápido con Docker
 
@@ -539,7 +539,7 @@ antes para acordar el enfoque.
 
 - **[whaileys](https://github.com/canove/whaileys)** — la librería WebSocket de WhatsApp que
   usa el proveedor `whaileys`
-- **[Whaticket Cloud](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=es-related-projects)** — la plataforma comercial gestionada
+- **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-related-projects)** — la plataforma comercial gestionada
 
 ## Licencia
 

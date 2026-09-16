@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-logo" target="_blank">
+  <a href="https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-logo" target="_blank">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="images/whaticket-logo-white.png">
       <img src="images/whaticket-logo-black.png" width="300" alt="Whaticket">
@@ -7,7 +7,7 @@
   </a>
 </p>
 
-<h1 align="center">Whaticket Community</h1>
+<h1 align="center">Whaticket Open Source</h1>
 
 <p align="center">
   <strong>O sistema de atendimento via WhatsApp, open source, que deu origem ao Whaticket.</strong><br>
@@ -18,7 +18,7 @@
   <a href="LICENSE"><img alt="Licença: MIT" src="https://img.shields.io/badge/license-MIT-3956FF.svg"></a>
   <a href="https://github.com/canove/whaticket/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/canove/whaticket?color=3956FF"></a>
   <a href="https://discord.gg/Dp2tTZRYHg"><img alt="Discord" src="https://img.shields.io/discord/784109818247774249?logo=discord&logoColor=white&label=discord&color=3956FF"></a>
-  <a href="https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-badge"><img alt="Whaticket Cloud" src="https://img.shields.io/badge/cloud-whaticket.com-3956FF"></a>
+  <a href="https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-badge"><img alt="Whaticket" src="https://img.shields.io/badge/whaticket.com-3956FF"></a>
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 <p align="center">
   <a href="#o-que-é-isso">O que é isso</a> ·
-  <a href="#community-vs-cloud">Community vs Cloud</a> ·
+  <a href="#open-source-vs-whaticket">Open Source vs Whaticket</a> ·
   <a href="#capturas-de-tela">Capturas de tela</a> ·
   <a href="#início-rápido-com-docker">Início rápido</a> ·
   <a href="#configuração">Configuração</a> ·
@@ -41,10 +41,10 @@
 Em 2020 este repositório era um experimento de fim de semana: transformar mensagens de
 WhatsApp em tickets de atendimento para que um time inteiro pudesse responder a partir de um
 único número. Virou um dos projetos de helpdesk para WhatsApp mais forkados do GitHub — e
-virou o **[Whaticket](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-intro)**, a plataforma comercial que hoje atende
+virou o **[Whaticket](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-intro)**, a plataforma comercial que hoje atende
 **mais de 4.500 empresas** na América Latina.
 
-Este repositório é a **Community Edition**: o código original, sob licença MIT. É livre para
+Este repositório é o **Whaticket Open Source**: o código original, sob licença MIT. É livre para
 hospedar, forkar e construir em cima. Não é um teste gratuito, nem uma demo capada, nem uma
 isca de leads — é o código do qual a empresa nasceu, mantido público.
 
@@ -56,17 +56,17 @@ ou [whaileys](https://github.com/canove/whaileys)), guardando tudo em MySQL/Mari
 o backend via REST e WebSockets, em português, inglês e espanhol.
 
 > [!NOTE]
-> **Quer isso sem administrar servidor?** O [Whaticket Cloud](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-cloud-callout) é o
+> **Quer isso sem administrar servidor?** O [Whaticket](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-product-callout) é o
 > produto gerenciado feito pelo mesmo time — API oficial do WhatsApp, Instagram, Facebook,
 > TikTok, Telegram e web chat em uma única caixa de entrada, chatbots com IA, campanhas e
-> suporte 24/7. [14 dias grátis, sem cartão de crédito](https://whaticket.com/pt/precos/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-cloud-trial).
+> suporte 24/7. [14 dias grátis, sem cartão de crédito](https://whaticket.com/pt/precos/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-trial).
 
-## Community vs Cloud
+## Open Source vs Whaticket
 
 Os dois são feitos pelas mesmas pessoas. Escolha conforme quanta operação você quer no seu
 colo.
 
-| | **Community Edition** | **[Whaticket Cloud](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-comparison-table)** |
+| | **Whaticket Open Source** | **[Whaticket](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-comparison-table)** |
 |---|:---:|:---:|
 | Licença / preço | MIT, grátis para sempre | A partir de US$ 49/mês |
 | Hospedagem, atualizações, backups | Por sua conta | Gerenciado |
@@ -145,7 +145,7 @@ pendente ou aberto, o ticket **fechado** mais recente é reaberto em vez de um n
 > Os providers por QR Code usados aqui são clientes **não oficiais** do WhatsApp. O WhatsApp
 > não permite bots nem clientes não oficiais na plataforma, então seu número pode ser
 > bloqueado. Se você precisa de um caminho suportado e sem risco de bloqueio, use a API
-> oficial do WhatsApp — [disponível no Whaticket Cloud](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-ban-warning).
+> oficial do WhatsApp — [disponível no Whaticket](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-ban-warning).
 
 ## Início rápido com Docker
 
@@ -532,7 +532,7 @@ combinarmos a abordagem.
 
 - **[whaileys](https://github.com/canove/whaileys)** — a biblioteca WebSocket de WhatsApp usada
   pelo provider `whaileys`
-- **[Whaticket Cloud](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-community&utm_content=pt-related-projects)** — a plataforma comercial gerenciada
+- **[Whaticket](https://whaticket.com/pt/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=pt-related-projects)** — a plataforma comercial gerenciada
 
 ## Licença
 
