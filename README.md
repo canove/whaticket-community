@@ -66,7 +66,7 @@ Both are built by the same team. The difference is how much infrastructure you w
 
 | | **Whaticket Open Source** | **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=en-comparison-table)** |
 |---|:---:|:---:|
-| License / price | MIT, free forever | From US$49/month |
+| License / price | MIT, free forever | From US$49/month for 3 users |
 | Hosting, updates, backups | You run it | Managed for you |
 | WhatsApp via QR code | ✅ | ✅ |
 | Official WhatsApp Cloud API | ❌ | ✅ |
@@ -82,6 +82,8 @@ Both are built by the same team. The difference is how much infrastructure you w
 | Integrations (Zapier, Shopify, Slack, Google…) | ❌ | ✅ |
 | Mobile apps (iOS / Android) | ❌ | ✅ |
 | Support | Community, on [Discord](https://discord.gg/Dp2tTZRYHg) and issues | 24/7 over WhatsApp |
+
+The commercial plan starts at 3 users, which comes to about US$16 per user per month.
 
 ## Screenshots
 

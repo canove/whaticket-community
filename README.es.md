@@ -69,7 +69,7 @@ administrar.
 
 | | **Whaticket Open Source** | **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-comparison-table)** |
 |---|:---:|:---:|
-| Licencia / precio | MIT, gratis para siempre | Desde US$ 49/mes |
+| Licencia / precio | MIT, gratis para siempre | Desde US$ 49/mes para 3 usuarios |
 | Alojamiento, actualizaciones, respaldos | Por tu cuenta | Gestionado |
 | WhatsApp por código QR | ✅ | ✅ |
 | API oficial de WhatsApp (Cloud API) | ❌ | ✅ |
@@ -85,6 +85,8 @@ administrar.
 | Integraciones (Zapier, Shopify, Slack, Google…) | ❌ | ✅ |
 | Aplicaciones móviles (iOS / Android) | ❌ | ✅ |
 | Soporte | Comunidad, en [Discord](https://discord.gg/Dp2tTZRYHg) y en los issues | 24/7 por WhatsApp |
+
+El plan comercial empieza en 3 usuarios, lo que sale alrededor de US$ 16 por usuario al mes.
 
 ## Capturas de pantalla
 
