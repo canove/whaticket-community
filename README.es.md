@@ -11,7 +11,7 @@
 
 <p align="center">
   <strong>El sistema de tickets de WhatsApp, de código abierto, que dio origen a Whaticket.</strong><br>
-  Varios agentes, un número de WhatsApp — cada conversación se convierte en un ticket.
+  Varios agentes en un mismo número. Cada conversación se convierte en un ticket.
 </p>
 
 <p align="center">
@@ -40,50 +40,51 @@
 
 En 2020 este repositorio era un experimento de fin de semana: convertir mensajes de WhatsApp
 en tickets de soporte para que todo un equipo pudiera responder desde un único número. Se
-convirtió en uno de los proyectos de helpdesk para WhatsApp más forkeados de GitHub — y en
-**[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-intro)**, la plataforma comercial que hoy atiende a **más de
-4.500 empresas** en América Latina.
+convirtió en uno de los proyectos de helpdesk para WhatsApp más forkeados de GitHub, y dio
+origen a **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-intro)**, la plataforma comercial que hoy
+atiende a **más de 4.500 empresas** en América Latina.
 
-Este repositorio es **Whaticket Open Source**: el código original, con licencia MIT. Es libre
-para alojar, forkear y construir encima. No es una prueba gratuita, ni una demo recortada, ni
-un anzuelo comercial — es el código del que nació la empresa, mantenido en público.
+Este repositorio es **Whaticket Open Source**: el código original, con licencia MIT. Puedes
+alojarlo por tu cuenta, forkearlo y construir encima. El código del que nació la empresa sigue
+siendo público.
 
-**Backend** — Node.js + TypeScript + Express + Sequelize, comunicándose con WhatsApp a través
+**Backend**: Node.js + TypeScript + Express + Sequelize. Se comunica con WhatsApp a través
 de una capa de proveedores intercambiable ([whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
-o [whaileys](https://github.com/canove/whaileys)), guardando todo en MySQL/MariaDB.
+o [whaileys](https://github.com/canove/whaileys)) y guarda todo en MySQL/MariaDB.
 
-**Frontend** — una aplicación de chat en React + Material UI (empaquetada con Vite) que se
-comunica con el backend mediante REST y WebSockets, en español, portugués e inglés.
+**Frontend**: una aplicación de chat en React + Material UI, empaquetada con Vite. Habla con
+el backend mediante REST y WebSockets, en español, portugués e inglés.
 
 > [!NOTE]
-> **¿Quieres esto sin administrar servidores?** [Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-product-callout) es el
-> producto gestionado creado por el mismo equipo — API oficial de WhatsApp, Instagram,
-> Facebook, TikTok, Telegram y chat web en una sola bandeja de entrada, chatbots con IA,
-> campañas masivas y soporte 24/7.
+> **¿Prefieres no administrar servidores?** [Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-product-callout) es la
+> plataforma gestionada creada por el mismo equipo. Trabaja con la API oficial de WhatsApp y
+> reúne Instagram, Facebook, TikTok, Telegram y chat web en una sola bandeja de entrada, con
+> chatbots con IA, campañas masivas y soporte 24/7.
 > [14 días gratis, sin tarjeta de crédito](https://whaticket.com/precios/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-trial).
 
 ## Open Source vs Whaticket
 
-Ambos están hechos por las mismas personas. Elige según cuánta operación quieras llevar tú.
+Ambos están hechos por el mismo equipo. La diferencia está en cuánta infraestructura quieres
+administrar.
 
 | | **Whaticket Open Source** | **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-comparison-table)** |
 |---|:---:|:---:|
 | Licencia / precio | MIT, gratis para siempre | Desde US$ 49/mes |
 | Alojamiento, actualizaciones, respaldos | Por tu cuenta | Gestionado |
 | WhatsApp por código QR | ✅ | ✅ |
-| API oficial de WhatsApp (Cloud API) | — | ✅ |
+| API oficial de WhatsApp (Cloud API) | ❌ | ✅ |
 | Varios agentes en el mismo número | ✅ | ✅ |
 | Múltiples conexiones de WhatsApp | ✅ | ✅ |
 | Colas / departamentos | ✅ | ✅ |
 | Respuestas rápidas | ✅ | ✅ |
 | Multimedia (imagen/audio/video/archivos) | ✅ | ✅ |
-| Instagram, Facebook, TikTok, Telegram, chat web | — | ✅ |
-| Chatbots por reglas y con IA (Wäbot) | — | ✅ |
-| Campañas masivas | — | ✅ |
+| Instagram, Facebook, TikTok, Telegram, chat web | ❌ | ✅ |
+| Chatbots por reglas y con IA (Wäbot) | ❌ | ✅ |
+| Campañas masivas | ❌ | ✅ |
 | Reportes, CSAT y métricas de desempeño | Panel básico | ✅ |
-| Integraciones (Zapier, Shopify, Slack, Google…) | — | ✅ |
-| Aplicaciones móviles (iOS / Android) | — | ✅ |
-| Soporte | Comunidad — [Discord](https://discord.gg/Dp2tTZRYHg) e issues | 24/7 por WhatsApp |
+| Integraciones (Zapier, Shopify, Slack, Google…) | ❌ | ✅ |
+| Aplicaciones móviles (iOS / Android) | ❌ | ✅ |
+| Soporte | Comunidad, en [Discord](https://discord.gg/Dp2tTZRYHg) y en los issues | 24/7 por WhatsApp |
 
 ## Capturas de pantalla
 
@@ -112,16 +113,16 @@ Ambos están hechos por las mismas personas. Elige según cuánta operación qui
 
 ## Funcionalidades
 
-- 💬 **Bandeja de entrada compartida** — varios agentes respondiendo desde el mismo número
-- 📱 **Múltiples conexiones** — conecta más de una cuenta de WhatsApp y recíbelo todo en un solo lugar
-- 🎫 **Ciclo de vida del ticket** — pendiente → abierto → resuelto, con asignación por agente
-- 🏷️ **Colas** — dirige las conversaciones entrantes al departamento correcto
-- ⚡ **Respuestas rápidas** — mensajes predefinidos para las preguntas de todos los días
-- 🖼️ **Multimedia** — envía y recibe imágenes, audios, videos y documentos
-- 👥 **Contactos** — inicia conversaciones con contactos nuevos sin tocar el teléfono
-- 📊 **Panel** — visión general de tickets y actividad de los agentes
-- 🔌 **Proveedor de WhatsApp intercambiable** — `whatsapp-web.js` (Puppeteer) o `whaileys` (WebSocket)
-- 🌍 **i18n** — español, portugués e inglés incluidos
+- 💬 **Bandeja de entrada compartida**: varios agentes respondiendo desde el mismo número
+- 📱 **Múltiples conexiones**: conecta más de una cuenta de WhatsApp y recíbelo todo en un solo lugar
+- 🎫 **Ciclo de vida del ticket**: pendiente → abierto → resuelto, con asignación por agente
+- 🏷️ **Colas**: dirige las conversaciones entrantes al departamento correcto
+- ⚡ **Respuestas rápidas**: mensajes predefinidos para las preguntas de todos los días
+- 🖼️ **Multimedia**: envía y recibe imágenes, audios, videos y documentos
+- 👥 **Contactos**: inicia conversaciones con contactos nuevos sin tocar el teléfono
+- 📊 **Panel**: visión general de tickets y actividad de los agentes
+- 🔌 **Proveedor de WhatsApp intercambiable**: `whatsapp-web.js` (Puppeteer) o `whaileys` (WebSocket)
+- 🌍 **i18n**: español, portugués e inglés incluidos
 
 ### Cómo funcionan los tickets
 
@@ -139,14 +140,14 @@ uno nuevo.
 - **Node.js 14+** (la CI compila en Node 14)
 - **MySQL 5.7+ o MariaDB 10.6+**
 - **Docker** (opcional, pero es la forma más rápida de levantar la base de datos)
-- **Redis** (opcional — se usa para persistir las claves de sesión de WhatsApp)
+- **Redis** (opcional, se usa para persistir las claves de sesión de WhatsApp)
 - Un servidor Linux si vas a producción. Estas instrucciones asumen Ubuntu 20.04+.
 
 > [!WARNING]
 > Los proveedores por código QR que se usan aquí son clientes **no oficiales** de WhatsApp.
-> WhatsApp no permite bots ni clientes no oficiales en su plataforma, así que tu número puede
-> ser bloqueado. Si necesitas una ruta soportada y sin riesgo de bloqueo, usa la API oficial de
-> WhatsApp — [disponible en Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-ban-warning).
+> WhatsApp no permite bots ni clientes no oficiales en su plataforma, y los números conectados
+> así pueden ser bloqueados. La alternativa soportada es la API oficial de WhatsApp, que
+> [Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-ban-warning) ofrece.
 
 ## Inicio rápido con Docker
 
@@ -156,7 +157,7 @@ cd whaticket
 cp .env.example .env
 ```
 
-Edita el `.env` — como mínimo define `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` y `JWT_REFRESH_SECRET`:
+Edita el `.env`. Como mínimo, define `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` y `JWT_REFRESH_SECRET`:
 
 ```bash
 # MYSQL
@@ -198,7 +199,7 @@ Abre el frontend, inicia sesión con la cuenta creada por el seed, ve a **Conexi
 primera conexión de WhatsApp y escanea el código QR. A partir de ahí, cada mensaje que reciba
 ese número aparece en la lista de tickets.
 
-**Credenciales por defecto:** `admin@whaticket.com` / `admin` — cámbialas de inmediato.
+**Credenciales por defecto:** `admin@whaticket.com` / `admin`. Cámbialas de inmediato.
 
 <details>
 <summary><b>Servicios Docker opcionales</b></summary>
@@ -279,7 +280,7 @@ sudo apt-get install -y libxshmfence-dev libgbm-dev wget unzip fontconfig locale
 
 ```bash
 cd backend
-cp .env.example .env   # luego complétalo — ver Configuración más abajo
+cp .env.example .env   # luego complétalo, ver Configuración más abajo
 npm install
 npm run build
 npx sequelize db:migrate
@@ -287,7 +288,7 @@ npx sequelize db:seed:all
 npm run dev            # o: npm start
 ```
 
-**4. Frontend** — en una segunda terminal:
+**4. Frontend**, en una segunda terminal:
 
 ```bash
 cd frontend
@@ -312,7 +313,7 @@ escanea el código QR.
 <details>
 <summary><b>Ubuntu 20.04 + pm2 + nginx + Let's Encrypt</b></summary>
 
-Estos pasos asumen que **no** estás como root — Puppeteer se niega a arrancar como root.
+Estos pasos asumen que **no** estás como root, porque Puppeteer se niega a arrancar como root.
 Apunta dos subdominios a tu servidor antes de empezar; esta guía usa `app.midominio.com` para
 el frontend y `api.midominio.com` para el backend.
 
@@ -427,7 +428,7 @@ client_max_body_size 20M;
 sudo nginx -t && sudo service nginx restart
 ```
 
-**HTTPS** — obligatorio para notificaciones y envío de audio:
+**HTTPS**, obligatorio para notificaciones y envío de audio:
 
 ```bash
 sudo snap install --classic certbot
@@ -443,18 +444,18 @@ sudo certbot --nginx
 | Variable | Descripción | Por defecto |
 |---|---|---|
 | `WHATSAPP_PROVIDER` | Driver de WhatsApp: `wwebjs` o `whaileys` | `wwebjs` |
-| `NODE_ENV` | `DEVELOPMENT` activa logs más detallados | — |
+| `NODE_ENV` | `DEVELOPMENT` activa logs más detallados | |
 | `PORT` | Puerto en el que escucha el backend | `8080` |
 | `PROXY_PORT` | Puerto público detrás del reverse proxy (`443` en producción) | `8080` |
 | `BACKEND_URL` | URL pública del backend | `http://localhost:8080` |
-| `FRONTEND_URL` | URL pública del frontend — **el CORS depende de esto** | `http://localhost:3000` |
+| `FRONTEND_URL` | URL pública del frontend. **El CORS depende de esto** | `http://localhost:3000` |
 | `DB_HOST` / `DB_PORT` | Host y puerto de la base de datos | `localhost` / `3306` |
 | `DB_DIALECT` | `mysql` | `mysql` |
-| `DB_NAME` / `DB_USER` / `DB_PASS` | Credenciales de la base de datos | — |
-| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Secretos de firma de los tokens — **cámbialos** | — |
-| `REDIS_URL` | Cadena de conexión de Redis. Vacío lo desactiva | — |
+| `DB_NAME` / `DB_USER` / `DB_PASS` | Credenciales de la base de datos | |
+| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Secretos de firma de los tokens, **cámbialos** | |
+| `REDIS_URL` | Cadena de conexión de Redis. Vacío lo desactiva | |
 | `REDIS_DB` | Índice de la base Redis para las claves de sesión | `0` |
-| `CHROME_BIN` / `CHROME_WS` / `CHROME_ARGS` | Configuración de Puppeteer/Chrome (solo `wwebjs`) | — |
+| `CHROME_BIN` / `CHROME_WS` / `CHROME_ARGS` | Configuración de Puppeteer/Chrome (solo `wwebjs`) | |
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info`, `debug`, `trace` | `info` |
 | `WHAILEYS_LOG_LEVEL` | Nivel de log del proveedor `whaileys` | `error` |
 
@@ -470,15 +471,15 @@ sudo certbot --nginx
 | | `wwebjs` | `whaileys` |
 |---|---|---|
 | Cómo conecta | Puppeteer controlando WhatsApp Web | Protocolo WebSocket directo |
-| Consumo de memoria | Alto — un Chrome por sesión | Bajo |
+| Consumo de memoria | Alto, un Chrome por sesión | Bajo |
 | Dependencias de sistema | Chrome + varios paquetes `lib*` | Ninguna |
-| Madurez en este repositorio | Por defecto, probado en producción durante años | Más nuevo, en evolución activa |
+| Madurez en este repositorio | Por defecto, en producción durante años | Más nuevo, en desarrollo activo |
 
 Cambia entre ellos con `WHATSAPP_PROVIDER` en `backend/.env`.
 
 ## Actualizar una instalación existente
 
-Compara siempre el `.env.example` con tu `.env` antes de actualizar — las variables nuevas
+Compara siempre el `.env.example` con tu `.env` antes de actualizar. Las variables nuevas
 aparecen ahí primero.
 
 ```bash
@@ -511,8 +512,8 @@ echo "Actualización finalizada. ¡Disfrútalo!"
 Durante los últimos años este repositorio recibió solo parches de seguridad y actualizaciones
 de dependencias, mientras el esfuerzo del equipo se dirigía a la plataforma comercial. Eso
 está cambiando: planeamos retomar el trabajo regular de funcionalidades aquí. Los commits
-recientes son los primeros pasos — la migración del frontend a Vite y una capa intercambiable
-de proveedores de WhatsApp con el nuevo driver
+recientes son los primeros pasos: el frontend migró a Vite, y la integración con WhatsApp pasó
+a una capa intercambiable de proveedores, con el nuevo driver
 [whaileys](https://github.com/canove/whaileys).
 
 Qué significa esto para ti hoy:
@@ -523,23 +524,23 @@ Qué significa esto para ti hoy:
 - Los cambios que rompan compatibilidad se señalarán en las notas de versión.
 
 Si dependes de este proyecto, [cuéntanos en Discord](https://discord.gg/Dp2tTZRYHg) qué es lo
-que más falta hace — eso influye en las prioridades.
+que más falta hace. Eso es lo que define las prioridades.
 
 ## Contribuir
 
 Los pull requests son bienvenidos. Correcciones de bugs, actualizaciones de dependencias,
-documentación y traducciones son todas valiosas — para cualquier cosa grande, abre un issue
+documentación y traducciones son todas bienvenidas. Para cualquier cosa grande, abre un issue
 antes para acordar el enfoque.
 
-- 💬 [Discord](https://discord.gg/Dp2tTZRYHg) — preguntas y discusión
+- 💬 [Discord](https://discord.gg/Dp2tTZRYHg): preguntas y discusión
 - 🗣️ [Foro de la comunidad](https://whaticket.online/)
-- 🐛 [Issues](https://github.com/canove/whaticket/issues) — bugs y sugerencias
+- 🐛 [Issues](https://github.com/canove/whaticket/issues): bugs y sugerencias
 
 ## Proyectos relacionados
 
-- **[whaileys](https://github.com/canove/whaileys)** — la librería WebSocket de WhatsApp que
+- **[whaileys](https://github.com/canove/whaileys)**: la librería WebSocket de WhatsApp que
   usa el proveedor `whaileys`
-- **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-related-projects)** — la plataforma comercial gestionada
+- **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-related-projects)**: la plataforma comercial gestionada
 
 ## Licencia
 
