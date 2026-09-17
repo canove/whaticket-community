@@ -521,11 +521,10 @@ need most. That is what shapes the priorities.
 
 ## Contributing
 
-Pull requests are welcome. Bug fixes, dependency upgrades, documentation and translations are
-all welcome. For anything large, open an issue first so we can agree on the approach.
+Pull requests are welcome: bug fixes, dependency upgrades, documentation and translations.
+For anything large, open an issue first so we can agree on the approach.
 
 - 💬 [Discord](https://discord.gg/Dp2tTZRYHg): questions and discussion
-- 🗣️ [Community forum](https://whaticket.online/)
 - 🐛 [Issues](https://github.com/canove/whaticket/issues): bugs and feature requests
 
 ## Related projects

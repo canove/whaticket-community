@@ -522,12 +522,10 @@ o que mais faz falta. É isso que define as prioridades.
 
 ## Contribuindo
 
-Pull requests são bem-vindos. Correções de bugs, atualização de dependências, documentação e
-traduções são todas bem-vindas. Para qualquer coisa grande, abra uma issue antes para
-combinarmos a abordagem.
+Pull requests são bem-vindos: correções de bugs, atualização de dependências, documentação e
+traduções. Para qualquer coisa grande, abra uma issue antes para combinarmos a abordagem.
 
 - 💬 [Discord](https://discord.gg/Dp2tTZRYHg): dúvidas e discussão
-- 🗣️ [Fórum da comunidade](https://whaticket.online/)
 - 🐛 [Issues](https://github.com/canove/whaticket/issues): bugs e sugestões
 
 ## Projetos relacionados

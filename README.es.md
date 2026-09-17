@@ -530,12 +530,11 @@ que más falta hace. Eso es lo que define las prioridades.
 
 ## Contribuir
 
-Los pull requests son bienvenidos. Correcciones de bugs, actualizaciones de dependencias,
-documentación y traducciones son todas bienvenidas. Para cualquier cosa grande, abre un issue
-antes para acordar el enfoque.
+Los pull requests son bienvenidos: correcciones de bugs, actualizaciones de dependencias,
+documentación y traducciones. Para cualquier cosa grande, abre un issue antes para acordar el
+enfoque.
 
 - 💬 [Discord](https://discord.gg/Dp2tTZRYHg): preguntas y discusión
-- 🗣️ [Foro de la comunidad](https://whaticket.online/)
 - 🐛 [Issues](https://github.com/canove/whaticket/issues): bugs y sugerencias
 
 ## Proyectos relacionados
