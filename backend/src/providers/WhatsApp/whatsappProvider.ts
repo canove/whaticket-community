@@ -7,7 +7,7 @@ import {
   SendMediaOptions
 } from "./types";
 import { WhatsappWebJsProvider } from "./Implementations/wwebjs";
-import { WhaileysProvider } from "./Implementations/whaileys";
+import { ZapoProvider } from "./Implementations/zapo";
 
 export interface WhatsappProvider {
   init(whatsapp: Whatsapp): Promise<void>;
@@ -46,7 +46,7 @@ const provider = process.env.WHATSAPP_PROVIDER || "wwebjs";
 
 const providersMap: Record<string, WhatsappProvider> = {
   wwebjs: WhatsappWebJsProvider,
-  whaileys: WhaileysProvider
+  zapo: ZapoProvider
 };
 
 const whatsappProvider = providersMap[provider];
