@@ -36,6 +36,11 @@ export default defineConfig({
     global: "globalThis",
   },
   optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        ".js": "jsx",
+      },
+    },
     include: [
       "mic-recorder-to-mp3",
       "@material-ui/core",

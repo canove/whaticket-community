@@ -50,7 +50,7 @@ siendo público.
 
 **Backend**: Node.js + TypeScript + Express + Sequelize. Se comunica con WhatsApp a través
 de una capa de proveedores intercambiable ([whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
-o [whaileys](https://github.com/canove/whaileys)) y guarda todo en MySQL/MariaDB.
+o [zapo-js](https://github.com/vinikjkkj/zapo)) y guarda todo en MySQL/MariaDB.
 
 **Frontend**: una aplicación de chat en React + Material UI, empaquetada con Vite. Habla con
 el backend mediante REST y WebSockets, en español, portugués e inglés.
@@ -123,7 +123,7 @@ El plan comercial empieza en 3 usuarios, lo que sale alrededor de US$ 16 por usu
 - 🖼️ **Multimedia**: envía y recibe imágenes, audios, videos y documentos
 - 👥 **Contactos**: inicia conversaciones con contactos nuevos sin tocar el teléfono
 - 📊 **Panel**: visión general de tickets y actividad de los agentes
-- 🔌 **Proveedor de WhatsApp intercambiable**: `whatsapp-web.js` (Puppeteer) o `whaileys` (WebSocket)
+- 🔌 **Proveedor de WhatsApp intercambiable**: `whatsapp-web.js` (Puppeteer) o `zapo` (WebSocket)
 - 🌍 **i18n**: español, portugués e inglés incluidos
 
 ### Cómo funcionan los tickets
@@ -139,10 +139,10 @@ uno nuevo.
 
 ## Requisitos
 
-- **Node.js 14+** (la CI compila en Node 14)
+- **Node.js 14+** para el proveedor `wwebjs`, **Node.js 20.9+** para el proveedor `zapo`
+  (la CI y el Dockerfile del backend todavía compilan en Node 14)
 - **MySQL 5.7+ o MariaDB 10.6+**
 - **Docker** (opcional, pero es la forma más rápida de levantar la base de datos)
-- **Redis** (opcional, se usa para persistir las claves de sesión de WhatsApp)
 - Un servidor Linux si vas a producción. Estas instrucciones asumen Ubuntu 20.04+.
 
 > [!WARNING]
@@ -445,7 +445,7 @@ sudo certbot --nginx
 
 | Variable | Descripción | Por defecto |
 |---|---|---|
-| `WHATSAPP_PROVIDER` | Driver de WhatsApp: `wwebjs` o `whaileys` | `wwebjs` |
+| `WHATSAPP_PROVIDER` | Driver de WhatsApp: `wwebjs` o `zapo` | `wwebjs` |
 | `NODE_ENV` | `DEVELOPMENT` activa logs más detallados | |
 | `PORT` | Puerto en el que escucha el backend | `8080` |
 | `PROXY_PORT` | Puerto público detrás del reverse proxy (`443` en producción) | `8080` |
@@ -455,11 +455,10 @@ sudo certbot --nginx
 | `DB_DIALECT` | `mysql` | `mysql` |
 | `DB_NAME` / `DB_USER` / `DB_PASS` | Credenciales de la base de datos | |
 | `JWT_SECRET` / `JWT_REFRESH_SECRET` | Secretos de firma de los tokens, **cámbialos** | |
-| `REDIS_URL` | Cadena de conexión de Redis. Vacío lo desactiva | |
-| `REDIS_DB` | Índice de la base Redis para las claves de sesión | `0` |
 | `CHROME_BIN` / `CHROME_WS` / `CHROME_ARGS` | Configuración de Puppeteer/Chrome (solo `wwebjs`) | |
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info`, `debug`, `trace` | `info` |
-| `WHAILEYS_LOG_LEVEL` | Nivel de log del proveedor `whaileys` | `error` |
+| `ZAPO_LOG_LEVEL` | Nivel de log del proveedor `zapo` | `error` |
+| `ZAPO_AUTH_PATH` | Archivo SQLite donde el proveedor `zapo` guarda la sesión | `.zapo_auth/state.sqlite` |
 
 ### Frontend (`frontend/.env`)
 
@@ -470,14 +469,19 @@ sudo certbot --nginx
 
 ### Elegir un proveedor de WhatsApp
 
-| | `wwebjs` | `whaileys` |
+| | `wwebjs` | `zapo` |
 |---|---|---|
 | Cómo conecta | Puppeteer controlando WhatsApp Web | Protocolo WebSocket directo |
 | Consumo de memoria | Alto, un Chrome por sesión | Bajo |
-| Dependencias de sistema | Chrome + varios paquetes `lib*` | Ninguna |
+| Dependencias de sistema | Chrome + varios paquetes `lib*` | Node 20.9+ y SQLite (`better-sqlite3`) |
 | Madurez en este repositorio | Por defecto, en producción durante años | Más nuevo, en desarrollo activo |
 
 Cambia entre ellos con `WHATSAPP_PROVIDER` en `backend/.env`.
+
+El proveedor `zapo` envía medios sin ninguna dependencia extra, pero las miniaturas, las
+dimensiones y el waveform de las notas de voz vienen del paquete opcional
+`@zapo-js/media-utils` (que necesita `ffmpeg`/`ffprobe` y `sharp`). Al instalarlo, el
+proveedor lo usa en el siguiente reinicio; sin él los medios se envían igual, solo sin vista previa.
 
 ## Actualizar una instalación existente
 
@@ -516,7 +520,7 @@ de dependencias, mientras el esfuerzo del equipo se dirigía a la plataforma com
 está cambiando: planeamos retomar el trabajo regular de funcionalidades aquí. Los commits
 recientes son los primeros pasos: el frontend migró a Vite, y la integración con WhatsApp pasó
 a una capa intercambiable de proveedores, con el nuevo driver
-[whaileys](https://github.com/canove/whaileys).
+[zapo-js](https://github.com/vinikjkkj/zapo).
 
 Qué significa esto para ti hoy:
 
@@ -539,8 +543,8 @@ enfoque.
 
 ## Proyectos relacionados
 
-- **[whaileys](https://github.com/canove/whaileys)**: la librería WebSocket de WhatsApp que
-  usa el proveedor `whaileys`
+- **[zapo-js](https://github.com/vinikjkkj/zapo)**: la librería WebSocket de WhatsApp que
+  usa el proveedor `zapo`
 - **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=es-related-projects)**: la plataforma comercial gestionada
 
 ## Licencia
