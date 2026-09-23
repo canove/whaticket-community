@@ -6,27 +6,24 @@ import {
   AppBar,
   Toolbar,
   List,
-  Typography,
-  Divider,
-  MenuItem,
   IconButton,
-  Menu,
-  Switch,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import AccountCircle from "@material-ui/icons/AccountCircle";
+import MenuOpenIcon from "@material-ui/icons/MenuOpen";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
 
 import MainListItems from "./MainListItems";
 import NotificationsPopOver from "../components/NotificationsPopOver";
-import UserModal from "../components/UserModal";
+import SidebarUserMenu from "../components/SidebarUserMenu";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
 import { useThemeContext } from "../context/DarkMode";
+import logo from "../assets/whaticket-logo-white.png";
 
-const drawerWidth = 240;
+const drawerWidth = 280;
+const drawerCollapsedWidth = 92;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,41 +34,25 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   toolbar: {
+    minHeight: theme.sizing.appBar,
     paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    padding: "0 8px",
-    minHeight: "48px",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    backgroundColor: theme.palette.background.default,
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+    backgroundColor: theme.palette.appBar.background,
   },
   menuButton: {
     marginRight: 36,
-    color: theme.palette.text.primary,
+    color: theme.palette.common.white,
   },
-  menuButtonHidden: {
-    display: "none",
+  logo: {
+    height: 30,
   },
-  title: {
+  grow: {
     flexGrow: 1,
-    color: theme.palette.text.primary,
+  },
+  headerIcon: {
+    color: theme.palette.common.white,
   },
   drawerPaper: {
     position: "relative",
@@ -81,7 +62,6 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    backgroundColor: theme.palette.background.paper,
   },
   drawerPaperClose: {
     overflowX: "hidden",
@@ -89,49 +69,48 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9),
-    },
+    width: drawerCollapsedWidth,
+  },
+  drawerSurface: {
+    padding: theme.spacing(2, 0, 2, 2),
+    backgroundColor: "transparent",
+  },
+  drawerDocked: {
+    borderRight: 0,
+  },
+  sidebarCard: {
+    flex: 1,
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    padding: theme.spacing(1, 1.75),
+    backgroundColor: theme.palette.cards.background,
+    border: theme.border.divider,
+    borderRadius: theme.borderRadius.medium,
+    overflow: "hidden",
+  },
+  navList: {
+    flex: 1,
+    overflowX: "hidden",
+    overflowY: "auto",
+    ...theme.scrollbarStyles,
+  },
+  sidebarFooter: {
+    borderTop: theme.border.divider,
+    paddingTop: theme.spacing(1),
   },
   appBarSpacer: {
-    minHeight: "48px",
+    minHeight: theme.sizing.appBar,
   },
   content: {
     flex: 1,
     overflow: "auto",
   },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    display: "flex",
-    overflow: "auto",
-    flexDirection: "column",
-  },
-  switch: {
-    transform: "scale(0.8)",
-  },
-  iconButton: {
-    color: theme.palette.text.primary,
-  },
-  themeSwitchContainer: {
-    display: "flex",
-    alignItems: "center",
-  },
-  themeIcon: {
-    color: theme.palette.text.primary,
-  },
 }));
 
 const LoggedInLayout = ({ children }) => {
   const classes = useStyles();
-  const [userModalOpen, setUserModalOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { handleLogout, loading } = useContext(AuthContext);
+  const { loading } = useContext(AuthContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
@@ -151,26 +130,6 @@ const LoggedInLayout = ({ children }) => {
     }
   }, [drawerOpen]);
 
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-    setMenuOpen(true);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-    setMenuOpen(false);
-  };
-
-  const handleOpenUserModal = () => {
-    setUserModalOpen(true);
-    handleCloseMenu();
-  };
-
-  const handleClickLogout = () => {
-    handleCloseMenu();
-    handleLogout();
-  };
-
   const drawerClose = () => {
     if (document.body.offsetWidth < 600) {
       setDrawerOpen(false);
@@ -189,99 +148,45 @@ const LoggedInLayout = ({ children }) => {
         classes={{
           paper: clsx(
             classes.drawerPaper,
-            !drawerOpen && classes.drawerPaperClose
+            !drawerOpen && classes.drawerPaperClose,
+            classes.drawerSurface
           ),
+          paperAnchorDockedLeft: classes.drawerDocked,
         }}
         open={drawerOpen}
       >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
-            <ChevronLeftIcon />
-          </IconButton>
+        <div className={classes.appBarSpacer} />
+        <div className={classes.sidebarCard}>
+          <List className={classes.navList}>
+            <MainListItems drawerClose={drawerClose} collapsed={!drawerOpen} />
+          </List>
+          <div className={classes.sidebarFooter}>
+            <SidebarUserMenu collapsed={!drawerOpen} />
+          </div>
         </div>
-        <Divider />
-        <List>
-          <MainListItems drawerClose={drawerClose} />
-        </List>
-        <Divider />
       </Drawer>
-      <UserModal
-        open={userModalOpen}
-        onClose={() => setUserModalOpen(false)}
-        userId={user?.id}
-      />
-      <AppBar
-        position="absolute"
-        className={clsx(classes.appBar, drawerOpen && classes.appBarShift)}
-      >
+      <AppBar position="absolute" className={classes.appBar}>
         <Toolbar variant="dense" className={classes.toolbar}>
           <IconButton
             edge="start"
             aria-label="open drawer"
             onClick={() => setDrawerOpen(!drawerOpen)}
-            className={clsx(
-              classes.menuButton,
-              drawerOpen && classes.menuButtonHidden
-            )}
+            className={classes.menuButton}
           >
-            <MenuIcon />
+            {drawerOpen ? <MenuOpenIcon /> : <MenuIcon />}
           </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            noWrap
-            className={classes.title}
+          <img src={logo} alt="Whaticket" className={classes.logo} />
+          <div className={classes.grow} />
+
+          <IconButton
+            aria-label={i18n.t("mainDrawer.appBar.darkMode")}
+            onClick={toggleTheme}
+            className={classes.headerIcon}
           >
-            WhaTicket
-          </Typography>
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
 
-          <div className={classes.themeSwitchContainer}>
-            <Brightness4Icon className={classes.themeIcon} />
-            <Switch
-              checked={darkMode}
-              onChange={toggleTheme}
-              color="default"
-              className={classes.switch}
-            />
-          </div>
-
-          {user.id && (
-            <NotificationsPopOver className={classes.iconButton} />
-          )}
-
-          <div>
-            <IconButton
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              className={classes.iconButton}
-            >
-              <AccountCircle />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              getContentAnchorEl={null}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={menuOpen}
-              onClose={handleCloseMenu}
-            >
-              <MenuItem onClick={handleOpenUserModal}>
-                {i18n.t("mainDrawer.appBar.user.profile")}
-              </MenuItem>
-              <MenuItem onClick={handleClickLogout}>
-                {i18n.t("mainDrawer.appBar.user.logout")}
-              </MenuItem>
-            </Menu>
-          </div>
+          {user.id && <NotificationsPopOver />}
         </Toolbar>
       </AppBar>
       <main className={classes.content}>

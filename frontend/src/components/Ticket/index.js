@@ -52,9 +52,6 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    borderLeft: "0",
     marginRight: -drawerWidth,
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
@@ -63,13 +60,11 @@ const useStyles = makeStyles((theme) => ({
   },
 
   mainWrapperShift: {
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginRight: 0,
+    marginRight: theme.spacing(1),
   },
 }));
 

@@ -19,15 +19,13 @@ const useStyles = makeStyles(theme => ({
 		height: "100%",
 		flexDirection: "column",
 		overflow: "hidden",
-		borderTopRightRadius: 0,
-		borderBottomRightRadius: 0,
 	},
 
 	ticketsList: {
 		flex: 1,
 		overflowY: "scroll",
 		...theme.scrollbarStyles,
-		borderTop: "2px solid rgba(0, 0, 0, 0.12)",
+		borderTop: theme.border.divider,
 	},
 
 	ticketsListHeader: {
@@ -49,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
 	noTicketsText: {
 		textAlign: "center",
-		color: "rgb(104, 121, 146)",
+		color: theme.palette.text.secondary,
 		fontSize: "14px",
 		lineHeight: "1.4",
 	},
@@ -269,7 +267,12 @@ const reducer = (state, action) => {
 	};
 
 	return (
-    <Paper className={classes.ticketsListWrapper} style={style}>
+    <Paper
+      elevation={0}
+      square
+      className={classes.ticketsListWrapper}
+      style={style}
+    >
 			<Paper
 				square
 				name="closed"

@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     // padding: theme.spacing(2),
     // height: `calc(100% - 48px)`,
-    padding: 0,
+    padding: theme.spacing(2),
     height: "100%",
   },
 

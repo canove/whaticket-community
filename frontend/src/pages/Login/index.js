@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import {
-  Avatar,
   Button,
   CssBaseline,
   TextField,
@@ -15,13 +14,14 @@ import {
   Link
 } from '@material-ui/core';
 
-import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
+import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { makeStyles } from "@material-ui/core/styles";
 
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
+import logo from "../../assets/whaticket-logo-blue.png";
 
 // const Copyright = () => {
 // 	return (
@@ -43,9 +43,12 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+  logo: {
+    width: "75%",
+    marginBottom: theme.spacing(3),
+    [theme.breakpoints.down("sm")]: {
+      width: "95%",
+    },
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -77,9 +80,7 @@ const Login = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlined />
-        </Avatar>
+        <img src={logo} alt="Whaticket" className={classes.logo} />
         <Typography component="h1" variant="h5">
           {i18n.t("login.title")}
         </Typography>
