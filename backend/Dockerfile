@@ -1,4 +1,4 @@
-FROM node:22-bullseye as build-deps
+FROM node:22-bookworm as build-deps
 
 RUN apt-get update && apt-get install -y wget ffmpeg
 
