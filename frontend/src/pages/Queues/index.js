@@ -7,7 +7,6 @@ import {
   IconButton,
   makeStyles,
   Paper,
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -19,6 +18,7 @@ import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ResponsiveTable from "../../components/ResponsiveTable";
 import Title from "../../components/Title";
 import { i18n } from "../../translate/i18n";
 import toastError from "../../errors/toastError";
@@ -191,7 +191,7 @@ const Queues = () => {
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper className={classes.mainPaper} variant="outlined">
-        <Table size="small">
+        <ResponsiveTable>
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -213,7 +213,10 @@ const Queues = () => {
               {queues.map((queue) => (
                 <TableRow key={queue.id}>
                   <TableCell align="center">{queue.name}</TableCell>
-                  <TableCell align="center">
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("queues.table.color")}
+                  >
                     <div className={classes.customTableCell}>
                       <span
                         style={{
@@ -225,16 +228,21 @@ const Queues = () => {
                       />
                     </div>
                   </TableCell>
-                  <TableCell align="center">
-                    <div className={classes.customTableCell}>
-                      <Typography
-                        style={{ width: 300, align: "center" }}
-                        noWrap
-                        variant="body2"
-                      >
-                        {queue.greetingMessage}
-                      </Typography>
-                    </div>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("queues.table.greeting")}
+                  >
+                    {queue.greetingMessage && (
+                      <div className={classes.customTableCell}>
+                        <Typography
+                          style={{ width: 300, align: "center" }}
+                          noWrap
+                          variant="body2"
+                        >
+                          {queue.greetingMessage}
+                        </Typography>
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell align="center">
                     <IconButton
@@ -259,7 +267,7 @@ const Queues = () => {
               {loading && <TableRowSkeleton columns={4} />}
             </>
           </TableBody>
-        </Table>
+        </ResponsiveTable>
       </Paper>
     </MainContainer>
   );

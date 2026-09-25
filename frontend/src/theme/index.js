@@ -6,6 +6,7 @@ const borderRadius = {
   small: "8px",
   medium: "16px",
   input: "10px",
+  table: "12px",
   pill: "999px",
 };
 

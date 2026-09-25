@@ -10,7 +10,6 @@ import {
 	TableRow,
 	TableCell,
 	IconButton,
-	Table,
 	TableHead,
 	Paper,
 	Tooltip,
@@ -32,6 +31,7 @@ import MainHeader from "../../components/MainHeader";
 import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ResponsiveTable from "../../components/ResponsiveTable";
 
 import api from "../../services/api";
 import WhatsAppModal from "../../components/WhatsAppModal";
@@ -322,7 +322,7 @@ const Connections = () => {
 				</MainHeaderButtonsWrapper>
 			</MainHeader>
 			<Paper className={classes.mainPaper} variant="outlined">
-				<Table size="small">
+				<ResponsiveTable>
 					<TableHead>
 						<TableRow>
 							<TableCell align="center">
@@ -354,16 +354,28 @@ const Connections = () => {
 									whatsApps.map(whatsApp => (
 										<TableRow key={whatsApp.id}>
 											<TableCell align="center">{whatsApp.name}</TableCell>
-											<TableCell align="center">
+											<TableCell
+												align="center"
+												data-label={i18n.t("connections.table.status")}
+											>
 												{renderStatusToolTips(whatsApp)}
 											</TableCell>
-											<TableCell align="center">
+											<TableCell
+												align="center"
+												data-label={i18n.t("connections.table.session")}
+											>
 												{renderActionButtons(whatsApp)}
 											</TableCell>
-											<TableCell align="center">
+											<TableCell
+												align="center"
+												data-label={i18n.t("connections.table.lastUpdate")}
+											>
 												{format(parseISO(whatsApp.updatedAt), "dd/MM/yy HH:mm")}
 											</TableCell>
-											<TableCell align="center">
+											<TableCell
+												align="center"
+												data-label={i18n.t("connections.table.default")}
+											>
 												{whatsApp.isDefault && (
 													<div className={classes.customTableCell}>
 														<CheckCircle style={{ color: green[500] }} />
@@ -392,7 +404,7 @@ const Connections = () => {
 							</>
 						)}
 					</TableBody>
-				</Table>
+				</ResponsiveTable>
 			</Paper>
 		</MainContainer>
 	);

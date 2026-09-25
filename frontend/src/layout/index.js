@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     height: "100vh",
     [theme.breakpoints.down("sm")]: {
-      height: "calc(100vh - 56px)",
+      height: "100dvh",
     },
   },
   toolbar: {
