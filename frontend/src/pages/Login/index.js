@@ -16,12 +16,13 @@ import {
 
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
-import logo from "../../assets/whaticket-logo-blue.png";
+import logoBlack from "../../assets/whaticket-logo-black.png";
+import logoWhite from "../../assets/whaticket-logo-white.png";
 
 // const Copyright = () => {
 // 	return (
@@ -61,6 +62,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Login = () => {
   const classes = useStyles();
+  const theme = useTheme();
 
   const [user, setUser] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -75,6 +77,8 @@ const Login = () => {
     e.preventDefault();
     handleLogin(user);
   };
+
+  const logo = theme.palette.type === "dark" ? logoWhite : logoBlack;
 
   return (
     <Container component="main" maxWidth="xs">

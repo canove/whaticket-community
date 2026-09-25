@@ -21,13 +21,14 @@ import {
 
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import logo from "../../assets/whaticket-logo-blue.png";
+import logoBlack from "../../assets/whaticket-logo-black.png";
+import logoWhite from "../../assets/whaticket-logo-white.png";
 
 // const Copyright = () => {
 // 	return (
@@ -76,6 +77,7 @@ const UserSchema = Yup.object().shape({
 
 const SignUp = () => {
 	const classes = useStyles();
+	const theme = useTheme();
 	const history = useHistory();
 
 	const initialState = { name: "", email: "", password: "" };
@@ -91,6 +93,8 @@ const SignUp = () => {
 			toastError(err);
 		}
 	};
+
+	const logo = theme.palette.type === "dark" ? logoWhite : logoBlack;
 
 	return (
 		<Container component="main" maxWidth="xs">

@@ -115,10 +115,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.action.selected,
   },
   statusChipSelected: {
-    backgroundColor: theme.palette.info.main,
-    color: theme.palette.info.contrastText,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
     "&:hover, &:focus": {
-      backgroundColor: theme.palette.info.main,
+      backgroundColor: theme.palette.primary.main,
     },
   },
   statusChipLabel: {
