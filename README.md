@@ -48,7 +48,7 @@ self-host it, fork it and build on top of it. The code the company started from 
 
 **Backend**: Node.js + TypeScript + Express + Sequelize. It talks to WhatsApp through a
 pluggable provider layer ([whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
-or [whaileys](https://github.com/canove/whaileys)) and stores everything in MySQL/MariaDB.
+or [zapo-js](https://github.com/vinikjkkj/zapo)) and stores everything in MySQL/MariaDB.
 
 **Frontend**: a React + Material UI chat app built with Vite. It communicates with the
 backend over REST and WebSockets, in English, Portuguese and Spanish.
@@ -120,7 +120,7 @@ The commercial plan starts at 3 users, which comes to about US$16 per user per m
 - 🖼️ **Media**: send and receive images, audio, video and documents
 - 👥 **Contacts**: start conversations with new contacts without touching the phone
 - 📊 **Dashboard**: ticket and agent activity at a glance
-- 🔌 **Pluggable WhatsApp provider**: `whatsapp-web.js` (Puppeteer) or `whaileys` (WebSocket)
+- 🔌 **Pluggable WhatsApp provider**: `whatsapp-web.js` (Puppeteer) or `zapo` (WebSocket)
 - 🌍 **i18n**: English, Portuguese and Spanish out of the box
 
 ### How tickets work
@@ -135,10 +135,10 @@ If a contact writes again within 2 hours and has no pending or open ticket, the 
 
 ## Requirements
 
-- **Node.js 14+** (CI builds on Node 14)
+- **Node.js 14+** for the `wwebjs` provider, **Node.js 22+** for the `zapo` provider
+  (the backend CI and Dockerfile build on Node 22)
 - **MySQL 5.7+ or MariaDB 10.6+**
 - **Docker** (optional, but the fastest way to get a database up)
-- **Redis** (optional, used to persist WhatsApp session keys)
 - A Linux server if you are deploying to production. Ubuntu 20.04+ is what these
   instructions assume.
 
@@ -438,7 +438,7 @@ sudo certbot --nginx
 
 | Variable | Description | Default |
 |---|---|---|
-| `WHATSAPP_PROVIDER` | WhatsApp driver: `wwebjs` or `whaileys` | `wwebjs` |
+| `WHATSAPP_PROVIDER` | WhatsApp driver: `wwebjs` or `zapo` | `wwebjs` |
 | `NODE_ENV` | `DEVELOPMENT` gives you verbose debugging | |
 | `PORT` | Port the backend listens on | `8080` |
 | `PROXY_PORT` | Public port behind your reverse proxy (`443` in production) | `8080` |
@@ -448,11 +448,10 @@ sudo certbot --nginx
 | `DB_DIALECT` | `mysql` | `mysql` |
 | `DB_NAME` / `DB_USER` / `DB_PASS` | Database credentials | |
 | `JWT_SECRET` / `JWT_REFRESH_SECRET` | Token signing secrets, **change these** | |
-| `REDIS_URL` | Redis connection string. Leave empty to disable | |
-| `REDIS_DB` | Redis database index for session keys | `0` |
 | `CHROME_BIN` / `CHROME_WS` / `CHROME_ARGS` | Puppeteer/Chrome settings (`wwebjs` only) | |
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info`, `debug`, `trace` | `info` |
-| `WHAILEYS_LOG_LEVEL` | Log level for the `whaileys` provider | `error` |
+| `ZAPO_LOG_LEVEL` | Log level for the `zapo` provider | `error` |
+| `ZAPO_AUTH_PATH` | SQLite file where the `zapo` provider keeps session state | `.zapo_auth/state.sqlite` |
 
 ### Frontend (`frontend/.env`)
 
@@ -463,14 +462,19 @@ sudo certbot --nginx
 
 ### Choosing a WhatsApp provider
 
-| | `wwebjs` | `whaileys` |
+| | `wwebjs` | `zapo` |
 |---|---|---|
 | How it connects | Puppeteer driving WhatsApp Web | Direct WebSocket protocol |
 | Memory footprint | Heavy, one Chrome per session | Light |
-| System dependencies | Chrome + many `lib*` packages | None |
+| System dependencies | Chrome + many `lib*` packages | Node 22+ and SQLite (`better-sqlite3`) |
 | Maturity in this repo | Default, in production for years | Newer, in active development |
 
 Switch between them with `WHATSAPP_PROVIDER` in `backend/.env`.
+
+The `zapo` provider uploads media without any extra dependency, but thumbnails, media
+dimensions and voice-note waveforms come from the optional `@zapo-js/media-utils` package
+(which needs `ffmpeg`/`ffprobe` and `sharp`). Install it and the provider picks it up on the
+next restart; without it media still sends, just without previews.
 
 ## Updating an existing installation
 
@@ -500,6 +504,22 @@ pm2 restart all
 echo "Update finished. Enjoy!"
 ```
 
+### Coming from the `whaileys` provider
+
+The `whaileys` provider was replaced by `zapo`. Connections paired under `whaileys` carry
+over on their own, without scanning a new QR code:
+
+1. Move the server to Node.js 22+ (a `better-sqlite3` requirement).
+2. Optionally, set `WHATSAPP_PROVIDER=zapo` in `backend/.env`. The old `whaileys` value keeps
+   working and points to the same provider.
+3. Run the update script above. When the backend restarts, each connection's session is copied
+   from the database into `.zapo_auth/state.sqlite` and the connection comes back without a new
+   QR code.
+
+The copy reads the `session` column of `Whatsapps` and the `WppKeys` table, so keep `WppKeys`
+until every connection is back online. Redis is no longer read and can be turned off. A
+connection whose session can't be copied shows a new QR code, like a fresh pairing.
+
 ## Project status
 
 **Maintenance mode, with active development returning.**
@@ -508,7 +528,7 @@ For the last few years this repository has received security and dependency patc
 the team's effort went into the commercial platform. That is changing: we are planning a
 return to regular feature work here. Recent commits are the first steps: the frontend moved
 to Vite, and the WhatsApp integration moved to a pluggable provider layer with the new
-[whaileys](https://github.com/canove/whaileys) driver.
+[zapo-js](https://github.com/vinikjkkj/zapo) driver.
 
 What that means for you today:
 
@@ -529,8 +549,8 @@ For anything large, open an issue first so we can agree on the approach.
 
 ## Related projects
 
-- **[whaileys](https://github.com/canove/whaileys)**: the WhatsApp WebSocket library used by
-  the `whaileys` provider
+- **[zapo-js](https://github.com/vinikjkkj/zapo)**: the WhatsApp WebSocket library used by
+  the `zapo` provider
 - **[Whaticket](https://whaticket.com/?utm_source=github&utm_medium=readme&utm_campaign=whaticket-oss&utm_content=en-related-projects)**: the managed commercial platform
 
 ## License
