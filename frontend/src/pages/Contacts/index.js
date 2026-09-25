@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
@@ -23,6 +22,7 @@ import EditIcon from "@material-ui/icons/Edit";
 
 import api from "../../services/api";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ResponsiveTable from "../../components/ResponsiveTable";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
 
@@ -280,7 +280,7 @@ const Contacts = () => {
         variant="outlined"
         onScroll={handleScroll}
       >
-        <Table size="small">
+        <ResponsiveTable>
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox" />
@@ -304,8 +304,18 @@ const Contacts = () => {
                     {<Avatar src={contact.profilePicUrl} />}
                   </TableCell>
                   <TableCell>{contact.name}</TableCell>
-                  <TableCell align="center">{contact.number}</TableCell>
-                  <TableCell align="center">{contact.email}</TableCell>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("contacts.table.whatsapp")}
+                  >
+                    {contact.number}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("contacts.table.email")}
+                  >
+                    {contact.email}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
@@ -340,7 +350,7 @@ const Contacts = () => {
               {loading && <TableRowSkeleton avatar columns={3} />}
             </>
           </TableBody>
-        </Table>
+        </ResponsiveTable>
       </Paper>
     </MainContainer>
   );

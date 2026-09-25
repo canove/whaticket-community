@@ -6,7 +6,6 @@ import {
   IconButton,
   makeStyles,
   Paper,
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -25,6 +24,7 @@ import Title from "../../components/Title";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ResponsiveTable from "../../components/ResponsiveTable";
 import QuickAnswersModal from "../../components/QuickAnswersModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { toast } from "react-toastify";
@@ -236,7 +236,7 @@ const QuickAnswers = () => {
         variant="outlined"
         onScroll={handleScroll}
       >
-        <Table size="small">
+        <ResponsiveTable>
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -255,7 +255,12 @@ const QuickAnswers = () => {
               {quickAnswers.map((quickAnswer) => (
                 <TableRow key={quickAnswer.id}>
                   <TableCell align="center">{quickAnswer.shortcut}</TableCell>
-                  <TableCell align="center">{quickAnswer.message}</TableCell>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("quickAnswers.table.message")}
+                  >
+                    {quickAnswer.message}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
@@ -279,7 +284,7 @@ const QuickAnswers = () => {
               {loading && <TableRowSkeleton columns={3} />}
             </>
           </TableBody>
-        </Table>
+        </ResponsiveTable>
       </Paper>
     </MainContainer>
   );

@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { Formik, Form, Field } from "formik";
 
 import {
-	Avatar,
 	Button,
 	CssBaseline,
 	TextField,
@@ -20,14 +19,16 @@ import {
 	Link
 } from '@material-ui/core';
 
-import { LockOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
+import { Visibility, VisibilityOff } from '@material-ui/icons';
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import logoBlack from "../../assets/whaticket-logo-black.png";
+import logoWhite from "../../assets/whaticket-logo-white.png";
 
 // const Copyright = () => {
 // 	return (
@@ -49,9 +50,12 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: "column",
 		alignItems: "center",
 	},
-	avatar: {
-		margin: theme.spacing(1),
-		backgroundColor: theme.palette.secondary.main,
+	logo: {
+		width: "75%",
+		marginBottom: theme.spacing(3),
+		[theme.breakpoints.down("sm")]: {
+			width: "95%",
+		},
 	},
 	form: {
 		width: "100%",
@@ -73,6 +77,7 @@ const UserSchema = Yup.object().shape({
 
 const SignUp = () => {
 	const classes = useStyles();
+	const theme = useTheme();
 	const history = useHistory();
 
 	const initialState = { name: "", email: "", password: "" };
@@ -89,13 +94,13 @@ const SignUp = () => {
 		}
 	};
 
+	const logo = theme.palette.type === "dark" ? logoWhite : logoBlack;
+
 	return (
 		<Container component="main" maxWidth="xs">
 			<CssBaseline />
 			<div className={classes.paper}>
-				<Avatar className={classes.avatar}>
-					<LockOutlined />
-				</Avatar>
+				<img src={logo} alt="Whaticket" className={classes.logo} />
 				<Typography component="h1" variant="h5">
 					{i18n.t("signup.title")}
 				</Typography>

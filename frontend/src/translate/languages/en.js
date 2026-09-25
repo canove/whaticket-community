@@ -294,6 +294,7 @@ const messages = {
             profile: "Profile",
             logout: "Logout",
           },
+          darkMode: "Dark mode",
         },
       },
       notifications: {

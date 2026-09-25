@@ -298,6 +298,7 @@ const messages = {
             profile: "Perfil",
             logout: "Cerrar Sesión",
           },
+          darkMode: "Modo oscuro",
         },
       },
       notifications: {

@@ -35,6 +35,8 @@ import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessa
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import toastError from "../../errors/toastError";
+import whatsBackground from "../../assets/wa-background.png";
+import whatsBackgroundDark from "../../assets/wa-background-dark.png";
 
 let Mp3Recorder = null;
 
@@ -53,11 +55,14 @@ const initRecorder = async () => {
 
 const useStyles = makeStyles(theme => ({
   mainWrapper: {
-    background: "#eee",
+    backgroundColor: theme.palette.background.chat,
+    backgroundImage: `url(${
+      theme.palette.type === "dark" ? whatsBackgroundDark : whatsBackground
+    })`,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+    padding: theme.spacing(0, 1.5, 1),
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
       bottom: 0,
@@ -66,17 +71,18 @@ const useStyles = makeStyles(theme => ({
   },
 
   newMessageBox: {
-    background: "#eee",
     width: "100%",
     display: "flex",
     padding: "7px",
     alignItems: "center",
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.borderRadius.medium,
+    boxShadow: theme.elevation.light,
   },
 
   messageInputWrapper: {
     padding: 6,
     marginRight: 7,
-    background: "#fff",
     display: "flex",
     borderRadius: 20,
     flex: 1,
@@ -90,7 +96,7 @@ const useStyles = makeStyles(theme => ({
   },
 
   sendMessageIcons: {
-    color: "grey",
+    color: theme.palette.text.secondary,
   },
 
   uploadInput: {
@@ -103,8 +109,8 @@ const useStyles = makeStyles(theme => ({
     position: "relative",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#eee",
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+    backgroundColor: theme.palette.background.paper,
+    borderTop: theme.border.divider,
   },
 
   emojiBox: {
@@ -148,8 +154,13 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 8,
+    paddingBottom: 8,
     paddingLeft: 73,
     paddingRight: 7,
+    marginBottom: theme.spacing(0.5),
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.borderRadius.medium,
+    boxShadow: theme.elevation.light,
   },
 
   replyginMsgContainer: {
@@ -191,9 +202,9 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     position: "absolute",
     bottom: "50px",
-    background: "#ffffff",
+    background: theme.palette.background.paper,
     padding: "2px",
-    border: "1px solid #CCC",
+    border: theme.border.divider,
     left: 0,
     width: "100%",
     "& li": {
@@ -205,7 +216,7 @@ const useStyles = makeStyles(theme => ({
         overflow: "hidden",
         maxHeight: "32px",
         "&:hover": {
-          background: "#F1F1F1",
+          background: theme.palette.action.hover,
           cursor: "pointer",
         },
       },

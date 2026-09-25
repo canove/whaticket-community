@@ -8,10 +8,11 @@ import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   ticketHeader: {
+    position: "relative",
     display: "flex",
-    backgroundColor: "#eee",
+    backgroundColor: theme.palette.action.selected,
     flex: "none",
-    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+    borderBottom: theme.border.divider,
     [theme.breakpoints.down("sm")]: {
       flexWrap: "wrap",
     },
