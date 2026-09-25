@@ -8,8 +8,11 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     // padding: theme.spacing(2),
     // height: `calc(100% - 48px)`,
-    padding: theme.spacing(2),
+    padding: 0,
     height: "100%",
+    [theme.breakpoints.up("sm")]: {
+      padding: theme.spacing(2),
+    },
   },
 
   contentWrapper: {

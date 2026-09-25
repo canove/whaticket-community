@@ -7,6 +7,7 @@ import {
   Toolbar,
   List,
   IconButton,
+  useMediaQuery,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import MenuOpenIcon from "@material-ui/icons/MenuOpen";
@@ -111,27 +112,19 @@ const useStyles = makeStyles((theme) => ({
 const LoggedInLayout = ({ children }) => {
   const classes = useStyles();
   const { loading } = useContext(AuthContext);
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("xs"), {
+    noSsr: true,
+  });
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
   const { darkMode, toggleTheme } = useThemeContext();
 
   useEffect(() => {
-    if (document.body.offsetWidth > 600) {
-      setDrawerOpen(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (document.body.offsetWidth < 600) {
-      setDrawerVariant("temporary");
-    } else {
-      setDrawerVariant("permanent");
-    }
-  }, [drawerOpen]);
+    setDrawerOpen(!isMobile);
+  }, [isMobile]);
 
   const drawerClose = () => {
-    if (document.body.offsetWidth < 600) {
+    if (isMobile) {
       setDrawerOpen(false);
     }
   };
@@ -143,7 +136,7 @@ const LoggedInLayout = ({ children }) => {
   return (
     <div className={classes.root}>
       <Drawer
-        variant={drawerVariant}
+        variant={isMobile ? "temporary" : "permanent"}
         className={drawerOpen ? classes.drawerPaper : classes.drawerPaperClose}
         classes={{
           paper: clsx(
