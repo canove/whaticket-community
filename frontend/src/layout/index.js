@@ -75,6 +75,9 @@ const useStyles = makeStyles((theme) => ({
   drawerSurface: {
     padding: theme.spacing(2, 0, 2, 2),
     backgroundColor: "transparent",
+    [theme.breakpoints.down("xs")]: {
+      pointerEvents: "none",
+    },
   },
   drawerDocked: {
     borderRight: 0,
@@ -89,6 +92,9 @@ const useStyles = makeStyles((theme) => ({
     border: theme.border.divider,
     borderRadius: theme.borderRadius.medium,
     overflow: "hidden",
+    [theme.breakpoints.down("xs")]: {
+      pointerEvents: "auto",
+    },
   },
   navList: {
     flex: 1,
@@ -147,6 +153,7 @@ const LoggedInLayout = ({ children }) => {
           paperAnchorDockedLeft: classes.drawerDocked,
         }}
         open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
       >
         <div className={classes.appBarSpacer} />
         <div className={classes.sidebarCard}>
