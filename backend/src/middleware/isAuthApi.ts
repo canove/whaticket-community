@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import AppError from "../errors/AppError";
-import ListSettingByValueService from "../services/SettingServices/ListSettingByValueService";
+import CheckSettings from "../helpers/CheckSettings";
 
 const isAuthApi = async (
   req: Request,
@@ -17,12 +17,9 @@ const isAuthApi = async (
   const [, token] = authHeader.split(" ");
 
   try {
-    const getToken = await ListSettingByValueService(token);
-    if (!getToken) {
-      throw new AppError("ERR_SESSION_EXPIRED", 401);
-    }
+    const apiToken = await CheckSettings("userApiToken");
 
-    if (getToken.value !== token) {
+    if (token !== apiToken) {
       throw new AppError("ERR_SESSION_EXPIRED", 401);
     }
   } catch (err) {
