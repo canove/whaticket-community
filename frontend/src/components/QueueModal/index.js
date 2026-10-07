@@ -77,7 +77,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 	const greetingRef = useRef();
 
 	useEffect(() => {
-		(async () => {
+		void (async () => {
 			if (!queueId) return;
 			try {
 				const { data } = await api.get(`/queue/${queueId}`);
@@ -131,7 +131,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 					validationSchema={QueueSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							handleSaveQueue(values);
+							void handleSaveQueue(values);
 							actions.setSubmitting(false);
 						}, 400);
 					}}

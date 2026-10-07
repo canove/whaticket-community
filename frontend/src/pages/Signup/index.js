@@ -111,7 +111,7 @@ const SignUp = () => {
 					validationSchema={UserSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							handleSignUp(values);
+							void handleSignUp(values);
 							actions.setSubmitting(false);
 						}, 400);
 					}}

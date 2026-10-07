@@ -21,7 +21,7 @@ const QrcodeModal = ({ open, onClose, whatsAppId }) => {
 				toastError(err);
 			}
 		};
-		fetchSession();
+		void fetchSession();
 	}, [whatsAppId]);
 
 	useEffect(() => {

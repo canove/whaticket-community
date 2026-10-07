@@ -55,7 +55,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 				}
 			};
 
-			fetchContacts();
+			void fetchContacts();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);
@@ -97,7 +97,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	};
 
 	const handleAddNewContactTicket = contact => {
-		handleSaveTicket(contact.id);
+		void handleSaveTicket(contact.id);
 	};
 
 	const createAddContactOption = (filterOptions, params) => {
@@ -163,7 +163,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 								onKeyPress={e => {
 									if (loading || !selectedContact) return;
 									else if (e.key === "Enter") {
-										handleSaveTicket(selectedContact.id);
+										void handleSaveTicket(selectedContact.id);
 									}
 								}}
 								InputProps={{

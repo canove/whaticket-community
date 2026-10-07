@@ -33,7 +33,7 @@ const ModalImageCors = ({ imageUrl }) => {
 			setBlobUrl(url);
 			setFetching(false);
 		};
-		fetchImage();
+		void fetchImage();
 	}, [imageUrl]);
 
 	return (

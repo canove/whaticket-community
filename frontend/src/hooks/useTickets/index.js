@@ -48,7 +48,7 @@ const useTickets = ({
                             if (ticket.status !== "closed") {
                                 let dataUltimaInteracaoChamado = new Date(ticket.updatedAt)
                                 if (dataUltimaInteracaoChamado < dataLimite)
-                                    closeTicket(ticket)
+                                    void closeTicket(ticket)
                             }
                         })
                     }
@@ -63,13 +63,17 @@ const useTickets = ({
             }
 
             const closeTicket = async(ticket) => {
-                await api.put(`/tickets/${ticket.id}`, {
-                    status: "closed",
-                    userId: ticket.userId || null,
-                })
+                try {
+                    await api.put(`/tickets/${ticket.id}`, {
+                        status: "closed",
+                        userId: ticket.userId || null,
+                    })
+                } catch (err) {
+                    toastError(err)
+                }
             }
 
-            fetchTickets()
+            void fetchTickets()
         }, 500)
         return () => clearTimeout(delayDebounceFn)
     }, [

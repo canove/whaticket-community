@@ -107,7 +107,7 @@ const UserModal = ({ open, onClose, userId }) => {
 			}
 		};
 
-		fetchUser();
+		void fetchUser();
 	}, [userId, open]);
 
 	const handleClose = () => {
@@ -150,7 +150,7 @@ const UserModal = ({ open, onClose, userId }) => {
 					validationSchema={UserSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							handleSaveUser(values);
+							void handleSaveUser(values);
 							actions.setSubmitting(false);
 						}, 400);
 					}}
