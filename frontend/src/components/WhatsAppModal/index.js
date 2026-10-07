@@ -82,7 +82,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 				toastError(err);
 			}
 		};
-		fetchSession();
+		void fetchSession();
 	}, [whatsAppId]);
 
 	const handleSaveWhatsApp = async values => {
@@ -126,7 +126,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 					validationSchema={SessionSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							handleSaveWhatsApp(values);
+							void handleSaveWhatsApp(values);
 							actions.setSubmitting(false);
 						}, 400);
 					}}

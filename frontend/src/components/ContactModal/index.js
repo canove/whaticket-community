@@ -99,7 +99,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 			}
 		};
 
-		fetchContact();
+		void fetchContact();
 	}, [contactId, open, initialValues]);
 
 	const handleClose = () => {
@@ -139,7 +139,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 					validationSchema={ContactSchema}
 					onSubmit={(values, actions) => {
 						setTimeout(() => {
-							handleSaveContact(values);
+							void handleSaveContact(values);
 							actions.setSubmitting(false);
 						}, 400);
 					}}

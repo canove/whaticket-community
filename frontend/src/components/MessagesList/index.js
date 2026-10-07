@@ -361,7 +361,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
           toastError(err);
         }
       };
-      fetchMessages();
+      void fetchMessages();
     }, 500);
     return () => {
       clearTimeout(delayDebounceFn);
