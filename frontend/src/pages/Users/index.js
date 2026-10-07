@@ -5,7 +5,6 @@ import openSocket from "../../services/socket-io";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
@@ -26,6 +25,7 @@ import Title from "../../components/Title";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
+import ResponsiveTable from "../../components/ResponsiveTable";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
@@ -233,7 +233,7 @@ const Users = () => {
         variant="outlined"
         onScroll={handleScroll}
       >
-        <Table size="small">
+        <ResponsiveTable>
           <TableHead>
             <TableRow>
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
@@ -256,9 +256,24 @@ const Users = () => {
               {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell align="center">{user.name}</TableCell>
-                  <TableCell align="center">{user.email}</TableCell>
-                  <TableCell align="center">{user.profile}</TableCell>
-                  <TableCell align="center">{user.whatsapp?.name}</TableCell>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("users.table.email")}
+                  >
+                    {user.email}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("users.table.profile")}
+                  >
+                    {user.profile}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    data-label={i18n.t("users.table.whatsapp")}
+                  >
+                    {user.whatsapp?.name}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
@@ -282,7 +297,7 @@ const Users = () => {
               {loading && <TableRowSkeleton columns={4} />}
             </>
           </TableBody>
-        </Table>
+        </ResponsiveTable>
       </Paper>
     </MainContainer>
   );

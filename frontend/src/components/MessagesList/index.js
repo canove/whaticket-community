@@ -27,6 +27,7 @@ import LocationPreview from "../LocationPreview";
 import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
 import whatsBackground from "../../assets/wa-background.png";
+import whatsBackgroundDark from "../../assets/wa-background-dark.png";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -42,11 +43,14 @@ const useStyles = makeStyles((theme) => ({
   },
 
   messagesList: {
-    backgroundImage: `url(${whatsBackground})`,
+    backgroundColor: theme.palette.background.chat,
+    backgroundImage: `url(${
+      theme.palette.type === "dark" ? whatsBackgroundDark : whatsBackground
+    })`,
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
-    padding: "20px 20px 20px 20px",
+    padding: theme.spacing(1),
     overflowY: "scroll",
     [theme.breakpoints.down("sm")]: {
       paddingBottom: "90px",
@@ -67,7 +71,10 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 20,
     marginTop: 2,
     minWidth: 100,
-    maxWidth: 600,
+    maxWidth: 450,
+    [theme.breakpoints.down("xs")]: {
+      maxWidth: 250,
+    },
     height: "auto",
     display: "block",
     position: "relative",
@@ -79,8 +86,8 @@ const useStyles = makeStyles((theme) => ({
     },
 
     whiteSpace: "pre-wrap",
-    backgroundColor: "#ffffff",
-    color: "#303030",
+    backgroundColor: theme.palette.contactMessage.main,
+    color: theme.palette.text.primary,
     alignSelf: "flex-start",
     borderTopLeftRadius: 0,
     borderTopRightRadius: 8,
@@ -90,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: 5,
     paddingTop: 5,
     paddingBottom: 0,
-    boxShadow: "0 1px 1px #b3b3b3",
+    boxShadow: theme.elevation.light,
   },
 
   quotedContainerLeft: {
@@ -121,7 +128,10 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20,
     marginTop: 2,
     minWidth: 100,
-    maxWidth: 600,
+    maxWidth: 450,
+    [theme.breakpoints.down("xs")]: {
+      maxWidth: 250,
+    },
     height: "auto",
     display: "block",
     position: "relative",
@@ -133,18 +143,18 @@ const useStyles = makeStyles((theme) => ({
     },
 
     whiteSpace: "pre-wrap",
-    backgroundColor: "#dcf8c6",
-    color: "#303030",
+    backgroundColor: theme.palette.userMessage.main,
+    color: theme.palette.text.primary,
     alignSelf: "flex-end",
     borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    borderTopRightRadius: 0,
     borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 0,
+    borderBottomRightRadius: 8,
     paddingLeft: 5,
     paddingRight: 5,
     paddingTop: 5,
     paddingBottom: 0,
-    boxShadow: "0 1px 1px #b3b3b3",
+    boxShadow: theme.elevation.light,
   },
 
   quotedContainerRight: {
@@ -212,7 +222,7 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     bottom: 0,
     right: 5,
-    color: "#999",
+    color: theme.palette.text.secondary,
   },
 
   dailyTimestamp: {
@@ -220,14 +230,14 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     alignSelf: "center",
     width: "110px",
-    backgroundColor: "#e1f3fb",
+    backgroundColor: theme.palette.timestamp.background,
     margin: "10px",
     borderRadius: "10px",
-    boxShadow: "0 1px 1px #b3b3b3",
+    boxShadow: theme.elevation.light,
   },
 
   dailyTimestampText: {
-    color: "#808888",
+    color: theme.palette.text.secondary,
     padding: 8,
     alignSelf: "center",
     marginLeft: "0px",

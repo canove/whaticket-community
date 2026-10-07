@@ -4,7 +4,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { parseISO, format, isSameDay } from "date-fns";
 import clsx from "clsx";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { alpha, makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -30,6 +30,13 @@ const useStyles = makeStyles(theme => ({
 
 	pendingTicket: {
 		cursor: "unset",
+		paddingRight: theme.spacing(12),
+	},
+
+	ticketSelected: {
+		"&.Mui-selected, &.Mui-selected:hover": {
+			backgroundColor: alpha(theme.palette.primary.main, 0.08),
+		},
 	},
 
 	noTicketsDiv: {
@@ -72,23 +79,28 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	contactLastMessage: {
-		paddingRight: 20,
+		flex: 1,
+		minWidth: 0,
 	},
 
-	newMessagesCount: {
+	unreadCount: {
 		alignSelf: "center",
-		marginRight: 8,
-		marginLeft: "auto",
-	},
-
-	badgeStyle: {
-		color: "white",
+		minWidth: 20,
+		marginLeft: theme.spacing(1),
+		padding: theme.spacing(0, 0.75),
+		borderRadius: theme.borderRadius.pill,
 		backgroundColor: green[500],
+		color: theme.palette.common.white,
+		textAlign: "center",
+		...theme.typography.caption,
+		fontWeight: 500,
 	},
 
 	acceptButton: {
 		position: "absolute",
-		left: "50%",
+		right: theme.spacing(1.5),
+		top: "50%",
+		transform: "translateY(-50%)",
 	},
 
 	ticketQueueColor: {
@@ -98,21 +110,19 @@ const useStyles = makeStyles(theme => ({
 		position: "absolute",
 		top: "0%",
 		left: "0%",
+		borderRadius: "0 4px 4px 0",
+		backgroundColor: theme.palette.queue.fallback,
 	},
 
 	userTag: {
-		position: "absolute",
-		marginRight: 5,
-		right: 5,
-		bottom: 5,
-		background: "#2576D2",
-		color: "#ffffff",
-		border: "1px solid #CCC",
-		padding: 1,
-		paddingLeft: 5,
-		paddingRight: 5,
-		borderRadius: 10,
-		fontSize: "0.9em"
+		flex: "none",
+		alignSelf: "center",
+		marginLeft: theme.spacing(1),
+		padding: theme.spacing(0, 0.75),
+		borderRadius: theme.borderRadius.pill,
+		backgroundColor: theme.palette.action.selected,
+		color: theme.palette.text.secondary,
+		...theme.typography.caption,
 	},
 }));
 
@@ -161,6 +171,7 @@ const TicketListItem = ({ ticket }) => {
 					handleSelectTicket(ticket.id);
 				}}
 				selected={ticketId && +ticketId === ticket.id}
+				classes={{ selected: classes.ticketSelected }}
 				className={clsx(classes.ticket, {
 					[classes.pendingTicket]: ticket.status === "pending",
 				})}
@@ -171,12 +182,14 @@ const TicketListItem = ({ ticket }) => {
 					title={ticket.queue?.name || "Sem fila"}
 				>
 					<span
-						style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
+						style={{ backgroundColor: ticket.queue?.color }}
 						className={classes.ticketQueueColor}
 					></span>
 				</Tooltip>
 				<ListItemAvatar>
-					<Avatar src={ticket?.contact?.profilePicUrl} />
+					<Avatar src={ticket?.contact?.profilePicUrl}>
+						{ticket.contact.name.charAt(0)}
+					</Avatar>
 				</ListItemAvatar>
 				<ListItemText
 					disableTypography
@@ -211,9 +224,6 @@ const TicketListItem = ({ ticket }) => {
 									)}
 								</Typography>
 							)}
-							{ticket.whatsappId && (
-								<div className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{ticket.whatsapp?.name}</div>
-							)}
 						</span>
 					}
 					secondary={
@@ -232,13 +242,14 @@ const TicketListItem = ({ ticket }) => {
 								)}
 							</Typography>
 
-							<Badge
-								className={classes.newMessagesCount}
-								badgeContent={ticket.unreadMessages}
-								classes={{
-									badge: classes.badgeStyle,
-								}}
-							/>
+							{ticket.whatsappId && (
+								<span className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{ticket.whatsapp?.name}</span>
+							)}
+							{ticket.unreadMessages > 0 && (
+								<span className={classes.unreadCount}>
+									{ticket.unreadMessages > 99 ? "99+" : ticket.unreadMessages}
+								</span>
+							)}
 						</span>
 					}
 				/>

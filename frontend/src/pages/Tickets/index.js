@@ -15,16 +15,18 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     // // backgroundColor: "#eee",
     // padding: theme.spacing(4),
-    height: `calc(100% - 48px)`,
+    height: `calc(100% - ${theme.sizing.appBar}px)`,
     overflowY: "hidden",
     backgroundColor: theme.palette.background.default,
+    [theme.breakpoints.up("sm")]: {
+      padding: theme.spacing(2),
+    },
   },
 
   chatPapper: {
     // backgroundColor: "red",
     display: "flex",
     height: "100%",
-    backgroundColor: theme.palette.background.paper,
   },
 
   contactsWrapper: {
@@ -46,6 +48,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     height: "100%",
     flexDirection: "column",
+    [theme.breakpoints.up("md")]: {
+      paddingLeft: theme.spacing(2),
+    },
   },
   welcomeMsg: {
     backgroundColor: theme.palette.background.paper,
@@ -54,7 +59,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     height: "100%",
     textAlign: "center",
-    borderRadius: 0,
   },
   ticketsManager: {},
   ticketsManagerClosed: {
@@ -91,7 +95,7 @@ const Chat = () => {
               </>
             ) : (
               <Hidden only={["sm", "xs"]}>
-                <Paper className={classes.welcomeMsg}>
+                <Paper variant="outlined" className={classes.welcomeMsg}>
                   {/* <Paper square variant="outlined" className={classes.welcomeMsg}> */}
                   <span>{i18n.t("chat.noTicketMessage")}</span>
                 </Paper>
