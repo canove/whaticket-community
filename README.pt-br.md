@@ -157,7 +157,7 @@ cd whaticket
 cp .env.example .env
 ```
 
-Edite o `.env`. No mínimo, defina `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` e `JWT_REFRESH_SECRET`:
+Edite o `.env`. No mínimo, defina `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` e `JWT_REFRESH_SECRET`. Gere cada segredo JWT separadamente com `openssl rand -hex 32` e cole as duas saídas diferentes, de 64 caracteres hexadecimais, no arquivo. O backend valida os valores antes de carregar a aplicação e não inicia se estiverem ausentes, malformados, com padrões repetidos ou iguais. A validação de formato não prova como o valor foi gerado; use sempre um gerador criptograficamente seguro:
 
 ```bash
 # MYSQL
@@ -173,8 +173,8 @@ BACKEND_PORT=8080
 BACKEND_SERVER_NAME=api.meudominio.com
 BACKEND_URL=https://api.meudominio.com
 PROXY_PORT=443
-JWT_SECRET=troque-isso
-JWT_REFRESH_SECRET=troque-isso-tambem
+JWT_SECRET=
+JWT_REFRESH_SECRET=
 
 # FRONTEND
 FRONTEND_PORT=80
@@ -188,6 +188,14 @@ Suba tudo:
 ```bash
 docker-compose up -d --build
 ```
+
+#### Instalações existentes e rotação dos segredos JWT
+
+Instalações antigas podem depender dos valores padrão ou de segredos curtos. Antes de atualizar, faça backup do arquivo de ambiente, gere dois novos segredos como acima e configure `JWT_SECRET` e `JWT_REFRESH_SECRET` no `.env` do Compose (ou em `backend/.env` se o backend rodar no host). Não reutilize nenhum segredo para outra finalidade. O Compose e o backend falham de forma segura se os valores necessários estiverem ausentes.
+
+Alterar qualquer segredo invalida tokens assinados com o valor anterior. Após a implantação, os usuários precisarão entrar novamente; cookies de refresh existentes não poderão ser renovados. Access tokens já emitidos continuam válidos até expirarem (15 minutos); a rotação de segredos não os revoga imediatamente.
+
+Para uma implantação controlada, programe uma janela de manutenção: pare o backend, atualize os dois segredos, reinicie e valide a saúde do serviço antes de reabrir o tráfego. Nunca imprima valores de ambiente em logs ou relatórios de suporte. Se o backend indicar configuração JWT inválida, confirme localmente que cada variável contém 64 caracteres hexadecimais copiados de invocações separadas de `openssl rand -hex 32`; não cole os valores em chamados.
 
 **Apenas na primeira execução**, popule o banco:
 

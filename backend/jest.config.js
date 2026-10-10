@@ -90,6 +90,8 @@ module.exports = {
   // A preset that is used as a base for Jest's configuration
   preset: "ts-jest",
 
+  setupFiles: ["<rootDir>/src/__tests__/setup.ts"],
+
   // Run tests from one or more projects
   // projects: undefined,
 

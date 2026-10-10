@@ -159,7 +159,7 @@ cd whaticket
 cp .env.example .env
 ```
 
-Edita el `.env`. Como mínimo, define `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` y `JWT_REFRESH_SECRET`:
+Edita el `.env`. Como mínimo, define `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` y `JWT_REFRESH_SECRET`. Genera cada secreto JWT por separado con `openssl rand -hex 32` y pega en el archivo las dos salidas distintas de 64 caracteres hexadecimales. El backend valida los valores antes de cargar la aplicación y no arranca si faltan, tienen un formato incorrecto, patrones repetidos o son iguales. La validación del formato no demuestra cómo se generó el valor: usa siempre un generador criptográficamente seguro:
 
 ```bash
 # MYSQL
@@ -175,8 +175,8 @@ BACKEND_PORT=8080
 BACKEND_SERVER_NAME=api.midominio.com
 BACKEND_URL=https://api.midominio.com
 PROXY_PORT=443
-JWT_SECRET=cambia-esto
-JWT_REFRESH_SECRET=cambia-esto-tambien
+JWT_SECRET=
+JWT_REFRESH_SECRET=
 
 # FRONTEND
 FRONTEND_PORT=80
@@ -190,6 +190,14 @@ Levanta todo:
 ```bash
 docker-compose up -d --build
 ```
+
+#### Instalaciones existentes y rotación de secretos JWT
+
+Las instalaciones antiguas pueden depender de los valores predeterminados o de secretos cortos. Antes de actualizar, haz una copia del archivo de entorno, genera dos secretos nuevos como se indicó y configura `JWT_SECRET` y `JWT_REFRESH_SECRET` en el `.env` de Compose (o en `backend/.env` si ejecutas el backend en el host). No reutilices estos secretos para otros fines. Compose y el backend fallan de forma segura si faltan los valores obligatorios.
+
+Cambiar cualquiera de los secretos invalida los tokens firmados con el valor anterior. Después del despliegue, los usuarios tendrán que iniciar sesión de nuevo; las cookies de refresh existentes ya no se podrán renovar. Los access tokens ya emitidos siguen siendo válidos hasta que expiren (15 minutos); la rotación de secretos no los revoca inmediatamente.
+
+Para un despliegue controlado, programa una ventana de mantenimiento: detén el backend, actualiza ambos secretos, reinícialo y verifica su estado antes de reabrir el tráfico. Nunca imprimas valores de entorno en logs ni informes de soporte. Si el backend informa de una configuración JWT inválida, comprueba localmente que cada variable contiene 64 caracteres hexadecimales copiados de ejecuciones separadas de `openssl rand -hex 32`; no incluyas los valores en tickets.
 
 **Solo en la primera ejecución**, carga los datos iniciales:
 
