@@ -460,6 +460,8 @@ sudo certbot --nginx
 | `ZAPO_LOG_LEVEL` | Nivel de log del proveedor `zapo` | `error` |
 | `ZAPO_AUTH_PATH` | Archivo SQLite donde el proveedor `zapo` guarda la sesión | `.zapo_auth/state.sqlite` |
 
+El cierre de sesión y los cambios de contraseña invalidan los refresh tokens de la cuenta al incrementar `tokenVersion`. Los access tokens ya emitidos siguen siendo válidos hasta 15 minutos.
+
 ### Frontend (`frontend/.env`)
 
 | Variable | Descripción |
