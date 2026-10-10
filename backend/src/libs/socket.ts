@@ -18,7 +18,7 @@ export const initIO = (httpServer: Server): SocketIO => {
     const { token } = socket.handshake.query;
     let tokenData = null;
     try {
-      tokenData = verify(token, authConfig.secret);
+      tokenData = verify(token, authConfig.secret, { algorithms: ["HS256"] });
       logger.debug(JSON.stringify(tokenData), "io-onConnection: tokenData");
     } catch (error) {
       logger.error(JSON.stringify(error), "Error decoding token");

@@ -156,7 +156,7 @@ cd whaticket
 cp .env.example .env
 ```
 
-Edit `.env`. At minimum, set `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` and `JWT_REFRESH_SECRET`:
+Edit `.env`. At minimum, set `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` and `JWT_REFRESH_SECRET`. Generate each JWT secret separately with `openssl rand -hex 32` and paste the two different 64-character outputs into the file. The backend validates both values before loading the application and will not start with missing, malformed, repeated-pattern, or identical secrets. Format checks cannot prove how a value was generated; always use a cryptographically secure random generator rather than a password, hand-written value, or copied example:
 
 ```bash
 # MYSQL
@@ -172,8 +172,8 @@ BACKEND_PORT=8080
 BACKEND_SERVER_NAME=api.mydomain.com
 BACKEND_URL=https://api.mydomain.com
 PROXY_PORT=443
-JWT_SECRET=change-me
-JWT_REFRESH_SECRET=change-me-too
+JWT_SECRET=
+JWT_REFRESH_SECRET=
 
 # FRONTEND
 FRONTEND_PORT=80
@@ -187,6 +187,14 @@ Bring everything up:
 ```bash
 docker-compose up -d --build
 ```
+
+#### Existing installations and JWT secret rotation
+
+Older installations may have relied on built-in JWT defaults or short values. Before upgrading, back up the current environment file, generate two new secrets as above, and set `JWT_SECRET` and `JWT_REFRESH_SECRET` in the Compose `.env` (or in `backend/.env` for a host-based backend). Do not reuse either secret for another purpose. Compose and the backend both fail closed when required values are missing.
+
+Changing either signing secret invalidates tokens signed with the previous value. After deployment, users must log in again; existing refresh cookies cannot be refreshed. Already-issued access tokens remain valid until their 15-minute expiry; rotating signing secrets does not provide immediate access-token revocation.
+
+For a low-downtime deployment, schedule a maintenance window: stop the backend, update both secrets, then start the backend and verify health before reopening traffic. Never print environment values in logs or support output. If startup reports an invalid JWT configuration, verify that each variable contains exactly the 64 hexadecimal characters copied from a separate `openssl rand -hex 32` invocation; do not paste the values into diagnostic reports.
 
 On the **first run only**, seed the database:
 
@@ -447,7 +455,7 @@ sudo certbot --nginx
 | `DB_HOST` / `DB_PORT` | Database host and port | `localhost` / `3306` |
 | `DB_DIALECT` | `mysql` | `mysql` |
 | `DB_NAME` / `DB_USER` / `DB_PASS` | Database credentials | |
-| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Token signing secrets, **change these** | |
+| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Required, different 32-byte random hex keys for access and refresh JWT signing. Generate independently with `openssl rand -hex 32`. | none; backend refuses to start without valid values |
 | `CHROME_BIN` / `CHROME_WS` / `CHROME_ARGS` | Puppeteer/Chrome settings (`wwebjs` only) | |
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info`, `debug`, `trace` | `info` |
 | `ZAPO_LOG_LEVEL` | Log level for the `zapo` provider | `error` |
