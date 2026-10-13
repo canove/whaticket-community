@@ -100,7 +100,7 @@ const QuickAnswersModal = ({
       }
     };
 
-    fetchQuickAnswer();
+    void fetchQuickAnswer();
   }, [quickAnswerId, open, initialValues]);
 
   const handleClose = () => {
@@ -146,7 +146,7 @@ const QuickAnswersModal = ({
           validationSchema={QuickAnswerSchema}
           onSubmit={(values, actions) => {
             setTimeout(() => {
-              handleSaveQuickAnswer(values);
+              void handleSaveQuickAnswer(values);
               actions.setSubmitting(false);
             }, 400);
           }}

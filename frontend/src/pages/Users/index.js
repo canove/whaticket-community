@@ -116,7 +116,7 @@ const Users = () => {
           toastError(err);
         }
       };
-      fetchUsers();
+      void fetchUsers();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, pageNumber]);

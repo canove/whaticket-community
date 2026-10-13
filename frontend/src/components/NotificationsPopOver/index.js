@@ -67,7 +67,7 @@ const NotificationsPopOver = () => {
 		if (!("Notification" in window)) {
 			console.log("This browser doesn't support notifications");
 		} else {
-			Notification.requestPermission();
+			void Notification.requestPermission();
 		}
 	}, [play]);
 

@@ -55,11 +55,15 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId })
 
 	useEffect(() => {
 		const loadQueues = async () => {
-			const list = await findAllQueues();
-			setAllQueues(list);
-			setQueues(list);
+			try {
+				const list = await findAllQueues();
+				setAllQueues(list);
+				setQueues(list);
+			} catch (err) {
+				toastError(err);
+			}
 		}
-		loadQueues();
+		void loadQueues();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -83,7 +87,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId })
 				}
 			};
 
-			fetchUsers();
+			void fetchUsers();
 		}, 500);
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchParam, modalOpen]);

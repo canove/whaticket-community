@@ -24,7 +24,7 @@ const useAuth = () => {
 			return config;
 		},
 		error => {
-			Promise.reject(error);
+			return Promise.reject(error);
 		}
 	);
 
@@ -55,7 +55,7 @@ const useAuth = () => {
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
-		(async () => {
+		void (async () => {
 			if (token) {
 				try {
 					const { data } = await api.post("/auth/refresh_token");

@@ -116,7 +116,7 @@ const QuickAnswers = () => {
           toastError(err);
         }
       };
-      fetchQuickAnswers();
+      void fetchQuickAnswers();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, pageNumber]);

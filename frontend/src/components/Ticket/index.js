@@ -93,7 +93,7 @@ const Ticket = () => {
           toastError(err);
         }
       };
-      fetchTicket();
+      void fetchTicket();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [ticketId, history]);

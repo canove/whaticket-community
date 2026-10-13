@@ -259,7 +259,7 @@ const MessageInput = ({ ticketStatus }) => {
 
   const handleChangeInput = e => {
     setInputMessage(e.target.value);
-    handleLoadQuickAnswer(e.target.value);
+    void handleLoadQuickAnswer(e.target.value);
   };
 
   const handleQuickAnswersClick = value => {
@@ -628,7 +628,7 @@ const MessageInput = ({ ticketStatus }) => {
               onKeyPress={e => {
                 if (loading || e.shiftKey) return;
                 else if (e.key === "Enter") {
-                  handleSendMessage();
+                  void handleSendMessage();
                 }
               }}
             />

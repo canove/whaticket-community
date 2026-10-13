@@ -96,7 +96,7 @@ const Queues = () => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       setLoading(true);
       try {
         const { data } = await api.get("/queue");

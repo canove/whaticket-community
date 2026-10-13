@@ -39,7 +39,7 @@ const VcardPreview = ({ contact, numbers }) => {
                     toastError(err);
                 }
             };
-            fetchContacts();
+            void fetchContacts();
         }, 500);
         return () => clearTimeout(delayDebounceFn);
     }, [contact, numbers]);

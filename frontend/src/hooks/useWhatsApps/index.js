@@ -69,7 +69,7 @@ const useWhatsApps = () => {
 				toastError(err);
 			}
 		};
-		fetchSession();
+		void fetchSession();
 	}, []);
 
 	useEffect(() => {

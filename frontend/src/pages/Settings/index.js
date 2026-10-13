@@ -51,7 +51,7 @@ const Settings = () => {
 				toastError(err);
 			}
 		};
-		fetchSession();
+		void fetchSession();
 	}, []);
 
 	useEffect(() => {
