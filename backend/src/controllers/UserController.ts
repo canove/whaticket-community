@@ -27,14 +27,18 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password, name, profile, queueIds, whatsappId } = req.body;
+  const { email, password, name, queueIds, whatsappId } = req.body;
+  let { profile } = req.body;
 
-  if (
-    req.url === "/signup" &&
-    (await CheckSettingsHelper("userCreation")) === "disabled"
-  ) {
-    throw new AppError("ERR_USER_CREATION_DISABLED", 403);
-  } else if (req.url !== "/signup" && req.user.profile !== "admin") {
+  if (req.url === "/signup") {
+    if ((await CheckSettingsHelper("userCreation")) === "disabled") {
+      throw new AppError("ERR_USER_CREATION_DISABLED", 403);
+    }
+    // Self-registration must never grant elevated privileges. The profile is
+    // forced to a non-admin value regardless of client input. Only an existing
+    // admin may create privileged accounts via the authenticated route below.
+    profile = "user";
+  } else if (req.user.profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
